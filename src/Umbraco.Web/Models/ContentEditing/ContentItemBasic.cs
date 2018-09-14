@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public DateTime CreateDate { get; set; }
 
         [DataMember(Name = "published")]
-        public bool Published { get; set; }
+        public bool Published => State == ContentSavedState.Published || State == ContentSavedState.PublishedPendingChanges;
 
         /// <summary>
         /// Determines if the content item is a draft
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "state")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ContentSavedState? State { get; set; } = null;
+        public ContentSavedState State { get; set; }
 
         protected bool Equals(ContentItemBasic other)
         {

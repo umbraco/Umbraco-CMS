@@ -6,23 +6,28 @@
     public enum ContentSavedState
     {
         /// <summary>
+        /// The state has not been set
+        /// </summary>
+        NotSet = -1,
+
+        /// <summary>
         /// The item isn't created yet
         /// </summary>
-        NotCreated,
+        NotCreated = 1,
 
         /// <summary>
         /// The item is saved but isn't published
         /// </summary>
-        Draft,
+        Draft = 2,
 
         /// <summary>
         /// The item is published and there are no pending changes
         /// </summary>
-        Published,
+        Published = 3,
 
         /// <summary>
         /// The item is published and there are pending changes
         /// </summary>
-        PublishedPendingChanges
+        PublishedPendingChanges = 4
     }
 }

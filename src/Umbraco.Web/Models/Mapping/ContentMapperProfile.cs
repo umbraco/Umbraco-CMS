@@ -32,7 +32,6 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
-            var contentSavedStateResolver = new ContentSavedStateResolver();
             
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
@@ -67,7 +66,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentSavedStateResolver<ContentPropertyDisplay>>())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
@@ -81,110 +80,76 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<CultureUpdateDateResolver>())
-                .ForMember(dest => dest.Published, opt => opt.ResolveUsing<CulturePublishedResolver>())
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing<CultureStateResolver>());
+                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<UpdateDateResolver>())
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentSavedStateResolver<ContentPropertyBasic>>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
         }
-    }
 
-    internal class CultureStateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, ContentSavedState?>
-    {
-        //WB: Note this is same logic as ContentSavedStateResolver.cs
-        //But this is for ContentItemBasic instead of ContentVariantDisplay
-        public ContentSavedState? Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, ContentSavedState? destMember, ResolutionContext context)
+        /// <summary>
+        /// Resolves the update date for a content item/content variant
+        /// </summary>
+        private class UpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
         {
-            PublishedState publishedState;
-            bool isEdited;
-            
-
-            if (source.ContentType.VariesByCulture())
+            public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
             {
-                //Get the culture from the context which will be set during the mapping operation for each variant
                 var culture = context.GetCulture();
 
                 //a culture needs to be in the context for a variant content item
-                if (culture == null)
-                    throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.UpdateDate;
 
-                publishedState = source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
-                    ? PublishedState.Unpublished
-                    : source.IsCulturePublished(culture)
-                        ? PublishedState.Published
-                        : PublishedState.Unpublished;
-
-                isEdited = source.IsCultureEdited(culture);
+                var pubDate = source.GetPublishDate(culture);
+                return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
             }
-            else
-            {
-                publishedState = source.PublishedState == PublishedState.Unpublished
-                    ? PublishedState.Unpublished
-                    : PublishedState.Published;
-
-                isEdited = source.Edited;
-            }
-
-            if (publishedState == PublishedState.Unpublished)
-                return isEdited && source.Id > 0 ? ContentSavedState.Draft : ContentSavedState.NotCreated;
-
-            if (publishedState == PublishedState.Published)
-                return isEdited ? ContentSavedState.PublishedPendingChanges : ContentSavedState.Published;
-
-            throw new NotSupportedException($"PublishedState {publishedState} is not supported.");
         }
-    }
 
-    internal class CultureUpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
-    {
-        public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
+        /// <summary>
+        /// Resolves the published flag for a content item/content variant
+        /// </summary>
+        private class PublishedResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, bool>
         {
-            var culture = context.GetCulture();
-
-            //a culture needs to be in the context for a variant content item
-            if (culture == null || source.ContentType.VariesByCulture() == false)
-                return source.UpdateDate;
-
-            var pubDate = source.GetPublishDate(culture);
-            return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
-        }
-    }
-
-    internal class CulturePublishedResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, bool>
-    {
-        public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
-        {
-            var culture = context.GetCulture();
-
-            //a culture needs to be in the context for a variant content item
-            if (culture == null || source.ContentType.VariesByCulture() == false)
-                return source.Published;
-
-            return source.IsCulturePublished(culture);
-        }
-    }
-
-    internal class CultureNameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
-    {
-        public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
-        {
-            var culture = context.GetCulture();
-
-            //a culture needs to be in the context for a variant content item
-            if (culture == null || source.ContentType.VariesByCulture() == false)
-                return source.Name;
-            
-            if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
+            public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
             {
-                return name;
-            }
-            else
-            {
-                return $"({ source.Name })";
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.Published;
+
+                return source.IsCulturePublished(culture);
             }
         }
+
+        /// <summary>
+        /// Resolves the name for a content item/content variant
+        /// </summary>
+        private class NameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
+        {
+            public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
+            {
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.Name;
+
+                if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
+                {
+                    return name;
+                }
+                else
+                {
+                    return $"({ source.Name })";
+                }
+            }
+        }
+
     }
+
+
+    
 }
