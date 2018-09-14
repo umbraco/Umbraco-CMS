@@ -211,7 +211,7 @@
         <key alias="lastPublished">Last published</key>
         <key alias="noItemsToShow">There are no items to show</key>
         <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
-        <key alias="listViewNoContent">No content has been added</key>
+        <key alias="listViewNoContent">No child items have been added</key>
         <key alias="listViewNoMembers">No members have been added</key>
         <key alias="mediatype">Media Type</key>
         <key alias="mediaLinks">Link to media item(s)</key>
