@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ContentApp _contentApp = new ContentApp
         {
-            Alias = "content",
+            Alias = "umbContent",
             Name = "Content",
             Icon = "icon-document",
             View = "views/content/apps/content/content.html"
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
 
         private readonly ContentApp _infoApp = new ContentApp
         {
-            Alias = "info",
+            Alias = "umbInfo",
             Name = "Info",
             Icon = "icon-info",
             View = "views/content/apps/info/info.html"
