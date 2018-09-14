@@ -97,7 +97,7 @@
             templateUrl: 'views/components/editor/umb-editor-content-header.html',
             scope: {
                 name: "=",
-                nameLocked: "=",
+                nameDisabled: "<?",
                 menu: "=",
                 hideMenu: "<?",
                 variants: "=",

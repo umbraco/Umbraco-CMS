@@ -211,7 +211,7 @@
         <key alias="lastPublished">Last published</key>
         <key alias="noItemsToShow">There are no items to show</key>
         <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
-        <key alias="listViewNoContent">No content has been added</key>
+        <key alias="listViewNoContent">No child items have been added</key>
         <key alias="listViewNoMembers">No members have been added</key>
         <key alias="mediatype">Media Type</key>
         <key alias="mediaLinks">Link to media item(s)</key>
@@ -222,6 +222,7 @@
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
         <key alias="noMediaLink">This media item has no link</key>
+        <key alias="noProperties">No content can be added for this item</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>

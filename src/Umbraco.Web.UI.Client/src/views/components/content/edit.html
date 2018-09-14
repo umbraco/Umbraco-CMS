@@ -9,7 +9,8 @@
             <umb-variant-content-editors 
                 page="page"
                 content="content"
-                culture="culture">
+                culture="culture"
+                on-select-app="appChanged(app)">
             </umb-variant-content-editors>
 
             <umb-editor-footer>
@@ -37,14 +38,14 @@
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview"
+                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
                         type="button" 
                         button-style="info" 
                         action="preview(content)"
                         label="Preview page" 
                         label-key="buttons_showPage">
                     </umb-button>
-
+                    
                     <umb-button-group 
                         ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"
