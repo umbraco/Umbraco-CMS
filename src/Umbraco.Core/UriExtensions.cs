@@ -30,6 +30,7 @@ namespace Umbraco.Core
         ///      These are def back office:
         ///          /Umbraco/RestServices   = back office
         ///          /Umbraco/BackOffice     = back office
+        ///          /Umbraco/Preview        = back office
         ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
         ///      so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
         ///      but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
@@ -77,7 +78,8 @@ namespace Umbraco.Core
 
             //check for special back office paths
             if (urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/BackOffice/")
-                || urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/RestServices/"))
+                || urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/RestServices/")
+                || urlPath.InvariantStartsWith("/" + globalSettings.GetUmbracoMvcArea() + "/Preview/"))
             {
                 return true;
             }

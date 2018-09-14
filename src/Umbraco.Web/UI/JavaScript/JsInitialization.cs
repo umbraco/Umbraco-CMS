@@ -33,16 +33,20 @@ namespace Umbraco.Web.UI.JavaScript
         private static readonly Regex Token = new Regex("(\"##\\w+?##\")", RegexOptions.Compiled);
 
         /// <summary>
-        /// Processes all found manifest files and outputs the main.js file containing all plugin manifests
+        /// Gets the JS initialization script to boot the back office application
         /// </summary>
-        public string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
+        /// <param name="httpContext"></param>
+        /// <param name="scripts"></param>
+        /// <param name="angularModule">
+        /// The angular module name to boot
+        /// </param>
+        /// <returns></returns>
+        public static string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> scripts, string angularModule)
         {
-            var files = GetScriptFiles(httpContext, umbracoInit, additionalJsFiles);
-
             var jarray = new StringBuilder();
             jarray.AppendLine("[");
             var first = true;
-            foreach (var file in files)
+            foreach (var file in scripts)
             {
                 if (first) first = false;
                 else jarray.AppendLine(",");
@@ -53,10 +57,22 @@ namespace Umbraco.Web.UI.JavaScript
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            return WriteScript(jarray.ToString(), IOHelper.ResolveUrl(SystemDirectories.Umbraco), angularModule);
         }
 
-        public IEnumerable<string> GetScriptFiles(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
+        /// <summary>
+        /// Returns a list of optimized script paths for the back office
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="umbracoInit"></param>
+        /// <param name="additionalJsFiles"></param>
+        /// <returns>
+        /// Cache busted/optimized script paths for the back office including manifest and property editor scripts
+        /// </returns>
+        /// <remarks>
+        /// Used to cache bust and optimize script paths for the back office
+        /// </remarks>
+        public IEnumerable<string> OptimizeBackOfficeScriptFiles(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
         {
             var scripts = new HashSet<string>();
             foreach (var script in umbracoInit)
@@ -76,6 +92,26 @@ namespace Umbraco.Web.UI.JavaScript
         }
 
         /// <summary>
+        /// Returns a list of optimized script paths
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="scriptFiles"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Used to cache bust and optimize script paths
+        /// </remarks>
+        public static IEnumerable<string> OptimizeScriptFiles(HttpContextBase httpContext, IEnumerable<string> scriptFiles)
+        {
+            var scripts = new HashSet<string>();
+            foreach (var script in scriptFiles)
+                scripts.Add(script);
+
+            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, ClientDependencyType.Javascript, httpContext));
+
+            return scripts.ToArray();
+        }
+
+        /// <summary>
         /// Returns the default config as a JArray
         /// </summary>
         /// <returns></returns>
@@ -86,14 +122,24 @@ namespace Umbraco.Web.UI.JavaScript
         }
 
         /// <summary>
+        /// Returns the default config as a JArray
+        /// </summary>
+        /// <returns></returns>
+        internal static IEnumerable<string> GetPreviewInitialization()
+        {
+            var resources = JsonConvert.DeserializeObject<JArray>(Resources.PreviewInitialize);
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+        }
+
+        /// <summary>
         /// Parses the JsResources.Main and replaces the replacement tokens accordingly.
         /// </summary>
         /// <param name="replacements"></param>
         /// <returns></returns>
-        internal static string WriteScript(params string[] replacements)
+        internal static string WriteScript(string scripts, string umbracoPath, string angularModule)
         {
             var count = 0;
-
+            var replacements = new[] { scripts, umbracoPath, angularModule };
             // replace, catering for the special syntax when we have
             // js function() objects contained in the json
 
