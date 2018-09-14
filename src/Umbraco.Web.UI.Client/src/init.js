@@ -122,12 +122,25 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 $route.reload();
             }
             else {
-                //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
-                //used as a global persistent query string that does not change routes.
-
+                
+                //check if the location being changed is only due to global/state query strings which means the location change
+                //isn't actually going to cause a route change.
                 if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
-                    //continue the route
-                    $route.reload();
+                    //The location change will cause a route change. We need to ensure that the global/state
+                    //query strings have not been stripped out. If they have, we'll re-add them and re-route.
+
+                    var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
+                    if (toRetain) {
+                        $route.updateParams(toRetain);
+                    }
+                    else {
+                        //continue the route
+                        $route.reload();
+                    }
+                }
+                else {
+                    //navigation is not changing but we should update the currentRouteParams to include all current parameters
+                    currentRouteParams = angular.copy(next.params); 
                 }
             }
         });

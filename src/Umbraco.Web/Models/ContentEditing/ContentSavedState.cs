@@ -6,11 +6,6 @@
     public enum ContentSavedState
     {
         /// <summary>
-        /// The state has not been set
-        /// </summary>
-        NotSet = -1,
-
-        /// <summary>
         /// The item isn't created yet
         /// </summary>
         NotCreated = 1,

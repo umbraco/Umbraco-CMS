@@ -8,6 +8,21 @@ namespace Umbraco.Web.Models.Mapping
 {
 
     /// <summary>
+    /// Returns the <see cref="ContentSavedState?"/> for an <see cref="IContent"/> item
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    internal class ContentBasicSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState?>
+        where T : ContentPropertyBasic
+    {
+        private readonly ContentSavedStateResolver<T> _inner = new ContentSavedStateResolver<T>();
+
+        public ContentSavedState? Resolve(IContent source, IContentProperties<T> destination, ContentSavedState? destMember, ResolutionContext context)
+        {
+            return _inner.Resolve(source, destination, default, context);
+        }
+    }
+
+    /// <summary>
     /// Returns the <see cref="ContentSavedState"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
