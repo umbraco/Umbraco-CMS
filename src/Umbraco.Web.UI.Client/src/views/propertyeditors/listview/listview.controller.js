@@ -164,7 +164,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     $scope.$watch(function () {
         return $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
     }, function (newVal, oldVal) {
-        if (newVal !== oldVal) {
+        if (newVal && newVal !== oldVal) {
             //update the options
             $scope.options.cultureName = newVal;
             $scope.reloadView($scope.contentId);
