@@ -341,7 +341,6 @@
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\endPreview.aspx" />
-    <Content Include="Umbraco\Dialogs\Preview.aspx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
@@ -428,18 +427,7 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
-    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
     <Content Include="Umbraco\Views\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">

@@ -28,7 +28,7 @@ namespace Umbraco.Web.UI.JavaScript
             return toParse.Split(new[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        protected IEnumerable<string> OptimizeAssetCollection(IEnumerable<string> assets, ClientDependencyType assetType, HttpContextBase httpContext)
+        internal static IEnumerable<string> OptimizeAssetCollection(IEnumerable<string> assets, ClientDependencyType assetType, HttpContextBase httpContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
@@ -41,11 +41,11 @@ namespace Umbraco.Web.UI.JavaScript
                 // ike lib/blah/blah.js so we need to turn them into absolutes here
                 if (x.StartsWith("/") == false && Uri.IsWellFormedUriString(x, UriKind.Relative))
                 {
-                    return (IClientDependencyFile) new BasicFile(assetType) { FilePath = new Uri(requestUrl, x).AbsolutePath };
+                    return new BasicFile(assetType) { FilePath = new Uri(requestUrl, x).AbsolutePath };
                 }
 
                 return assetType == ClientDependencyType.Javascript
-                    ? (IClientDependencyFile) new JavascriptFile(x)
+                    ? new JavascriptFile(x)
                     : (IClientDependencyFile) new CssFile(x);
             }).ToList();
 
