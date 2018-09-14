@@ -359,7 +359,7 @@ namespace Umbraco.Web.Editors
             var mapped = MapToDisplay(emptyContent);
 
             //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
+            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
             
             return mapped;
         }
