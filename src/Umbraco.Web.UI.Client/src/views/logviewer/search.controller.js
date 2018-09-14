@@ -83,6 +83,7 @@
         vm.findItem = findItem;
         vm.checkForSavedSearch = checkForSavedSearch;
         vm.addToSavedSearches = addToSavedSearches;
+        vm.deleteSavedSearch = deleteSavedSearch;
         vm.back = back;
 
 
@@ -272,9 +273,7 @@
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
                     logViewerResource.postSavedSearch(model.queryName, model.queryToSave).then(function(data){
-                        console.log('search after add', data);
                         vm.searches = data;
-
                         overlayService.close();
                     });
                 },
@@ -284,7 +283,12 @@
             };
 
             overlayService.open(overlay);
+        }
 
+        function deleteSavedSearch(model) {
+            logViewerResource.deleteSavedSearch(model.name, model.query).then(function (data) {
+                vm.searches = data;
+            });
         }
 
         function back() {

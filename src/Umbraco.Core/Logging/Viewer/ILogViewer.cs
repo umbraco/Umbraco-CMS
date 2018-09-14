@@ -19,9 +19,14 @@ namespace Umbraco.Core.Logging.Viewer
         IEnumerable<SavedLogSearch> GetSavedSearches();
 
         /// <summary>
-        /// Adds a new saved search to chosen datasource
+        /// Adds a new saved search to chosen datasource and returns the updated searches
         /// </summary>
         IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query);
+
+        /// <summary>
+        /// Deletes a saved search to chosen datasource and returns the remaining searches
+        /// </summary>
+        IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query);
 
         /// <summary>
         /// A count of number of errors

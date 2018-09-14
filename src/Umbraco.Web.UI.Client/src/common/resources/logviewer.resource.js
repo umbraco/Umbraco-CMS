@@ -10,7 +10,7 @@
     //the factory object returned
     return {
 
-        getNumberOfErrors: function(){
+        getNumberOfErrors: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -19,7 +19,7 @@
                 'Failed to retrieve number of errors in logs');
         },
 
-        getLogLevelCounts: function(){
+        getLogLevelCounts: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -28,7 +28,7 @@
                 'Failed to retrieve log level counts');
         },
 
-        getMessageTemplates: function(){
+        getMessageTemplates: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -37,7 +37,7 @@
                 'Failed to retrieve log templates');
         },
 
-        getSavedSearches: function(){
+        getSavedSearches: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -46,20 +46,25 @@
                 'Failed to retrieve saved searches');
         },
 
-        postSavedSearch: function(name, query){
+        postSavedSearch: function (name, query) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "PostSavedSearch"), {'name': name, 'query': query }),
+                        "PostSavedSearch"), { 'name': name, 'query': query }),
                 'Failed to add new saved search');
-
-                return umbRequestHelper.resourcePromise(
-                    $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
-                    "Failed to save data for data type id " + dataType.id);
         },
 
-        getLogs: function(options){
+        deleteSavedSearch: function (name, query) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "logViewerApiBaseUrl",
+                        "DeleteSavedSearch"), { 'name': name, 'query': query }),
+                'Failed to delete saved search');
+        },
+
+        getLogs: function (options) {
 
             var defaults = {
                 pageSize: 100,

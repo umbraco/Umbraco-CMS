@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using Umbraco.Core.Logging.Viewer;
@@ -27,7 +26,7 @@ namespace Umbraco.Web.Editors
         {
             return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
-        
+
         [HttpGet]
         public LogLevelCounts GetLogLevelCounts()
         {
@@ -57,6 +56,12 @@ namespace Umbraco.Web.Editors
         public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item)
         {
             return _logViewer.AddSavedSearch(item.Name, item.Query);
+        }
+
+        [HttpPost]
+        public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item)
+        {
+            return _logViewer.DeleteSavedSearch(item.Name, item.Query);
         }
     }
 }

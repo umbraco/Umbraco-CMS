@@ -11,7 +11,8 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public class JsonLogViewer : LogViewerSourceBase
     {
-        
+        private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+
         public override IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = new List<LogEvent>();
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Logging.Viewer
                 var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
 
                 //Foreach file we find - open it
-                foreach(var filePath in filesForCurrentDay)
+                foreach (var filePath in filesForCurrentDay)
                 {
                     //Open log file & add contents to the log collection
                     //Which we then use LINQ to page over
@@ -50,20 +51,18 @@ namespace Umbraco.Core.Logging.Viewer
                     }
                 }
             }
-            
+
             return logs;
         }
 
         public override IEnumerable<SavedLogSearch> GetSavedSearches()
         {
             //Our default implementation 
-            //Open JSON file on disk and return serialize obj back
-            var path = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
             //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(path, "[]");
+            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
 
-            var rawJson = File.ReadAllText(path);
+            var rawJson = File.ReadAllText(SearchesConfigPath);
             return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
         }
 
@@ -78,19 +77,33 @@ namespace Umbraco.Core.Logging.Viewer
             //Serilaize to JSON string
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
-            //Open file & save contents
-            var path = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
-
             //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(path, "[]");
+            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
 
             //Write it back down to file
-            File.WriteAllText(path, rawJson);
+            File.WriteAllText(SearchesConfigPath, rawJson);
 
             //Return the updated object - so we can instantly reset the entire array from the API response
             //As opposed to push a new item into the array
             return searches;
-            
+        }
+
+        public override IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        {
+            //Get the existing items
+            var searches = GetSavedSearches().ToList();
+
+            //Removes the search
+            searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
+
+            //Serilaize to JSON string
+            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
+
+            //Write it back down to file
+            File.WriteAllText(SearchesConfigPath, rawJson);
+
+            //Return the updated object - so we can instantly reset the entire array from the API response
+            return searches;
         }
     }
 }
