@@ -206,6 +206,29 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
         /**
          * @ngdoc method
+         * @name umbraco.services.navigationService#retainQueryStrings
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Will check the next route parameters to see if any of the query strings that should be retained from the previous route are missing,
+         * if they are they will be merged and an object containing all route parameters is returned. If nothing should be changed, then null is returned.
+         * @param {Object} currRouteParams The current route parameters
+         * @param {Object} nextRouteParams The next route parameters
+         */
+        retainQueryStrings: function (currRouteParams, nextRouteParams) {
+            var toRetain = angular.copy(nextRouteParams);
+            var updated = false;
+            _.each(retainedQueryStrings, function (r) {
+                if (currRouteParams[r] && !nextRouteParams[r]) {
+                    toRetain[r] = currRouteParams[r];
+                    updated = true;
+                }
+            });
+            return updated ? toRetain : null;
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.navigationService#load
          * @methodOf umbraco.services.navigationService
          *

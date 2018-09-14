@@ -179,6 +179,15 @@
                         variant.variants[i].active = false;
                     }
                 }
+
+                // keep track of the open variants across the different split views
+                // push the first variant then update the variant index based on the editor index
+                if(vm.openVariants && vm.openVariants.length === 0) {
+                    vm.openVariants.push(variant.language.culture);
+                } else {
+                    vm.openVariants[editorIndex] = variant.language.culture;
+                }
+                
             }
 
             //then assign the variant to a view model to the content app
@@ -186,14 +195,6 @@
                 return a.alias === "content";
             });
             contentApp.viewModel = variant;
-            
-            // keep track of the open variants across the different split views
-            // push the first variant then update the variant index based on the editor index
-            if(vm.openVariants && vm.openVariants.length === 0) {
-                vm.openVariants.push(variant.language.culture);
-            } else {
-                vm.openVariants[editorIndex] = variant.language.culture;
-            }
 
             // make sure the same app it set to active in the new variant
             if(activeAppAlias) {
