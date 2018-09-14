@@ -268,11 +268,11 @@
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
                 view: "logviewersearch",
-                queryToSave: vm.logOptions.filterExpression,
+                query: vm.logOptions.filterExpression,
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
-                    logViewerResource.postSavedSearch(model.queryName, model.queryToSave).then(function(data){
+                    logViewerResource.postSavedSearch(model.name, model.query).then(function(data){
                         vm.searches = data;
                         overlayService.close();
                     });
@@ -285,10 +285,28 @@
             overlayService.open(overlay);
         }
 
-        function deleteSavedSearch(model) {
-            logViewerResource.deleteSavedSearch(model.name, model.query).then(function (data) {
-                vm.searches = data;
-            });
+        function deleteSavedSearch(searchItem) {
+
+            var overlay = {
+                title: "Delete Search",
+                subtitle: "Are you sure you wish to delete",
+                closeButtonLabel: "Cancel",
+                submitButtonLabel: "Delete Search",
+                view: "default",
+                submit: function (model) {
+                    //Resource call with two params (name & query)
+                    //API that opens the JSON and adds it to the bottom
+                    logViewerResource.deleteSavedSearch(searchItem.name, searchItem.query).then(function(data){
+                        vm.searches = data;
+                        overlayService.close();
+                    });
+                },
+                close: function() {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(overlay);
         }
 
         function back() {
