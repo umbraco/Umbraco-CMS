@@ -191,7 +191,7 @@
 
             //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
-                return a.alias === "content";
+                return a.alias === "umbContent";
             });
             contentApp.viewModel = variant;
 
@@ -221,7 +221,7 @@
                 var editor = vm.editors[e];
                 for (var i = 0; i < editor.content.apps.length; i++) {
                     var app = editor.content.apps[i];
-                    if (app.alias === "content") {
+                    if (app.alias === "umbContent") {
                         app.active = true;
                     }
                     else {

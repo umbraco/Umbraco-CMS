@@ -147,7 +147,7 @@
 
             // only create the save/publish/preview buttons if the 
             // content app is "Conent"
-            if(app && app.alias !== "content") {
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showPreviewButton = false;

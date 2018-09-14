@@ -40,7 +40,7 @@
             // disable the name field if the active content app is not "Content"
             vm.nameDisabled = false;
             angular.forEach(vm.editor.content.apps, function(app){
-                if(app.active && app.alias !== "content") {
+                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                     vm.nameDisabled = true;
                 }
             });
@@ -78,9 +78,9 @@
          * @param {any} item
          */
         function selectApp(item) {
-            // disable the name field if the active content app is not "Content"
+            // disable the name field if the active content app is not "Content" or "Info"
             vm.nameDisabled = false;
-            if(item && item.alias !== "content") {
+            if(item && item.alias !== "umbContent" && item.alias !== "umbInfo") {
                 vm.nameDisabled = true;
             }
             // call the callback if any is registered
