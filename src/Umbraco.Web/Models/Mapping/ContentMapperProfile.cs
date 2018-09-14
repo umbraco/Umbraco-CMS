@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -31,7 +32,6 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
-            var contentSavedStateResolver = new ContentSavedStateResolver();
             
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentSavedStateResolver<ContentPropertyDisplay>>())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
@@ -80,19 +80,76 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>());
+                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<UpdateDateResolver>())
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
         }
+
+        /// <summary>
+        /// Resolves the update date for a content item/content variant
+        /// </summary>
+        private class UpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
+        {
+            public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
+            {
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.UpdateDate;
+
+                var pubDate = source.GetPublishDate(culture);
+                return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
+            }
+        }
+
+        /// <summary>
+        /// Resolves the published flag for a content item/content variant
+        /// </summary>
+        private class PublishedResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, bool>
+        {
+            public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
+            {
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.Published;
+
+                return source.IsCulturePublished(culture);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the name for a content item/content variant
+        /// </summary>
+        private class NameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
+        {
+            public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
+            {
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null || source.ContentType.VariesByCulture() == false)
+                    return source.Name;
+
+                if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
+                {
+                    return name;
+                }
+                else
+                {
+                    return $"({ source.Name })";
+                }
+            }
+        }
+
     }
 
-    internal class CultureNameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
-    {
-        public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
-        {
-            return source.GetCultureName(context.GetCulture());
-        }
-    }
+
+    
 }
