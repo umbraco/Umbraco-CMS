@@ -406,6 +406,8 @@
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
+    <Compile Include="Persistence\SqlContextExtensions.cs" />
+    <Compile Include="Persistence\SqlSyntaxExtensions.cs" />
     <Compile Include="Persistence\UmbracoPocoDataBuilder.cs" />
     <Compile Include="PropertyEditors\ColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
