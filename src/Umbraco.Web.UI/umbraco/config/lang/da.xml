@@ -2,7 +2,7 @@
 <language alias="da" intName="Danish" localName="dansk" lcid="6" culture="da-DK">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Tilføj domæne</key>
@@ -132,6 +132,9 @@
     <key alias="saveAndGenerateModels">Gem og generer modeller</key>
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
+    <key alias="deleteTag">Slet tag</key>
+    <key alias="confirmActionCancel">Fortryd</key>
+    <key alias="confirmActionConfirm">Bekræft</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -153,7 +156,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
-  </area>  
+  </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
@@ -211,7 +214,7 @@
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
-    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>    
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -235,7 +238,7 @@
     <key alias="childItems" version="7.0">Undersider</key>
     <key alias="target" version="7.0">Åben i vindue</key>
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
@@ -256,6 +259,7 @@
     <key alias="dropFilesHere">Slip filerne her...</key>
     <key alias="urls">Link til medie</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
     <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
@@ -419,6 +423,7 @@
       Navnet '%0%' eksisterer allerede.
    ]]>
     </key>
+      <key alias="overviewTitle">Ordbog</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -704,7 +709,7 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
     <key alias="databaseNotFound">
       <![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
-<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mere information om at redigere web.config her.</a></p>]]>
+<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mere information om at redigere web.config her.</a></p>]]>
     </key>
     <key alias="databaseText"><![CDATA[For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Tryk på <strong>Opgradér</strong> knappen for at opgradere din database til Umbraco %0%</p><p>Bare rolig - intet indhold vil blive slettet og alt vil stadig fungere bagefter!</p>]]></key>
@@ -985,7 +990,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
   </area>
-  
+
 
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
@@ -1149,19 +1154,19 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
-      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes.
       Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
     </key>
 
     <key alias="insertPageField">Sideværdi</key>
     <key alias="insertPageFieldDesc">
-      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller
       vise en standardværdi i tilfælde af, at feltet er tomt.
     </key>
 
     <key alias="insertPartialView">Partial view</key>
     <key alias="insertPartialViewDesc">
-      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved
       genbruges og deles på tværs af sideskabelonerne.
     </key>
 
@@ -1172,7 +1177,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="renderBody">Indsæt en underliggende skabelon</key>
     <key alias="renderBodyDesc">
       <![CDATA[
-      Henter indholdet af en underliggende skabelon ind, ved at 
+      Henter indholdet af en underliggende skabelon ind, ved at
       indsætte et <code>@RenderBody()</code> element.
       ]]>
     </key>
@@ -1181,8 +1186,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="defineSection">Definer en sektion</key>
     <key alias="defineSectionDesc">
       <![CDATA[
-         Definerer en del af din skabelon som en navngivet sektion, ved at 
-         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
+         Definerer en del af din skabelon som en navngivet sektion, ved at
+         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i
          overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
       ]]>
     </key>
@@ -1190,15 +1195,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="renderSection">Indsæt en sektion</key>
     <key alias="renderSectionDesc">
       <![CDATA[
-      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
-      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
+      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et
+      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have
       defineret en sektion via et <code>@section [name]{ ... }</code> element.
       ]]>
     </key>
 
     <key alias="sectionName">Sektionsnavn</key>
     <key alias="sectionMandatory">Sektionen er obligatorisk</key>
-    
+
     <key alias="sectionMandatoryDesc">
       Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
     </key>
@@ -1210,7 +1215,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="iWant">Returner</key>
     <key alias="allContent">alt indhold</key>
     <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
-    
+
     <key alias="from">fra</key>
     <key alias="websiteRoot">mit website</key>
     <key alias="where">hvor</key>
@@ -1242,14 +1247,14 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="template">Skabelon</key>
   </area>
-  
+
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
     <key alias="media">Billede</key>
     <key alias="macro">Macro</key>
     <key alias="embed">Embed</key>
     <key alias="headline">Overskrift</key>
-    <key alias="quote">Citat</key>  
+    <key alias="quote">Citat</key>
     <key alias="insertControl">Vælg indholdstype</key>
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
@@ -1600,5 +1605,12 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="textbox">
     <key alias="characters_left">Karakterer tilbage</key>
+  </area>
+  <area alias="recycleBin">
+    <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
+    <key alias="mediaTrashed">Slettet medie med Id: {0} relateret til original "parent" / mappe med id: {1}</key>
+    <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette dokument/medie</key>
+    <key alias="noRestoreRelation">Der findes ikke nogen "Genopret" relation for dette dokument/medie. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
+    <key alias="restoreUnderRecycled">Det dokument/medie du ønsker at genoprette under ('%0%') er i skraldespanden. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
   </area>
 </language>

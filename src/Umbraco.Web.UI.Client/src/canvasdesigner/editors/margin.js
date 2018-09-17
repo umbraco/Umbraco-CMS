@@ -12,7 +12,7 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.selectedmargin = {
         name: "",
-        value: 0,
+        value: 0
     };
 
     $scope.setSelectedmargin = function (margintype) {
@@ -50,7 +50,7 @@ angular.module("Umbraco.canvasdesigner")
             leftmarginvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 1 ? $scope.item.defaultValue[1] : '',
             rightmarginvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 2 ? $scope.item.defaultValue[2] : '',
             topmarginvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 3 ? $scope.item.defaultValue[3] : '',
-            bottommarginvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : '',
+            bottommarginvalue: $scope.item.defaultValue && $scope.item.defaultValue.length > 4 ? $scope.item.defaultValue[4] : ''
         };
     }
 

@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 var currentVersion = _appCtx.CurrentVersion().GetVersion(3).ToString();
                 var newVersion = UmbracoVersion.Current.ToString();
-                var reportUrl = string.Format("https://our.umbraco.org/contribute/releases/compare?from={0}&to={1}&notes=1", currentVersion, newVersion);
+                var reportUrl = string.Format("https://our.umbraco.com/contribute/releases/compare?from={0}&to={1}&notes=1", currentVersion, newVersion);
 
                 return new
                 {

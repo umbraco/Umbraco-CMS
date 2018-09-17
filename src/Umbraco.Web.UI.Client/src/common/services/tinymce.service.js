@@ -156,13 +156,13 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 						var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
 						editor.dom.setAttrib(imgElm, 'style', s);
-						editor.dom.setAttrib(imgElm, 'id', null);
 
 						if (img.url) {
 							var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
 							editor.dom.setAttrib(imgElm, 'data-mce-src', src);
 						}
-					}
+                    }
+				    editor.dom.setAttrib(imgElm, 'id', null);
 				}, 500);
 			}
 		},
@@ -761,6 +761,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @param {string} input the string to parse      
 		 */
 		getAnchorNames: function (input) {
+      if (!input) return [];
+        
 			var anchorPattern = /<a id=\\"(.*?)\\">/gi;
 			var matches = input.match(anchorPattern);
 			var anchors = [];
@@ -771,7 +773,9 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				});
 			}
 
-			return anchors;
+			return anchors.filter(function(val, i, self) {
+          return self.indexOf(val) === i;
+      });
 		},
 
 		insertLinkInEditor: function (editor, target, anchorElm) {

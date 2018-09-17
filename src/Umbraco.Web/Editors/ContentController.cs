@@ -9,7 +9,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -23,10 +22,11 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.web;
-using umbraco.presentation.preview;
 using Umbraco.Core.Events;
 using Constants = Umbraco.Core.Constants;
+using umbraco.cms.businesslogic;
+using System.Collections;
+using umbraco;
 
 namespace Umbraco.Web.Editors
 {
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
                 ));
             }
         }
@@ -1156,5 +1156,41 @@ namespace Umbraco.Web.Editors
             return allowed;
         }
 
+        [EnsureUserPermissionForContent("contentId", 'R')]
+        public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
+        {
+            var notifications = new List<NotifySetting>();
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var actionList = ActionsResolver.Current.Actions;
+            foreach (var a in actionList)
+            {
+                if (a.ShowInNotifier)
+                {
+                    NotifySetting n = new NotifySetting
+                    {
+                        Name = ui.Text("actions", a.Alias),
+                        Checked = (UmbracoUser.GetNotifications(content.Path).IndexOf(a.Letter) > -1),
+                        NotifyCode = a.Letter.ToString()
+                    };
+                    notifications.Add(n);
+                }
+            }
+            return notifications;
+        }
+
+        public void PostNotificationOptions(int contentId, string notifyOptions = "")
+        {
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var content = Services.ContentService.GetById(contentId);
+
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var node = new CMSNode(contentId);
+
+            global::umbraco.cms.businesslogic.workflow.Notification.UpdateNotifications(UmbracoUser, node, notifyOptions ?? "");
+        }
     }
 }

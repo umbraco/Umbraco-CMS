@@ -13,9 +13,9 @@
         </div>
     </div>
     <div class="umb-node-preview__actions">
-        <a class="umb-node-preview__action" title="Edit" href="" ng-if="allowEdit"  ng-click="onEdit()"><localize key="general_edit">Edit</localize></a>
-        <a class="umb-node-preview__action" title="Open" href="" ng-if="allowOpen"  ng-click="onOpen()"><localize key="general_open">Open</localize></a>
-        <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" href="" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></a>
+        <a class="umb-node-preview__action" title="Edit" href="{{editUrl}}" ng-if="allowEdit"  ng-click="onEdit()"><localize key="general_edit">Edit</localize></a>
+        <a class="umb-node-preview__action" title="Open" href="{{openUrl}}" ng-if="allowOpen"  ng-click="onOpen()"><localize key="general_open">Open</localize></a>
+        <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" href="{{removeUrl}}" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></i></a>
     </div>
 
 </div>

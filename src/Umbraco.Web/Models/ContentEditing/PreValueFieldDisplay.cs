@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -41,10 +40,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
 
-        /// <summary>
-        /// This allows for inner prevalues to be defined, for views such as radiobuttonlist, that require a selection.
-        /// </summary>        
-        [DataMember(Name = "prevalues")]
-        public PreValueInnerListItem[] PreValues { get; set; }
     }
 }

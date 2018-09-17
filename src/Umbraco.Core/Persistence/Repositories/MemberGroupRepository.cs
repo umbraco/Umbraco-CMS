@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
-            var missingRoles = roleNames.Except(existingRoles);
+            var missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
             if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
@@ -280,8 +280,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 //exist in the roleNames list, then determine which ones are not currently assigned.
                 var mId = memberId;
                 var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
-                var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName)).Select(x => x.RoleName);
-                var nonAssignedRoles = roleNames.Except(assignedRoles);
+                var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName,StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
+                var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
                 foreach (var toAssign in nonAssignedRoles)
                 {
                     var groupId = rolesForNames.First(x => x.Text == toAssign).NodeId;

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
-            this.Alter.Table("umbracoConsent").AlterColumn("comment").AsString().Nullable();
+            Alter.Table("umbracoConsent").AlterColumn("comment").AsString().Nullable();
         }
 
         public override void Down()

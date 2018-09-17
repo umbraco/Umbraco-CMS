@@ -561,9 +561,6 @@
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
-    <None Include="Config\metablogConfig.Release.config">
-      <DependentUpon>metablogConfig.config</DependentUpon>
-    </None>
     <None Include="Config\ExamineSettings.Release.config">
       <DependentUpon>ExamineSettings.config</DependentUpon>
     </None>
@@ -760,7 +757,6 @@
     <Content Include="Umbraco\Dialogs\create.aspx" />
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\publish.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
@@ -994,7 +990,6 @@
     <Content Include="Config\Dashboard.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\metablogConfig.config" />
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1035,9 +1030,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7120</DevelopmentServerPort>
+          <DevelopmentServerPort>7130</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7120</IISUrl>
+          <IISUrl>http://localhost:7130</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
