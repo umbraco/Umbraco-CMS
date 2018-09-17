@@ -57,17 +57,12 @@ namespace Umbraco.Web.Models.Mapping
 
             // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
-            if (context.Options.Items.ContainsKey("IncludeProperties"))
-            {
-                if (context.Options.Items["IncludeProperties"] is IEnumerable<string> includeProperties
-                    && includeProperties.Contains(property.Alias) == false)
-                {
-                    return result;
-                }
-            }
+            var includedProperties = context.Options.GetIncludedProperties();
+            if (includedProperties != null && !includedProperties.Contains(property.Alias))
+                return result;
 
             //Get the culture from the context which will be set during the mapping operation for each property
-            var culture = context.GetCulture();
+            var culture = context.Options.GetCulture();
 
             //a culture needs to be in the context for a property type that can vary
             if (culture == null && property.PropertyType.VariesByCulture())

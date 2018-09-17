@@ -494,15 +494,14 @@ namespace Umbraco.Web.Editors
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
-                        opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;                        
+
+                        opts.SetCulture(cultureName);                        
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
-                        if (string.IsNullOrWhiteSpace(includeProperties) == false)
-                        {
-                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
-                        }
-                    }));
-
+                        if (!includeProperties.IsNullOrWhiteSpace())
+                            opts.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
+                    }))
+                .ToList(); // evaluate now
 
             return pagedResult;
         }

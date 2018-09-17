@@ -142,6 +142,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\ImageHelper.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
@@ -302,7 +303,6 @@
     <Compile Include="Models\Mapping\ContentAppResolverExtensions.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayNameResolver.cs" />
     <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
-    <Compile Include="Models\Mapping\ResolutionContextExtensions.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
