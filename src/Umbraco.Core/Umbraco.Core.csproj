@@ -1391,6 +1391,7 @@
     <Compile Include="Services\OperationResultType.cs" />
     <Compile Include="Services\Implement\PackagingService.cs" />
     <Compile Include="Services\Implement\PublicAccessService.cs" />
+    <Compile Include="Services\Ordering.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\PublishResult.cs" />
     <Compile Include="Services\PublishResultType.cs" />

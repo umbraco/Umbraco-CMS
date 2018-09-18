@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 
@@ -760,7 +761,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     var query = scope.SqlContext.Query<IContent>().Where(x => x.ParentId == root.Id);
-                    var result = repository.GetPage(query, 0, 20, out var totalRecords, "UpdateDate", Direction.Ascending, true);
+                    var result = repository.GetPage(query, 0, 20, out var totalRecords, null, Ordering.By("UpdateDate"));
 
                     Assert.AreEqual(25, totalRecords);
                     foreach (var r in result)
@@ -803,12 +804,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPage(query, 0, 2, out var totalRecords, "title", Direction.Ascending, false);
+                    var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("title", isCustomField: true));
 
                     Assert.AreEqual(3, totalRecords);
                     Assert.AreEqual(2, result.Count());
 
-                    result = repository.GetPage(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
+                    result = repository.GetPage(query, 1, 2, out totalRecords, null, Ordering.By("title", isCustomField: true));
 
                     Assert.AreEqual(1, result.Count());
                 }
@@ -835,7 +836,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                    var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name"));
 
                     Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                     Assert.That(result.Count(), Is.EqualTo(1));
@@ -858,7 +859,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 1, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -875,7 +876,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 0, 2, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(2));
@@ -892,7 +893,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Descending, true);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name", Direction.Descending));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -911,7 +912,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(1));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -930,7 +931,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("text"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
