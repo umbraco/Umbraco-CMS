@@ -54,30 +54,43 @@ namespace Umbraco.Core.Logging.Viewer
             string[] logLevels = null)
         {
             //Get all logs into memory (Not sure this good or not)
-            var logs = GetAllLogs(startDate, endDate);
+            var allLogs = GetAllLogs(startDate, endDate);
+            var logs = allLogs;
 
             //If we have a filter expression, apply it
             if (string.IsNullOrEmpty(filterExpression) == false)
             {
                 Func<LogEvent, bool> filter = null;
-                
+
                 // If the expression evaluates then make it into a filter
                 if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
                 {
                     filter = evt => true.Equals(eval(evt));
                 }
-                else // assume the expression was a search string and make a Like filter from that
+                else 
                 {
-                    var filterSearch = $"@Message like '%{FilterLanguage.EscapeLikeExpressionContent(filterExpression)}%'";
-                    if (FilterLanguage.TryCreateFilter(filterSearch, out eval, out error))
-                    {
-                        filter = evt => true.Equals(eval(evt));
-                    }
+                    //Assume the expression was a search string and make a Like filter from that
+                    filter = PerformMessageLikeFilter(filterExpression);
                 }
-                
-                if (filter != null)
+
+                //Go and filter the logs
+                //May be with a valid expression (could be single word & return no results)
+                //Failed expression so we try @Message like
+                logs = FilterLogs(logs, filter);
+
+                //If logs now has a count of 0 AND filterExpression contains no spaces
+                //We can assume a single word search (Which would PASS creating a filter above)
+                if (logs.Count() == 0 && filterExpression.Contains(" ") == false)
                 {
-                    logs = logs.Where(filter);
+                    //Reset logs & filter
+                    logs = allLogs;
+                    filter = null;
+
+                    //Do an expression using message like
+                    filter = PerformMessageLikeFilter(filterExpression);
+
+                    //Filter the logs again with the single word
+                    logs = FilterLogs(logs, filter);
                 }
             }
 
@@ -115,6 +128,27 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 Items = logMessages
             };
+        }
+
+        private Func<LogEvent, bool> PerformMessageLikeFilter(string filterExpression)
+        {
+            var filterSearch = $"@Message like '%{FilterLanguage.EscapeLikeExpressionContent(filterExpression)}%'";
+            if (FilterLanguage.TryCreateFilter(filterSearch, out var eval, out var error))
+            {
+                return evt => true.Equals(eval(evt));
+            }
+
+            return null;
+        }
+
+        private IEnumerable<LogEvent> FilterLogs(IEnumerable<LogEvent> logs, Func<LogEvent, bool> filter)
+        {
+            if (filter != null)
+            {
+                logs = logs.Where(filter);
+            }
+
+            return logs;
         }
     }
 }
