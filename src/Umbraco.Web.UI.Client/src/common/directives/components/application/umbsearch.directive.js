@@ -18,6 +18,7 @@
         var vm = this;
 
         vm.$onInit = onInit;
+        vm.$onDestroy = onDestroy;
         vm.search = search;
         vm.closeSearch = closeSearch;
 
@@ -28,6 +29,10 @@
 
             console.log("init search thingy");
             backdropService.open();
+        }
+
+        function onDestroy() {
+            backdropService.close();
         }
 
         /**
