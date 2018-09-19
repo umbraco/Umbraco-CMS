@@ -113,6 +113,7 @@
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="Models\ContentEditing\ContentChangeDocType.cs" />
     <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
     <Compile Include="Models\Mapping\ContentSavedStateResolver.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
