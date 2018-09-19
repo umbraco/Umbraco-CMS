@@ -256,9 +256,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // is empty for many nodes) - see: http://issues.umbraco.org/issue/U4-8831
 
             var dbfield = GetQuotedFieldName("umbracoNode", "id");
+            (dbfield, _) = SqlContext.Visit<NodeDto>(x => x.NodeId); // fixme?!
             if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
-                psql.OrderBy(DetectSystemOrderingAlias(dbfield, sql));
+                psql.OrderBy(GetAliasedField(dbfield, sql)); // fixme why aliased?
             }
 
             // create prepared sql
@@ -276,6 +277,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ? ApplyCustomOrdering(ref sql, ordering)
                 : ApplySystemOrdering(ref sql, ordering);
 
+            // beware! NPoco paging code parses the query to isolate the ORDER BY fragment,
+            // using a regex that wants "([\w\.\[\]\(\)\s""`,]+)" - meaning that anything
+            // else in orderBy is going to break NPoco / not be detected
+
+            // beware! NPoco paging code (in PagingHelper) collapses everything [foo].[bar]
+            // to [bar] only, so we MUST use aliases, cannot use [table].[field]
+
+            // beware! pre-2012 SqlServer is using a convoluted syntax for paging, which
+            // includes "SELECT ROW_NUMBER() OVER (ORDER BY ...) poco_rn FROM SELECT (...",
+            // so anything added here MUST also be part of the inner SELECT statement, ie
+            // the original statement, AND must be using the proper alias, as the inner SELECT
+            // will hide the original table.field names entirely
+
             if (ordering.Direction == Direction.Ascending)
                 sql.OrderBy(orderBy);
             else
@@ -286,15 +300,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // id is invariant
             if (ordering.OrderBy.InvariantEquals("id"))
-                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId), sql);
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId), sql);
 
             // sort order is invariant
             if (ordering.OrderBy.InvariantEquals("sortOrder"))
-                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.SortOrder), sql);
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.SortOrder), sql);
 
             // path is invariant
             if (ordering.OrderBy.InvariantEquals("path"))
-                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.Path), sql);
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Path), sql);
 
             // note: 'owner' is the user who created the item as a whole,
             //       we don't have an 'owner' per culture (should we?)
@@ -303,28 +317,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var joins = Sql()
                     .InnerJoin<UserDto>("ownerUser").On<NodeDto, UserDto>((node, user) => node.UserId == user.Id, aliasRight: "ownerUser");
 
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "ownerUser") + " AS ordering "), sql.Arguments);
+
                 sql = InsertJoins(sql, joins);
 
-                //fixme: This doesn't seem to work even if we try to detect alias 
-                return SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "ownerUser");
+                return "ordering";
             }
 
             // note: each version culture variation has a date too,
             //       maybe we would want to use it instead?
             if (ordering.OrderBy.InvariantEquals("versionDate") || ordering.OrderBy.InvariantEquals("updateDate"))
-                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate), sql);
+                return GetAliasedField(SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate), sql);
 
             // create date is invariant (we don't keep each culture's creation date)
             if (ordering.OrderBy.InvariantEquals("createDate"))
-                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate), sql);
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate), sql);
 
             // name is variant
             if (ordering.OrderBy.InvariantEquals("name"))
             {
-                //fixme: This doesn't seem to work even if we try to detect alias 
                 // no culture = can only work on the invariant name
+                // see notes in ApplyOrdering: the field MUST be aliased
                 if (ordering.Culture.IsNullOrWhiteSpace())
-                    return SqlSyntax.GetFieldName<NodeDto>(x => x.Text);
+                    return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
 
                 // culture = must work on variant name ?? invariant name
                 // insert proper join and return coalesced ordering field
@@ -334,28 +350,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
                     .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
 
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlContext.Visit<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql + " AS ordering "), sql.Arguments);
+
                 sql = InsertJoins(sql, joins);
 
-                return SqlContext.Visit<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql;
+                return "ordering";
             }
 
             // previously, we'd accept anything and just sanitize it - not anymore
             throw new NotSupportedException($"Ordering by {ordering.OrderBy} not supported.");
-        }
-
-        /// <summary>
-        /// Detect the alias an ordered system field in the main SQL
-        /// </summary>
-        /// <param name="dbfield"></param>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        private string DetectSystemOrderingAlias(string dbfield, Sql sql)
-        {
-            // get alias, if aliased
-            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-            if (match != null) dbfield = match.Groups[2].Value;
-            return dbfield;
         }
 
         private string ApplyCustomOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
@@ -395,18 +399,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // insert this just above the first WHERE
             var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
 
-            // insert the SQL selected field, too, before the first FROM else ordering cannot work
-            newSql = InsertBefore(newSql, "FROM", ", customPropData.customPropVal "); // trailing space is important!
+            // see notes in ApplyOrdering: the field MUST be selected + aliased
+            newSql = InsertBefore(newSql, "FROM", ", customPropData.customPropVal AS ordering "); // trailing space is important!
 
             // create the new sql
             sql = Sql(newSql, argsList.ToArray());
 
             // and order by the custom field
             // this original code means that an ascending sort would first expose all NULL values, ie items without a value
-            return "customPropData.customPropVal";
-            // this better (?) code ensures that items without a value always come last (ie both in asc- and desc-ending sorts)
-            // not enabled yet - should we?
-            //return "(CASE WHEN customPropData.customPropVal IS NULL THEN 1 ELSE 0 END), customPropData.customPropVal";
+            return "ordering";
+
+            // note: adding an extra sorting criteria on
+            // "(CASE WHEN customPropData.customPropVal IS NULL THEN 1 ELSE 0 END")
+            // would ensure that items without a value always come last, both in ASC and DESC-ending sorts
         }
 
         public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity> query,
@@ -555,6 +560,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return result;
         }
 
+        protected string InsertBefore(Sql<ISqlContext> s, string atToken, string insert)
+            => InsertBefore(s.SQL, atToken, insert);
+
         protected string InsertBefore(string s, string atToken, string insert)
         {
             var pos = s.InvariantIndexOf(atToken);
@@ -576,6 +584,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return Sql(InsertBefore(sql.SQL, "WHERE", joinsSql), args);
+        }
+
+        private string GetAliasedField(string field, Sql sql)
+        {
+            // get alias, if aliased
+            //
+            // regex looks for pattern "([\w+].[\w+]) AS ([\w+])" ie "(field) AS (alias)"
+            // and, if found & a group's field matches the field name, returns the alias
+            //
+            // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
+            // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
+
+            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            return match == null ? field : match.Groups[2].Value;
         }
 
         protected string GetQuotedFieldName(string tableName, string fieldName)

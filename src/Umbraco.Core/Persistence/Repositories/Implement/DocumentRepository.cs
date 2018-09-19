@@ -821,16 +821,24 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var joins = Sql()
                     .InnerJoin<UserDto>("updaterUser").On<ContentVersionDto, UserDto>((version, user) => version.UserId == user.Id, aliasRight: "updaterUser");
 
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering"), sql.Arguments);
+
                 sql = InsertJoins(sql, joins);
 
-                return SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser");
+                return "ordering";
             }
 
             if (ordering.OrderBy.InvariantEquals("published"))
             {
                 // no culture = can only work on the global 'published' flag
                 if (ordering.Culture.IsNullOrWhiteSpace())
-                    return "(CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END)";
+                {
+                    // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                    // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
+                    sql = Sql(InsertBefore(sql, "FROM", ", (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) AS ordering "), sql.Arguments);
+                    return "ordering";
+                }
 
                 // invariant: left join will yield NULL and we must use pcv to determine published
                 // variant: left join may yield NULL or something, and that determines published
@@ -843,17 +851,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 sql = InsertJoins(sql, joins);
 
-                // insert the SQL selected field, too, before the first FROM else ordering cannot work
-                // also: must insert the whole CASE body here, and only return 'opub', else NPoco paging code fails 
+                // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
                 var sqlText = InsertBefore(sql.SQL, "FROM",
 
                     // when invariant, ie 'variations' does not have the culture flag (value 1), use the global 'published' flag on pcv.id,
                     // otherwise check if there's a version culture variation for the lang, via ccv.id
-                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccv.id IS NULL THEN 0 ELSE 1 END) END) AS opub "); // trailing space is important!
+                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccv.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
 
                 sql = Sql(sqlText, sql.Arguments);
 
-                return "opub";
+                return "ordering";
             }
 
             return base.ApplySystemOrdering(ref sql, ordering);
