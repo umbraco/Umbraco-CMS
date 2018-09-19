@@ -1,0 +1,27 @@
+
+<div class="umb-search" on-outside-click="vm.closeSearch()">
+
+    <input 
+        class="umb-search-input" 
+        type="text" 
+        ng-model="vm.searchQuery" 
+        ng-change="vm.search(vm.searchQuery)" 
+        placeholder="Search..." 
+        autofocus />
+    
+    <ul class="umb-search-results" ng-if="vm.searchResults.length > 0">
+        <li class="umb-search-results_item">
+            <strong>Result 1</strong>
+            <small class="umb-search-results_item-description">/result-1/</small>
+        </li>
+        <li class="umb-search-results_item">
+            <strong>Result 2</strong>
+            <small class="umb-search-results_item-description">/result-2/</small>
+        </li>
+        <li class="umb-search-results_item">
+            <strong>Result 3</strong>
+            <small class="umb-search-results_item-description">/result-3/</small>
+        </li>
+    </ul>
+
+</div>
