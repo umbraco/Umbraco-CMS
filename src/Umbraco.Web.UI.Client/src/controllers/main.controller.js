@@ -43,6 +43,10 @@ function MainController($scope, $location, appState, treeService, notificationsS
         eventsService.emit("app.closeDialogs", event);
     };
 
+    $scope.closeSearch = function() {
+        appState.setSearchState("show", false);
+    };
+
     var evts = [];
 
     //when a user logs out or timesout

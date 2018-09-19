@@ -20,19 +20,24 @@
         vm.$onInit = onInit;
         vm.$onDestroy = onDestroy;
         vm.search = search;
+        vm.handleKeyUp = handleKeyUp;
         vm.closeSearch = closeSearch;
 
         function onInit() {
-
             vm.searchResults = [];
             vm.hasResults = false;
-
-            console.log("init search thingy");
             backdropService.open();
         }
 
         function onDestroy() {
             backdropService.close();
+        }
+
+        function handleKeyUp(event) {
+            // esc
+            if(event.keyCode === 27) {
+                closeSearch();
+            }
         }
 
         /**
@@ -49,11 +54,9 @@
          * @param {string} searchQuery
          */
         function search(searchQuery) {
-            console.log(searchQuery);
             if(searchQuery.length > 0) {
                 var search = {"term": searchQuery};
                 searchService.searchAll(search).then(function(result){
-                
                     //result is a dictionary of group Title and it's results
                     var filtered = {};
                     _.each(result, function (value, key) {
@@ -61,12 +64,10 @@
                             filtered[key] = value;
                         }
                     });
-
+                    // bind to view model
                     vm.searchResults = filtered;
                     // check if search has results
                     vm.hasResults = Object.keys(vm.searchResults).length > 0;
-                    console.log("results", vm.searchResults);
-                    console.log("has results", vm.hasResults);
                 });
 
             } else {
