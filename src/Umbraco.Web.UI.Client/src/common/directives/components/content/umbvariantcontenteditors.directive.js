@@ -9,7 +9,8 @@
         bindings: {
             page: "<",
             content: "<", //TODO: Not sure if this should be = since we are changing the 'active' property of a variant
-            culture: "<"
+            culture: "<",
+            onSelectApp: "&?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController
@@ -39,8 +40,6 @@
 
         /** Called when the component initializes */
         function onInit() {
-            // set first app to active
-            vm.content.apps[0].active = true;
             prevContentDateUpdated = angular.copy(vm.content.updateDate);
             setActiveCulture();
         }
@@ -192,7 +191,7 @@
 
             //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
-                return a.alias === "content";
+                return a.alias === "umbContent";
             });
             contentApp.viewModel = variant;
 
@@ -222,7 +221,7 @@
                 var editor = vm.editors[e];
                 for (var i = 0; i < editor.content.apps.length; i++) {
                     var app = editor.content.apps[i];
-                    if (app.alias === "content") {
+                    if (app.alias === "umbContent") {
                         app.active = true;
                     }
                     else {
@@ -311,6 +310,9 @@
         function selectApp(app) {
             if(app && app.alias) {
                 activeAppAlias = app.alias;
+            }
+            if(vm.onSelectApp) {
+                vm.onSelectApp({"app": app});
             }
         }
 

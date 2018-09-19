@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var listViewApp = new ContentApp
             {
-                Alias = "childItems",
+                Alias = "umbListView",
                 Name = "Child items",
                 Icon = "icon-list",
                 View = "views/content/apps/listview/listview.html"

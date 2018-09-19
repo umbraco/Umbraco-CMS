@@ -27,10 +27,13 @@
 
         function init(content) {
 
+            // set first app to active
+            content.apps[0].active = true;
+
             if (infiniteMode) {
                 createInfiniteModeButtons(content);
             } else {
-                createButtons(content);
+                createButtons(content, content.apps[0]);
             }
 
             editorState.set($scope.content);
@@ -135,7 +138,22 @@
 
         }
 
-        function createButtons(content) {
+        /**
+         * Create the save/publish/preview buttons for the view
+         * @param {any} content the content node
+         * @param {any} app the active content app
+         */
+        function createButtons(content, app) {
+
+            // only create the save/publish/preview buttons if the 
+            // content app is "Conent"
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                $scope.defaultButton = null;
+                $scope.subButtons = null;
+                $scope.page.showPreviewButton = false;
+                return;
+            }
+
             $scope.page.buttonGroupState = "init";
             var buttons = contentEditingHelper.configureContentEditorButtons({
                 create: $scope.page.isNew,
@@ -147,9 +165,10 @@
                     unPublish: $scope.unPublish
                 }
             });
-
+            
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+            $scope.page.showPreviewButton = true;
 
         }
 
@@ -467,10 +486,14 @@
                 // Chromes popup blocker will kick in if a window is opened 
                 // without the initial scoped request. This trick will fix that.
                 //  
-                var previewWindow = $window.open('preview/?init=true&id=' + content.id, 'umbpreview');
+                var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
                 // Build the correct path so both /#/ and #/ work.
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
+                var query = 'id=' + content.id;
+                if ($scope.culture) {
+                    query += "&culture=" + $scope.culture;
+                }
+                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
                 //The user cannot save if they don't have access to do that, in which case we just want to preview
                 //and that's it otherwise they'll get an unauthorized access message
@@ -478,8 +501,22 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    $scope.save().then(function (data) {
+                    var selectedVariant;
+                    if (!$scope.culture) {
+                        selectedVariant = $scope.content.variants[0];
+                    }
+                    else {
+                        selectedVariant = _.find($scope.content.variants, function (v) {
+                            return v.language.culture === $scope.culture;
+                        });
+                    }
+
+                    //ensure the save flag is set
+                    selectedVariant.save = true;
+                    performSave({ saveMethod: contentResource.publish, action: "save" }).then(function (data) {
                         previewWindow.location.href = redirect;
+                    }, function (err) {
+                        //validation issues ....
                     });
                 }
             }
@@ -553,6 +590,14 @@
                 }
                 $scope.saveAndCloseButtonState = "success";
             });
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appChanged = function(app) {
+            createButtons($scope.content, app);
         };
 
         function moveNode(node, target) {

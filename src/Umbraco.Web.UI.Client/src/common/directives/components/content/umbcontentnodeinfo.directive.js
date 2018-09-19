@@ -315,7 +315,7 @@
             // load audit trail when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function(){
-                    if (args.alias === "info") {
+                    if (args.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
                     } else {

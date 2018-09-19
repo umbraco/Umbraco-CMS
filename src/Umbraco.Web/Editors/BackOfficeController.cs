@@ -44,7 +44,7 @@ namespace Umbraco.Web.Editors
     /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
-    [DisableClientCache]
+    [DisableBrowserCache]
     public class BackOfficeController : UmbracoController
     {
         private readonly ManifestParser _manifestParser;
@@ -192,7 +192,8 @@ namespace Umbraco.Web.Editors
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
 
-            var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
@@ -211,7 +212,7 @@ namespace Umbraco.Web.Editors
                 var initJs = new JsInitialization(_manifestParser);
                 var initCss = new CssInitialization(_manifestParser);
                 var assets = new List<string>();
-                assets.AddRange(initJs.GetScriptFiles(HttpContext, Enumerable.Empty<string>()));
+                assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
                 assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
                 return new JArray(assets);
             }
