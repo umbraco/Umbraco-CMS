@@ -258,13 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dbfield = GetQuotedFieldName("umbracoNode", "id");
             if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
-                // get alias, if aliased
-                var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-                var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-                if (match != null) dbfield = match.Groups[2].Value;
-
-                // add field
-                psql.OrderBy(dbfield);
+                psql.OrderBy(DetectSystemOrderingAlias(dbfield, sql));
             }
 
             // create prepared sql
@@ -292,15 +286,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // id is invariant
             if (ordering.OrderBy.InvariantEquals("id"))
-                return SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId);
+                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId), sql);
 
             // sort order is invariant
             if (ordering.OrderBy.InvariantEquals("sortOrder"))
-                return SqlSyntax.GetFieldName<NodeDto>(x => x.SortOrder);
+                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.SortOrder), sql);
 
             // path is invariant
             if (ordering.OrderBy.InvariantEquals("path"))
-                return SqlSyntax.GetFieldName<NodeDto>(x => x.Path);
+                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.Path), sql);
 
             // note: 'owner' is the user who created the item as a whole,
             //       we don't have an 'owner' per culture (should we?)
@@ -311,21 +305,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 sql = InsertJoins(sql, joins);
 
+                //fixme: This doesn't seem to work even if we try to detect alias 
                 return SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "ownerUser");
             }
 
             // note: each version culture variation has a date too,
             //       maybe we would want to use it instead?
             if (ordering.OrderBy.InvariantEquals("versionDate") || ordering.OrderBy.InvariantEquals("updateDate"))
-                return SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate);
+                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate), sql);
 
             // create date is invariant (we don't keep each culture's creation date)
             if (ordering.OrderBy.InvariantEquals("createDate"))
-                return SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate);
+                return DetectSystemOrderingAlias(SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate), sql);
 
             // name is variant
             if (ordering.OrderBy.InvariantEquals("name"))
             {
+                //fixme: This doesn't seem to work even if we try to detect alias 
                 // no culture = can only work on the invariant name
                 if (ordering.Culture.IsNullOrWhiteSpace())
                     return SqlSyntax.GetFieldName<NodeDto>(x => x.Text);
@@ -345,6 +341,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // previously, we'd accept anything and just sanitize it - not anymore
             throw new NotSupportedException($"Ordering by {ordering.OrderBy} not supported.");
+        }
+
+        /// <summary>
+        /// Detect the alias an ordered system field in the main SQL
+        /// </summary>
+        /// <param name="dbfield"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        private string DetectSystemOrderingAlias(string dbfield, Sql sql)
+        {
+            // get alias, if aliased
+            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
+            if (match != null) dbfield = match.Groups[2].Value;
+            return dbfield;
         }
 
         private string ApplyCustomOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
