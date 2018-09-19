@@ -10,6 +10,8 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
+        private static readonly string expressionOperators = "()+=*<>%-";
+
         public abstract IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
         public abstract IEnumerable<SavedLogSearch> GetSavedSearches();
@@ -57,39 +59,32 @@ namespace Umbraco.Core.Logging.Viewer
             var allLogs = GetAllLogs(startDate, endDate);
             var logs = allLogs;
 
-            //If we have a filter expression, apply it
+            //If we have a filter expression check it and apply
             if (string.IsNullOrEmpty(filterExpression) == false)
             {
                 Func<LogEvent, bool> filter = null;
 
-                // If the expression evaluates then make it into a filter
-                if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
+                // If the expression is one word and doesn't contain a serilog operator then we can perform a like search
+                if (!filterExpression.Contains(" ") && !filterExpression.ContainsAny(expressionOperators.Select(c => c)))
                 {
-                    filter = evt => true.Equals(eval(evt));
-                }
-                else 
-                {
-                    //Assume the expression was a search string and make a Like filter from that
                     filter = PerformMessageLikeFilter(filterExpression);
                 }
-
-                //Go and filter the logs
-                //May be with a valid expression (could be single word & return no results)
-                //Failed expression so we try @Message like
-                logs = FilterLogs(logs, filter);
-
-                //If logs now has a count of 0 AND filterExpression contains no spaces
-                //We can assume a single word search (Which would PASS creating a filter above)
-                if (logs.Count() == 0 && filterExpression.Contains(" ") == false)
+                else // check if it's a valid expression
                 {
-                    //Reset logs & filter
-                    logs = allLogs;
-                    filter = null;
+                    // If the expression evaluates then make it into a filter
+                    if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
+                    {
+                        filter = evt => true.Equals(eval(evt));
+                    }
+                    else
+                    {
+                        //Assume the expression was a search string and make a Like filter from that
+                        filter = PerformMessageLikeFilter(filterExpression);
+                    }
+                }
 
-                    //Do an expression using message like
-                    filter = PerformMessageLikeFilter(filterExpression);
-
-                    //Filter the logs again with the single word
+                if (filter != null)
+                {
                     logs = FilterLogs(logs, filter);
                 }
             }
@@ -110,7 +105,7 @@ namespace Umbraco.Core.Logging.Viewer
             long pageIndex = pageNumber - 1;
 
             //Order By, Skip, Take & Select
-            IEnumerable<LogMessage> logMessages = logs
+            var logMessages = logs
                 .OrderBy(l => l.Timestamp, orderDirection)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
