@@ -4,24 +4,30 @@
     <input 
         class="umb-search-input" 
         type="text" 
-        ng-model="vm.searchQuery" 
+        ng-model="vm.searchQuery"
+        ng-model-options="{ debounce: 200 }"
         ng-change="vm.search(vm.searchQuery)" 
         placeholder="Search..." 
         autofocus />
-    
-    <ul class="umb-search-results" ng-if="vm.searchResults.length > 0">
-        <li class="umb-search-results_item">
-            <strong>Result 1</strong>
-            <small class="umb-search-results_item-description">/result-1/</small>
-        </li>
-        <li class="umb-search-results_item">
-            <strong>Result 2</strong>
-            <small class="umb-search-results_item-description">/result-2/</small>
-        </li>
-        <li class="umb-search-results_item">
-            <strong>Result 3</strong>
-            <small class="umb-search-results_item-description">/result-3/</small>
-        </li>
-    </ul>
+
+    <div class="umb-search-results">
+        <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults">
+            <div class="umb-search-group__title">{{key}}</div>
+            <ul class="umb-search-items">
+                <li class="umb-search-item" ng-repeat="result in group.results">
+                    <a class="umb-search-result__link" ng-href="" href="">
+                        <i class="umb-search-result__icon {{result.icon}}"></i>
+                        <span class="umb-search-result__meta">
+                            <span class="umb-search-result__name">{{result.name}}</span>
+                            <span class="umb-search-result__description">/path/to/something/here</span>
+                            <!--
+                            <span class="umb-search-result__description" ng-show="result.subTitle">{{result.subTitle}}</span>
+                            -->
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 
 </div>
