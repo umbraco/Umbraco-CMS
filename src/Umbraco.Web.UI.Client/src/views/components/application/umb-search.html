@@ -1,14 +1,17 @@
 
 <div class="umb-search" on-outside-click="vm.closeSearch()">
 
-    <input 
-        class="umb-search-input" 
-        type="text" 
-        ng-model="vm.searchQuery"
-        ng-model-options="{ debounce: 200 }"
-        ng-change="vm.search(vm.searchQuery)" 
-        placeholder="Search..." 
-        autofocus />
+    <div class="flex items-center">
+        <i class="umb-search-input-icon icon-search"></i>
+        <input 
+            class="umb-search-input" 
+            type="text" 
+            ng-model="vm.searchQuery"
+            ng-model-options="{ debounce: 200 }"
+            ng-change="vm.search(vm.searchQuery)" 
+            placeholder="Search..." 
+            autofocus />
+    </div>
 
     <div class="umb-search-results">
         <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults">
