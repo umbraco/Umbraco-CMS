@@ -76,6 +76,16 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public async Task<ActionResult> VerifyInvite(string invite)
         {
+            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
+            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
+            //dumped at the default admin view with no detail
+            if(User.GetUmbracoIdentity() != null)
+            {
+                AuthenticationManager.SignOut(
+                    Core.Constants.Security.BackOfficeAuthenticationType,
+                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            }
+            
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -123,11 +133,6 @@ namespace Umbraco.Web.Editors
             }
 
             //sign the user in
-
-            AuthenticationManager.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
             await SignInManager.SignInAsync(identityUser, false, false);
 
             return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
