@@ -29,12 +29,12 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
     });
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture"];
-    var retainedQueryStrings = ['mculture'];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
+    var retainedQueryStrings = ["mculture"];
 
     //used to track the current dialog object
     var currentDialog = null;
-        
+
     //tracks the user profile dialog
     var userDialog = null;
 
