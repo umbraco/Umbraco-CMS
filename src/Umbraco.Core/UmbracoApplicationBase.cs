@@ -3,10 +3,10 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using log4net;
 using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Core
 {
@@ -27,7 +27,7 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual ILogger GetLogger()
         {
-            return Logger.CreateWithDefaultLog4NetConfiguration();
+            return SerilogLogger.CreateWithDefaultConfiguration();
         }
 
         // events - in the order they trigger
@@ -91,7 +91,7 @@ namespace Umbraco.Core
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                logger.Error<UmbracoApplicationBase>(msg, exception);
+                logger.Error<UmbracoApplicationBase>(exception, msg);
             };
         }
 
@@ -160,13 +160,6 @@ namespace Umbraco.Core
                 _runtime = null;
             }
 
-            // dispose the container and everything
-            // but first, capture the looger!
-            var logger = Current.Logger;
-            Current.Reset(); 
-
-            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
-
             // try to log the detailed shutdown message (typical asp.net hack: http://weblogs.asp.net/scottgu/433194)
             try
             {
@@ -184,24 +177,27 @@ namespace Umbraco.Core
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                var shutdownMsg = $"Application shutdown. Details: {HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
-
-                logger.Info<UmbracoApplicationBase>(shutdownMsg);
+                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                    HostingEnvironment.ShutdownReason,
+                    shutDownMessage,
+                    shutDownStack);
             }
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
+
+            // dispose the container and everything
+            Current.Reset();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
         // sender is System.Web.HttpApplicationFactory, evargs is EventArgs.Empty
         protected void Application_End(object sender, EventArgs evargs)
         {
-            HandleApplicationEnd();
             OnApplicationEnd(sender, evargs);
-            LogManager.Shutdown();
+            HandleApplicationEnd();
         }
 
         #endregion
@@ -220,7 +216,7 @@ namespace Umbraco.Core
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred.", exception);
+            Current.Logger.Error<UmbracoApplicationBase>(exception, "An unhandled exception occurred");
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -243,7 +239,7 @@ namespace Umbraco.Core
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>($"Error in {name} handler.", ex);
+                Current.Logger.Error<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

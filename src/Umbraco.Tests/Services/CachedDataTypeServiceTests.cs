@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 

@@ -637,6 +637,13 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
             }
+            if (identityUser.IsPropertyDirty("LastPasswordChangeDateUtc")
+                || (user.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value)
+            {
+                anythingChanged = true;
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
+            }
             if (identityUser.IsPropertyDirty("EmailConfirmed")
                 || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
                 || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))

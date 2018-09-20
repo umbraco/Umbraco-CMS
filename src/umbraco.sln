@@ -8,19 +8,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 	ProjectSection(SolutionItems) = preProject
 		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
 		..\build\build.ps1 = ..\build\build.ps1
-		..\build\BuildDocs.ps1 = ..\build\BuildDocs.ps1
 		..\NuGet.Config = ..\NuGet.Config
-		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
-		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
 		SolutionInfo.cs = SolutionInfo.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		ApiDocs\docfx.filter.yml = ApiDocs\docfx.filter.yml
-		ApiDocs\docfx.json = ApiDocs\docfx.json
-		ApiDocs\index.md = ApiDocs\index.md
-		ApiDocs\toc.yml = ApiDocs\toc.yml
+		..\docs\BUILD.md = ..\docs\BUILD.md
+		..\docs\CODE_OF_CONDUCT.md = ..\docs\CODE_OF_CONDUCT.md
+		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
+		..\LICENSE.md = ..\LICENSE.md
+		..\docs\PULL_REQUEST_TEMPLATE.md = ..\docs\PULL_REQUEST_TEMPLATE.md
+		..\docs\README.md = ..\docs\README.md
+		..\docs\V8_GETTING_STARTED.md = ..\docs\V8_GETTING_STARTED.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
+		..\build\NuSpecs\UmbracoCms.Web.nuspec = ..\build\NuSpecs\UmbracoCms.Web.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -83,18 +84,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "About", "About", "{420D2458-E404-4181-B05A-0FE99EC5C504}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
 	ProjectSection(SolutionItems) = preProject
-		..\BUILD.md = ..\BUILD.md
-		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
-		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
-		..\LICENSE.md = ..\LICENSE.md
-		..\PULL_REQUEST_TEMPLATE.md = ..\PULL_REQUEST_TEMPLATE.md
-		..\README.md = ..\README.md
-		..\V8_GETTING_STARTED.md = ..\V8_GETTING_STARTED.md
+		ApiDocs\docfx.filter.yml = ApiDocs\docfx.filter.yml
+		ApiDocs\docfx.json = ApiDocs\docfx.json
+		ApiDocs\index.md = ApiDocs\index.md
+		ApiDocs\toc.yml = ApiDocs\toc.yml
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj", "{7020A059-C0D1-43A0-8EFD-23591A0C9AF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,10 +124,6 @@ Global
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7020A059-C0D1-43A0-8EFD-23591A0C9AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7020A059-C0D1-43A0-8EFD-23591A0C9AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7020A059-C0D1-43A0-8EFD-23591A0C9AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7020A059-C0D1-43A0-8EFD-23591A0C9AF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +134,7 @@ Global
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{86DEB346-089F-4106-89C8-D852B9CF2A33} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

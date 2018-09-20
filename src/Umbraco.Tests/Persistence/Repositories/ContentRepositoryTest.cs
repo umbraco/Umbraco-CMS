@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 
@@ -140,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // publish = new edit version
                 content1.SetValue("title", "title");
-                ((Content)content1).TryPublishValues();
+                ((Content)content1).PublishCulture();
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -202,7 +203,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
-                ((Content)content1).TryPublishValues();
+                ((Content)content1).PublishCulture();
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -238,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish = new version
                 content1.Name = "name-4";
                 content1.SetValue("title", "title-4");
-                ((Content)content1).TryPublishValues();
+                ((Content)content1).PublishCulture();
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -648,7 +649,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish them all
                 foreach (var content in result)
                 {
-                    content.TryPublishValues();
+                    content.PublishCulture();
                     repository.Save(content);
                 }
 
@@ -667,9 +668,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void RegexAliasTest()
+        public void AliasRegexTest()
         {
-            var regex = VersionableRepositoryBaseAliasRegex.For(new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)));
+            var regex = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)).AliasRegex;
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             var matches = regex.Matches(sql);
@@ -683,22 +684,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_With_Variant_Names()
         {
-            //2x content types, one invariant, one variant
-
+            // one invariant content type named "umbInvariantTextPage"
+            //
             var invariantCt = MockedContentTypes.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage");
-            invariantCt.Variations = ContentVariation.InvariantNeutral;
-            foreach (var p in invariantCt.PropertyTypes) p.Variations = ContentVariation.InvariantNeutral;
+            invariantCt.Variations = ContentVariation.Nothing;
+            foreach (var p in invariantCt.PropertyTypes) p.Variations = ContentVariation.Nothing;
             ServiceContext.FileService.SaveTemplate(invariantCt.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(invariantCt);
 
+            // one variant (by culture) content type named "umbVariantTextPage"
+            // with properties, every 2nd one being variant (by culture), the other being invariant
+            //
             var variantCt = MockedContentTypes.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage");
-            variantCt.Variations = ContentVariation.CultureNeutral;
+            variantCt.Variations = ContentVariation.Culture;
             var propTypes = variantCt.PropertyTypes.ToList();
             for (var i = 0; i < propTypes.Count; i++)
             {
                 var p = propTypes[i];
-                //every 2nd one is variant
-                p.Variations = i % 2 == 0 ? ContentVariation.CultureNeutral : ContentVariation.InvariantNeutral;
+                p.Variations = i % 2 == 0 ? ContentVariation.Culture : ContentVariation.Nothing;
             }
             ServiceContext.FileService.SaveTemplate(variantCt.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(variantCt);
@@ -710,6 +713,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var root = MockedContent.CreateSimpleContent(invariantCt);
             ServiceContext.ContentService.Save(root);
+
+            var children = new List<IContent>();
 
             for (var i = 0; i < 25; i++)
             {
@@ -732,27 +737,37 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
 
                 ServiceContext.ContentService.Save(child);
+                children.Add(child);
             }
+
+            var child1 = children[1];
+            Assert.IsTrue(child1.ContentType.VariesByCulture());
+            Assert.IsTrue(child1.Name.StartsWith("VAR"));
+            Assert.IsTrue(child1.GetCultureName("en-US").StartsWith("VAR"));
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
-                var query = scope.SqlContext.Query<IContent>().Where(x => x.ParentId == root.Id);
+                var child = repository.Get(children[1].Id); // 1 is variant
+                Assert.IsTrue(child.ContentType.VariesByCulture());
+                Assert.IsTrue(child.Name.StartsWith("VAR"));
+                Assert.IsTrue(child.GetCultureName("en-US").StartsWith("VAR"));
 
                 try
                 {
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPage(query, 0, 20, out var totalRecords, "UpdateDate", Direction.Ascending, true);
+                    var query = scope.SqlContext.Query<IContent>().Where(x => x.ParentId == root.Id);
+                    var result = repository.GetPage(query, 0, 20, out var totalRecords, null, Ordering.By("UpdateDate"));
 
                     Assert.AreEqual(25, totalRecords);
                     foreach (var r in result)
                     {
                         var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
-                        var name = isInvariant ? r.Name : r.Names["en-US"];
+                        var name = isInvariant ? r.Name : r.CultureNames["en-US"];
                         var namePrefix = isInvariant ? "INV" : "VAR";
 
                         //ensure the correct name (invariant vs variant) is in the result
@@ -761,7 +776,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         foreach (var p in r.Properties)
                         {
                             //ensure there is a value for the correct variant/invariant property
-                            var value = p.GetValue(p.PropertyType.Variations.Has(ContentVariation.InvariantNeutral) ? null : "en-US");
+                            var value = p.GetValue(p.PropertyType.Variations.VariesByNothing() ? null : "en-US");
                             Assert.IsNotNull(value);
                         }
                     }
@@ -789,12 +804,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPage(query, 0, 2, out var totalRecords, "title", Direction.Ascending, false);
+                    var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("title", isCustomField: true));
 
                     Assert.AreEqual(3, totalRecords);
                     Assert.AreEqual(2, result.Count());
 
-                    result = repository.GetPage(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
+                    result = repository.GetPage(query, 1, 2, out totalRecords, null, Ordering.By("title", isCustomField: true));
 
                     Assert.AreEqual(1, result.Count());
                 }
@@ -821,7 +836,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                    var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name"));
 
                     Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                     Assert.That(result.Count(), Is.EqualTo(1));
@@ -844,7 +859,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 1, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -861,7 +876,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 0, 2, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(2));
@@ -878,7 +893,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Descending, true);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name", Direction.Descending));
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -897,7 +912,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(1));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -916,7 +931,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = scope.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = scope.SqlContext.Query<IContent>().Where(x => x.Name.Contains("text"));
-                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
 
                 Assert.That(totalRecords, Is.EqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));

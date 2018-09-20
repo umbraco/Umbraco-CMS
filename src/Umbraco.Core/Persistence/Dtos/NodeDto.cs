@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.Dtos
     {
         public const string TableName = Constants.DatabaseSchema.Tables.Node;
         public const int NodeIdSeed = 1060;
+        private int? _userId;
 
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
@@ -45,8 +46,9 @@ namespace Umbraco.Core.Persistence.Dtos
         public bool Trashed { get; set; }
 
         [Column("nodeUser")] // fixme dbfix rename userId
+        [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int? UserId { get; set; }
+        public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]

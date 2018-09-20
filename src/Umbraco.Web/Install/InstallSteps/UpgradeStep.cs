@@ -19,7 +19,14 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var currentVersion = UmbracoVersion.Local.ToString();
+                var currentVersion = UmbracoVersion.Local;
+
+                //fixme - in this case there's a db but the version is cleared which is fine and a normal way to force the upgrader
+                // to execute, but before we would detect the current version via the DB like DatabaseSchemaResult.DetermineInstalledVersion
+                // what now, do we need to?
+                if (currentVersion == null)
+                    currentVersion = new Semver.SemVersion(0); 
+
                 var newVersion = UmbracoVersion.SemanticVersion.ToString();
 
                 string FormatGuidState(string value)
@@ -34,7 +41,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 var currentState = FormatGuidState(state.CurrentMigrationState);
                 var newState = FormatGuidState(state.FinalMigrationState);
 
-                var reportUrl = $"https://our.umbraco.org/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
+                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
 
                 return new { currentVersion, newVersion, currentState, newState, reportUrl };
             }

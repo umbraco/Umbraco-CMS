@@ -6,6 +6,7 @@
         var vm = this;
 
         vm.page = {};
+        vm.showBackButton = true;
         vm.language = {};
         vm.availableCultures = null;
         vm.breadcrumbs = [];
@@ -85,13 +86,13 @@
 
                 languageResource.save(vm.language).then(function (lang) {
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                    formHelper.resetForm({ scope: $scope });
 
                     vm.language = lang;
                     vm.page.saveButtonState = "success";
-                    notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
+                    localizationService.localize("speechBubbles_languageSaved").then(function(value){
+                        notificationsService.success(value);
+                    });
 
                     // emit event when language is created
                     if($routeParams.create) {
@@ -106,12 +107,6 @@
 
                     formHelper.handleError(err);
 
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
                 });
             }
 
@@ -127,9 +122,7 @@
         }
 
         function toggleMandatory() {
-            if(!vm.language.isDefault) {
-                vm.language.isMandatory = !vm.language.isMandatory;
-            }
+            vm.language.isMandatory = !vm.language.isMandatory;
         }
 
         function toggleDefault() {
@@ -141,7 +134,6 @@
 
             vm.language.isDefault = !vm.language.isDefault;
             if(vm.language.isDefault) {
-                vm.language.isMandatory = true;
                 vm.showDefaultLanguageInfo = true;
             } else {
                 vm.showDefaultLanguageInfo = false;

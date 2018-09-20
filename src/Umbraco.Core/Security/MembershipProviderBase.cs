@@ -281,7 +281,7 @@ namespace Umbraco.Core.Security
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
             {
                 var ex = new ProviderException("Provider can not retrieve a hashed password");
-                Current.Logger.Error<MembershipProviderBase>("Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true", ex);
+                Current.Logger.Error<MembershipProviderBase>(ex, "Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true");
                 throw ex;
             }
 
@@ -720,7 +720,7 @@ namespace Umbraco.Core.Security
                     }
                     else
                     {
-                        //if the salt bytes is too long for the required key length for the algorithm, extend it
+                        //if the salt bytes is too short for the required key length for the algorithm, extend it
                         var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
                         var dstOffset = 0;
                         while (dstOffset < numArray2.Length)

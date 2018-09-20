@@ -22,7 +22,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the version comment of the executing code (eg "beta").
         /// </summary>
-        public static string CurrentComment => "alpha.41";
+        public static string CurrentComment => "alpha.50";
 
         /// <summary>
         /// Gets the assembly version of Umbraco.Code.dll.
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Configuration
                 {
                     // fixme - this should live in its own independent file! NOT web.config!
                     var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
-                    return SemVersion.TryParse(value, out var semver) ? semver : null;
+                    return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }
                 catch
                 {

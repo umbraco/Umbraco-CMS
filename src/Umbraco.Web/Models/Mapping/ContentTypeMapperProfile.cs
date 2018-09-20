@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                     dest.AllowedTemplates = source.AllowedTemplates
                         .Where(x => x != null)
                         .Select(fileService.GetTemplate)
+                        .Where(x => x != null)
                         .ToArray();
 
                     if (source.DefaultTemplate != null)
@@ -112,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .ForMember(display => display.Notifications, opt => opt.Ignore())
-                .ForMember(display => display.AllowCultureVariant, opt => opt.MapFrom(type => type.Variations.HasFlag(ContentVariation.CultureNeutral)))
+                .ForMember(display => display.AllowCultureVariant, opt => opt.MapFrom(type => type.VariesByCulture()))
                 .AfterMap((source, dest) =>
                 {
                     //sync templates

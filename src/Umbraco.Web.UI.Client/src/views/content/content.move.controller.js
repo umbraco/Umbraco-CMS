@@ -25,6 +25,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 
 	    var node = dialogOptions.currentNode;
 
+        function treeLoadedHandler(args) {
+            if (node && node.path) {
+                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+            }
+        }
+
 	    function nodeSelectHandler(args) {
 
 			if(args && args.event) {
@@ -102,16 +108,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
                     $scope.success = false;
                     $scope.error = err;
                     $scope.busy = false;
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
+                   
                 });
 	    };
 
         $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
             $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
         }	    

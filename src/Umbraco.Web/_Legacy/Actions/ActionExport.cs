@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
 {
@@ -12,14 +11,6 @@ namespace Umbraco.Web._Legacy.Actions
 #pragma warning disable 612,618
         private static readonly ActionExport m_instance = new ActionExport();
 #pragma warning restore 612,618
-
-        /// <summary>
-        /// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-        /// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-        /// When this applicatio is refactored, this constuctor should be made private.
-        /// </summary>
-        [Obsolete("Use the singleton instantiation instead of a constructor")]
-        public ActionExport() { }
 
         public static ActionExport Instance
         {
@@ -38,10 +29,7 @@ namespace Umbraco.Web._Legacy.Actions
 
         public string JsFunctionName
         {
-            get
-            {
-                return string.Format("{0}.actionExport()", ClientTools.Scripts.GetAppActions);
-            }
+            get { return ""; }
         }
 
         public string JsSource
@@ -56,7 +44,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return "exportDocumentType";
+                return "export";
             }
         }
 

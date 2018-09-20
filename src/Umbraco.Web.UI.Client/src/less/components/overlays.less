@@ -4,7 +4,7 @@
     background: @white;
     z-index: @zindexUmbOverlay;
     animation: fadeIn 0.2s;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
 }
 
 .umb-overlay__form {
@@ -109,14 +109,24 @@
     width: 400px;
     height: 400px;
     box-sizing: border-box;
+    border-radius: @baseBorderRadius;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-header {
+    border: none;
+    background: transparent;
+    padding: 20px 20px 0 20px;
     text-align: center;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-container {
-    padding: 10px;
+    padding: 20px;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */

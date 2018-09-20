@@ -81,26 +81,37 @@ namespace Umbraco.Core.Models
         ContentStatus Status { get; }
 
         /// <summary>
-        /// Gets a value indicating whether a given culture is published.
+        /// Gets a value indicating whether a culture is published.
         /// </summary>
         /// <remarks>
         /// <para>A culture becomes published whenever values for this culture are published,
         /// and the content published name for this culture is non-null. It becomes non-published
         /// whenever values for this culture are unpublished.</para>
+        /// <para>A culture becomes published as soon as PublishCulture has been invoked,
+        /// even though the document might now have been saved yet (and can have no identity).</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
 
         /// <summary>
+        /// Gets a value indicating whether a culture was published.
+        /// </summary>
+        /// <remarks>
+        /// <para>Mirrors <see cref="IsCulturePublished"/> whenever the content item is saved.</para>
+        /// </remarks>
+        bool WasCulturePublished(string culture);
+
+        /// <summary>
         /// Gets the date a culture was published.
         /// </summary>
-        DateTime GetCulturePublishDate(string culture);
+        DateTime? GetPublishDate(string culture);
 
         /// <summary>
         /// Gets a value indicated whether a given culture is edited.
         /// </summary>
         /// <remarks>
-        /// <para>A culture is edited when it is not published, or when it is published but
-        /// it has changes.</para>
+        /// <para>A culture is edited when it is available, and not published or published but
+        /// with changes.</para>
+        /// <para>A culture can be edited even though the document might now have been saved yet (and can have no identity).</para>
         /// </remarks>
         bool IsCultureEdited(string culture);
 
@@ -122,11 +133,6 @@ namespace Umbraco.Core.Models
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
         IReadOnlyDictionary<string, string> PublishNames { get; }
-
-        /// <summary>
-        /// Gets the available cultures.
-        /// </summary>
-        IEnumerable<string> AvailableCultures { get; }
 
         /// <summary>
         /// Gets the published cultures.
@@ -162,67 +168,21 @@ namespace Umbraco.Core.Models
         IContent DeepCloneWithResetIdentities();
 
         /// <summary>
-        /// Publishes all values.
+        /// Registers a culture to be published.
         /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
+        /// <returns>A value indicating whether the culture can be published.</returns>
         /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valid.</para>
+        /// <para>Fails if properties don't pass variant validtion rules.</para>
+        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
-        //fixme return an Attempt with some error results if it doesn't work
-        //fixme - needs API review as this is not used apart from in tests
-        //bool TryPublishAllValues();
+        bool PublishCulture(string culture = "*");
 
         /// <summary>
-        /// Publishes values.
+        /// Registers a culture to be unpublished.
         /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
         /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valid.</para>
+        /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
-        //fixme return an Attempt with some error results if it doesn't work
-        bool TryPublishValues(string culture = null, string segment = null);
-
-        /// <summary>
-        /// Publishes the culture/any values.
-        /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
-        /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valie.</para>
-        /// </remarks>
-        //fixme - needs API review as this is not used apart from in tests
-        //bool PublishCultureValues(string culture = null);
-
-        /// <summary>
-        /// Clears all published values.
-        /// </summary>
-        void ClearAllPublishedValues();
-
-        /// <summary>
-        /// Clears published values.
-        /// </summary>
-        void ClearPublishedValues(string culture = null, string segment = null);
-
-        /// <summary>
-        /// Clears the culture/any published values.
-        /// </summary>
-        void ClearCulturePublishedValues(string culture = null);
-
-        /// <summary>
-        /// Copies values from another document.
-        /// </summary>
-        void CopyAllValues(IContent other);
-
-        /// <summary>
-        /// Copies values from another document.
-        /// </summary>
-        void CopyValues(IContent other, string culture = null, string segment = null);
-
-        /// <summary>
-        /// Copies culture/any values from another document.
-        /// </summary>
-        void CopyCultureValues(IContent other, string culture = null);
+        void UnpublishCulture(string culture = "*");
     }
 }

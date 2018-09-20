@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Examine;
 using LightInject;
@@ -17,7 +15,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
-using Umbraco.Examine;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Components
@@ -34,6 +31,11 @@ namespace Umbraco.Web.Components
     /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+
+    // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
+    // todo - should not be a strong dependency on "examine" but on an "indexing component"
+    [RequireComponent(typeof(ExamineComponent))]
+
     public sealed class DatabaseServerRegistrarAndMessengerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private object _locker = new object();
@@ -158,7 +160,8 @@ namespace Umbraco.Web.Components
             var task = new InstructionProcessTask(_processTaskRunner,
                 60000, //delay before first execution
                 _messenger.Options.ThrottleSeconds*1000, //amount of ms between executions
-                _messenger);
+                _messenger,
+                _logger);
             _processTaskRunner.TryAdd(task);
             return task;
         }
@@ -176,12 +179,14 @@ namespace Umbraco.Web.Components
         private class InstructionProcessTask : RecurringTaskBase
         {
             private readonly DatabaseServerMessenger _messenger;
+            private readonly ILogger _logger;
 
             public InstructionProcessTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                DatabaseServerMessenger messenger)
+                DatabaseServerMessenger messenger, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 _messenger = messenger;
+                _logger = logger;
             }
 
             public override bool IsAsync => false;
@@ -192,8 +197,14 @@ namespace Umbraco.Web.Components
             /// <returns>A value indicating whether to repeat the task.</returns>
             public override bool PerformRun()
             {
-                // TODO what happens in case of an exception?
-                _messenger.Sync();
+                try
+                {
+                    _messenger.Sync();
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<InstructionProcessTask>("Failed (will repeat).", e);
+                }
                 return true; // repeat
             }
         }
@@ -235,7 +246,7 @@ namespace Umbraco.Web.Components
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>("Failed to update server record in database.", ex);
+                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>(ex, "Failed to update server record in database.");
                     return false; // probably stop if we have an error
                 }
             }

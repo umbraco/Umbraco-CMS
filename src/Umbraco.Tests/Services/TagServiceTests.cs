@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -36,27 +37,23 @@ namespace Umbraco.Tests.Services
 
             IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             // change
             content1.AssignTags("tags", new[] { "elephant" }, true);
             content1.RemoveTags("tags", new[] { "cow" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             // more changes
             content1.AssignTags("tags", new[] { "mouse" }, true);
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
             content1.RemoveTags("tags", new[] { "mouse" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             // get it back
             content1 = contentService.GetById(content1.Id);
             var tagsValue = content1.GetValue("tags").ToString();
-            var tagsValues = tagsValue.Split(',');
+            var tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
             Assert.AreEqual(3, tagsValues.Length);
             Assert.Contains("pig", tagsValues);
             Assert.Contains("goat", tagsValues);
@@ -88,17 +85,14 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "cow", "pig" });
-            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             var content3 = MockedContent.CreateSimpleContent(contentType, "Tagged content 3", -1);
             content3.AssignTags("tags", new[] { "cow" });
-            content3.TryPublishValues();
             contentService.SaveAndPublish(content3);
 
             // Act

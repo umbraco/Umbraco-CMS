@@ -18,12 +18,12 @@ namespace Umbraco.Core.Services
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
-        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = -1);
-        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = -1);
-        bool DeletePartialView(string path, int userId = -1);
-        bool DeletePartialViewMacro(string path, int userId = -1);
-        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = -1);
-        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = -1);
+        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
+        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
+        bool DeletePartialView(string path, int userId = 0);
+        bool DeletePartialViewMacro(string path, int userId = 0);
+        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
+        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
         bool ValidatePartialView(PartialView partialView);
         bool ValidatePartialViewMacro(PartialView partialView);
 
@@ -45,14 +45,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
-        void SaveStylesheet(Stylesheet stylesheet, int userId = -1);
+        void SaveStylesheet(Stylesheet stylesheet, int userId = 0);
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-        void DeleteStylesheet(string path, int userId = -1);
+        void DeleteStylesheet(string path, int userId = 0);
 
         /// <summary>
         /// Validates a <see cref="Stylesheet"/>
@@ -79,14 +79,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="script"><see cref="Script"/> to save</param>
         /// <param name="userId">Optional id of the user saving the script</param>
-        void SaveScript(Script script, int userId = -1);
+        void SaveScript(Script script, int userId = 0);
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
-        void DeleteScript(string path, int userId = -1);
+        void DeleteScript(string path, int userId = 0);
 
         /// <summary>
         /// Validates a <see cref="Script"/>
@@ -170,26 +170,11 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId);
 
         /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        TemplateNode GetTemplateNode(string alias);
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
-
-        /// <summary>
         /// Saves a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to save</param>
         /// <param name="userId">Optional id of the user saving the template</param>
-        void SaveTemplate(ITemplate template, int userId = -1);
+        void SaveTemplate(ITemplate template, int userId = 0);
 
         /// <summary>
         /// Creates a template for a content type
@@ -200,16 +185,16 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = -1);
+        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
 
-        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = -1);
+        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
 
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the template</param>
-        void DeleteTemplate(string alias, int userId = -1);
+        void DeleteTemplate(string alias, int userId = 0);
 
         /// <summary>
         /// Validates a <see cref="ITemplate"/>
@@ -223,7 +208,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
-        void SaveTemplate(IEnumerable<ITemplate> templates, int userId = -1);
+        void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0);
 
         /// <summary>
         /// This checks what the default rendering engine is set in config but then also ensures that there isn't already

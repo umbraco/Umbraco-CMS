@@ -18,7 +18,7 @@
       }
 
       var valFormManager = ctrl[1];
-      scope.subView.hasError = false;
+      scope.model.hasError = false;
 
       //listen for form validation changes
       valFormManager.onValidationStatusChanged(function (evt, args) {
@@ -27,21 +27,21 @@
              var subViewContent = el.find(".ng-invalid");
 
              if (subViewContent.length > 0) {
-                 scope.subView.hasError = true;
+                 scope.model.hasError = true;
              } else {
-                 scope.subView.hasError = false;
+                 scope.model.hasError = false;
              }
 
           }
           else {
-             scope.subView.hasError = false;
+              scope.model.hasError = false;
           }
       });
 
     }
 
     var directive = {
-      require: ['?^form', '?^valFormManager'],
+      require: ['?^^form', '?^^valFormManager'],
       restrict: "A",
       link: link
     };

@@ -53,7 +53,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                         Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
-                        HttpContext.Current.IsDebuggingEnabled);
+                        Current.RuntimeState.Debug);
 
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())
@@ -100,7 +100,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<GridValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    Current.Logger.Error<GridValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
                 }
             }
 

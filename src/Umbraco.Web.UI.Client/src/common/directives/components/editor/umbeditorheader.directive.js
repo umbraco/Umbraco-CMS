@@ -201,50 +201,16 @@ Use this directive to construct a header inside the main editor window.
 
 **/
 
-(function() {
+(function () {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper, $location, editorService) {
+    function EditorHeaderDirective(editorService) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-
-            function onInit() {
-                setCurrentVariant(scope.variants);
-                setVariantStatusColor(scope.variants);
-            }
-
-            function setCurrentVariant(variants) {
-
-                angular.forEach(variants, function (variant) {
-                    if(variant.current) {
-                        scope.vm.currentVariant = variant;
-                    }
-                });
-            }
-
-            //TODO: This doesn't really affect any UI currently, need some feedback from mads
-            function setVariantStatusColor(variants) {
-                angular.forEach(variants, function (variant) {
-
-                    //TODO: What about variant.exists? If we are applying colors/styles, this should be one of them
-
-                    switch (variant.state) {
-                        case "Published":
-                            variant.stateColor = "success";
-                            break;
-                        case "Unpublished":
-                        //TODO: Not sure if these statuses will ever bubble up to the UI?
-                        case "Publishing":
-                        case "Unpublishing":
-                        default:
-                            variant.stateColor = "gray";
-                    }
-                });
-            }
 
             scope.goBack = function () {
                 if (scope.onBack) {
@@ -252,14 +218,17 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
-            scope.selectVariant = function (event, variant) {
-                scope.vm.dropdownOpen = false;
-                $location.search("cculture", variant.language.culture);
-            };
+            scope.selectNavigationItem = function(item) {
+                if(scope.onSelectNavigationItem) {
+                    scope.onSelectNavigationItem({"item": item});
+                }
+            }
 
-            scope.openIconPicker = function() {
+            scope.openIconPicker = function () {
                 var iconPicker = {
-                    submit: function(model) {
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
+                    submit: function (model) {
                         if (model.icon) {
                             if (model.color) {
                                 scope.icon = model.icon + " " + model.color;
@@ -271,34 +240,12 @@ Use this directive to construct a header inside the main editor window.
                         }
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
                 editorService.iconPicker(iconPicker);
             };
-
-            scope.closeSplitView = function() {
-                if(scope.onCloseSplitView) {
-                    scope.onCloseSplitView();
-                }
-            };
-
-            scope.openInSplitView = function(event, variant) {
-                if(scope.onOpenInSplitView) {
-                    scope.vm.dropdownOpen = false;
-                    scope.onOpenInSplitView({"variant": variant});
-                }
-            };
-
-            scope.$watch('variants', function(newValue, oldValue){
-                if(!newValue) return;
-                if(newValue === oldValue) return;
-                setCurrentVariant(newValue);
-                setVariantStatusColor(newValue);
-            }, true);
-
-            onInit();
 
         }
 
@@ -308,11 +255,10 @@ Use this directive to construct a header inside the main editor window.
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-header.html',
             scope: {
-                tabs: "=",
-                actions: "=",
                 name: "=",
                 nameLocked: "=",
                 menu: "=",
+                hideMenu: "<?",
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
@@ -320,14 +266,11 @@ Use this directive to construct a header inside the main editor window.
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",
-                variants: "=",
                 navigation: "=",
+                onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "@?",
-                splitViewOpen: "=?",
-                onOpenInSplitView: "&?",
-                onCloseSplitView: "&?"
+                showBackButton: "<?"
             },
             link: link
         };

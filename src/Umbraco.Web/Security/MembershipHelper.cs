@@ -59,22 +59,6 @@ namespace Umbraco.Web.Security
 
         // used here and there for IMember operations (not front-end stuff, no need for _memberCache)
 
-        [Obsolete("Use the constructor specifying an UmbracoContext")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MembershipHelper(HttpContextBase httpContext)
-        {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            _httpContext = httpContext;
-            _membershipProvider = MPE.GetMembersMembershipProvider();
-            _roleProvider = Roles.Enabled ? Roles.Provider : new MembersRoleProvider(MemberService);
-
-            // _memberCache remains null - not supposed to use it
-            // alternatively we'd need to get if from the 'current' UmbracoContext?
-
-            // helpers are *not* instanciated by the container so we have to
-            // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
-        }
 
         // used everywhere
         public MembershipHelper(UmbracoContext umbracoContext)
@@ -317,7 +301,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
+                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
             //Log them in
@@ -658,10 +642,15 @@ namespace Umbraco.Web.Security
                 var provider = _membershipProvider;
 
                 string username;
+                
                 if (provider.IsUmbracoMembershipProvider())
                 {
                     var member = GetCurrentPersistedMember();
+                    // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
+                    if (member == null)
+                        return false;
                     username = member.Username;
+                    
                     // If types defined, check member is of one of those types
                     var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
                     if (allowTypesList.Any(allowType => allowType != string.Empty))
@@ -680,6 +669,9 @@ namespace Umbraco.Web.Security
                 else
                 {
                     var member = provider.GetCurrentUser();
+                    // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
+                    if (member == null)
+                        return false;
                     username = member.UserName;
                 }
 

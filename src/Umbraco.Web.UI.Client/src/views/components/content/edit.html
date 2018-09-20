@@ -5,41 +5,13 @@
     <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
-            
-            <div class="umb-split-views">
-                <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
-                    
-                    <umb-load-indicator
-                        ng-if="editor.loading">
-                    </umb-load-indicator>
 
-                    <div class="umb-split-view__content" ng-if="!editor.loading">
-                        <umb-editor-header 
-                            menu="page.menu"
-                            name="editor.content.name"
-                            hide-icon="true"
-                            hide-description="true" 
-                            hide-alias="true"
-                            navigation="editor.content.apps"
-                            variants="editor.content.variants"
-                            on-back="backToListView()"
-                            show-back-button="{{page.listViewPath}}"
-                            split-view-open="editors.length > 1"
-                            on-open-in-split-view="openInSplitView(variant)"
-                            on-close-split-view="closeSplitView($index, editor)">
-                        </umb-editor-header>
-
-                        <umb-editor-container>
-                            <umb-editor-sub-views 
-                                ng-if="!page.loading" 
-                                sub-views="editor.content.apps" 
-                                model="editor.content">
-                            </umb-editor-sub-views>    
-                        </umb-editor-container>
-                    </div>
-
-                </div>
-            </div>
+            <umb-variant-content-editors 
+                page="page"
+                content="content"
+                culture="culture"
+                on-select-app="appChanged(app)">
+            </umb-variant-content-editors>
 
             <umb-editor-footer>
 
@@ -57,25 +29,25 @@
                 <umb-editor-footer-content-right>
 
                     <umb-button
-                        ng-if="model.infiniteMode"
+                        ng-if="infiniteModel.infiniteMode"
                         action="close()"
                         button-style="link"
-                        label="Close"
+                        label-key="general_close"
                         type="button">
                     </umb-button>
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview" 
+                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
                         type="button" 
                         button-style="info" 
                         action="preview(content)"
                         label="Preview page" 
                         label-key="buttons_showPage">
                     </umb-button>
-
+                    
                     <umb-button-group 
-                        ng-if="defaultButton && !content.trashed" 
+                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"
                         default-button="defaultButton" 
                         sub-buttons="subButtons" 
@@ -83,6 +55,24 @@
                         direction="up"
                         float="right">
                     </umb-button-group>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfiniteSaveAndClose"
+                        action="saveAndClose(content)"
+                        button-style="primary"
+                        state="saveAndCloseButtonState"
+                        label-key="buttons_saveAndClose"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfinitePublishAndClose"
+                        action="publishAndClose(content)"
+                        button-style="primary"
+                        state="publishAndCloseButtonState"
+                        label-key="buttons_publishAndClose"
+                        type="button">
+                    </umb-button>
 
                     <umb-button 
                         alias="restore" 

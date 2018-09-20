@@ -30,6 +30,9 @@ namespace Umbraco.Core.Models
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             ParentId = parentId;
+
+            // set a default configuration
+            Configuration = _editor.GetConfigurationEditor().DefaultConfigurationObject;
         }
 
         private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());

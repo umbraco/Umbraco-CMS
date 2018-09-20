@@ -11,6 +11,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
@@ -93,7 +94,7 @@ namespace Umbraco.Web.Editors
                 if (resetResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", resetResult.Errors);
-                    _logger.Warn<PasswordChanger>($"Could not reset user password {errors}");
+                    _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
                 }
 
@@ -122,7 +123,7 @@ namespace Umbraco.Web.Editors
                 if (changeResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", changeResult.Errors);
-                    _logger.Warn<PasswordChanger>($"Could not change user password {errors}");
+                    _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
                 }
                 return Attempt.Succeed(new PasswordChangedModel());

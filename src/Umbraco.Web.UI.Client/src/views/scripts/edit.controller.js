@@ -19,9 +19,14 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        
+
+        templateHelper.getGeneralShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
+
+        templateHelper.getEditorShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
 
         vm.script = {};
 
@@ -154,7 +159,7 @@
                                 });
                             },
                             readOnly: true
-                        },
+                        }
                     ]);
                     
                     // initial cursor placement

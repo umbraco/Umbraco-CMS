@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
-            if (DatabaseType == DBType.MySql)
+            if (DatabaseType.IsMySql())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence
                     _spid = Convert.ToInt32(command.ExecuteScalar());
                 }
             }
-            else if (DatabaseType == DBType.SqlServer)
+            else if (DatabaseType.IsSqlServer())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -183,20 +183,20 @@ namespace Umbraco.Core.Persistence
         }
 
 #if DEBUG_DATABASES
-        public override void OnConnectionClosing(IDbConnection conn)
+        protected override void OnConnectionClosing(DbConnection conn)
         {
             _spid = -1;
             base.OnConnectionClosing(conn);
         }
 #endif
 
-        protected override void OnException(Exception x)
+        protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>("Exception (" + InstanceId + ").", x);
-            _logger.Debug<UmbracoDatabase>("At:\r\n" + Environment.StackTrace);
+            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
+            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>("Sql:\r\n" + CommandToString(LastSQL, LastArgs));
-            base.OnException(x);
+                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+            base.OnException(ex);
         }
 
         private DbCommand _cmd;
@@ -208,11 +208,11 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>(CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
+                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
-            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
+            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + System.Threading.Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
 #endif

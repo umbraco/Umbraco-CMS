@@ -26,12 +26,13 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security.Identity;
+
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
+using Umbraco.Web.Security;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Editors
     /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
-    [DisableClientCache]
+    [DisableBrowserCache]
     public class BackOfficeController : UmbracoController
     {
         private readonly ManifestParser _manifestParser;
@@ -191,7 +192,8 @@ namespace Umbraco.Web.Editors
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
 
-            var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
@@ -210,7 +212,7 @@ namespace Umbraco.Web.Editors
                 var initJs = new JsInitialization(_manifestParser);
                 var initCss = new CssInitialization(_manifestParser);
                 var assets = new List<string>();
-                assets.AddRange(initJs.GetScriptFiles(HttpContext, Enumerable.Empty<string>()));
+                assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
                 assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
                 return new JArray(assets);
             }
@@ -373,7 +375,7 @@ namespace Umbraco.Web.Editors
         {
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
             if (response == null) throw new ArgumentNullException("response");
-
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
             //Here we can check if the provider associated with the request has been configured to allow
             // new users (auto-linked external accounts). This would never be used with public providers such as 
@@ -384,8 +386,10 @@ namespace Umbraco.Web.Editors
             {
                 Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
             }
-
-            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            else
+            {
+                autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            }
 
             // Sign in the user with this external login provider if the user already has a login
             var user = await UserManager.FindAsync(loginInfo.Login);

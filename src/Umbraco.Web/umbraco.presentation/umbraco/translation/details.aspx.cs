@@ -5,6 +5,8 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.BusinessLogic;
+using Umbraco.Web;
+
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 
@@ -49,7 +51,11 @@ namespace umbraco.presentation.umbraco.translation {
             //pp_totalWords.Text = Services.TextService.Localize("translation/totalWords");
 
             lt = new Literal();
-            lt.Text = library.ReplaceLineBreaks(t.Comment);
+
+
+            var umbHelper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+            lt.Text = umbHelper.ReplaceLineBreaksForHtml(t.Comment).ToString();
+
             pp_comment.Controls.Add(lt);
             pp_comment.Text = Services.TextService.Localize("comment");
 

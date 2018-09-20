@@ -167,8 +167,7 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
-                ContentVariation.CultureNeutral);
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
@@ -216,8 +215,7 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
-                ContentVariation.CultureNeutral);
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
@@ -274,8 +272,7 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
-                ContentVariation.CultureNeutral);
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
 
             var publishedContentCache = new Mock<IPublishedContentCache>();

@@ -35,14 +35,14 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (JsonStorageType(propertyType.DataType.Id))
             {
                 var jArray = JsonConvert.DeserializeObject<JArray>(source.ToString());
-                return jArray.ToObject<string[]>();
+                return jArray.ToObject<string[]>() ?? Array.Empty<string>();
             }
 
             // Otherwise assume CSV storage type and return as string array
-            var csvTags =
-                source.ToString()
-                    .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
-                    .ToArray();
+            var sourceString = source?.ToString() ?? string.Empty;
+            var csvTags = sourceString
+                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                .ToArray();
             return csvTags;
         }
 

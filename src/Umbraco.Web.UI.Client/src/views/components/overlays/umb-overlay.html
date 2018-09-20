@@ -6,8 +6,10 @@
             <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
         </div>
 
-        <div data-element="overlay-content" class="umb-overlay-container form-horizontal" ng-transclude>
-            <div ng-if="view" ng-include="view"></div>
+        <div data-element="overlay-content" class="umb-overlay-container form-horizontal">
+            <ng-transclude></ng-transclude>
+            <div ng-if="view && !parentScope" ng-include="view"></div>
+            <div class="scoped-view" style="display: none;"></div>
         </div>
 
         <div class="umb-overlay__item-details" ng-if="model.itemDetails">

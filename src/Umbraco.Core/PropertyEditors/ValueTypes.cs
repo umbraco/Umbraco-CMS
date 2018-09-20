@@ -43,6 +43,11 @@ namespace Umbraco.Core.PropertyEditors
         public const string Integer = "INT"; // Integer
 
         /// <summary>
+        /// Integer value.
+        /// </summary>
+        public const string Bigint = "BIGINT"; // String
+
+        /// <summary>
         /// Json value.
         /// </summary>
         public const string Json = "JSON"; // NText
@@ -87,6 +92,7 @@ namespace Umbraco.Core.PropertyEditors
                     return ValueStorageType.Decimal;
 
                 case String:
+                case Bigint:
                     return ValueStorageType.Nvarchar;
 
                 case Text:

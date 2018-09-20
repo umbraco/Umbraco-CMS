@@ -116,7 +116,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
+                _logger.Error<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
         }
 
@@ -172,7 +172,7 @@ namespace Umbraco.Web.Install
 
             try
             {
-                var requestUri = $"http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 using (var httpClient = new HttpClient())
@@ -183,7 +183,7 @@ namespace Umbraco.Web.Install
             }
             catch (AggregateException ex)
             {
-                _logger.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                _logger.Error<InstallHelper>(ex, "Could not download list of available starter kits");
             }
 
             return packages;

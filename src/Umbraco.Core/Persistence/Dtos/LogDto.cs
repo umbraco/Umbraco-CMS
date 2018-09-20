@@ -10,12 +10,16 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class LogDto
     {
+        private int? _userId;
+
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
         [Column("userId")]
-        public int UserId { get; set; }
+        [ForeignKey(typeof(UserDto))]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("NodeId")]
         [Index(IndexTypes.NonClustered, Name = "IX_umbracoLog")]

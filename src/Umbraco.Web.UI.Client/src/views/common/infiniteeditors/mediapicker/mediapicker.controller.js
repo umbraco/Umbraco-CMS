@@ -1,10 +1,13 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, localStorageService, localizationService, editorService) {
+        function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
 
             if (!$scope.model.title) {
-                $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
+                localizationService.localize("defaultdialogs_selectMedia")
+                    .then(function(data){
+                        $scope.model.title = data;
+                    });
             }
 
             var dialogOptions = $scope.model;
@@ -17,6 +20,7 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
+            $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -47,7 +51,7 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: '',
+                filter: ''
             };
 
             //preload selected item
@@ -245,7 +249,8 @@ angular.module("umbraco")
                 // make sure that last opened node is on the same path as start node
                 var nodePath = node.path.split(",");
 
-                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
+                // also make sure the node is not trashed
+                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
                     $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
                     return true;
                 } else {

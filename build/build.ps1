@@ -62,12 +62,16 @@
     $global:node_path = $env:path
     $nodePath = $this.BuildEnv.NodePath
     $gitExe = (Get-Command git).Source
+    if (-not $gitExe) { $gitExe = (Get-Command git).Path }
     $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
     $env:path = "$nodePath;$gitPath"
 
     $global:node_nodepath = $this.ClearEnvVar("NODEPATH")
     $global:node_npmcache = $this.ClearEnvVar("NPM_CONFIG_CACHE")
     $global:node_npmprefix = $this.ClearEnvVar("NPM_CONFIG_PREFIX")
+    
+    # https://github.com/gruntjs/grunt-contrib-connect/issues/235
+    $this.SetEnvVar("NODE_NO_HTTP2", "1")
   })
 
   $ubuild.DefineMethod("RestoreNode",
@@ -77,6 +81,8 @@
     $this.SetEnvVar("NODEPATH", $node_nodepath)
     $this.SetEnvVar("NPM_CONFIG_CACHE", $node_npmcache)
     $this.SetEnvVar("NPM_CONFIG_PREFIX", $node_npmprefix)
+    
+    $ignore = $this.ClearEnvVar("NODE_NO_HTTP2")
   })
 
   $ubuild.DefineMethod("CompileBelle",
@@ -123,7 +129,7 @@
 
     Write-Output "### install gulp-cli" >> $log 2>&1
     &npm install -g gulp-cli --quiet >> $log 2>&1
-    if (-not $?) { throw "Failed to install gulp-cli" } # that one is expected to work
+    $error.Clear() # that one fails 'cos some files not being removed - ignore
 
     Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
     &gulp build --buildversion=$this.Version.Release >> $log 2>&1
@@ -297,7 +303,11 @@
 
     # copy libs
     Write-Host "Copy SqlCE libraries"
-    $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
+    $nugetPackages = $env:NUGET_PACKAGES
+    if (-not $nugetPackages)
+    {
+      $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
+    }
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
@@ -394,9 +404,15 @@
         -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
+
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version $this.Version.Semver.ToString() `
+        -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
 
@@ -412,7 +428,7 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms", "UmbracoCms.Core"),
+      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
       ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine"))
     if ($this.OnError()) { return }
   })
@@ -422,7 +438,7 @@
     Write-Host "Prepare Azure Gallery"
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
-
+  
   $ubuild.DefineMethod("Build",
   {
     $error.Clear()
@@ -452,6 +468,7 @@
     if ($this.OnError()) { return }
     $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
+    Write-Host "Done"
   })
 
   # ################################################################
@@ -467,5 +484,4 @@
     $ubuild.Build()
     if ($ubuild.OnError()) { return }
   }
-  Write-Host "Done"
   if ($get) { return $ubuild }

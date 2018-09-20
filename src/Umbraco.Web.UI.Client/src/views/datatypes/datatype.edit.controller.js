@@ -28,7 +28,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 label: preVals[i].label,
                 view: preVals[i].view,
                 value: preVals[i].value,
-                config: preVals[i].config,
+                config: preVals[i].config
             });
         }
     }
@@ -50,8 +50,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.preValues = [];
 
     if ($routeParams.create) {
-
+        
         $scope.page.loading = true;
+        $scope.showIdentifier = false;
 
         //we are creating so get an empty data type item
         dataTypeResource.getScaffold($routeParams.id)
@@ -77,6 +78,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
         $scope.page.loading = true;
 
+        $scope.showIdentifier = true;
+
         //we are editing so get the content item from the server
         dataTypeResource.getById($routeParams.id)
             .then(function(data) {
@@ -95,7 +98,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
+                serverValidationManager.notifyAndClearAllSubscriptions();
 
                 navigationService.syncTree({ tree: "datatypes", path: data.path }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
@@ -143,7 +146,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

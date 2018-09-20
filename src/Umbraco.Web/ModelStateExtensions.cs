@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Core;
 
 namespace Umbraco.Web
 {
@@ -37,44 +38,66 @@ namespace Umbraco.Web
         {
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
-
-
-        //NOTE: we used this alot in v5 when we had editors in MVC, this was really handy for knockout editors using JS
-
-        ///// <summary>
-        ///// Adds an error to the model state that has to do with data validation, this is generally used for JSON responses
-        ///// </summary>
-        ///// <param name="state"></param>
-        ///// <param name="errorMessage"></param>
-        //public static void AddDataValidationError(this ModelStateDictionary state, string errorMessage)
-        //{
-        //    state.AddModelError("DataValidation", errorMessage);
-        //}
-
+        
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>
         /// <param name="modelState"></param>
         /// <param name="result"></param>
         /// <param name="propertyAlias"></param>
-        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string propertyAlias)
+        /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
+        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ValidationResult result, string propertyAlias, string culture = "")
         {
-            modelState.AddValidationError(result, "_Properties", propertyAlias);
+            if (culture == null)
+                culture = "";
+            modelState.AddValidationError(result, "_Properties", propertyAlias, culture);
         }
 
-        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string prefix, string owner)
+        /// <summary>
+        /// Returns a list of cultures that have property errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        {
+            //Add any culture specific errors here
+            var cultureErrors = modelState.Keys
+                .Select(x => x.Split('.')) //split into parts
+                .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
+                .Select(x => x[2]) //select the culture part
+                .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                .Distinct()
+                .ToList();
+
+            return cultureErrors;
+        }
+
+        /// <summary>
+        /// Adds the error to model state correctly for a property so we can use it on the client side.
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="result"></param>
+        /// <param name="parts">
+        /// Each model state validation error has a name and in most cases this name is made up of parts which are delimited by a '.'
+        /// </param>
+        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ValidationResult result, params string[] parts)
         {
             // if there are assigned member names, we combine the member name with the owner name
             // so that we can try to match it up to a real field. otherwise, we assume that the
             // validation message is for the overall owner.
+            // Owner = the component being validated, like a content property but could be just an html field on another editor
+
             var withNames = false;
+            var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.AddModelError($"{prefix}.{owner}.{memberName}", result.ErrorMessage);
+                modelState.AddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
                 withNames = true;
             }
             if (!withNames)
-                modelState.AddModelError($"{prefix}.{owner}", result.ErrorMessage);
+                modelState.AddModelError($"{delimitedParts}", result.ErrorMessage);
         }
 
         public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)

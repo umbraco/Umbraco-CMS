@@ -88,8 +88,7 @@ namespace Umbraco.Core.Services.Implement
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            Current.Logger.Warn<LocalizedTextServiceFileSources>(
-                                                string.Format("The culture {0} found in the file {1} is not a valid culture", cultureVal, fileInfo.FullName));
+                                            Current.Logger.Warn<LocalizedTextServiceFileSources>("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }
@@ -126,7 +125,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (fileSourceFolder.Exists == false)
             {
-                Current.Logger.Warn<LocalizedTextServiceFileSources>(() => $"The folder does not exist: {fileSourceFolder.FullName}, therefore no sources will be discovered");
+                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
             }
             else
             {
@@ -205,7 +204,7 @@ namespace Umbraco.Core.Services.Implement
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<LocalizedTextServiceFileSources>("Could not load file into XML " + supplementaryFile.File.FullName, ex);
+                            _logger.Error<LocalizedTextServiceFileSources>(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
                             continue;
                         }
 

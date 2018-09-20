@@ -215,10 +215,7 @@ namespace Umbraco.Core.Configuration
                 ConfigurationManager.RefreshSection("appSettings");
             }
         }
-        
-        [Obsolete("Use IOHelper.GetRootDirectorySafe() instead")]
-        public static string FullPathToRoot => IOHelper.GetRootDirectorySafe();
-
+              
         /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
@@ -284,7 +281,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Returns a string value to determine if umbraco should skip version-checking.
+        /// Returns the number of days that should take place between version checks.
         /// </summary>
         /// <value>The version check period in days (0 = never).</value>
         public int VersionCheckPeriod

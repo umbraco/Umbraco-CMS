@@ -122,6 +122,14 @@
 // Make the list-items overlay the bottom border
 .nav-tabs > li {
   // margin-bottom: -1px;
+
+  &.dropdown {
+    margin-bottom: -3px;
+
+    >.dropdown-toggle {
+      padding-bottom: 2px;
+    }
+  }
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
@@ -144,27 +152,6 @@
   color: @black;
   border-bottom-color: @turquoise;
   cursor: default;
-}
-
-//SD: NOTE: Added tab error states
-.show-validation .tab-error a,
-.show-validation .tab-error a:hover,
-.show-validation .tab-error a:focus {
-  color: @white !important;
-  background-color: @red !important;
-  border-color: @errorBorder;
-}
-
-.show-validation .tab-error a:before {
-  content: "\e25d";
-  font-family: 'icomoon';
-  margin-right: 5px;
-  vertical-align: top;
-}
-
-.show-validation .nav-tabs > li.active.error > a,
-.show-validation .nav-tabs > li.active.error > a:hover,
-.show-validation .nav-tabs > li.active.error > a:focus {
 }
 
 // PILLS

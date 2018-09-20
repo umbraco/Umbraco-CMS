@@ -18,6 +18,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -390,17 +391,6 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
         #endregion
-
-        [Obsolete("Use GetyByIds instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
-        {
-            if (ids == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-            return GetResultForKeys(ids, type);
-        }
 
         public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
         {

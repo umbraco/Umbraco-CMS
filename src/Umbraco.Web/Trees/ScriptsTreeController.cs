@@ -6,7 +6,7 @@ using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
-    [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, "Scripts", "icon-folder", "icon-folder", sortOrder: 2)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, "Scripts", "icon-folder", "icon-folder", sortOrder: 4)]
     public class ScriptsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.ScriptsFileSystem; // fixme inject

@@ -8,26 +8,38 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, string[]>
+    internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, UrlInfo[]>
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly PublishedRouter _publishedRouter;
+        private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
         private readonly ILogger _logger;
 
-        public ContentUrlResolver(ILocalizedTextService textService, IContentService contentService, ILogger logger)
+        public ContentUrlResolver(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            PublishedRouter publishedRouter, 
+            ILocalizationService localizationService,
+            ILocalizedTextService textService,
+            IContentService contentService,
+            ILogger logger)
         {
-            _textService = textService;
-            _contentService = contentService;
-            _logger = logger;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _publishedRouter = publishedRouter ?? throw new System.ArgumentNullException(nameof(publishedRouter));
+            _localizationService = localizationService ?? throw new System.ArgumentNullException(nameof(localizationService));
+            _textService = textService ?? throw new System.ArgumentNullException(nameof(textService));
+            _contentService = contentService ?? throw new System.ArgumentNullException(nameof(contentService));
+            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
         }
 
-        public string[] Resolve(IContent source, ContentItemDisplay destination, string[] destMember, ResolutionContext context)
+        public UrlInfo[] Resolve(IContent source, ContentItemDisplay destination, UrlInfo[] destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false);
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null
-                ? new[] {"Cannot generate urls without a current Umbraco Context"}
-                : source.GetContentUrls(umbracoContext.UrlProvider, _textService, _contentService, _logger).ToArray();
+                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
+                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _textService, _contentService, _logger).ToArray();
 
             return urls;
         }

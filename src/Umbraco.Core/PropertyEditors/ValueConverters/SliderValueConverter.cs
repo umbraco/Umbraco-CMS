@@ -72,7 +72,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return Storages.GetOrAdd(dataTypeId, id =>
             {
                 var dataType = _dataTypeService.GetDataType(id);
-                var configuration = dataType.ConfigurationAs<SliderPropertyEditorConfiguration>();
+                var configuration = dataType.ConfigurationAs<SliderConfiguration>();
                 return configuration.EnableRange;
             });
         }

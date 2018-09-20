@@ -50,36 +50,7 @@ namespace Umbraco.Web.Editors
                 Items = MapAvatarsAndNames(mapped)
             };
         }
-
-        [Obsolete("Use GetPagedLog instead")]
-        public IEnumerable<AuditLog> GetEntityLog(int id)
-        {
-            long totalRecords;
-            var result = Services.AuditService.GetPagedItemsByEntity(id, 1, int.MaxValue, out totalRecords);
-            return Mapper.Map<IEnumerable<AuditLog>>(result);
-        }
-
-        //TODO: Move to CurrentUserController?
-        [Obsolete("Use GetPagedCurrentUserLog instead")]
-        public IEnumerable<AuditLog> GetCurrentUserLog(AuditType logType, DateTime? sinceDate)
-        {
-            long totalRecords;
-            var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = Security.GetUserId().ResultOr(0);
-            var result = Services.AuditService.GetPagedItemsByUser(userId, 1, int.MaxValue, out totalRecords, auditTypeFilter: new[] {logType},customFilter: dateQuery);
-            return Mapper.Map<IEnumerable<AuditLog>>(result);
-        }
-
-        [Obsolete("Use GetPagedLog instead")]
-        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate)
-        {
-            if (sinceDate == null)
-                sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
-
-            return Mapper.Map<IEnumerable<AuditLog>>(
-                Services.AuditService.GetLogs(logType, sinceDate.Value));
-        }
-
+        
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var userIds = items.Select(x => x.UserId).ToArray();

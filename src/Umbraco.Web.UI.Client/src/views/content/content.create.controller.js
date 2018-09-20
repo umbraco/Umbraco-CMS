@@ -13,6 +13,8 @@ function contentCreateController($scope,
   $location,
   navigationService,
   blueprintConfig) {
+  
+  var mainCulture = $routeParams.mculture ? $routeParams.mculture : null;
 
   function initialize() {
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
@@ -32,7 +34,10 @@ function contentCreateController($scope,
       $location
           .path("/content/content/edit/" + $scope.currentNode.id)
           .search("doctype", docType.alias)
-          .search("create", "true");
+          .search("create", "true")
+          /* when we create a new node we want to make sure it uses the same 
+          language as what is selected in the tree */
+          .search("cculture", mainCulture);
     close();
   }
 

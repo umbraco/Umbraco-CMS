@@ -41,9 +41,9 @@ namespace Umbraco.Web.Scheduling
                 if (settings.Logging.MaxLogAge > -1)
                     maximumAge = settings.Logging.MaxLogAge;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error<LogScrubber>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.", e);
+                _logger.Error<LogScrubber>(ex, "Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.");
             }
             return maximumAge;
 
@@ -57,9 +57,9 @@ namespace Umbraco.Web.Scheduling
                 if (settings.Logging.CleaningMiliseconds > -1)
                     interval = settings.Logging.CleaningMiliseconds;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error<LogScrubber>("Unable to locate a log scrubbing interval. Defaulting to 4 hours.", e);
+                logger.Error<LogScrubber>(ex, "Unable to locate a log scrubbing interval. Defaulting to 4 hours.");
             }
             return interval;
         }
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Scheduling
         {
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
+                case ServerRole.Replica:
                     _logger.Debug<LogScrubber>("Does not run on slave servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:

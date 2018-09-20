@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(0))
+                                controller => controller.GetBigThumbnail(""))
                         },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -199,7 +199,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetEntityLog(0))
+                                controller => controller.GetPagedEntityLog(0, 0, 0, Core.Persistence.DatabaseModelDefinitions.Direction.Ascending, null))
                         },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetTags(""))
                         },
                         {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
                         },
                         {
@@ -277,6 +277,10 @@ namespace Umbraco.Web.Editors
                             "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
                                 controller => controller.GetPublishedStatusUrl())
                         },
+                        {
+                            "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
+                                controller => controller.DeleteById(int.MaxValue))
+						},
                         {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
                                 controller => controller.GetStatus())

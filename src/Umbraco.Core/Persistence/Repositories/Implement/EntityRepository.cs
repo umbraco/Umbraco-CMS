@@ -54,7 +54,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, sql);
-            sql = sql.OrderBy<NodeDto>(x => x.NodeId);
+            //fixme - we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
+            sql = sql.OrderBy("NodeId");
 
             //IEnumerable<IUmbracoEntity> result;
             //
@@ -847,7 +848,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
-            entity.CreatorId = dto.UserId ?? 0;
+            entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
             entity.Id = dto.NodeId;
             entity.Key = dto.UniqueId;
             entity.Level = dto.Level;
@@ -904,7 +905,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Edited = dto.Edited;
             entity.Published = dto.Published;
 
-            if (dto.Variations.Has(ContentVariation.CultureNeutral) && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
+            if (dto.Variations.VariesByCulture() && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
             {
                 var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var info in dto.VariationInfo)

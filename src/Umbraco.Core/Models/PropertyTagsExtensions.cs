@@ -156,8 +156,16 @@ namespace Umbraco.Core.Models
                     return value.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
 
                 case TagsStorageType.Json:
-                    //fixme doesn't take into account variants
-                    return JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString().Trim());
+                    try
+                    {
+                        //fixme doesn't take into account variants
+                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString().Trim());
+                    }
+                    catch (JsonException)
+                    {
+                        //cannot parse, malformed
+                        return Enumerable.Empty<string>();
+                    }
 
                 default:
                     throw new NotSupportedException($"Value \"{storageType}\" is not a valid TagsStorageType.");
@@ -217,7 +225,7 @@ namespace Umbraco.Core.Models
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string");
+                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
                     }
                     break;
 

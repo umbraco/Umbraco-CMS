@@ -10,6 +10,20 @@ function angularHelper($log, $q) {
     return {
 
         /**
+         * Method used to re-run the $parsers for a given ngModel
+         * @param {} scope 
+         * @param {} ngModel 
+         * @returns {} 
+         */
+        revalidateNgModel: function (scope, ngModel) {
+            this.safeApply(scope, function() {
+                angular.forEach(ngModel.$parsers, function (parser) {
+                    parser(ngModel.$viewValue);
+                });
+            });
+        },
+
+        /**
          * Execute a list of promises sequentially. Unlike $q.all which executes all promises at once, this will execute them in sequence.
          * @param {} promises 
          * @returns {} 
@@ -54,7 +68,7 @@ function angularHelper($log, $q) {
          * This checks if a digest/apply is already occuring, if not it will force an apply call
          */
         safeApply: function (scope, fn) {
-            if (scope.$$phase || scope.$root.$$phase) {
+            if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
                 if (angular.isFunction(fn)) {
                     fn();
                 }
@@ -90,8 +104,7 @@ function angularHelper($log, $q) {
             // is to inject the $element object and use: $element.inheritedData('$formController');
 
             var form = null;
-            //var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
-            var requiredFormProps = ["$addControl", "$removeControl", "$setValidity", "$setDirty", "$setPristine"];
+            var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
 
             // a method to check that the collection of object prop names contains the property name expected
             function propertyExists(objectPropNames) {
@@ -153,18 +166,24 @@ function angularHelper($log, $q) {
          * Returns a null angular FormController, mostly for use in unit tests
          *      NOTE: This is actually the same construct as angular uses internally for creating a null form but they don't expose
          *          any of this publicly to us, so we need to create our own.
+         *      NOTE: The properties has been added to the null form because we use them to get a form on a scope.
          *
          * @param {string} formName The form name to assign
          */
         getNullForm: function (formName) {
             return {
+                $error: {},
+                $dirty: false,
+                $pristine: true,
+                $valid: true,
+                $submitted: false,
+                $pending: undefined,
                 $addControl: angular.noop,
                 $removeControl: angular.noop,
                 $setValidity: angular.noop,
                 $setDirty: angular.noop,
                 $setPristine: angular.noop,
                 $name: formName
-                //NOTE: we don't include the 'properties', just the methods.
             };
         }
     };

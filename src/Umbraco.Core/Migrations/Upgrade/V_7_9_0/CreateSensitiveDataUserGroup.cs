@@ -21,7 +21,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_9_0
             if (exists) return;
 
             var groupId = Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", new UserGroupDto { StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.SensitiveDataGroupAlias, Name = "Sensitive data", DefaultPermissions = "", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-lock" });
-            Database.Insert(new User2UserGroupDto { UserGroupId = Convert.ToInt32(groupId), UserId = Constants.Security.SuperId }); // add super to sensitive data
+            Database.Insert(new User2UserGroupDto { UserGroupId = Convert.ToInt32(groupId), UserId = Constants.Security.SuperUserId }); // add super to sensitive data
         }
     }
 }

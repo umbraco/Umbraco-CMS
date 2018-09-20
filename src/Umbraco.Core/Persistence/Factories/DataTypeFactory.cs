@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Path = dto.NodeDto.Path;
                 dataType.SortOrder = dto.NodeDto.SortOrder;
                 dataType.Trashed = dto.NodeDto.Trashed;
-                dataType.CreatorId = dto.NodeDto.UserId ?? 0;
+                dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
 
                 dataType.SetLazyConfiguration(dto.Configuration);
 

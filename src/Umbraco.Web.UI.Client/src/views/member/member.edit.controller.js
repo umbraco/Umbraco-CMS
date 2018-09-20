@@ -45,6 +45,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     editorState.set($scope.content);
 
+                    // set all groups to open
+                    angular.forEach($scope.content.tabs, function(group){
+                        group.open = true;
+                    });
+
                     $scope.page.loading = false;
 
                 });
@@ -58,6 +63,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
+
+                    // set all groups to open
+                    angular.forEach($scope.content.tabs, function(group){
+                        group.open = true;
+                    });
 
                     $scope.page.loading = false;
 
@@ -107,7 +117,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     // route but there might be server validation errors in the collection which we need to display
                     // after the redirect, so we will bind all subscriptions which will show the server validation errors
                     // if there are any and then clear them so the collection no longer persists them.
-                    serverValidationManager.executeAndClearAllSubscriptions();
+                    serverValidationManager.notifyAndClearAllSubscriptions();
 
                     $scope.page.loading = false;
 
@@ -134,7 +144,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

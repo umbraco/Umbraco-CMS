@@ -5,8 +5,9 @@ using System.Linq;
 using System.Web;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -35,17 +36,6 @@ namespace Umbraco.Web
         public static string Url(this IPublishedContent content)
         {
             return content.Url;
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
-        //[Obsolete("UrlWithDomain() is obsolete, use the UrlAbsolute() method instead.")]
-        public static string UrlWithDomain(this IPublishedContent content)
-        {
-            return content.UrlAbsolute();
         }
 
         /// <summary>
@@ -82,13 +72,56 @@ namespace Umbraco.Web
         public static string GetUrlSegment(this IPublishedContent content, string culture = null)
         {
             // for invariant content, return the invariant url segment
-            if (!content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (!content.ContentType.VariesByCulture())
                 return content.UrlSegment;
 
+            // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'
+            // is null (meaning, 'current') - and can return 'null' if that culture is not published - and
+            // will return 'null' if the content is variant and culture is invariant
+
             // else try and get the culture info
-            // return the corresponding url segment, or null if none (ie the culture is not published)
+            // return the corresponding url segment, or null if none
             var cultureInfo = content.GetCulture(culture);
             return cultureInfo?.UrlSegment;
+		}
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                // fixme - perfs? nothing cached here
+                var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                return publishedContentContentType.IsAllowedTemplate(templateId);
+            }
+
+            return true;
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            // fixme - perfs? nothing cached here
+            var template = Current.Services.FileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id);
+        }
+
+        #endregion
+
+        #region IsComposedOf
+
+        /// <summary>
+        /// Gets a value indicating whether the content is of a content type composed of the given alias
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
+        public static bool IsComposedOf(this IPublishedContent content, string alias)
+        {
+            return content.ContentType.CompositionAliases.Contains(alias);
         }
 
         #endregion
@@ -233,6 +266,17 @@ namespace Umbraco.Web
             //    ? new HtmlString(format(property.Value<T>()))
             //    : new HtmlString(alt);
         }
+
+        #endregion
+
+        #region Variations
+
+        /// <summary>
+        /// Determines whether the content has a culture.
+        /// </summary>
+        /// <remarks>Culture is case-insensitive.</remarks>
+        public static bool HasCulture(this IPublishedContent content, string culture)
+            => content.Cultures.ContainsKey(culture);
 
         #endregion
 
@@ -392,7 +436,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
         {
-            return content.Ancestors().Any(x => x.Id == other.Id);
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -407,7 +451,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            return content.AncestorsOrSelf().Any(x => x.Id == other.Id);
+            return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
         }
 
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -422,8 +466,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using Descendants(), that's expensive
-            return other.Ancestors().Any(x => x.Id == content.Id);
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -438,8 +481,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using DescendantsOrSelf(), that's expensive
-            return other.AncestorsOrSelf().Any(x => x.Id == content.Id);
+            return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -731,7 +773,7 @@ namespace Umbraco.Web
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
 
-        internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
             var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
             return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
@@ -1091,13 +1133,13 @@ namespace Umbraco.Web
             return content.Children(predicate).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content)
+        public static T FirstChild<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault(predicate);

@@ -233,6 +233,7 @@ namespace Umbraco.Web.Trees
         {
             var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
+            treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
@@ -252,6 +253,7 @@ namespace Umbraco.Web.Trees
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
+            treeNode.Path = entity.Path;
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }

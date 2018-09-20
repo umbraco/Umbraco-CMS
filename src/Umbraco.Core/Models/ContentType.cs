@@ -29,15 +29,6 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        /// <summary>
-        /// Constuctor for creating a ContentType with the parent as an inherited type.
-        /// </summary>
-        /// <remarks>Use this to ensure inheritance from parent.</remarks>
-        /// <param name="parent"></param>
-        [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
-        public ContentType(IContentType parent) : this(parent, null)
-        {
-        }
 
         /// <summary>
         /// Constuctor for creating a ContentType with the parent as an inherited type.
@@ -108,6 +99,30 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateId">The template id to check</param>
+        /// <returns>True if AllowedTemplates contains the templateId else False</returns>
+        public bool IsAllowedTemplate(int templateId)
+        {
+            return AllowedTemplates == null 
+                ? false 
+                : AllowedTemplates.Any(t => t.Id == templateId);
+        }
+
+        /// <summary>
+        /// Determines if AllowedTemplates contains templateId
+        /// </summary>
+        /// <param name="templateAlias">The template alias to check</param>
+        /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
+        public bool IsAllowedTemplate(string templateAlias)
+        {
+            return AllowedTemplates == null
+                ? false
+                : AllowedTemplates.Any(t => t.Alias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        /// <summary>
         /// Sets the default template for the ContentType
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate"/></param>
@@ -144,16 +159,6 @@ namespace Umbraco.Core.Models
             AllowedTemplates = templates;
 
             return result;
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContentType Clone(string alias)
-        {
-            return DeepCloneWithResetIdentities(alias);
         }
     }
 }

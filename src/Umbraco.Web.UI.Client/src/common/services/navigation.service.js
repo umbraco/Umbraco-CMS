@@ -28,6 +28,9 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
         navReadyPromise.resolve(mainTreeApi);
     });
 
+    //A list of query strings defined that when changed will not cause a reload of the route
+    var nonRoutingQueryStrings = ["mculture", "cculture"];
+    var retainedQueryStrings = ['mculture'];
 
     //used to track the current dialog object
     var currentDialog = null;
@@ -91,7 +94,84 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
         }
     }
 
+    /**
+     * Converts a string request path to a dictionary of route params
+     * @param {any} requestPath
+     */
+    function pathToRouteParts(requestPath) {
+        if (!angular.isString(requestPath)) {
+            throw "The value for requestPath is not a string";
+        }
+        var pathAndQuery = requestPath.split("#")[1];
+        if (pathAndQuery) {
+            if (pathAndQuery.indexOf("%253") || pathAndQuery.indexOf("%252")) {
+                pathAndQuery = decodeURIComponent(pathAndQuery);
+            }
+            var pathParts = pathAndQuery.split("?");
+            var path = pathParts[0];
+            var qry = pathParts.length === 1 ? "" : pathParts[1];
+            var qryParts = qry.split("&");
+            var result = {
+                path: path
+            };
+            for (var i = 0; i < qryParts.length; i++) {
+                var keyVal = qryParts[i].split("=");
+                if (keyVal.length == 2) {
+                    result[keyVal[0]] = keyVal[1];
+                }
+            }
+            return result;
+        }
+    }
+
     var service = {
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#isRouteChangingNavigation
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Detects if the route param differences will cause a navigation change or if the route param differences are
+         * only tracking state changes.
+         * This is used for routing operations where reloadOnSearch is false and when detecting form dirty changes when navigating to a different page.
+         * @param {object} currUrlParams Either a string path or a dictionary of route parameters
+         * @param {object} nextUrlParams Either a string path or a dictionary of route parameters
+         */
+        isRouteChangingNavigation: function (currUrlParams, nextUrlParams) {
+
+            if (angular.isString(currUrlParams)) {
+                currUrlParams = pathToRouteParts(currUrlParams);
+            }
+
+            if (angular.isString(nextUrlParams)) {
+                nextUrlParams = pathToRouteParts(nextUrlParams);
+            }
+
+            var allowRoute = true;
+
+            //The only time that we want to not route is if only any of the nonRoutingQueryStrings have changed/added.
+            //If any of the other parts have changed we do not cancel
+            var currRoutingKeys = _.difference(_.keys(currUrlParams), nonRoutingQueryStrings);
+            var nextRoutingKeys = _.difference(_.keys(nextUrlParams), nonRoutingQueryStrings);
+            var diff1 = _.difference(currRoutingKeys, nextRoutingKeys);
+            var diff2 = _.difference(nextRoutingKeys, currRoutingKeys);
+            
+            //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
+            if (diff1.length === 0 && diff2.length === 0) {
+                var partsChanged = 0;
+                _.each(currRoutingKeys, function (k) {
+                    if (currUrlParams[k] != nextUrlParams[k]) {
+                        partsChanged++;
+                    }
+                });
+                if (partsChanged === 0) {
+                    allowRoute = false; //nothing except our query strings changed, so don't continue routing
+                }
+            }
+
+            return allowRoute;
+        },
 
         /**
          * @ngdoc method
@@ -113,8 +193,8 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
          * @description
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
-        clearSearch: function () {
-            var toRetain = ["mculture"];
+        clearSearch: function (toRetain) {
+            var toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
             _.each(toRetain, function (k) {
@@ -122,6 +202,29 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                     $location.search(k, currentSearch[k]);
                 }
             });
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#retainQueryStrings
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Will check the next route parameters to see if any of the query strings that should be retained from the previous route are missing,
+         * if they are they will be merged and an object containing all route parameters is returned. If nothing should be changed, then null is returned.
+         * @param {Object} currRouteParams The current route parameters
+         * @param {Object} nextRouteParams The next route parameters
+         */
+        retainQueryStrings: function (currRouteParams, nextRouteParams) {
+            var toRetain = angular.copy(nextRouteParams);
+            var updated = false;
+            _.each(retainedQueryStrings, function (r) {
+                if (currRouteParams[r] && !nextRouteParams[r]) {
+                    toRetain[r] = currRouteParams[r];
+                    updated = true;
+                }
+            });
+            return updated ? toRetain : null;
         },
 
         /**
@@ -281,10 +384,9 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
          */
         showMenu: function(args) {
             
-            var deferred = $q.defer();
             var self = this;
 
-            treeService.getMenu({ treeNode: args.node })
+            return treeService.getMenu({ treeNode: args.node })
                 .then(function(data) {
 
                     //check for a default
@@ -313,8 +415,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                             });
 
                             //return the dialog this is opening.
-                            deferred.resolve(dialog);
-                            return;
+                            return $q.resolve(dialog);
                         }
                     }
 
@@ -327,10 +428,9 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                     appState.setMenuState("dialogTitle", args.node.name);
 
                     //we're not opening a dialog, return null.
-                    deferred.resolve(null);
+                    return $q.resolve(null);
                 });
-
-            return deferred.promise;
+            
         },
 
         /**
@@ -526,7 +626,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
                     //These will show up on the dialog controller's $scope under dialogOptions
                     currentNode: args.node,
-                    currentAction: args.action,
+                    currentAction: args.action
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created
@@ -547,7 +647,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             setMode("default");
 
             if(showMenu){
-                this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+                this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             }
         },
         /**

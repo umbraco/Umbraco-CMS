@@ -162,7 +162,7 @@ namespace Umbraco.Examine
         /// </remarks>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            ProfilingLogger.Logger.Debug(GetType(), () => $"{name} indexer initializing");
+            ProfilingLogger.Logger.Debug(GetType(), "{IndexerName} indexer initializing", name);
 
             if (config["enableDefaultEventHandler"] != null && bool.TryParse(config["enableDefaultEventHandler"], out var enabled))
             {
@@ -331,11 +331,11 @@ namespace Umbraco.Examine
         /// <summary>
         /// overridden for logging
         /// </summary>
-        /// <param name="e"></param>
-        protected override void OnIndexingError(IndexingErrorEventArgs e)
+        /// <param name="ex"></param>
+        protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Logger.Error(GetType(), e.Message, e.InnerException);
-            base.OnIndexingError(e);
+            ProfilingLogger.Logger.Error(GetType(), ex.InnerException, ex.Message);
+            base.OnIndexingError(ex);
         }
 
         /// <summary>
@@ -359,7 +359,12 @@ namespace Umbraco.Examine
                 }
             }
 
-            ProfilingLogger.Logger.Debug(GetType(), () => $"Write lucene doc id:{docArgs.ValueSet.Id}, category:{docArgs.ValueSet.Category}, type:{docArgs.ValueSet.ItemType}");
+            ProfilingLogger.Logger.Debug(GetType(),
+                "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
+                docArgs.ValueSet.Id,
+                docArgs.ValueSet.Category,
+                docArgs.ValueSet.ItemType);
+
 
             base.OnDocumentWriting(docArgs);
         }
@@ -369,7 +374,10 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, IndexItem item, IndexWriter writer)
         {
-            ProfilingLogger.Logger.Debug(GetType(), () => $"AddDocument {item.ValueSet.Id} with type {item.ValueSet.ItemType}");
+            ProfilingLogger.Logger.Debug(GetType(),
+                "AddDocument {DocumentId} with type {DocumentItemType}",
+                item.ValueSet.Id,
+                item.ValueSet.ItemType);
             base.AddDocument(doc, item, writer);
         }
 
@@ -389,6 +397,8 @@ namespace Umbraco.Examine
             //the value of the field 'as-is'.
             foreach (var value in e.IndexItem.ValueSet.Values.ToList()) //ToList here to make a diff collection else we'll get collection modified errors
             {
+                if (value.Value == null) continue;
+
                 if (value.Value.Count > 0)
                 {
                     if (value.Value.First() is string str)

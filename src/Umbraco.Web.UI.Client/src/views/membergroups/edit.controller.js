@@ -67,7 +67,7 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
             memberGroupResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function (data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

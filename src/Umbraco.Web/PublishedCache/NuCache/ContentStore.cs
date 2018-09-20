@@ -415,8 +415,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
                 return false;
 
+            // check whether parent is published
+            var canBePublished = ParentPublishedLocked(kit);
+
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished);
 
             return true;
         }
@@ -443,7 +446,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.Debug<ContentStore>("Set content ID:" + kit.Node.Id);
+            _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
 
             var lockInfo = new WriteLockInfo();
             try
@@ -568,7 +571,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (link?.Value == null) return false;
 
                 var content = link.Value;
-                _logger.Debug<ContentStore>("Clear content ID:" + content.Id);
+                _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
 
                 // clear the entire branch
                 ClearBranchLocked(content);
@@ -641,6 +644,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return true;
             var link = GetParentLink(kit.Node);
             return link?.Value != null;
+        }
+
+        private bool ParentPublishedLocked(ContentNodeKit kit)
+        {
+            if (kit.Node.ParentContentId < 0)
+                return true;
+            var link = GetParentLink(kit.Node);
+            var node = link?.Value;
+            return node?.Published != null;
         }
 
         private void AddToParentLocked(ContentNode content)
@@ -1182,7 +1194,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot (" + (_genRef?.GenRefRef.Count.ToString() ?? "live") + ").");
+                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenRefRef.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)

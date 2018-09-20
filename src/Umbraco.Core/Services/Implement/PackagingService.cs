@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true)
         {
             return ImportContentTypes(element, true, userId);
         }
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -491,7 +491,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -631,10 +631,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        _logger.Warn<PackagingService>(
-                            string.Format(
-                                "Packager: Error handling allowed templates. Template with alias '{0}' could not be found.",
-                                alias));
+                        _logger.Warn<PackagingService>("Packager: Error handling allowed templates. Template with alias '{TemplateAlias}' could not be found.", alias);
                     }
                 }
 
@@ -650,10 +647,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format(
-                            "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
-                            defaultTemplateElement.Value));
+                    _logger.Warn<PackagingService>("Packager: Error handling default template. Default template with alias '{DefaultTemplateAlias}' could not be found.", defaultTemplateElement.Value);
                 }
             }
         }
@@ -724,11 +718,8 @@ namespace Umbraco.Core.Services.Implement
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
-                                      property.Element("Name").Value,
-                                      dataTypeDefinitionId,
-                                      property.Element("Type").Value.Trim()));
+                    _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
+                        property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
                     dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
@@ -772,7 +763,9 @@ namespace Umbraco.Core.Services.Implement
                 var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.Get(alias);
                 if (allowedChild == null)
                 {
-                    _logger.Warn<PackagingService>($"Packager: Error handling DocumentType structure. DocumentType with alias '{alias}' could not be found and was not added to the structure for '{contentType.Alias}'.");
+                    _logger.Warn<PackagingService>(
+                        "Packager: Error handling DocumentType structure. DocumentType with alias '{DoctypeAlias}' could not be found and was not added to the structure for '{DoctypeStructureAlias}'.",
+                        alias, contentType.Alias);
                     continue;
                 }
 
@@ -856,7 +849,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -956,7 +949,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -989,7 +982,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1190,7 +1183,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1231,7 +1224,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns></returns>
-        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1502,7 +1495,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional user id</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1536,7 +1529,10 @@ namespace Umbraco.Core.Services.Implement
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                     templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
+                    _logger.Info<PackagingService>(
+                        "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
+                        (string) elementCopy.Element("Alias"),
+                        (string) elementCopy.Element("Master"));
                 }
 
                 graph.AddItem(TopoGraph.CreateNode((string) elementCopy.Element("Alias"), elementCopy, dependencies));
@@ -1579,7 +1575,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
 
-        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
         {
 
             if (raiseEvents)
@@ -1670,7 +1666,7 @@ namespace Umbraco.Core.Services.Implement
             set { _packageInstallation = value; }
         }
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = -1, bool raiseEvents = false)
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
             var metaData = GetPackageMetaData(packageFilePath);
 

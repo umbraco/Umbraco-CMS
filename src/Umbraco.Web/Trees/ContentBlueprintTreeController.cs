@@ -19,7 +19,7 @@ namespace Umbraco.Web.Trees
     /// This authorizes based on access to the content section even though it exists in the settings
     /// </remarks>
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, null, sortOrder: 8)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, null, sortOrder: 10)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController

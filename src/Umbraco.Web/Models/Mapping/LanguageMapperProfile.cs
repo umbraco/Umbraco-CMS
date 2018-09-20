@@ -28,23 +28,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             public IEnumerable<Language> Convert(IEnumerable<ILanguage> source, IEnumerable<Language> destination, ResolutionContext context)
             {
-                var allLanguages = source.OrderBy(x => x.Id).ToList();
-                var langs = new List<Language>(allLanguages.Select(x => context.Mapper.Map<ILanguage, Language>(x, null, context)));
-
-                //if there's only one language, by default it is the default
-                if (langs.Count == 1)
-                {
-                    langs[0].IsDefaultVariantLanguage = true;
-                    langs[0].Mandatory = true;
-                }
-                else if (allLanguages.All(x => !x.IsDefaultVariantLanguage))
-                {
-                    //if no language has the default flag, then the defaul language is the one with the lowest id
-                    langs[0].IsDefaultVariantLanguage = true;
-                    langs[0].Mandatory = true;
-                }
-
-                return langs.OrderBy(x => x.Name);
+                return source.Select(x => context.Mapper.Map<ILanguage, Language>(x, null, context)).OrderBy(x => x.Name);
             }
         }
     }

@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -325,7 +326,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPage(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 1, out totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -347,7 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPage(query, 1, 1, out totalRecords, "SortOrder", Direction.Ascending, true);
+                var result = repository.GetPage(query, 1, 1, out totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -369,7 +370,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPage(query, 0, 2, out totalRecords, "SortOrder", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 2, out totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -391,7 +392,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
                 long totalRecords;
-                var result = repository.GetPage(query, 0, 1, out totalRecords, "SortOrder", Direction.Descending, true);
+                var result = repository.GetPage(query, 0, 1, out totalRecords, null, Ordering.By("SortOrder", Direction.Descending));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -412,8 +413,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
-                var result = repository.GetPage(query, 0, 1, out totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name"));
 
                 // Assert
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
@@ -434,10 +434,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
 
                 var filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("File"));
-                var result = repository.GetPage(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filter);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -453,15 +452,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                MediaTypeRepository mediaTypeRepository;
-                var repository = CreateRepository(provider, out mediaTypeRepository);
+                var repository = CreateRepository(provider, out _);
 
                 // Act
                 var query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
-                long totalRecords;
 
                 var filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("Test"));
-                var result = repository.GetPage(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filter);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));

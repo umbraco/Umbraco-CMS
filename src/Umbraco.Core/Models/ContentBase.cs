@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
-            SetName(name, culture);
+            SetCultureName(name, culture);
 
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.Names);
+            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.CultureNames);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -139,104 +139,101 @@ namespace Umbraco.Core.Models
 
         #region Cultures
 
+        // notes - common rules
+        // - setting a variant value on an invariant content type throws
+        // - getting a variant value on an invariant content type returns null
+        // - setting and getting the invariant value is always possible
+        // - setting a null value clears the value
+
+        /// <inheritdoc />
+        public IEnumerable<string> AvailableCultures
+            => _cultureInfos?.Select(x => x.Key) ?? Enumerable.Empty<string>();
+
+        /// <inheritdoc />
+        public bool IsCultureAvailable(string culture)
+            => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
+
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> Names => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
-
-        // sets culture infos
-        // internal for repositories
-        // clear by clearing name
-        internal void SetCultureInfos(string culture, string name, DateTime date)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
-
-            if (culture == null)
-            {
-                Name = name;
-                return;
-            }
-
-            // private method, assume that culture is valid
-
-            if (_cultureInfos == null)
-                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-
-            _cultureInfos[culture] = (name, date);
-        }
+        public virtual IReadOnlyDictionary<string, string> CultureNames => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         /// <inheritdoc />
-        public virtual void SetName(string name, string culture)
+        public virtual string GetCultureName(string culture)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ClearName(culture);
-                return;
-            }
-
-            if (culture == null)
-            {
-                Name = name;
-                return;
-            }
-
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
-                throw new NotSupportedException("Content type does not support varying name by culture.");
-
-            if (_cultureInfos == null)
-                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-
-            _cultureInfos[culture] = (name, DateTime.Now);
-            OnPropertyChanged(Ps.Value.NamesSelector);
-        }
-
-        /// <inheritdoc />
-        public virtual string GetName(string culture)
-        {
-            if (culture == null) return Name;
+            if (culture.IsNullOrWhiteSpace()) return Name;
+            if (!ContentTypeBase.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
-        public bool IsCultureAvailable(string culture)
-            => !string.IsNullOrWhiteSpace(GetName(culture));
-
-        private void ClearName(string culture)
+        public DateTime? GetCultureDate(string culture)
         {
-            if (culture == null)
-            {
-                Name = null;
-                return;
-            }
-
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
-                throw new NotSupportedException("Content type does not support varying name by culture.");
-
-            if (_cultureInfos == null) return;
-            if (!_cultureInfos.ContainsKey(culture))
-                throw new InvalidOperationException($"Cannot unpublish culture {culture}, the document contains only cultures {string.Join(", ", _cultureInfos.Keys)}");
-
-            _cultureInfos.Remove(culture);
-            if (_cultureInfos.Count == 0)
-                _cultureInfos = null;
+            if (culture.IsNullOrWhiteSpace()) return null;
+            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (_cultureInfos == null) return null;
+            return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
 
-        protected virtual void ClearNames()
+        /// <inheritdoc />
+        public virtual void SetCultureName(string name, string culture)
         {
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
-                throw new NotSupportedException("Content type does not support varying name by culture.");
+            if (ContentTypeBase.VariesByCulture()) // set on variant content type
+            {
+                if (culture.IsNullOrWhiteSpace()) // invariant is ok
+                {
+                    Name = name; // may be null
+                }
+                else if (name.IsNullOrWhiteSpace()) // clear
+                {
+                    ClearCultureInfo(culture);
+                }
+                else // set
+                {
+                    SetCultureInfo(culture, name, DateTime.Now);
+                }
+            }
+            else // set on invariant content type
+            {
+                if (!culture.IsNullOrWhiteSpace()) // invariant is NOT ok
+                    throw new NotSupportedException("Content type does not vary by culture.");
 
+                Name = name; // may be null
+            }
+        }
+
+        protected void ClearCultureInfos()
+        {
             _cultureInfos = null;
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
-        /// <inheritdoc />
-        public DateTime GetCultureDate(string culture)
+        protected void ClearCultureInfo(string culture)
         {
-            if (_cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
-                return infos.Date;
-            throw new InvalidOperationException($"Culture \"{culture}\" is not available.");
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null) return;
+            _cultureInfos.Remove(culture);
+            if (_cultureInfos.Count == 0)
+                _cultureInfos = null;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        // internal for repository
+        internal void SetCultureInfo(string culture, string name, DateTime date)
+        {
+            if (name.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null)
+                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+
+            _cultureInfos[culture.ToLowerInvariant()] = (name, date);
+            OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
         #endregion
@@ -283,67 +280,92 @@ namespace Umbraco.Core.Models
             Properties.Add(property);
         }
 
-        // HttpPostedFileBase is the base class that can be mocked
-        // HttpPostedFile is what we get in ASP.NET
-        // HttpPostedFileWrapper wraps sealed HttpPostedFile as HttpPostedFileBase
+        #endregion
 
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, string culture = null, string segment = null)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), culture, segment);
-        }
+        #region Copy
 
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, string culture = null, string segment = null)
+        /// <inheritdoc />
+        public virtual void CopyFrom(IContent other, string culture = "*")
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value, culture, segment);
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            culture = culture?.ToLowerInvariant().NullOrWhiteSpaceAsNull();
+
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            if (!ContentTypeBase.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentTypeBase.Alias}\" with variation \"{ContentTypeBase.Variations}\".");
+
+            // copying from the same Id and VersionPk
+            var copyingFromSelf = Id == other.Id && VersionId == other.VersionId;
+            var published = copyingFromSelf;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties for the specified culture
+            foreach (var property in Properties)
+            {
+                // each property type may or may not support the variation
+                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        property.SetValue(null, pvalue.Culture, pvalue.Segment);
+                    }
+            }
+
+            // copy properties from 'other'
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                        SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                    }
+                }
+            }
+
+            // copy names, too
+
+            if (culture == "*")
+                ClearCultureInfos();
+
+            if (culture == null || culture == "*")
+                Name = other.Name;
+
+            foreach (var (otherCulture, otherName) in other.CultureNames)
+            {
+                if (culture == "*" || culture == otherCulture)
+                    SetCultureName(otherName, otherCulture);
+            }
         }
 
         #endregion
 
         #region Validation
-
-        internal virtual Property[] ValidateAllProperties()
-        {
-            //fixme - needs API review as this is not used apart from in tests
-
-            return Properties.Where(x => !x.IsAllValid()).ToArray();
-        }
-
+        
         /// <inheritdoc />
-        public bool IsValid(string culture = null, string segment = null)
+        public virtual Property[] ValidateProperties(string culture = "*")
         {
-            var name = GetName(culture);
-            if (name.IsNullOrWhiteSpace()) return false;
-            return ValidateProperties(culture, segment).Length == 0;
-        }
+            var alsoInvariant = culture != null && culture != "*";
 
-        /// <inheritdoc />
-        public virtual Property[] ValidateProperties(string culture = null, string segment = null)
-        {
-            return Properties.Where(x =>
-            {
-                if (!culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
-                    return false; //has a culture, this prop is only culture invariant, ignore
-                if (culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.InvariantSegment))
-                    return false; //no culture, this prop is only culture variant, ignore
-                if (!segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantSegment | ContentVariation.CultureSegment))
-                    return false; //has segment, this prop is only segment neutral, ignore
-                if (segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral))
-                    return false; //no segment, this prop is only non segment neutral, ignore
-                return !x.IsValid(culture, segment);
-            }).ToArray();
-        }
-
-        internal virtual Property[] ValidatePropertiesForCulture(string culture = null)
-        {
-            //fixme - needs API review as this is not used apart from in tests
-
-            return Properties.Where(x => !x.IsCultureValid(culture)).ToArray();
+            return Properties.Where(x => // select properties...
+                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
+                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
+                .ToArray();
         }
 
         #endregion

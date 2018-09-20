@@ -38,7 +38,38 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
+               /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#getWhereCompositionIsUsedInContentTypes
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Returns a list of media types which use a specific composition with a given id
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.getWhereCompositionIsUsedInContentTypes(1234)
+         *    .then(function(mediaTypeList) {
+         *        console.log(mediaTypeList);
+         *    });
+         * </pre>
+         * @param {Int} contentTypeId id of the composition content type to retrieve the list of the media types where it has been used
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
+            var query = {
+                contentTypeId: contentTypeId
+            };
 
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "mediaTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInContentTypes"),
+                    query),
+                'Failed to retrieve data for content type id ' + contentTypeId);
+        },
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaTypeResource#getAllowedTypes
@@ -182,7 +213,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -202,7 +233,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
@@ -213,7 +244,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
-                       { parentId: parentId, name: name })),
+                        { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
         },
 

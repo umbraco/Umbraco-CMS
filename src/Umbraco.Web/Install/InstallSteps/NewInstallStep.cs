@@ -49,16 +49,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(UserModel user)
         {
-            var admin = _userService.GetUserById(Constants.Security.SuperId);
+            var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperId, true);
+            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperUserId, true);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperId}.");
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
             try

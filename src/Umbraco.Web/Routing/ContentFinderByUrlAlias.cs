@@ -38,19 +38,20 @@ namespace Umbraco.Web.Routing
             {
                 node = FindContentByAlias(frequest.UmbracoContext.ContentCache,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
+                    frequest.Culture.Name,
                     frequest.Uri.GetAbsolutePathDecoded());
 
                 if (node != null)
                 {
                     frequest.PublishedContent = node;
-                    Logger.Debug<ContentFinderByUrlAlias>(() => $"Path \"{frequest.Uri.AbsolutePath}\" is an alias for id={frequest.PublishedContent.Id}");
+                    Logger.Debug<ContentFinderByUrlAlias>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
                 }
             }
 
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -58,40 +59,59 @@ namespace Umbraco.Web.Routing
             // there may be spaces as in "/foo/bar,  /foo/nil"
             // these should probably be taken care of earlier on
 
-            alias = alias.TrimStart('/');
-            var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append(XPathStrings.Root);
+            // TODO
+            // can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // and then the comparisons in IsMatch can be way faster - and allocate way less strings
+
+            const string propertyAlias = Constants.Conventions.Content.UrlAlias;
+
+            var test1 = alias.TrimStart('/') + ",";
+            var test2 = ",/" + test1; // test2 is ",/alias,"
+            test1 = "," + test1; // test1 is ",alias,"
+
+            bool IsMatch(IPublishedContent c, string a1, string a2)
+            {
+                // this basically implements the original XPath query ;-(
+                //
+                // "//* [@isDoc and (" +
+                // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
+                // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
+                // ")]"
+
+                if (!c.HasProperty(propertyAlias)) return false;
+                var p = c.GetProperty(propertyAlias);
+                var varies = p.PropertyType.VariesByCulture();
+                string v;
+                if (varies)
+                {
+                    if (!c.HasCulture(culture)) return false;
+                    v = c.Value<string>(propertyAlias, culture);
+                }
+                else
+                {
+                    v = c.Value<string>(propertyAlias);
+                }
+                if (string.IsNullOrWhiteSpace(v)) return false;
+                v = "," + v.Replace(" ", "") + ",";
+                return v.Contains(a1) || v.Contains(a2);
+            }
+
+            // fixme - even with Linq, what happens below has to be horribly slow
+            // but the only solution is to entirely refactor url providers to stop being dynamic
 
             if (rootNodeId > 0)
-                xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
-
-            XPathVariable var = null;
-            if (alias.Contains('\'') || alias.Contains('"'))
             {
-                // use a var, as escaping gets ugly pretty quickly
-                var = new XPathVariable("alias", alias);
-                alias = "$alias";
+                var rootNode = cache.GetById(rootNodeId);
+                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
             }
-            xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentByAlias, alias);
 
-            var xpath = xpathBuilder.ToString();
+            foreach (var rootContent in cache.GetAtRoot())
+            {
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                if (c != null) return c;
+            }
 
-            // note: it's OK if var is null, will be ignored
-            return cache.GetSingleByXPath(xpath, var);
+            return null;
         }
-
-        #region XPath Strings
-
-        static class XPathStrings
-        {
-            public static string Root => "/root";
-            public const string DescendantDocumentById = "//* [@isDoc and @id={0}]";
-            public const string DescendantDocumentByAlias = "//* [@isDoc and ("
-                + "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
-                + " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
-                + ")]";
-        }
-
-        #endregion
     }
 }

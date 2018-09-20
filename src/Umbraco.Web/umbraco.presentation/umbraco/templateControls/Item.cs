@@ -265,17 +265,6 @@ namespace umbraco.presentation.templateControls
             return FindAttribute(new AttributeCollectionAdapter(Attributes), "recursive") == "true";
         }
 
-        /// <summary>
-        /// Determines whether field uses the API to lookup the value
-        /// (if a NodeId attribute is specified and is different from the current page id).
-        /// </summary>
-        /// <returns><c>true</c> if API lookup is used; otherwise, <c>false</c>.</returns>
-        [Obsolete("Method never implemented", true)]
-        protected virtual bool FieldIsApiLookup()
-        {
-            // TODO: remove false and add security
-            return false;
-        }
 
         /// <summary>
         /// Gets a value indicating whether the current item is editable by the current user.

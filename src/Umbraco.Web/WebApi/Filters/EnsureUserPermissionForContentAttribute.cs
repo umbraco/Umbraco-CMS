@@ -6,6 +6,8 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -68,7 +70,25 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (parts.Length == 1)
                 {
-                    nodeId = (int)actionContext.ActionArguments[parts[0]];
+                    var argument = actionContext.ActionArguments[parts[0]].ToString();
+                    // if the argument is an int, it will parse and can be assigned to nodeId
+                    // if might be a udi, so check that next
+                    // otherwise treat it as a guid - unlikely we ever get here
+                    if (int.TryParse(argument, out int parsedId))
+                    {
+                        nodeId = parsedId;
+                    }
+                    else if (Udi.TryParse(argument, true, out Udi udi))
+                    {
+                        //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        nodeId = Current.Services.EntityService.GetId(udi).Result;
+                    }
+                    else
+                    {
+                        Guid.TryParse(argument, out Guid key);
+                        //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        nodeId = Current.Services.EntityService.GetId(key, UmbracoObjectTypes.Document).Result;
+                    }
                 }
                 else
                 {
@@ -89,7 +109,8 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (ContentController.CheckPermissions(
                 actionContext.Request.Properties,
-                UmbracoContext.Current.Security.CurrentUser,
+                //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                Current.UmbracoContext.Security.CurrentUser,
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.EntityService,

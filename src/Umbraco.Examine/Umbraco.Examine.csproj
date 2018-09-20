@@ -50,7 +50,7 @@
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="NPoco" Version="3.9.3" />
+    <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\ConfigIndexCriteria.cs" />
@@ -61,7 +61,6 @@
     <Compile Include="Config\IndexSets.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
-    <Compile Include="LoggingLevel.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoContentIndexer.cs" />

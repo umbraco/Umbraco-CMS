@@ -96,10 +96,7 @@
                             userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
                                 clearSelection();
                                 onInit();
-                                formHelper.showNotifications(data);
-                            }, function(error) {
-                                formHelper.showNotifications(error.data);
-                            });
+                            }, angular.noop);
                         }
 
                     });

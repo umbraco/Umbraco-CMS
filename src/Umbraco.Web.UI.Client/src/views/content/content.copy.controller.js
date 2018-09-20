@@ -20,12 +20,19 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	    }
 	    $scope.treeModel = {
 	        hideHeader: false
-	    }
+        }
+        $scope.toggle = toggleHandler;
 	    userService.getCurrentUser().then(function (userData) {
-            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
 	    });
 
 	    var node = dialogOptions.currentNode;
+
+        function treeLoadedHandler(args) {
+            if (node && node.path) {
+                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+            }
+        }
 
 	    function nodeSelectHandler(args) {
 
@@ -51,7 +58,27 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
           	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
-	    }
+        }
+
+        function toggleHandler(type){
+            // If the relateToOriginal toggle is clicked
+            if(type === "relate"){
+                if($scope.relateToOriginal){
+                    $scope.relateToOriginal = false;
+                    return;
+                }
+                $scope.relateToOriginal = true;
+            }
+
+            // If the recurvise toggle is clicked
+            if(type === "recursive"){
+                if($scope.recursive){
+                    $scope.recursive = false;
+                    return;
+                }
+                $scope.recursive = true;
+            }
+        }
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;
@@ -100,17 +127,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
                 }, function (err) {
                     $scope.success = false;
                     $scope.error = err;
-                    $scope.busy = false;
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
+                    $scope.busy = false;                   
                 });
 	    };
 
         $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
             $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
         }

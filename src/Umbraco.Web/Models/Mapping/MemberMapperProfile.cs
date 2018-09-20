@@ -14,16 +14,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MemberMapperProfile : Profile
     {
-        public MemberMapperProfile(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
+        public MemberMapperProfile(
+            MemberTabsAndPropertiesResolver tabsAndPropertiesResolver,
+            MemberTreeNodeUrlResolver memberTreeNodeUrlResolver,
+            MemberBasicPropertiesResolver memberBasicPropertiesResolver,
+            IUserService userService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService)
         {
             // create, capture, cache
             var memberOwnerResolver = new OwnerResolver<IMember>(userService);
-            var tabsAndPropertiesResolver = new MemberTabsAndPropertiesResolver(textService, memberService, userService);
             var memberProfiderFieldMappingResolver = new MemberProviderFieldResolver();
             var membershipScenarioMappingResolver = new MembershipScenarioResolver(memberTypeService);
             var memberDtoPropertiesResolver = new MemberDtoPropertiesResolver();
-            var memberTreeNodeUrlResolver = new MemberTreeNodeUrlResolver();
-            var memberBasicPropertiesResolver = new MemberBasicPropertiesResolver();
 
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             CreateMap<MembershipUser, MemberDisplay>().ConvertUsing<MembershipUserTypeConverter>();
@@ -45,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.Names, opt => opt.Ignore())
+                .ForMember(dest => dest.CultureNames, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentId, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
@@ -70,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.MembershipScenario, opt => opt.ResolveUsing(src => membershipScenarioMappingResolver.Resolve(src)))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.UseValue<ContentSavedState?>(null))
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
@@ -88,7 +91,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.UseValue<ContentSavedState?>(null))
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
@@ -112,7 +115,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.UseValue(ContentSavedState.Draft))
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
@@ -120,14 +123,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
-            CreateMap<IMember, ContentItemDto<IMember>>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+            CreateMap<IMember, ContentPropertyCollectionDto>()
+                //.ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
+                //.ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
+                //.ForMember(dest => dest.Published, opt => opt.Ignore())
+                //.ForMember(dest => dest.Edited, opt => opt.Ignore())
+                //.ForMember(dest => dest.Updater, opt => opt.Ignore())
+                //.ForMember(dest => dest.Icon, opt => opt.Ignore())
+                //.ForMember(dest => dest.Alias, opt => opt.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dest => dest.Properties, opt => opt.ResolveUsing(src => memberDtoPropertiesResolver.Resolve(src)));
 

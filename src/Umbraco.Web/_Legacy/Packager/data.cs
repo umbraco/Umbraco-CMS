@@ -1,8 +1,6 @@
 using System;
 using System.Xml;
-using System.Xml.XPath;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -182,7 +180,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<data>("An error occurred in GetAllPackages", ex);
+                    Current.Logger.Error<data>(ex, "An error occurred in GetAllPackages");
                 }
             }
 
@@ -264,17 +262,6 @@ namespace umbraco.cms.businesslogic.packager
 
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method is no longer in use and will be removed in the future")]
-        public static void UpdateValue(XmlNode n, string Value)
-        {
-            if (n.FirstChild != null)
-                n.FirstChild.Value = Value;
-            else
-            {
-                n.AppendChild(Source.CreateTextNode(Value));
-            }
-        }
 
         public static void Save(PackageInstance package, string dataSource)
         {

@@ -1,4 +1,5 @@
-<umb-editor-view ng-controller="Umbraco.Editors.MediaPickerController as vm">
+<div ng-controller="Umbraco.Editors.MediaPickerController as vm">
+<umb-editor-view >
     
     <umb-editor-header
         name="model.title"
@@ -36,7 +37,8 @@
                             type="button" 
                             label-key="general_upload" 
                             action="upload()" 
-                            disabled="lockedFolder">
+                            disabled="lockedFolder"
+                            button-style="info">
                         </umb-button>
                     </div>
     
@@ -77,14 +79,14 @@
                     hide-dropzone="{{!activeDrag && images.length > 0 || searchOptions.filter }}"
                     compact="{{ images.length > 0 }}">
                 </umb-file-dropzone>
-    
+                
                 <umb-media-grid 
                     ng-if="!loading" 
                     items="images" 
                     on-click="clickHandler"
                     on-click-name="clickItemName"
                     on-click-edit="editMediaItem(item)"
-                    allow-on-click-edit="true"
+                    allow-on-click-edit="{{allowMediaEdit}}"
                     item-max-width="150"
                     item-max-height="150" 
                     item-min-width="100" 
@@ -175,3 +177,5 @@
     </umb-editor-footer>
 
 </umb-editor-view>
+
+</div>

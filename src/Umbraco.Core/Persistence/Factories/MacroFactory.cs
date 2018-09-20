@@ -5,9 +5,9 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MacroFactory
+    internal static class MacroFactory
     {
-        public IMacro BuildEntity(MacroDto dto)
+        public static IMacro BuildEntity(MacroDto dto)
         {
             var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public MacroDto BuildDto(IMacro entity)
+        public static MacroDto BuildDto(IMacro entity)
         {
             var dto = new MacroDto
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private List<MacroPropertyDto> BuildPropertyDtos(IMacro entity)
+        private static List<MacroPropertyDto> BuildPropertyDtos(IMacro entity)
         {
             var list = new List<MacroPropertyDto>();
             foreach (var p in entity.Properties)

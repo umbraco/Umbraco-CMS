@@ -21,7 +21,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"At least 2 people have named their cat 'Umbraco'",
 					'On an average day, more than 1000 people download Umbraco',
 					'<a target="_blank" href="https://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
-					'You can find the world\'s friendliest CMS community at <a target="_blank" href="https://our.umbraco.org">our.umbraco.org</a>',
+					'You can find the world\'s friendliest CMS community at <a target="_blank" href="https://our.umbraco.com">our.umbraco.com</a>',
 					'You can become a certified Umbraco developer by attending one of the official courses',
 					'Umbraco works really well on tablets',
 					'You have 100% control over your markup and design when crafting a website in Umbraco',
@@ -29,9 +29,9 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"There's a pretty big chance, you've visited a website powered by Umbraco today",
 					"'Umbraco-spotting' is the game of spotting big brands running Umbraco",
 					"At least 4 people have the Umbraco logo tattooed on them",
-					"'Umbraco' is the danish name for an allen key",
+					"'Umbraco' is the Danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
-					"More than 600 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='https://umbra.co/codegarden'>CodeGarden</a>", 
+					"More than 600 people from all over the world meet each year in Denmark in May for our annual conference <a target='_blank' href='https://umbra.co/codegarden'>CodeGarden</a>", 
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
 					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
 					"Umbraco has been installed in more than 198 countries"
@@ -121,7 +121,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			}
 		},
 
-		//loads available packages from our.umbraco.org
+		//loads available packages from our.umbraco.com
 		getPackages : function(){
 			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
 		},
@@ -233,56 +233,59 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 			function processInstallStep() {
 
-			    $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", _installerModel)
-			        .success(function(data, status, headers, config) {
-			            if (!data.complete) {
+                $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", _installerModel)
+                    .then(function (response) {
+                        var data = response.data;
+                        if (!data.complete) {
 
-			                //progress feedback
-			                service.status.progress = calculateProgress(service.status.steps, data.nextStep);
+                            //progress feedback
+                            service.status.progress = calculateProgress(service.status.steps, data.nextStep);
 
-			                if (data.view) {
-			                    //set the current view and model to whatever the process returns, the view is responsible for retriggering install();
-			                    var v = resolveView(data.view);
-			                    service.status.current = { view: v, model: data.model };
+                            if (data.view) {
+                                //set the current view and model to whatever the process returns, the view is responsible for retriggering install();
+                                var v = resolveView(data.view);
+                                service.status.current = { view: v, model: data.model };
 
-			                    //turn off loading bar and feedback
-			                    service.switchToConfiguration();
-			                }
-			                else {
-			                    var desc = getDescriptionForStepName(service.status.steps, data.nextStep);
-			                    if (desc) {
-			                        service.status.feedback = desc;
-			                    }
-			                    processInstallStep();
-			                }
-			            }
-			            else {
-			                service.complete();
-			            }
-			        }).error(function(data, status, headers, config) {
-			            //need to handle 500's separately, this will happen if something goes wrong outside
-			            // of the installer (like app startup events or something) and these will get returned as text/html
-			            // not as json. If this happens we can't actually load in external views since they will YSOD as well!
+                                //turn off loading bar and feedback
+                                service.switchToConfiguration();
+                            }
+                            else {
+                                var desc = getDescriptionForStepName(service.status.steps, data.nextStep);
+                                if (desc) {
+                                    service.status.feedback = desc;
+                                }
+                                processInstallStep();
+                            }
+                        }
+                        else {
+                            service.complete();
+                        }
+                    }, function (response) {
+
+                        var data = response.data;
+                        var status = response.status;
+                        //need to handle 500's separately, this will happen if something goes wrong outside
+                        // of the installer (like app startup events or something) and these will get returned as text/html
+                        // not as json. If this happens we can't actually load in external views since they will YSOD as well!
                         // so we need to display this in our own internal way
-			            
-			            if (status >= 500 && status < 600) {			                
-			                service.status.current = { view: "ysod", model: null };
-			                var ysod = data;
-                            //we need to manually write the html to the iframe - the html contains full html markup
-			                $timeout(function () {
-			                    document.getElementById('ysod').contentDocument.write(ysod);
-			                }, 500);
-			            }
-			            else {
-			                //this is where we handle installer error
-			                var v = data.view ? resolveView(data.view) : resolveView("error");
-			                var model = data.model ? data.model : data;
-			                service.status.current = { view: v, model: model };			                
-			            }
 
-			            service.switchToConfiguration();
-			            
-			        });
+                        if (status >= 500 && status < 600) {
+                            service.status.current = { view: "ysod", model: null };
+                            var ysod = data;
+                            //we need to manually write the html to the iframe - the html contains full html markup
+                            $timeout(function () {
+                                document.getElementById('ysod').contentDocument.write(ysod);
+                            }, 500);
+                        }
+                        else {
+                            //this is where we handle installer error
+                            var v = data.view ? resolveView(data.view) : resolveView("error");
+                            var model = data.model ? data.model : data;
+                            service.status.current = { view: v, model: model };
+                        }
+
+                        service.switchToConfiguration();
+                    });
 			}
 			processInstallStep();
 		},

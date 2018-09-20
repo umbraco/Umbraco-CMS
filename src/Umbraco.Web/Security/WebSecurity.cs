@@ -175,7 +175,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Gets the currnet user's id.
+        /// Gets the current user's id.
         /// </summary>
         /// <returns></returns>
         public virtual Attempt<int> GetUserId()

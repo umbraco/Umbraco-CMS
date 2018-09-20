@@ -87,14 +87,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _variations = origin._variations;
         }
 
+        // determines whether a property has value
         public override bool HasValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
 
-            var sourceValue = GetSourceValue(culture, segment);
+            var value = GetSourceValue(culture, segment);
+            var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
+            if (hasValue.HasValue) return hasValue.Value;
 
-            return sourceValue != null &&
-                   (!(sourceValue is string) || string.IsNullOrWhiteSpace((string) sourceValue) == false);
+            lock (_locko)
+            {
+                value = GetInterValue(culture, segment);
+                hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+                if (hasValue.HasValue) return hasValue.Value;
+
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+
+                // initial reference cache level always is .Content
+                const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+                if (!cacheValues.ObjectInitialized)
+                {
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, value, _isPreviewing);
+                    cacheValues.ObjectInitialized = true;
+                }
+                value = cacheValues.ObjectValue;
+                return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+            }
         }
 
         // used to cache the CacheValues of this property
@@ -191,10 +211,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (culture != null && segment != null) return;
 
             // use context values
-            // fixme CultureSegment?
             var publishedVariationContext = _content.VariationContextAccessor?.VariationContext;
-            if (culture == null) culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : "";
-            if (segment == null) segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : "";
+            if (culture == null) culture = _variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
+            if (segment == null) segment = _variations.VariesBySegment() ? publishedVariationContext?.Segment : "";
         }
 
         public override object GetValue(string culture = null, string segment = null)

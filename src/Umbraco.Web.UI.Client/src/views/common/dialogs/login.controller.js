@@ -23,6 +23,7 @@
         $scope.togglePassword = function () {
             var elem = $("form[name='loginForm'] input[name='password']");
             elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+            $(".password-text.show, .password-text.hide").toggle();
         }
 
         function init() {
@@ -144,7 +145,7 @@
                     .then(function (data) {
 
                         //success
-                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
                         $scope.invitedUserPasswordModel.buttonState = "success";
                         //set the user and set them as logged in
                         $scope.invitedUser = data;
@@ -180,7 +181,7 @@
                     modalClass: "login-overlay",
                     animation: "slide",
                     show: true,
-                    callback: callback,
+                    callback: callback
 
                 });
             }

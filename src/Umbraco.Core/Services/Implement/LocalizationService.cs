@@ -227,7 +227,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
-        public void Save(IDictionaryItem dictionaryItem, int userId = -1)
+        public void Save(IDictionaryItem dictionaryItem, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-        public void Delete(IDictionaryItem dictionaryItem, int userId = -1)
+        public void Delete(IDictionaryItem dictionaryItem, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -356,10 +356,13 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         /// <param name="userId">Optional id of the user saving the language</param>
-        public void Save(ILanguage language, int userId = -1)
+        public void Save(ILanguage language, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
                 var saveEventArgs = new SaveEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
                 {
@@ -382,10 +385,13 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
-        public void Delete(ILanguage language, int userId = -1)
+        public void Delete(ILanguage language, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
                 var deleteEventArgs = new DeleteEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
                 {

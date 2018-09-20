@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Media;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -14,11 +16,15 @@ namespace Umbraco.Web.PropertyEditors
     public class FileUploadPropertyEditor : DataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSection;
+        private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
-        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem)
+        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSection)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _contentSection = contentSection;
+            _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
         /// <summary>
@@ -148,16 +154,16 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var property in properties)
             {
-                var autoFillConfig = _mediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
+                var autoFillConfig = _contentSection.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 foreach (var pvalue in property.Values)
                 {
                     var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
                     if (string.IsNullOrWhiteSpace(svalue))
-                        _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
+                        _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                     else
-                        _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
+                        _uploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
                 }
             }
         }

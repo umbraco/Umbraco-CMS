@@ -27,7 +27,11 @@ namespace Umbraco.Core.Persistence.Factories
                     if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
                     {
                         foreach (var propDto in propDtos)
+                        {
+                            property.Id = propDto.Id;
                             property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
+                        }
+                            
                     }
 
                     property.ResetDirtyProperties(false);
@@ -99,13 +103,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 if (property.PropertyType.IsPublishing)
                 {
-                    // fixme
-                    // why only CultureNeutral?
-                    // then, the tree can only show when a CultureNeutral value has been modified, but not when
-                    // a CultureSegment has been modified, so if I edit some french/mobile thing, the tree will
-                    // NOT tell me that I have changes?
-
-                    var editingCultures = property.PropertyType.Variations.Has(ContentVariation.CultureNeutral);
+                    var editingCultures = property.PropertyType.VariesByCulture();
                     if (editingCultures && editedCultures == null) editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     // publishing = deal with edit and published values

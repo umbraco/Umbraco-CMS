@@ -33,6 +33,7 @@ namespace Umbraco.Core.Models.Identity
         private string[] _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
+        private DateTime? _lastPasswordChangeDateUtc;
 
         /// <summary>
         ///  Used to construct a new instance without an identity
@@ -92,14 +93,6 @@ namespace Umbraco.Core.Models.Identity
             _roles.CollectionChanged += _roles_CollectionChanged;
         }
 
-        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await manager.CreateIdentityAsync(this, Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
-        }
-
         /// <summary>
         /// Returns true if an Id has been set on this object this will be false if the object is new and not peristed to the database
         /// </summary>
@@ -134,6 +127,15 @@ namespace Umbraco.Core.Models.Identity
         {
             get => _userName;
             set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector);
+        }
+
+        /// <summary>
+        /// LastPasswordChangeDateUtc so we can track changes to it
+        /// </summary>
+        public override DateTime? LastPasswordChangeDateUtc
+        {
+            get { return _lastPasswordChangeDateUtc; }
+            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
         }
 
         /// <summary>
@@ -419,6 +421,7 @@ namespace Umbraco.Core.Models.Identity
             public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
             public readonly PropertyInfo UserNameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.UserName);
             public readonly PropertyInfo LastLoginDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastLoginDateUtc);
+            public readonly PropertyInfo LastPasswordChangeDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastPasswordChangeDateUtc);
             public readonly PropertyInfo EmailConfirmedSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, bool>(x => x.EmailConfirmed);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Name);
             public readonly PropertyInfo AccessFailedCountSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int>(x => x.AccessFailedCount);
@@ -439,5 +442,6 @@ namespace Umbraco.Core.Models.Identity
                 groups => groups.GetHashCode());
 
         }
+        
     }
 }

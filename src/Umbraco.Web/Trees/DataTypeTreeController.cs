@@ -17,7 +17,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:7)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree

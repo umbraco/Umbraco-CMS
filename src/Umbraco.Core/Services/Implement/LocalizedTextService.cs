@@ -104,7 +104,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (xmlSource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
+                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (_dictionarySource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
+                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -203,28 +203,11 @@ namespace Umbraco.Core.Services.Implement
             return attempt ? attempt.Result : currentCulture;
         }
 
-        /// <summary>
-        /// HAAAAAAAAAAACK! Used for backwards compat to convert a user's real culture code to a region code - normally this would be two letters
-        /// </summary>
-        /// <param name="currentCulture"></param>
-        /// <returns></returns>
-        public string ConvertToRegionCodeFromSupportedCulture(CultureInfo currentCulture)
-        {
-            if (currentCulture == null) throw new ArgumentNullException("currentCulture");
-
-            if (_fileSources == null) return currentCulture.Name;
-
-            var attempt = _fileSources.Value.TryConvert4LetterCultureTo2Letter(currentCulture);
-            return attempt
-                ? attempt.Result
-                : currentCulture.Name;
-        }
-
         private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
+                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 
@@ -262,7 +245,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (xmlSource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
+                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 

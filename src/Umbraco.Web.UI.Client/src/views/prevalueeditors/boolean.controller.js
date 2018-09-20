@@ -1,7 +1,30 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.BooleanController",
     function ($scope) {
-        if ($scope.model.value === 1 || $scope.model.value === "1" || $scope.model.value === true) {
-            $scope.model.value = "1";
+
+        function updateToggleValue() {
+            $scope.toggleValue = false;
+
+            if ($scope.model && Object.toBoolean($scope.model.value)) {
+                $scope.toggleValue = true;
+            }
         }
-        $scope.htmlId = "bool-" + String.CreateGuid();
+
+        if($scope.model.value === null){
+            $scope.model.value = "0";
+        }
+
+        updateToggleValue();
+
+        $scope.toggle = function(){
+            if (Object.toBoolean($scope.model.value)) {
+                $scope.model.value = "0";
+                updateToggleValue();
+
+                return;
+            }
+
+            $scope.model.value = "1";
+
+            updateToggleValue();
+        }
     });

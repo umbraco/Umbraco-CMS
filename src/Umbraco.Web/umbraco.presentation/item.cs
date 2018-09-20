@@ -60,7 +60,9 @@ namespace umbraco
 
             if (_fieldName.StartsWith("#"))
             {
-                _fieldContent = library.GetDictionaryItem(_fieldName.Substring(1, _fieldName.Length - 1));
+                var umbHelper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+
+                _fieldContent = umbHelper.GetDictionaryValue(_fieldName.Substring(1, _fieldName.Length - 1));
             }
             else
             {
@@ -69,8 +71,12 @@ namespace umbraco
 
                 if (publishedContent == null)
                 {
-                    var recursiveVal = GetRecursiveValueLegacy(elements);
-                    _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+                    if (recursive)
+                    {
+                        var recursiveVal = GetRecursiveValueLegacy(elements);
+                        _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+                    }
+                   
                 }
 
                 //check for published content and get its value using that

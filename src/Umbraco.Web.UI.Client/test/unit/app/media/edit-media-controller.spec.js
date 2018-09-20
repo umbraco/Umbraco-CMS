@@ -36,7 +36,7 @@ describe('edit media controller tests', function () {
         httpBackend.flush();
     }));
 
-    describe('media edit controller save', function () {
+    describe('media edit controller init', function () {
 
         it('it should have an media object', function () {
 
@@ -54,23 +54,6 @@ describe('edit media controller tests', function () {
         it('it should have added an info app', function () {
             expect(scope.content.apps[1].alias).toBe("info");
         });
-
-        it('all other tabs than the info tab should have a properties collection', function () {
-            $(scope.content.tabs).each(function (i, tab) {
-                if (tab.id !== -1 && tab.alias !== '_umb_infoTab') {
-                    expect(tab.properties.length).toBeGreaterThan(0);
-                }
-            });
-        });
-
-        it('it should change updateDate on save', function () {
-            var currentUpdateDate = scope.content.updateDate;
-
-            setTimeout(function () {
-                scope.save(scope.content);
-                expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
-            }, 1000);
-        });
-
+        
     });
 });

@@ -73,10 +73,10 @@ namespace Umbraco.Web
             if (user == null)
             {
                 Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
-                user = userService.GetUserById(Constants.Security.SuperId);
+                user = userService.GetUserById(Constants.Security.SuperUserId);
                 if (user == null)
                 {
-                    Current.Logger.Warn(typeof(NotificationServiceExtensions), $"Noticiations can not be sent, no admin user with id {Constants.Security.SuperId} could be resolved");
+                    Current.Logger.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                     return;
                 }
             }
@@ -98,10 +98,10 @@ namespace Umbraco.Web
             if (user == null)
             {
                 Current.Logger.Debug(typeof(NotificationServiceExtensions), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
-                user = userService.GetUserById(Constants.Security.SuperId);
+                user = userService.GetUserById(Constants.Security.SuperUserId);
                 if (user == null)
                 {
-                    Current.Logger.Warn(typeof(NotificationServiceExtensions), $"Noticiations can not be sent, no admin user with id {Constants.Security.SuperId} could be resolved");
+                    Current.Logger.Warn(typeof(NotificationServiceExtensions), "Noticiations can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                     return;
                 }
             }

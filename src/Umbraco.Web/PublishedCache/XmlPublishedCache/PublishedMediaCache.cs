@@ -122,13 +122,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         //TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }
@@ -306,13 +306,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         //TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }
@@ -330,8 +330,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
             if (miss < ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                Current.Logger.Warn<PublishedMediaCache>(() => $"Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
-                    + " them from DB. This may indicate that the Examine index is corrupted.");
+                Current.Logger.Warn<PublishedMediaCache>("Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
+                    + " them from DB. This may indicate that the Examine index is corrupted.", ExamineIndexMissMax);
 
             return ConvertFromIMedia(media);
         }
@@ -348,8 +348,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            Current.Logger.Warn<PublishedMediaCache>(() =>
-                $"Could not retrieve media {id} from Examine index or from legacy library.GetMedia method");
+            Current.Logger.Warn<PublishedMediaCache>("Could not retrieve media {MediaId} from Examine index or from legacy library.GetMedia method", id);
 
             return null;
         }
@@ -493,69 +492,88 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <returns></returns>
         private IEnumerable<IPublishedContent> GetChildrenMedia(int parentId, XPathNavigator xpath = null)
         {
-
-            //if there is no navigator, try examine first, then re-look it up
-            if (xpath == null)
+            // if there *is* a navigator, directly look it up
+            if (xpath != null)
             {
-                var searchProvider = GetSearchProviderSafe();
+                return ToIPublishedContent(parentId, xpath);
+            }
 
-                if (searchProvider != null)
+            // otherwise, try examine first, then re-look it up
+            var searchProvider = GetSearchProviderSafe();
+
+            if (searchProvider != null)
+            {
+                try
                 {
-                    try
+                    //first check in Examine as this is WAY faster
+                    var criteria = searchProvider.CreateCriteria("media");
+
+                    var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
+                    //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
+
+                    // sort with the Sort field (updated for 8.0)
+                    var results = searchProvider.Search(
+                        filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
+
+                    if (results.Any())
                     {
-                        //first check in Examine as this is WAY faster
-                        var criteria = searchProvider.CreateCriteria("media");
-
-                        var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
-                        //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
-                        //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
-
-                        // sort with the Sort field (updated for 8.0)
-                        var results = searchProvider.Search(
-                            filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
-
-                        if (results.Any())
+                        // var medias = results.Select(ConvertFromSearchResult);
+                        var medias = results.Select(x =>
                         {
-                            // var medias = results.Select(ConvertFromSearchResult);
-                            var medias = results.Select(x =>
-                            {
-                                int nid;
-                                if (int.TryParse(x["__NodeId"], out nid) == false && int.TryParse(x["NodeId"], out nid) == false)
-                                    throw new Exception("Failed to extract NodeId from search result.");
-                                var cacheValues = GetCacheValues(nid, id => ConvertFromSearchResult(x));
-                                return CreateFromCacheValues(cacheValues);
-                            });
+                            int nid;
+                            if (int.TryParse(x["__NodeId"], out nid) == false && int.TryParse(x["NodeId"], out nid) == false)
+                                throw new Exception("Failed to extract NodeId from search result.");
+                            var cacheValues = GetCacheValues(nid, id => ConvertFromSearchResult(x));
+                            return CreateFromCacheValues(cacheValues);
+                        });
 
-                            return medias;
-                        }
-
-                        //if there's no result then return null. Previously we defaulted back to library.GetMedia below
-                        //but this will always get called for when we are getting descendents since many items won't have
-                        //children and then we are hitting the database again!
-                        //So instead we're going to rely on Examine to have the correct results like it should.
-                        return Enumerable.Empty<IPublishedContent>();
+                        return medias;
                     }
-                    catch (FileNotFoundException)
-                    {
-                        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-                        //See this thread: http://examine.cdodeplex.com/discussions/264341
-                        //Catch the exception here for the time being, and just fallback to GetMedia
-                    }
-                }
 
-                //falling back to get media
-
-                var media = library.GetMedia(parentId, true);
-                if (media?.Current != null)
-                {
-                    xpath = media.Current;
-                }
-                else
-                {
+                    //if there's no result then return null. Previously we defaulted back to library.GetMedia below
+                    //but this will always get called for when we are getting descendents since many items won't have
+                    //children and then we are hitting the database again!
+                    //So instead we're going to rely on Examine to have the correct results like it should.
                     return Enumerable.Empty<IPublishedContent>();
+                }
+                catch (FileNotFoundException)
+                {
+                    //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                    //See this thread: http://examine.cdodeplex.com/discussions/264341
+                    //Catch the exception here for the time being, and just fallback to GetMedia
                 }
             }
 
+            // falling back to get media
+            // was library.GetMedia which had its own cache, but MediaService *also* caches
+            // so, library.GetMedia is gone and now we directly work with MediaService
+            // (code below copied from what library was doing)
+            var media = Current.Services.MediaService.GetById(parentId);
+            if (media == null)
+            {
+                return Enumerable.Empty<IPublishedContent>();
+            }
+
+            var serialized = EntityXmlSerializer.Serialize(
+                                Current.Services.MediaService,
+                                Current.Services.DataTypeService,
+                                Current.Services.UserService,
+                                Current.Services.LocalizationService,
+                                Current.UrlSegmentProviders,
+                                media,
+                                true);
+
+            var mediaIterator = serialized.CreateNavigator().Select("/");
+
+            return mediaIterator.Current == null
+                ? Enumerable.Empty<IPublishedContent>()
+                : ToIPublishedContent(parentId, mediaIterator.Current);
+        }
+
+
+        internal IEnumerable<IPublishedContent> ToIPublishedContent(int parentId, XPathNavigator xpath)
+        {
             var mediaList = new List<IPublishedContent>();
 
             // this is so bad, really
@@ -578,31 +596,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 mediaList.Add(CreateFromCacheValues(cacheValues));
             }
 
-            ////The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
-            //var item = xpath.Select("//*[@id='" + parentId + "']");
-            //if (item.Current == null)
-            //{
-            //    return Enumerable.Empty<IPublishedContent>();
-            //}
-            //var children = item.Current.SelectChildren(XPathNodeType.Element);
-
-            //foreach(XPathNavigator x in children)
-            //{
-            //    //NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
-            //    // will leave it here as it must have done something!
-            //    if (x.Name != "contents")
-            //    {
-            //        //make sure it's actually a node, not a property
-            //        if (!string.IsNullOrEmpty(x.GetAttribute("path", "")) &&
-            //            !string.IsNullOrEmpty(x.GetAttribute("id", "")))
-            //        {
-            //            mediaList.Add(ConvertFromXPathNavigator(x));
-            //        }
-            //    }
-            //}
-
             return mediaList;
         }
+
 
         internal void Resync()
         {

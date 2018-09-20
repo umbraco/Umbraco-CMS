@@ -18,11 +18,17 @@ namespace Umbraco.Web.Templates
     public static class TemplateUtilities
     {
         //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
+        [Obsolete("Use the overload specifying an UmbracoContext")]
         internal static string ParseInternalLinks(string text, bool preview)
         {
-            using (UmbracoContext.Current.ForcedPreview(preview)) // force for url provider
+            return ParseInternalLinks(text, preview, UmbracoContext.Current);
+        }
+
+        internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
+        {
+            using (umbracoContext.ForcedPreview(preview)) // force for url provider
             {
-                text = ParseInternalLinks(text);
+                text = ParseInternalLinks(text, umbracoContext.UrlProvider);
             }
 
             return text;
@@ -69,21 +75,6 @@ namespace Umbraco.Web.Templates
             return text;
         }
 
-        /// <summary>
-        /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static string ParseInternalLinks(string text)
-        {
-            //don't attempt to proceed without a context as we cannot lookup urls without one
-            if (UmbracoContext.Current == null)
-                return text;
-
-            var urlProvider = UmbracoContext.Current.UrlProvider;
-            return ParseInternalLinks(text, urlProvider);
-        }
 
         // static compiled regex for faster performance
         private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
@@ -109,7 +100,7 @@ namespace Umbraco.Web.Templates
             {
                 // find all relative urls (ie. urls that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                Current.Logger.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
+                Current.Logger.Debug(typeof(IOHelper), "After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

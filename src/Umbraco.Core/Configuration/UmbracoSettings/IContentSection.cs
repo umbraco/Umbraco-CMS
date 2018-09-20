@@ -43,8 +43,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         string PreviewBadge { get; }
 
-        int UmbracoLibraryCacheDuration { get; }
-
         MacroErrorBehaviour MacroErrorBehaviour { get; }
 
         IEnumerable<string> DisallowedUploadFiles { get; }

@@ -23,7 +23,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         {
             // handle context culture
             if (culture == null)
-                culture = VariationContextAccessor?.VariationContext.Culture;
+                culture = VariationContextAccessor?.VariationContext?.Culture;
 
             // no invariant culture infos
             if (culture == "" || Cultures == null) return null;

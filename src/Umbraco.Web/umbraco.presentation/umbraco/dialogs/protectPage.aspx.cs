@@ -244,7 +244,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Error<protectPage>("An error occurred initializing the protect page editor", ex);
+                        Current.Logger.Error<protectPage>(ex, "An error occurred initializing the protect page editor");
                     }
 
                     if (GetProtectionType(documentId) == ProtectionType.Simple)

@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService, editorService) {
+function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -87,6 +87,8 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             $location.path("/").search("");
             historyService.removeAll();
             treeService.clearCache();
+            editorService.closeAll();
+            overlayService.close();
 
             //if the user changed, clearout local storage too - could contain sensitive data
             localStorageService.clearAll();
@@ -176,5 +178,5 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 angular.module('umbraco').controller("Umbraco.MainController", MainController).
     config(function (tmhDynamicLocaleProvider) {
         //Set url for locale files
-        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular/1.1.5/i18n/angular-locale_{{locale}}.js');
+        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale}}.js');
     });

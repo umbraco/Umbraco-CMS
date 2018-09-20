@@ -102,7 +102,7 @@ namespace Umbraco.Web.UI.Pages
                 if (!Security.ValidateUserApp(CurrentApp))
                 {
                     var ex = new SecurityException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
-                    Current.Logger.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
+                    Current.Logger.Error<UmbracoEnsuredPage>(ex, "Tried to access '{CurrentApp}'", CurrentApp);
                     throw ex;
                 }
 
@@ -112,11 +112,11 @@ namespace Umbraco.Web.UI.Pages
                 // Clear content as .NET transfers rendered content.
                 Response.Clear();
 
-                // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
-                if (RedirectToUmbraco)
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?t=" + Security.GetSessionId(), true);
-                else
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.GetSessionId(), true);
+                // Ensure the person is definitely logged out
+                UmbracoContext.Current.Security.ClearCurrentLogin();
+
+                // Redirect to the login page
+                Response.Redirect(SystemDirectories.Umbraco + "#/login", true);
             }
         }
 
