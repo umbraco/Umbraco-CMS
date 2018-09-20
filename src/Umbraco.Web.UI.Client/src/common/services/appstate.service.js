@@ -252,7 +252,6 @@ function appState(eventsService) {
          *
          */
         setSearchState: function (key, value) {
-            console.log("set serach state");
             setState(searchState, key, value, "searchState");
         },
 
