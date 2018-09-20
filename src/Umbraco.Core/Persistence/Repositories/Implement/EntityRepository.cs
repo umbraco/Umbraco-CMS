@@ -901,10 +901,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = new DocumentEntitySlim();
             BuildContentEntity(entity, dto);
             
-            //fixme we need to set these statuses for each variant, see notes in IDocumentEntitySlim
+            //fill in the invariant info
             entity.Edited = dto.Edited;
             entity.Published = dto.Published;
 
+            //fill in the variant info
             if (dto.Variations.VariesByCulture() && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
             {
                 var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);

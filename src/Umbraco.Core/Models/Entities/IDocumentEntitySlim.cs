@@ -7,26 +7,35 @@ namespace Umbraco.Core.Models.Entities
     /// </summary>
     public interface IDocumentEntitySlim : IContentEntitySlim
     {
-        //fixme we need to supply more information than this and change this property name. This will need to include Published/Editor per variation since we need this information for the tree
+        /// <summary>
+        /// Gets the variant name for each culture
+        /// </summary>
         IReadOnlyDictionary<string, string> CultureNames { get; }
 
+        /// <summary>
+        /// Gets the published cultures.
+        /// </summary>
+        IEnumerable<string> PublishedCultures { get; }
+
+        /// <summary>
+        /// Gets the edited cultures.
+        /// </summary>
+        IEnumerable<string> EditedCultures { get; }
+
+        /// <summary>
+        /// Gets the content variation of the content type.
+        /// </summary>
         ContentVariation Variations { get; }
 
         /// <summary>
-        /// At least one variation is published
+        /// Gets a value indicating whether the content is published.
         /// </summary>
-        /// <remarks>
-        /// If the document is invariant, this simply means there is a published version
-        /// </remarks>
-        bool Published { get; set; }
+        bool Published { get; }
 
         /// <summary>
-        /// At least one variation has pending changes
+        /// Gets a value indicating whether the content has been edited.
         /// </summary>
-        /// <remarks>
-        /// If the document is invariant, this simply means there is pending changes
-        /// </remarks>
-        bool Edited { get; set; }
+        bool Edited { get; }
 
     }
 }
