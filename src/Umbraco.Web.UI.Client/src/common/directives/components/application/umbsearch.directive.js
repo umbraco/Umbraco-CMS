@@ -20,6 +20,7 @@
         vm.$onInit = onInit;
         vm.$onDestroy = onDestroy;
         vm.search = search;
+        vm.clickItem = clickItem;
         vm.handleKeyUp = handleKeyUp;
         vm.closeSearch = closeSearch;
 
@@ -31,6 +32,10 @@
 
         function onDestroy() {
             backdropService.close();
+        }
+
+        function clickItem(item) {
+            closeSearch();
         }
 
         function handleKeyUp(event) {
