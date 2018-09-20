@@ -13,7 +13,7 @@
         }
     };
     
-    function umbSearchController($scope, backdropService, searchService) {
+    function umbSearchController($timeout, backdropService, searchService) {
 
         var vm = this;
 
@@ -21,12 +21,15 @@
         vm.$onDestroy = onDestroy;
         vm.search = search;
         vm.clickItem = clickItem;
+        vm.clearSearch = clearSearch;
         vm.handleKeyUp = handleKeyUp;
         vm.closeSearch = closeSearch;
 
         function onInit() {
+            vm.searchQuery = "";
             vm.searchResults = [];
             vm.hasResults = false;
+            vm.focusSearch = true;
             backdropService.open();
         }
 
@@ -39,6 +42,19 @@
          */
         function clickItem() {
             closeSearch();
+        }
+
+        /**
+         * Clears the search query
+         */
+        function clearSearch() {
+            vm.focusSearch = false;
+            vm.searchQuery = "";
+            $timeout(function(){
+                vm.focusSearch  = true;
+                vm.searchResults = [];
+                vm.hasResults = false;
+            });
         }
 
         /**
@@ -83,8 +99,7 @@
                 });
 
             } else {
-                vm.searchResults = [];
-                vm.hasResults = false;
+                clearSearch();
             }
         }
 

@@ -36,6 +36,23 @@
     margin-bottom: 0;
 }
 
+.umb-search-input-clear {
+    background: none;
+    border: none;
+    font-size: 12px;
+    margin-right: 20px;
+    color: @gray-3;
+}
+
+.umb-search-input-clear.ng-enter {
+    opacity: 0;
+    transition: opacity 100ms ease-in-out;
+}
+
+.umb-search-input-clear.ng-enter.ng-enter-active {
+    opacity: 1;
+}
+
 /*
     Search results
 */
