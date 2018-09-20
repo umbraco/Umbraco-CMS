@@ -133,7 +133,11 @@ namespace Umbraco.Web.Editors
             }
 
             //sign the user in
+            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
             await SignInManager.SignInAsync(identityUser, false, false);
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
+            identityUser.LastLoginDateUtc = previousLastLoginDate;
+            await UserManager.UpdateAsync(identityUser);
 
             return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
         }
