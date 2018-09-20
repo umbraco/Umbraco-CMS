@@ -109,7 +109,6 @@
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
-    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -14,7 +13,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Xml;
 using File = System.IO.File;
@@ -115,11 +113,7 @@ namespace umbraco.cms.businesslogic.packager
             ContainsStyleSheeConflicts = false;
         }
 
-        [Obsolete("Use the ctor with all parameters")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Installer(string name, string version, string url, string license, string licenseUrl, string author, string authorUrl, int requirementsMajor, int requirementsMinor, int requirementsPatch, string readme, string control)
-        {
-        }
+
 
         /// <summary>
         /// Constructor

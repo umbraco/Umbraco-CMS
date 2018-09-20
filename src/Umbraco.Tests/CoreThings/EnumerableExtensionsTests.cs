@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.CoreThings
         }
 
         [Test]
-        public void Flatten_List_2()
+        public void SelectRecursive_2()
         {
             var hierarchy = new TestItem("1")
             {
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.CoreThings
                 };
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = hierarchy.Children.FlattenList(x => x.Children);
+            var flattened = FlattenList(hierarchy.Children, x => x.Children);
 #pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.CoreThings
         }
 
         [Test]
-        public void Flatten_List()
+        public void SelectRecursive()
         {
             var hierarchy = new TestItem("1")
             {
@@ -118,7 +119,7 @@ namespace Umbraco.Tests.CoreThings
             };
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = hierarchy.Children.FlattenList(x => x.Children);
+            var flattened = FlattenList(hierarchy.Children, x => x.Children);
 #pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
@@ -139,6 +140,13 @@ namespace Umbraco.Tests.CoreThings
             }
             public string Name { get; }
             public IEnumerable<TestItem> Children { get; set; }
+        }
+
+
+
+        private IEnumerable<T> FlattenList<T>(IEnumerable<T> e, Func<T, IEnumerable<T>> f)
+        {
+            return e.SelectMany(c => FlattenList(f(c), f)).Concat(e);
         }
 
         [Test]
