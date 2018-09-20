@@ -23,7 +23,9 @@ namespace Umbraco.Tests.Web.AngularIntegration
 
             Assert.AreEqual(@"LazyLoad.js([World], function () {
     //we need to set the legacy UmbClientMgr path
-    UmbClientMgr.setUmbracoPath('Hello');
+    if ((typeof UmbClientMgr) !== ""undefined"") {
+        UmbClientMgr.setUmbracoPath('Hello');
+    }
 
     jQuery(document).ready(function () {
 
