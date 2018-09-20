@@ -34,10 +34,17 @@
             backdropService.close();
         }
 
-        function clickItem(item) {
+        /**
+         * Handles when a search result is clicked
+         */
+        function clickItem() {
             closeSearch();
         }
 
+        /**
+         * Handles all keyboard events
+         * @param {object} event
+         */
         function handleKeyUp(event) {
             // esc
             if(event.keyCode === 27) {
