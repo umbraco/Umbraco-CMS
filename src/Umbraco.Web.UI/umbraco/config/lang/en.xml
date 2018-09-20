@@ -1688,8 +1688,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
 
-		<key alias="compositionUsageHeading">Where is this composition used?</key>
-		<key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+        <key alias="compositionUsageHeading">Where is this composition used?</key>
+        <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
     </area>
 
     <area alias="modelsBuilder">
@@ -1864,7 +1864,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="goToProfile">Go to user profile</key>
         <key alias="groupsHelp">Add groups to assign access and permissions</key>
         <key alias="inviteAnotherUser">Invite another user</key>
-        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
+        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco. Invites last for 72 hours.</key>
         <key alias="language">Language</key>
         <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
         <key alias="lastLockoutDate">Last lockout date</key>
@@ -1928,6 +1928,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="userInvited">has been invited</key>
         <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
         <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
+        <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
         <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
         <key alias="writer">Writer</key>
         <key alias="translator">Translator</key>
