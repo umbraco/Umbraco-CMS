@@ -159,7 +159,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
-
+    
     //watch for culture changes in the query strings and update accordingly
     $scope.$watch(function () {
         return $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
@@ -204,8 +204,8 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         }
     });
 
-    $scope.selectLayout = function (selectedLayout) {
-        $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, selectedLayout, $scope.model.config.layouts);
+    $scope.selectLayout = function (layout) {
+        $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, layout, $scope.model.config.layouts);
     };
 
     function showNotificationsAndReset(err, reload, successMsg) {
@@ -332,15 +332,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             $scope.reloadView($scope.contentId);
         }
     }
-
-    $scope.isAnythingSelected = function () {
-        if ($scope.selection.length === 0) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
+    
     $scope.selectedItemsCount = function () {
         return $scope.selection.length;
     };
