@@ -560,7 +560,7 @@ namespace Umbraco.Web
                 var httpContext = ((HttpApplication) sender).Context;
 
                 var httpRequestId = Guid.Empty;
-                HttpRequestIdEnricher.TryGetCurrentHttpRequestId(out httpRequestId);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
 
                 Logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}",
                     httpRequestId,
@@ -609,7 +609,7 @@ namespace Umbraco.Web
                 if (UmbracoContext.Current != null)
                 {
                     var httpRequestId = Guid.Empty;
-                    HttpRequestIdEnricher.TryGetCurrentHttpRequestId(out httpRequestId);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
 
                     Logger.Verbose<UmbracoModule>(
                         "End request [{HttpRequestId}]: {RequestUrl} took {Duration}ms",

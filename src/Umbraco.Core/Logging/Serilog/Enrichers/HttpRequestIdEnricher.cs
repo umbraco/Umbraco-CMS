@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -17,8 +16,6 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// </summary>
         public const string HttpRequestIdPropertyName = "HttpRequestId";
 
-        static readonly string RequestIdItemName = typeof(HttpRequestIdEnricher).Name + "+RequestId";
-
         /// <summary>
         /// Enrich the log event with an id assigned to the currently-executing HTTP request, if any.
         /// </summary>
@@ -29,33 +26,11 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
             if (logEvent == null) throw new ArgumentNullException("logEvent");
 
             Guid requestId;
-            if (!TryGetCurrentHttpRequestId(out requestId))
+            if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId))
                 return;
 
             var requestIdProperty = new LogEventProperty(HttpRequestIdPropertyName, new ScalarValue(requestId));
             logEvent.AddPropertyIfAbsent(requestIdProperty);
-        }
-
-        /// <summary>
-        /// Retrieve the id assigned to the currently-executing HTTP request, if any.
-        /// </summary>
-        /// <param name="requestId">The request id.</param>
-        /// <returns><c>true</c> if there is a request in progress; <c>false</c> otherwise.</returns>
-        public static bool TryGetCurrentHttpRequestId(out Guid requestId)
-        {
-            if (HttpContext.Current == null)
-            {
-                requestId = default(Guid);
-                return false;
-            }
-
-            var requestIdItem = HttpContext.Current.Items[RequestIdItemName];
-            if (requestIdItem == null)
-                HttpContext.Current.Items[RequestIdItemName] = requestId = Guid.NewGuid();
-            else
-                requestId = (Guid)requestIdItem;
-
-            return true;
-        }
+        }        
     }
 }
