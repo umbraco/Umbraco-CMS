@@ -1277,7 +1277,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = new List<ContentNuDto>();
                 foreach (var c in descendants)
                 {
@@ -1344,7 +1344,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
@@ -1402,7 +1402,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

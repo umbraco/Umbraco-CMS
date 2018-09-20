@@ -326,6 +326,7 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
@@ -407,6 +408,8 @@
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
+    <Compile Include="Persistence\SqlContextExtensions.cs" />
+    <Compile Include="Persistence\SqlSyntaxExtensions.cs" />
     <Compile Include="Persistence\UmbracoPocoDataBuilder.cs" />
     <Compile Include="PropertyEditors\ColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
@@ -1390,6 +1393,7 @@
     <Compile Include="Services\OperationResultType.cs" />
     <Compile Include="Services\Implement\PackagingService.cs" />
     <Compile Include="Services\Implement\PublicAccessService.cs" />
+    <Compile Include="Services\Ordering.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\PublishResult.cs" />
     <Compile Include="Services\PublishResultType.cs" />

@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<DataTypeConfigurationFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
-            var propEd = Current.PropertyEditors[editorAlias];
+            var propEd = _propertyEditors[editorAlias];
             if (propEd == null)
             {
                 throw new InvalidOperationException("Could not find property editor with alias " + editorAlias);
