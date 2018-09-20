@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -23,5 +24,8 @@ namespace Umbraco.Core.Manifest
 
         [JsonProperty("gridEditors")]
         public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
+
+        [JsonProperty("contentApps")]
+        public IContentAppDefinition[] ContentApps { get; set; } = Array.Empty<IContentAppDefinition>();
     }
 }
