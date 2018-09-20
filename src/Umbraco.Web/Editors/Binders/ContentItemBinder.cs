@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors.Binders
                         //map the property dto collection with the culture of the current variant
                         variant.PropertyCollectionDto = Mapper.Map<ContentPropertyCollectionDto>(
                             model.PersistedContent,
-                            options => options.Items[ResolutionContextExtensions.CultureKey] = variant.Culture);
+                            options => options.SetCulture(variant.Culture));
                     }
 
                     //now map all of the saved values to the dto

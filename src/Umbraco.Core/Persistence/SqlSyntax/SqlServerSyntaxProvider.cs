@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -45,6 +46,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2012 = 5,
             V2014 = 6,
             V2016 = 7,
+            V2017 = 8,
             Other = 99
         }
 
@@ -71,37 +73,35 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             public void Initialize()
             {
-                var firstPart = string.IsNullOrWhiteSpace(ProductVersion) ? "??" : ProductVersion.Split('.')[0];
-                switch (firstPart)
-                {
-                    case "??":
-                        ProductVersionName = VersionName.Invalid;
-                        break;
-                    case "13":
-                        ProductVersionName = VersionName.V2016;
-                        break;
-                    case "12":
-                        ProductVersionName = VersionName.V2014;
-                        break;
-                    case "11":
-                        ProductVersionName = VersionName.V2012;
-                        break;
-                    case "10":
-                        ProductVersionName = VersionName.V2008;
-                        break;
-                    case "9":
-                        ProductVersionName = VersionName.V2005;
-                        break;
-                    case "8":
-                        ProductVersionName = VersionName.V2000;
-                        break;
-                    case "7":
-                        ProductVersionName = VersionName.V7;
-                        break;
-                    default:
-                        ProductVersionName = VersionName.Other;
-                        break;
-                }
+                ProductVersionName = MapProductVersion(ProductVersion);
+            }
+        }
+
+        private static VersionName MapProductVersion(string productVersion)
+        {
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            switch (firstPart)
+            {
+                case "??":
+                    return VersionName.Invalid;
+                case "14":
+                    return VersionName.V2017;
+                case "13":
+                    return VersionName.V2016;
+                case "12":
+                    return VersionName.V2014;
+                case "11":
+                    return VersionName.V2012;
+                case "10":
+                    return VersionName.V2008;
+                case "9":
+                    return VersionName.V2005;
+                case "8":
+                    return VersionName.V2000;
+                case "7":
+                    return VersionName.V7;
+                default:
+                    return VersionName.Other;
             }
         }
 
@@ -133,6 +133,33 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 // can't ignore, really
                 throw new Exception("Failed to determine Sql Server version (see inner exception).", e);
+            }
+        }
+
+        internal static VersionName GetVersionName(string connectionString, string providerName)
+        {
+            var factory = DbProviderFactories.GetFactory(providerName);
+            var connection = factory.CreateConnection();
+
+            if (connection == null)
+                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
+
+            connection.ConnectionString = connectionString;
+            using (connection)
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT SERVERPROPERTY('ProductVersion');";
+                    var productVersion = command.ExecuteScalar().ToString();
+                    connection.Close();
+                    return MapProductVersion(productVersion);
+                }
+                catch
+                {
+                    return VersionName.Unknown;
+                }
             }
         }
 

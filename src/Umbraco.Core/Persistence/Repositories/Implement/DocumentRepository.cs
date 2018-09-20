@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -673,13 +674,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             PermissionRepository.Save(permission);
         }
 
-        /// <summary>
-        /// Gets paged content results.
-        /// </summary>
+        /// <inheritdoc />
         public override IEnumerable<IContent> GetPage(IQuery<IContent> query,
-            long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField,
-            IQuery<IContent> filter = null)
+            long pageIndex, int pageSize, out long totalRecords,            
+            IQuery<IContent> filter, Ordering ordering)
         {
             Sql<ISqlContext> filterSql = null;
 
@@ -692,8 +690,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x),
-                orderBy, orderDirection, orderBySystemField,
-                filterSql);
+                filterSql,
+                ordering);
         }
 
         public bool IsPathPublished(IContent content)
@@ -814,25 +812,59 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
+        protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
-            // NOTE see sortby.prevalues.controller.js for possible values
-            // that need to be handled here or in VersionableRepositoryBase
-
-            //Some custom ones
-            switch (orderBy.ToUpperInvariant())
+            // note: 'updater' is the user who created the latest draft version,
+            //       we don't have an 'updater' per culture (should we?)
+            if (ordering.OrderBy.InvariantEquals("updater"))
             {
-                case "UPDATER":
-                    // fixme orders by id not letter = bad
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.ContentVersion, "userId");
-                case "PUBLISHED":
-                    // fixme kill
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");
-                case "CONTENTTYPEALIAS":
-                    throw new NotSupportedException("Don't know how to support ContentTypeAlias.");
+                var joins = Sql()
+                    .InnerJoin<UserDto>("updaterUser").On<ContentVersionDto, UserDto>((version, user) => version.UserId == user.Id, aliasRight: "updaterUser");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering"), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
             }
 
-            return base.GetDatabaseFieldNameForOrderBy(orderBy);
+            if (ordering.OrderBy.InvariantEquals("published"))
+            {
+                // no culture = can only work on the global 'published' flag
+                if (ordering.Culture.IsNullOrWhiteSpace())
+                {
+                    // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                    // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
+                    sql = Sql(InsertBefore(sql, "FROM", ", (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) AS ordering "), sql.Arguments);
+                    return "ordering";
+                }
+
+                // invariant: left join will yield NULL and we must use pcv to determine published
+                // variant: left join may yield NULL or something, and that determines published
+
+                var joins = Sql()
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
+                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((pcv, ccv) => pcv.Id == ccv.VersionId, "pcv", "ccv"); // join on *published* content version
+
+                sql = InsertJoins(sql, joins);
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
+                var sqlText = InsertBefore(sql.SQL, "FROM",
+
+                    // when invariant, ie 'variations' does not have the culture flag (value 1), use the global 'published' flag on pcv.id,
+                    // otherwise check if there's a version culture variation for the lang, via ccv.id
+                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccv.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+
+                sql = Sql(sqlText, sql.Arguments);
+
+                return "ordering";
+            }
+
+            return base.ApplySystemOrdering(ref sql, ordering);
         }
 
         private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false)
