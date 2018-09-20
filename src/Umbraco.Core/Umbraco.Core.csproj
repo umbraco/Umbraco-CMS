@@ -336,6 +336,7 @@
     <Compile Include="Logging\Viewer\LogMessage.cs" />
     <Compile Include="Logging\Viewer\LogViewerComponent.cs" />
     <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
+    <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
     <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
@@ -369,6 +370,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
