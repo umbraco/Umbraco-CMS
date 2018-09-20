@@ -460,6 +460,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public int LanguageId { get; set; }
             [Column("versionCultureName")]
             public string Name { get; set; }
+            [Column("versionCultureEdited")]
+            public bool Edited { get; set; }
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -522,7 +524,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .AndSelect<ContentVersionCultureVariationDto>(
                             x => Alias(x.Id, "versionCultureId"),
                             x => Alias(x.LanguageId, "versionCultureLangId"),
-                            x => Alias(x.Name, "versionCultureName"));
+                            x => Alias(x.Name, "versionCultureName"),
+                            x => Alias(x.Edited, "versionCultureEdited"));
                 }
             }
 
@@ -905,6 +908,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Edited = dto.Edited;
             entity.Published = dto.Published;
 
+            var publishedCultures = new List<string>();
+            var editedCultures = new List<string>();
+
             //fill in the variant info
             if (dto.Variations.VariesByCulture() && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
             {
@@ -914,9 +920,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var isoCode = _langRepository.GetIsoCodeById(info.LanguageId);
                     if (isoCode != null)
                         variantInfo[isoCode] = info.Name;
+
+                    if (dto.Published)
+                    {
+                        publishedCultures.Add(isoCode);
+                        if (info.Edited)
+                        {
+                            editedCultures.Add(isoCode);
+                        }
+                    }
                 }
                 entity.CultureNames = variantInfo;
                 entity.Variations = dto.Variations;
+                entity.PublishedCultures = publishedCultures;
+                entity.EditedCultures = editedCultures;
             }
             return entity;
         }
