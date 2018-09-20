@@ -259,7 +259,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
     with simple values */
 
-    $scope.getContent = function () {
+    $scope.getContent = function (contentId) {
         $scope.reloadView($scope.contentId, true);
     }
 
