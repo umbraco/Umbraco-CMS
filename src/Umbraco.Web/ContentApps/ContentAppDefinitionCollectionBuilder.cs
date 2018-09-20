@@ -9,19 +9,20 @@ namespace Umbraco.Web.ContentApps
 {
     public class ContentAppDefinitionCollectionBuilder : OrderedCollectionBuilderBase<ContentAppDefinitionCollectionBuilder, ContentAppDefinitionCollection, IContentAppDefinition>
     {
-        private readonly ManifestParser _manifestParser;
-
-        public ContentAppDefinitionCollectionBuilder(IServiceContainer container, ManifestParser manifestParser)
+        public ContentAppDefinitionCollectionBuilder(IServiceContainer container)
             : base(container)
-        {
-            _manifestParser = manifestParser;
-        }
+        { }
 
         protected override ContentAppDefinitionCollectionBuilder This => this;
 
         protected override IEnumerable<IContentAppDefinition> CreateItems(params object[] args)
         {
-            return base.CreateItems(args).Concat(_manifestParser.Manifest.ContentApps);
+            // get the manifest parser just-in-time - injecting it in the ctor would mean that
+            // simply getting the builder in order to configure the collection, would require
+            // its dependencies too, and that can create cycles or other oddities
+            var manifestParser = Container.GetInstance<ManifestParser>();
+
+            return base.CreateItems(args).Concat(manifestParser.Manifest.ContentApps);
         }
     }
 }
