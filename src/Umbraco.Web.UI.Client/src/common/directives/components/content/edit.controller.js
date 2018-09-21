@@ -439,7 +439,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function (oldModel) {
+                        close: function () {
                             overlayService.close();
                         }
                     };
