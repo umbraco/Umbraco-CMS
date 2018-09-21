@@ -131,7 +131,7 @@
         <key alias="saveAndPublish">Publish</key>
         <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
-        <key alias="saveToPublish">Save and send for approval</key>
+        <key alias="saveToPublish">Send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
         <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
@@ -266,10 +266,12 @@
         <key alias="isSensitiveValue_short">This value is hidden.</key>
         <key alias="languagesToPublish">What languages would you like to publish?</key>
         <key alias="languagesToSave">What languages would you like to save?</key>
+        <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
         <key alias="publishedLanguages">Published Languages</key>
         <key alias="unmodifiedLanguages">Unmodified Languages</key>
         <key alias="readyToPublish">Ready to Publish?</key>
         <key alias="readyToSave">Ready to Save?</key>
+        <key alias="sendForApproval">Send for approval</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
