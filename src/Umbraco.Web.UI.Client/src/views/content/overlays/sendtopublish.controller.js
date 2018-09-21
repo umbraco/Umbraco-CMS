@@ -50,7 +50,7 @@
             // * it's editor is in a $dirty state
             // * it is in Draft state
             // * it is published with pending changes
-            return (variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
         }
 
         function unmodifiedVariantFilter(variant) {
@@ -58,7 +58,7 @@
             // * it's editor is in a $dirty state
             // * it has been published
             // * it is not created for that specific language
-            return (variant.state === "Published" && !variant.isDirty || variant.state === "NotCreated" && !variant.isDirty);
+            return (variant.state === "Published" && !variant.isDirty && !variant.active || variant.state === "NotCreated" && !variant.isDirty && !variant.active);
         }
 
         //when this dialog is closed, reset all 'sendToPublish' flags
