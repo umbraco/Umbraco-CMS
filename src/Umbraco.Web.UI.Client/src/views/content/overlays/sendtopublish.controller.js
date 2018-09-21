@@ -8,6 +8,7 @@
 
         vm.modifiedVariantFilter = modifiedVariantFilter;
         vm.unmodifiedVariantFilter = unmodifiedVariantFilter;
+        vm.changeSelection = changeSelection;
 
         function onInit() {
 
@@ -43,6 +44,13 @@
 
             vm.loading = false;
             
+        }
+
+        function changeSelection() {
+            var firstSelected = _.find(vm.variants, function (v) {
+                return v.sendToPublish;
+            });
+            $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
         function modifiedVariantFilter(variant) {
