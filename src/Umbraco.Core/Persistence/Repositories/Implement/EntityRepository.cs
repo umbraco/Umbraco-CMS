@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -27,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ILanguageRepository _langRepository;
-        
+
         public EntityRepository(IScopeAccessor scopeAccessor, ILanguageRepository langRepository)
         {
             _scopeAccessor = scopeAccessor;
@@ -36,7 +34,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected IUmbracoDatabase Database => _scopeAccessor.AmbientScope.Database;
         protected Sql<ISqlContext> Sql() => _scopeAccessor.AmbientScope.SqlContext.Sql();
-        protected ISqlSyntaxProvider SqlSyntax => _scopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
         #region Repository
 
@@ -463,11 +460,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public int LanguageId { get; set; }
             [Column("versionCultureName")]
             public string Name { get; set; }
-
-            [Column("versionCurrent")]
-            public bool VersionCurrent { get; set; }
-            [Column("versionPublished")]
-            public bool VersionPublished { get; set; }
+            [Column("versionCultureEdited")]
+            public bool Edited { get; set; }
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -530,11 +524,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .AndSelect<ContentVersionCultureVariationDto>(
                             x => Alias(x.Id, "versionCultureId"),
                             x => Alias(x.LanguageId, "versionCultureLangId"),
-                            x => Alias(x.Name, "versionCultureName"))
-                        .AndSelect<ContentVersionDto>(
-                            x => Alias(x.Current, "versionCurrent"))
-                        .AndSelect<DocumentVersionDto>(
-                            x => Alias(x.Published, "versionPublished"));
+                            x => Alias(x.Name, "versionCultureName"),
+                            x => Alias(x.Edited, "versionCultureEdited"));
                 }
             }
 
@@ -543,12 +534,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (isContent || isMedia)
             {
-                if (isMedia)
-                    sql.InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current);
-                else
-                    sql.InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId);
-
                 sql
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                     .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                     .LeftJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
             }
@@ -567,17 +554,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (isContent)
                     sql
-                        .LeftJoin<ContentVersionCultureVariationDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>((left, right) => left.Id == right.VersionId)
-                        .LeftJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id);
+                        .LeftJoin<ContentVersionCultureVariationDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>((left, right) => left.Id == right.VersionId);
             }
 
 
             filter?.Invoke(sql);
-
-            if (isContent)
-            {
-                sql.Where($"{SqlSyntax.GetFieldName<ContentVersionDto>(x => x.Current)} = 1 OR {SqlSyntax.GetFieldName<DocumentVersionDto>(x => x.Published)} = 1");
-            }
 
             return sql;
         }
@@ -636,9 +617,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql
                     .AndBy<DocumentDto>(x => x.Published, x => x.Edited)
-                    .AndBy<ContentVersionCultureVariationDto>(x => x.Id, x => x.LanguageId, x => x.Name)
-                    .AndBy<ContentVersionDto>(x => x.Id, x => x.Current)
-                    .AndBy<DocumentVersionDto>(x => x.Id, x => x.Published);
+                    .AndBy<ContentVersionCultureVariationDto>(x => x.Id, x => x.LanguageId, x => x.Name);
             }
 
 
@@ -945,11 +924,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (dto.Published)
                     {
                         publishedCultures.Add(isoCode);
+                        if (info.Edited)
+                        {
+                            editedCultures.Add(isoCode);
+                        }
                     }
-                    //if (info.Edited)
-                    //{
-                    //    editedCultures.Add(isoCode);
-                    //}
                 }
                 entity.CultureNames = variantInfo;
                 entity.Variations = dto.Variations;
