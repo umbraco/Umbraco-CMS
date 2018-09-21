@@ -10,6 +10,9 @@ namespace Umbraco.Web.ContentApps
 {
     internal class ListViewContentAppDefinition : IContentAppDefinition
     {
+        // see note on ContentApp
+        private const int Weight = -666;
+
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
 
@@ -51,7 +54,8 @@ namespace Umbraco.Web.ContentApps
                 Alias = "umbListView",
                 Name = "Child items",
                 Icon = "icon-list",
-                View = "views/content/apps/listview/listview.html"
+                View = "views/content/apps/listview/listview.html",
+                Weight = Weight
             };
 
             var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;

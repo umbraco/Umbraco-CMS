@@ -9,6 +9,22 @@ using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Core.Manifest
 {
+    // contentApps: [
+    //   {
+    //     name: 'App Name',        // required
+    //     alias: 'appAlias',       // required
+    //     weight: 0,               // optional, default is 0, use values between -99 and +99
+    //     icon: 'icon.app',        // required
+    //     view: 'path/view.htm',   // required
+    //     show: [                  // optional, default is always show
+    //       '-content/foo',        // hide for content type 'foo'
+    //       '+content/*',          // show for all other content types
+    //       '+media/*'             // show for all media types
+    //     ]
+    //   },
+    //   ...
+    // ]
+
     /// <summary>
     /// Represents a content app definition, parsed from a manifest.
     /// </summary>
@@ -33,6 +49,12 @@ namespace Umbraco.Core.Manifest
         /// </remarks>
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the weight of the content app.
+        /// </summary>
+        [DataMember(Name = "weight")]
+        public int Weight { get; set; }
 
         /// <summary>
         /// Gets or sets the icon of the content app.
@@ -115,7 +137,8 @@ namespace Umbraco.Core.Manifest
                 Alias = Alias,
                 Name = Name,
                 Icon = Icon,
-                View = View
+                View = View,
+                Weight = Weight
             });
         }
 

@@ -6,6 +6,9 @@ namespace Umbraco.Web.ContentApps
 {
     internal class ContentEditorContentAppDefinition : IContentAppDefinition
     {
+        // see note on ContentApp
+        private const int Weight = -100;
+
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
 
@@ -19,7 +22,8 @@ namespace Umbraco.Web.ContentApps
                         Alias = "umbContent",
                         Name = "Content",
                         Icon = "icon-document",
-                        View = "views/content/apps/content/content.html"
+                        View = "views/content/apps/content/content.html",
+                        Weight = Weight
                     });
 
                 case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
@@ -28,7 +32,8 @@ namespace Umbraco.Web.ContentApps
                         Alias = "umbContent",
                         Name = "Content",
                         Icon = "icon-document",
-                        View = "views/media/apps/content/content.html"
+                        View = "views/media/apps/content/content.html",
+                        Weight = Weight
                     });
 
                 case IMedia _:

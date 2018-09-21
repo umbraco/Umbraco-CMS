@@ -14,7 +14,7 @@ namespace Umbraco.Web.ContentApps
 
         public IEnumerable<ContentApp> GetContentAppsFor(object o)
         {
-            return this.Select(x => x.GetContentAppFor(o)).WhereNotNull();
+            return this.Select(x => x.GetContentAppFor(o)).WhereNotNull().OrderBy(x => x.Weight);
         }
     }
 }

@@ -27,6 +27,18 @@ namespace Umbraco.Core.Models.ContentEditing
         public string Alias { get; set; }
 
         /// <summary>
+        /// Gets or sets the weight of the content app.
+        /// </summary>
+        /// <remarks>
+        /// <para>Content apps are ordered by weight, from left (lowest values) to right (highest values).</para>
+        /// <para>Some built-in apps have special weights: listview is -666, content is -100 and infos is +100.</para>
+        /// <para>The default weight is 0, meaning somewhere in-between content and infos, but weight could
+        /// be used for ordering between user-level apps, or anything really.</para>
+        /// </remarks>
+        [DataMember(Name = "weight")]
+        public int Weight { get; set; }
+
+        /// <summary>
         /// Gets the icon of the content app.
         /// </summary>
         /// <remarks>
@@ -43,7 +55,6 @@ namespace Umbraco.Core.Models.ContentEditing
 
         /// <summary>
         /// The view model specific to this app
-        /// fixme how/where is this used?
         /// </summary>
         [DataMember(Name = "viewModel")]
         public object ViewModel { get; set; }
