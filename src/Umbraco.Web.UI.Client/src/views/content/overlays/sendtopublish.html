@@ -46,7 +46,7 @@
         <br />
     </div>
 
-    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unmodifiedVariantFilter).length > 0">
         <div style="margin-bottom: 15px; font-weight: bold;">
             <p><localize key="content_unmodifiedLanguages"></localize></p>
         </div>
