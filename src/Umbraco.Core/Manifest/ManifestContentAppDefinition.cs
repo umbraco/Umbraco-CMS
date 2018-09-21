@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
@@ -13,10 +15,9 @@ namespace Umbraco.Core.Manifest
     [DataContract(Name = "appdef", Namespace = "")]
     public class ManifestContentAppDefinition : IContentAppDefinition
     {
-        private static readonly Regex ShowRegex = new Regex("^([+-])?([a-z]+)/([a-z0-9_]+|\\*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private string _view;
         private ContentApp _app;
+        private ShowRule[] _showRules;
 
         /// <summary>
         /// Gets or sets the name of the content app.
@@ -61,47 +62,41 @@ namespace Umbraco.Core.Manifest
         /// <inheritdoc />
         public ContentApp GetContentAppFor(object o)
         {
-            string entityType, contentType;
+            string partA, partB;
 
             switch (o)
             {
                 case IContent content:
-                    entityType = "content";
-                    contentType = content.ContentType.Alias;
+                    partA = "content";
+                    partB = content.ContentType.Alias;
                     break;
 
                 case IMedia media:
-                    entityType = "media";
-                    contentType = media.ContentType.Alias;
+                    partA = "media";
+                    partB = media.ContentType.Alias;
                     break;
 
                 default:
                     return null;
             }
 
+            var rules = _showRules ?? (_showRules = ShowRule.Parse(Show).ToArray());
+
             // if no 'show' is specified, then always display the content app
-            if (Show.Length > 0)
+            if (rules.Length > 0)
             {
                 var ok = false;
 
                 // else iterate over each entry
-                foreach (var show in Show)
+                foreach (var rule in rules)
                 {
-                    var match = ShowRegex.Match(show);
-                    if (!match.Success)
-                        throw new FormatException($"Illegal 'show' entry \"{show}\" in manifest.");
-
-                    var e = match.Groups[2].Value;
-                    var c = match.Groups[3].Value;
-
                     // if the entry does not apply, skip it
-                    // support wildcards for entity & content types
-                    if ((e != "*" && !e.InvariantEquals(entityType)) || (c != "*" && !c.InvariantEquals(contentType)))
+                    if (!rule.Matches(partA, partB))
                         continue;
 
                     // if the entry applies,
                     // if it's an exclude entry, exit, do not display the content app
-                    if (match.Groups[1].Value == "-")
+                    if (!rule.Show)
                         return null;
 
                     // else break - ok to display
@@ -122,6 +117,37 @@ namespace Umbraco.Core.Manifest
                 Icon = Icon,
                 View = View
             });
+        }
+
+        private class ShowRule
+        {
+            private static readonly Regex ShowRegex = new Regex("^([+-])?([a-z]+)/([a-z0-9_]+|\\*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            public bool Show { get; private set; }
+            public string PartA { get; private set; }
+            public string PartB { get; private set; }
+
+            public bool Matches(string partA, string partB)
+            {
+                return (PartA == "*" || PartA.InvariantEquals(partA)) && (PartB == "*" || PartB.InvariantEquals(partB));
+            }
+
+            public static IEnumerable<ShowRule> Parse(string[] rules)
+            {
+                foreach (var rule in rules)
+                {
+                    var match = ShowRegex.Match(rule);
+                    if (!match.Success)
+                        throw new FormatException($"Illegal 'show' entry \"{rule}\" in manifest.");
+
+                    yield return new ShowRule
+                    {
+                        Show = match.Groups[1].Value != "-",
+                        PartA = match.Groups[2].Value,
+                        PartB = match.Groups[3].Value
+                    };
+                }
+            }
         }
     }
 }
