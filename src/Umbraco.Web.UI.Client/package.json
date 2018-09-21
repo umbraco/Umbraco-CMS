@@ -2,14 +2,14 @@
   "author": "Umbraco HQ",
   "name": "umbraco",
   "homepage": "https://github.com/umbraco/umbraco-cms/",
-  "version": "7.1.2",
+  "version": "7.12.0",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/umbraco/Umbraco-CMS.git"
   },
   "bugs": {
-    "url": "https://issues.umbraco.org"
+    "url": "https://github.com/umbraco/Umbraco-CMS/issues"
   },
   "engines": {
     "node": ">= 0.8.4"
