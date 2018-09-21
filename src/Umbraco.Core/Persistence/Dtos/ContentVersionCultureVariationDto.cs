@@ -42,7 +42,8 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? PublishedUserId { get => _publishedUserId == 0 ? null : _publishedUserId; set => _publishedUserId = value; } //return null if zero
 
-        [Column("edited")]
-        public bool Edited { get; set; }
+        // fixme: I've commented this out, it's never used, need to review 
+        //[Column("edited")]
+        //public bool Edited { get; set; }
     }
 }

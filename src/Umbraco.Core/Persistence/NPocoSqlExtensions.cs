@@ -76,26 +76,7 @@ namespace Umbraco.Core.Persistence
             var (s, a) = sql.SqlContext.Visit(predicate, alias);
             return sql.Where(s, a);
         }
-
-        /// <summary>
-        /// Appends an AND clause to a WHERE Sql statement.
-        /// </summary>
-        /// <typeparam name="TDto">The type of the Dto.</typeparam>
-        /// <param name="sql">The Sql statement.</param>
-        /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
-        /// <param name="alias">An optional alias for the table.</param>
-        /// <returns>The Sql statement.</returns>
-        /// <remarks>
-        /// <para>Chaining <c>.Where(...).Where(...)</c> in NPoco works because it merges the two WHERE statements,
-        /// however if the first statement is not an explicit WHERE statement, chaining fails and two WHERE
-        /// statements appear in the resulting Sql. This allows for adding an AND clause without problems.</para>
-        /// </remarks>
-        public static Sql<ISqlContext> AndWhere<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
-        {
-            var (s, a) = sql.SqlContext.Visit(predicate, alias);
-            return sql.Append("AND (" + s + ")", a);
-        }
-
+        
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>

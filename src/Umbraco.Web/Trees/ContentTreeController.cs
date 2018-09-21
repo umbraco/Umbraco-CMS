@@ -47,10 +47,10 @@ namespace Umbraco.Web.Trees
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var langId = queryStrings?["culture"];
+            var culture = queryStrings?["culture"];
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
-            if (CanUserAccessNode(entity, allowedUserOptions, langId))
+            if (CanUserAccessNode(entity, allowedUserOptions, culture))
             {
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
@@ -74,11 +74,21 @@ namespace Umbraco.Web.Trees
                 {
                     var documentEntity = (IDocumentEntitySlim) entity;
 
-                    //fixme we need these statuses per variant but to do that we need to fix the issues listed in IDocumentEntitySlim
-                    if (!documentEntity.Published)
-                        node.SetNotPublishedStyle();
-                    //if (documentEntity.Edited)
-                    //    node.SetHasUnpublishedVersionStyle();
+                    if (!documentEntity.Variations.VariesByCulture())
+                    {
+                        if (!documentEntity.Published)
+                            node.SetNotPublishedStyle();
+                        if (documentEntity.Edited)
+                            node.SetHasUnpublishedVersionStyle();
+                    }
+                    else
+                    {
+                        if (!culture.IsNullOrWhiteSpace())
+                        {
+                            if (!documentEntity.PublishedCultures.Contains(culture))
+                                node.SetNotPublishedStyle();
+                        }
+                    }
 
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
