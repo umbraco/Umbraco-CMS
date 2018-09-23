@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PublishedContent
             request.Culture = new CultureInfo("en-AU");
             publishedRouter.ConfigureRequest(request);
 
-            Assert.AreEqual(1, umbracoContext.HttpContext.Items["pageID"]);
+            Assert.AreEqual(1, umbracoContext.PageId);
             Assert.AreEqual(request.UmbracoPage.Elements.Count, ((Hashtable) umbracoContext.HttpContext.Items["pageElements"]).Count);
         }
 

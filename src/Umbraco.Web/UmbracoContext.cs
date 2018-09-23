@@ -262,8 +262,7 @@ namespace Umbraco.Web
             {
                 try
                 {
-                    //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                    return int.Parse(HttpContext.Items["pageID"].ToString());
+                    return Current.PublishedRequest.PublishedContent.Id;
                 }
                 catch
                 {

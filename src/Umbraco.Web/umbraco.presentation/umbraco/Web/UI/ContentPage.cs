@@ -11,11 +11,7 @@ namespace umbraco.presentation.Web.UI
 
         public int UmbracoNodeId
         {
-            set
-            {
-                _id = value;
-                System.Web.HttpContext.Current.Items["pageID"] = _id;
-            }
+            set { _id = value; }
             get {return _id;}
         }
         public ContentPage()
