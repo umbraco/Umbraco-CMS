@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
             // We need to get all datatypes with an alias of "umbraco.tags" so we can loop over them and set the missing values if needed
             var datatypes = Context.Database.Fetch<DataTypeDto>("SELECT * FROM cmsDataType");
             var tagsDataTypes = datatypes.Where(x => string.Equals(x.PropertyEditorAlias, Constants.PropertyEditors.TagsAlias, StringComparison.InvariantCultureIgnoreCase));
-            var dataTypePreValues = Context.Database.Fetch<DataTypePreValueDto>("SELECT * FROM cmsDataTypePrevalues");
+            var dataTypePreValues = Context.Database.Fetch<DataTypePreValueDto>("SELECT * FROM cmsDataTypePreValues");
 
             foreach (var datatype in tagsDataTypes)
             {
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
                 // if the "storageType" has not been set we do so by adding a new row in the table for the nodid and set it
                 if (result == null)
                 {
-                    Insert.IntoTable("CmsDataTypePrevalues").Row(new
+                    Insert.IntoTable("cmsDataTypePreValues").Row(new
                     {
                         datatypeNodeId = datatype.DataTypeId,
                         value = "Csv",
