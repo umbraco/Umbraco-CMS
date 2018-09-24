@@ -10,8 +10,7 @@ using Umbraco.Core.IO;
 namespace Umbraco.Core.Logging.Viewer
 {
     public class JsonLogViewer : LogViewerSourceBase
-    {
-        private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+    {       
 
         public override IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate)
         {
@@ -54,56 +53,6 @@ namespace Umbraco.Core.Logging.Viewer
 
             return logs;
         }
-
-        public override IEnumerable<SavedLogSearch> GetSavedSearches()
-        {
-            //Our default implementation 
-
-            //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
-
-            var rawJson = File.ReadAllText(SearchesConfigPath);
-            return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
-        }
-
-        public override IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query)
-        {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
-
-            //Add the new item to the bottom of the list
-            searches.Add(new SavedLogSearch { Name = name, Query = query });
-
-            //Serilaize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
-
-            //Write it back down to file
-            File.WriteAllText(SearchesConfigPath, rawJson);
-
-            //Return the updated object - so we can instantly reset the entire array from the API response
-            //As opposed to push a new item into the array
-            return searches;
-        }
-
-        public override IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query)
-        {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
-
-            //Removes the search
-            searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
-
-            //Serilaize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //Write it back down to file
-            File.WriteAllText(SearchesConfigPath, rawJson);
-
-            //Return the updated object - so we can instantly reset the entire array from the API response
-            return searches;
-        }
+        
     }
 }

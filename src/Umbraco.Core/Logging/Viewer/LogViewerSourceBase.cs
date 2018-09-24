@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Filters.Expressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -11,14 +13,60 @@ namespace Umbraco.Core.Logging.Viewer
     public abstract class LogViewerSourceBase : ILogViewer
     {
         private static readonly string expressionOperators = "()+=*<>%-";
+        private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
         public abstract IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
-        public abstract IEnumerable<SavedLogSearch> GetSavedSearches();
+        public virtual IEnumerable<SavedLogSearch> GetSavedSearches()
+        {
+            //Our default implementation
 
-        public abstract IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query);
+            //If file does not exist - lets create it with an empty array
+            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
 
-        public abstract IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query);
+            var rawJson = System.IO.File.ReadAllText(SearchesConfigPath);
+            return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
+        }
+
+        public virtual IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query)
+        {
+            //Get the existing items
+            var searches = GetSavedSearches().ToList();
+
+            //Add the new item to the bottom of the list
+            searches.Add(new SavedLogSearch { Name = name, Query = query });
+
+            //Serilaize to JSON string
+            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
+
+            //If file does not exist - lets create it with an empty array
+            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
+
+            //Write it back down to file
+            System.IO.File.WriteAllText(SearchesConfigPath, rawJson);
+
+            //Return the updated object - so we can instantly reset the entire array from the API response
+            //As opposed to push a new item into the array
+            return searches;
+        }
+
+        public virtual IEnumerable<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        {
+            //Get the existing items
+            var searches = GetSavedSearches().ToList();
+
+            //Removes the search
+            searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
+
+            //Serilaize to JSON string
+            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
+
+            //Write it back down to file
+            System.IO.File.WriteAllText(SearchesConfigPath, rawJson);
+
+            //Return the updated object - so we can instantly reset the entire array from the API response
+            return searches;
+        }
 
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
