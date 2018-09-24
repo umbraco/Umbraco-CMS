@@ -9,6 +9,7 @@
     'lib/moment/moment.min.js',
 
     'lib/animejs/anime.min.js',
+    'lib/jsdiff/diff.min.js',
 
     'lib/angular-route/angular-route.js',
     'lib/angular-cookies/angular-cookies.js',

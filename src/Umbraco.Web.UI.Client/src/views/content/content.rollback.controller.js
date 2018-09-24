@@ -13,30 +13,38 @@
 
             vm.loading = true;
             vm.variantVersions = [];
+            vm.diff = null;
 
             // fake load versions
             var currentLanguage = $scope.currentNode.metaData.culture;
             $timeout(function(){
-                vm.versions = {
-                    "currentVersion": {
-                        "id": 1,
-                        "name": "Variant name (Created: 22/08/2018 13.32)"
-                    },
-                    "previousVersions": [
+
+                vm.currentVersion = {
+                    "id": 1,
+                    "createDate": "22/08/2018 13.32",
+                    "name": "Forside",
+                    "properties": [
                         {
-                            "id": 1,
-                            "name": "Variant name (Created: 22/08/2018 13.32)"
+                            "alias": "headline",
+                            "label": "Headline",
+                            "value": "Velkommen"
                         },
                         {
-                            "id": 2,
-                            "name": "Variant name (Created: 21/08/2018 19.25)"
-                        },
-                        {
-                            "id": 3,
-                            "name": "Variant name (Created: 15/08/2018 22.11)"
+                            "alias": "text",
+                            "label": "Text",
+                            "value": "This is my danish Content"
                         }
                     ]
                 };
+
+                vm.previousVersions = [
+                    {
+                        "id": 2,
+                        "name": "Forside",
+                        "createDate": "21/08/2018 19.25"
+                    }
+                ];
+
                 vm.loading = false;
             }, 200);
         }
@@ -49,7 +57,45 @@
          * This will load in a new version
          */
         function loadVersion(id) {
-            console.log("load version", id);
+
+            // fake load version
+            var currentLanguage = $scope.currentNode.metaData.culture;
+
+            vm.diff = {};
+            vm.diff.properties = [];
+
+            var oldVersion = {
+                "id": 2,
+                "name": "Foride",
+                "properties": [
+                    {
+                        "alias": "headline",
+                        "label": "Headline",
+                        "value": ""
+                    },
+                    {
+                        "alias": "text",
+                        "label": "Text",
+                        "value": "This is my danish Content Test"
+                    }
+                ]
+            };
+
+            // find diff in name
+            vm.diff.name = JsDiff.diffWords(vm.currentVersion.name, oldVersion.name);
+
+            // find diff in properties
+            angular.forEach(vm.currentVersion.properties, 
+                function(newProperty, index){
+                    var oldProperty = oldVersion.properties[index];
+                    var diffProperty = {
+                        "alias": newProperty.alias,
+                        "label": newProperty.label,
+                        "diff": JsDiff.diffWords(newProperty.value, oldProperty.value)
+                    };
+                    vm.diff.properties.push(diffProperty);
+                });
+
         }
 
         /**
