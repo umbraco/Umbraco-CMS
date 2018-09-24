@@ -334,6 +334,8 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
+    <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
@@ -365,6 +367,8 @@
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
+    <Compile Include="Models\ContentEditing\ContentApp.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
