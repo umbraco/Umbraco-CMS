@@ -1,0 +1,55 @@
+<div ng-controller="Umbraco.Editors.Content.RollbackController as vm">
+
+    <div class="umb-dialog-body" ng-cloak>
+
+        <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+        <div class="umb-pane" ng-show="!vm.loading">
+
+            <div>
+                <h5>Rollback {{ currentNode.name }}</h5>
+                <p class="abstract ng-scope">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vel semper nibh, sed posuere nulla. Vestibulum viverra libero at rutrum ultricies.</p>
+                </p>
+            
+                <h5><localize key="rollback_currentVersion"></localize></h5>
+                <p>{{vm.versions.currentVersion.name}}</p>
+                
+                <h5><localize key="rollback_rollbackTo"></localize></h5>
+                <select 
+                    class="input-block-level"
+                    ng-model="vm.selectedVersion"
+                    ng-options="version.name for version in vm.versions.previousVersions track by version.id"
+                    ng-change="vm.loadVersion(vm.selectedVersion.id)">
+                    <option value=""><localize key="general_choose">Choose</localize>...</option>
+                </select>
+            </div>
+
+            <div class="diff">
+                <localize key="rollback_diffHelp"></localize>
+            </div>
+                
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+        <umb-button
+            label-key="general_close"
+            disabled="vm.saveState === 'busy'"
+            action="vm.closeDialog()"
+            type="button"
+            button-style="link">
+        </umb-button>
+
+        <umb-button
+            label-key="buttons_rollback"
+            disabled="vm.saveState === 'busy'"
+            state="vm.saveState"
+            action="vm.rollback()"
+            type="button"
+            button-style="success">
+        </umb-button>
+    </div>
+
+</div>
