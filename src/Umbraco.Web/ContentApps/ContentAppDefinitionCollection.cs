@@ -10,34 +10,38 @@ namespace Umbraco.Web.ContentApps
 {
     public class ContentAppDefinitionCollection : BuilderCollectionBase<IContentAppDefinition>
     {
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
-        public ContentAppDefinitionCollection(IEnumerable<IContentAppDefinition> items)
+        public ContentAppDefinitionCollection(IEnumerable<IContentAppDefinition> items, ILogger logger)
             : base(items)
         {
-            //_logger = logger;
+            _logger = logger;
         }
 
         public IEnumerable<ContentApp> GetContentAppsFor(object o)
         {
-            var apps = this.Select(x => x.GetContentAppFor(o)).WhereNotNull().OrderBy(x => x.Weight);
-            //apps must have unique aliases, we will remove any duplicates and log problems
-            var resultApps = new Dictionary<string, ContentApp>();
+            var apps = this.Select(x => x.GetContentAppFor(o)).WhereNotNull().OrderBy(x => x.Weight).ToList();
+
+            var aliases = new HashSet<string>();
             List<string> dups = null;
-            foreach(var a in apps)
+
+            foreach (var app in apps)
             {
-                if (resultApps.TryGetValue(a.Alias, out var count))
-                    (dups ?? (dups = new List<string>())).Add(a.Alias);
+                if (aliases.Contains(app.Alias))
+                    (dups ?? (dups = new List<string>())).Add(app.Alias);
                 else
-                    resultApps[a.Alias] = a;
-            }
-            if (dups != null)
-            {
-                throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
-                //_logger.Warn<ContentAppDefinitionCollection>($"Duplicate content app aliases found: {string.Join(",", dups)}");
+                    aliases.Add(app.Alias);
             }
 
-            return resultApps.Values;
+            if (dups != null)
+            {
+                // dying is not user-friendly, so let's write to log instead, and wish people read logs...
+
+                //throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
+                _logger.Warn<ContentAppDefinitionCollection>($"Duplicate content app aliases found: {string.Join(",", dups)}");
+            }
+
+            return apps;
         }
     }
 }

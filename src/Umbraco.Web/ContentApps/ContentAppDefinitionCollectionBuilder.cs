@@ -2,6 +2,7 @@
 using System.Linq;
 using LightInject;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
 
@@ -14,6 +15,15 @@ namespace Umbraco.Web.ContentApps
         { }
 
         protected override ContentAppDefinitionCollectionBuilder This => this;
+
+        // need to inject dependencies in the collection, so override creation
+        public override ContentAppDefinitionCollection CreateCollection()
+        {
+            // get the logger just-in-time - see note below for manifest parser
+            var logger = Container.GetInstance<ILogger>();
+
+            return new ContentAppDefinitionCollection(CreateItems(), logger);
+        }
 
         protected override IEnumerable<IContentAppDefinition> CreateItems(params object[] args)
         {
