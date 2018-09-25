@@ -313,17 +313,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids)
         {
-            // this ... is an interesting query - could we make it simpler? probably, by having DocumentCultureVariationDto
-            // handle 'available' and 'published' in addition to 'edited' - would take (a bit) more time to save a document,
-            // but would make querying way faster
-
             return Sql()
                 .Select<NodeDto>(x => x.NodeId)
                 .AndSelect<LanguageDto>(x => x.IsoCode)
                 .AndSelect<DocumentDto>("doc", x => Alias(x.Published, "DocumentPublished"), x => Alias(x.Edited, "DocumentEdited"))
-                .AndSelect<ContentVersionCultureVariationDto>("ccv", x => Alias(x.Id, "CultureAvailableData"), x => Alias(x.Name, "Name"))
-                .AndSelect<ContentVersionCultureVariationDto>("pcv", x => Alias(x.Id, "CulturePublishedData"))
-                .AndSelect<DocumentCultureVariationDto>("dcv", x => Alias(x.Edited, "CultureEditedData"))
+                .AndSelect<DocumentCultureVariationDto>("dcv",
+                    x => Alias(x.Available, "CultureAvailable"), x => Alias(x.Published, "CulturePublished"), x => Alias(x.Edited, "CultureEdited"),
+                    x => Alias(x.Name, "Name"))
 
                 // from node x language
                 .From<NodeDto>()
@@ -336,22 +332,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // left-join do document variation - matches cultures that are *available* + indicates when *edited*
                 .LeftJoin<DocumentCultureVariationDto>("dcv")
                     .On<NodeDto, DocumentCultureVariationDto, LanguageDto>((node, dcv, lang) => node.NodeId == dcv.NodeId && lang.Id == dcv.LanguageId, aliasRight: "dcv")
-
-                // join to current version - always exists
-                // left-join to current version variations - indicates which cultures are *available*
-                .InnerJoin<ContentVersionDto>("cv")
-                    .On<NodeDto, ContentVersionDto>((node, ev) => node.NodeId == ev.NodeId && ev.Current, aliasRight: "cv")
-                .LeftJoin<ContentVersionCultureVariationDto>("ccv")
-                    .On<ContentVersionDto, ContentVersionCultureVariationDto, LanguageDto>((cv, ccv, lang) => cv.Id == ccv.VersionId && lang.Id == ccv.LanguageId, "cv", "ccv")
-
-                // left-join to published version - exists when whole node is published
-                // left-join to published version variations - matches cultures that are *published*
-                .LeftJoin<ContentVersionDto>(nested => nested.InnerJoin<DocumentVersionDto>("dv")
-                                                             .On<ContentVersionDto, DocumentVersionDto>((pv, dv) => pv.Id == dv.Id && dv.Published, "pv", "dv"),
-                        "pv")
-                    .On<NodeDto, ContentVersionDto>((node, pv) => node.NodeId == pv.NodeId, aliasRight: "pv")
-                .LeftJoin<ContentVersionCultureVariationDto>("pcv")
-                    .On<ContentVersionDto, ContentVersionCultureVariationDto, LanguageDto>((pv, pcv, lang) => pv.Id == pcv.VersionId && lang.Id == pcv.LanguageId, "pv", "pcv")
 
                 // for selected nodes
                 .WhereIn<NodeDto>(x => x.NodeId, ids);
@@ -566,16 +546,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public bool DocumentPublished { get; set; }
             public bool DocumentEdited { get; set; }
 
-            public int? CultureAvailableData { get; set; }
-            public int? CulturePublishedData { get; set; }
-            public bool? CultureEditedData { get; set; }
-
-            [ResultColumn]
-            public bool CultureAvailable => CultureAvailableData.HasValue;
-            [ResultColumn]
-            public bool CulturePublished => CulturePublishedData.HasValue;
-            [ResultColumn]
-            public bool CultureEdited => CultureEditedData ?? false;
+            public bool CultureAvailable { get; set; }
+            public bool CulturePublished { get; set; }
+            public bool CultureEdited { get; set; }
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

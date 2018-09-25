@@ -41,9 +41,5 @@ namespace Umbraco.Core.Persistence.Dtos
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? PublishedUserId { get => _publishedUserId == 0 ? null : _publishedUserId; set => _publishedUserId = value; } //return null if zero
-
-        // fixme: I've commented this out, it's never used, need to review 
-        //[Column("edited")]
-        //public bool Edited { get; set; }
     }
 }

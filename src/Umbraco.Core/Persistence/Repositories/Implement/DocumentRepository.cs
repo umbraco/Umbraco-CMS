@@ -8,14 +8,12 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -1099,16 +1097,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
         {
-            foreach (var (culture, name) in content.CultureNames)
+            var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
+            foreach (var culture in allCultures)
                 yield return new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
-                    // if not published, always edited
-                    // no need to check for availability: it *is* available since it is in content.CultureNames
-                    Edited = !content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture))
+                    Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
+
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+
+                    Available = content.IsCultureAvailable(culture),
+                    Published = content.IsCulturePublished(culture),
+                    Edited = content.IsCultureAvailable(culture) &&
+                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
         }
 
