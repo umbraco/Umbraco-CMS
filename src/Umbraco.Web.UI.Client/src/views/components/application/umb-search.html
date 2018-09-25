@@ -2,7 +2,7 @@
 <div class="umb-search" on-outside-click="vm.closeSearch()" ng-keyup="vm.handleKeyUp($event)">
 
     <div class="flex items-center">
-        <i class="umb-search-input-icon icon-search"></i>
+        <i class="umb-search-input-icon icon-search" ng-click="vm.focusSearch()"></i>
         <input 
             class="umb-search-input" 
             type="text" 
@@ -10,7 +10,7 @@
             ng-model-options="{ debounce: 200 }"
             ng-change="vm.search(vm.searchQuery)" 
             placeholder="Search..." 
-            focus-when="{{vm.focusSearch}}" />
+            focus-when="{{vm.searchHasFocus}}" />
         <button ng-if="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
     </div>
 
