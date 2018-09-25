@@ -277,7 +277,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
 
         public override string Format(ForeignKeyDefinition foreignKey)
         {
-            return string.Format(CreateForeignKeyConstraint,
+            return string.Format(Format(foreignKey),
                                  GetQuotedTableName(foreignKey.ForeignTable),
                                  GetQuotedColumnName(foreignKey.ForeignColumns.First()),
                                  GetQuotedTableName(foreignKey.PrimaryTable),
