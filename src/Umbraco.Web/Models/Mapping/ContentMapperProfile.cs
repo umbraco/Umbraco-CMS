@@ -108,7 +108,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if we don't have a date for a culture, it means the culture is not available, and
                 // hey we should probably not be mapping it, but it's too late, return a fallback date
-                var date = source.GetCultureDate(culture);
+                var date = source.GetUpdateDate(culture);
                 return date ?? source.UpdateDate;
             }
         }

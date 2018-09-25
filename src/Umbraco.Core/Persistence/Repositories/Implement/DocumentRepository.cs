@@ -503,7 +503,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
+                    {
+                        edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+
+                        // fixme - change tracking
+                        // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
+                        // culture has just been edited or not, so we don't update its update date - that date only changes
+                        // when the name is set, and it all works because the controller does it - but, if someone uses a
+                        // service to change a property value and save (without setting name), the update date does not change.
+                    }
 
                 // replace the content version variations (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
@@ -1031,7 +1040,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
                     Name = dto.Name,
-                    Date = dto.Date
+                    Date = dto.UpdateDate
                 });
             }
 
@@ -1076,7 +1085,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetCultureDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1091,7 +1100,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
