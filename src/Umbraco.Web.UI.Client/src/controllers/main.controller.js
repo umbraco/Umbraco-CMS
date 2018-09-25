@@ -15,6 +15,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.editors = [];
     $scope.overlay = {};
+    $scope.drawer = {};
+    $scope.search = {};
     
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -39,6 +41,10 @@ function MainController($scope, $location, appState, treeService, notificationsS
         }
 
         eventsService.emit("app.closeDialogs", event);
+    };
+
+    $scope.closeSearch = function() {
+        appState.setSearchState("show", false);
     };
 
     var evts = [];
@@ -114,9 +120,15 @@ function MainController($scope, $location, appState, treeService, notificationsS
         };
     }));
 
+    // events for search
+    evts.push(eventsService.on("appState.searchState.changed", function (e, args) {
+        if (args.key === "show") {
+            $scope.search.show = args.value;
+        }
+    }));
+
     // events for drawer
     // manage the help dialog by subscribing to the showHelp appState
-    $scope.drawer = {};
     evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
         // set view
         if (args.key === "view") {
@@ -156,6 +168,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
         $scope.backdrop = args;
     }));
 
+    // event for infinite editors
     evts.push(eventsService.on("appState.editors.add", function (name, args) {
         $scope.editors = args.editors;
     }));
