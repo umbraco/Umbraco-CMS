@@ -32,7 +32,7 @@ namespace umbraco.presentation.umbraco.dialogs
         protected ContentPicker loginPagePicker = new ContentPicker();
         protected ContentPicker errorPagePicker = new ContentPicker();
 
-        const string MemberIdRuleType = "MemberId"; // moved from Constants-Conventions.cs
+        private const string MemberIdRuleType = "MemberId"; // moved from Constants-Conventions.cs
 
 
         override protected void OnInit(EventArgs e)
