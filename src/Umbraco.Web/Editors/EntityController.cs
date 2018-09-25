@@ -226,13 +226,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        [Obsolete("Use GetyById instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
-        {
-            return GetResultForKey(id, type);
-        }
-
+     
         /// <summary>
         /// Gets an entity by a xpath query
         /// </summary>
