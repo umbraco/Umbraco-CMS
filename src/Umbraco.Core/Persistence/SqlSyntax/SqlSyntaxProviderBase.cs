@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var col = Regex.Escape(GetQuotedColumnName("column")).Replace("column", @"\w+");
             var fld = Regex.Escape(GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
             // ReSharper restore VirtualMemberCallInConstructor
-            AliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            AliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         public Regex AliasRegex { get; }

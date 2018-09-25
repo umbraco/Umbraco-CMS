@@ -117,6 +117,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<IncreaseLanguageIsoCodeColumnLength>("{EB34B5DC-BB87-4005-985E-D983EA496C38}"); // from 7.12.0
             Chain<RenameTrueFalseField>("{517CE9EA-36D7-472A-BF4B-A0D6FB1B8F89}"); // from 7.12.0
             Chain<SetDefaultTagsStorageType>("{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}"); // from 7.12.0
+            Chain<UpdateDefaultMandatoryLanguage>("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}");
             //FINAL
 
 

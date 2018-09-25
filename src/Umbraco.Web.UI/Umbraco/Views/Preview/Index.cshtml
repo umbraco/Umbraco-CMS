@@ -1,17 +1,30 @@
-﻿@using System.Web.Mvc.Html
-@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Models.ContentEditing.BackOfficePreview>
+﻿@using Umbraco.Core
+@using ClientDependency.Core
+@using ClientDependency.Core.Mvc
+@using Umbraco.Core.IO
+@using Umbraco.Web
+@using Umbraco.Core.Configuration
+
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
+
+    Html
+        .RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Umbraco Canvas Designer</title>
-    <link href="../assets/css/canvasdesigner.css" type="text/css" rel="stylesheet" />
-    <link href="../lib/jquery-ui/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
+    <meta charset="utf-8">
+    <title>Umbraco Preview</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="pinterest" content="nopin" />
+
+    @Html.RenderCssHere(
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+
 </head>
-<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="Umbraco.canvasdesignerController">
+<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController">
     <div class="wait" ng-show="!frameLoaded"></div>
 
     @if (string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView) == false)
@@ -19,8 +32,8 @@
         @Html.Partial(Model.PreviewExtendedHeaderView)
     }
 
-    <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
-        <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
+    <div id="demo-iframe-wrapper" ng-show="frameLoaded && pageUrl" class="{{previewDevice.css}}">
+        <preview-i-frame src="pageUrl" on-loaded="onFrameLoaded(iframe)"></preview-i-frame>
     </div>
     <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
         <div class="fix-left-menu selected">
@@ -30,17 +43,19 @@
                     ../assets/img/application/logo@3x.png 3x" />
             </div>
             <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
-                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
-                    <a href="#"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
+                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
+                    <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
-                <li ng-click="exitPreview()">
-                    <a href="#" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
+                <li>
+                    <a href="" ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
                 </li>
             </ul>
         </div>
-        
+
     </div>
+
     <script src="../lib/rgrove-lazyload/lazyload.js"></script>
-    <script src="../js/canvasdesigner.loader.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview")"></script>
+
 </body>
 </html>

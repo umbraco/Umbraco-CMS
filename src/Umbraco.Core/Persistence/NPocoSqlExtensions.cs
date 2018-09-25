@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -74,10 +73,27 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
         {
-            var expresionist = new PocoToSqlExpressionVisitor<TDto>(sql.SqlContext, alias);
-            var whereExpression = expresionist.Visit(predicate);
-            sql.Where(whereExpression, expresionist.GetSqlParameters());
-            return sql;
+            var (s, a) = sql.SqlContext.Visit(predicate, alias);
+            return sql.Where(s, a);
+        }
+
+        /// <summary>
+        /// Appends an AND clause to a WHERE Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
+        /// <param name="alias">An optional alias for the table.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>Chaining <c>.Where(...).Where(...)</c> in NPoco works because it merges the two WHERE statements,
+        /// however if the first statement is not an explicit WHERE statement, chaining fails and two WHERE
+        /// statements appear in the resulting Sql. This allows for adding an AND clause without problems.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> AndWhere<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
+        {
+            var (s, a) = sql.SqlContext.Visit(predicate, alias);
+            return sql.Append("AND (" + s + ")", a);
         }
 
         /// <summary>
@@ -92,10 +108,8 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto1, TDto2>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, bool>> predicate, string alias1 = null, string alias2 = null)
         {
-            var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sql.SqlContext, alias1, alias2);
-            var whereExpression = expresionist.Visit(predicate);
-            sql.Where(whereExpression, expresionist.GetSqlParameters());
-            return sql;
+            var (s, a) = sql.SqlContext.Visit(predicate, alias1, alias2);
+            return sql.Where(s, a);
         }
 
         /// <summary>
@@ -108,7 +122,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, IEnumerable values)
         {
-            var fieldName = GetFieldName(field, sql.SqlContext.SqlSyntax);
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
             sql.Where(fieldName + " IN (@values)", new { values });
             return sql;
         }
@@ -136,7 +150,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereNotIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, IEnumerable values)
         {
-            var fieldName = GetFieldName(field, sql.SqlContext.SqlSyntax);
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
             sql.Where(fieldName + " NOT IN (@values)", new { values });
             return sql;
         }
@@ -164,7 +178,8 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql WhereAnyIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>>[] fields, IEnumerable values)
         {
-            var fieldNames = fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
+            var fieldNames = fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             var sb = new StringBuilder();
             sb.Append("(");
             for (var i = 0; i < fieldNames.Length; i++)
@@ -180,7 +195,7 @@ namespace Umbraco.Core.Persistence
 
         private static Sql<ISqlContext> WhereIn<T>(this Sql<ISqlContext> sql, Expression<Func<T, object>> fieldSelector, Sql valuesSql, bool not)
         {
-            var fieldName = GetFieldName(fieldSelector, sql.SqlContext.SqlSyntax);
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             sql.Where(fieldName + (not ? " NOT" : "") +" IN (" + valuesSql.SQL + ")", valuesSql.Arguments);
             return sql;
         }
@@ -274,7 +289,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ")");
+            return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ")");
         }
 
         /// <summary>
@@ -286,9 +301,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.OrderBy(columns);
         }
 
@@ -301,7 +317,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderByDescending<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ") DESC");
+            return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ") DESC");
         }
 
         /// <summary>
@@ -313,9 +329,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderByDescending<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.OrderBy(columns.Select(x => x + " DESC"));
         }
 
@@ -339,7 +356,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> GroupBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.GroupBy(GetFieldName(field, sql.SqlContext.SqlSyntax));
+            return sql.GroupBy(sql.SqlContext.SqlSyntax.GetFieldName(field));
         }
 
         /// <summary>
@@ -351,9 +368,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> GroupBy<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.GroupBy(columns);
         }
 
@@ -366,9 +384,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.Append(", " + string.Join(", ", columns));
         }
 
@@ -381,9 +400,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> AndByDescending<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.Append(", " + string.Join(", ", columns.Select(x => x + " DESC")));
         }
 
@@ -572,9 +592,10 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> SelectCount<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
-                : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
             return sql.Select("COUNT (" + string.Join(", ", columns) + ")");
         }
 
@@ -906,7 +927,7 @@ namespace Umbraco.Core.Persistence
 
             public SqlUpd<TDto> Set(Expression<Func<TDto, object>> fieldSelector, object value)
             {
-                var fieldName = GetFieldName(fieldSelector, _sqlContext.SqlSyntax);
+                var fieldName = _sqlContext.SqlSyntax.GetFieldName(fieldSelector);
                 _setExpressions.Add(new Tuple<string, object>(fieldName, value));
                 return this;
             }
@@ -1060,17 +1081,6 @@ namespace Umbraco.Core.Persistence
         {
             var attr = column.FirstAttribute<ColumnAttribute>();
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
-        }
-
-        private static string GetFieldName<TDto>(Expression<Func<TDto, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
-        {
-            var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
-            var fieldName = field.GetColumnName();
-
-            var type = typeof (TDto);
-            var tableName = type.GetTableName();
-
-            return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
         }
 
         internal static void WriteToConsole(this Sql sql)

@@ -26,7 +26,9 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using System.Collections.Generic;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 
@@ -137,7 +139,7 @@ namespace Umbraco.Web.Editors
             var name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
-            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, listName, "member");
+            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member"));
             apps[0].Active = true;
 
             var display = new MemberListDisplay

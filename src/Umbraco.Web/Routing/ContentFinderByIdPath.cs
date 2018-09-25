@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
+using System.Globalization;
 
 namespace Umbraco.Web.Routing
 {
@@ -53,6 +54,13 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
+                        //if we have a node, check if we have a culture in the query string
+                        if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("culture"))
+                        {
+                            //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
+                            frequest.Culture = CultureInfo.GetCultureInfo(frequest.UmbracoContext.HttpContext.Request.QueryString["culture"]);
+                        }
+
                         frequest.PublishedContent = node;
                         _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }

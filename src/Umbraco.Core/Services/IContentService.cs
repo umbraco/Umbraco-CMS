@@ -166,31 +166,28 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetContentInRecycleBin();
 
         /// <summary>
-        /// Gets child documents of a given parent.
+        /// Gets child documents of a parent.
         /// </summary>
         /// <param name="id">The parent identifier.</param>
         /// <param name="pageIndex">The page number.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
         /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+            string filter = null, Ordering ordering = null);
 
         /// <summary>
-        /// Gets child documents of a given parent.
+        /// Gets child documents of a parent.
         /// </summary>
         /// <param name="id">The parent identifier.</param>
         /// <param name="pageIndex">The page number.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
-        /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
         /// <param name="filter">Query filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+            IQuery<IContent> filter, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.

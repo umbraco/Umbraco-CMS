@@ -3,6 +3,7 @@ using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Editors
 {
+
     public class BackOfficeModel
     {
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings)
