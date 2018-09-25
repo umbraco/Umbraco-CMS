@@ -1,4 +1,7 @@
+@using Umbraco.Core.Models.PublishedContent
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
+
 @*
     Macro to display a gallery of images from the Media section.
     Works with either a 'Single Media Picker' or a 'Multiple Media Picker' macro parameter (see below).
@@ -20,16 +23,16 @@
     <div class="row">
         @foreach (var mediaId in mediaIds.Split(','))
         {
-            var media = Umbraco.TypedMedia(mediaId);
+            var media = Umbraco.Media(mediaId);
 
             @* a single image *@
-            if (media.DocumentTypeAlias == "Image")
+            if (media.IsDocumentType("Image"))
             {
-                @Render(media as Image);
+                @Render(media);
             }
 
             @* a folder with images under it *@
-            foreach (var image in media.Children<Image>())
+            foreach (var image in media.Children())
             {
                 @Render(image);
             }
@@ -37,7 +40,7 @@
     </div>
 }
 
-@helper Render(Image item)
+@helper Render(IPublishedContent item)
 {
     <div class="col-xs-6 col-md-3">
         <a href="@item.Url" class="thumbnail">
