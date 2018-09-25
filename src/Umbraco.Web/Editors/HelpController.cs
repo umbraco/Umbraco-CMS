@@ -8,12 +8,16 @@ namespace Umbraco.Web.Editors
 {
     public class HelpController : UmbracoAuthorizedJsonController
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static HttpClient _httpClient;
         public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree, string baseUrl = "https://our.umbraco.com")
         {
             var url = string.Format(baseUrl + "/Umbraco/Documentation/Lessons/GetContextHelpDocs?sectionAlias={0}&treeAlias={1}", section, tree);
+
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
+
             //fetch dashboard json and parse to JObject
-            var json = await HttpClient.GetStringAsync(url);
+            var json = await _httpClient.GetStringAsync(url);
             var result = JsonConvert.DeserializeObject<List<HelpPage>>(json);
             if (result != null)
                 return result;

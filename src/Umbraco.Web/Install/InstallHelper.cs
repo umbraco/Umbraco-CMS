@@ -193,9 +193,8 @@ namespace Umbraco.Web.Install
         internal IEnumerable<Package> GetStarterKits()
         {
             if (_httpClient == null)
-            {
                 _httpClient = new HttpClient();
-            }
+
             var packages = new List<Package>();
             try
             {

@@ -63,13 +63,11 @@ namespace Umbraco.Web.Scheduling
         private async Task<bool> GetTaskByHttpAync(string url, CancellationToken token)
         {
             if (_httpClient == null)
-            {
                 _httpClient = new HttpClient();
-            }
+
             if (Uri.TryCreate(_appContext.UmbracoApplicationUrl, UriKind.Absolute, out var baseUri))
-            {
                 _httpClient.BaseAddress = baseUri;
-            }
+
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             //TODO: pass custom the authorization header, currently these aren't really secured!

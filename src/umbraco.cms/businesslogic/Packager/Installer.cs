@@ -688,9 +688,7 @@ namespace umbraco.cms.businesslogic.packager
                 Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Packages));
 
             if (_webClient == null)
-            {
                 _webClient = new WebClient();
-            }
 
             _webClient.DownloadFile(
                 "http://" + PackageServer + "/fetch?package=" + Package.ToString(),

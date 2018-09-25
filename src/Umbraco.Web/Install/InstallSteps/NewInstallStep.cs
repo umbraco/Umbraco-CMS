@@ -83,9 +83,8 @@ namespace Umbraco.Web.Install.InstallSteps
                 try
                 {
                     if (_webClient == null)
-                    {
                         _webClient = new WebClient();
-                    }
+
                     var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
                     _webClient.UploadValues("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", values);
                 }
