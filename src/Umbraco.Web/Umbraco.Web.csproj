@@ -1411,9 +1411,6 @@
       <DependentUpon>nodeSorter.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />

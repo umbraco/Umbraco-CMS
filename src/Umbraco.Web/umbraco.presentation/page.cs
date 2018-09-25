@@ -3,18 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.UI;
-using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
 
 namespace umbraco
@@ -146,55 +141,7 @@ namespace umbraco
             _elements.Add("path", path);
             _elements.Add("splitpath", _splitpath);
         }
-
-        void populatePageData(XmlNode node)
-        {
-            string s;
-            DateTime dt;
-            Guid guid;
-            int i;
-
-            if (int.TryParse(attrValue(node, "id"), out i))
-                _elements["pageID"] = this._pageId = i;
-
-            if ((s = attrValue(node, "nodeName")) != null)
-                _elements["pageName"] = this._pageName = s;
-
-            if (int.TryParse(attrValue(node, "parentId"), out i))
-                _elements["parentId"] = this._parentId = i;
-
-            if (int.TryParse(attrValue(node, "nodeType"), out i))
-                _elements["nodeType"] = this._nodeType = i;
-            if ((s = attrValue(node, "nodeTypeAlias")) != null)
-                _elements["nodeTypeAlias"] = this._nodeTypeAlias = s;
-
-            if ((s = attrValue(node, "writerName")) != null)
-                _elements["writerName"] = this._writerName = s;
-            if ((s = attrValue(node, "creatorName")) != null)
-                _elements["creatorName"] = this._creatorName = s;
-
-            if (DateTime.TryParse(attrValue(node, "createDate"), out dt))
-                _elements["createDate"] = this._createDate = dt;
-            if (DateTime.TryParse(attrValue(node, "updateDate"), out dt))
-                _elements["updateDate"] = this._updateDate = dt;
-
-            if (Guid.TryParse(attrValue(node, "pageVersion"), out guid))
-                _elements["pageVersion"] = this._pageVersion = guid;
-
-            if ((s = attrValue(node, "path")) != null)
-            {
-                _elements["path"] = this._path = s;
-                _elements["splitpath"] = this._splitpath = _path.Split(',');
-            }
-        }
-
-        string attrValue(XmlNode node, string attributeName)
-        {
-            var attr = node.Attributes.GetNamedItem(attributeName);
-            var value = attr != null ? attr.Value : null;
-            return value;
-        }
-
+        
         /// <summary>
         /// Puts the properties of the node into the elements table
         /// </summary>
@@ -217,42 +164,6 @@ namespace umbraco
                 }
             }
         }
-
-        void populateElementData(XmlNode node)
-        {
-            string xpath = "./* [not(@isDoc)]";
-
-            foreach (XmlNode data in node.SelectNodes(xpath))
-            {
-                // ignore empty elements
-                if (data.ChildNodes.Count == 0)
-                    continue;
-
-                string alias = data.Name;
-                string value = data.FirstChild.Value;
-
-                // moved to PublishedContentRequest + UmbracoModule
-                //if (alias == "umbracoRedirect")
-                //{
-                //    int i;
-                //    if (int.TryParse(value, out i))
-                //        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(data.FirstChild.Value)), true);
-                //}
-
-                if (_elements.ContainsKey(alias))
-                {
-                    Current.Logger.Debug<page>(
-                        string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));
-                }
-                else
-                {
-                    _elements[alias] = value;
-                    Current.Logger.Debug<page>(
-                        string.Format("Load element \"{0}\"", alias));
-                }
-            }
-        }
-
         #endregion
 
         #region Public properties
