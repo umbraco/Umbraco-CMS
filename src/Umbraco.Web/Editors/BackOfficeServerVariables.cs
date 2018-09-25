@@ -52,10 +52,11 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "umbracoPath"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
-                {"features", new [] {"disabledFeatures"}}
+                {"features", new [] {"disabledFeatures"}},
+                {"serviceCaches", new [] {"views"}}
             };
             //now do the filtering...
             var defaults = GetServerVariables();
@@ -95,8 +96,14 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
+            var appState = GetApplicationState();
             var defaultVals = new Dictionary<string, object>
             {
+                {
+                    "serviceCaches", new Dictionary<string, object> {
+                        { "views", "umb-views" +  appState["cacheBuster"] }
+                    }
+                },
                 {
                     "umbracoUrls", new Dictionary<string, object>
                     {
@@ -323,7 +330,7 @@ namespace Umbraco.Web.Editors
                     "isDebuggingEnabled", _httpContext.IsDebuggingEnabled
                 },
                 {
-                    "application", GetApplicationState()
+                    "application", appState
                 },
                 {
                     "externalLogins", new Dictionary<string, object>

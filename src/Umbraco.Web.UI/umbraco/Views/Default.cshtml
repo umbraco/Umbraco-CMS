@@ -1,4 +1,4 @@
-﻿@using Umbraco.Core
+@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
 @using Umbraco.Core.IO
@@ -63,9 +63,8 @@
                 </div>
             </section>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
+            <umb-tour ng-if="tour.show"
+                      model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
@@ -74,19 +73,17 @@
 
     </div>
 
-    <umb-backdrop
-        ng-if="backdrop.show"
-        backdrop-opacity="backdrop.opacity"
-        highlight-element="backdrop.element"
-        highlight-prevent-click="backdrop.elementPreventClick"
-        disable-events-on-click="backdrop.disableEventsOnClick">
+    <umb-backdrop ng-if="backdrop.show"
+                  backdrop-opacity="backdrop.opacity"
+                  highlight-element="backdrop.element"
+                  highlight-prevent-click="backdrop.elementPreventClick"
+                  disable-events-on-click="backdrop.disableEventsOnClick">
     </umb-backdrop>
 
-    <umb-overlay
-        ng-if="ysodOverlay.show"
-        model="ysodOverlay"
-        position="right"
-        view="ysodOverlay.view">
+    <umb-overlay ng-if="ysodOverlay.show"
+                 model="ysodOverlay"
+                 position="right"
+                 view="ysodOverlay.view">
     </umb-overlay>
 
     @Html.BareMinimumServerVariablesScript(Url, ApplicationContext.Current, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
@@ -106,5 +103,33 @@
         <script src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
+    <script type="text/javascript">
+            if ('serviceWorker' in navigator && window.isSecureContext) {
+                if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    navigator.serviceWorker.getRegistration(Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath)
+                        .then(function (reg) {
+                            if (reg) {
+                                reg.unregister(); //ensures we remove the service worker when in debug
+                                }
+                        });
+                } else {
+
+                    window.addEventListener('load',
+                        function() {
+                            var caches = Object.values(Umbraco.Sys.ServerVariables.serviceCaches).join(",");
+                            navigator.serviceWorker
+                                .register('/umbraco-sw.js?serviceCaches=' + caches, { scope: '/@ViewBag.UmbracoPath' })
+                                .then(function(registration) {
+                                        // Registration was successful
+                                        //console.log('ServiceWorker registration successful with scope: ',registration.scope);
+                                    },
+                                    function(err) {
+                                        // registration failed :(
+                                        //console.log('ServiceWorker registration failed: ', err);
+                                    });
+                        });
+                }
+            }
+    </script>
 </body>
 </html>
