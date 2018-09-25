@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRollbackController($scope, $timeout) {
+    function ContentRollbackController($scope, assetsService) {
 
         var vm = this;
 
@@ -15,9 +15,10 @@
             vm.variantVersions = [];
             vm.diff = null;
 
-            // fake load versions
-            var currentLanguage = $scope.currentNode.metaData.culture;
-            $timeout(function(){
+            // Load in diff library
+            assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {
+
+                var currentLanguage = $scope.currentNode.metaData.culture;
 
                 vm.currentVersion = {
                     "id": 1,
@@ -46,7 +47,9 @@
                 ];
 
                 vm.loading = false;
-            }, 200);
+
+            });
+
         }
 
         function rollback() {
