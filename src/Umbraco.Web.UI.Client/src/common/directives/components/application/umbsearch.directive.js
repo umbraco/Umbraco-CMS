@@ -24,12 +24,13 @@
         vm.clearSearch = clearSearch;
         vm.handleKeyUp = handleKeyUp;
         vm.closeSearch = closeSearch;
+        vm.focusSearch = focusSearch;
 
         function onInit() {
             vm.searchQuery = "";
             vm.searchResults = [];
             vm.hasResults = false;
-            vm.focusSearch = true;
+            focusSearch();
             backdropService.open();
         }
 
@@ -48,12 +49,19 @@
          * Clears the search query
          */
         function clearSearch() {
-            vm.focusSearch = false;
             vm.searchQuery = "";
+            vm.searchResults = [];
+            vm.hasResults = false;
+            focusSearch();
+        }
+
+        /**
+         * Add focus to the search field
+         */
+        function focusSearch() {
+            vm.searchHasFocus = false;
             $timeout(function(){
-                vm.focusSearch  = true;
-                vm.searchResults = [];
-                vm.hasResults = false;
+                vm.searchHasFocus  = true;
             });
         }
 
