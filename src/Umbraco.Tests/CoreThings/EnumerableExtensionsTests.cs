@@ -51,15 +51,9 @@ namespace Umbraco.Tests.CoreThings
                         }
                 };
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = FlattenList(hierarchy.Children, x => x.Children);
-#pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
-            Assert.AreEqual(3, flattened.Count());
             Assert.AreEqual(3, selectRecursive.Count());
-
-            Assert.IsTrue(flattened.SequenceEqual(selectRecursive));
         }
 
         [Test]
@@ -118,17 +112,8 @@ namespace Umbraco.Tests.CoreThings
                 }
             };
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = FlattenList(hierarchy.Children, x => x.Children);
-#pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
-
-            Assert.AreEqual(10, flattened.Count());
             Assert.AreEqual(10, selectRecursive.Count());
-
-            // both methods return the same elements, but not in the same order
-            Assert.IsFalse(flattened.SequenceEqual(selectRecursive));
-            foreach (var x in flattened) Assert.IsTrue(selectRecursive.Contains(x));
         }
 
         private class TestItem
@@ -140,13 +125,6 @@ namespace Umbraco.Tests.CoreThings
             }
             public string Name { get; }
             public IEnumerable<TestItem> Children { get; set; }
-        }
-
-
-
-        private IEnumerable<T> FlattenList<T>(IEnumerable<T> e, Func<T, IEnumerable<T>> f)
-        {
-            return e.SelectMany(c => FlattenList(f(c), f)).Concat(e);
         }
 
         [Test]
