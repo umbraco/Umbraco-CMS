@@ -10,8 +10,9 @@ namespace umbraco.presentation
 	[Obsolete("This is no longer used and will be removed in future versions")]
 	public class keepAliveService
 	{
+	    private static WebClient _webClient;
         //NOTE: sender will be the umbraco ApplicationContext
-		public static void PingUmbraco(object sender)
+        public static void PingUmbraco(object sender)
 		{
 			if (sender == null || !(sender is ApplicationContext))
 				return;
@@ -21,10 +22,9 @@ namespace umbraco.presentation
 		    var url = appContext.UmbracoApplicationUrl + "/ping.aspx";
 			try
 			{
-				using (var wc = new WebClient())
-				{
-					wc.DownloadString(url);
-				}
+			    if (_webClient == null)
+			        _webClient = new WebClient();
+                _webClient.DownloadString(url);
 			}
 			catch(Exception ee)
 			{

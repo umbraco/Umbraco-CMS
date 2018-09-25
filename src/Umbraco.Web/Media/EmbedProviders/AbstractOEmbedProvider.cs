@@ -12,18 +12,20 @@ namespace Umbraco.Web.Media.EmbedProviders
 {
     //TODO: Make all Http calls async
 
-    public abstract class AbstractOEmbedProvider: IEmbedProvider
+    public abstract class AbstractOEmbedProvider : IEmbedProvider
     {
+        private static WebClient _webClient;
+
         public virtual bool SupportsDimensions
         {
             get { return true; }
         }
 
         [ProviderSetting]
-        public string APIEndpoint{ get;set; }
+        public string APIEndpoint { get; set; }
 
         [ProviderSetting]
-        public Dictionary<string, string> RequestParams{ get;set; }
+        public Dictionary<string, string> RequestParams { get; set; }
 
         public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
 
@@ -51,10 +53,9 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public virtual string DownloadResponse(string url)
         {
-            using (var webClient = new WebClient())
-            {
-                return webClient.DownloadString(url);
-            }
+            if (_webClient == null)
+                _webClient = new WebClient();
+            return _webClient.DownloadString(url);
         }
 
         public virtual T GetJsonResponse<T>(string url) where T : class
