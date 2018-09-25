@@ -59,13 +59,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //fixme - we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
             sql = sql.OrderBy("NodeId");
 
-
             var page = Database.Page<BaseDto>(pageIndex + 1, pageSize, sql);
             var dtos = page.Items;
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
             
             if (isContent)
-                BuildVariantInfo(entities);
+                BuildVariants(entities.Cast<DocumentEntitySlim>());
 
             if (isMedia)
                 BuildProperties(entities, dtos);
@@ -86,12 +85,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
-                var dtos = Database.FetchOneToMany<ContentEntityDto>(
-                    ddto => ddto.VariationInfo,
-                    ddto => ddto.VersionId,
-                    sql);
-                
-                return dtos.Count == 0 ? null : BuildVariantInfo(BuildDocumentEntity(dtos[0]))[0];
+                var cdtos = Database.Fetch<ContentEntityDto>(sql);
+
+                return cdtos.Count == 0 ? null : BuildVariants(BuildDocumentEntity(cdtos[0]));
             }
 
             var dto = Database.FirstOrDefault<BaseDto>(sql);
@@ -149,14 +145,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
-                var cdtos = Database.FetchOneToMany<ContentEntityDto>(
-                    dto => dto.VariationInfo,
-                    dto => dto.VersionId,
-                    sql);
+                var cdtos = Database.Fetch<ContentEntityDto>(sql);
 
                 return cdtos.Count == 0
                     ? Enumerable.Empty<IEntitySlim>()
-                    : BuildVariantInfo(cdtos.Select(BuildDocumentEntity).ToArray()).ToList();
+                    : BuildVariants(cdtos.Select(BuildDocumentEntity)).ToList();
             }
 
             var dtos = Database.Fetch<BaseDto>(sql);
@@ -280,54 +273,90 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.AdditionalData[pdto.PropertyTypeDto.Alias] = new EntitySlim.PropertySlim(pdto.PropertyTypeDto.DataTypeDto.EditorAlias, value);
         }
 
-        private void BuildVariantInfo(EntitySlim[] entities)
-        {
-            BuildVariantInfo((DocumentEntitySlim[])entities);
-        }
+        private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
+            => BuildVariants(new[] { entity }).First();
 
-        private DocumentEntitySlim[] BuildVariantInfo(params DocumentEntitySlim[] entities)
+        private IEnumerable<DocumentEntitySlim> BuildVariants(IEnumerable<DocumentEntitySlim> entities)
         {
-            if (entities.Any(x => x.Variations.VariesByCulture()))
+            List<DocumentEntitySlim> v = null;
+            var entitiesList = entities.ToList();
+            foreach (var e in entitiesList)
             {
-                //each EntitySlim at this stage is an DocumentEntitySlim
-
-                var dtos = Database.FetchByGroups<VariationPublishInfoDto, int>(entities.Select(x => x.Id), 2000, GetVariantPublishedInfo)
-                    .GroupBy(x => x.NodeId)
-                    .ToDictionary(x => x.Key, x => (IEnumerable<VariationPublishInfoDto>)x);
-
-                foreach (var e in entities.OfType<DocumentEntitySlim>().Where(x => x.Variations.VariesByCulture()).OrderBy(x => x.Id))
-                {
-                    //fixme: how do i get this info? Seems that requires another query since that is how I think it's done in the DocumentRepository
-                    //e.EditedCultures =
-                    e.PublishedCultures = dtos[e.Id].Where(x => x.VersionPublished).Select(x => x.IsoCode).Distinct().ToList();
-                }
+                if (e.Variations.VariesByCulture())
+                    (v ?? (v = new List<DocumentEntitySlim>())).Add(e);
             }
 
-            return entities;
+            if (v == null) return entitiesList;
+
+            // fetch all variant info dtos
+            var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), 2000, GetVariantInfos);
+
+            // group by node id (each group contains all languages)
+            var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
+
+            foreach (var e in v)
+            {
+                // since we're only iterating on entities that vary, we must have something
+                var edtos = xdtos[e.Id];
+
+                e.CultureNames = edtos.Where(x => x.CultureAvailable).ToDictionary(x => x.IsoCode, x => x.Name);
+                e.PublishedCultures = edtos.Where(x => x.CulturePublished).Select(x => x.IsoCode);
+                e.EditedCultures = edtos.Where(x => x.CultureAvailable && x.CultureEdited).Select(x => x.IsoCode);
+            }
+
+            return entitiesList;
         }
 
         #endregion
 
         #region Sql
 
-        private Sql<ISqlContext> GetVariantPublishedInfo(IEnumerable<int> ids)
+        protected Sql<ISqlContext> GetVariantInfos(IEnumerable<int> ids)
         {
-            var sql = Sql();
-            sql
-                .Select<ContentVersionDto>(x => x.NodeId, x => Alias(x.Id, "versionId"), x => Alias(x.Current, "versionCurrent"))
-                .AndSelect<ContentVersionCultureVariationDto>(x => Alias(x.Id, "versionCultureId"))
+            // this ... is an interesting query - could we make it simpler? probably, by having DocumentCultureVariationDto
+            // handle 'available' and 'published' in addition to 'edited' - would take (a bit) more time to save a document,
+            // but would make querying way faster
+
+            return Sql()
+                .Select<NodeDto>(x => x.NodeId)
                 .AndSelect<LanguageDto>(x => x.IsoCode)
-                .AndSelect<DocumentVersionDto>(x => Alias(x.Published, "versionPublished"))
+                .AndSelect<DocumentDto>("doc", x => Alias(x.Published, "DocumentPublished"), x => Alias(x.Edited, "DocumentEdited"))
+                .AndSelect<ContentVersionCultureVariationDto>("ccv", x => Alias(x.Id, "CultureAvailableData"), x => Alias(x.Name, "Name"))
+                .AndSelect<ContentVersionCultureVariationDto>("pcv", x => Alias(x.Id, "CulturePublishedData"))
+                .AndSelect<DocumentCultureVariationDto>("dcv", x => Alias(x.Edited, "CultureEditedData"))
+
+                // from node x language
                 .From<NodeDto>()
-                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
-                .InnerJoin<ContentVersionCultureVariationDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
-                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>(x => x.Id, x => x.Id)
-                .InnerJoin<LanguageDto>().On<ContentVersionCultureVariationDto, LanguageDto>(x => x.LanguageId, x => x.Id)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
-                .WhereIn<NodeDto>(x => x.NodeId, ids)
-                .Where($"{SqlSyntax.GetFieldName<ContentVersionDto>(x => x.Current)} = 1 OR {SqlSyntax.GetFieldName<DocumentVersionDto>(x => x.Published)} = 1");
-            return sql;
+                .CrossJoin<LanguageDto>()
+
+                // join to document - always exists - indicates global document published/edited status
+                .InnerJoin<DocumentDto>("doc")
+                    .On<NodeDto, DocumentDto>((node, doc) => node.NodeId == doc.NodeId, aliasRight: "doc")
+
+                // left-join do document variation - matches cultures that are *available* + indicates when *edited*
+                .LeftJoin<DocumentCultureVariationDto>("dcv")
+                    .On<NodeDto, DocumentCultureVariationDto, LanguageDto>((node, dcv, lang) => node.NodeId == dcv.NodeId && lang.Id == dcv.LanguageId, aliasRight: "dcv")
+
+                // join to current version - always exists
+                // left-join to current version variations - indicates which cultures are *available*
+                .InnerJoin<ContentVersionDto>("cv")
+                    .On<NodeDto, ContentVersionDto>((node, ev) => node.NodeId == ev.NodeId && ev.Current, aliasRight: "cv")
+                .LeftJoin<ContentVersionCultureVariationDto>("ccv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto, LanguageDto>((cv, ccv, lang) => cv.Id == ccv.VersionId && lang.Id == ccv.LanguageId, "cv", "ccv")
+
+                // left-join to published version - exists when whole node is published
+                // left-join to published version variations - matches cultures that are *published*
+                .LeftJoin<ContentVersionDto>(nested => nested.InnerJoin<DocumentVersionDto>("dv")
+                                                             .On<ContentVersionDto, DocumentVersionDto>((pv, dv) => pv.Id == dv.Id && dv.Published, "pv", "dv"),
+                        "pv")
+                    .On<NodeDto, ContentVersionDto>((node, pv) => node.NodeId == pv.NodeId, aliasRight: "pv")
+                .LeftJoin<ContentVersionCultureVariationDto>("pcv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto, LanguageDto>((pv, pcv, lang) => pv.Id == pcv.VersionId && lang.Id == pcv.LanguageId, "pv", "pcv")
+
+                // for selected nodes
+                .WhereIn<NodeDto>(x => x.NodeId, ids);
         }
+
         // gets the full sql for a given object type and a given unique id
         protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectType, Guid uniqueId)
         {
@@ -368,9 +397,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
                 .OrderBy<PropertyDataDto>(x => x.VersionId);
-        }
-
-        
+        }      
 
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
@@ -397,12 +424,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (isContent)
                 {
                     sql
-                        .AndSelect<DocumentDto>(x => x.Published, x => x.Edited)
-                        //This MUST come last in the select statements since we will end up with a 1:M query
-                        .AndSelect<ContentVersionCultureVariationDto>(
-                            x => Alias(x.Id, "versionCultureId"),
-                            x => Alias(x.LanguageId, "versionCultureLangId"),
-                            x => Alias(x.Name, "versionCultureName"));
+                        .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
                 }
             }
 
@@ -428,10 +450,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql
                     .LeftJoin<NodeDto>("child").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.ParentId, aliasRight: "child");
-
-                if (isContent)
-                    sql
-                        .LeftJoin<ContentVersionCultureVariationDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>((left, right) => left.Id == right.VersionId);
             }
 
 
@@ -493,8 +511,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isContent)
             {
                 sql
-                    .AndBy<DocumentDto>(x => x.Published, x => x.Edited)
-                    .AndBy<ContentVersionCultureVariationDto>(x => x.Id, x => x.LanguageId, x => x.Name);
+                    .AndBy<DocumentDto>(x => x.Published, x => x.Edited);
             }
 
 
@@ -537,34 +554,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             public ContentVariation Variations { get; set; }
 
-            [ResultColumn, Reference(ReferenceType.Many)]
-            public List<ContentEntityVariationInfoDto> VariationInfo { get; set; }
-
             public bool Published { get; set; }
             public bool Edited { get; set; }
         }
 
-        private class VariationPublishInfoDto
+        public class VariantInfoDto
         {
             public int NodeId { get; set; }
-            public int VersionId { get; set; }
-            public bool VersionCurrent { get; set; }
             public string IsoCode { get; set; }
-            public int VersionCultureId { get; set; }
-            public bool VersionPublished { get; set; }
-        }
-
-        /// <summary>
-        /// The DTO used in the 1:M result for content variation info
-        /// </summary>
-        private class ContentEntityVariationInfoDto
-        {
-            [Column("versionCultureId")]
-            public int VersionCultureId { get; set; }
-            [Column("versionCultureLangId")]
-            public int LanguageId { get; set; }
-            [Column("versionCultureName")]
             public string Name { get; set; }
+            public bool DocumentPublished { get; set; }
+            public bool DocumentEdited { get; set; }
+
+            public int? CultureAvailableData { get; set; }
+            public int? CulturePublishedData { get; set; }
+            public bool? CultureEditedData { get; set; }
+
+            [ResultColumn]
+            public bool CultureAvailable => CultureAvailableData.HasValue;
+            [ResultColumn]
+            public bool CulturePublished => CulturePublishedData.HasValue;
+            [ResultColumn]
+            public bool CultureEdited => CultureEditedData ?? false;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -648,53 +659,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
         {
+            // EntitySlim does not track changes
+            var entity = new DocumentEntitySlim();
+            BuildContentEntity(entity, dto);
+
             if (dto is ContentEntityDto contentDto)
             {
-                return BuildDocumentEntity(contentDto);
+                // fill in the invariant info
+                entity.Edited = contentDto.Edited;
+                entity.Published = contentDto.Published;
+                entity.Variations = contentDto.Variations;
             }
 
-            // EntitySlim does not track changes
-            var entity = new DocumentEntitySlim();
-            BuildContentEntity(entity, dto);
-            return entity;
-        }
-
-        /// <summary>
-        /// Builds the <see cref="EntitySlim"/> from a <see cref="ContentEntityDto"/> and ensures the AdditionalData is populated with variant info
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        private DocumentEntitySlim BuildDocumentEntity(ContentEntityDto dto)
-        {
-            // EntitySlim does not track changes
-            var entity = new DocumentEntitySlim();
-            BuildContentEntity(entity, dto);
-            
-            //fill in the invariant info
-            entity.Edited = dto.Edited;
-            entity.Published = dto.Published;
-
-            var publishedCultures = new List<string>();
-            var editedCultures = new List<string>();
-
-            //fill in the variant info
-            if (dto.Variations.VariesByCulture() && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
-            {
-                //fixme: Currently require making a 2nd query to fill in publish status information for variants
-
-                var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-                foreach (var info in dto.VariationInfo)
-                {
-                    var isoCode = _langRepository.GetIsoCodeById(info.LanguageId);
-                    if (isoCode != null)
-                        variantInfo[isoCode] = info.Name;
-                    
-                }
-                entity.CultureNames = variantInfo;
-                entity.Variations = dto.Variations;
-                entity.PublishedCultures = publishedCultures;
-                entity.EditedCultures = editedCultures;
-            }
             return entity;
         }
 
