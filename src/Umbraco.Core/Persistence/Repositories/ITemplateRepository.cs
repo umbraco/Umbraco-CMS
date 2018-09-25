@@ -19,25 +19,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<ITemplate> GetDescendants(string alias);
 
         /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        TemplateNode GetTemplateNode(string alias);
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
-
-        /// <summary>
         /// This checks what the default rendering engine is set in config but then also ensures that there isn't already
         /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate
         /// rendering engine to use.

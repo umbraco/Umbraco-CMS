@@ -25,13 +25,15 @@ namespace umbraco.presentation.umbraco.dialogs
         public protectPage()
         {
             CurrentApp = Constants.Applications.Content.ToString();
-
         }
 
         protected Literal jsShowWindow;
         protected DualSelectbox _memberGroups = new DualSelectbox();
         protected ContentPicker loginPagePicker = new ContentPicker();
         protected ContentPicker errorPagePicker = new ContentPicker();
+
+        private const string MemberIdRuleType = "MemberId"; // moved from Constants-Conventions.cs
+
 
         override protected void OnInit(EventArgs e)
         {
@@ -66,7 +68,7 @@ namespace umbraco.presentation.umbraco.dialogs
             if (entry == null) return ProtectionType.NotProtected;
 
             //legacy states that if it is protected by a member id then it is 'simple'
-            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType)
+            return entry.Rules.Any(x => x.RuleType == MemberIdRuleType)
                 ? ProtectionType.Simple
                 : ProtectionType.Advanced;
         }
