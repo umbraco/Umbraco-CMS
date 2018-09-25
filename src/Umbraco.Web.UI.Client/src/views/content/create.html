@@ -10,8 +10,8 @@
 
         <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
 
-            <li data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
-                <a ng-click="createOrSelectBlueprintIfAny(docType)">
+            <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
+                <a class="umb-action-link" ng-click="createOrSelectBlueprintIfAny(docType)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">
                         {{docType.name}}
@@ -25,8 +25,8 @@
         </ul>
         <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint && docType.blueprints.length > 0">
 
-            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
-                <a ng-click="createFromBlueprint(key)">
+            <li class="umb-action" ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
+                <a class="umb-action-link" ng-click="createFromBlueprint(key)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">
                         {{value}}
@@ -34,8 +34,8 @@
                 </a>
             </li>
             
-            <li class="sep" ng-show="allowBlank">
-                <a ng-click="createBlank(docType)">
+            <li class="umb-action sep" ng-show="allowBlank">
+                <a class="umb-action-link" ng-click="createBlank(docType)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">
                         <localize key="blueprints_blankBlueprint">Blank</localize>
