@@ -48,6 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
 
             if (query == null) query = new Query<IAuditItem>();
+            
             var queryHasWhereClause = query.GetWhereClauses().Any();
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
@@ -58,7 +59,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var filterSql = new Sql();
                 foreach (var filterClause in customFilterWheres)
-                {
+                {                   
                     filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
                 }
 
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var filterSql = new Sql();
                 foreach (var filterClause in auditTypeFilter)
-                {
+                {                   
                     filterSql.Append("AND (logHeader = @logHeader)", new { logHeader = filterClause.ToString() });
                 }
 
@@ -166,7 +167,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Apply filter
             if (filterSql != null)
             {
-                //ensure we don't append a WHERE if there is already one
+               	//ensure we don't append a WHERE if there is already one
                 var sqlFilter = hasWhereClause
                     ? filterSql.SQL
                     : " WHERE " + filterSql.SQL.TrimStart("AND ");
