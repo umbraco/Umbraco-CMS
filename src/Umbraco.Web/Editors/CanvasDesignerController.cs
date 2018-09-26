@@ -1,29 +1,17 @@
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Web.Http;
-using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using umbraco;
 using Umbraco.Web.WebApi;
 using System;
 using System.Net.Http.Headers;
 using System.Web;
-using System.IO;
-using Umbraco.Core.Models;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
 
     public class CanvasDesignerController : UmbracoApiController
     {
-        private static WebClient _webClient;
+        private static HttpClient _httpClient;
 
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
@@ -35,17 +23,14 @@ namespace Umbraco.Web.Editors
             // Google Web Font JSON URL
             var googleWebFontAPIURL = string.Format("https://www.googleapis.com/webfonts/v1/webfonts?key={0}", APIKey);
 
-            var response = "{}";
-            if (_webClient == null)
-                _webClient = new WebClient();
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
 
-            response = _webClient.DownloadString(new Uri(googleWebFontAPIURL));
-
-            var resp = Request.CreateResponse();
-            resp.Content = new StringContent(response);
-            resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            return resp;
-
+            using (var request = new HttpRequestMessage(HttpMethod.Get, googleWebFontAPIURL))
+            {
+                var response = _httpClient.SendAsync(request).Result;
+                return response;
+            }
         }
 
         [HttpGet]

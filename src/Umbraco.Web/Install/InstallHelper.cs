@@ -198,12 +198,11 @@ namespace Umbraco.Web.Install
             var packages = new List<Package>();
             try
             {
-                var requestUri = string.Format("https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={0}",
-                    UmbracoVersion.Current);
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (var response = _httpClient.SendAsync(request).Result)
                 {
+                    var response = _httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }

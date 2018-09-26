@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 
@@ -6,53 +7,50 @@ namespace dashboardUtilities
 {
     using System;
     using System.Linq;
-    using System.Net;
     using System.Net.Mime;
-    using umbraco;
     using umbraco.BasePages;
-    using umbraco.BusinessLogic;
     using Umbraco.Core.IO;
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
-        private static WebClient _webClient;
+        private static HttpClient _httpClient;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             try
             {
-                if (Request.QueryString.AllKeys.Contains("url") && Request.QueryString["url"] != null)
+                if (Request.QueryString.AllKeys.Contains("url") == false || Request.QueryString["url"] == null)
+                    return;
+
+                var url = Request.QueryString["url"];
+                if (string.IsNullOrWhiteSpace(url) || url.StartsWith("/"))
+                    return;
+
+                if (Uri.TryCreate(url, UriKind.Absolute, out var requestUri) == false)
+                    return;
+
+                var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+                if (feedProxyXml?.SelectSingleNode($"//allow[@host = '{requestUri.Host}']") != null && requestUri.Port == 80)
                 {
-                    var url = Request.QueryString["url"];
-                    if (!string.IsNullOrWhiteSpace(url) && !url.StartsWith("/"))
+                    if (_httpClient == null)
+                        _httpClient = new HttpClient();
+
+                    using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                     {
-                        Uri requestUri;
-                        if (Uri.TryCreate(url, UriKind.Absolute, out requestUri))
-                        {
-                            var feedProxyXml = xmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                            if (feedProxyXml != null 
-                                && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
-                                && requestUri.Port == 80)
-                            {
-                                if (_webClient == null)
-                                    _webClient = new WebClient();
-                               
-                                    var response = _webClient.DownloadString(requestUri);
+                        var response = _httpClient.SendAsync(request).Result;
+                        var result = response.Content.ReadAsStringAsync().Result;
 
-                                    if (string.IsNullOrEmpty(response) == false)
-                                    {
-                                        Response.Clear();
-                                        Response.ContentType = Request.CleanForXss("type") ?? MediaTypeNames.Text.Xml;
-                                        Response.Write(response);
-                                    }
+                        if (string.IsNullOrEmpty(result))
+                            return;
 
-                            }
-                            else
-                            {
-                                LogHelper.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
-                            }
-                        }
+                        Response.Clear();
+                        Response.ContentType = Request.CleanForXss("type") ?? MediaTypeNames.Text.Xml;
+                        Response.Write(result);
                     }
+                }
+                else
+                {
+                    LogHelper.Debug<FeedProxy>($"Access to unallowed feedproxy attempted: {requestUri}");
                 }
             }
             catch (Exception ex)

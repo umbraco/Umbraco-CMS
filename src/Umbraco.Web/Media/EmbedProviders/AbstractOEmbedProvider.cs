@@ -14,7 +14,7 @@ namespace Umbraco.Web.Media.EmbedProviders
 
     public abstract class AbstractOEmbedProvider : IEmbedProvider
     {
-        private static WebClient _webClient;
+        private static HttpClient _httpClient;
 
         public virtual bool SupportsDimensions
         {
@@ -53,9 +53,14 @@ namespace Umbraco.Web.Media.EmbedProviders
 
         public virtual string DownloadResponse(string url)
         {
-            if (_webClient == null)
-                _webClient = new WebClient();
-            return _webClient.DownloadString(url);
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
+
+            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                var response = _httpClient.SendAsync(request).Result;
+                return response.Content.ReadAsStringAsync().Result;
+            }
         }
 
         public virtual T GetJsonResponse<T>(string url) where T : class
