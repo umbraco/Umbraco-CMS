@@ -47,11 +47,12 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar color="secondary"
-                                                size="xs"
-                                                name="{{item.userName}}"
-                                                img-src="{{item.userAvatars[3]}}"
-                                                img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    <umb-avatar 
+                                        color="secondary"
+                                        size="xs"
+                                        name="{{item.userName}}"
+                                        img-src="{{item.userAvatars[3]}}"
+                                        img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
                                     </umb-avatar>
                                 </div>
 
@@ -62,9 +63,10 @@
                             </div>
 
                             <div class="history-item__break">
-                                <umb-badge size="xs"
-                                           color="{{item.logTypeColor}}">
-                                  
+                                <umb-badge
+                                    class="history-item__badge"
+                                    size="xs"
+                                    color="{{item.logTypeColor}}">
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
                                 <span>

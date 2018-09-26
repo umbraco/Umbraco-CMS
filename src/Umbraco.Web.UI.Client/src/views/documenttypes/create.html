@@ -4,40 +4,35 @@
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">
-            <li data-element="action-documentType" ng-hide="model.disableTemplates">
-                <a href="" ng-click="createDocType()" umb-auto-focus>
-
-                    <i class="large icon-item-arrangement"></i>
-
+            <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
+                <a href="" ng-click="createDocType()" class="umb-action-link" umb-auto-focus>
+                    <i class="large icon icon-item-arrangement"></i>
                     <span class="menu-label">
                         <localize key="content_documentType">Document type</localize>
                     </span>
                 </a>
             </li>
-            <li data-element="action-documentTypeWithoutTemplate">
-                <a href="" ng-click="createComponent()">
-                    <i class="large icon-item-arrangement"></i>
-
+            <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
+                <a href="" ng-click="createComponent()" class="umb-action-link">
+                    <i class="large icon icon-item-arrangement"></i>
                     <span class="menu-label">
                         <localize ng-if="model.disableTemplates == false" key="create_documentTypeWithoutTemplate"></localize>
                         <localize ng-if="model.disableTemplates == true" key="content_documentType">Document type></localize>
                     </span>
                 </a>
             </li>
-            <li data-element="action-documentTypeCollection">
-                <a href="" ng-click="showCreateDocTypeCollection()">
-
-                    <i class="large icon-thumbnail-list"></i>
-
+            <li data-element="action-documentTypeCollection" class="umb-action">
+                <a href="" ng-click="showCreateDocTypeCollection()" class="umb-action-link">
+                    <i class="large icon icon-thumbnail-list"></i>
                     <span class="menu-label">
                         Document Type Collection
                         <!--                        <localize key="content_documentType_collection">Document Type Collection</localize>-->
                     </span>
                 </a>
             </li>
-            <li data-element="action-folder" ng-if="model.allowCreateFolder">
-                <a href="" ng-click="showCreateFolder()">
-                    <i class="large icon-folder"></i>
+            <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
+                <a href="" ng-click="showCreateFolder()" class="umb-action-link">
+                    <i class="large icon icon-folder"></i>
                     <span class="menu-label"><localize key="general_folder"></localize></span>
                 </a>
             </li>

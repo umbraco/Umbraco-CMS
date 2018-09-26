@@ -23,9 +23,6 @@ namespace Umbraco.Core
             {
                 public const string MemberUsernameRuleType = "MemberUsername";
                 public const string MemberRoleRuleType = "MemberRole";
-
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberIdRuleType = "MemberId";
             }
 
 

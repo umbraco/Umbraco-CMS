@@ -96,31 +96,20 @@ namespace Umbraco.Web.Models.Mapping
         {
             public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
             {
-                var culture = context.GetCulture();
+                // invariant = global date
+                if (!source.ContentType.VariesByCulture()) return source.UpdateDate;
 
-                //a culture needs to be in the context for a variant content item
-                if (culture == null || source.ContentType.VariesByCulture() == false)
-                    return source.UpdateDate;
+                // variant = depends on culture
+                var culture = context.Options.GetCulture();
 
-                var pubDate = source.GetPublishDate(culture);
-                return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
-            }
-        }
+                // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
+                if (culture == null)
+                    throw new InvalidOperationException("Missing culture in mapping options.");
 
-        /// <summary>
-        /// Resolves the published flag for a content item/content variant
-        /// </summary>
-        private class PublishedResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, bool>
-        {
-            public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
-            {
-                var culture = context.GetCulture();
-
-                //a culture needs to be in the context for a variant content item
-                if (culture == null || source.ContentType.VariesByCulture() == false)
-                    return source.Published;
-
-                return source.IsCulturePublished(culture);
+                // if we don't have a date for a culture, it means the culture is not available, and
+                // hey we should probably not be mapping it, but it's too late, return a fallback date
+                var date = source.GetCultureDate(culture);
+                return date ?? source.UpdateDate;
             }
         }
 
@@ -131,25 +120,20 @@ namespace Umbraco.Web.Models.Mapping
         {
             public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
             {
-                var culture = context.GetCulture();
+                // invariant = only 1 name
+                if (!source.ContentType.VariesByCulture()) return source.Name;
 
-                //a culture needs to be in the context for a variant content item
-                if (culture == null || source.ContentType.VariesByCulture() == false)
-                    return source.Name;
+                // variant = depends on culture
+                var culture = context.Options.GetCulture();
 
-                if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
-                {
-                    return name;
-                }
-                else
-                {
-                    return $"({ source.Name })";
-                }
+                // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
+                if (culture == null)
+                    throw new InvalidOperationException("Missing culture in mapping options.");
+
+                // if we don't have a name for a culture, it means the culture is not available, and
+                // hey we should probably not be mapping it, but it's too late, return a fallback name
+                return source.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
             }
         }
-
-    }
-
-
-    
+    }    
 }

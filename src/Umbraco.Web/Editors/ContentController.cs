@@ -24,6 +24,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -32,6 +33,7 @@ using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 
@@ -227,7 +229,7 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content");
+            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content"));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
@@ -457,10 +459,10 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "",
-                string cultureName = "")
+                string cultureName = "") // TODO it's not a NAME it's the ISO CODE
         {
             long totalChildren;
-            IContent[] children;
+            List<IContent> children;
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -472,16 +474,14 @@ namespace Umbraco.Web.Editors
                 }
 
                 children = Services.ContentService
-                    .GetPagedChildren(
-                        id, (pageNumber - 1), pageSize,
-                        out totalChildren,
-                        orderBy, orderDirection, orderBySystemField,
-                        queryFilter).ToArray();
+                    .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren,
+                        queryFilter,
+                        Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
             }
             else
             {
-                children = Services.ContentService.GetChildren(id).ToArray();
-                totalChildren = children.Length;
+                children = Services.ContentService.GetChildren(id).ToList();
+                totalChildren = children.Count;
             }
 
             if (totalChildren == 0)
@@ -494,15 +494,14 @@ namespace Umbraco.Web.Editors
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
-                        opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;                        
+
+                        opts.SetCulture(cultureName);                        
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
-                        if (string.IsNullOrWhiteSpace(includeProperties) == false)
-                        {
-                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
-                        }
-                    }));
-
+                        if (!includeProperties.IsNullOrWhiteSpace())
+                            opts.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
+                    }))
+                .ToList(); // evaluate now
 
             return pagedResult;
         }

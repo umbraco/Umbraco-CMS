@@ -33,12 +33,14 @@ using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -200,6 +202,12 @@ namespace Umbraco.Web.Runtime
 
             // register properties fallback
             composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+
+            // register known content apps
+            composition.Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
+                .Append<ListViewContentAppDefinition>()
+                .Append<ContentEditorContentAppDefinition>()
+                .Append<ContentInfoContentAppDefinition>();
         }
 
         internal void Initialize(

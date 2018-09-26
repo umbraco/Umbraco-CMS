@@ -37,6 +37,7 @@ using Umbraco.Web.Services;
 using Umbraco.Examine;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
@@ -206,6 +207,9 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+
+            // register empty content apps collection
+            Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
         }
 
         protected virtual void ComposeCacheHelper()

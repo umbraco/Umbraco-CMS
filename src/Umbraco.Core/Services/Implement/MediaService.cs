@@ -515,14 +515,9 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
-                var query = Query<IMedia>();
 
-                //if the id is System Root, then just get all - NO! does not make sense!
-                //if (id != Constants.System.Root)
-
-                query.Where(x => x.ParentId == id);
-
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                var query = Query<IMedia>().Where(x => x.ParentId == id);
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
         }
 
@@ -561,7 +556,7 @@ namespace Umbraco.Core.Services.Implement
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
                     : Query<IMedia>().Where(x => x.Name.Contains(filter));
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filterQuery);
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filterQuery, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
         }
 
@@ -607,6 +602,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.MediaTree);
 
                 var query = Query<IMedia>();
+
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -618,7 +614,8 @@ namespace Umbraco.Core.Services.Implement
                     }
                     query.Where(x => x.Path.SqlStartsWith(mediaPath[0].Path + ",", TextColumnType.NVarchar));
                 }
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
         }
 

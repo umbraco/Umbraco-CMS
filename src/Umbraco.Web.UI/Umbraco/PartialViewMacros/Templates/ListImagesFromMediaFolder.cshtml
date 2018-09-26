@@ -13,11 +13,12 @@
 *@
 
 @{ var mediaId = Model.MacroParameters["mediaId"]; }
+
 @if (mediaId != null)
 {
     @* Get the media item associated with the id passed in *@
-    var media = Umbraco.TypedMedia(mediaId);
-    var selection = media.Children<Image>().ToArray();
+    var media = Umbraco.Media(mediaId);
+    var selection = media.Children.ToArray();
 
     if (selection.Length > 0)
     {

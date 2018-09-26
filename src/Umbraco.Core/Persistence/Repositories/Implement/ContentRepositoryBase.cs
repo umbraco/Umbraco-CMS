@@ -232,16 +232,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<TEntity> filter = null);
-
-        // sql: the main sql
-        // filterSql: a filtering ? fixme different from v7?
-        // orderBy: the name of an ordering field
-        // orderDirection: direction for orderBy
-        // orderBySystemField: whether orderBy is a system field or a custom field (property value)
-        private Sql<ISqlContext> PrepareSqlForPage(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
+        private Sql<ISqlContext> PreparePageSql(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, Ordering ordering)
         {
-            if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
+            // non-filtering, non-ordering = nothing to do
+            if (filterSql == null && ordering.IsEmpty) return sql;
 
             // preserve original
             var psql = new Sql<ISqlContext>(sql.SqlContext, sql.SQL, sql.Arguments);
@@ -251,74 +245,131 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 psql.Append(filterSql);
 
             // non-sorting, we're done
-            if (string.IsNullOrEmpty(orderBy))
+            if (ordering.IsEmpty)
                 return psql;
 
-            // else apply sort
-            var dbfield = orderBySystemField
-                ? GetOrderBySystemField(ref psql, orderBy)
-                : GetOrderByNonSystemField(ref psql, orderBy);
-
-            if (orderDirection == Direction.Ascending)
-                psql.OrderBy(dbfield);
-            else
-                psql.OrderByDescending(dbfield);
+            // else apply ordering
+            ApplyOrdering(ref psql, ordering);
 
             // no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
             // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
             // is empty for many nodes) - see: http://issues.umbraco.org/issue/U4-8831
 
-            dbfield = GetDatabaseFieldNameForOrderBy("umbracoNode", "id");
-            if (orderBySystemField == false || orderBy.InvariantEquals(dbfield) == false)
+            var dbfield = GetQuotedFieldName("umbracoNode", "id");
+            (dbfield, _) = SqlContext.Visit<NodeDto>(x => x.NodeId); // fixme?!
+            if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
-                // get alias, if aliased
-                var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-                var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-                if (match != null) dbfield = match.Groups[2].Value;
-
-                // add field
-                psql.OrderBy(dbfield);
+                psql.OrderBy(GetAliasedField(dbfield, sql)); // fixme why aliased?
             }
 
             // create prepared sql
             // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
-            psql = new Sql<ISqlContext>(psql.SqlContext, psql.SQL.ToSingleLine(), psql.Arguments);
+            psql = Sql(psql.SQL.ToSingleLine(), psql.Arguments);
             return psql;
         }
 
-        private string GetOrderBySystemField(ref Sql<ISqlContext> sql, string orderBy)
+        private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
-            // get the database field eg "[table].[column]"
-            var dbfield = GetDatabaseFieldNameForOrderBy(orderBy);
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-            // for SqlServer pagination to work, the "order by" field needs to be the alias eg if
-            // the select statement has "umbracoNode.text AS NodeDto__Text" then the order field needs
-            // to be "NodeDto__Text" and NOT "umbracoNode.text".
-            // not sure about SqlCE nor MySql, so better do it too. initially thought about patching
-            // NPoco but that would be expensive and not 100% possible, so better give NPoco proper
-            // queries to begin with.
-            // thought about maintaining a map of columns-to-aliases in the sql context but that would
-            // be expensive and most of the time, useless. so instead we parse the SQL looking for the
-            // alias. somewhat expensive too but nothing's free.
+            var orderBy = ordering.IsCustomField
+                ? ApplyCustomOrdering(ref sql, ordering)
+                : ApplySystemOrdering(ref sql, ordering);
 
-            // note: ContentTypeAlias is not properly managed because it's not part of the query to begin with!
+            // beware! NPoco paging code parses the query to isolate the ORDER BY fragment,
+            // using a regex that wants "([\w\.\[\]\(\)\s""`,]+)" - meaning that anything
+            // else in orderBy is going to break NPoco / not be detected
 
-            // get alias, if aliased
-            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
-            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-            if (match != null) dbfield = match.Groups[2].Value;
+            // beware! NPoco paging code (in PagingHelper) collapses everything [foo].[bar]
+            // to [bar] only, so we MUST use aliases, cannot use [table].[field]
 
-            return dbfield;
+            // beware! pre-2012 SqlServer is using a convoluted syntax for paging, which
+            // includes "SELECT ROW_NUMBER() OVER (ORDER BY ...) poco_rn FROM SELECT (...",
+            // so anything added here MUST also be part of the inner SELECT statement, ie
+            // the original statement, AND must be using the proper alias, as the inner SELECT
+            // will hide the original table.field names entirely
+
+            if (ordering.Direction == Direction.Ascending)
+                sql.OrderBy(orderBy);
+            else
+                sql.OrderByDescending(orderBy);
         }
 
-        private string GetOrderByNonSystemField(ref Sql<ISqlContext> sql, string orderBy)
+        protected virtual string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+        {
+            // id is invariant
+            if (ordering.OrderBy.InvariantEquals("id"))
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.NodeId), sql);
+
+            // sort order is invariant
+            if (ordering.OrderBy.InvariantEquals("sortOrder"))
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.SortOrder), sql);
+
+            // path is invariant
+            if (ordering.OrderBy.InvariantEquals("path"))
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Path), sql);
+
+            // note: 'owner' is the user who created the item as a whole,
+            //       we don't have an 'owner' per culture (should we?)
+            if (ordering.OrderBy.InvariantEquals("owner"))
+            {
+                var joins = Sql()
+                    .InnerJoin<UserDto>("ownerUser").On<NodeDto, UserDto>((node, user) => node.UserId == user.Id, aliasRight: "ownerUser");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "ownerUser") + " AS ordering "), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
+            }
+
+            // note: each version culture variation has a date too,
+            //       maybe we would want to use it instead?
+            if (ordering.OrderBy.InvariantEquals("versionDate") || ordering.OrderBy.InvariantEquals("updateDate"))
+                return GetAliasedField(SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate), sql);
+
+            // create date is invariant (we don't keep each culture's creation date)
+            if (ordering.OrderBy.InvariantEquals("createDate"))
+                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate), sql);
+
+            // name is variant
+            if (ordering.OrderBy.InvariantEquals("name"))
+            {
+                // no culture = can only work on the invariant name
+                // see notes in ApplyOrdering: the field MUST be aliased
+                if (ordering.Culture.IsNullOrWhiteSpace())
+                    return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
+
+                // culture = must work on variant name ?? invariant name
+                // insert proper join and return coalesced ordering field
+
+                var joins = Sql()
+                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlContext.Visit<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql + " AS ordering "), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
+            }
+
+            // previously, we'd accept anything and just sanitize it - not anymore
+            throw new NotSupportedException($"Ordering by {ordering.OrderBy} not supported.");
+        }
+
+        private string ApplyCustomOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
             // sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
             // from 'current' content version for the given order by field
             var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "intValue");
+            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "decimalValue");
             var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dateValue");
             var sortedString = "COALESCE(varcharValue,'')"; // assuming COALESCE is ok for all syntaxes
-            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "decimalValue");
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             var innerSql = Sql().Select($@"CASE
@@ -329,49 +380,60 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         END AS customPropVal,
                         cver.nodeId AS customPropNodeId")
                 .From<ContentVersionDto>("cver")
-                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.Id == right.Id, "cver", "opdata")
-                .InnerJoin<PropertyTypeDto>("optype").On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "opdata", "optype")
+                .InnerJoin<PropertyDataDto>("opdata")
+                    .On<ContentVersionDto, PropertyDataDto>((version, pdata) => version.Id == pdata.VersionId, "cver", "opdata")
+                .InnerJoin<PropertyTypeDto>("optype").On<PropertyDataDto, PropertyTypeDto>((pdata, ptype) => pdata.PropertyTypeId == ptype.Id, "opdata", "optype")
+                .LeftJoin<LanguageDto>().On<PropertyDataDto, LanguageDto>((pdata, lang) => pdata.LanguageId == lang.Id, "opdata")
                 .Where<ContentVersionDto>(x => x.Current, "cver") // always query on current (edit) values
-                .Where<PropertyTypeDto>(x => x.Alias == "", "optype");
+                .Where<PropertyTypeDto>(x => x.Alias == ordering.OrderBy, "optype")
+                .Where<PropertyDataDto, LanguageDto>((opdata, lang) => opdata.LanguageId == null || lang.IsoCode == ordering.Culture, "opdata");
 
-            // @0 is for x.Current ie 'true' = 1
-            // @1 is for x.Alias
-            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "@" + sql.Arguments.Length);
+            // merge arguments
+            var argsList = sql.Arguments.ToList();
+            var innerSqlString = ParameterHelper.ProcessParams(innerSql.SQL, innerSql.Arguments, argsList);
+
+            // create the outer join complete sql fragment
             var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
                 ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
 
-            // insert this just above the last WHERE
-            var pos = sql.SQL.InvariantIndexOf("WHERE");
-            if (pos < 0) throw new Exception("Oops, WHERE not found.");
-            var newSql = sql.SQL.Insert(pos, outerJoinTempTable);
+            // insert this just above the first WHERE
+            var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
 
-            var newArgs = sql.Arguments.ToList();
-            newArgs.Add(orderBy);
+            // see notes in ApplyOrdering: the field MUST be selected + aliased
+            newSql = InsertBefore(newSql, "FROM", ", customPropData.customPropVal AS ordering "); // trailing space is important!
 
-            // insert the SQL selected field, too, else ordering cannot work
-            if (sql.SQL.StartsWith("SELECT ") == false) throw new Exception("Oops: SELECT not found.");
-            newSql = newSql.Insert("SELECT ".Length, "customPropData.customPropVal, ");
-
-            sql = new Sql<ISqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
+            // create the new sql
+            sql = Sql(newSql, argsList.ToArray());
 
             // and order by the custom field
-            return "customPropData.customPropVal";
+            // this original code means that an ascending sort would first expose all NULL values, ie items without a value
+            return "ordering";
+
+            // note: adding an extra sorting criteria on
+            // "(CASE WHEN customPropData.customPropVal IS NULL THEN 1 ELSE 0 END")
+            // would ensure that items without a value always come last, both in ASC and DESC-ending sorts
         }
 
+        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity> query,
+            long pageIndex, int pageSize, out long totalRecords,
+            IQuery<TEntity> filter,
+            Ordering ordering);
+
+        // here, filter can be null and ordering cannot
         protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
             long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapDtos,
-            string orderBy, Direction orderDirection, bool orderBySystemField,
-            Sql<ISqlContext> filterSql = null) // fixme filter is different on v7?
+            Sql<ISqlContext> filter,
+            Ordering ordering)
         {
-            if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             // start with base query, and apply the supplied IQuery
-            if (query == null) query = AmbientScope.SqlContext.Query<TEntity>();
+            if (query == null) query = Query<TEntity>();
             var sql = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
 
             // sort and filter
-            sql = PrepareSqlForPage(sql, filterSql, orderBy, orderDirection, orderBySystemField);
+            sql = PreparePageSql(sql, filter, ordering);
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
@@ -498,36 +560,48 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return result;
         }
 
-        protected virtual string GetDatabaseFieldNameForOrderBy(string orderBy)
-        {
-            // translate the supplied "order by" field, which were originally defined for in-memory
-            // object sorting of ContentItemBasic instance, to the actual database field names.
+        protected string InsertBefore(Sql<ISqlContext> s, string atToken, string insert)
+            => InsertBefore(s.SQL, atToken, insert);
 
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "VERSIONDATE":
-                case "UPDATEDATE":
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.ContentVersion, "versionDate");
-                case "CREATEDATE":
-                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "createDate");
-                case "NAME":
-                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "text");
-                case "PUBLISHED":
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");
-                case "OWNER":
-                    //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
-                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "nodeUser");
-                case "PATH":
-                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "path");
-                case "SORTORDER":
-                    return GetDatabaseFieldNameForOrderBy("umbracoNode", "sortOrder");
-                default:
-                    //ensure invalid SQL cannot be submitted
-                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
-            }
+        protected string InsertBefore(string s, string atToken, string insert)
+        {
+            var pos = s.InvariantIndexOf(atToken);
+            if (pos < 0) throw new Exception($"Could not find token \"{atToken}\".");
+            return s.Insert(pos, insert);
         }
 
-        protected string GetDatabaseFieldNameForOrderBy(string tableName, string fieldName)
+        protected Sql<ISqlContext> InsertJoins(Sql<ISqlContext> sql, Sql<ISqlContext> joins)
+        {
+            var joinsSql = joins.SQL;
+            var args = sql.Arguments;
+
+            // merge args if any
+            if (joins.Arguments.Length > 0)
+            {
+                var argsList = args.ToList();
+                joinsSql = ParameterHelper.ProcessParams(joinsSql, joins.Arguments, argsList);
+                args = argsList.ToArray();
+            }
+
+            return Sql(InsertBefore(sql.SQL, "WHERE", joinsSql), args);
+        }
+
+        private string GetAliasedField(string field, Sql sql)
+        {
+            // get alias, if aliased
+            //
+            // regex looks for pattern "([\w+].[\w+]) AS ([\w+])" ie "(field) AS (alias)"
+            // and, if found & a group's field matches the field name, returns the alias
+            //
+            // so... if query contains "[umbracoNode].[nodeId] AS [umbracoNode__nodeId]"
+            // then GetAliased for "[umbracoNode].[nodeId]" returns "[umbracoNode__nodeId]"
+
+            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
+            var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(field));
+            return match == null ? field : match.Groups[2].Value;
+        }
+
+        protected string GetQuotedFieldName(string tableName, string fieldName)
         {
             return SqlContext.SqlSyntax.GetQuotedTableName(tableName) + "." + SqlContext.SqlSyntax.GetQuotedColumnName(fieldName);
         }
