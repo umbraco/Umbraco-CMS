@@ -19,6 +19,23 @@
                 </ul>
             </umb-box-content>
         </umb-box>
+        <umb-box data-element="node-info-redirects" style="display:none;" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
+            <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
+            <umb-box-content class="block-form">
+                <div style="position: relative;">
+                    <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
+                    <div ng-show="hasRedirects">
+                        <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
+                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                            <li ng-repeat="redirectUrl in redirectUrls">
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </umb-box-content>
+        </umb-box>
 
         <umb-box data-element="node-info-history">
             <umb-box-header title-key="general_history"></umb-box-header>
@@ -61,6 +78,7 @@
                             <div class="history-item__break">
                                 <umb-badge size="xs"
                                            color="{{item.logTypeColor}}">
+
                                     <!--{{ item.logType }}-->
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
