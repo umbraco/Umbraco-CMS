@@ -1616,6 +1616,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="chooseExtra">Choose extra</key>
         <key alias="chooseDefault">Choose default</key>
         <key alias="areAdded">are added</key>
+		<key alias="mediaMissing">Image missing for media item: %0%</key>
+		<key alias="mediaRecyleBin">Media item (id: %0%) is in recycle bin</key>
     </area>
 
     <area alias="contentTypeEditor">

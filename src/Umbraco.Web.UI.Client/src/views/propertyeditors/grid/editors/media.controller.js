@@ -1,7 +1,9 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, $rootScope, $timeout, userService) {
+    function ($scope, $rootScope, $timeout, userService, mediaResource, mediaHelper, localizationService) {
 
+		$scope.message = localizationService.localize('grid_clickToInsertImage', 'Click to insert image');
+	
         if (!$scope.model.config.startNodeId) {
             userService.getCurrentUser().then(function (userData) {
                 $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
@@ -43,30 +45,43 @@ angular.module("umbraco")
             };
         };
 
-        $scope.setUrl = function(){
+         $scope.setUrl = function () {
 
-            if($scope.control.value.image){
-                var url = $scope.control.value.image;
+            if ($scope.control.value && $scope.control.value.image) {
+                mediaResource.getById($scope.control.value.id).then(function (media) {
+					if(media.parentId!='-21'){
+                    var url = $scope.control.value.image = mediaHelper.resolveFile(media, false);
+                    if(url!=''){
+                        if ($scope.control.editor.config && $scope.control.editor.config.size) {
+                            url += "?width=" + $scope.control.editor.config.size.width;
+                            url += "&height=" + $scope.control.editor.config.size.height;
+                            url += "&animationprocessmode=first";
 
-                if($scope.control.editor.config && $scope.control.editor.config.size){
-                    url += "?width=" + $scope.control.editor.config.size.width;
-                    url += "&height=" + $scope.control.editor.config.size.height;
-                    url += "&animationprocessmode=first";
+                            if ($scope.control.value.focalPoint) {
+                                url += "&center=" + $scope.control.value.focalPoint.top + "," + $scope.control.value.focalPoint.left;
+                                url += "&mode=crop";
+                            }
+                        }
 
-                    if($scope.control.value.focalPoint){
-                        url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
-                        url += "&mode=crop";
+                        // set default size if no crop present (moved from the view)
+                        if (url.indexOf('?') == -1) {
+                            url += "?width=800&upscale=false&animationprocessmode=false"
+                        }
+						
+						
                     }
-                }
-
-                // set default size if no crop present (moved from the view)
-                if (url.indexOf('?') == -1)
-                {
-                    url += "?width=800&upscale=false&animationprocessmode=false"
-                }
-                $scope.url = url;
-            }
-        };
+					else{
+						$scope.message = localizationService.localize('grid_mediaMissing', [$scope.control.value.id]);
+					}
+					}
+					else{
+					
+					$scope.message = localizationService.localize('grid_mediaRecyleBin', [$scope.control.value.id]);
+					}
+                    $scope.url = url;
+                });
+            };
+		 };
 
         $timeout(function(){
             if($scope.control.$initializing){
@@ -75,4 +90,6 @@ angular.module("umbraco")
                 $scope.setUrl();
             }
         }, 200);
+		
+		$scope.setUrl();
 });
