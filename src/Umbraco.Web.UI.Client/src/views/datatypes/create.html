@@ -4,17 +4,17 @@
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">           
-            <li data-element="action-data-type">
-                <a href="" ng-click="createDataType()" umb-auto-focus>
-                    <i class="large icon-autofill"></i>
+            <li data-element="action-data-type" class="umb-action">
+                <a href="" class="umb-action-link" ng-click="createDataType()" umb-auto-focus>
+                    <i class="large icon icon-autofill"></i>
                     <span class="menu-label">
                         <localize key="create_newDataType">New data type</localize>
                     </span>
                 </a>
             </li>
-            <li data-element="action-folder">
-                <a href="" ng-click="showCreateFolder()">
-                    <i class="large icon-folder"></i>
+            <li data-element="action-folder" class="umb-action">
+                <a href="" class="umb-action-link" ng-click="showCreateFolder()">
+                    <i class="large icon icon-folder"></i>
                     <span class="menu-label">
                         <localize key="create_newFolder">New folder</localize>
                     </span>
