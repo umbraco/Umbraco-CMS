@@ -47,7 +47,7 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: '',
+                filter: ''
             };
 
             //preload selected item
@@ -82,17 +82,21 @@ angular.module("umbraco")
                     //media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
                     var altText = $scope.target.altText;
-                    mediaResource.getById(id)
-                        .then(function (node) {
-                            $scope.target = node;
-                            if (ensureWithinStartNode(node)) {
-                                selectImage(node);
-                                $scope.target.url = mediaHelper.resolveFile(node);
-                                $scope.target.altText = altText;
-                                $scope.openDetailsDialog();
-                            }
-                        },
-                        gotoStartNode);
+                    if (id) {
+                        mediaResource.getById(id)
+                            .then(function (node) {
+                                $scope.target = node;
+                                if (ensureWithinStartNode(node)) {
+                                    selectImage(node);
+                                    $scope.target.url = mediaHelper.resolveFile(node);
+                                    $scope.target.altText = altText;
+                                    $scope.openDetailsDialog();
+                                }
+                            },
+                                gotoStartNode);
+                    } else {
+                        gotoStartNode();
+                    }
                 }
             }
 
@@ -246,7 +250,8 @@ angular.module("umbraco")
                 // make sure that last opened node is on the same path as start node
                 var nodePath = node.path.split(",");
 
-                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
+                // also make sure the node is not trashed
+                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
                     $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
                     return true;
                 } else {
@@ -318,25 +323,25 @@ angular.module("umbraco")
                                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
                                 // set properties to match a media object
-                                if (mediaItem.metaData &&
-                                    mediaItem.metaData.umbracoWidth &&
-                                    mediaItem.metaData.umbracoHeight) {
-
-                                    mediaItem.properties = [
-                                        {
+                                mediaItem.properties = [];
+                                if (mediaItem.metaData) {
+                                    if (mediaItem.metaData.umbracoWidth && mediaItem.metaData.umbracoHeight) {
+                                        mediaItem.properties.push({
                                             alias: "umbracoWidth",
                                             value: mediaItem.metaData.umbracoWidth.Value
-                                        },
-                                        {
+                                        });
+                                        mediaItem.properties.push({
                                             alias: "umbracoHeight",
                                             value: mediaItem.metaData.umbracoHeight.Value
-                                        },
-                                        {
-                                            alias: 'umbracoFile',
+                                        });
+                                    }
+                                    if (mediaItem.metaData.umbracoFile) {
+                                        mediaItem.properties.push({
+                                            alias: "umbracoFile",
                                             editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
                                             value: mediaItem.metaData.umbracoFile.Value
-                                        }
-                                    ];
+                                        });
+                                    }
                                 }
                             });
                         // update images

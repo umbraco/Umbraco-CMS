@@ -15,13 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
         public override void Up()
         {
             var indexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             // drop the index if it exists
             if (indexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeUniqueID")))

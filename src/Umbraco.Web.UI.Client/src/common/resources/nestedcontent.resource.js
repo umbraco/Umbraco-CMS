@@ -7,6 +7,6 @@
                     $http.get(url),
                     'Failed to retrieve content types'
                 );
-            },
+            }
         };
     });

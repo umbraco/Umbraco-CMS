@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
-
+        private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,
@@ -89,7 +89,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
         {
-            using (var httpClient = new HttpClient())
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
@@ -97,7 +96,11 @@ namespace Umbraco.Core.Services
                 byte[] bytes;
                 try
                 {
-                    bytes = httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    if (_httpClient == null)
+                    {
+                        _httpClient = new HttpClient();
+                    }
+                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
                 }
                 catch (HttpRequestException ex)
                 {

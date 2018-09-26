@@ -8,7 +8,7 @@
             scope.search = "";
             scope.miniListViews = [];
             scope.breadcrumb = [];
-
+            
             var miniListViewsHistory = [];
             var goingForward = true;
             var skipAnimation = true;
@@ -60,9 +60,13 @@
                 
                 entityResource.getPagedChildren(miniListView.node.id, scope.entityType, miniListView.pagination)
                     .then(function (data) {
+
                         // update children
                         miniListView.children = data.items;
                         _.each(miniListView.children, function(c) {
+                            // child allowed by default
+                            c.allowed = true;
+ 
                             // convert legacy icon for node
                             if(c.icon) {
                                 c.icon = iconHelper.convertFromLegacyIcon(c.icon);
@@ -72,6 +76,17 @@
                                 c.hasChildren = c.metaData.HasChildren;
                                 if(scope.entityType === "Document") {
                                     c.published = c.metaData.IsPublished;
+                                }
+                            }
+                             
+                            // filter items if there is a filter and it's not advanced
+                            // ** ignores advanced filter at the moment
+                            if (scope.entityTypeFilter && !scope.entityTypeFilter.filterAdvanced) {
+                                var a = scope.entityTypeFilter.filter.toLowerCase().replace(/\s/g, '').split(',');
+                                var found = a.indexOf(c.metaData.ContentTypeAlias.toLowerCase()) >= 0;
+                                
+                                if (!scope.entityTypeFilter.filterExclude && !found || scope.entityTypeFilter.filterExclude && found) {
+                                    c.allowed = false;
                                 }
                             }
                         });
@@ -89,7 +104,7 @@
             };
 
             scope.selectNode = function(node) {
-                if(scope.onSelect) {
+                if (scope.onSelect && node.allowed) {
                     scope.onSelect({'node': node});
                 }
             };
@@ -202,7 +217,8 @@
                 entityType: "@",
                 startNodeId: "=",
                 onSelect: "&",
-                onClose: "&"
+                onClose: "&",
+                entityTypeFilter: "="
             },
             link: link
         };

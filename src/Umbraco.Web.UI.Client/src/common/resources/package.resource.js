@@ -57,7 +57,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.packageInstallResource
          *
          * @description
-         * Downloads a package file from our.umbraco.org to the website server.
+         * Downloads a package file from our.umbraco.com to the website server.
          * 
          * ##usage
          * <pre>

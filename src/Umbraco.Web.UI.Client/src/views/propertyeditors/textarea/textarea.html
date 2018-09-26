@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.PropertyEditors.textAreaController">
-	<textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="10" class="umb-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()"></textarea>
+	<textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()"></textarea>
 	<span class="help-inline" val-msg-for="textarea" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
 	<span class="help-inline" val-msg-for="textarea" val-toggle-msg="valServer"></span>
     <div class="help" ng-if="model.maxlength">

@@ -68,16 +68,17 @@ namespace Umbraco.Web.Trees
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
             {
-
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
+                var hasChildren = ShouldRenderChildrenOfContainer(e);
+                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.DocumentGuid,
                     parentId,
                     queryStrings,
-                    entity.HasChildren && (isContainer == false));
+                    hasChildren);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 
@@ -234,7 +235,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionRights>(ui.Text("actions", ActionRights.Instance.Alias), true);
             menu.Items.Add<ActionProtect>(ui.Text("actions", ActionProtect.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
 
-            menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true);
             menu.Items.Add<ActionSendToTranslate>(ui.Text("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);

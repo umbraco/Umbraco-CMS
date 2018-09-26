@@ -20,9 +20,10 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
-    
+
     public class CanvasDesignerController : UmbracoApiController
     {
+        private static WebClient _webClient;
 
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
@@ -35,10 +36,10 @@ namespace Umbraco.Web.Editors
             var googleWebFontAPIURL = string.Format("https://www.googleapis.com/webfonts/v1/webfonts?key={0}", APIKey);
 
             var response = "{}";
-            using (var client = new System.Net.WebClient())
-            {
-                response = client.DownloadString(new Uri(googleWebFontAPIURL));
-            }
+            if (_webClient == null)
+                _webClient = new WebClient();
+
+            response = _webClient.DownloadString(new Uri(googleWebFontAPIURL));
 
             var resp = Request.CreateResponse();
             resp.Content = new StringContent(response);
@@ -59,7 +60,7 @@ namespace Umbraco.Web.Editors
 
             // Prepare string parameter result
             string[] paramLines = paramBlock.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            IList<string> parameters = new List<string>();          
+            IList<string> parameters = new List<string>();
             foreach (var line in paramLines)
             {
                 if (!line.Contains("@import"))

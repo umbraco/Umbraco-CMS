@@ -23,6 +23,7 @@
         $scope.togglePassword = function () {
             var elem = $("form[name='loginForm'] input[name='password']");
             elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+            $(".password-text.show, .password-text.hide").toggle();
         }
 
         function init() {
@@ -180,7 +181,7 @@
                     modalClass: "login-overlay",
                     animation: "slide",
                     show: true,
-                    callback: callback,
+                    callback: callback
 
                 });
             }

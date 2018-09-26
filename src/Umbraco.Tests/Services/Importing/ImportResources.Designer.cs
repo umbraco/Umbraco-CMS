@@ -313,7 +313,7 @@ namespace Umbraco.Tests.Services.Importing {
         ///      &lt;name&gt;Template-Update&lt;/name&gt;
         ///      &lt;version&gt;0.1&lt;/version&gt;
         ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
-        ///      &lt;url&gt;http://our.umbraco.org/projects&lt;/url&gt;
+        ///      &lt;url&gt;https://our.umbraco.com/projects&lt;/url&gt;
         ///      &lt;requirements&gt;
         ///        &lt;major&gt;3&lt;/major&gt;
         ///        &lt;minor&gt;0&lt;/minor&gt;
@@ -339,7 +339,7 @@ namespace Umbraco.Tests.Services.Importing {
         ///      &lt;name&gt;Template-Update&lt;/name&gt;
         ///      &lt;version&gt;0.1&lt;/version&gt;
         ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
-        ///      &lt;url&gt;http://our.umbraco.org/projects&lt;/url&gt;
+        ///      &lt;url&gt;https://our.umbraco.com/projects&lt;/url&gt;
         ///      &lt;requirements&gt;
         ///        &lt;major&gt;3&lt;/major&gt;
         ///        &lt;minor&gt;0&lt;/minor&gt;
