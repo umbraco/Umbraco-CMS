@@ -81,7 +81,7 @@ namespace Umbraco.Web.Templates
                 }
             }
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnableStrippingUdiDataAttributes)
+            if (UmbracoConfig.For.UmbracoSettings().Content.StripUdiAttributes)
             {
                 text = StripUdiDataAttributes(text);
             }

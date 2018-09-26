@@ -76,7 +76,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         string LoginBackgroundImage { get; }
 
-        bool EnableStrippingUdiDataAttributes { get; }
+        bool StripUdiAttributes { get; }
         
     }
 }
