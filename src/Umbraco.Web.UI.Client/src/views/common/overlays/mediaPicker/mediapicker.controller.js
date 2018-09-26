@@ -88,7 +88,7 @@ angular.module("umbraco")
                                 $scope.target = node;
                                 if (ensureWithinStartNode(node)) {
                                     selectImage(node);
-                                    $scope.target.url = mediaHelper.resolveFile(node);
+                                    $scope.target.url = mediaHelper.getMediaPropertyValue({ mediaModel: media });
                                     $scope.target.altText = altText;
                                     $scope.openDetailsDialog();
                                 }
@@ -192,7 +192,7 @@ angular.module("umbraco")
                         if (image.image) {
                             $scope.target.url = image.image;
                         } else {
-                            $scope.target.url = mediaHelper.resolveFile(image);
+                            $scope.target.url = mediaHelper.getMediaPropertyValue({ mediaModel: media });
                         }
 
                         $scope.openDetailsDialog();
