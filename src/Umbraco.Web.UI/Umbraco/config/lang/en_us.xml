@@ -141,6 +141,7 @@
         <key alias="saveAndGenerateModels">Save and generate models</key>
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
+        <key alias="rollback">Rollback</key>
         <key alias="deleteTag">Delete tag</key>
         <key alias="confirmActionCancel">Cancel</key>
         <key alias="confirmActionConfirm">Confirm</key>
