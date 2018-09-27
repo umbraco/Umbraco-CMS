@@ -78,8 +78,8 @@ namespace Umbraco.Web.Trees
                     {
                         if (!documentEntity.Published)
                             node.SetNotPublishedStyle();
-                        if (documentEntity.Edited)
-                            node.SetHasUnpublishedVersionStyle();
+                        else if (documentEntity.Edited)
+                            node.SetHasPendingVersionStyle();
                     }
                     else
                     {
@@ -87,6 +87,8 @@ namespace Umbraco.Web.Trees
                         {
                             if (!documentEntity.PublishedCultures.Contains(culture))
                                 node.SetNotPublishedStyle();
+                            else if (documentEntity.EditedCultures.Contains(culture))
+                                node.SetHasPendingVersionStyle();
                         }
                     }
 
@@ -237,7 +239,7 @@ namespace Umbraco.Web.Trees
 
             AddActionNode<ActionSort>(item, menu, true);
 
-            AddActionNode<ActionRollback>(item, menu, convert: true);
+            AddActionNode<ActionRollback>(item, menu);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
             AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);

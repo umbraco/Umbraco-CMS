@@ -132,7 +132,7 @@ namespace umbraco.presentation.templateControls
 
             // set pageId to int.MinValue if no pageID was found,
             // e.g. if the macro was rendered on a custom (non-Umbraco) page
-            var pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
+            var pageId = UmbracoContext.Current.PageId == null ? int.MinValue : UmbracoContext.Current.PageId.Value;
 
             if ((string.IsNullOrEmpty(Language) == false && Text != "") || string.IsNullOrEmpty(FileLocation) == false) {
                 var tempMacro = new MacroModel();

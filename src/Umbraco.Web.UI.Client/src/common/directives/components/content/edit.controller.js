@@ -379,7 +379,34 @@
         };
 
         $scope.sendToPublish = function () {
-            return performSave({ saveMethod: contentResource.sendToPublish, action: "sendToPublish" });
+            clearNotifications($scope.content);
+            if (showSaveOrPublishDialog()) {
+                //before we launch the dialog we want to execute all client side validations first
+                if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
+
+                    var dialog = {
+                        parentScope: $scope,
+                        view: "views/content/overlays/sendtopublish.html",
+                        variants: $scope.content.variants, //set a model property for the dialog
+                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                        submitButtonLabel: "Send for approval",
+                        submit: function (model) {
+                            model.submitButtonState = "busy";
+                            clearNotifications($scope.content);
+                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                            console.log("saving need to happen here");
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+                    
+                    overlayService.open(dialog);
+                }
+            }
+            else {
+                return performSave({ saveMethod: contentResource.sendToPublish, action: "sendToPublish" });
+            }
         };
 
         $scope.saveAndPublish = function () {
@@ -419,7 +446,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function (oldModel) {
+                        close: function () {
                             overlayService.close();
                         }
                     };

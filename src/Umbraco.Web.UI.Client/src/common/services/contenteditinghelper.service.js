@@ -161,11 +161,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //publish action
                         return {
                             letter: ch,
-                            labelKey: args.content.variants && args.content.variants.length > 1 ? "buttons_saveAndPublishMany" : "buttons_saveAndPublish",
+                            labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "saveAndPublish"
+                            alias: "saveAndPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "H":
                         //send to publish
@@ -175,7 +176,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.sendToPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "sendToPublish"
+                            alias: "sendToPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "A":
                         //save
@@ -185,7 +187,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.save,
                             hotKey: "ctrl+s",
                             hotKeyWhenHidden: true,
-                            alias: "save"
+                            alias: "save",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "Z":
                         //unpublish

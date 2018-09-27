@@ -389,9 +389,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\Empty %28ForUseWithCustomViews%29.cshtml">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Breadcrumb.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
@@ -457,8 +454,6 @@
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="App_Browsers\w3cvalidator.browser" />
-    <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
