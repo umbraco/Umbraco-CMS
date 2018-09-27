@@ -198,7 +198,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.unPublish,
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
-                            alias: "unpublish"
+                            alias: "unpublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     default:
                         return null;
