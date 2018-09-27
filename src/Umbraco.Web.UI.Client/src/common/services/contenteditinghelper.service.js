@@ -253,9 +253,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-
-                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return variant.publishDate; }).length > 0;
-
+                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
                     if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
