@@ -57,9 +57,16 @@ angular.module("umbraco.directives")
 
 					};
 
-					var setDimensions = function(){
-						scope.dimensions.width = $image.width();
-						scope.dimensions.height = $image.height();
+                    var setDimensions = function () {
+
+                        if (scope.src.endsWith('.svg') && $image.width() === 0 && $image.height() === 0) {
+                            // deal with svg that have no size
+                            $image.width(200);
+                            $image.height(200);
+                        }
+
+                        scope.dimensions.width = $image.width();
+                        scope.dimensions.height = $image.height();
 
 						if(scope.center){
 							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
