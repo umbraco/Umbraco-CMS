@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
-
+        private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,
@@ -89,17 +89,18 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
         {
-            var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
-
-            using (var httpClient = new HttpClient())
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", packageRepo.RestApiUrl, packageId, umbracoVersion.ToString(3));
+                var url = string.Format("{0}/{1}?version={2}&includeHidden=true&asFile=true", Constants.PackageRepository.RestApiBaseUrl, packageId, umbracoVersion.ToString(3));
                 byte[] bytes;
                 try
                 {
-                    bytes = httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    if (_httpClient == null)
+                    {
+                        _httpClient = new HttpClient();
+                    }
+                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
                 }
                 catch (HttpRequestException ex)
                 {
@@ -124,7 +125,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                Audit(uow, AuditType.PackagerInstall, string.Format("Package {0} fetched from {1}", packageId, packageRepo.Id), userId, -1);
+                Audit(uow, AuditType.PackagerInstall, string.Format("Package {0} fetched from {1}", packageId, Constants.PackageRepository.DefaultRepositoryId), userId, -1);
                 return null;
             }
         }

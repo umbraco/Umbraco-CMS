@@ -1,0 +1,9 @@
+﻿<div class="umb-color-swatches">
+
+    <button class="umb-color-box umb-color-box--{{size}} btn-{{color.value}}" ng-repeat="color in colors" title="{{color.name}}" ng-class="{active:color.value === selectedColor}" ng-click="setColor(color.value)">
+        <div class="check_circle">
+            <i class="icon icon-check small"></i>
+        </div>
+    </button>
+
+</div>

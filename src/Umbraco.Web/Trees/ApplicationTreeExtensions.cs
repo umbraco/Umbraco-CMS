@@ -51,18 +51,24 @@ namespace Umbraco.Web.Trees
 
         internal static string GetRootNodeDisplayName(this TreeAttribute attribute, ILocalizedTextService textService)
         {
-            //if title is defined, return that
-            if (string.IsNullOrEmpty(attribute.Title) == false)
-                return attribute.Title;
+            var label = $"[{attribute.Alias}]";
 
-
-            //try to look up a tree header matching the tree alias
+            // try to look up a the localized tree header matching the tree alias
             var localizedLabel = textService.Localize("treeHeaders/" + attribute.Alias);
-            if (string.IsNullOrEmpty(localizedLabel) == false)
-                return localizedLabel;
+            
+            // if the localizedLabel returns [alias] then return the title attribute from the trees.config file, if it's defined
+            if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(attribute.Title) == false)
+                    label = attribute.Title;
+            }
+            else
+            {
+                // the localizedLabel translated into something that's not just [alias], so use the translation
+                label = localizedLabel;
+            }
 
-            //is returned to signal that a label was not found
-            return "[" + attribute.Alias + "]";
+            return label;
         }
 
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)

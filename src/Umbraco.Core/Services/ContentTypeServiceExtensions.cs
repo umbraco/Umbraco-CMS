@@ -109,6 +109,23 @@ namespace Umbraco.Core.Services
 
             return new ContentTypeAvailableCompositionsResults(ancestors, result);
         }
+        /// <summary>
+        /// Returns the list of content types the composition is used in
+        /// </summary>
+        /// <param name="allContentTypes"></param>
+        /// <param name="ctService"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        internal static IEnumerable<IContentTypeComposition> GetWhereCompositionIsUsedInContentTypes(this IContentTypeService ctService,
+            IContentTypeComposition source,
+            IContentTypeComposition[] allContentTypes)
+        { 
+
+            var sourceId = source != null ? source.Id : 0;
+
+            // find which content types are using this composition
+            return allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
+        }
 
         private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
         {

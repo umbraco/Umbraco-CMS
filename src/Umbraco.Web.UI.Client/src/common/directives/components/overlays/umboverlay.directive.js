@@ -59,7 +59,6 @@
 </pre>
 
 <h1>General Options</h1>
-Lorem ipsum dolor sit amet..
 <table>
     <thead>
         <tr>
@@ -74,7 +73,7 @@ Lorem ipsum dolor sit amet..
         <td>Set the title of the overlay.</td>
     </tr>
     <tr>
-        <td>model.subTitle</td>
+        <td>model.subtitle</td>
         <td>String</td>
         <td>Set the subtitle of the overlay.</td>
     </tr>
@@ -496,6 +495,7 @@ Opens an overlay to show a custom YSOD. </br>
                      var activeElementType = document.activeElement.tagName;
                      var clickableElements = ["A", "BUTTON"];
                      var submitOnEnter = document.activeElement.hasAttribute("overlay-submit-on-enter");
+                     var submitOnEnterValue = submitOnEnter ? document.activeElement.getAttribute("overlay-submit-on-enter") : "";
 
                      if(clickableElements.indexOf(activeElementType) === 0) {
                         document.activeElement.click();
@@ -503,7 +503,9 @@ Opens an overlay to show a custom YSOD. </br>
                      } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
 
 
-                     } else {
+                     } else if (submitOnEnter && submitOnEnterValue === "false") {
+                         // don't do anything
+                     }else {
                         scope.$apply(function () {
                            scope.submitForm(scope.model);
                         });

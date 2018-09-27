@@ -23,6 +23,7 @@ namespace Umbraco.Web.Install
 {
     internal class InstallHelper
     {
+        private static HttpClient _httpClient;
         private readonly UmbracoContext _umbContext;
         private InstallationType? _installationType;
 
@@ -191,17 +192,17 @@ namespace Umbraco.Web.Install
 
         internal IEnumerable<Package> GetStarterKits()
         {
-            var packages = new List<Package>();
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
 
+            var packages = new List<Package>();
             try
             {
-                var requestUri = string.Format("http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={0}",
-                    UmbracoVersion.Current);
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (var httpClient = new HttpClient())
-                using (var response = httpClient.SendAsync(request).Result)
                 {
+                    var response = _httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }

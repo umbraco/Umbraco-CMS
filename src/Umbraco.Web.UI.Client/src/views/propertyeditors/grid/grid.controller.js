@@ -1,6 +1,21 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
+    function (
+        $scope,
+        $http,
+        assetsService,
+        localizationService,
+        $rootScope,
+        dialogService,
+        gridService,
+        mediaResource,
+        imageHelper,
+        $timeout,
+        umbRequestHelper,
+        angularHelper,
+        $element,
+        eventsService
+    ) {
 
         // Grid status variables
         var placeHolder = "";
@@ -203,7 +218,7 @@ angular.module("umbraco")
                 // Fade in control when sorting stops
                 ui.item.context.style.opacity = "1";
 
-                ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
+                ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr("id"));
@@ -318,7 +333,7 @@ angular.module("umbraco")
             }
         }
 
-        $scope.addRow = function (section, layout) {
+        $scope.addRow = function (section, layout, isInit) {
 
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
@@ -330,10 +345,13 @@ angular.module("umbraco")
             if (row) {
                 section.rows.push(row);
             }
-
-            currentForm.$setDirty();
+            if (!isInit) {
+                currentForm.$setDirty();
+            }
 
             $scope.showRowConfigurations = false;
+
+            eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
         };
 
@@ -584,6 +602,8 @@ angular.module("umbraco")
 
             cell.controls.push(newControl);
 
+            eventsService.emit("grid.itemAdded", { scope: $scope, element: $element, cell: cell, item: newControl });
+
         };
 
         $scope.addTinyMce = function (cell) {
@@ -709,7 +729,7 @@ angular.module("umbraco")
             if (!section.rows || section.rows.length === 0) {
                 section.rows = [];
                 if(section.$allowedLayouts.length === 1){
-                    $scope.addRow(section, section.$allowedLayouts[0]);
+                    $scope.addRow(section, section.$allowedLayouts[0], true);
                 }
             } else {
                 _.forEach(section.rows, function (row, index) {
@@ -873,7 +893,12 @@ angular.module("umbraco")
             // *********************************************
             // Init grid
             // *********************************************
+
+            eventsService.emit("grid.initializing", { scope: $scope, element: $element });
+
             $scope.initContent();
+
+            eventsService.emit("grid.initialized", { scope: $scope, element: $element });
 
         });
 

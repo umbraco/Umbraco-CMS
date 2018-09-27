@@ -94,7 +94,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 else
                 {
                     result = StatusResultType.Error;
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, response.StatusDescription });
+                    message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, response.StatusDescription });
                 }
             }
             catch (Exception ex)
@@ -104,11 +104,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
                         ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                        : _textService.Localize("healthcheck/httpsCheckInvalidUrl", new [] { url, exception.Message });
+                        : _textService.Localize("healthcheck/healthCheckInvalidUrl", new [] { url, exception.Message });
                 }
                 else
                 {
-                    message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, ex.Message });
+                    message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, ex.Message });
                 }
 
                 result = StatusResultType.Error;

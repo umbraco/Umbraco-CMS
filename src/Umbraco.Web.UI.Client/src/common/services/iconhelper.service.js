@@ -166,7 +166,13 @@ function iconHelper($q, $timeout) {
                     var c = ".icon-";
 
                     for (var i = document.styleSheets.length - 1; i >= 0; i--) {
-                        var classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+                        var classes = null;
+                        try {
+                            classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+                        } catch (e) {
+                            console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
+                            continue;
+                        }
                         
                         if (classes !== null) {
                             for(var x=0;x<classes.length;x++) {

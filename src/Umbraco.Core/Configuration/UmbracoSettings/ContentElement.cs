@@ -112,7 +112,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get
             {
-                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
+                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""z-index:99999; position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
             }
         }
 
@@ -193,6 +193,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<string> LoginBackgroundImage
         {
             get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
+        }
+
+        [ConfigurationProperty("StripUdiAttributes")]
+        internal InnerTextConfigurationElement<bool> StripUdiAttributes
+        {
+            get { return GetOptionalTextElement("StripUdiAttributes", true); }
         }
 
         string IContentSection.NotificationEmailAddress
@@ -358,6 +364,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return LoginBackgroundImage; }
         }
-        
+
+        bool IContentSection.StripUdiAttributes
+        {
+            get { return StripUdiAttributes; }
+        }
     }
 }

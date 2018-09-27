@@ -290,6 +290,9 @@ namespace Umbraco.Core.Persistence.Repositories
             // Apply filter
             if (defaultFilter != null)
             {
+                //NOTE: It is assumed here that the `sql` already contains a WHERE clause, see UserRepository.GetFilteredSqlForPagedResults
+                // for an example of when it's not assumed there's already a WHERE clause
+
                 var filterResult = defaultFilter();
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql

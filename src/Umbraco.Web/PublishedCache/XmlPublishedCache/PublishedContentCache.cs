@@ -346,10 +346,88 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Getters
 
+        private readonly object _idkMapLocker = new object();
+        private IdkMap _idkMap;
+
+        // populate the idkmap by indexing the content cache
+        // assuming that the content cache cannot be corrupted
+        private void EnsureIdkMap(UmbracoContext umbracoContext)
+        {
+            lock (_idkMapLocker)
+            {
+                if (_idkMap != null) return;
+
+                _idkMap = ApplicationContext.Current.Services.IdkMap; // fixme inject
+
+                // give the map a fast mapper
+                _idkMap.SetMapper(UmbracoObjectTypes.Document, GetKeyForId, GetIdForKey);
+
+                // populate the map with what we know, so far
+                var xml = GetXml(umbracoContext, false);
+                var nav = xml.CreateNavigator();
+                var iter = nav.SelectDescendants(XPathNodeType.Element, true);
+                _idkMap.Populate(Enumerate(iter), UmbracoObjectTypes.Document);
+            }
+        }
+
+        private IEnumerable<(int id, Guid key)> Enumerate(XPathNodeIterator iter)
+        {
+            while (iter.MoveNext())
+            {
+                string idString = null;
+                string keyString = null;
+
+                if (iter.Current.MoveToFirstAttribute())
+                {
+                    do
+                    {
+                        switch (iter.Current.Name)
+                        {
+                            case "id":
+                                idString = iter.Current.Value;
+                                break;
+                            case "key":
+                                keyString = iter.Current.Value;
+                                break;
+                        }
+                    } while ((idString == null || keyString == null) && iter.Current.MoveToNextAttribute());
+
+                    iter.Current.MoveToParent();
+                }
+
+                if (idString == null || keyString == null) continue;
+
+                var id = int.Parse(idString);
+                var key = Guid.Parse(keyString);
+                yield return (id, key);
+            }
+        }
+
+        private Guid GetKeyForId(int id)
+        {
+            var xml = GetXml(UmbracoContext.Current, false);
+            var elt = xml.GetElementById(id.ToString(CultureInfo.InvariantCulture));
+            return elt == null ? default (Guid) : Guid.Parse(elt.GetAttribute("key"));
+        }
+
+        private int GetIdForKey(Guid key)
+        {
+            var xml = GetXml(UmbracoContext.Current, false);
+            var elt = xml.SelectSingleNode("//* [@key=$guid]", new XPathVariable("guid", key.ToString())) as XmlElement;
+            return elt == null ? default (int) : int.Parse(elt.GetAttribute("id"));
+        }
+
         public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
     	{
     		return ConvertToDocument(GetXml(umbracoContext, preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)), preview);
     	}
+
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, Guid nodeKey)
+        {
+            EnsureIdkMap(umbracoContext);
+            var mapAttempt = _idkMap.GetIdForKey(nodeKey, UmbracoObjectTypes.Document);
+            return mapAttempt ? GetById(umbracoContext, preview, mapAttempt.Result) : null;
+        }
 
         public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
         {

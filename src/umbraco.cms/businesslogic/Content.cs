@@ -149,7 +149,7 @@ namespace umbraco.cms.businesslogic
                         {
                             _contentType = new ContentType(contentTypeId);
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             return null;
                         }

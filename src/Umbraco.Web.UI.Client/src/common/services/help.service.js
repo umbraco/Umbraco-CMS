@@ -2,8 +2,8 @@ angular.module('umbraco.services')
 	.factory('helpService', function ($http, $q, umbRequestHelper) {
 		var helpTopics = {};
 
-		var defaultUrl = "http://our.umbraco.org/rss/help";
-		var tvUrl = "http://umbraco.tv/feeds/help";
+		var defaultUrl = "https://our.umbraco.com/rss/help";
+		var tvUrl = "https://umbraco.tv/feeds/help";
 
 		function getCachedHelp(url){
 			if(helpTopics[url]){

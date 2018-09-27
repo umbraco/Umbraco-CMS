@@ -93,7 +93,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                                 },
 	                            name: searchText,
 	                            metaData: {
-	                                listViewNode: child,
+	                                listViewNode: child
 	                            },
 	                            cssClass: "icon-search",
 	                            cssClasses: ["not-published"]

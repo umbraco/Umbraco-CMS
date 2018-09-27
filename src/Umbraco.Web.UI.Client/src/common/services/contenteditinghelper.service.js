@@ -243,10 +243,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
 
 
-                //if we are not creating, then we should add unpublish too,
+                // if we are not creating, then we should add unpublish too,
                 // so long as it's already published and if the user has access to publish
+                // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U")) {
+                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
@@ -259,7 +260,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // if save button is alread the default don't change it just update the label
                 if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
                     buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return;
+                    return buttons;
                 }
                 
                 if(buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {

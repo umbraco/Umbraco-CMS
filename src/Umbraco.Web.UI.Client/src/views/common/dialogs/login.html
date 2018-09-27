@@ -22,7 +22,7 @@
                             <localize key="user_newPassword">New password</localize>
                             <small style="font-size: 13px;">{{invitedUserPasswordModel.passwordPolicyText}}</small>
                         </label>
-                        <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" autocomplete="off" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
+                        <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>
@@ -30,7 +30,7 @@
 
                     <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
                         <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
-                        <input type="password" ng-model="invitedUserPasswordModel.confirmPassword" name="confirmPassword" class="-full-width-input" required val-compare="password" autocomplete="off" />
+                        <input type="password" ng-model="invitedUserPasswordModel.confirmPassword" name="confirmPassword" class="-full-width-input" required val-compare="password" />
                         <span class="help-inline" val-msg-for="confirmPassword" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                         <span class="help-inline" val-msg-for="confirmPassword" val-toggle-msg="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
                     </div>
@@ -149,8 +149,12 @@
 
                         <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
                             <label><localize key="general_password">Password</localize></label>
+                            <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
                             <div class="password-toggle">
-                                <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" /><a ng-click="togglePassword()">Toggle</a>
+                                <a href="#" prevent-default ng-click="togglePassword()">
+                                    <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
+                                    <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
+                                </a>
                             </div>
                         </div>
 
@@ -177,7 +181,7 @@
                     <form method="POST" name="requestPasswordResetForm" ng-submit="requestPasswordResetSubmit(email)">
                         <div class="control-group" ng-class="{error: requestPasswordResetForm.email.$invalid}">
                             <label><localize key="general_email">Email</localize></label>
-                            <input type="email" ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
+                            <input type="email" val-email ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
                         </div>
 
                         <div class="control-group" ng-show="requestPasswordResetForm.$invalid">

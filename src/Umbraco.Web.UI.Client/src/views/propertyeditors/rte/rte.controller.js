@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
 
         $scope.isLoading = true;
 
@@ -185,6 +185,12 @@ angular.module("umbraco")
                                     //cannot parse, we'll just leave it
                                 }
                             }
+                            if (val === "true") {
+                                tinyMceConfig.customConfig[i] = true;
+                            }
+                            if (val === "false") {
+                                tinyMceConfig.customConfig[i] = false;
+                            }
                         }
                     }
 
@@ -260,18 +266,19 @@ angular.module("umbraco")
 
 
                     editor.on('ObjectResized', function (e) {
-                        var qs = "?width=" + e.width + "&height=" + e.height;
+                        var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
                         var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
 
                         syncContent(editor);
                     });
-
+					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
                         $scope.linkPickerOverlay = {
                             view: "linkpicker",
                             currentTarget: currentTarget,
+							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
                             show: true,
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
@@ -359,7 +366,8 @@ angular.module("umbraco")
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
                     //update the display val again if it has changed from the server;
-                    tinyMceEditor.setContent(newVal, { format: 'raw' });
+                    //uses an empty string in the editor when the value is null
+                    tinyMceEditor.setContent(newVal || "", { format: 'raw' });
                     //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
                     // is required for our plugins listening to this event to execute
                     tinyMceEditor.fire('LoadContent', null);
@@ -369,7 +377,9 @@ angular.module("umbraco")
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                    $scope.model.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
+                    if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+                        $scope.model.value = tinyMceEditor.getContent();
+                    }
                 });
 
                 //when the element is disposed we need to unsubscribe!

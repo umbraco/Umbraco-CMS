@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+
     [DataContract(Name = "auditLog", Namespace = "")]
     public class AuditLog
     {

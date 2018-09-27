@@ -66,8 +66,12 @@ namespace umbraco
 
                 if (publishedContent == null)
                 {
-                    var recursiveVal = GetRecursiveValueLegacy(elements);
-                    _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+                    if (recursive)
+                    {
+                        var recursiveVal = GetRecursiveValueLegacy(elements);
+                        _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+                    }
+                   
                 }
 
                 //check for published content and get its value using that

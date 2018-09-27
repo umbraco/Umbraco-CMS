@@ -393,12 +393,12 @@ namespace Umbraco.Web.Mvc
                 return GetWebFormsHandler();
             }
 
-            //here we need to check if there is no hijacked route and no template assigned, if this is the case
-            //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            //we also check if we're allowed to render even though there's no template (json render in headless).
-            if (publishedContentRequest.HasTemplate == false &&
-                routeDef.HasHijackedRoute == false &&
-                FeaturesResolver.Current.Features.Enabled.RenderNoTemplate == false)
+            //Here we need to check if there is no hijacked route and no template assigned,
+            //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
+            //We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
+            //for example for json rendering in headless.
+            if ((publishedContentRequest.HasTemplate == false && FeaturesResolver.Current.Features.Disabled.DisableTemplates == false)
+                && routeDef.HasHijackedRoute == false)
             {
                 publishedContentRequest.UpdateOnMissingTemplate(); // will go 404
 

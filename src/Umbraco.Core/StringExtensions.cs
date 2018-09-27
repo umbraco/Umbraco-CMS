@@ -8,14 +8,12 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Xml;
-using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 using System.Web.Security;
-using Umbraco.Core.Strings;
+using Newtonsoft.Json;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -121,8 +119,8 @@ namespace Umbraco.Core
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.
-                    return resolvedUrlResult.Success 
-                        ? resolvedUrlResult 
+                    return resolvedUrlResult.Success
+                        ? resolvedUrlResult
                         : Attempt.Succeed(input);
                 }
             }
@@ -144,7 +142,7 @@ namespace Umbraco.Core
         }
 
         internal static readonly Regex Whitespace = new Regex(@"\s+", RegexOptions.Compiled);
-        internal static readonly string[] JsonEmpties = new [] { "[]", "{}" };
+        internal static readonly string[] JsonEmpties = new[] { "[]", "{}" };
         internal static bool DetectIsEmptyJson(this string input)
         {
             return JsonEmpties.Contains(Whitespace.Replace(input, string.Empty));
@@ -166,7 +164,7 @@ namespace Umbraco.Core
                 var obj = JsonConvert.DeserializeObject(input);
                 return obj;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -472,13 +470,13 @@ namespace Umbraco.Core
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
         }
 
-        /// <summary>Is null or white space.</summary>
-        /// <param name="str">The str.</param>
-        /// <returns>The is null or white space.</returns>
-        public static bool IsNullOrWhiteSpace(this string str)
-        {
-            return (str == null) || (str.Trim().Length == 0);
-        }
+        /// <summary>Indicates whether a specified string is null, empty, or
+        /// consists only of white-space characters.</summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>Returns <see langword="true"/> if the value is null,
+        /// empty, or consists only of white-space characters, otherwise
+        /// returns <see langword="false"/>.</returns>
+        public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
 
         public static string IfNullOrWhiteSpace(this string str, string defaultValue)
         {
@@ -624,7 +622,7 @@ namespace Umbraco.Core
                 byte[] decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 return null;
             }
@@ -1436,14 +1434,25 @@ namespace Umbraco.Core
             return ReplaceMany(text, regexSpecialCharacters);
         }
 
+        /// <summary>
+        /// Checks whether a string "haystack" contains within it any of the strings in the "needles" collection and returns true if it does or false if it doesn't
+        /// </summary>
+        /// <param name="haystack">The string to check</param>
+        /// <param name="needles">The collection of strings to check are contained within the first string</param>
+        /// <param name="comparison">The type of comparision to perform - defaults to <see cref="StringComparison.CurrentCulture"/></param>
+        /// <returns>True if any of the needles are contained with haystack; otherwise returns false</returns>
+        /// Added fix to ensure the comparison is used - see http://issues.umbraco.org/issue/U4-11313
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
         {
-            if (haystack == null) throw new ArgumentNullException("haystack");
-            if (string.IsNullOrEmpty(haystack) == false || needles.Any())
+            if (haystack == null)
+                throw new ArgumentNullException("haystack");
+
+            if (string.IsNullOrEmpty(haystack) || needles == null || !needles.Any())
             {
-                return needles.Any(value => haystack.IndexOf(value) >= 0);
+                return false;
             }
-            return false;
+
+            return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
         }
 
         public static bool CsvContains(this string csv, string value)
@@ -1564,6 +1573,30 @@ namespace Umbraco.Core
             byte temp = guid[left];
             guid[left] = guid[right];
             guid[right] = temp;
+        }
+        
+        /// <summary>
+        /// Converts a file name to a friendly name for a content item
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string ToFriendlyName(this string fileName)
+        {
+            // strip the file extension
+            fileName = fileName.StripFileExtension();
+
+            // underscores and dashes to spaces
+            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+
+            // any other conversions ?
+
+            // Pascalcase (to be done last)
+            fileName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(fileName);
+
+            // Replace multiple consecutive spaces with a single space
+            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+
+            return fileName;
         }
     }
 }
