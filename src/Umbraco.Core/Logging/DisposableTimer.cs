@@ -37,10 +37,10 @@ namespace Umbraco.Core.Logging
                 switch (_level)
                 {
                     case LogLevel.Debug:
-                        logger.Debug(loggerType, "{StartMessage} [Timing {TimingId}]", _timingId, startMessage);
+                        logger.Debug(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     case LogLevel.Information:
-                        logger.Info(loggerType, "{StartMessage} [Timing {TimingId}]", _timingId, startMessage);
+                        logger.Info(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(level));
@@ -84,15 +84,15 @@ namespace Umbraco.Core.Logging
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
+                    _logger.Error(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                 }
                 else switch (_level)
                 {
                     case LogLevel.Debug:
-                        _logger.Debug(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Debug(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     case LogLevel.Information:
-                        _logger.Info(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Info(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     // filtered in the ctor
                     //default:
