@@ -269,7 +269,7 @@ namespace Umbraco.Core.Models
             if (_publishInfos == null)
                 _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _publishInfos[culture] = (name, date);
+            _publishInfos[culture.ToLowerInvariant()] = (name, date);
         }
 
         private void ClearPublishInfos()
@@ -294,7 +294,7 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
             if (_editedCultures == null)
                 _editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _editedCultures.Add(culture);
+            _editedCultures.Add(culture.ToLowerInvariant());
         }
 
         // sets all publish edited

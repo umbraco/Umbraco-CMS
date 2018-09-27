@@ -80,13 +80,13 @@ namespace Umbraco.Core.Models
         bool IsCultureAvailable(string culture);
 
         /// <summary>
-        /// Gets the date a culture was created.
+        /// Gets the date a culture was updated.
         /// </summary>
         /// <remarks>
         /// <para>When <paramref name="culture" /> is <c>null</c>, returns <c>null</c>.</para>
         /// <para>If the specified culture is not available, returns <c>null</c>.</para>
         /// </remarks>
-        DateTime? GetCultureDate(string culture);
+        DateTime? GetUpdateDate(string culture);
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
