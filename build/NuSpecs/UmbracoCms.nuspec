@@ -40,7 +40,6 @@
 
         <!-- these files are copied by install.ps1 -->
         <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
-        <file src="$BuildTmp$\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
         <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
         <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
 
