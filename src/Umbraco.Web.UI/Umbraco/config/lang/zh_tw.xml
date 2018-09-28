@@ -507,7 +507,7 @@
     <key alias="current">目前</key>
     <key alias="embed">內嵌</key>
     <key alias="selected">選取的</key>
-     <key alias="includeFromsubFolders">Include from subfolders</key>
+     <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="colors">
     <key alias="black">黑</key>

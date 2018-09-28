@@ -695,7 +695,7 @@
     <key alias="selected">выбрано</key>
     <key alias="embed">Встроить</key>
     <key alias="retrieve">Получить</key>
-    <key alias="includeFromsubFolders">Include from subfolders</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Цвет фона</key>
