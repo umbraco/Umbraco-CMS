@@ -357,7 +357,7 @@
     <key alias="yes">예</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
-    <key alias="includeFromsubFolders">Include from subfolders</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">배경색</key>

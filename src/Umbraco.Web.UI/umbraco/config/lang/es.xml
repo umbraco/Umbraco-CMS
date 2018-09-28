@@ -644,7 +644,7 @@
         <key alias="current">actual</key>
         <key alias="embed">Insertar</key>
         <key alias="selected">selecionado</key>
-        <key alias="includeFromsubFolders">Include from subfolders</key>
+        <key alias="includeFromsubFolders">Include subfolders in search</key>
     </area>
     <area alias="colors">
         <key alias="black">Negro</key>

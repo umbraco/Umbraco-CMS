@@ -495,7 +495,7 @@
     <key alias="current">現在</key>
     <key alias="move">移動</key>
     <key alias="embed">埋め込み</key>
-    <key alias="includeFromsubFolders">Include from subfolders</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
 
   <area alias="colors">
