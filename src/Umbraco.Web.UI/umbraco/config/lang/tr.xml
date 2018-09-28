@@ -428,6 +428,7 @@
     <key alias="yes">Evet</key>
     <key alias="folder">Klasör</key>
     <key alias="searchResults">Arama Sonuçları</key>
+    <key alias="includeFromsubFolders">Include from subfolders</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Arka plan rengi</key>

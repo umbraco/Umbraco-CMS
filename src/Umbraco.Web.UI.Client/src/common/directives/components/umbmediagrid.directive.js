@@ -125,6 +125,14 @@ Use this directive to generate a thumbnail grid of media items.
                         i--;
                     }
 
+                    if (scope.includeSubFolders !== 'true') {
+                        if (item.parentId !== parseInt(scope.currentFolderId)) {
+                            scope.items.splice(i, 1);
+                            i--;
+                        }
+                    }
+                    
+
                 }
 
                 if (scope.items.length > 0) {
@@ -307,7 +315,9 @@ Use this directive to generate a thumbnail grid of media items.
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
                 itemMinHeight: "@",
-                onlyImages: "@"
+                onlyImages: "@",
+                includeSubFolders: "@",
+                currentFolderId: "@"
             },
             link: link
         };

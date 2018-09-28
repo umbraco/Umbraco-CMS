@@ -553,6 +553,7 @@
     <key alias="current">当前</key>
     <key alias="embed">嵌入</key>
     <key alias="selected">已选择</key>
+    <key alias="includeFromsubFolders">Include from subfolders</key>
   </area>
 
   <area alias="colors">

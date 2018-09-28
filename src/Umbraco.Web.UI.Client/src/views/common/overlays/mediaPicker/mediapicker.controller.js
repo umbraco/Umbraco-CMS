@@ -318,7 +318,10 @@ angular.module("umbraco")
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items,
-                            function(mediaItem) {
+                            function (mediaItem) {
+                                if (mediaItem.parentId === $scope.currentFolder.id) {
+                                    mediaItem.currentFolder = true;
+                                }
                                 // set thumbnail and src
                                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);

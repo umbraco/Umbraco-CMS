@@ -676,6 +676,7 @@
     <key alias="embed">Intégrer</key>
     <key alias="retrieve">Retrouver</key>
     <key alias="selected">sélectionné</key>
+    <key alias="includeFromsubFolders">Include from subfolders</key>
   </area>
 
   <area alias="colors">

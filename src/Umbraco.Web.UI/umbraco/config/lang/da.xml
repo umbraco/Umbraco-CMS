@@ -645,6 +645,7 @@
     <key alias="embed">Indlejring</key>
     <key alias="retrieve">Hent</key>
     <key alias="selected">valgt</key>
+    <key alias="includeFromsubFolders">Medtag fra undermapper</key>
   </area>
 
   <area alias="colors">
