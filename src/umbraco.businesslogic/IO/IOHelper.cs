@@ -66,7 +66,6 @@ namespace umbraco.IO
 
         }
 
-
         /// <summary>
         /// Validates if the current filepath matches a directory where the user is allowed to edit a file
         /// </summary>
