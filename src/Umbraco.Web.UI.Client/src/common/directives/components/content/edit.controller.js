@@ -335,9 +335,31 @@
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "content_unPublish",
                     submit: function (model) {
+
                         model.submitButtonState = "busy";
-                        clearNotifications($scope.content);
-                        // TODO: do some unpublishing here
+                        
+                        var selectedVariants = _.filter(model.variants, function(variant) { return variant.unpublish; });
+                        var culturesForUnpublishing = _.map(selectedVariants, function(variant) { return variant.language.culture; });
+
+                        /* TODO: the end point need to handle an array of cultures
+                        contentResource.unPublish($scope.content.id, culture)
+                            .then(function (data) {
+                                formHelper.resetForm({ scope: $scope });
+                                contentEditingHelper.handleSuccessfulSave({
+                                    scope: $scope,
+                                    savedContent: data,
+                                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                                });
+                                init($scope.content);
+                                syncTreeNode($scope.content, data.path);
+                                $scope.page.buttonGroupState = "success";
+                                eventsService.emit("content.unpublished", { content: $scope.content });
+                                overlayService.close();
+                            }, function (err) {
+                                $scope.page.buttonGroupState = 'error';
+                            });
+                        */
+                        
                     },
                     close: function () {
                         overlayService.close();
