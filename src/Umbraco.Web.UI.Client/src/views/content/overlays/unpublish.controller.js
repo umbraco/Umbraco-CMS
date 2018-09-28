@@ -4,7 +4,7 @@
     function UnpublishController($scope, localizationService) {
 
         var vm = this;
-        vm.loading = true;
+        var autoSelectedVariants = [];
 
         vm.changeSelection = changeSelection;
         vm.publishedVariantFilter = publishedVariantFilter;
@@ -21,15 +21,71 @@
                 });
             }
 
-            vm.loading = false;
+            if (vm.variants.length !== 0) {
+                //now sort it so that the current one is at the top
+                vm.variants = _.sortBy(vm.variants, function (v) {
+                    return v.active ? 0 : 1;
+                });
+
+                var active = _.find(vm.variants, function (v) {
+                    return v.active;
+                });
+
+                if (active) {
+                    //ensure that the current one is selected
+                    active.unpublish = true;
+                }
+
+                // autoselect other variants if needed
+                changeSelection(active);
+            }
             
         }
 
-        function changeSelection() {
+        function changeSelection(selectedVariant) {
+
+            // disable submit button if nothing is selected
             var firstSelected = _.find(vm.variants, function (v) {
                 return v.unpublish;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
+
+            // if a mandatory variant is selected we want to selet all other variants 
+            // and disable selection for the others
+            if(selectedVariant.unpublish && selectedVariant.language.isMandatory) {
+
+                angular.forEach(vm.variants, function(variant){
+                    if(!variant.unpublish && publishedVariantFilter(variant)) {
+                        // keep track of the variants we automaically select
+                        // so we can remove the selection again
+                        autoSelectedVariants.push(variant.language.culture);
+                        variant.unpublish = true;
+                    }
+                    variant.disabled = true;
+                });
+
+                // make sure the mandatory isn't disabled so we can deselect again
+                selectedVariant.disabled = false;
+
+            }
+
+            // if a mandatory variant is deselected we want to deselet all the variants
+            // that was automatically selected so it goes back to the state before the mandatory language was selected.
+            // We also want to enable all checkboxes again
+            if(!selectedVariant.unpublish && selectedVariant.language.isMandatory) {
+                
+                angular.forEach(vm.variants, function(variant){
+
+                    // check if variant was auto selected, then deselect
+                    if(_.contains(autoSelectedVariants, variant.language.culture)) {
+                        variant.unpublish = false;
+                    };
+
+                    variant.disabled = false;
+                });
+                autoSelectedVariants = [];
+            }
+
         }
 
         function publishedVariantFilter(variant) {
@@ -46,10 +102,11 @@
             return (variant.state !== "Published" && variant.state !== "PublishedPendingChanges");
         }
 
-        //when this dialog is closed, reset all 'unpublish' flags
+        //when this dialog is closed, remove all unpublish and disabled flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
                 vm.variants[i].unpublish = false;
+                vm.variants[i].disabled = false;
             }
         });
 

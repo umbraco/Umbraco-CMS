@@ -4,11 +4,7 @@
         <p><localize key="content_languagesToUnpublish"></localize></p>
     </div>
 
-    <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
-        <umb-load-indicator></umb-load-indicator>
-    </div>
-
-    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+    <div class="umb-list umb-list--condensed">
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
             <ng-form name="unpublishVariantSelectorForm">
@@ -18,6 +14,7 @@
                             type="checkbox"
                             ng-model="variant.unpublish"
                             ng-change="vm.changeSelection(variant)"
+                            ng-disabled="variant.disabled"
                             style="margin-right: 8px;"
                             val-server-field="{{variant.htmlId}}" />
                     <div>
