@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Media.Exif
 {
@@ -12,27 +13,22 @@ namespace Umbraco.Core.Media.Exif
         {
             fileStream.Position = 0;
 
-            var document = new XDocument();
+            var document = XDocument.Load(fileStream); //if it will throw an exception ugly try catch in MediaFileSystem will catch it
 
-            try
-            {
-                document = XDocument.Load(fileStream);
-            }
-            catch (Exception ex)
-            {
-                return;
-            }
+            var width = document.Root?.Attributes().Where(x => x.Name == "width").Select(x => x.Value).FirstOrDefault() ?? UmbracoConfig.For.UmbracoSettings().Content.SvgDefaultSize;
+            var height = document.Root?.Attributes().Where(x => x.Name == "height").Select(x => x.Value).FirstOrDefault() ?? UmbracoConfig.For.UmbracoSettings().Content.SvgDefaultSize;
 
-            var width = document.Root.Attributes().Where(x => x.Name == "width").Select(x => x.Value).FirstOrDefault();
-            var height = document.Root.Attributes().Where(x => x.Name == "height").Select(x => x.Value).FirstOrDefault();
+            Properties.Add(new ExifSInt(ExifTag.PixelYDimension, int.Parse(height)));
+            Properties.Add(new ExifSInt(ExifTag.PixelXDimension, int.Parse(width)));
 
-            Properties[ExifTag.PixelYDimension].Value = height;
-            Properties[ExifTag.PixelXDimension].Value = width;
+            Format = ImageFileFormat.SVG;
         }
+
+
         public override void Save(Stream stream)
         {
-            throw new NotImplementedException();
         }
+
 
         public override Image ToImage()
         {

@@ -13,20 +13,19 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Media.Exif;
-using Umbraco.Core.Media.TypeDetector;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
 {
-	/// <summary>
-	/// A custom file system provider for media
-	/// </summary>
-	[FileSystemProvider("media")]
-	public class MediaFileSystem : FileSystemWrapper
-	{
-	    private readonly IContentSection _contentConfig;
+    /// <summary>
+    /// A custom file system provider for media
+    /// </summary>
+    [FileSystemProvider("media")]
+    public class MediaFileSystem : FileSystemWrapper
+    {
+        private readonly IContentSection _contentConfig;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
-	    private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
         private readonly object _folderCounterLock = new object();
         private long _folderCounter;
@@ -40,8 +39,8 @@ namespace Umbraco.Core.IO
         };
 
         public MediaFileSystem(IFileSystem wrapped)
-			: this(wrapped, UmbracoConfig.For.UmbracoSettings().Content, ApplicationContext.Current.ProfilingLogger.Logger)
-		{ }
+            : this(wrapped, UmbracoConfig.For.UmbracoSettings().Content, ApplicationContext.Current.ProfilingLogger.Logger)
+        { }
 
         public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig, ILogger logger)
             : base(wrapped)
@@ -61,13 +60,13 @@ namespace Umbraco.Core.IO
 
         [Obsolete("This low-level method should NOT exist.")]
         public string GetRelativePath(int propertyId, string fileName)
-		{
+        {
             var sep = _contentConfig.UploadAllowDirectories
-				? Path.DirectorySeparatorChar
-				: '-';
+                ? Path.DirectorySeparatorChar
+                : '-';
 
-			return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
-		}
+            return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
+        }
 
         [Obsolete("This low-level method should NOT exist.", false)]
         public string GetRelativePath(string subfolder, string fileName)
@@ -265,7 +264,7 @@ namespace Umbraco.Core.IO
             var filename = Path.GetFileName(sourcepath);
             var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             this.CopyFile(sourcepath, filepath);
-            
+
             return filepath;
         }
 
@@ -322,7 +321,7 @@ namespace Umbraco.Core.IO
         /// <param name="filepath"></param>
         /// <param name="filestream"></param>
         private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream)
-        {            
+        {
             // will use filepath for extension, and filestream for length
             _uploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
         }
@@ -358,18 +357,19 @@ namespace Umbraco.Core.IO
             {
                 var jpgInfo = ImageFile.FromStream(stream);
 
-                if (jpgInfo.Format != ImageFileFormat.Unknown && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension) && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
+                if (jpgInfo.Format != ImageFileFormat.Unknown
+                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
+                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
                 {
                     var height = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelYDimension].Value);
                     var width = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelXDimension].Value);
-
                     if (height > 0 && width > 0)
                     {
                         return new Size(width, height);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //We will just swallow, just means we can't read exif data, we don't want to log an error either
             }
@@ -377,6 +377,7 @@ namespace Umbraco.Core.IO
             //we have no choice but to try to read in via GDI
             using (var image = Image.FromStream(stream))
             {
+
                 var fileWidth = image.Width;
                 var fileHeight = image.Height;
                 return new Size(fileWidth, fileHeight);
@@ -429,8 +430,8 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    public void DeleteMediaFiles(IEnumerable<string> files)
-	    {
+        public void DeleteMediaFiles(IEnumerable<string> files)
+        {
             files = files.Distinct();
 
             Parallel.ForEach(files, file =>

@@ -737,15 +737,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        try
-                        {
-                            f.SetValue(Constants.Conventions.Media.File, fileName, fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            var x = ex;
-                            throw;
-                        }
+                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
                     var saveResult = mediaService.WithResult().Save(f, Security.CurrentUser.Id);
