@@ -56,6 +56,8 @@ namespace Umbraco.Web.Editors
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
 
+        public object Domains { get; private set; }
+
         public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
         {
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -1144,6 +1146,18 @@ namespace Umbraco.Web.Editors
 
                 return content;
             }
+        }
+
+        public ContentDomainsAndCulture GetCultureAndDomains(int id)
+        {
+            var nodeDomains = Services.DomainService.GetAssignedDomains(id, true).ToArray();
+            var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
+            var domains = nodeDomains.Where(d => !d.IsWildcard).Select(d => new DomainDisplay(d.DomainName, d.LanguageId.GetValueOrDefault(0)));
+            return new ContentDomainsAndCulture
+            {
+                Domains = domains,
+                Language = wildcard == null || !wildcard.LanguageId.HasValue ? "undefined" : wildcard.LanguageId.ToString()
+            };
         }
 
         [HttpPost]

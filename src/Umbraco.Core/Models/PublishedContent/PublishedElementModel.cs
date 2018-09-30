@@ -6,7 +6,7 @@
     /// </summary>
     /// <remarks>Every strongly-typed property set class should inherit from <c>PublishedElementModel</c>
     /// (or inherit from a class that inherits from... etc.) so they are picked by the factory.</remarks>
-    public class PublishedElementModel : PublishedElementWrapped
+    public abstract class PublishedElementModel : PublishedElementWrapped
     {
         /// <inheritdoc />
         /// <summary>

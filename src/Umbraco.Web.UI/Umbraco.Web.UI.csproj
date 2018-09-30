@@ -334,7 +334,6 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
-    <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

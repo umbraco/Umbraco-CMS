@@ -164,6 +164,7 @@
     <Compile Include="Editors\LogViewerController.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
+    <Compile Include="Models\ContentEditing\ContentDomainsAndCulture.cs" />
     <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
     <Compile Include="Trees\LogViewerTreeController.cs" />
     <Compile Include="Models\Mapping\ContentSavedStateResolver.cs" />
