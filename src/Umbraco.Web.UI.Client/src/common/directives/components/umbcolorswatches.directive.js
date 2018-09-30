@@ -1,5 +1,4 @@
-﻿
-/**
+﻿/**
 @ngdoc directive
 @name umbraco.directives.directive:umbColorSwatches
 @restrict E
@@ -15,9 +14,10 @@ Use this directive to generate color swatches to pick from.
     </umb-color-swatches>
 </pre>
 @param {array} colors (<code>attribute</code>): The array of colors.
-@param {string} colors (<code>attribute</code>): The array of colors.
 @param {string} selectedColor (<code>attribute</code>): The selected color.
 @param {string} size (<code>attribute</code>): The size (s, m).
+@param {string} useLabel (<code>attribute</code>): Specify if labels should be used.
+@param {string} useColorClass (<code>attribute</code>): Specify if color values are css classes.
 @param {function} onSelect (<code>expression</code>): Callback function when the item is selected.
 **/
 
@@ -28,6 +28,11 @@ Use this directive to generate color swatches to pick from.
 
         function link(scope, el, attr, ctrl) {
 
+            // Set default to true if not defined
+            if (angular.isUndefined(scope.useColorClass)) {
+                scope.useColorClass = false;
+            }
+            
             scope.setColor = function (color) {
                 //scope.selectedColor({color: color });
                 scope.selectedColor = color;
@@ -47,7 +52,9 @@ Use this directive to generate color swatches to pick from.
                 colors: '=?',
                 size: '@',
                 selectedColor: '=',
-                onSelect: '&'
+                onSelect: '&',
+                useLabel: '=',
+                useColorClass: '=?'
             },
             link: link
         };
