@@ -429,7 +429,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Hides the menu by hiding the containing dom element
          */
         hideMenu: function() {
-			alert("hideMenu");
             //SD: Would we ever want to access the last action'd node instead of clearing it here?
             appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
