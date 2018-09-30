@@ -31,10 +31,10 @@ angular.module("umbraco.directives")
 					//elements
 					var $viewport = element.find(".viewport");
 					var $image = element.find("img");
-					var $overlay = element.find(".overlay");
+                    var $overlay = element.find(".overlay");
 
-					scope.style = function () {
-						if(scope.dimensions.width <= 0){
+				    scope.style = function () {
+                        if (scope.dimensions.width <= 0) {
 							setDimensions();
 						}
 
@@ -45,23 +45,29 @@ angular.module("umbraco.directives")
 					};
 
 					scope.setFocalPoint = function(event) {
+					    scope.$emit("imageFocalPointStart");
 
-						scope.$emit("imageFocalPointStart");
+					    var offsetX = event.offsetX - 10;
+					    var offsetY = event.offsetY - 10;
 
-						var offsetX = event.offsetX - 10;
-						var offsetY = event.offsetY - 10;
+					    calculateGravity(offsetX, offsetY);
 
-						calculateGravity(offsetX, offsetY);
-
-						lazyEndEvent();
-
+					    lazyEndEvent();
 					};
 
-					var setDimensions = function(){
-						scope.dimensions.width = $image.width();
-						scope.dimensions.height = $image.height();
-
-						if(scope.center){
+                    var setDimensions = function () {
+                        if (scope.src.endsWith(".svg")) {
+                            // svg files don't automatically get a size by
+                            // loading them set a default size for now
+                            $image.attr("width", "200");
+                            $image.attr("height", "200");
+                            // can't crop an svg file, don't show the focal point
+                            $overlay.remove();
+                        }
+					    scope.dimensions.width = $image.width();
+					    scope.dimensions.height = $image.height();
+                        
+					    if(scope.center){
 							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
 							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
 						}else{
