@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<language alias="en_us" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+<language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
     <creator>
         <name>The Umbraco community</name>
         <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
@@ -163,7 +163,6 @@
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
     </area>
-
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
         <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
@@ -345,6 +344,7 @@
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorLinkPicker">Anchor / querystring</key>
         <key alias="anchorInsert">Name</key>
+        <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>
@@ -686,6 +686,7 @@
         <key alias="selected">selected</key>
 		<key alias="includeFromsubFolders">Include subfolders in search</key>
     </area>
+
     <area alias="colors">
         <key alias="black">Black</key>
         <key alias="green">Green</key>
@@ -707,6 +708,7 @@
         <key alias="deeppurple">Deep Purple</key>
         <key alias="indigo">Indigo</key>
     </area>
+
     <area alias="shortcuts">
         <key alias="addTab">Add tab</key>
         <key alias="addProperty">Add property</key>
@@ -736,9 +738,9 @@
         <key alias="editorHeader">Editor</key>
     </area>
     <area alias="graphicheadline">
-        <key alias="backgroundcolor">Background color</key>
+        <key alias="backgroundcolor">Background colour</key>
         <key alias="bold">Bold</key>
-        <key alias="color">Text color</key>
+        <key alias="color">Text colour</key>
         <key alias="font">Font</key>
         <key alias="text">Text</key>
     </area>
@@ -779,7 +781,7 @@
       ]]>
         </key>
         <key alias="databaseUpgradeDone">
-            <![CDATA[Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to
+            <![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to
       proceed. ]]>
         </key>
         <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
@@ -1270,7 +1272,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         </key>
     </area>
     <area alias="colorpicker">
-        <key alias="noColors">You have not configured any approved colors</key>
+        <key alias="noColors">You have not configured any approved colours</key>
     </area>
     <area alias="contentPicker">
         <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
@@ -1462,6 +1464,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="preview">Preview</key>
         <key alias="styles">Styles</key>
     </area>
+
     <area alias="template">
         <key alias="edittemplate">Edit template</key>
 
@@ -1565,7 +1568,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="descending">descending</key>
 
         <key alias="template">Template</key>
+
     </area>
+
     <area alias="grid">
         <key alias="rte">Rich Text Editor</key>
         <key alias="media">Image</key>
@@ -1603,7 +1608,6 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="settings">Settings</key>
         <key alias="settingsDetails">Configure what settings editors can change</key>
 
-
         <key alias="styles">Styles</key>
         <key alias="stylesDetails">Configure what styling editors can change</key>
 
@@ -1620,6 +1624,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
 
     <area alias="contentTypeEditor">
+
         <key alias="compositions">Compositions</key>
         <key alias="noTabs">You have not added any tabs</key>
         <key alias="addNewTab">Add new tab</key>
@@ -1633,6 +1638,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="allowedTemplatesHeading">Allowed Templates</key>
         <key alias="allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</key>
+
         <key alias="allowAsRootHeading">Allow as root</key>
         <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree</key>
         <key alias="allowAsRootCheckbox">Yes - allow content of this type in the root</key>
@@ -1641,6 +1647,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
 
         <key alias="chooseChildNode">Choose child node</key>
+
         <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
         <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
         <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
@@ -2032,6 +2039,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="deleteUser">Delete User</key>
         <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
     </area>
+
     <area alias="validation">
         <key alias="validation">Validation</key>
         <key alias="validateAsEmail">Validate as an email address</key>
@@ -2205,9 +2213,5 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
         <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
         <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
-    </area>
-    <area alias="notify">
-        <key alias="notifySet">Select your notifications for</key>
-        <key alias="notificationsSavedFor">Notification settings saved for </key>
     </area>
 </language>

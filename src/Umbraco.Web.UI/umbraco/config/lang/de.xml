@@ -445,7 +445,6 @@
     <key alias="searchResults">Suchergebnisse</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Hintergrundfarbe</key>

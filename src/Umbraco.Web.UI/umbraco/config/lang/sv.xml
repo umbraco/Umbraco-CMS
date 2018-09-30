@@ -438,7 +438,6 @@
     <key alias="embed">Inbäddning</key>
     <key alias="retrieve">Hämta</key>
     <key alias="selected">valgt</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>

@@ -543,7 +543,6 @@
     <key alias="current">huidig</key>
     <key alias="embed">Embed</key>
     <key alias="selected">geselecteerd</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="colors">
     <key alias="black">Zwart</key>

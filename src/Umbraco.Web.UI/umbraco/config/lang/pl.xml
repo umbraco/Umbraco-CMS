@@ -624,7 +624,6 @@
     <key alias="current">bieżący</key>
     <key alias="embed">Osadzony</key>
     <key alias="selected">wybrany</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
       
   <area alias="colors">

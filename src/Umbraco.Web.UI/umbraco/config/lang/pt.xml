@@ -354,7 +354,6 @@
     <key alias="yes">Sim</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Cor de fundo</key>
