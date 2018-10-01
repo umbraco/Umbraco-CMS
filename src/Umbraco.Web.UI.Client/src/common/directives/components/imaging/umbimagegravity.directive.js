@@ -41,7 +41,6 @@
         };
 
         function setFocalPoint (event) {
-
             $scope.$emit("imageFocalPointStart");
 
             var offsetX = event.offsetX - 10;
@@ -50,7 +49,6 @@
             calculateGravity(offsetX, offsetY);
 
             lazyEndEvent();
-
         };
 
         /** Initializes the component */

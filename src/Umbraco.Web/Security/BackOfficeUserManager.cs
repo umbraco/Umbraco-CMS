@@ -191,7 +191,10 @@ namespace Umbraco.Web.Security
 
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
+                manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"))
+                {
+                    TokenLifespan = TimeSpan.FromDays(3)
+                };
             }
 
             manager.UserLockoutEnabledByDefault = true;
@@ -703,6 +706,7 @@ namespace Umbraco.Web.Security
             var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
             return httpContext.GetCurrentRequestIpAddress();
         }
+
     }
 
 }

@@ -52,6 +52,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly PropertyEditorCollection _propertyEditors;
+        private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,

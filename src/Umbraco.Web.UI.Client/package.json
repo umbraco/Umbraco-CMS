@@ -9,7 +9,7 @@
     "url": "https://github.com/umbraco/Umbraco-CMS.git"
   },
   "bugs": {
-    "url": "https://issues.umbraco.org"
+    "url": "https://github.com/umbraco/Umbraco-CMS/issues"
   },
   "engines": {
     "node": ">= 0.8.4"

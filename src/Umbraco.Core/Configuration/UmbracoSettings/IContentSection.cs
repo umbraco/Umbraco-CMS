@@ -14,7 +14,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> ImageTagAllowedAttributes { get; }
 
         IEnumerable<IImagingAutoFillUploadField> ImageAutoFillProperties { get; }
-
+        
         string ScriptFolderPath { get; }
 
         IEnumerable<string> ScriptFileTypes { get; }
@@ -66,5 +66,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool EnableInheritedMediaTypes { get; }
 
         string LoginBackgroundImage { get; }
+        bool StripUdiAttributes { get; }
+        
     }
 }
