@@ -45,6 +45,18 @@
                         label="Preview page" 
                         label-key="buttons_showPage">
                     </umb-button>
+
+                    <umb-button 
+                        ng-if="page.showSaveButton"
+                        alias="save"
+                        type="button"
+                        button-style="info"
+                        state="page.saveButtonState"
+                        action="save(content)"
+                        label-key="buttons_save"
+                        shortcut="ctrl+s"
+                        add-ellipsis="content.variants && content.variants.length > 1 ? 'true' : 'false'">
+                    </umb-button>
                     
                     <umb-button-group 
                         ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 

@@ -157,10 +157,17 @@
             if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
+                $scope.page.showSaveButton = false;
                 $scope.page.showPreviewButton = false;
                 return;
             }
 
+            // create the save button
+            if(_.contains($scope.content.allowedActions, "A")) {
+                $scope.page.showSaveButton = true;
+            }
+
+            // create the pubish combo button
             $scope.page.buttonGroupState = "init";
             var buttons = contentEditingHelper.configureContentEditorButtons({
                 create: $scope.page.isNew,
@@ -168,7 +175,6 @@
                 methods: {
                     saveAndPublish: $scope.saveAndPublish,
                     sendToPublish: $scope.sendToPublish,
-                    save: $scope.save,
                     unPublish: $scope.unPublish
                 }
             });
