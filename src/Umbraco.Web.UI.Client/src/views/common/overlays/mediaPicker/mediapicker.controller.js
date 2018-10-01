@@ -237,7 +237,10 @@ angular.module("umbraco")
             $scope.onUploadComplete = function(files) {
                 $scope.gotoFolder($scope.currentFolder).then(function() {
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
-                        selectImage($scope.images[$scope.images.length - 1]);
+                        var image = $scope.images[$scope.images.length - 1];
+                        $scope.target = image;
+                        $scope.target.url = mediaHelper.resolveFile(image);
+                        selectImage(image);
                     }
                 });
             };
@@ -318,7 +321,10 @@ angular.module("umbraco")
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items,
-                            function(mediaItem) {
+                            function (mediaItem) {
+                                if (mediaItem.parentId === $scope.currentFolder.id) {
+                                    mediaItem.currentFolder = true;
+                                }
                                 // set thumbnail and src
                                 mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
                                 mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);

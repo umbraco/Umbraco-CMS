@@ -451,6 +451,7 @@
     <key alias="embed">Innbygging</key>
     <key alias="retrieve">Hent</key>
     <key alias="selected">valgt</key>
+    <key alias="includeFromsubFolders">Include subfolders in search</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrunnsfarge</key>
