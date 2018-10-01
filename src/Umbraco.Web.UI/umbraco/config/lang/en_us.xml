@@ -684,7 +684,7 @@
         <key alias="embed">Embed</key>
         <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
-        <key alias="includeFromsubFolders">Include subfolders in search</key>
+		<key alias="includeFromsubFolders">Include subfolders in search</key>
     </area>
     <area alias="colors">
         <key alias="black">Black</key>
