@@ -27,10 +27,13 @@
 
         function init(content) {
 
+            // set first app to active
+            content.apps[0].active = true;
+
             if (infiniteMode) {
                 createInfiniteModeButtons(content);
             } else {
-                createButtons(content);
+                createButtons(content, content.apps[0]);
             }
 
             editorState.set($scope.content);
@@ -38,9 +41,16 @@
             //We fetch all ancestors of the node to generate the footer breadcrumb navigation
             if (!$scope.page.isNew) {
                 if (content.parentId && content.parentId !== -1) {
-                    entityResource.getAncestors(content.id, "document")
+                    entityResource.getAncestors(content.id, "document", $scope.culture)
                         .then(function (anc) {
                             $scope.ancestors = anc;
+                        });
+                    $scope.$watch('culture',
+                        function(value, oldValue) {
+                            entityResource.getAncestors(content.id, "document", value)
+                                .then(function (anc) {
+                                    $scope.ancestors = anc;
+                                });
                         });
                 }
             }
@@ -135,7 +145,22 @@
 
         }
 
-        function createButtons(content) {
+        /**
+         * Create the save/publish/preview buttons for the view
+         * @param {any} content the content node
+         * @param {any} app the active content app
+         */
+        function createButtons(content, app) {
+
+            // only create the save/publish/preview buttons if the 
+            // content app is "Conent"
+            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                $scope.defaultButton = null;
+                $scope.subButtons = null;
+                $scope.page.showPreviewButton = false;
+                return;
+            }
+
             $scope.page.buttonGroupState = "init";
             var buttons = contentEditingHelper.configureContentEditorButtons({
                 create: $scope.page.isNew,
@@ -147,9 +172,10 @@
                     unPublish: $scope.unPublish
                 }
             });
-
+            
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+            $scope.page.showPreviewButton = true;
 
         }
 
@@ -353,7 +379,34 @@
         };
 
         $scope.sendToPublish = function () {
-            return performSave({ saveMethod: contentResource.sendToPublish, action: "sendToPublish" });
+            clearNotifications($scope.content);
+            if (showSaveOrPublishDialog()) {
+                //before we launch the dialog we want to execute all client side validations first
+                if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
+
+                    var dialog = {
+                        parentScope: $scope,
+                        view: "views/content/overlays/sendtopublish.html",
+                        variants: $scope.content.variants, //set a model property for the dialog
+                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                        submitButtonLabel: "Send for approval",
+                        submit: function (model) {
+                            model.submitButtonState = "busy";
+                            clearNotifications($scope.content);
+                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                            console.log("saving need to happen here");
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+                    
+                    overlayService.open(dialog);
+                }
+            }
+            else {
+                return performSave({ saveMethod: contentResource.sendToPublish, action: "sendToPublish" });
+            }
         };
 
         $scope.saveAndPublish = function () {
@@ -393,7 +446,7 @@
                                     return $q.when(err);
                                 });
                         },
-                        close: function (oldModel) {
+                        close: function () {
                             overlayService.close();
                         }
                     };
@@ -467,10 +520,14 @@
                 // Chromes popup blocker will kick in if a window is opened 
                 // without the initial scoped request. This trick will fix that.
                 //  
-                var previewWindow = $window.open('preview/?init=true&id=' + content.id, 'umbpreview');
+                var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
                 // Build the correct path so both /#/ and #/ work.
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
+                var query = 'id=' + content.id;
+                if ($scope.culture) {
+                    query += "&culture=" + $scope.culture;
+                }
+                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
                 //The user cannot save if they don't have access to do that, in which case we just want to preview
                 //and that's it otherwise they'll get an unauthorized access message
@@ -478,8 +535,22 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    $scope.save().then(function (data) {
+                    var selectedVariant;
+                    if (!$scope.culture) {
+                        selectedVariant = $scope.content.variants[0];
+                    }
+                    else {
+                        selectedVariant = _.find($scope.content.variants, function (v) {
+                            return v.language.culture === $scope.culture;
+                        });
+                    }
+
+                    //ensure the save flag is set
+                    selectedVariant.save = true;
+                    performSave({ saveMethod: contentResource.publish, action: "save" }).then(function (data) {
                         previewWindow.location.href = redirect;
+                    }, function (err) {
+                        //validation issues ....
                     });
                 }
             }
@@ -553,6 +624,14 @@
                 }
                 $scope.saveAndCloseButtonState = "success";
             });
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appChanged = function(app) {
+            createButtons($scope.content, app);
         };
 
         function moveNode(node, target) {

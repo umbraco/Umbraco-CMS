@@ -39,6 +39,7 @@ namespace Umbraco.Core.Persistence
         private string _providerName;
         private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
+        private bool _serverVersionDetected;
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
@@ -112,7 +113,56 @@ namespace Umbraco.Core.Persistence
         public bool Configured { get; private set; }
 
         /// <inheritdoc />
-        public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
+        public bool CanConnect
+        {
+            get
+            {
+                if (!Configured || !DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName)) return false;
+
+                if (_serverVersionDetected) return true;
+
+                if (_databaseType.IsSqlServer())
+                    DetectSqlServerVersion();
+                _serverVersionDetected = true;
+
+                return true;
+            }
+        }
+
+        private void DetectSqlServerVersion()
+        {
+            // replace NPoco database type by a more efficient one
+
+            var setting = ConfigurationManager.AppSettings["Umbraco.DatabaseFactory.ServerVersion"];
+            var fromSettings = false;
+
+            if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
+                || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
+            {
+                versionName = SqlServerSyntaxProvider.GetVersionName(_connectionString, _providerName);
+            }
+            else
+            {
+                fromSettings = true;
+            }
+
+            switch (versionName)
+            {
+                case SqlServerSyntaxProvider.VersionName.V2008:
+                    _databaseType = DatabaseType.SqlServer2008;
+                    break;
+                case SqlServerSyntaxProvider.VersionName.V2012:
+                case SqlServerSyntaxProvider.VersionName.V2014:
+                case SqlServerSyntaxProvider.VersionName.V2016:
+                case SqlServerSyntaxProvider.VersionName.V2017:
+                    _databaseType = DatabaseType.SqlServer2012;
+                    break;
+                // else leave unchanged
+            }
+
+            _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
+                versionName, _databaseType, fromSettings ? "settings" : "detected");
+        }
 
         /// <inheritdoc />
         public ISqlContext SqlContext => _sqlContext;

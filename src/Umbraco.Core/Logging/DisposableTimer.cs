@@ -30,17 +30,17 @@ namespace Umbraco.Core.Logging
             _endMessage = endMessage;
             _failMessage = failMessage;
             _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
-            _timingId = Guid.NewGuid().ToString("N");
+            _timingId = Guid.NewGuid().ToString("N").Substring(0, 7); // keep it short-ish
 
             if (thresholdMilliseconds == 0)
             {
                 switch (_level)
                 {
                     case LogLevel.Debug:
-                        logger.Debug(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
+                        logger.Debug(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     case LogLevel.Information:
-                        logger.Info(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
+                        logger.Info(loggerType, "{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(level));
@@ -84,15 +84,15 @@ namespace Umbraco.Core.Logging
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, _failException, "[Timing {TimingId}] {FailMessage} ({TimingDuration}ms)", _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
+                    _logger.Error(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                 }
                 else switch (_level)
                 {
                     case LogLevel.Debug:
-                        _logger.Debug(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Debug(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     case LogLevel.Information:
-                        _logger.Info(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Info(_loggerType, "{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     // filtered in the ctor
                     //default:

@@ -327,10 +327,16 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
-    <Compile Include="Logging\Serilog\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
+    <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
@@ -354,6 +360,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
@@ -363,6 +370,8 @@
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
+    <Compile Include="Models\ContentEditing\ContentApp.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
@@ -406,6 +415,8 @@
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
+    <Compile Include="Persistence\SqlContextExtensions.cs" />
+    <Compile Include="Persistence\SqlSyntaxExtensions.cs" />
     <Compile Include="Persistence\UmbracoPocoDataBuilder.cs" />
     <Compile Include="PropertyEditors\ColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
@@ -1389,6 +1400,7 @@
     <Compile Include="Services\OperationResultType.cs" />
     <Compile Include="Services\Implement\PackagingService.cs" />
     <Compile Include="Services\Implement\PublicAccessService.cs" />
+    <Compile Include="Services\Ordering.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\PublishResult.cs" />
     <Compile Include="Services\PublishResultType.cs" />

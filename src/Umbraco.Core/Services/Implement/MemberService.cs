@@ -387,7 +387,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
+                return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
             }
         }
 
@@ -405,7 +405,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
                 var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
-                return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
+                return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
         }
 
@@ -557,7 +557,7 @@ namespace Umbraco.Core.Services.Implement
                         throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
                 }
 
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending, true);
+                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
             }
         }
 
@@ -598,7 +598,7 @@ namespace Umbraco.Core.Services.Implement
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, "Email", Direction.Ascending, true);
+                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Email"));
             }
         }
 
@@ -639,7 +639,7 @@ namespace Umbraco.Core.Services.Implement
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
+                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
             }
         }
 

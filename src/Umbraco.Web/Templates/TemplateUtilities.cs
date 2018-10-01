@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 
@@ -17,13 +16,6 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
-        //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
-        [Obsolete("Use the overload specifying an UmbracoContext")]
-        internal static string ParseInternalLinks(string text, bool preview)
-        {
-            return ParseInternalLinks(text, preview, UmbracoContext.Current);
-        }
-
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -100,7 +92,7 @@ namespace Umbraco.Web.Templates
             {
                 // find all relative urls (ie. urls that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                Current.Logger.Debug(typeof(IOHelper), "After regex: {ElapsedMilliseconds} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                Current.Logger.Debug(typeof(IOHelper), "After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

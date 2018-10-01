@@ -1,9 +1,12 @@
 <div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineMgmtController">
 
-    <h3 class="bold">Examine Management</h3>
+    <umb-box>
+        <umb-box-content>
+            <h3 class="bold">Examine Management</h3>
+        </umb-box-content>
+    </umb-box>
 
     <div ng-show="loading">
-        <div class="umb-healthcheck-group__details-status-overlay"></div>
         <umb-load-indicator></umb-load-indicator>
     </div>
 

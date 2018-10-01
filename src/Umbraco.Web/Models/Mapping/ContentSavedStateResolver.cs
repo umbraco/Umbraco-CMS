@@ -6,9 +6,30 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentSavedStateResolver : IValueResolver<IContent, ContentVariantDisplay, ContentSavedState>
+
+    /// <summary>
+    /// Returns the <see cref="ContentSavedState?"/> for an <see cref="IContent"/> item
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    internal class ContentBasicSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState?>
+        where T : ContentPropertyBasic
     {
-        public ContentSavedState Resolve(IContent source, ContentVariantDisplay destination, ContentSavedState destMember, ResolutionContext context)
+        private readonly ContentSavedStateResolver<T> _inner = new ContentSavedStateResolver<T>();
+
+        public ContentSavedState? Resolve(IContent source, IContentProperties<T> destination, ContentSavedState? destMember, ResolutionContext context)
+        {
+            return _inner.Resolve(source, destination, default, context);
+        }
+    }
+
+    /// <summary>
+    /// Returns the <see cref="ContentSavedState"/> for an <see cref="IContent"/> item
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    internal class ContentSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState>
+        where T : ContentPropertyBasic
+    {
+        public ContentSavedState Resolve(IContent source, IContentProperties<T> destination, ContentSavedState destMember, ResolutionContext context)
         {
             PublishedState publishedState;
             bool isEdited;
@@ -16,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
             if (source.ContentType.VariesByCulture())
             {
                 //Get the culture from the context which will be set during the mapping operation for each variant
-                var culture = context.GetCulture();
+                var culture = context.Options.GetCulture();
 
                 //a culture needs to be in the context for a variant content item
                 if (culture == null)

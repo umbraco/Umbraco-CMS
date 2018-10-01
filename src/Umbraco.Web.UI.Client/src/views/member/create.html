@@ -4,9 +4,9 @@
         <h5><localize key="member_createNewMember">Create a new member</localize></h5>
         <ul class="umb-actions umb-actions-child">
 
-            <li ng-repeat="docType in allowedTypes">
-                <a href="#member/member/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-                    <i class="large {{docType.icon}}"></i>
+            <li class="umb-action" ng-repeat="docType in allowedTypes">
+                <a class="umb-action-link" href="#member/member/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+                    <i class="large icon {{docType.icon}}"></i>
                     <span class="menu-label">
                         {{docType.name}}
                         <small>{{docType.description}}</small>

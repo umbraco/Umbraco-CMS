@@ -10,13 +10,13 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
                    <div class="btn-group" ng-show="listViewAllowedTypes.length > 1">
                        <a class="btn btn-success dropdown-toggle" ng-click="page.createDropdownOpen = !page.createDropdownOpen" ng-href="">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
-                       <umb-dropdown class="umb-actions" ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                             <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                 <a ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                                     {{::contentType.name}}
@@ -32,7 +32,7 @@
                    </div>
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
                    <umb-button
                        type="button"
                        label="Clear selection"
@@ -42,7 +42,7 @@
                    </umb-button>
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
                    <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
                    <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
@@ -56,18 +56,18 @@
 
            <umb-editor-sub-header-content-right>
 
-               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
 
                    <umb-layout-selector
-                       ng-if="options.layout.layouts"
+                       ng-show="options.layout.layouts"
                        layouts="options.layout.layouts"
                        active-layout="options.layout.activeLayout"
-                       on-layout-select="selectLayout">
+                       on-layout-select="selectLayout(layout)">
                    </umb-layout-selector>
 
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
                    <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                        <div class="inner-addon left-addon">
                            <i class="icon icon-search" ng-click="enterSearch($event)"></i>
@@ -85,7 +85,7 @@
                    </ng-form>
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
 
                    <umb-button
                        ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
@@ -156,14 +156,14 @@
          selection="selection"
          options="options"
          entity-type="{{entityType}}"
-         on-get-content="getContent">
+         on-get-content="getContent(contentId)">
       </umb-list-view-layout>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <div class="flex justify-center">
           <umb-pagination
-             ng-if="listViewResultSet.totalPages"
+             ng-show="listViewResultSet.totalPages"
              page-number="options.pageNumber"
              total-pages="listViewResultSet.totalPages"
              on-next="next"

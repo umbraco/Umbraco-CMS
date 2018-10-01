@@ -65,6 +65,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {string=} icon Set a button icon.
 @param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
+@param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
+
 **/
 
 (function () {
@@ -90,14 +92,15 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 icon: "@?",
                 disabled: "<?",
                 size: "@?",
-                alias: "@?"
+                alias: "@?",
+                addEllipsis: "@?"
             }
         });
 
     //TODO: This doesn't seem necessary?
-    UmbButtonController.$inject = ['$timeout'];
+    UmbButtonController.$inject = ['$timeout', 'localizationService'];
 
-    function UmbButtonController($timeout) {
+    function UmbButtonController($timeout, localizationService) {
 
         var vm = this;
 
@@ -110,6 +113,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
             vm.blockElement = false;
             vm.style = null;
             vm.innerState = "init";
+
+            vm.buttonLabel = vm.label;
 
             if (vm.buttonStyle) {
 
@@ -138,6 +143,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
             }
 
+            setButtonLabel();
+
         }
 
         function onChanges(changes) {
@@ -161,11 +168,41 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     vm.disabled = changes.disabled.currentValue;
                 }
             }
+
+            // watch for label changes
+            if(changes.label && changes.label.currentValue) {
+                vm.buttonLabel = changes.label.currentValue;
+                setButtonLabel();
+            }
+
+            // watch for label key changes
+            if(changes.labelKey && changes.labelKey.currentValue) {
+                setButtonLabel();
+            }
+
         }
 
         function clickButton(event) {
             if(vm.action) {
                 vm.action({$event: event});
+            }
+        }
+
+        function setButtonLabel() {
+            // if the button opens a dialog add "..." to the label
+            if(vm.addEllipsis === "true") {
+                vm.buttonLabel = vm.buttonLabel + "...";
+            }
+
+            // look up localization key
+            if(vm.labelKey) {
+                localizationService.localize(vm.labelKey).then(function(value){
+                    vm.buttonLabel = value;
+                    // if the button opens a dialog add "..." to the label
+                    if(vm.addEllipsis === "true") {
+                        vm.buttonLabel = vm.buttonLabel + "...";
+                    }
+                });
             }
         }
 

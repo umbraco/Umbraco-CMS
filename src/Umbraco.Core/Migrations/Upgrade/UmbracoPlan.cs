@@ -130,6 +130,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .Chain<FallbackLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}"); // to next
             // resume at {5F4597F4-A4E0-4AFE-90B5-6D2F896830EB} ...
 
+            Chain<RefactorVariantsModel>("{B19BF0F2-E1C6-4AEB-A146-BC559D97A2C6}");
             //FINAL
 
 

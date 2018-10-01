@@ -260,6 +260,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 });
                 if (found) {
                     //set the route param
+                    found.active = true;
                     $scope.selectedLanguage = found;
                 }
             }
@@ -407,6 +408,13 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
             //}
             //execute them sequentially
+
+            // set selected language to active
+            angular.forEach($scope.languages, function(language){
+                language.active = false;
+            });
+            language.active = true;
+
             angularHelper.executeSequentialPromises(promises);
         });
 

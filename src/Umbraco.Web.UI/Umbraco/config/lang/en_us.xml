@@ -126,12 +126,10 @@
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
-        
         <key alias="saveAndClose">Save and close</key>
         <key alias="saveAndPublish">Publish</key>
-        <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
-        <key alias="saveToPublish">Save and send for approval</key>
+        <key alias="saveToPublish">Send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
         <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
@@ -143,6 +141,7 @@
         <key alias="saveAndGenerateModels">Save and generate models</key>
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
+        <key alias="rollback">Rollback</key>
         <key alias="deleteTag">Delete tag</key>
         <key alias="confirmActionCancel">Cancel</key>
         <key alias="confirmActionConfirm">Confirm</key>
@@ -211,7 +210,7 @@
         <key alias="lastPublished">Last published</key>
         <key alias="noItemsToShow">There are no items to show</key>
         <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
-        <key alias="listViewNoContent">No content has been added</key>
+        <key alias="listViewNoContent">No child items have been added</key>
         <key alias="listViewNoMembers">No members have been added</key>
         <key alias="mediatype">Media Type</key>
         <key alias="mediaLinks">Link to media item(s)</key>
@@ -222,6 +221,7 @@
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
         <key alias="noMediaLink">This media item has no link</key>
+        <key alias="noProperties">No content can be added for this item</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
@@ -265,10 +265,12 @@
         <key alias="isSensitiveValue_short">This value is hidden.</key>
         <key alias="languagesToPublish">What languages would you like to publish?</key>
         <key alias="languagesToSave">What languages would you like to save?</key>
+        <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
         <key alias="publishedLanguages">Published Languages</key>
         <key alias="unmodifiedLanguages">Unmodified Languages</key>
         <key alias="readyToPublish">Ready to Publish?</key>
         <key alias="readyToSave">Ready to Save?</key>
+        <key alias="sendForApproval">Send for approval</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -1639,8 +1641,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <area alias="contentTypeEditor">
         <key alias="compositions">Compositions</key>
         <key alias="noTabs">You have not added any tabs</key>
-        <key alias="addNewTab">Add new tab</key>
-        <key alias="addAnotherTab">Add another tab</key>
+        <key alias="addGroup">Add Group</key>
         <key alias="inheritedFrom">Inherited from</key>
         <key alias="addProperty">Add property</key>
         <key alias="requiredLabel">Required label</key>
