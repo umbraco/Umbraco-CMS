@@ -108,7 +108,8 @@ namespace Umbraco.Web.Models
 		public abstract int CreatorId { get; }
 		public abstract string Path { get; }
 		public abstract DateTime CreateDate { get; }
-		public abstract DateTime UpdateDate { get; }
+        public abstract DateTime UpdateDate { get; }
+		public abstract DateTime? ExpireDate { get; }
 		public abstract Guid Version { get; }
 		public abstract int Level { get; }
 

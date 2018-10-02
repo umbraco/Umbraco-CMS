@@ -59,12 +59,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		private string _path;
 		private DateTime _createDate;
 		private DateTime _updateDate;
+	    private DateTime? _expireDate;
 		private Guid _version;
 		private int _sortOrder;
 		private int _level;
 	    private bool _isDraft;
 
-		public override IEnumerable<IPublishedContent> Children
+	    public override IEnumerable<IPublishedContent> Children
 		{
 			get
 			{
@@ -246,7 +247,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			}
 		}
 
-		public override Guid Version
+	    public override DateTime? ExpireDate
+	    {
+	        get
+	        {
+	            if (_nodeInitialized == false) InitializeNode();
+	            return _expireDate;
+	        }
+	    }
+
+        public override Guid Version
 		{
 			get
 			{
@@ -319,7 +329,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             InitializeNode(_xmlNode, UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema, _isPreviewing,
                 out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
                 out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
-                out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
+                out _version, out _createDate, out _updateDate, out _expireDate, out _level, out _isDraft, out _contentType, out _properties,
                 PublishedContentType.Get);
 
             // warn: this is not thread-safe...
@@ -329,7 +339,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal static void InitializeNode(XmlNode xmlNode, bool legacy, bool isPreviewing,
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
-            out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
+            out Guid version, out DateTime createDate, out DateTime updateDate, out DateTime? expireDate, out int level, out bool isDraft,
             out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
             Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
         {
@@ -340,6 +350,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             key = version = default(Guid);
             name = writerName = urlName = creatorName = docTypeAlias = path = null;
             createDate = updateDate = default(DateTime);
+            expireDate = null;
             isDraft = false;
             contentType = null;
             properties = null;
@@ -401,7 +412,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		            createDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("createDate").Value);
 		        if (xmlNode.Attributes.GetNamedItem("updateDate") != null)
 		            updateDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("updateDate").Value);
-		        if (xmlNode.Attributes.GetNamedItem("level") != null)
+		        if (xmlNode.Attributes.GetNamedItem("expireDate") != null
+		            && string.IsNullOrEmpty(xmlNode.Attributes.GetNamedItem("expireDate").Value) == false)
+		            expireDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("expireDate").Value);
+                if (xmlNode.Attributes.GetNamedItem("level") != null)
 		            level = int.Parse(xmlNode.Attributes.GetNamedItem("level").Value);
 
                 isDraft = (xmlNode.Attributes.GetNamedItem("isDraft") != null);

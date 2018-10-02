@@ -612,6 +612,11 @@ namespace umbraco
                 get { return _inner.UpdateDate; }
             }
 
+            public DateTime? ExpireDate
+            {
+                get { return _inner.ExpireDate; }
+            }
+
             public Guid Version
             {
                 get { return _inner.Version; }

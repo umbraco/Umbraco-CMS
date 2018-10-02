@@ -55,7 +55,8 @@ namespace Umbraco.Core.Models
 		int CreatorId { get; }
 		string Path { get; }
 		DateTime CreateDate { get; }
-		DateTime UpdateDate { get; }
+        DateTime UpdateDate { get; }
+        DateTime? ExpireDate { get; }
 		Guid Version { get; }
 		int Level { get; }
 		string Url { get; }

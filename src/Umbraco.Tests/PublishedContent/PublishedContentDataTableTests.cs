@@ -206,6 +206,7 @@ namespace Umbraco.Tests.PublishedContent
 	        public string Path { get; set; }
 	        public DateTime CreateDate { get; set; }
 	        public DateTime UpdateDate { get; set; }
+	        public DateTime? ExpireDate { get; set; }
 	        public Guid Version { get; set; }
 	        public int Level { get; set; }
             public bool IsDraft { get; set; }
