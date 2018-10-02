@@ -198,7 +198,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             buttons.subButtons = [];
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
-            // Publish, SendToPublish, Save
+            // Publish, SendToPublish
             var buttonOrder = ["U", "H"];
 
             //Create the first button (primary button)
