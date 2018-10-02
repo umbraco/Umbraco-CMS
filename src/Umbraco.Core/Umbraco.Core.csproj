@@ -727,7 +727,6 @@
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
-    <Compile Include="Models\PropertyTagChange.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
