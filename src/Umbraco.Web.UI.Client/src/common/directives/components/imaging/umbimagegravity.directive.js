@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
 				scope: {
 					src: '=',
 					center: "=",
-					onImageLoaded: "="
+                    onImageLoaded: "&"
 				},
 				link: function(scope, element, attrs) {
 
@@ -56,23 +56,17 @@ angular.module("umbraco.directives")
 					};
 
                     var setDimensions = function () {
-                        if (scope.src.endsWith(".svg")) {
-                            // svg files don't automatically get a size by
-                            // loading them set a default size for now
-                            $image.attr("width", "200");
-                            $image.attr("height", "200");
-                            // can't crop an svg file, don't show the focal point
-                            $overlay.remove();
+                    if (scope.isCroppable) {
+					        scope.dimensions.width = $image.width();
+					        scope.dimensions.height = $image.height();
+                            
+					        if(scope.center){
+							    scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
+							    scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
+						    }else{
+							    scope.center = { left: 0.5, top: 0.5 };
+                            }
                         }
-					    scope.dimensions.width = $image.width();
-					    scope.dimensions.height = $image.height();
-                        
-					    if(scope.center){
-							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
-							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
-						}else{
-							scope.center = { left: 0.5, top: 0.5 };
-						}
 					};
 
 					var calculateGravity = function(offsetX, offsetY){
@@ -113,10 +107,32 @@ angular.module("umbraco.directives")
 					//// INIT /////
 					$image.load(function() {
 					    $timeout(function() {
+                        scope.isCroppable = true;
+                        scope.hasDimensions = true;
+
+                        if (scope.src !== "undefined") {
+                            if (scope.src.endsWith(".svg")) {
+                                scope.isCroppable = false;
+                                scope.hasDimensions = false;
+                            } else {
+                                // From: https://stackoverflow.com/a/51789597/5018
+                                var type = scope.src.substring(scope.src.indexOf("/") + 1, scope.src.indexOf(";base64"));
+                                if (type.startsWith("svg")) {
+                                    scope.isCroppable = false;
+                                    scope.hasDimensions = false;
+                                }
+                            }
+                        }
+
 					        setDimensions();
 					        scope.loaded = true;
 					        if (angular.isFunction(scope.onImageLoaded)) {
-					            scope.onImageLoaded();
+                                scope.onImageLoaded(
+                                    {
+                                        "isCroppable": scope.isCroppable,
+                                        "hasDimensions": scope.hasDimensions
+                                    }
+                                );
 					        }
 					    });
 					});
