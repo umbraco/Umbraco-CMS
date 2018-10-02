@@ -53,6 +53,18 @@ namespace Umbraco.Web.Editors
             if (currentUser.IsAdmin())
                 return Attempt<string>.Succeed();
 
+            // var derp = ((userGroupSave.Id == null || (int)userGroupSave.Id <= 0) && Services.SectionService.GetAllowedSections(Security.CurrentUser.Id).Select(x => x.Alias).Contains(Constants.Applications.Users)) ? Attempt<string>.Succeed() : Attempt<string>.Failed();
+
+            var existingGroups = _userService.GetUserGroupsByAlias(groupAliases);
+
+            if(!existingGroups.Any())
+            {
+                // We're dealing with new groups,
+                // so authorization should be given to any user with access to Users section
+                if (currentUser.AllowedSections.Contains(Constants.Applications.Users))
+                    return Attempt<string>.Succeed();
+            }
+
             var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
             var missingAccess = groupAliases.Except(userGroups).ToArray();
             return missingAccess.Length == 0
