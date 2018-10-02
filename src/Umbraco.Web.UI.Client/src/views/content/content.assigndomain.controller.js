@@ -46,10 +46,10 @@
                             vm.language = lang[0];
                         }
                     }
-                    vm.domains = data.Domains.map(function (d) {
-                        var matchedLangs = vm.languages.filter(function (l) {
-                            return matchLanguageById(l, d.Language);
 
+                    vm.domains = data.Domains.map(function (d) {
+                        var matchedLangs = vm.languages.filter(function (lng) {
+                            return matchLanguageById(lng, d.Lang);
                         });
                         return {
                             Name: d.Name,
@@ -60,7 +60,9 @@
         }
 
         function matchLanguageById(language, id) {
-            return language.Id === id;
+            var langId = parseInt(language.id);
+            var comparisonId = parseInt(id);
+            return langId  === comparisonId;
         }
 
         function closeDialog() {
@@ -116,7 +118,7 @@
             }
             else {
                 console.log('not valid');
-            }            
+            }
         }
 
         activate();

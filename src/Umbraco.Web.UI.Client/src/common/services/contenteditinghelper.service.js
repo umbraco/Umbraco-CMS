@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.save || !args.methods.unPublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unPublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -179,17 +179,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             alias: "sendToPublish",
                             addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
-                    case "A":
-                        //save
-                        return {
-                            letter: ch,
-                            labelKey: "buttons_save",
-                            handler: args.methods.save,
-                            hotKey: "ctrl+s",
-                            hotKeyWhenHidden: true,
-                            alias: "save",
-                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
-                        };
                     case "Z":
                         //unpublish
                         return {
@@ -209,8 +198,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             buttons.subButtons = [];
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
-            // Publish, SendToPublish, Save
-            var buttonOrder = ["U", "H", "A"];
+            // Publish, SendToPublish
+            var buttonOrder = ["U", "H"];
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
