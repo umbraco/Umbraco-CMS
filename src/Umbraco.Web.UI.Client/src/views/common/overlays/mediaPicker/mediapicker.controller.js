@@ -237,10 +237,7 @@ angular.module("umbraco")
             $scope.onUploadComplete = function(files) {
                 $scope.gotoFolder($scope.currentFolder).then(function() {
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
-                        var image = $scope.images[$scope.images.length - 1];
-                        $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
-                        selectImage(image);
+                        selectImage($scope.images[$scope.images.length - 1]);
                     }
                 });
             };
