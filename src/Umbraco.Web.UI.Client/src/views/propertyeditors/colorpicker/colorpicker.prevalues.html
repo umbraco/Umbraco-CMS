@@ -13,8 +13,8 @@
         <div class="control-group umb-prevalues-multivalues__listitem color-picker-preval" ng-repeat="item in model.value track by $id(item)">
             <i class="icon icon-navigation handle"></i>
             <div class="umb-prevalues-multivalues__left">
-                <div class="thumbnail span1" hex-bg-color="{{item.value}}" bg-orig="transparent"></div>
                 <div class="color-picker-prediv"><pre>#{{item.value}}</pre><span>{{item.label}}</span></div>
+                <div class="thumbnail span1" hex-bg-color="{{item.value}}" hex-bg-orig="transparent"></div>
             </div>
             <div class="umb-prevalues-multivalues__right">
                 <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
