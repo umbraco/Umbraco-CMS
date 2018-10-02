@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -63,42 +64,45 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Items_By_User_Id_With_Query_And_Filter()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var sp = TestObjects.GetScopeProvider(Logger);
+            using (var scope = sp.CreateScope())
             {
-                for (int i = 0; i < 100; i++)
+                var repo = new AuditRepository((IScopeAccessor)sp, CacheHelper, Logger);
+
+                for (var i = 0; i < 100; i++)
                 {
-                    repo.AddOrUpdate(new AuditItem(i, string.Format("Content {0} created", i), AuditType.New, 0));
-                    repo.AddOrUpdate(new AuditItem(i, string.Format("Content {0} published", i), AuditType.Publish, 0));
+                    repo.Save(new AuditItem(i, $"Content {i} created", AuditType.New, 0));
+                    repo.Save(new AuditItem(i, $"Content {i} published", AuditType.Publish, 0));
                 }
-                unitOfWork.Commit();
+
+                scope.Complete();
             }
 
-            using (var repo = new AuditRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            using (var scope = sp.CreateScope())
             {
-                var query = Query<IAuditItem>.Builder.Where(x => x.UserId == 0);
+                var repo = new AuditRepository((IScopeAccessor)sp, CacheHelper, Logger);
+
+                var query = sp.SqlContext.Query<IAuditItem>().Where(x => x.UserId == 0);
 
                 try
                 {
-                    DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     var page = repo.GetPagedResultsByQuery(query, 0, 10, out var total, Direction.Descending,
                             new[] { AuditType.Publish },
-                            Query<IAuditItem>.Builder.Where(x => x.UserId > -1));
+                            sp.SqlContext.Query<IAuditItem>().Where(x => x.UserId > -1));
 
                     Assert.AreEqual(10, page.Count());
                     Assert.AreEqual(100, total);
                 }
                 finally
                 {
-                    DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.DisableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
-
 
         [Test]
         public void Get_Paged_Items_With_AuditType_Filter()

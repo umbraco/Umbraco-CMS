@@ -20,6 +20,8 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
+using System.Linq;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Web
 {

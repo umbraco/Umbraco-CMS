@@ -122,6 +122,7 @@ namespace Umbraco.Web.Trees
                 });
 
                 if (container.HasChildren == false)
+                { 
                     //can delete data type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
                 }

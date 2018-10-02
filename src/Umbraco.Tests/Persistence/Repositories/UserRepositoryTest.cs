@@ -15,6 +15,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -346,63 +347,64 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
         {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
-                var query = Query<IUser>.Builder.Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+                var query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
 
                 try
                 {
-                    DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
                             excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                            filter: Query<IUser>.Builder.Where(x => x.Id > -1));
+                            filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
 
                     // Assert
                     Assert.AreEqual(2, totalRecs);
                 }
                 finally
                 {
-                    DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.DisableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
+            
         }
 
         [Test]
         public void Can_Get_Paged_Results_With_Filter_And_Groups()
         {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
 
                 try
                 {
-                    DatabaseContext.Database.EnableSqlTrace = true;
-                    DatabaseContext.Database.EnableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
                         includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                        filter: Query<IUser>.Builder.Where(x => x.Id == 0));
+                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == 0));
 
                     // Assert
                     Assert.AreEqual(1, totalRecs);
                 }
                 finally
                 {
-                    DatabaseContext.Database.EnableSqlTrace = false;
-                    DatabaseContext.Database.DisableSqlCount();
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
