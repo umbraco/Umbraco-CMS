@@ -10,7 +10,7 @@
         </div>
     </div>
     <div ui-sortable="sortableOptions" ng-model="model.value">
-        <div class="control-group umb-prevalues-multivalues__listitem color-picker-preval" ng-repeat="item in model.value">
+        <div class="control-group umb-prevalues-multivalues__listitem color-picker-preval" ng-repeat="item in model.value track by $id(item)">
             <i class="icon icon-navigation handle"></i>
             <div class="umb-prevalues-multivalues__left">
                 <div class="thumbnail span1" hex-bg-color="{{item.value}}" bg-orig="transparent"></div>
