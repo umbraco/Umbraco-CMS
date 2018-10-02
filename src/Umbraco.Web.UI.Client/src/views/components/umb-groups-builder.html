@@ -5,23 +5,26 @@
         <umb-editor-sub-header-content-right>
 
             <umb-button
+                style="margin-right: 5px;"
                 alias="compositions"
                 ng-if="compositions !== false"
                 type="button"
-                button-style="link"
+                button-style="outline"
                 label-key="contentTypeEditor_compositions"
                 icon="icon-merge"
-                action="openCompositionsDialog()">
+                action="openCompositionsDialog()"
+                size="xs">
             </umb-button>
 
             <umb-button
                 alias="reorder"
                 ng-if="sorting !== false"
                 type="button"
-                button-style="link"
+                button-style="outline"
                 label-key="{{sortingButtonKey}}"
                 icon="icon-navigation"
-                action="toggleSortingMode();">
+                action="toggleSortingMode();"
+                size="xs">
             </umb-button>
 
         </umb-editor-sub-header-content-right>
