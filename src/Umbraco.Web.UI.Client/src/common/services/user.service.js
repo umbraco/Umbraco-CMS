@@ -150,29 +150,6 @@ angular.module('umbraco.services')
             }
         }
 
-        function getMomentLocales(locales, supportedLocales) {
-            
-            var localeUrls = [];
-            var locales = locales.split(',');
-            for (var i = 0; i < locales.length; i++) {
-                var locale = locales[i].toString().toLowerCase();
-                if (locale !== 'en-us') {
-
-                    if (supportedLocales.indexOf(locale + '.js') > -1) {
-                        localeUrls.push('lib/moment/' + locale + '.js');
-                    }
-                    if (locale.indexOf('-') > -1) {
-                        var majorLocale = locale.split('-')[0] + '.js';
-                        if (supportedLocales.indexOf(majorLocale) > -1) {
-                            localeUrls.push('lib/moment/' + majorLocale);
-                        }
-                    }
-                }
-            }
-
-            return localeUrls;
-        }
-
         /** resets all user data, broadcasts the notAuthenticated event and shows the login dialog */
         function userAuthExpired(isLogout) {
             //store the last user id and clear the user

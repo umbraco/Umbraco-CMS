@@ -1442,7 +1442,6 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
         {
-            using (var httpClient = new HttpClient())
             using (var scope = _scopeProvider.CreateScope())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
@@ -1450,7 +1449,11 @@ namespace Umbraco.Core.Services.Implement
                 byte[] bytes;
                 try
                 {
-                    bytes = httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    if (_httpClient == null)
+                    {
+                        _httpClient = new HttpClient();
+                    }
+                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
                 }
                 catch (HttpRequestException ex)
                 {

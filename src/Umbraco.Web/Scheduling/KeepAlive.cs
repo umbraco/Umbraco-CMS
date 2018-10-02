@@ -28,7 +28,7 @@ namespace Umbraco.Web.Scheduling
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            // not on slaves nor unknown role servers
+            // not on replicas nor unknown role servers
             switch (_runtime.ServerRole)
             {
                 case ServerRole.Replica:

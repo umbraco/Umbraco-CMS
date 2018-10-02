@@ -221,7 +221,8 @@
                     isClientSide: true
                 });
 
-                newVal += files[i].name + ",";
+                //special check for a comma in the name
+                newVal += files[i].name.replace(',', '-') + ",";
 
                 if (isImage) {
 

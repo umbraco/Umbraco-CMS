@@ -83,10 +83,21 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         {
                             var guidUdi = udi as GuidUdi;
                             if (guidUdi == null) continue;
-                            var multiNodeTreePickerItem =
-                                GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(guidUdi.Guid))
-                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid))
-                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id => _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(guidUdi.Guid));
+
+                            IPublishedContent multiNodeTreePickerItem = null;
+                            switch (udi.EntityType)
+                            {
+                                case Constants.UdiEntityType.Document:
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(guidUdi.Guid));
+                                    break;
+                                case Constants.UdiEntityType.Media:
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid));
+                                    break;
+                                case Constants.UdiEntityType.Member:
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id => _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(guidUdi.Guid));
+                                    break;
+                            }
+
                             if (multiNodeTreePickerItem != null)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);

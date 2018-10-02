@@ -66,22 +66,5 @@ namespace Umbraco.Core.Security
         /// </summary>
         private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
 
-        /// <summary>
-        /// Ensures that the thread culture is set based on the back office user's culture
-        /// </summary>
-        /// <param name="identity"></param>
-        internal static void EnsureCulture(this IIdentity identity)
-        {
-            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
-            {
-                Thread.CurrentThread.CurrentUICulture =
-                    Thread.CurrentThread.CurrentCulture =
-                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
-            }
-        }
-        /// <summary>
-        /// Used so that we aren't creating a new CultureInfo object for every single request
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
     }
 }
