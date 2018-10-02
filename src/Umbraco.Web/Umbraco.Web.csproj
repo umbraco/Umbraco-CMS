@@ -136,11 +136,16 @@
     <Compile Include="Media\Exif\JPEGMarker.cs" />
     <Compile Include="Media\Exif\JPEGSection.cs" />
     <Compile Include="Media\Exif\MathEx.cs" />
+    <Compile Include="Media\Exif\SvgFile.cs" />
     <Compile Include="Media\Exif\TIFFFile.cs" />
     <Compile Include="Media\Exif\TIFFHeader.cs" />
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\ImageHelper.cs" />
+    <Compile Include="Media\TypeDetector\JpegDetector.cs" />
+    <Compile Include="Media\TypeDetector\RasterizedTypeDetector.cs" />
+    <Compile Include="Media\TypeDetector\SvgDetector.cs" />
+    <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
