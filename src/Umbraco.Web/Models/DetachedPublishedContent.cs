@@ -153,6 +153,11 @@ namespace Umbraco.Web.Models
             get { return _containerNode != null ? _containerNode.UpdateDate : DateTime.MinValue; }
         }
 
+        public override DateTime? ExpireDate
+        {
+            get { return _containerNode?.ExpireDate; }
+        }
+
         public override Guid Version
         {
             get { return _containerNode != null ? _containerNode.Version : Guid.Empty; }

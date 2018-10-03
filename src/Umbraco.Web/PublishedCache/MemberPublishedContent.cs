@@ -220,6 +220,11 @@ namespace Umbraco.Web.PublishedCache
             get { return _member.UpdateDate; }
         }
 
+        public override DateTime? ExpireDate
+        {
+            get { return null; }
+        }
+
         public override Guid Version
         {
             get { return _member.Version; }

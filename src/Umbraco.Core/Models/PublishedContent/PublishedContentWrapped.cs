@@ -135,6 +135,11 @@ namespace Umbraco.Core.Models.PublishedContent
             get { return Content.UpdateDate; }
         }
 
+        public virtual DateTime? ExpireDate
+        {
+            get { return Content.ExpireDate; }
+        }
+
         public virtual Guid Version
         {
             get { return Content.Version; }

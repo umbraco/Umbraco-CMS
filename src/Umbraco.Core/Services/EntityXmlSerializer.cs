@@ -43,6 +43,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
             xml.Add(new XAttribute("isPublished", content.Published));
+            xml.Add(new XAttribute("expireDate", content.ExpireDate?.ToString("s") ?? string.Empty));
 
             if (deep)
             {

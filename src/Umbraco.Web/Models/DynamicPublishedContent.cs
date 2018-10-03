@@ -423,6 +423,11 @@ namespace Umbraco.Web.Models
             get { return PublishedContent.UpdateDate; }
         }
 
+	    DateTime? IPublishedContent.ExpireDate
+	    {
+	        get { return PublishedContent.ExpireDate; }
+	    }
+
         Guid IPublishedContent.Version
         {
             get { return PublishedContent.Version; }
