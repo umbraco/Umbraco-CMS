@@ -5,22 +5,6 @@
     /// </summary>
     public interface IPublishedValueFallback
     {
-        // fixme discussions & challenges
-        //
-        // - the fallback: parameter value must be open, so about anything can be passed to the IPublishedValueFallback
-        //    we have it now, it's an integer + constants, cool
-        //
-        // - we need to be able to configure (via code for now) a default fallback policy?
-        //    not! the default value of the fallback: parameter is 'default', not 'none', and if people
-        //    want to implement a different default behavior, they have to override the fallback provider
-        //
-        // - (and...)
-        //    ModelsBuilder model.Value(x => x.Price, ...) extensions need to be adjusted too
-        //
-        // - cache & perfs
-        //     soon as ppl implement custom fallbacks, caching is a problem, so better just not cache
-        //     OTOH we need to implement the readonly thing for languages
-
         /// <summary>
         /// Tries to get a fallback value for a property.
         /// </summary>
@@ -37,6 +21,9 @@
         /// <para>It can only fallback at property level (no recurse).</para>
         /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
         /// get property.Value() or property.Value{T}() to trigger fallback.</para>
+        /// <para>Note that <paramref name="culture"/> and <paramref name="segment"/> may not be contextualized,
+        /// so the variant context should be used to contextualize them (see our default implementation in
+        /// the web project.</para>
         /// </remarks>
         bool TryGetValue(IPublishedProperty property, string culture, string segment, Fallback fallback, object defaultValue, out object value);
 

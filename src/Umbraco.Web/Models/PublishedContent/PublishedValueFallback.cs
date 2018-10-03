@@ -12,14 +12,15 @@ namespace Umbraco.Web.Models.PublishedContent
     public class PublishedValueFallback : IPublishedValueFallback
     {
         private readonly ILocalizationService _localizationService;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedValueFallback"/> class.
         /// </summary>
-        /// <param name="serviceContext"></param>
-        public PublishedValueFallback(ServiceContext serviceContext)
+        public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
         {
             _localizationService = serviceContext.LocalizationService;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         /// <inheritdoc />
@@ -31,6 +32,8 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <inheritdoc />
         public bool TryGetValue<T>(IPublishedProperty property, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
+            _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, ref culture, ref segment);
+
             foreach (var f in fallback)
             {
                 switch (f)
@@ -62,6 +65,14 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <inheritdoc />
         public bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
+            var propertyType = content.ContentType.GetPropertyType(alias);
+            if (propertyType == null)
+            {
+                value = default;
+                return false;
+            }
+            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+
             foreach (var f in fallback)
             {
                 switch (f)
@@ -94,6 +105,14 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <inheritdoc />
         public virtual bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
+            var propertyType = content.ContentType.GetPropertyType(alias);
+            if (propertyType == null)
+            {
+                value = default;
+                return false;
+            }
+            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+
             // note: we don't support "recurse & language" which would walk up the tree,
             // looking at languages at each level - should someone need it... they'll have
             // to implement it.

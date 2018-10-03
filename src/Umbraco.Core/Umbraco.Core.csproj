@@ -399,6 +399,7 @@
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
