@@ -123,6 +123,8 @@
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
