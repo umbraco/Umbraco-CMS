@@ -5,7 +5,7 @@
         var defaultLabel = null;
 
         $scope.newColor = defaultColor;
-        $scope.newLavel = defaultLabel;
+        $scope.newLabel = defaultLabel;
         $scope.hasError = false;
 
         $scope.labels = {};
