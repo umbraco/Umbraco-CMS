@@ -24,6 +24,105 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceTests : TestWithSomeContentBase
     {
+
+        //TODO: Then write the ones for content type changes
+
+        [Test]
+        public void Change_Content_Type_From_Variant_Invariant()
+        {
+            //initialize the listener which is responsible for updating content based on variant/invariant changes
+            var listener = new UpdateContentOnVariantChangesComponent();
+            listener.Initialize(ServiceContext.ContentService, ServiceContext.LocalizationService);
+
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Culture
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.ResetDirtyProperties(false);
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.SetCultureName("Home", "en-US");
+            doc.SetValue("title", "hello world", "en-US");
+            ServiceContext.ContentService.Save(doc);
+
+            Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+
+            //change the content type to be invariant
+            contentType.Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+
+            //change back property type to be variant
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+        }
+
+        [Test]
+        public void Change_Property_Type_From_Invariant_Variant()
+        {
+            //initialize the listener which is responsible for updating content based on variant/invariant changes
+            var listener = new UpdateContentOnVariantChangesComponent();
+            listener.Initialize(ServiceContext.ContentService, ServiceContext.LocalizationService);
+
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Nothing
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.ResetDirtyProperties(false);
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.SetCultureName("Home", "en-US");
+            doc.SetValue("title", "hello world");
+            ServiceContext.ContentService.Save(doc);
+
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+
+            //change the property type to be variant
+            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+
+            //change back property type to be invariant
+            contentType.PropertyTypes.First().Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+        }
+
         [Test]
         public void Change_Property_Type_From_Variant_Invariant()
         {

@@ -12,6 +12,7 @@ namespace Umbraco.Core.Components
     /// Manages data changes for when content/property types have variation changes
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    //fixme: this one MUST fire before any of the content cache ones
     public sealed class UpdateContentOnVariantChangesComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private IContentService _contentService;
@@ -40,7 +41,9 @@ namespace Umbraco.Core.Components
                     {
                         var propType = c.Item.PropertyTypes.First(x => x.Alias == a);
 
-                        switch(propType.Variations)
+                        //fixme: this does not take into account segments, but how can we since we don't know what it changed from?
+
+                        switch (propType.Variations)
                         {
                             case ContentVariation.Culture:
                                 //if the current variation is culture it means that the previous was nothing
@@ -50,7 +53,7 @@ namespace Umbraco.Core.Components
                                     try
                                     {
                                         content.Properties[a].PropertyType.Variations = ContentVariation.Nothing;
-                                        //now get the culture val
+                                        //now get the invariant val
                                         invariantVal = content.GetValue(a);
                                     }
                                     finally

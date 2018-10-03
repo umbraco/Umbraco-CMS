@@ -402,10 +402,19 @@ AND umbracoNode.id <> @id",
                     propertyType.PropertyGroupId = new Lazy<int>(() => groupId);
             }
 
+            //check if the content type variation has been changed to Nothing since we will need to update
+            //all property types to Nothing as well if they aren't already
+            //fixme: this does not take into account segments, but how can we since we don't know what it changed from?
+            var ctVariationChangedToNothing = entity.IsPropertyDirty("Variations") && entity.Variations == ContentVariation.Nothing;
+
             // insert or update properties
             // all of them, no-group and in-groups
             foreach (var propertyType in entity.PropertyTypes)
             {
+                //fixme: this does not take into account segments, but how can we since we don't know what it changed from?
+                if (ctVariationChangedToNothing && propertyType.Variations != ContentVariation.Nothing)
+                    propertyType.Variations = ContentVariation.Nothing;
+
                 var groupId = propertyType.PropertyGroupId?.Value ?? default(int);
                 // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default(int))
