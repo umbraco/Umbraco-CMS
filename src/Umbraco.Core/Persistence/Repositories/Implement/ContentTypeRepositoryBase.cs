@@ -323,9 +323,7 @@ AND umbracoNode.id <> @id",
                 });
             }
 
-            // fixme below, manage the property type
-
-            // delete ??? fixme wtf is this?
+            // delete property types
             // ... by excepting entries from db with entries from collections
             if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {

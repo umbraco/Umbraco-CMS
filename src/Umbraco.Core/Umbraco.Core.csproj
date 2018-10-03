@@ -170,6 +170,7 @@
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\UmbracoComponentBase.cs" />
     <Compile Include="Components\UmbracoCoreComponent.cs" />
+    <Compile Include="Components\UpdateContentOnVariantChangesComponent.cs" />
     <Compile Include="Composing\BuilderCollectionBase.cs" />
     <Compile Include="Composing\CollectionBuilderBase.cs" />
     <Compile Include="Composing\CompositionRoots\ConfigurationCompositionRoot.cs" />

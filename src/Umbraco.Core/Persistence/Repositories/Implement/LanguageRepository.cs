@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
-        private FullDataSetRepositoryCachePolicy<ILanguage, int> TypedCachePolicy => (FullDataSetRepositoryCachePolicy<ILanguage, int>) CachePolicy;
+        private FullDataSetRepositoryCachePolicy<ILanguage, int> TypedCachePolicy => CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
 
         #region Overrides of RepositoryBase<int,Language>
 
@@ -215,7 +215,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         
         public ILanguage GetByIsoCode(string isoCode)
         {
-            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            // ensure cache is populated, in a non-expensive way
+            if (TypedCachePolicy != null)
+                TypedCachePolicy.GetAllCached(PerformGetAll);
+
             var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
             return id.HasValue ? Get(id.Value) : null;
         }
@@ -228,7 +231,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (isoCode == null) return null;
 
-            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            // ensure cache is populated, in a non-expensive way
+            if (TypedCachePolicy != null)
+                TypedCachePolicy.GetAllCached(PerformGetAll);
+
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
@@ -246,7 +252,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (id == null) return null;
 
-            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            // ensure cache is populated, in a non-expensive way
+            if (TypedCachePolicy != null)
+                TypedCachePolicy.GetAllCached(PerformGetAll);
+
             lock (_codeIdMap) // yes, we want to lock _codeIdMap
             {
                 if (_idCodeMap.TryGetValue(id.Value, out var isoCode)) return isoCode;
@@ -269,8 +278,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // do NOT leak that language, it's not deep-cloned!
         private ILanguage GetDefault()
         {
-            // get all cached, non-cloned
-            var languages = TypedCachePolicy.GetAllCached(PerformGetAll).ToList();
+            // get all cached
+            var languages = (TypedCachePolicy?.GetAllCached(PerformGetAll) //try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
+                ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)).ToList();
+
             var language = languages.FirstOrDefault(x => x.IsDefaultVariantLanguage);
             if (language != null) return language;
 

@@ -408,7 +408,8 @@ namespace Umbraco.Core.Models
         /// PropertyTypes that are not part of a PropertyGroup
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes;
+        //fixme should we mark this as EditorBrowsable hidden since it really isn't ever used?
+        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes; 
 
         /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
