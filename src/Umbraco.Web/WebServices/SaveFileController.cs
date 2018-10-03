@@ -251,7 +251,7 @@ namespace Umbraco.Web.WebServices
                 .EnsureEndsWith(".css");
 
             var svce = (FileService) Services.FileService;
-            var stylesheet = svce.GetStylesheetByName(oldName);
+            var stylesheet = svce.GetStylesheetByName(filename);
             if (stylesheet == null)
                 stylesheet = new Stylesheet(filename);
             else
