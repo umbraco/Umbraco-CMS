@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -585,6 +586,17 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -1113,39 +1125,75 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
-        /// <param name="id">The content id to unpublish</param>
-        /// <param name="culture">The culture variant for the content id to unpublish, if none specified will unpublish all variants of the content</param>
+        /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("id", 'U')]
+        [EnsureUserPermissionForContent("model.Id", 'U')]
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay PostUnPublish(int id, string culture = null)
+        public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));
 
             if (foundContent == null)
-                HandleContentNotFound(id);
+                HandleContentNotFound(model.Id);
 
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.GetUserId().ResultOr(0));
-
-            var content = MapToDisplay(foundContent);
-
-            if (!unpublishResult.Success)
+            var languageCount = _allLangs.Value.Count();
+            if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
             {
-                AddCancelMessage(content);
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
+                //this means that the entire content item will be unpublished
+                var unpublishResult = Services.ContentService.Unpublish(foundContent, userId: Security.GetUserId().ResultOr(0));
+
+                var content = MapToDisplay(foundContent);
+
+                if (!unpublishResult.Success)   
+                {
+                    AddCancelMessage(content);
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
+                }
+                else
+                {
+                    content.AddSuccessNotification(
+                        Services.TextService.Localize("content/unpublish"),
+                        Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                    return content;
+                }
             }
             else
             {
-                //fixme should have a better localized method for when we have the UnpublishResultType.SuccessMandatoryCulture status
+                //we only want to unpublish some of the variants
+                var results = new Dictionary<string, UnpublishResult>();
+                foreach(var c in model.Cultures)
+                {
+                    var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
+                    results[c] = result;
+                    if (result.Result == UnpublishResultType.SuccessMandatoryCulture)
+                    {
+                        //if this happens, it means they are all unpublished, we don't need to continue
+                        break;
+                    }
+                }
 
-                content.AddSuccessNotification(
-                    Services.TextService.Localize("content/unPublish"),
-                    unpublishResult.Result == UnpublishResultType.SuccessCulture
-                        ? Services.TextService.Localize("speechBubbles/contentVariationUnpublished", new[] { culture })
-                        : Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                var content = MapToDisplay(foundContent);
 
+                //check for this status and return the correct message
+                if (results.Any(x => x.Value.Result == UnpublishResultType.SuccessMandatoryCulture))
+                {
+                    content.AddSuccessNotification(
+                           Services.TextService.Localize("content/unpublish"),
+                           Services.TextService.Localize("speechBubbles/contentMandatoryCultureUnpublished"));
+                    return content;
+                }
+
+                //otherwise add a message for each one unpublished
+                foreach (var r in results)
+                {
+                    content.AddSuccessNotification(
+                           Services.TextService.Localize("content/unpublish"),
+                           Services.TextService.Localize("speechBubbles/contentCultureUnpublished", new[] { _allLangs.Value[r.Key].CultureName }));
+                }
                 return content;
+
             }
+
         }
 
         public ContentDomainsAndCulture GetCultureAndDomains(int id)

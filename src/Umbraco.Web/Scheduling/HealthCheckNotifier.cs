@@ -38,7 +38,7 @@ namespace Umbraco.Web.Scheduling
             switch (_runtimeState.ServerRole)
             {
                 case ServerRole.Replica:
-                    _logger.Debug<HealthCheckNotifier>("Does not run on slave servers.");
+                    _logger.Debug<HealthCheckNotifier>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
                     _logger.Debug<HealthCheckNotifier>("Does not run on servers with unknown role.");

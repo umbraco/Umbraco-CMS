@@ -154,7 +154,7 @@
     <key alias="smallMove">Flyttet</key>
     <key alias="smallSave">Gemt</key>
     <key alias="smallDelete">Slettet</key>
-    <key alias="smallUnPublish">Afpubliceret</key>
+    <key alias="smallUnpublish">Afpubliceret</key>
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
@@ -229,7 +229,7 @@
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Afpublicér</key>
+    <key alias="unpublish">Afpublicér</key>
     <key alias="unpublished">Afpubliceret</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>

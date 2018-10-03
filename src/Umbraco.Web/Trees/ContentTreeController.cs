@@ -235,7 +235,6 @@ namespace Umbraco.Web.Trees
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             AddActionNode<ActionMove>(item, menu, true);
             AddActionNode<ActionCopy>(item, menu);
-            AddActionNode<ActionChangeDocType>(item, menu, convert: true);
 
             AddActionNode<ActionSort>(item, menu, true);
 

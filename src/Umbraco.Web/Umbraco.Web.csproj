@@ -60,10 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
-    <PackageReference Include="ClientDependency" Version="1.9.6" />
+    <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
     <PackageReference Include="ImageProcessor">
       <Version>2.6.2.25</Version>
     </PackageReference>
@@ -136,12 +136,18 @@
     <Compile Include="Media\Exif\JPEGMarker.cs" />
     <Compile Include="Media\Exif\JPEGSection.cs" />
     <Compile Include="Media\Exif\MathEx.cs" />
+    <Compile Include="Media\Exif\SvgFile.cs" />
     <Compile Include="Media\Exif\TIFFFile.cs" />
     <Compile Include="Media\Exif\TIFFHeader.cs" />
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\ImageHelper.cs" />
+    <Compile Include="Media\TypeDetector\JpegDetector.cs" />
+    <Compile Include="Media\TypeDetector\RasterizedTypeDetector.cs" />
+    <Compile Include="Media\TypeDetector\SvgDetector.cs" />
+    <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollectionBuilder.cs" />
@@ -557,7 +563,7 @@
     <Compile Include="_Legacy\Actions\ActionSort.cs" />
     <Compile Include="_Legacy\Actions\ActionToPublish.cs" />
     <Compile Include="_Legacy\Actions\ActionTranslate.cs" />
-    <Compile Include="_Legacy\Actions\ActionUnPublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionUnpublish.cs" />
     <Compile Include="_Legacy\Actions\ActionUpdate.cs" />
     <Compile Include="_Legacy\Actions\ContextMenuSeperator.cs" />
     <Compile Include="_Legacy\Actions\IAction.cs" />

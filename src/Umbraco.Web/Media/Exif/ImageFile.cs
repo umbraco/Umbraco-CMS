@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Text;
+using Umbraco.Web.Media.TypeDetector;
 
 namespace Umbraco.Web.Media.Exif
 {
@@ -118,22 +119,25 @@ namespace Umbraco.Web.Media.Exif
         /// <returns>The <see cref="ImageFile"/> created from the file.</returns>
         public static ImageFile FromStream(Stream stream, Encoding encoding)
         {
-            stream.Seek (0, SeekOrigin.Begin);
-            byte[] header = new byte[8];
-            stream.Seek (0, SeekOrigin.Begin);
-            if (stream.Read (header, 0, header.Length) != header.Length)
-                throw new NotValidImageFileException ();
-
             // JPEG
-            if (header[0] == 0xFF && header[1] == 0xD8)
-                return new JPEGFile (stream, encoding);
+            if (JpegDetector.IsOfType(stream))
+            {
+                return new JPEGFile(stream, encoding);
+            }
 
             // TIFF
-            string tiffHeader = Encoding.ASCII.GetString (header, 0, 4);
-            if (tiffHeader == "MM\x00\x2a" || tiffHeader == "II\x2a\x00")
-                return new TIFFFile (stream, encoding);
+            if (TIFFDetector.IsOfType(stream))
+            {
+                return new TIFFFile(stream, encoding);
+            }
 
-            throw new NotValidImageFileException ();
+            // SVG
+            if (SvgDetector.IsOfType(stream))
+            {
+                return new SvgFile(stream);
+            }
+
+            throw new NotValidImageFileException();
         }
         #endregion
     }

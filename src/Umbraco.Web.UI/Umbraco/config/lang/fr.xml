@@ -159,7 +159,7 @@
 	<key alias="smallMove">Déplacement</key>
 	<key alias="smallSave">Sauvegarde</key>
 	<key alias="smallDelete">Suppression</key>
-	<key alias="smallUnPublish">Dépublication</key>
+	<key alias="smallUnpublish">Dépublication</key>
 	<key alias="smallRollBack">Récupération</key>
 	<key alias="smallSendToPublish">Envoi pour publication</key>
 	<key alias="smallSendToTranslate">Envoi pour traduction</key>
@@ -234,7 +234,7 @@
     <key alias="titleOptional">Titre (optionnel)</key>
     <key alias="altTextOptional">Texte alternatif (optionnel)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Dépublier</key>
+    <key alias="unpublish">Dépublier</key>
 	<key alias="unpublished">Dépublié</key>
     <key alias="updateDate">Dernière édition</key>
     <key alias="updateDateDesc" version="7.0">Date/heure à laquelle ce document a été édité</key>

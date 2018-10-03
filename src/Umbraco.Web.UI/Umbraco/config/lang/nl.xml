@@ -165,7 +165,7 @@
     <key alias="titleOptional">Titel (optioneel)</key>
     <key alias="altTextOptional">Alternatieve tekst (optioneel)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Depubliceren</key>
+    <key alias="unpublish">Depubliceren</key>
     <key alias="updateDate">Laatst gewijzigd</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Bestand(en) verwijderen</key>
