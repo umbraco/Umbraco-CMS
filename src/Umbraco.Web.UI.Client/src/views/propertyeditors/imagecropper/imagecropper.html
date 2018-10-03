@@ -47,7 +47,7 @@
             </div>
 
             <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
-                <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
+                <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias, 'has-custom-crop':!!value.coordinates}" ng-click="crop(value)">
 
                     <umb-image-thumbnail center="model.value.focalPoint"
                                          crop="value.coordinates"
