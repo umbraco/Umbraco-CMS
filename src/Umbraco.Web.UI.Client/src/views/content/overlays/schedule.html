@@ -1,0 +1,85 @@
+<div ng-controller="Umbraco.Overlays.ScheduleContentController as vm">
+    
+    <div style="margin-bottom: 15px;">
+        <p><localize key="content_languagesToSave"></localize></p>
+    </div>
+
+    <div class="umb-list umb-list--condensed">
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants">
+            <ng-form name="scheduleSelectorForm">
+                <div class="flex">
+                    <input 
+                        id="{{variant.language.culture}}"
+                        name="saveVariantSelector"
+                        type="checkbox"
+                        ng-model="variant.schedule"
+                        ng-change="vm.changeSelection(variant)"
+                        style="margin-right: 8px;" />
+                    <div>
+                        
+                        <label for="{{variant.language.culture}}" style="margin-bottom: 2px;">
+                            <span>{{ variant.language.name }}</span>
+                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                        </label>
+
+                        <div>
+                            <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                        </div>
+
+                        <div ng-if="variant.schedule" class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
+                            <div style="font-size: 13px; margin-right: 5px;">Publish: </div>
+        
+                            <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;">
+                                <umb-date-time-picker 
+                                    options="vm.datePickerConfig"
+                                    on-change="vm.datePickerChange(variant, event, 'publish')">
+        
+                                    <div ng-if="variant.releaseDate" class="btn umb-button--xxs">
+                                        {{variant.releaseDateFormatted}}
+                                    </div>
+        
+                                    <a ng-hide="variant.releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                        <localize key="content_setDate">Set date</localize>
+                                    </a>
+        
+                                </umb-date-time-picker>
+        
+                                <a ng-if="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle">
+                                    <span class="icon icon-wrong"></span>
+                                </a>
+                            </div>
+        
+                            <div style="font-size: 13px; margin-right: 5px;">Unpublish:</div>
+        
+                            <div class="btn-group flex" style="font-size: 14px;">
+                                <umb-date-time-picker 
+                                    options="vm.datePickerConfig"
+                                    on-change="vm.datePickerChange(variant, event, 'unpublish')">
+        
+                                    <div ng-if="variant.removeDate" class="btn umb-button--xxs">
+                                        {{variant.removeDateFormatted}}
+                                    </div>
+                    
+                                    <a ng-hide="variant.removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                        <localize key="content_setDate">Set date</localize>
+                                    </a>
+        
+                                </umb-date-time-picker>
+        
+                                <a ng-if="variant.removeDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle">
+                                    <span class="icon icon-wrong"></span>
+                                </a>
+                            </div>
+        
+                        </div>
+
+                    </div>
+                </div>
+
+            </ng-form>
+        </div>
+        <br/>
+    </div>
+                        
+</div>

@@ -265,6 +265,7 @@
         <key alias="isSensitiveValue_short">This value is hidden.</key>
         <key alias="languagesToPublish">What languages would you like to publish?</key>
         <key alias="languagesToSave">What languages would you like to save?</key>
+        <key alias="languagesToSchedule">What languages would you like to schedule?</key>
         <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
         <key alias="publishedLanguages">Published Languages</key>
         <key alias="unmodifiedLanguages">Unmodified Languages</key>

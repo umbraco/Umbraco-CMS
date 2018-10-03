@@ -28,6 +28,14 @@
 
                 <umb-editor-footer-content-right>
 
+                    <umb-button 
+                        alias="schedule" 
+                        type="button" 
+                        button-style="info" 
+                        action="schedule(content)"
+                        label="Schedule">
+                    </umb-button>
+
                     <umb-button
                         ng-if="infiniteModel.infiniteMode"
                         action="close()"

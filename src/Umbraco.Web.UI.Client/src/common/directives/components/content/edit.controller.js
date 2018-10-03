@@ -536,6 +536,30 @@
 
         };
 
+        $scope.schedule = function() {
+            clearNotifications($scope.content);
+            //before we launch the dialog we want to execute all client side validations first
+            if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
+
+                var dialog = {
+                    parentScope: $scope,
+                    view: "views/content/overlays/schedule.html",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabel: "Schedule",
+                    submit: function (model) {
+                        model.submitButtonState = "busy";
+                        clearNotifications($scope.content);
+                        model.submitButtonState = "success";
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+                overlayService.open(dialog);
+            }
+        };
+
         $scope.preview = function (content) {
 
 
