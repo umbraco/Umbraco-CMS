@@ -245,18 +245,28 @@ namespace Umbraco.Web.WebServices
         public JsonResult SaveStylesheet(string filename, string oldName, string contents)
         {
             // sanitize input - stylesheet names have no extension
+            var svce = (FileService) Services.FileService;
+
+            if (filename != oldName)
+            {
+               var stylesheetExists = svce.GetStylesheetByName(filename);
+               if (stylesheetExists != null)
+                {
+                    return Failed(ui.Text("speechBubbles", "cssErrorText"), "A file named '" + filename + ".css' already exists." );
+                }
+            }
+
             filename = filename
                 .Replace('\\', '/')
                 .TrimStart('/')
                 .EnsureEndsWith(".css");
 
-            var svce = (FileService) Services.FileService;
             var stylesheet = svce.GetStylesheetByName(oldName);
             if (stylesheet == null)
                 stylesheet = new Stylesheet(filename);
             else
                 stylesheet.Path = filename;
-            stylesheet.Content = contents;
+                stylesheet.Content = contents;
 
             try
             {
