@@ -2,7 +2,7 @@
 
     <li ng-repeat="item in navigation | limitTo: itemsLimit ">
         <div ng-show="item.alias !== 'more'"
-             ng-class="{'show-validation': item.hasError}">
+            ng-class="item.errorClass">
             <a data-element="sub-view-{{item.alias}}"
                tabindex="-1"
                class="umb-sub-views-nav-item js-umb-sub-views-nav-item"

@@ -46,6 +46,12 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
         },
         link: function (scope, element, attr, ctrls) {
 
+            function notifySubView() {
+                if (subView){
+                    subView.valStatusChanged({ form: formCtrl, showValidation: scope.showValidation });
+                }
+            }
+
             var formCtrl = ctrls[0];
             var parentFormMgr = ctrls.length > 0 ? ctrls[1] : null;
             var subView = ctrls.length > 1 ? ctrls[2] : null;
@@ -84,9 +90,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             }, function (e) {
                 scope.$broadcast("valStatusChanged", { form: formCtrl });
 
-                if (subView){
-                    subView.valStatusChanged({ form: formCtrl });
-                }
+                notifySubView();
 
                 //find all invalid elements' .control-group's and apply the error class
                 var inError = element.find(".control-group .ng-invalid").closest(".control-group");
@@ -108,6 +112,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.showValidation)) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                notifySubView();
             }
 
             var unsubscribe = [];
@@ -116,6 +121,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function(ev, args) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                notifySubView();
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
             }));
@@ -125,6 +131,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 //remove validation class
                 element.removeClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = false;
+                notifySubView();
                 //clear form state as at this point we retrieve new data from the server
                 //and all validation will have cleared at this point
                 formCtrl.$setPristine();

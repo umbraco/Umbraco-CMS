@@ -2,7 +2,7 @@
     ng-class="'sub-view-' + model.name"
     val-sub-view>
 
-    <!-- User definied content apps -->
+    <!-- User definied content apps
     <div ng-switch="model.alias">
         <ng-form ng-switch-when="umbContent|umbInfo" ng-switch-when-separator="|" val-form-manager>
             <div
@@ -10,9 +10,9 @@
                 ng-show="model.active === true"
                 ng-include="model.view">
             </div>
-        </ng-form>
+        </ng-form>-->
 
-        <!-- Custom Content Apps -->
+        <!-- Custom Content Apps
         <ng-form ng-switch-default val-form-manager umb-isolate-form>
             <div
                 class="umb-editor-sub-view__content"
@@ -20,9 +20,13 @@
                 ng-include="model.view">
             </div>
         </ng-form>
+    </div>-->
+
+    <div
+        class="umb-editor-sub-view__content"
+        ng-show="model.active === true"
+        ng-include="model.view">
     </div>
-
-
 
 
 

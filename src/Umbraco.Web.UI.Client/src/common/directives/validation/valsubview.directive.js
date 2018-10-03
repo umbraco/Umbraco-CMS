@@ -19,14 +19,15 @@
 
             if (subViewContent.length > 0) {
                 $scope.model.hasError = true;
-                $element.addClass("show-validation");
+                $scope.model.errorClass = args.showValidation ? 'show-validation' : null;
             } else {
                 $scope.model.hasError = false;
-                $element.removeClass("show-validation");
+                $scope.model.errorClass = null;
             }
          }
          else {
              $scope.model.hasError = false;
+             $scope.model.errorClass = null;
          }
         }
       }
