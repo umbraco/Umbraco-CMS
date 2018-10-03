@@ -328,16 +328,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Add language to delete as a fall-back language to another one
                 var repository = CreateRepository(provider);
                 var languageToFallbackFrom = repository.Get(5);
-                languageToFallbackFrom.FallbackLanguageId = 1;
+                languageToFallbackFrom.FallbackLanguageId = 2; // fall back to #2 (something we can delete)
                 repository.Save(languageToFallbackFrom);
 
-                // Act
-                var languageToDelete = repository.Get(1);
+                // delete #2
+                var languageToDelete = repository.Get(2);
                 repository.Delete(languageToDelete);
 
-                var exists = repository.Exists(1);
+                var exists = repository.Exists(2);
 
-                // Assert
+                // has been deleted
                 Assert.That(exists, Is.False);
             }
         }
@@ -369,6 +369,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private void CreateTestData()
         {
+            //Id 1 is en-US - when Umbraco is installed
+
             var languageDK = new Language("da-DK") { CultureName = "da-DK" };
             ServiceContext.LocalizationService.Save(languageDK);//Id 2
 

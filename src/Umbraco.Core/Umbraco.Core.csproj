@@ -299,7 +299,6 @@
     <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
-    <Compile Include="Constants-Content.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />
     <Compile Include="Constants-DatabaseProviders.cs" />
@@ -393,6 +392,7 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\Fallback.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
     <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />

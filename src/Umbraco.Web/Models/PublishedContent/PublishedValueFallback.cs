@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using ValueFallback = Umbraco.Core.Constants.Content.ValueFallback;
 
 namespace Umbraco.Web.Models.PublishedContent
 {
@@ -24,82 +23,110 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, int fallback)
+        public bool TryGetValue(IPublishedProperty property, string culture, string segment, Fallback fallback, object defaultValue, out object value)
         {
-            return GetValue<object>(property, culture, segment, defaultValue, fallback);
+            return TryGetValue<object>(property, culture, segment, fallback, defaultValue, out value);
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, int fallback)
+        public bool TryGetValue<T>(IPublishedProperty property, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
-            switch (fallback)
+            foreach (var f in fallback)
             {
-                case ValueFallback.None:
-                case ValueFallback.Default:
-                    return defaultValue;
-                case ValueFallback.Language:
-                    return TryGetValueWithLanguageFallback(property, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
-                default:
-                    throw NotSupportedFallbackMethod(fallback);
+                switch (f)
+                {
+                    case Fallback.None:
+                        continue;
+                    case Fallback.DefaultValue:
+                        value = defaultValue;
+                        return true;
+                    case Fallback.Language:
+                        if (TryGetValueWithLanguageFallback(property, culture, segment, defaultValue, out value))
+                            return true;
+                        break;
+                    default:
+                        throw NotSupportedFallbackMethod(f, "property");
+                }
             }
+
+            value = defaultValue;
+            return false;
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, int fallback)
+        public bool TryGetValue(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
         {
-            return GetValue<object>(content, alias, culture, segment, defaultValue, fallback);
+            return TryGetValue<object>(content, alias, culture, segment, fallback, defaultValue, out value);
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, int fallback)
+        public bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
-            switch (fallback)
+            foreach (var f in fallback)
             {
-                case ValueFallback.None:
-                case ValueFallback.Default:
-                    return defaultValue;
-                case ValueFallback.Language:
-                    return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
-                default:
-                    throw NotSupportedFallbackMethod(fallback);
+                switch (f)
+                {
+                    case Fallback.None:
+                        continue;
+                    case Fallback.DefaultValue:
+                        value = defaultValue;
+                        return true;
+                    case Fallback.Language:
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out value))
+                            return true;
+                        break;
+                    default:
+                        throw NotSupportedFallbackMethod(f, "element");
+                }
             }
+
+            value = defaultValue;
+            return false;
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, int fallback)
+        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
         {
             // is that ok?
-            return GetValue<object>(content, alias, culture, segment, defaultValue, fallback);
+            return TryGetValue<object>(content, alias, culture, segment, fallback, defaultValue, out value);
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, int fallback)
+        public virtual bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
         {
-            switch (fallback)
+            // note: we don't support "recurse & language" which would walk up the tree,
+            // looking at languages at each level - should someone need it... they'll have
+            // to implement it.
+
+            foreach (var f in fallback)
             {
-                case ValueFallback.None:
-                case ValueFallback.Default:
-                    return defaultValue;
-                case ValueFallback.Recurse:
-                    return TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value1) ? value1 : defaultValue;
-                case ValueFallback.Language:
-                    return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
-                case ValueFallback.RecurseThenLanguage:
-                    return TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value3)
-                        ? value3
-                        : TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value4) ? value4 : defaultValue;
-                case ValueFallback.LanguageThenRecurse:
-                    return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value5)
-                        ? value5
-                        : TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value6) ? value6 : defaultValue;
-                default:
-                    throw NotSupportedFallbackMethod(fallback);
+                switch (f)
+                {
+                    case Fallback.None:
+                        continue;
+                    case Fallback.DefaultValue:
+                        value = defaultValue;
+                        return true;
+                    case Fallback.Language:
+                        if (TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out value))
+                            return true;
+                        break;
+                    case Fallback.Ancestors:
+                        if (TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out value))
+                            return true;
+                        break;
+                    default:
+                        throw NotSupportedFallbackMethod(f, "content");
+                }
             }
+
+            value = defaultValue;
+            return false;
         }
 
-        private NotSupportedException NotSupportedFallbackMethod(int fallback)
+        private NotSupportedException NotSupportedFallbackMethod(int fallback, string level)
         {
-            return new NotSupportedException($"Fallback {GetType().Name} does not support policy code '{fallback}'.");
+            return new NotSupportedException($"Fallback {GetType().Name} does not support fallback code '{fallback}' at {level} level.");
         }
 
         // tries to get a value, recursing the tree

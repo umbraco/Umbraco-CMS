@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -63,6 +65,8 @@ namespace Umbraco.Tests.PublishedContent
             var props = new[]
                 {
                     factory.CreatePropertyType("prop1", 1),
+                    factory.CreatePropertyType("welcomeText", 1),
+                    factory.CreatePropertyType("welcomeText2", 1),
                 };
             var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
 
@@ -168,7 +172,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "es", fallback: Core.Constants.Content.ValueFallback.Language);
+            var value = content.Value("welcomeText", "es", fallback: Fallback.ToLanguage);
             Assert.AreEqual("Welcome", value);
         }
 
@@ -176,7 +180,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Over_Two_Levels()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "it", fallback: Core.Constants.Content.ValueFallback.Language);
+            var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
             Assert.AreEqual("Welcome", value);
         }
 
@@ -184,7 +188,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "no", fallback: Core.Constants.Content.ValueFallback.Language);
+            var value = content.Value("welcomeText", "no", fallback: Fallback.ToLanguage);
             Assert.IsNull(value);
         }
 
@@ -200,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_Recursively()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText2", fallback: Core.Constants.Content.ValueFallback.Recurse);
+            var value = content.Value("welcomeText2", fallback: Fallback.ToAncestors);
             Assert.AreEqual("Welcome", value);
         }
 
@@ -208,7 +212,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_With_Recursive_Priority()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText", "nl", fallback: Core.Constants.Content.ValueFallback.RecurseThenLanguage);
+            var value = content.Value("welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
             // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
             Assert.AreEqual("Welkom", value);
@@ -218,7 +222,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_With_Fallback_Language_Priority()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText", "nl", fallback: Core.Constants.Content.ValueFallback.LanguageThenRecurse);
+            var value = content.Value("welcomeText", "nl", fallback: Fallback.ToLanguage);
 
             // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
             Assert.AreEqual("Welcome", value);
@@ -228,7 +232,48 @@ namespace Umbraco.Tests.PublishedContent
         public void Throws_For_Non_Supported_Fallback()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            Assert.Throws<NotSupportedException>(() => content.Value("welcomeText", "nl", fallback: 999));
+            Assert.Throws<NotSupportedException>(() => content.Value("welcomeText", "nl", fallback: Fallback.To(999)));
+        }
+
+        [Test]
+        public void Can_Fallback_To_Default_Value()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+
+            // no Dutch value is assigned, so getting null
+            var value = content.Value("welcomeText", "nl");
+            Assert.IsNull(value);
+
+            // even if we 'just' provide a default value
+            value = content.Value("welcomeText", "nl", defaultValue: "woop");
+            Assert.IsNull(value);
+
+            // but it works with proper fallback settings
+            value = content.Value("welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
+            Assert.AreEqual("woop", value);
+        }
+
+        [Test]
+        public void Can_Have_Custom_Default_Value()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+
+            // hack the value, pretend the converter would return something
+            var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;
+            Assert.IsNotNull(prop);
+            prop.SetValue("nl", "nope"); // HasValue false but getting value returns this
+
+            // there is an EN value
+            var value = content.Value("welcomeText", "en-US");
+            Assert.AreEqual("Welcome", value);
+
+            // there is no NL value and we get the 'converted' value
+            value = content.Value("welcomeText", "nl");
+            Assert.AreEqual("nope", value);
+
+            // but it works with proper fallback settings
+            value = content.Value("welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
+            Assert.AreEqual("woop", value);
         }
     }
 }
