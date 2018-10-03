@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -55,6 +56,8 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+
+        public object Domains { get; private set; }
 
         public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
         {
@@ -583,6 +586,17 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -1144,6 +1158,18 @@ namespace Umbraco.Web.Editors
 
                 return content;
             }
+        }
+
+        public ContentDomainsAndCulture GetCultureAndDomains(int id)
+        {
+            var nodeDomains = Services.DomainService.GetAssignedDomains(id, true).ToArray();
+            var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
+            var domains = nodeDomains.Where(d => !d.IsWildcard).Select(d => new DomainDisplay(d.DomainName, d.LanguageId.GetValueOrDefault(0)));
+            return new ContentDomainsAndCulture
+            {
+                Domains = domains,
+                Language = wildcard == null || !wildcard.LanguageId.HasValue ? "undefined" : wildcard.LanguageId.ToString()
+            };
         }
 
         [HttpPost]

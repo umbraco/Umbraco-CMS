@@ -41,7 +41,6 @@
         };
 
         function setFocalPoint (event) {
-
             $scope.$emit("imageFocalPointStart");
 
             var offsetX = event.offsetX - 10;
@@ -50,7 +49,6 @@
             calculateGravity(offsetX, offsetY);
 
             lazyEndEvent();
-
         };
 
         /** Initializes the component */
@@ -148,12 +146,26 @@
 
         /** Sets the width/height/left/top dimentions based on the image size and the "center" value */
         function setDimensions() {
-            if (htmlImage && vm.center) {
+
+            if (vm.src.endsWith(".svg")) {
+                // svg files don't automatically get a size by
+                // loading them set a default size for now
+                vm.dimensions.width = 200;
+                vm.dimensions.height = 200;
+                vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;
+                vm.dimensions.top = vm.center.top * vm.dimensions.height - 10;
+                // can't crop an svg file, don't show the focal point
+                if (htmlOverlay) {
+                    htmlOverlay.remove();
+                }
+            }
+            else if (htmlImage && vm.center) {
                 vm.dimensions.width = htmlImage.width();
                 vm.dimensions.height = htmlImage.height();
                 vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;
                 vm.dimensions.top = vm.center.top * vm.dimensions.height - 10;
             }
+
             return vm.dimensions.width;
         };
 

@@ -85,7 +85,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="ClientDependency" Version="1.9.6" />
+    <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
@@ -333,7 +333,6 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
-    <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

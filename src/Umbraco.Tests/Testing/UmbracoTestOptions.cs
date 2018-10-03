@@ -7,7 +7,9 @@
             // pure mocks
             Mock,
             // Serilog for tests
-            Serilog
+            Serilog,
+            // console logger
+            Console
         }
 
         public enum Database

@@ -85,6 +85,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             appState.setSectionState("showSearchResults", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
+			appState.setMenuState("currentNode", null);
 
             if (appState.getGlobalState("isTablet") === true) {
                 appState.setGlobalState("showNavigation", false);
@@ -365,7 +366,8 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
             if (appState.getGlobalState("isTablet") === true && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
-                appState.setSectionState("currentSection", $routeParams.section);
+				appState.setSectionState("currentSection", $routeParams.section);
+
                 setMode("default-hidesectiontree");
             }
 
