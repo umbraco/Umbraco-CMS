@@ -104,7 +104,6 @@
         };
 
         $scope.add = function (evt) {
-
             evt.preventDefault();
 
             if ($scope.newColor) {
@@ -117,6 +116,7 @@
                         value: $scope.newColor,
                         label: newLabel
                     });
+                    $scope.newLabel = "";
                     $scope.hasError = false;
                     return;
                 }
