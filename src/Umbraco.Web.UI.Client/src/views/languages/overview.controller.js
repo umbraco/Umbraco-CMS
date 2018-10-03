@@ -31,7 +31,7 @@
             var labelKeys = [
                 "treeHeaders_languages",
                 "general_mandatory",
-                "general_default"
+                "general_default",
                 "languages_fallsbackToLabel"
             ];
 
