@@ -151,7 +151,7 @@ angular.module("umbraco")
 
                 if (folder.id > 0) {
                     entityResource.getAncestors(folder.id, "media")
-                        .then(function(anc) {              
+                        .then(function(anc) {
                             $scope.path = _.filter(anc,
                                 function(f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
@@ -305,6 +305,23 @@ angular.module("umbraco")
                 $scope.loading = true;
                 debounceSearchMedia();
             };
+
+            /**
+                * Toggle the $scope.model.allowAsRoot value to either true or false
+             */
+            $scope.toggle = function(){
+
+                // Make sure to activate the changeSearch function everytime the toggle is clicked
+                $scope.changeSearch();
+
+                // Toggle the showChilds option
+                if($scope.showChilds){
+                    $scope.showChilds = false;
+                    return;
+                }
+
+                $scope.showChilds = true;
+            }
 
             $scope.changePagination = function(pageNumber) {
                 $scope.loading = true;
