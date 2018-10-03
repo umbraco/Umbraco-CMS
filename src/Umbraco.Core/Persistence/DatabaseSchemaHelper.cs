@@ -117,6 +117,8 @@ namespace Umbraco.Core.Persistence
             var tableExist = TableExist(tableName);
             if (overwrite && tableExist)
             {
+                _logger.Info<Database>(string.Format("Table '{0}' already exists, but will be recreated", tableName));
+
                 DropTable(tableName);
                 tableExist = false;
             }
@@ -169,13 +171,22 @@ namespace Umbraco.Core.Persistence
                         _logger.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
                     }
 
-                    
-
                     transaction.Complete();
+                    if (overwrite)
+                    {
+                        _logger.Info<Database>(string.Format("Table '{0}' was recreated", tableName));
+                    }
+                    else
+                    {
+                        _logger.Info<Database>(string.Format("New table '{0}' was created", tableName));
+                    }
                 }
             }
-
-            _logger.Info<Database>(string.Format("New table '{0}' was created", tableName));
+            else
+            {
+                // The table exists and was not recreated/overwritten.
+                _logger.Info<Database>(string.Format("Table '{0}' already exists - no changes were made", tableName));
+            }
         }
 
         public void DropTable<T>()
