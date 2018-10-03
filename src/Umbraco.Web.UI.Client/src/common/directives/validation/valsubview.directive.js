@@ -10,6 +10,28 @@
 
   function valSubViewDirective() {
 
+    function controller($scope, $element) {
+      //expose api
+      return {
+        valStatusChanged: function(args) {
+          if (!args.form.$valid) {
+            var subViewContent = $element.find(".ng-invalid");
+
+            if (subViewContent.length > 0) {
+                $scope.model.hasError = true;
+                $element.addClass("show-validation");
+            } else {
+                $scope.model.hasError = false;
+                $element.removeClass("show-validation");
+            }
+         }
+         else {
+             $scope.model.hasError = false;
+         }
+        }
+      }
+    }
+
     function link(scope, el, attr, ctrl) {
 
       //if there are no containing form or valFormManager controllers, then we do nothing
@@ -43,7 +65,8 @@
     var directive = {
       require: ['?^^form', '?^^valFormManager'],
       restrict: "A",
-      link: link
+      link: link,
+      controller: controller
     };
 
     return directive;
