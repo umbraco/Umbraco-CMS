@@ -6,25 +6,25 @@
 
     <div class="umb-list umb-list--condensed">
 
-        <div class="umb-list-item" ng-repeat="variant in vm.variants">
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
             <ng-form name="scheduleSelectorForm">
                 <div class="flex">
                     <input 
                         id="{{variant.language.culture}}"
                         name="saveVariantSelector"
                         type="checkbox"
-                        ng-model="variant.save"
+                        ng-model="variant.schedule"
                         ng-change="vm.changeSelection(variant)"
                         style="margin-right: 8px;" />
                     <div>
                         
                         <label for="{{variant.language.culture}}" style="margin-bottom: 2px;">
                             <span>{{ variant.language.name }}</span>
-                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                         </label>
 
-                        <div>
-                            <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                        <div class="umb-permission__description">
+                            <umb-variant-state variant="variant"></umb-variant-state>
+                            <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                         </div>
 
                         <div ng-if="variant.schedule" class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
@@ -80,6 +80,24 @@
             </ng-form>
         </div>
         <br/>
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="vm.hasPristineVariants">
+        <div style="margin-bottom: 15px; font-weight: bold;">
+            <p><localize key="content_publishedLanguages"></localize></p>
+        </div>
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter track by variant.language.culture">
+            <div>
+                <div style="margin-bottom: 2px;">
+                    <span>{{ variant.language.name }}</span>
+                </div>
+                <div class="umb-permission__description">
+                    <umb-variant-state variant="variant"></umb-variant-state>
+                    <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                </div>
+            </div>
+        </div>
     </div>
                         
 </div>
