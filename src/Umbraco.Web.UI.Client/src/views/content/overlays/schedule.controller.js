@@ -122,7 +122,7 @@
         //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].schedule = false;
+                vm.variants[i].save = false;
             }
         });
 
