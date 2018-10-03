@@ -7,6 +7,7 @@
         $scope.newColor = defaultColor;
         $scope.newLabel = defaultLabel;
         $scope.hasError = false;
+        $scope.focusOnNew = false;
 
         $scope.labels = {};
 
@@ -118,6 +119,7 @@
                     });
                     $scope.newLabel = "";
                     $scope.hasError = false;
+                    $scope.focusOnNew = true;
                     return;
                 }
 
