@@ -145,7 +145,7 @@ angular.module('umbraco.mocks').
                   "content_statistics": "Statistics",
                   "content_titleOptional": "Title (optional)",
                   "content_type": "Type",
-                  "content_unPublish": "Unpublish",
+                  "content_unpublish": "Unpublish",
                   "content_updateDate": "Last edited",
                   "content_updateDateDesc": "Date/time this document was created",
                   "content_uploadClear": "Remove file",

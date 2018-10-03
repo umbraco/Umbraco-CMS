@@ -177,7 +177,7 @@
                 methods: {
                     saveAndPublish: $scope.saveAndPublish,
                     sendToPublish: $scope.sendToPublish,
-                    unPublish: $scope.unPublish
+                    unpublish: $scope.unpublish
                 }
             });
             
@@ -334,52 +334,45 @@
             });
         }
 
-        $scope.unPublish = function () {
+        $scope.unpublish = function() {
+            clearNotifications($scope.content);
+            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
+                var dialog = {
+                    parentScope: $scope,
+                    view: "views/content/overlays/unpublish.html",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabelKey: "content_unpublish",
+                    submit: function (model) {
 
-            //if there's any variants than we need to set the language and include the variants to publish
-            var culture = null;
-            if ($scope.content.variants.length > 0) {
-                _.each($scope.content.variants,
-                    function (d) {
-                        //set the culture if this is active
-                        if (d.active === true) {
-                            culture = d.language.culture;
-                        }
-                    });
+                        model.submitButtonState = "busy";
+                        
+                        var selectedVariants = _.filter(model.variants, function(variant) { return variant.save; });
+                        var culturesForUnpublishing = _.map(selectedVariants, function(variant) { return variant.language.culture; });
+
+                        contentResource.unpublish($scope.content.id, culturesForUnpublishing)
+                            .then(function (data) {
+                                formHelper.resetForm({ scope: $scope });
+                                contentEditingHelper.reBindChangedProperties($scope.content, data);
+                                init($scope.content);
+                                syncTreeNode($scope.content, data.path);
+                                $scope.page.buttonGroupState = "success";
+                                eventsService.emit("content.unpublished", { content: $scope.content });
+                                overlayService.close();
+                            }, function (err) {
+                                $scope.page.buttonGroupState = 'error';
+                            });
+                        
+                        
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+                overlayService.open(dialog);
             }
-
-            if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
-
-                $scope.page.buttonGroupState = "busy";
-
-                eventsService.emit("content.unpublishing", { content: $scope.content });
-
-                contentResource.unPublish($scope.content.id, culture)
-                    .then(function (data) {
-
-                        formHelper.resetForm({ scope: $scope });
-
-                        contentEditingHelper.handleSuccessfulSave({
-                            scope: $scope,
-                            savedContent: data,
-                            rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                        });
-
-                        init($scope.content);
-
-                        syncTreeNode($scope.content, data.path);
-
-                        $scope.page.buttonGroupState = "success";
-
-                        eventsService.emit("content.unpublished", { content: $scope.content });
-
-                    }, function (err) {
-                        $scope.page.buttonGroupState = 'error';
-                    });
-            }
-
         };
-
+        
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
             if (showSaveOrPublishDialog()) {

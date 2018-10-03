@@ -146,7 +146,7 @@
     <area alias="auditTrails">
         <key alias="atViewingFor">Viewing for</key>
         <key alias="delete">Delete Content performed by user</key>
-        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="unpublish">Unpublish performed by user</key>
         <key alias="publish">Save and Publish performed by user</key>
         <key alias="save">Save Content performed by user</key>
         <key alias="move">Move Content performed by user</key>
@@ -159,7 +159,7 @@
         <key alias="smallMove">Move</key>
         <key alias="smallSave">Save</key>
         <key alias="smallDelete">Delete</key>
-        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallUnpublish">Unpublish</key>
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
@@ -238,7 +238,7 @@
         <key alias="titleOptional">Title (optional)</key>
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
-        <key alias="unPublish">Unpublish</key>
+        <key alias="unpublish">Unpublish</key>
         <key alias="unpublished">Unpublished</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>

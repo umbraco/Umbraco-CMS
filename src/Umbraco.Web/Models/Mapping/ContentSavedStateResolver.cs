@@ -33,6 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             PublishedState publishedState;
             bool isEdited;
+            bool isCreated;
 
             if (source.ContentType.VariesByCulture())
             {
@@ -50,6 +51,7 @@ namespace Umbraco.Web.Models.Mapping
                         : PublishedState.Unpublished;
 
                 isEdited = source.IsCultureEdited(culture);
+                isCreated = source.Id > 0 && source.IsCultureAvailable(culture);
             }
             else
             {
@@ -58,10 +60,14 @@ namespace Umbraco.Web.Models.Mapping
                     : PublishedState.Published;
 
                 isEdited = source.Edited;
+                isCreated = source.Id > 0;
             }
 
+            if (!isCreated)
+                return ContentSavedState.NotCreated;
+
             if (publishedState == PublishedState.Unpublished)
-                return isEdited && source.Id > 0 ? ContentSavedState.Draft : ContentSavedState.NotCreated;
+                return ContentSavedState.Draft;
 
             if (publishedState == PublishedState.Published)
                 return isEdited ? ContentSavedState.PublishedPendingChanges : ContentSavedState.Published;

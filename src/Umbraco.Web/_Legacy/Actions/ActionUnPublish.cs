@@ -8,14 +8,14 @@ namespace Umbraco.Web._Legacy.Actions
     /// <summary>
     /// This action is invoked when a document is being unpublished
     /// </summary>
-    public class ActionUnPublish : IAction
+    public class ActionUnpublish : IAction
     {
         //create singleton
 #pragma warning disable 612,618
-        private static readonly ActionUnPublish m_instance = new ActionUnPublish();
+        private static readonly ActionUnpublish m_instance = new ActionUnpublish();
 #pragma warning restore 612,618
 
-        public static ActionUnPublish Instance
+        public static ActionUnpublish Instance
         {
             get { return m_instance; }
         }

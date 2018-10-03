@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unPublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -183,11 +183,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //unpublish
                         return {
                             letter: ch,
-                            labelKey: "content_unPublish",
-                            handler: args.methods.unPublish,
+                            labelKey: "content_unpublish",
+                            handler: args.methods.unpublish,
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
-                            alias: "unpublish"
+                            alias: "unpublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     default:
                         return null;
@@ -241,7 +242,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
+                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
@@ -401,8 +403,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 case "Z":
                     return {
                         letter: ch,
-                        labelKey: "content_unPublish",
-                        handler: "unPublish"
+                        labelKey: "content_unpublish",
+                        handler: "unpublish"
                     };
 
                 default:

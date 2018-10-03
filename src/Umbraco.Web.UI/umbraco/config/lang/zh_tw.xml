@@ -161,7 +161,7 @@
     <key alias="titleOptional">標題（可選）</key>
     <key alias="altTextOptional">其他說明文字（可選）</key>
     <key alias="type">類型</key>
-    <key alias="unPublish">取消發佈</key>
+    <key alias="unpublish">取消發佈</key>
     <key alias="updateDate">最近編輯</key>
     <key alias="updateDateDesc" version="7.0">本文件修改時間</key>
     <key alias="uploadClear">移除文件</key>
