@@ -177,7 +177,8 @@
                 methods: {
                     saveAndPublish: $scope.saveAndPublish,
                     sendToPublish: $scope.sendToPublish,
-                    unPublish: $scope.unPublish
+                    unPublish: $scope.unPublish,
+                    schedulePublish: $scope.schedule
                 }
             });
             

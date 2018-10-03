@@ -63,11 +63,8 @@
                 return;
             }
 
-            console.log(date);
-
             //The date being passed in here is the user's local date/time that they have selected
             //we need to convert this date back to the server date on the model.
-
             var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
 
             // update publish value
@@ -86,9 +83,6 @@
 
             //The date being passed in here is the user's local date/time that they have selected
             //we need to convert this date back to the server date on the model.
-
-            console.log(date);
-
             var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
 
             // update publish value

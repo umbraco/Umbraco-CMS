@@ -131,6 +131,7 @@
         <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Send for approval</key>
         <key alias="saveListView">Save list view</key>
+        <key alias="schedulePublish">Schedule publish</key>
         <key alias="showPage">Preview</key>
         <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
         <key alias="styleChoose">Choose style</key>
