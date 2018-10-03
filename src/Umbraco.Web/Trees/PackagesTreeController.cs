@@ -25,7 +25,9 @@ namespace Umbraco.Web.Trees
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
-
+            
+            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Developer, Constants.Trees.Packages, "overview");
+           
             root.Icon = "icon-box";
 
             return root;
