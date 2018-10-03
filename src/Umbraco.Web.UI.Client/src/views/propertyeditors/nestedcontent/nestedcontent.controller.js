@@ -37,6 +37,18 @@
             });
         });
 
+        $scope.selectableDocTypesFor = function (config) {
+            // return all doctypes that are:
+            // 1. either already selected for this config, or
+            // 2. not selected in any other config
+            return _.filter($scope.model.docTypes, function (docType) {
+                return docType.alias === config.ncAlias || !_.find($scope.model.value, function(c) {
+                    return docType.alias === c.ncAlias;
+                });
+            });
+
+        }
+
         if (!$scope.model.value) {
             $scope.model.value = [];
             $scope.add();
