@@ -203,7 +203,7 @@
         <key alias="titleOptional">Título (opcional)</key>
         <key alias="altTextOptional">Texto alternativo (opcional)</key>
         <key alias="type">Tipo</key>
-        <key alias="unPublish">Ocultar</key>
+        <key alias="unpublish">Ocultar</key>
         <key alias="updateDate">Última actualización</key>
         <key alias="updateDateDesc" version="7.0">Fecha/hora este documento fue modificado</key>
         <key alias="uploadClear">Eliminar archivo</key>

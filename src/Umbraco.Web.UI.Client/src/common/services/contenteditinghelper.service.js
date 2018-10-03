@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unPublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -183,8 +183,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //unpublish
                         return {
                             letter: ch,
-                            labelKey: "content_unPublish",
-                            handler: args.methods.unPublish,
+                            labelKey: "content_unpublish",
+                            handler: args.methods.unpublish,
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
                             alias: "unpublish",
@@ -403,8 +403,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 case "Z":
                     return {
                         letter: ch,
-                        labelKey: "content_unPublish",
-                        handler: "unPublish"
+                        labelKey: "content_unpublish",
+                        handler: "unpublish"
                     };
 
                 default:

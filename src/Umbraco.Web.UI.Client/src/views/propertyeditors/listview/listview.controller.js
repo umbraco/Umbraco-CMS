@@ -411,7 +411,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     $scope.unpublish = function () {
         applySelected(
-            function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
+            function (selected, index) { return contentResource.unpublish(getIdCallback(selected[index])); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
                 return localizationService.localize(key, [count, total]);

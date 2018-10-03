@@ -149,7 +149,7 @@
     <area alias="auditTrails">
         <key alias="atViewingFor">Viewing for</key>
         <key alias="delete">Delete Content performed by user</key>
-        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="unpublish">Unpublish performed by user</key>
         <key alias="publish">Save and Publish performed by user</key>
         <key alias="save">Save Content performed by user</key>
         <key alias="move">Move Content performed by user</key>
@@ -162,7 +162,7 @@
         <key alias="smallMove">Move</key>
         <key alias="smallSave">Save</key>
         <key alias="smallDelete">Delete</key>
-        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallUnpublish">Unpublish</key>
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
@@ -243,7 +243,7 @@
         <key alias="titleOptional">Title (optional)</key>
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
-        <key alias="unPublish">Unpublish</key>
+        <key alias="unpublish">Unpublish</key>
         <key alias="unpublished">Draft</key>
         <key alias="notCreated">Not created</key>
         <key alias="updateDate">Last edited</key>
@@ -1438,7 +1438,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="templateSavedHeader">Template saved</key>
         <key alias="templateSavedText">Template saved without any errors!</key>
         <key alias="contentUnpublished">Content unpublished</key>
-        <key alias="contentVariationUnpublished">Content variation %0% unpublished</key>
+        <key alias="contentCultureUnpublished">Content variation %0% unpublished</key>
+        <key alias="contentMandatoryCultureUnpublished">The mandatory language '%0%' was unpublished. All languages for this content item are now unpublished.</key>
         <key alias="partialViewSavedHeader">Partial view saved</key>
         <key alias="partialViewSavedText">Partial view saved without any errors!</key>
         <key alias="partialViewErrorHeader">Partial view not saved</key>

@@ -16,7 +16,7 @@
 
             // set dialog title
             if (!$scope.model.title) {
-                localizationService.localize("content_unPublish").then(function (value) {
+                localizationService.localize("content_unpublish").then(function (value) {
                     $scope.model.title = value;
                 });
             }
@@ -34,7 +34,7 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.unpublish = true;
+                    active.save = true;
                 }
 
                 // autoselect other variants if needed
@@ -47,20 +47,20 @@
 
             // disable submit button if nothing is selected
             var firstSelected = _.find(vm.variants, function (v) {
-                return v.unpublish;
+                return v.save;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
 
             // if a mandatory variant is selected we want to selet all other variants 
             // and disable selection for the others
-            if(selectedVariant.unpublish && selectedVariant.language.isMandatory) {
+            if(selectedVariant.save && selectedVariant.language.isMandatory) {
 
                 angular.forEach(vm.variants, function(variant){
-                    if(!variant.unpublish && publishedVariantFilter(variant)) {
+                    if(!variant.save && publishedVariantFilter(variant)) {
                         // keep track of the variants we automaically select
                         // so we can remove the selection again
                         autoSelectedVariants.push(variant.language.culture);
-                        variant.unpublish = true;
+                        variant.save = true;
                     }
                     variant.disabled = true;
                 });
@@ -73,13 +73,13 @@
             // if a mandatory variant is deselected we want to deselet all the variants
             // that was automatically selected so it goes back to the state before the mandatory language was selected.
             // We also want to enable all checkboxes again
-            if(!selectedVariant.unpublish && selectedVariant.language.isMandatory) {
+            if(!selectedVariant.save && selectedVariant.language.isMandatory) {
                 
                 angular.forEach(vm.variants, function(variant){
 
                     // check if variant was auto selected, then deselect
                     if(_.contains(autoSelectedVariants, variant.language.culture)) {
-                        variant.unpublish = false;
+                        variant.save = false;
                     };
 
                     variant.disabled = false;
@@ -106,7 +106,7 @@
         //when this dialog is closed, remove all unpublish and disabled flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].unpublish = false;
+                vm.variants[i].save = false;
                 vm.variants[i].disabled = false;
             }
         });

@@ -1208,7 +1208,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_UnPublish_Content()
+        public void Can_Unpublish_Content()
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
