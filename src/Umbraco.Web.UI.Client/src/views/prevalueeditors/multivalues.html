@@ -14,7 +14,9 @@
                 <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
             </div>
             <div class="umb-prevalues-multivalues__right">
+                <input type="checkbox" ng-model="item.defaultSelected" ng-click="default(item, $event)"> default
                 <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
+                SELECTED:{{item.defaultSelected}}
             </div>
         </div>
     </div>

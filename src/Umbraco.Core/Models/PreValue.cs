@@ -5,10 +5,11 @@
     /// </summary>
     public class PreValue : IDeepCloneable
     {
-        public PreValue(int id, string value, int sortOrder)
+        public PreValue(int id, string value, int sortOrder,bool defaultSelected )
         {
             Id = id;
-            Value = value;       
+            Value = value;
+            DefaultSelected = defaultSelected;
             SortOrder = sortOrder;
         }
 
@@ -37,6 +38,8 @@
         /// The sort order stored for the pre-value field value
         /// </summary>
         public int SortOrder { get; private set; }
+
+        public bool DefaultSelected { get; set; }
 
         public virtual object DeepClone()
         {

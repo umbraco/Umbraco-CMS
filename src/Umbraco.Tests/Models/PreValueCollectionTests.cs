@@ -14,16 +14,16 @@ namespace Umbraco.Tests.Models
         {
             var d = new PreValueCollection(new Dictionary<string, PreValue>
             {
-                {"blah1", new PreValue(1, "test1", 1)},
-                {"blah2", new PreValue(2, "test1", 3)},
-                {"blah3", new PreValue(3, "test1", 2)}
+                {"blah1", new PreValue(1, "test1", 1, true)},
+                {"blah2", new PreValue(2, "test1", 3, false)},
+                {"blah3", new PreValue(3, "test1", 2, false)}
             });
 
             var a = new PreValueCollection(new[]
             {
-                new PreValue(1, "test1", 1),
-                new PreValue(2, "test1", 3),
-                new PreValue(3, "test1", 2)
+                new PreValue(1, "test1", 1, true),
+                new PreValue(2, "test1", 3, false),
+                new PreValue(3, "test1", 2, false)
             });
 
             var clone1 = (PreValueCollection)d.DeepClone();

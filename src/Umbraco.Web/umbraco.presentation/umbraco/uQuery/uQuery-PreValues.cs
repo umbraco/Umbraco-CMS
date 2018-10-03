@@ -23,7 +23,7 @@ namespace umbraco
 		/// <returns>
 		/// The inserted prevalue or null if the operation failed.
 		/// </returns>
-		public static PreValue MakeNewPreValue(int dataTypeDefinitionId, string value, string alias = "", int sortOrder = 0)
+		public static PreValue MakeNewPreValue(int dataTypeDefinitionId, string value, string alias = "", int sortOrder = 0, bool defaultSelected = false)
 		{
 		    using (var sqlHelper = Application.SqlHelper)
 		    {
@@ -33,6 +33,7 @@ namespace umbraco
 		                sqlHelper.CreateParameter("@dtdefid", dataTypeDefinitionId),
 		                sqlHelper.CreateParameter("@value", value),
 		                sqlHelper.CreateParameter("@alias", alias),
+                        sqlHelper.CreateParameter("@defaultSelected", defaultSelected),
 		                sqlHelper.CreateParameter("@sortorder", sortOrder));
 
 		        if (result > -1)

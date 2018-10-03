@@ -18,7 +18,7 @@
     "gulp-ngdocs": "^0.3.0",
     "gulp-open": "^2.1.0",
     "gulp-postcss": "^6.2.0",
-    "gulp-rename": "^1.2.2",
+    "gulp-rename": "^1.4.0",
     "gulp-sort": "^2.0.0",
     "gulp-watch": "^4.3.10",
     "gulp-wrap": "^0.13.0",
@@ -28,7 +28,7 @@
     "karma-jasmine": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
     "less": "^2.7.3",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.11",
     "merge-stream": "^1.0.1",
     "run-sequence": "^2.2.1"
   }
