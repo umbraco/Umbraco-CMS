@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using System.Diagnostics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Composing;
+using System.Net;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services.Implement;
@@ -43,6 +44,7 @@ namespace umbraco.cms.businesslogic.packager
 
         private readonly List<string> _binaryFileErrors = new List<string>();
         private int _currentUserId = -1;
+        private static WebClient _webClient;
 
 
         public string Name { get; private set; }
@@ -684,9 +686,10 @@ namespace umbraco.cms.businesslogic.packager
             if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Packages)) == false)
                 Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Packages));
 
-            var wc = new System.Net.WebClient();
+            if (_webClient == null)
+                _webClient = new WebClient();
 
-            wc.DownloadFile(
+            _webClient.DownloadFile(
                 "http://" + PackageServer + "/fetch?package=" + Package.ToString(),
                 IOHelper.MapPath(SystemDirectories.Packages + "/" + Package + ".umb"));
 

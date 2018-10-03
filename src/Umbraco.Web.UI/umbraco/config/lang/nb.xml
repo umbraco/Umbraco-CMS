@@ -151,7 +151,7 @@
     <key alias="titleOptional">Tittel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Avpubliser</key>
+    <key alias="unpublish">Avpubliser</key>
     <key alias="updateDate">Sist endret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for siste endring</key>
     <key alias="uploadClear">Fjern fil</key>

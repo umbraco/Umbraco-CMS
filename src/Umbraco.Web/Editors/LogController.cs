@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Editors
             var userId = Security.GetUserId().ResultOr(0);
             var result = Services.AuditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
-            return new PagedResult<AuditLog>(totalRecords, pageNumber + 1, pageSize)
+            return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
                 Items = MapAvatarsAndNames(mapped)
             };

@@ -12,8 +12,9 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CultureName = dto.CultureName,
                 Id = dto.Id,
-                IsDefaultVariantLanguage = dto.IsDefaultVariantLanguage,
-                Mandatory = dto.Mandatory
+                IsDefault = dto.IsDefault,
+                IsMandatory = dto.IsMandatory,
+                FallbackLanguageId = dto.FallbackLanguageId
             };
 
             // reset dirty initial properties (U4-1946)
@@ -27,12 +28,15 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CultureName = entity.CultureName,
                 IsoCode = entity.IsoCode,
-                IsDefaultVariantLanguage = entity.IsDefaultVariantLanguage,
-                Mandatory = entity.Mandatory
+                IsDefault = entity.IsDefault,
+                IsMandatory = entity.IsMandatory,
+                FallbackLanguageId = entity.FallbackLanguageId
             };
 
             if (entity.HasIdentity)
+            {
                 dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+            }
 
             return dto;
         }

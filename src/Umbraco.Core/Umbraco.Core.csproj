@@ -373,6 +373,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
@@ -402,12 +403,14 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\Fallback.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
     <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
@@ -738,7 +741,6 @@
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
-    <Compile Include="Models\PropertyTagChange.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />

@@ -1,18 +1,22 @@
 ﻿.umb-color-swatches {
+    display: flex;
+    flex-flow: row wrap;
 
     .umb-color-box {
         border: none;
         color: white;
         cursor: pointer;
-        padding: 5px;
+        padding: 1px;
         text-align: center;
         text-decoration: none;
-        display: inline-block;
         margin: 5px;
         border-radius: 3px;
         width: 30px;
         height: 30px;
         transition: box-shadow .3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover, &:focus {
             box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -25,6 +29,57 @@
             .check_circle {
                 width: 25px;
                 height: 25px;
+            }
+        }
+    }
+
+    &.with-labels {
+
+        .umb-color-box {
+            width: 120px;
+            height: 100%;
+            display: flex;
+            flex-flow: row wrap;
+
+            .umb-color-box-inner {
+                display: flex;
+                flex-flow: column wrap;
+                flex: 0 0 100%;
+                max-width: 100%;
+                min-height: 80px;
+                padding-top: 10px;
+
+                .umb-color-box__label {
+                    background: #fff;
+                    font-size: 14px;
+                    display: flex;
+                    flex-flow: column wrap;
+                    flex: 0 0 100%;
+                    padding: 1px 5px;
+                    max-width: 100%;
+                    margin-top: auto;
+                    margin-bottom: -3px;
+                    margin-left: -1px;
+                    margin-right: -1px;
+                    text-indent: 0;
+                    text-align: left;
+                    border: 1px solid @gray-8;
+                    border-bottom-left-radius: 3px;
+                    border-bottom-right-radius: 3px;
+                    overflow: hidden;
+
+                    .umb-color-box__name {
+                        color: @black;
+                        font-weight: bold;
+                        margin-top: 3px;
+                    }
+
+                    .umb-color-box__description {
+                        font-size: 12px;
+                        line-height: 1.5em;
+                        color: @gray-3;
+                    }
+                }
             }
         }
     }
