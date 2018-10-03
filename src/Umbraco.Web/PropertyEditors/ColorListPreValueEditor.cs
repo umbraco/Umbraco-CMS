@@ -119,12 +119,15 @@ namespace Umbraco.Web.PropertyEditors
 
                         var label = x["label"].ToString();
 
+                        var defaultSelected = x["defaultSelected"].ToString();
+                        bool defaultSelectedAsBoolean = defaultSelected == "true";
+
                         sortOrder++;
                         var value = useLabel
-                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
+                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder, defaultSelected = defaultSelected })
                             : color;
 
-                        return new PreValue(id, value, sortOrder);
+                        return new PreValue(id, value, sortOrder, defaultSelectedAsBoolean);
                     })
                     .WhereNotNull())
                 {

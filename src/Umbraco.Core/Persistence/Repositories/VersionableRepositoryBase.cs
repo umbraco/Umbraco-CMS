@@ -645,7 +645,7 @@ ORDER BY contentNodeId, versionId, propertytypeid
                                 .Distinct()
                                 .ToArray();
 
-                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder, x.DefaultSelected));
 
                             var preVals = new PreValueCollection(asDictionary);
 

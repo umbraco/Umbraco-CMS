@@ -76,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>Dictionary object containing the prevalue formatted with the field names as keys and the value of those fields as the values</returns>
         private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
         {
-            return new Dictionary<string, object>() { { "value", preValue.Value }, {"sortOrder", preValue.SortOrder } };
+            return new Dictionary<string, object>() { { "value", preValue.Value }, {"sortOrder", preValue.SortOrder }, {"defaultSelected", preValue.DefaultSelected } };
         }
 
         /// <summary>

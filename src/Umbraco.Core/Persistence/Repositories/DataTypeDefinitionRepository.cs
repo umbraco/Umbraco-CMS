@@ -442,7 +442,7 @@ AND umbracoNode.id <> @id",
             return IsolatedCache.GetCacheItem<PreValueCollection>(key, () =>
             {
                 var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = datetypeId });
-                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder, x.DefaultSelected), x.Alias, x.SortOrder)).ToList();
                 var collection = PreValueConverter.ConvertToPreValuesCollection(list);
                 return collection;
             }, TimeSpan.FromMinutes(20), isSliding: true);

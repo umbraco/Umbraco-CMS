@@ -15,6 +15,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
                 items.push({ 
                     value: $scope.model.value[i].value,
                     sortOrder: $scope.model.value[i].sortOrder,
+                    defaultSelected: $scope.model.value[i].defaultSelected,
                     id: i
                 });
             }
@@ -34,6 +35,15 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
             });
             
         };
+
+        $scope.default = function (item, evt) {
+            for (var i in $scope.model.value) { 
+                if (item.id !== $scope.model.value[i].id) {
+                    $scope.model.value[i].defaultSelected = false;
+                }
+            };
+        };
+
 
         $scope.add = function (evt) {
             evt.preventDefault();

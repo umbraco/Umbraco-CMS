@@ -24,6 +24,9 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("sortorder")]
         public int SortOrder { get; set; }
 
+        [Column("defaultSelected")]
+        public bool DefaultSelected { get; set; }
+
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(50)]
