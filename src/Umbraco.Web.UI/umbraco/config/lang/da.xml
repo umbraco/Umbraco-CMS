@@ -259,7 +259,7 @@
     <key alias="dropFilesHere">Slip filerne her...</key>
     <key alias="urls">Link til medie</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
-    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade.</key>
     <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
