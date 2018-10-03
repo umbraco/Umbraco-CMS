@@ -147,6 +147,7 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollectionBuilder.cs" />
@@ -562,7 +563,7 @@
     <Compile Include="_Legacy\Actions\ActionSort.cs" />
     <Compile Include="_Legacy\Actions\ActionToPublish.cs" />
     <Compile Include="_Legacy\Actions\ActionTranslate.cs" />
-    <Compile Include="_Legacy\Actions\ActionUnPublish.cs" />
+    <Compile Include="_Legacy\Actions\ActionUnpublish.cs" />
     <Compile Include="_Legacy\Actions\ActionUpdate.cs" />
     <Compile Include="_Legacy\Actions\ContextMenuSeperator.cs" />
     <Compile Include="_Legacy\Actions\IAction.cs" />

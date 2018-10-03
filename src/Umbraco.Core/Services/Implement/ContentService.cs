@@ -988,14 +988,14 @@ namespace Umbraco.Core.Services.Implement
                     UnpublishResultType result;
                     if (culture == "*" || culture == null)
                     {
-                        Audit(AuditType.UnPublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
                         result = UnpublishResultType.Success;
                     }
                     else
                     {
-                        Audit(AuditType.UnPublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
                         if (!content.Published)
-                            Audit(AuditType.UnPublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
+                            Audit(AuditType.Unpublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1120,9 +1120,9 @@ namespace Umbraco.Core.Services.Implement
                     if (unpublishResult.Success) // and succeeded, trigger events
                     {
                         // events and audit
-                        scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                        scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                        Audit(AuditType.UnPublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
                         scope.Complete();
                         return new PublishResult(PublishResultType.Success, evtMsgs, content);
                     }
@@ -1348,10 +1348,10 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.ContentTree);
 
                 // if it's not trashed yet, and published, we should unpublish
-                // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
+                // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
                 if (content.Trashed == false && content.Published)
-                    scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(UnPublished));
+                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(Unpublished));
 
                 DeleteLocked(scope, content);
 
@@ -2098,12 +2098,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> UnPublishing;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Unpublishing;
 
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> UnPublished;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Unpublished;
 
         /// <summary>
         /// Occurs after change.
@@ -2197,8 +2197,8 @@ namespace Umbraco.Core.Services.Implement
         // ensures that a document can be unpublished
         internal UnpublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
-            // raise UnPublishing event
-            if (scope.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            // raise Unpublishing event
+            if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
                 return new UnpublishResult(UnpublishResultType.FailedCancelledByEvent, evtMsgs, content);
@@ -2282,10 +2282,10 @@ namespace Umbraco.Core.Services.Implement
                 foreach (var content in contents.OrderByDescending(x => x.ParentId))
                 {
                     // if it's not trashed yet, and published, we should unpublish
-                    // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
+                    // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
                     if (content.Trashed == false && content.Published)
-                        scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(UnPublished));
+                        scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(Unpublished));
 
                     // if current content has children, move them to trash
                     var c = content;

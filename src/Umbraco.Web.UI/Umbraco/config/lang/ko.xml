@@ -104,7 +104,7 @@
     <key alias="statistics">통계</key>
     <key alias="titleOptional">제목(옵션)</key>
     <key alias="type">유형</key>
-    <key alias="unPublish">발행취소</key>
+    <key alias="unpublish">발행취소</key>
     <key alias="updateDate">마지막 수정일</key>
     <key alias="uploadClear">파일 삭제</key>
     <key alias="urls">문서에 링크</key>

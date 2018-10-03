@@ -104,7 +104,7 @@
     <key alias="statistics">Estatísticas</key>
     <key alias="titleOptional">Título (opcional)</key>
     <key alias="type">Tipo</key>
-    <key alias="unPublish">Des-Publicar</key>
+    <key alias="unpublish">Des-Publicar</key>
     <key alias="updateDate">Última edição</key>
     <key alias="uploadClear">Remover arquivo</key>
     <key alias="urls">Link ao documento</key>

@@ -277,7 +277,7 @@
     <key alias="target" version="7.0">Цель</key>
     <key alias="titleOptional">Заголовок (необязательно)</key>
     <key alias="type">Тип</key>
-    <key alias="unPublish">Скрыть</key>
+    <key alias="unpublish">Скрыть</key>
     <key alias="unpublished">Распубликовано</key>
     <key alias="unpublishDate">Распубликовать</key>
     <key alias="updateDate">Последняя правка</key>
