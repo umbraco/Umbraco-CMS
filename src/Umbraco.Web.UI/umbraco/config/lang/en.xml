@@ -153,6 +153,7 @@
         <key alias="rollback">Content rollback performed by user</key>
         <key alias="sendtopublish">Content Send To Publish performed by user</key>
         <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="sort">Sort child items performed by user</key>
         <key alias="smallCopy">Copy</key>
         <key alias="smallPublish">Publish</key>
         <key alias="smallMove">Move</key>
@@ -162,6 +163,7 @@
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
+        <key alias="smallSort">Sort</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
