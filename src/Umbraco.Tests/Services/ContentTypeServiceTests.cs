@@ -30,10 +30,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Change_Content_Type_From_Variant_Invariant()
         {
-            //initialize the listener which is responsible for updating content based on variant/invariant changes
-            var listener = new UpdateContentOnVariantChangesComponent();
-            listener.Initialize(ServiceContext.ContentService, ServiceContext.LocalizationService);
-
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -72,16 +68,23 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
+            //at this stage all property types were switched to invariant so even though the variant value
+            //exists it will not be returned because the property type is invariant,
+            //so this check proves that null will be returned
+            Assert.IsNull(doc.GetValue("title", "en-US"));
+
+            //we can now switch the property type to be variant and the value can be returned again
+            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+
         }
 
         [Test]
         public void Change_Property_Type_From_Invariant_Variant()
         {
-            //initialize the listener which is responsible for updating content based on variant/invariant changes
-            var listener = new UpdateContentOnVariantChangesComponent();
-            listener.Initialize(ServiceContext.ContentService, ServiceContext.LocalizationService);
-
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -126,10 +129,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Change_Property_Type_From_Variant_Invariant()
         {
-            //initialize the listener which is responsible for updating content based on variant/invariant changes
-            var listener = new UpdateContentOnVariantChangesComponent();
-            listener.Initialize(ServiceContext.ContentService, ServiceContext.LocalizationService);
-
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;

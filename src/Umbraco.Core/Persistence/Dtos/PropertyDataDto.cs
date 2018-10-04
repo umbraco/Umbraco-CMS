@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class PropertyDataDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
+        public const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
         public const int VarcharLength = 512;
         public const int SegmentLength = 256;
 

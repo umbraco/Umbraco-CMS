@@ -409,7 +409,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         //fixme should we mark this as EditorBrowsable hidden since it really isn't ever used?
-        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes; 
+        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes;
 
         /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
@@ -418,12 +418,18 @@ namespace Umbraco.Core.Models
         /// <returns>True if Property is dirty, otherwise False</returns>
         public override bool IsPropertyDirty(string propertyName)
         {
-            bool existsInEntity = base.IsPropertyDirty(propertyName);
+            var existsInEntity = base.IsPropertyDirty(propertyName);
+            if (existsInEntity) return true;
 
-            bool anyDirtyGroups = PropertyGroups.Any(x => x.IsPropertyDirty(propertyName));
-            bool anyDirtyTypes = PropertyTypes.Any(x => x.IsPropertyDirty(propertyName));
+            //check properties types for this alias if it exists
+            if (PropertyTypeExists(propertyName))
+                return PropertyTypes.Any(x => x.IsPropertyDirty(propertyName));
 
-            return existsInEntity || anyDirtyGroups || anyDirtyTypes;
+            //check property groups for this alias if it exists
+            if (PropertyGroups.Contains(propertyName))
+                return PropertyGroups.Any(x => x.IsPropertyDirty(propertyName));
+
+            return false;
         }
 
         /// <summary>
