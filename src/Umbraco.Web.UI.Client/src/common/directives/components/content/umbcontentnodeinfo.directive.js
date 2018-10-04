@@ -46,19 +46,6 @@
 
                     });
 
-                scope.datePickerConfig = {
-                    pickDate: true,
-                    pickTime: true,
-                    useSeconds: false,
-                    format: "YYYY-MM-DD HH:mm",
-                    icons: {
-                        time: "icon-time",
-                        date: "icon-calendar",
-                        up: "icon-chevron-up",
-                        down: "icon-chevron-down"
-                    }
-                };
-
                 scope.auditTrailOptions = {
                     "id": scope.node.id
                 };
