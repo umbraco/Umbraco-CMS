@@ -105,7 +105,7 @@
     <key alias="statistics">סטטיסטיקות</key>
     <key alias="titleOptional">כותרת (לא חובה)</key>
     <key alias="type">סוג</key>
-    <key alias="unPublish">ממתין לפירסום</key>
+    <key alias="unpublish">ממתין לפירסום</key>
     <key alias="updateDate">נערך לאחרונה</key>
     <key alias="uploadClear">הסר קובץ</key>
     <key alias="urls">קשר למסמך</key>

@@ -227,10 +227,6 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         },
             500);
 
-        if (reload === true) {
-            $scope.reloadView($scope.contentId, true);
-        }
-
         if (successMsg) {
             localizationService.localize("bulk_done")
                 .then(function (v) {
@@ -260,12 +256,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     with simple values */
 
     $scope.getContent = function (contentId) {
-        $scope.reloadView($scope.contentId, true);
+        
+        $scope.reloadView($scope.contentId);
     }
 
-    $scope.reloadView = function (id, reloadFolders) {
-
+   $scope.reloadView = function (id) {
         $scope.viewLoaded = false;
+        $scope.folders = [];
 
         listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
@@ -278,20 +275,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function (e, index) {
                     setPropertyValues(e);
-                });
-            }
+               if (e.contentTypeAlias === 'Folder') {
+                   $scope.folders.push(e);
+               }
+            });
+         }
 
-            if (reloadFolders && $scope.entityType === 'media') {
-                //The folders aren't loaded - we only need to do this once since we're never changing node ids
-                mediaResource.getChildFolders($scope.contentId)
-                    .then(function (page) {
-                        $scope.folders = page.items;
-                        $scope.viewLoaded = true;
-                    });
-
-            } else {
-                $scope.viewLoaded = true;
-            }
+          $scope.viewLoaded = true;
 
             //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
             // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -421,7 +411,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     $scope.unpublish = function () {
         applySelected(
-            function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
+            function (selected, index) { return contentResource.unpublish(getIdCallback(selected[index])); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
                 return localizationService.localize(key, [count, total]);
@@ -609,7 +599,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             $scope.options.allowBulkMove ||
             $scope.options.allowBulkDelete;
 
-        $scope.reloadView($scope.contentId, true);
+      $scope.reloadView($scope.contentId);
     }
 
     function getLocalizedKey(alias) {

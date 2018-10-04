@@ -172,6 +172,11 @@ namespace Umbraco.Tests.Testing
                 Container.RegisterSingleton<ILogger>(f => new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config"))));
                 Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
             }
+            else if (option == UmbracoTestOptions.Logger.Console)
+            {
+                Container.RegisterSingleton<ILogger>(f => new ConsoleLogger());
+                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
+            }
 
             Container.RegisterSingleton(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
         }

@@ -35,7 +35,8 @@
                  ng-class="{
                     '-selected':item.selected,
                     '-published':item.published,
-                    '-unpublished':!item.published
+                    '-unpublished':!item.published,
+                    'with-unpublished-version':!item.published && item.hasPublishedVersion
                 }"
                  ng-click="vm.selectItem(item, $index, $event)">
 
