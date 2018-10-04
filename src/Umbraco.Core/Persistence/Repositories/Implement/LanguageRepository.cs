@@ -219,6 +219,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (TypedCachePolicy != null)
                 TypedCachePolicy.GetAllCached(PerformGetAll);
 
+
             var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
             return id.HasValue ? Get(id.Value) : null;
         }
@@ -234,6 +235,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // ensure cache is populated, in a non-expensive way
             if (TypedCachePolicy != null)
                 TypedCachePolicy.GetAllCached(PerformGetAll);
+            else
+                PerformGetAll(); //we don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
 
             lock (_codeIdMap)
             {
@@ -255,6 +258,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // ensure cache is populated, in a non-expensive way
             if (TypedCachePolicy != null)
                 TypedCachePolicy.GetAllCached(PerformGetAll);
+            else
+                PerformGetAll();
 
             lock (_codeIdMap) // yes, we want to lock _codeIdMap
             {

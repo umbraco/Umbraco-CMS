@@ -25,7 +25,55 @@ namespace Umbraco.Tests.Services
     public class ContentTypeServiceTests : TestWithSomeContentBase
     {
 
-        //TODO: Then write the ones for content type changes
+        [Test]
+        public void Change_Content_Type_From_Invariant_Variant()
+        {
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Nothing;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Nothing
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.Name = "Hello1";
+            doc.SetValue("title", "hello world");
+            ServiceContext.ContentService.Save(doc);
+
+            Assert.AreEqual("Hello1", doc.Name);
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+
+            //change the content type to be variant, we will also update the name here to detect the copy changes
+            doc.Name = "Hello2";
+            ServiceContext.ContentService.Save(doc);
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
+            Assert.AreEqual("hello world", doc.GetValue("title")); //We are not checking against en-US here because properties will remain invariant
+
+            //change back property type to be invariant, we will also update the name here to detect the copy changes
+            doc.SetCultureName("Hello3", "en-US");
+            ServiceContext.ContentService.Save(doc);
+            contentType.Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+
+            Assert.AreEqual("Hello3", doc.Name);
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+        }
 
         [Test]
         public void Change_Content_Type_From_Variant_Invariant()
@@ -45,25 +93,30 @@ namespace Umbraco.Tests.Services
                 Variations = ContentVariation.Culture
             });
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
-            contentType.ResetDirtyProperties(false);
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
             IContent doc = MockedContent.CreateBasicContent(contentType);
-            doc.SetCultureName("Home", "en-US");
+            doc.SetCultureName("Hello1", "en-US");
             doc.SetValue("title", "hello world", "en-US");
             ServiceContext.ContentService.Save(doc);
 
+            Assert.AreEqual("Hello1", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
 
-            //change the content type to be invariant
-            contentType.Variations = ContentVariation.Nothing;
+            //change the content type to be invariant, we will also update the name here to detect the copy changes
+            doc.SetCultureName("Hello2", "en-US");
+            ServiceContext.ContentService.Save(doc);
+            contentType.Variations = ContentVariation.Nothing;            
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
+            Assert.AreEqual("Hello2", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
 
-            //change back property type to be variant
+            //change back property type to be variant, we will also update the name here to detect the copy changes
+            doc.Name = "Hello3";
+            ServiceContext.ContentService.Save(doc);
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
@@ -78,6 +131,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
+            Assert.AreEqual("Hello3", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
 
         }
@@ -87,7 +141,7 @@ namespace Umbraco.Tests.Services
         {
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
-            contentType.Variations = ContentVariation.Culture;
+            contentType.Variations = ContentVariation.Nothing;
             var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
             {
@@ -100,12 +154,11 @@ namespace Umbraco.Tests.Services
                 Variations = ContentVariation.Nothing
             });
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
-            contentType.ResetDirtyProperties(false);
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type
             IContent doc = MockedContent.CreateBasicContent(contentType);
-            doc.SetCultureName("Home", "en-US");
+            doc.Name = "Home";
             doc.SetValue("title", "hello world");
             ServiceContext.ContentService.Save(doc);
 
@@ -144,7 +197,6 @@ namespace Umbraco.Tests.Services
                 Variations = ContentVariation.Culture
             });
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
-            contentType.ResetDirtyProperties(false);
             ServiceContext.ContentTypeService.Save(contentType);
 
             //create some content of this content type

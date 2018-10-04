@@ -511,14 +511,10 @@ AND umbracoNode.id <> @id",
                 switch(toVariantType)
                 {
                     case ContentVariation.Culture:
-
                         MovePropertyDataToVariantCulture(defaultLangId, propertyTypeIds: propertyTypeIds);
-
                         break;
                     case ContentVariation.Nothing:
-
                         MovePropertyDataToVariantNothing(defaultLangId, propertyTypeIds: propertyTypeIds);
-
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -542,13 +538,88 @@ AND umbracoNode.id <> @id",
             switch (to)
             {
                 case ContentVariation.Culture:
+                    //move the property data
 
                     MovePropertyDataToVariantCulture(defaultLangId, sqlPropertyTypeIds: sqlPropertyTypeIds);
 
+                    //now we need to move the names
+                    //first clear out any existing names that might already exists under the default lang
+                    //there's 2x tables to update
+
+                    //clear out the versionCultureVariation table 
+                    var sqlSelect = Sql().Select<ContentVersionCultureVariationDto>(x => x.Id)
+                        .From<ContentVersionCultureVariationDto>()
+                        .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+                        .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
+                        .Where<ContentVersionCultureVariationDto>(x => x.LanguageId == defaultLangId);
+                    var sqlDelete = Sql()
+                        .Delete<ContentVersionCultureVariationDto>()
+                        .WhereIn<ContentVersionCultureVariationDto>(x => x.Id, sqlSelect);
+                    Database.Execute(sqlDelete);
+
+                    //clear out the documentCultureVariation table
+                    sqlSelect = Sql().Select<DocumentCultureVariationDto>(x => x.Id)
+                        .From<DocumentCultureVariationDto>()
+                        .InnerJoin<ContentDto>().On<ContentDto, DocumentCultureVariationDto>(x => x.NodeId, x => x.NodeId)
+                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
+                        .Where<DocumentCultureVariationDto>(x => x.LanguageId == defaultLangId);
+                    sqlDelete = Sql()
+                        .Delete<DocumentCultureVariationDto>()
+                        .WhereIn<DocumentCultureVariationDto>(x => x.Id, sqlSelect);
+                    Database.Execute(sqlDelete);
+
+                    //now we need to insert names into these 2 tables based on the invariant data
+
+                    //insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
+                    var cols = Sql().Columns<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
+                    sqlSelect = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
+                        .Append($", {defaultLangId}") //default language ID
+                        .From<ContentVersionDto>()
+                        .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                    var sqlInsert = Sql($"INSERT INTO {ContentVersionCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+                    Database.Execute(sqlInsert);
+
+                    //insert rows into the documentCultureVariation table
+                    cols = Sql().Columns<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
+                    sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
+                        .AndSelect<NodeDto>(x => x.Text)
+                        .Append($", 1, {defaultLangId}") //make Available + default language ID
+                        .From<DocumentDto>()
+                        .InnerJoin<NodeDto>().On<NodeDto, DocumentDto>(x => x.NodeId, x => x.NodeId)
+                        .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
+                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                    sqlInsert = Sql($"INSERT INTO {DocumentCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+                    Database.Execute(sqlInsert);
+
                     break;
                 case ContentVariation.Nothing:
+                    //move the property data
 
                     MovePropertyDataToVariantNothing(defaultLangId, sqlPropertyTypeIds: sqlPropertyTypeIds);
+
+                    //we dont need to move the names! this is because we always keep the invariant names with the name of the default language.
+
+                    //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
+
+                    ////now we need to move the names
+
+                    ////first update umbracoNode from documentCultureVariation
+                    //var sqlUpdate = Sql($"UPDATE {NodeDto.TableName} SET {Sql().Columns<NodeDto>(x => x.Text)} = {Sql().Columns<DocumentCultureVariationDto>(x => x.Name)}")
+                    //    .From<NodeDto>()
+                    //    .InnerJoin<DocumentCultureVariationDto>().On<DocumentCultureVariationDto, NodeDto>(x => x.NodeId, x => x.NodeId)
+                    //    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>(x => x.NodeId, x => x.NodeId)
+                    //    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                    //Database.Execute(sqlUpdate);
+
+                    ////next update umbracoContentVersion from contentVersionCultureVariation
+                    //sqlUpdate = Sql($"UPDATE {ContentVersionDto.TableName} SET {Sql().Columns<ContentVersionDto>(x => x.Text)} = {Sql().Columns<ContentVersionCultureVariationDto>(x => x.Name)}")
+                    //    .From<ContentVersionDto>()
+                    //    .InnerJoin<ContentVersionCultureVariationDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>(x => x.VersionId, x => x.Id)
+                    //    .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>(x => x.NodeId, x => x.NodeId)
+                    //    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                    //Database.Execute(sqlUpdate);
 
                     break;
                 case ContentVariation.CultureAndSegment:
@@ -558,6 +629,12 @@ AND umbracoNode.id <> @id",
             }
         }
 
+        /// <summary>
+        /// This will move all property data from variant to invariant
+        /// </summary>
+        /// <param name="defaultLangId"></param>
+        /// <param name="propertyTypeIds">Optional list of property type ids of the properties to be updated</param>
+        /// <param name="sqlPropertyTypeIds">Optional SQL statement used for the sub-query to select the properties type ids for the properties to be updated</param>
         private void MovePropertyDataToVariantNothing(int defaultLangId, IReadOnlyCollection<int> propertyTypeIds = null, Sql<ISqlContext> sqlPropertyTypeIds = null)
         {
             //first clear out any existing property data that might already exists under the default lang
@@ -587,6 +664,12 @@ AND umbracoNode.id <> @id",
             Database.Execute(sqlInsert);
         }
 
+        /// <summary>
+        /// This will move all property data from invariant to variant
+        /// </summary>
+        /// <param name="defaultLangId"></param>
+        /// <param name="propertyTypeIds">Optional list of property type ids of the properties to be updated</param>
+        /// <param name="sqlPropertyTypeIds">Optional SQL statement used for the sub-query to select the properties type ids for the properties to be updated</param>
         private void MovePropertyDataToVariantCulture(int defaultLangId, IReadOnlyCollection<int> propertyTypeIds = null, Sql<ISqlContext> sqlPropertyTypeIds = null)
         {
             //first clear out any existing property data that might already exists under the default lang
