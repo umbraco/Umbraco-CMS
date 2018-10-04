@@ -14,7 +14,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using ColumnInfo = NPoco.ColumnInfo;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,7 +9,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,9 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
-using Content = System.Web.UI.WebControls.Content;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
