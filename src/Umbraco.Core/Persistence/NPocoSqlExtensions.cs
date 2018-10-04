@@ -663,6 +663,18 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Adds columns to a SELECT Sql statement.
         /// </summary>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="fields">Expression indicating the column to select.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> AndSelect(this Sql<ISqlContext> sql, params string[] fields)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            return sql.Append(", " + string.Join(", ", fields));
+        }
+
+        /// <summary>
+        /// Adds columns to a SELECT Sql statement.
+        /// </summary>
         /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
         /// <param name="sql">The origin sql.</param>
         /// <param name="fields">Expressions indicating the columns to select.</param>
