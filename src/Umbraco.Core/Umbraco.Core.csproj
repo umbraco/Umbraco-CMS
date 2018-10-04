@@ -329,6 +329,10 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\Viewer\CountingFilter.cs" />
+    <Compile Include="Logging\Viewer\ErrorCounterFilter.cs" />
+    <Compile Include="Logging\Viewer\ExpressionFilter.cs" />
+    <Compile Include="Logging\Viewer\ILogFilter.cs" />
     <Compile Include="Logging\Viewer\LogTemplate.cs" />
     <Compile Include="Logging\Viewer\ILogViewer.cs" />
     <Compile Include="Logging\Viewer\LogLevelCounts.cs" />
@@ -344,6 +348,7 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />

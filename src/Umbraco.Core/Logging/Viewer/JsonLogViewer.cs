@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class JsonLogViewer : LogViewerSourceBase
+    public partial class JsonLogViewer : LogViewerSourceBase
     {       
-
-        public override IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate)
+        public override IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
         {
             var logs = new List<LogEvent>();
 
@@ -21,6 +17,8 @@ namespace Umbraco.Core.Logging.Viewer
 
             //Log Directory
             var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+
+            var count = 0;
 
             //foreach full day in the range - see if we can find one or more filenames that end with
             //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
@@ -44,7 +42,24 @@ namespace Umbraco.Core.Logging.Viewer
                             LogEvent evt;
                             while (reader.TryRead(out evt))
                             {
-                                logs.Add(evt);
+                                //TODO - convert psuedo code
+                                if (count > skip + take)
+                                {
+                                    break;
+                                }
+
+                                if (count < skip)
+                                {
+                                    count++;
+                                    continue;
+                                }
+
+                                if (filter.TakeLogEvent(evt))
+                                {
+                                    logs.Add(evt);
+                                }
+                                    
+                                count++;
                             }
                         }
                     }
@@ -52,7 +67,6 @@ namespace Umbraco.Core.Logging.Viewer
             }
 
             return logs;
-        }
-        
+        }        
     }
 }

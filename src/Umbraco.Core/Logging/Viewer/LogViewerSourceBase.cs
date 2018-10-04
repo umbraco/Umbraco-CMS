@@ -12,10 +12,10 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
-        private static readonly string expressionOperators = "()+=*<>%-";
+        
         private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
-        public abstract IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
+        public abstract IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
 
         public virtual IEnumerable<SavedLogSearch> GetSavedSearches()
         {
@@ -70,29 +70,26 @@ namespace Umbraco.Core.Logging.Viewer
 
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var logs = GetAllLogs(startDate, endDate);
-            return logs.Count(x => x.Level == LogEventLevel.Fatal || x.Level == LogEventLevel.Error || x.Exception != null);
+            var errorCounter = new ErrorCounterFilter();
+            GetLogs(DateTime.Now, DateTime.Now, errorCounter, 0, int.MaxValue);
+            return errorCounter.count;
         }
 
         public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var logs = GetAllLogs(startDate, endDate);
-            return new LogLevelCounts
-            {
-                Information = logs.Count(x => x.Level == LogEventLevel.Information),
-                Debug = logs.Count(x => x.Level == LogEventLevel.Debug),
-                Warning = logs.Count(x => x.Level == LogEventLevel.Warning),
-                Error = logs.Count(x => x.Level == LogEventLevel.Error),
-                Fatal = logs.Count(x => x.Level == LogEventLevel.Fatal)
-            };
+            var counter = new CountingFilter();
+            GetLogs(DateTime.Now, DateTime.Now, counter, 0, int.MaxValue);
+            return counter.Counts;
         }
 
         public IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var logs = GetAllLogs(startDate, endDate);
-            var templates = logs.GroupBy(x => x.MessageTemplate.Text)
-                .Select(g => new LogTemplate { MessageTemplate = g.Key, Count = g.Count() })
-                .OrderByDescending(x => x.Count);
+            var messageTemplates = new MessageTemplateFilter();
+            GetLogs(DateTime.Now, DateTime.Now, messageTemplates, 0, int.MaxValue);
+
+            var templates = messageTemplates.counts.
+                Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
+                .OrderByDescending(x=> x.Count);
 
             return templates;
         }
@@ -103,40 +100,9 @@ namespace Umbraco.Core.Logging.Viewer
             string filterExpression = null,
             string[] logLevels = null)
         {
-            //Get all logs into memory (Not sure this good or not)
-            var allLogs = GetAllLogs(startDate, endDate);
-            var logs = allLogs;
-
-            //If we have a filter expression check it and apply
-            if (string.IsNullOrEmpty(filterExpression) == false)
-            {
-                Func<LogEvent, bool> filter = null;
-
-                // If the expression is one word and doesn't contain a serilog operator then we can perform a like search
-                if (!filterExpression.Contains(" ") && !filterExpression.ContainsAny(expressionOperators.Select(c => c)))
-                {
-                    filter = PerformMessageLikeFilter(filterExpression);
-                }
-                else // check if it's a valid expression
-                {
-                    // If the expression evaluates then make it into a filter
-                    if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
-                    {
-                        filter = evt => true.Equals(eval(evt));
-                    }
-                    else
-                    {
-                        //Assume the expression was a search string and make a Like filter from that
-                        filter = PerformMessageLikeFilter(filterExpression);
-                    }
-                }
-
-                if (filter != null)
-                {
-                    logs = FilterLogs(logs, filter);
-                }
-            }
-
+            var expression = new ExpressionFilter(filterExpression);
+            var filteredLogs = GetLogs(DateTime.Now, DateTime.Now, expression, 0, int.MaxValue);
+            
             //This is user used the checkbox UI to toggle which log levels they wish to see
             //If an empty array - its implied all levels to be viewed
             if (logLevels.Length > 0)
@@ -144,16 +110,16 @@ namespace Umbraco.Core.Logging.Viewer
                 var logsAfterLevelFilters = new List<LogEvent>();
                 foreach (var level in logLevels)
                 {
-                    logsAfterLevelFilters.AddRange(logs.Where(x => x.Level.ToString() == level));
+                    logsAfterLevelFilters.AddRange(filteredLogs.Where(x => x.Level.ToString() == level));
                 }
-                logs = logsAfterLevelFilters;
+                filteredLogs = logsAfterLevelFilters;
             }
 
-            long totalRecords = logs.Count();
+            long totalRecords = filteredLogs.Count();
             long pageIndex = pageNumber - 1;
 
             //Order By, Skip, Take & Select
-            var logMessages = logs
+            var logMessages = filteredLogs
                 .OrderBy(l => l.Timestamp, orderDirection)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
@@ -171,27 +137,6 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 Items = logMessages
             };
-        }
-
-        private Func<LogEvent, bool> PerformMessageLikeFilter(string filterExpression)
-        {
-            var filterSearch = $"@Message like '%{FilterLanguage.EscapeLikeExpressionContent(filterExpression)}%'";
-            if (FilterLanguage.TryCreateFilter(filterSearch, out var eval, out var error))
-            {
-                return evt => true.Equals(eval(evt));
-            }
-
-            return null;
-        }
-
-        private IEnumerable<LogEvent> FilterLogs(IEnumerable<LogEvent> logs, Func<LogEvent, bool> filter)
-        {
-            if (filter != null)
-            {
-                logs = logs.Where(filter);
-            }
-
-            return logs;
-        }
+        }        
     }
 }

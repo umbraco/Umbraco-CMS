@@ -11,7 +11,7 @@ namespace Umbraco.Core.Logging.Viewer
         /// <summary>
         /// Get all logs from your chosen datasource back as Serilog LogEvents
         /// </summary>
-        IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
+        IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
 
         /// <summary>
         /// Get all saved searches from your chosen datasource
