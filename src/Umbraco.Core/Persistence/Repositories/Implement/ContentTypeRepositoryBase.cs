@@ -602,24 +602,7 @@ AND umbracoNode.id <> @id",
                     //we dont need to move the names! this is because we always keep the invariant names with the name of the default language.
 
                     //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
-
-                    ////now we need to move the names
-
-                    ////first update umbracoNode from documentCultureVariation
-                    //var sqlUpdate = Sql($"UPDATE {NodeDto.TableName} SET {Sql().Columns<NodeDto>(x => x.Text)} = {Sql().Columns<DocumentCultureVariationDto>(x => x.Name)}")
-                    //    .From<NodeDto>()
-                    //    .InnerJoin<DocumentCultureVariationDto>().On<DocumentCultureVariationDto, NodeDto>(x => x.NodeId, x => x.NodeId)
-                    //    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>(x => x.NodeId, x => x.NodeId)
-                    //    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
-                    //Database.Execute(sqlUpdate);
-
-                    ////next update umbracoContentVersion from contentVersionCultureVariation
-                    //sqlUpdate = Sql($"UPDATE {ContentVersionDto.TableName} SET {Sql().Columns<ContentVersionDto>(x => x.Text)} = {Sql().Columns<ContentVersionCultureVariationDto>(x => x.Name)}")
-                    //    .From<ContentVersionDto>()
-                    //    .InnerJoin<ContentVersionCultureVariationDto>().On<ContentVersionCultureVariationDto, ContentVersionDto>(x => x.VersionId, x => x.Id)
-                    //    .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>(x => x.NodeId, x => x.NodeId)
-                    //    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
-                    //Database.Execute(sqlUpdate);
+                    // if we want these SQL statements back, look into GIT history
 
                     break;
                 case ContentVariation.CultureAndSegment:
