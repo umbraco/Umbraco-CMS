@@ -99,11 +99,13 @@
         }
 
         function datePickerShow() {
+            // prevent the overlay from closing when the date picker is open
             $scope.model.disableBackdropClick = true;
         }
 
         function datePickerClose() {
             $timeout(function(){
+                // allow the date picker to close now the date picker is closed
                 $scope.model.disableBackdropClick = false;
             });
         }
@@ -159,15 +161,12 @@
         }
 
         function formatDatesToLocal(variant) {
-
             if(variant && variant.releaseDate) {
-                variant.releaseDateFormatted = dateHelper.getLocalDate(variant.releaseDate, vm.currentUser.locale, "YYYY-MM-DD HH:mm");
+                variant.releaseDateFormatted = dateHelper.getLocalDate(variant.releaseDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
-
             if(variant && variant.removeDate) {
-                variant.removeDateFormatted = dateHelper.getLocalDate(variant.removeDate, vm.currentUser.locale, "YYYY-MM-DD HH:mm");
+                variant.removeDateFormatted = dateHelper.getLocalDate(variant.removeDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
-
         }
 
         function changeSelection(variant) {
