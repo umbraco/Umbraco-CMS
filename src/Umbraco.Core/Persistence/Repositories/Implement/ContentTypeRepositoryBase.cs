@@ -498,7 +498,7 @@ AND umbracoNode.id <> @id",
         /// <param name="propertyTypeChanges"></param>
         private void MoveVariantData(IDictionary<int, (ContentVariation, ContentVariation)> propertyTypeChanges)
         {
-            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefaultVariantLanguage));
+            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefault));
 
             //Group by the "To" variation so we can bulk update in the correct batches
             foreach(var g in propertyTypeChanges.GroupBy(x => x.Value.Item2))
@@ -532,7 +532,7 @@ AND umbracoNode.id <> @id",
         /// <param name="to"></param>
         private void MoveVariantData(IContentTypeComposition contentType, ContentVariation from, ContentVariation to)
         {
-            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefaultVariantLanguage));
+            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefault));
 
             var sqlPropertyTypeIds = Sql().Select<PropertyTypeDto>(x => x.Id).From<PropertyTypeDto>().Where<PropertyTypeDto>(x => x.ContentTypeId == contentType.Id);
             switch (to)
