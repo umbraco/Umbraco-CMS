@@ -463,7 +463,7 @@ namespace Umbraco.Tests.Integration
 
         #endregion
 
-        #region Save, Publish & UnPublish single content
+        #region Save, Publish & Unpublish single content
 
         [Test]
         public void SaveUnpublishedContent()
@@ -721,7 +721,7 @@ namespace Umbraco.Tests.Integration
 
         #endregion
 
-        #region Publish & UnPublish branch
+        #region Publish & Unpublish branch
 
         [Test]
         public void UnpublishContentBranch()

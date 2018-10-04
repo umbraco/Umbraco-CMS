@@ -204,7 +204,7 @@
     <key alias="titleOptional">Tytuł (opcjonalny)</key>
     <key alias="altTextOptional">Alternatywny tekst (opcjonalny)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Cofnij publikację</key>
+    <key alias="unpublish">Cofnij publikację</key>
     <key alias="updateDate">Ostatnio edytowany</key>
     <key alias="updateDateDesc" version="7.0">Data/czas edycji dokumentu</key>
     <key alias="uploadClear">Usuń plik(i)</key>

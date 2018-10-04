@@ -155,7 +155,7 @@
     <key alias="titleOptional">タイトル (オプション)</key>
     <key alias="altTextOptional">代替テキスト (オプション)</key>
     <key alias="type">型</key>
-    <key alias="unPublish">非公開</key>
+    <key alias="unpublish">非公開</key>
     <key alias="updateDate">最終更新日時</key>
     <key alias="updateDateDesc" version="7.0">このドキュメントが最後に更新された日時</key>
     <key alias="uploadClear">ファイルの消去</key>

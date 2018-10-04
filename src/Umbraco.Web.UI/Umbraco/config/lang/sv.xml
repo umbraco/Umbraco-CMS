@@ -158,7 +158,7 @@
     <key alias="target">Mål</key>
     <key alias="titleOptional">Titel (valfritt)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Avpublicera</key>
+    <key alias="unpublish">Avpublicera</key>
     <key alias="unpublishDate">Avpubliceras</key>
     <key alias="updateDate">Senast redigerad</key>
     <key alias="updateDateDesc">Datum/tid detta dokument ändrats</key>

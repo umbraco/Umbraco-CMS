@@ -1,0 +1,66 @@
+<div ng-controller="Umbraco.Overlays.UnpublishController as vm">
+
+    <!-- 1 language -->
+    <div ng-if="vm.variants.length === 1">
+        <p><localize key="prompt_confirmUnpublish"></localize></p>
+    </div>
+
+    <!-- Multiple languages -->
+    <div ng-if="vm.variants.length > 1">
+        <div style="margin-bottom: 15px;">
+            <p><localize key="content_languagesToUnpublish"></localize></p>
+        </div>
+            
+        <div class="umb-list umb-list--condensed">
+    
+            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.publishedVariantFilter">
+                <ng-form name="unpublishVariantSelectorForm">
+                    <div class="flex">
+                        <input id="{{variant.htmlId}}"
+                                name="unpublishVariantSelector"
+                                type="checkbox"
+                                ng-model="variant.save"
+                                ng-change="vm.changeSelection(variant)"
+                                ng-disabled="variant.disabled"
+                                style="margin-right: 8px;"
+                                val-server-field="{{variant.htmlId}}" />
+                        <div>
+                            <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
+                                <span>{{ variant.language.name }}</span>
+                            </label>
+    
+                            <div class="umb-permission__description">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                            </div>
+    
+                        </div>
+                    </div>
+    
+                </ng-form>
+            </div>
+            <br />
+        </div>
+            
+        <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unpublishedVariantFilter).length > 0">
+            <div style="margin-bottom: 15px; font-weight: bold;">
+                <p><localize key="content_unpublishedLanguages"></localize></p>
+            </div>
+    
+            <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.unpublishedVariantFilter">
+                <div>
+                    <div style="margin-bottom: 2px;">
+                        <span>{{ variant.language.name }}</span>
+                        <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                    </div>
+    
+                    <div>
+                        <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+</div>

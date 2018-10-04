@@ -57,10 +57,10 @@ namespace Umbraco.Web.Components
             };
 
             //Send notifications for the unpublish action
-            ContentService.UnPublished += (sender, args) =>
+            ContentService.Unpublished += (sender, args) =>
             {
                 foreach (var content in args.PublishedEntities)
-                    notificationService.SendNotification(content, ActionUnPublish.Instance);
+                    notificationService.SendNotification(content, ActionUnpublish.Instance);
             };
         }
     }
