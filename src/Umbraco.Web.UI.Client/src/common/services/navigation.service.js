@@ -73,7 +73,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setSectionState("showSearchResults", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
-			appState.setMenuState("currentNode", null);
 
             if (appState.getGlobalState("isTablet") === true) {
                 appState.setGlobalState("showNavigation", false);
