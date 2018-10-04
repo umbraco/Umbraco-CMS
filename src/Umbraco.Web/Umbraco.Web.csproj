@@ -906,7 +906,7 @@
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
-    <Compile Include="PublishedContentPropertyExtension.cs" />
+    <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />

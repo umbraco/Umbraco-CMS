@@ -33,6 +33,7 @@
                         <th>Language</th>
                         <th>Default</th>
                         <th>Mandatory</th>
+                        <th>Fallback</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,6 +55,10 @@
                                 checked="language.isMandatory"
                                 size="xs">
                             </umb-checkmark>
+                        </td>
+                        <td>
+                            <span ng-if="language.fallbackLanguageId">{{vm.getLanguageById(language.fallbackLanguageId).name}}</span>
+                            <span ng-if="!language.fallbackLanguageId">(none)</span>
                         </td>
                         <td style="text-align: right;">
                             <umb-button

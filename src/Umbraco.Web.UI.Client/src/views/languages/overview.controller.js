@@ -13,6 +13,16 @@
         vm.editLanguage = editLanguage;
         vm.deleteLanguage = deleteLanguage;
 
+        vm.getLanguageById = function(id) {
+            for (var i = 0; i < vm.languages.length; i++) {
+                if (vm.languages[i].id === id) {
+                    return vm.languages[i];
+                }
+            }
+
+            return null;
+        };
+
         function init() {
 
             vm.loading = true;
@@ -21,18 +31,20 @@
             var labelKeys = [
                 "treeHeaders_languages",
                 "general_mandatory",
-                "general_default"
+                "general_default",
+                "languages_fallsbackToLabel"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
                 vm.labels.languages = values[0];
                 vm.labels.mandatory = values[1];
                 vm.labels.general = values[2];
+                vm.labels.fallsbackTo = values[3];
                 // set page name
                 vm.page.name = vm.labels.languages;
             });
 
-            languageResource.getAll().then(function(languages) {
+            languageResource.getAll().then(function (languages) {
                 vm.languages = languages;
                 vm.loading = false;
             });
