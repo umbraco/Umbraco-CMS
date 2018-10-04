@@ -1,17 +1,20 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, localizationService, dateHelper, userService) {
+    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService) {
 
         var vm = this;
 
         vm.datePickerChange = datePickerChange;
+        vm.datePickerShow = datePickerShow;
+        vm.datePickerClose = datePickerClose;
         vm.clearPublishDate = clearPublishDate;
         vm.clearUnpublishDate = clearUnpublishDate;
         vm.dirtyVariantFilter = dirtyVariantFilter;
         vm.pristineVariantFilter = pristineVariantFilter;
         vm.changeSelection = changeSelection;
 
+        vm.firstSelectedDates = {};
         vm.currentUser = null;
         vm.datePickerConfig = {
             pickDate: true,
@@ -37,18 +40,21 @@
                 });
             }
 
-            _.each(vm.variants,
-                function (variant) {
-                    variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
+            // Check for variants: if a node is invariant it will still have the default language in variants
+            // so we have to check for length > 1
+            if (vm.variants.length > 1) {
 
-                    //check for pristine variants
-                    if (!vm.hasPristineVariants) {
-                        vm.hasPristineVariants = pristineVariantFilter(variant);
-                    }
-                });
+                _.each(vm.variants,
+                    function (variant) {
+                        variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
+                        variant.htmlId = "_content_variant_" + variant.compositeId;
+    
+                        //check for pristine variants
+                        if (!vm.hasPristineVariants) {
+                            vm.hasPristineVariants = pristineVariantFilter(variant);
+                        }
+                    });
 
-            if (vm.variants.length !== 0) {
                 //now sort it so that the current one is at the top
                 vm.variants = _.sortBy(vm.variants, function (v) {
                     return v.active ? 0 : 1;
@@ -64,11 +70,8 @@
                     active.save = true;
                 }
 
-                //$scope.model.disableSubmitButton = !canPublish();
-
-            } else {
-                //disable Publish button if we have nothing to publish, should not happen
-                //$scope.model.disableSubmitButton = true;
+                $scope.model.disableSubmitButton = !canSchedule();
+            
             }
 
             // get current backoffice user and format dates
@@ -95,6 +98,16 @@
             }
         }
 
+        function datePickerShow() {
+            $scope.model.disableBackdropClick = true;
+        }
+
+        function datePickerClose() {
+            $timeout(function(){
+                $scope.model.disableBackdropClick = false;
+            });
+        }
+
         function setPublishDate(variant, date) {
 
             if (!date) {
@@ -110,6 +123,8 @@
 
             // make sure dates are formatted to the user's locale
             formatDatesToLocal(variant);
+
+            // store the first selected date so we can apply to other selected variants
 
         }
 
@@ -202,10 +217,14 @@
 
         onInit();
 
-        //when this dialog is closed, reset all 'save' flags
+        //when this dialog is closed, clean up
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
                 vm.variants[i].schedule = false;
+                vm.variants[i].releaseDate = null;
+                vm.variants[i].releaseDateFormatted = null;
+                vm.variants[i].removeDate = null;
+                vm.variants[i].releaseDateFormatted = null;
                 vm.variants[i].save = false;
             }
         });
