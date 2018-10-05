@@ -95,7 +95,8 @@
 
                     <a href=""
                        ng-if="!model.user.isCurrentUser"
-                     class="umb-node-preview-add"
+                       class="umb-node-preview-add"
+                       id="content-start-add"
                        ng-click="model.openContentPicker()"
                        prevent-default>
                         <localize key="general_add">Add</localize>
@@ -122,6 +123,7 @@
                        ng-if="!model.user.isCurrentUser"
                      class="umb-node-preview-add"
                        ng-click="model.openMediaPicker()"
+                       id="media-start-add"
                        prevent-default>
                         <localize key="general_add">Add</localize>
                     </a>
@@ -168,7 +170,7 @@
         <div class="umb-user-details-details__section">
 
             <!-- Avatar -->
-            <div>
+            <div class="umb-user-details-avtar">
                 <ng-form name="avatarForm" class="flex flex-column justify-center items-center">
 
                     <umb-avatar style="margin-bottom: 15px;"
