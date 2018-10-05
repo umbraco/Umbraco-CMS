@@ -27,7 +27,7 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
             
-            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/{"overview"}";
+            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/overview";
            
             root.Icon = "icon-box";
             
@@ -47,9 +47,7 @@ namespace Umbraco.Web.Trees
                         .Select(dt =>
                         {
                             var node = CreateTreeNode(dt.Data.Id.ToString(), id, queryStrings, dt.Data.Name, "icon-inbox", false,
-                                string.Format("/{0}/framed/{1}",
-                                    queryStrings.GetValue<string>("application"),
-                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));
+                                $"/{queryStrings.GetValue<string>("application")}/framed/{Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)}");
                             return node;
                         }));
             }
@@ -85,16 +83,16 @@ namespace Umbraco.Web.Trees
             // Root actions
             if (id == "-1")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
             }
             else if (id == "created")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
 
                 menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                    Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), true);
             }
             else
             {
