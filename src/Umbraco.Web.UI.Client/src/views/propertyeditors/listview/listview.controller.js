@@ -650,6 +650,23 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       }
    }
 
+
+   function createBlank(entityType,docTypeAlias) {
+       debugger;
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true");
+   }
+
+   function createFromBlueprint(entityType,docTypeAlias, blueprintId) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+   }
+
+   $scope.createBlank = createBlank;
+   $scope.createFromBlueprint = createFromBlueprint;
+
    //GO!
    initView();
 }
