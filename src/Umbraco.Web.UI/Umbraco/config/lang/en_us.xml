@@ -1326,21 +1326,14 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editscript">Edit script file</key>
     </area>
     <area alias="sections">
-        <key alias="concierge">Concierge</key>
         <key alias="content">Content</key>
-        <key alias="courier">Courier</key>
-        <key alias="developer">Developer</key>
-        <key alias="installer">Umbraco Configuration Wizard</key>
+        <key alias="packages">Packages</key>
         <key alias="media">Media</key>
         <key alias="member">Members</key>
-        <key alias="newsletters">Newsletters</key>
         <key alias="settings">Settings</key>
-        <key alias="statistics">Statistics</key>
         <key alias="translation">Translation</key>
         <key alias="users">Users</key>
-        <key alias="help" version="7.0">Help</key>
         <key alias="forms">Forms</key>
-        <key alias="analytics">Analytics</key>
     </area>
     <area alias="help">
         <key alias="goTo">go to</key>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
@@ -13,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class PackagesTreeController : TreeController
@@ -26,10 +27,10 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
             
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Developer, Constants.Trees.Packages, "overview");
+            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/{"overview"}";
            
             root.Icon = "icon-box";
-
+            
             return root;
         }
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

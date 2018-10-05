@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Media,
         Constants.Applications.Users,
         Constants.Applications.Settings,
-        Constants.Applications.Developer,
+        Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
