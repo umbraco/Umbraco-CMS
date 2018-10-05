@@ -97,14 +97,6 @@
                 eventsService.unsubscribe(evts[e]);
             }
 
-            evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
-            evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
             evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
                 if (args && args.documentType && args.documentType.key === content.documentType.key) {

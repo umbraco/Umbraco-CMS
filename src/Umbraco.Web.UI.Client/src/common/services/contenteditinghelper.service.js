@@ -266,40 +266,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
             }
 
-            // If we have a scheduled publish or unpublish date change the default button to 
-            // "save" and update the label to "save and schedule
-            if (args.content.releaseDate || args.content.removeDate) {
-
-                // if save button is alread the default don't change it just update the label
-                if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
-                    buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return buttons;
-                }
-
-                if (buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
-                    // save a copy of the default so we can push it to the sub buttons later
-                    var defaultButtonCopy = angular.copy(buttons.defaultButton);
-                    var newSubButtons = [];
-
-                    // if save button is not the default button - find it and make it the default
-                    angular.forEach(buttons.subButtons, function (subButton) {
-
-                        if (subButton.letter === "A") {
-                            buttons.defaultButton = subButton;
-                            buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                        } else {
-                            newSubButtons.push(subButton);
-                        }
-
-                    });
-
-                    // push old default button into subbuttons
-                    newSubButtons.push(defaultButtonCopy);
-                    buttons.subButtons = newSubButtons;
-                }
-
-            }
-
             return buttons;
         },
 
