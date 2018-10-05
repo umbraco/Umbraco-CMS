@@ -412,6 +412,7 @@ AND umbracoNode.id <> @id",
                 //we've already looked up the previous version of the content type so we know it's previous variation state
                 MoveVariantData(entity, (ContentVariation)dtoPk.Variations, entity.Variations);
                 Clear301Redirects(entity);
+                ClearScheduledPublishing(entity);
             }   
 
             //track any property types that are changing variation
@@ -511,6 +512,14 @@ AND umbracoNode.id <> @id",
                 .WhereIn((System.Linq.Expressions.Expression<Func<RedirectUrlDto, object>>)(x => x.ContentKey), sqlSelect);
             
             Database.Execute(sqlDelete);
+        }
+
+        /// <summary>
+        /// Clear any scheduled publishing associated with content for a content type
+        /// </summary>
+        private void ClearScheduledPublishing(IContentTypeComposition contentType)
+        {
+            //TODO: Fill this in when scheduled publishing is enabled for variants
         }
 
         /// <summary>
