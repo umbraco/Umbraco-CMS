@@ -274,6 +274,8 @@ AND umbracoNode.id <> @id",
             if (compositionBase != null && compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
+                //TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
+
                 // find Content based on the current ContentType
                 var sql = Sql()
                     .SelectAll()
@@ -292,6 +294,7 @@ AND umbracoNode.id <> @id",
                     // based on the PropertyTypes that belong to the removed ContentType.
                     foreach (var contentDto in contentDtos)
                     {
+                        //TODO: This could be done with bulk SQL statements
                         foreach (var propertyType in propertyTypes)
                         {
                             var nodeId = contentDto.NodeId;
@@ -408,6 +411,7 @@ AND umbracoNode.id <> @id",
             {
                 //we've already looked up the previous version of the content type so we know it's previous variation state
                 MoveVariantData(entity, (ContentVariation)dtoPk.Variations, entity.Variations);
+                Clear301Redirects(entity);
             }   
 
             //track any property types that are changing variation
@@ -490,6 +494,23 @@ AND umbracoNode.id <> @id",
             if (orphanPropertyTypeIds != null)
                 foreach (var id in orphanPropertyTypeIds)
                     DeletePropertyType(entity.Id, id);
+        }
+
+        /// <summary>
+        /// Clear any redirects associated with content for a content type
+        /// </summary>
+        private void Clear301Redirects(IContentTypeComposition contentType)
+        {
+            //first clear out any existing property data that might already exists under the default lang
+            var sqlSelect = Sql().Select<NodeDto>(x => x.UniqueId)
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
+                .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+            var sqlDelete = Sql()
+                .Delete<RedirectUrlDto>()
+                .WhereIn((System.Linq.Expressions.Expression<Func<RedirectUrlDto, object>>)(x => x.ContentKey), sqlSelect);
+            
+            Database.Execute(sqlDelete);
         }
 
         /// <summary>

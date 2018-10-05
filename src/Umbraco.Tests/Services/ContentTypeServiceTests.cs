@@ -24,6 +24,50 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceTests : TestWithSomeContentBase
     {
+        [Test]
+        public void Change_Content_Type_Variation_Clears_Redirects()
+        {
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Nothing;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Nothing
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            ServiceContext.ContentTypeService.Save(contentType);
+            var contentType2 = MockedContentTypes.CreateBasicContentType("test");
+            ServiceContext.ContentTypeService.Save(contentType2);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.Name = "Hello1";
+            ServiceContext.ContentService.Save(doc);
+
+            IContent doc2 = MockedContent.CreateBasicContent(contentType2);
+            ServiceContext.ContentService.Save(doc2);
+
+            ServiceContext.RedirectUrlService.Register("hello/world", doc.Key);
+            ServiceContext.RedirectUrlService.Register("hello2/world2", doc2.Key);
+
+            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
+            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+
+            //change variation
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            Assert.AreEqual(0, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
+            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+
+        }
 
         [Test]
         public void Change_Content_Type_From_Invariant_Variant()
