@@ -652,7 +652,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
 
    function createBlank(entityType,docTypeAlias) {
-       debugger;
        $location
          .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
          .search("doctype=" + docTypeAlias + "&create=true");
