@@ -346,6 +346,9 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<TItem> GetComposedOf(int id)
         {
+            //fixme: this is essentially the same as ContentTypeServiceExtensions.GetWhereCompositionIsUsedInContentTypes which loads
+            // all content types to figure this out, this instead makes quite a few queries so should be replaced
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);

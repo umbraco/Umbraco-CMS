@@ -267,6 +267,119 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Change_Property_Type_From_Variant_Invariant_On_A_Composition()
+        {
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Culture
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //compose this from the other one
+            var contentType2 = MockedContentTypes.CreateBasicContentType("test");
+            contentType2.Variations = ContentVariation.Culture;
+            contentType2.AddContentType(contentType);
+            ServiceContext.ContentTypeService.Save(contentType2);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.SetCultureName("Home", "en-US");
+            doc.SetValue("title", "hello world", "en-US");
+            ServiceContext.ContentService.Save(doc);
+
+            IContent doc2 = MockedContent.CreateBasicContent(contentType2);
+            doc2.SetCultureName("Home", "en-US");
+            doc2.SetValue("title", "hello world", "en-US");
+            ServiceContext.ContentService.Save(doc2);
+
+            //change the property type to be invariant
+            contentType.PropertyTypes.First().Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.AreEqual("hello world", doc2.GetValue("title"));
+
+            //change back property type to be variant
+            contentType.PropertyTypes.First().Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
+            Assert.AreEqual("hello world", doc2.GetValue("title", "en-US"));
+        }
+
+        [Test]
+        public void Change_Content_Type_From_Variant_Invariant_On_A_Composition()
+        {
+            //create content type with a property type that varies by culture
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            var contentCollection = new PropertyTypeCollection(true);
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            {
+                Alias = "title",
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88,
+                Variations = ContentVariation.Culture
+            });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //compose this from the other one
+            var contentType2 = MockedContentTypes.CreateBasicContentType("test");
+            contentType2.Variations = ContentVariation.Culture;
+            contentType2.AddContentType(contentType);
+            ServiceContext.ContentTypeService.Save(contentType2);
+
+            //create some content of this content type
+            IContent doc = MockedContent.CreateBasicContent(contentType);
+            doc.SetCultureName("Home", "en-US");
+            doc.SetValue("title", "hello world", "en-US");
+            ServiceContext.ContentService.Save(doc);
+
+            IContent doc2 = MockedContent.CreateBasicContent(contentType2);
+            doc2.SetCultureName("Home", "en-US");
+            doc2.SetValue("title", "hello world", "en-US");
+            ServiceContext.ContentService.Save(doc2);
+
+            //change the content type to be invariant
+            contentType.Variations = ContentVariation.Nothing;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+
+            Assert.AreEqual("hello world", doc.GetValue("title"));
+            Assert.AreEqual("hello world", doc2.GetValue("title"));
+
+            //change back content type to be variant
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+
+            //this will be null because the doc type was changed back to variant but it's property types don't get changed back
+            Assert.IsNull(doc.GetValue("title", "en-US")); 
+            Assert.IsNull(doc2.GetValue("title", "en-US"));
+        }
+
+        [Test]
         public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
         {
             IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");

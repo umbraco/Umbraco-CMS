@@ -415,7 +415,7 @@ AND umbracoNode.id <> @id",
                 ClearScheduledPublishing(entity);
             }   
 
-            //track any property types that are changing variation
+            //track any content type/property types that are changing variation which will require content updates
             var propertyTypeVariationChanges = new Dictionary<int, ContentVariation>();
 
             // insert or update properties
@@ -426,7 +426,9 @@ AND umbracoNode.id <> @id",
                 if (!ctVariationChanging)
                 {
                     if (propertyType.IsPropertyDirty("Variations"))
+                    {
                         propertyTypeVariationChanges[propertyType.Id] = propertyType.Variations;
+                    }   
                 }
                 else
                 {
@@ -481,7 +483,7 @@ AND umbracoNode.id <> @id",
                     .From<PropertyTypeDto>()
                     .WhereIn<PropertyTypeDto>(x => x.Id, propertyTypeVariationChanges.Keys));
 
-                foreach(var f in from)
+                foreach (var f in from)
                 {
                     changes[f.Key] = (propertyTypeVariationChanges[f.Key], (ContentVariation)f.Value);
                 }
@@ -489,6 +491,7 @@ AND umbracoNode.id <> @id",
                 //perform the move
                 MoveVariantData(changes);
             }
+
 
             // deal with orphan properties: those that were in a deleted tab,
             // and have not been re-mapped to another tab or to 'generic properties'
@@ -845,8 +848,11 @@ AND umbracoNode.id <> @id",
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<TEntity> GetTypesDirectlyComposedOf(int id)
         {
+            //fixme - this will probably be more efficient to simply load all content types and do the calculation, see GetWhereCompositionIsUsedInContentTypes
+
             var sql = Sql()
                 .SelectAll()
                 .From<NodeDto>()
