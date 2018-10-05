@@ -198,7 +198,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_schedulePublish",
                             handler: args.methods.schedulePublish,
                             alias: "schedulePublish",
-                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
+                            addEllipsis: "true"
                         };
                     default:
                         return null;
