@@ -14,7 +14,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, null, sortOrder: 2)]
     [UmbracoTreeAuthorize(Constants.Trees.PartialViews)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class PartialViewsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.PartialViewsFileSystem;

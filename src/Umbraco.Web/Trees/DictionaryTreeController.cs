@@ -11,7 +11,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
     public class DictionaryTreeController : TreeController
     {
