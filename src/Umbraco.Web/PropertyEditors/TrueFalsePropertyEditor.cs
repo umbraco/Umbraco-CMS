@@ -45,6 +45,14 @@ namespace Umbraco.Web.PropertyEditors
                 Fields.Add(new PreValueField()
                 {
                     Description = "",
+                    Key = "labelPosition",
+                    Name = "Label position",
+                    View = "views/propertyeditors/boolean/booleanWithLabels.prevalues.html"
+                });
+
+                Fields.Add(new PreValueField()
+                {
+                    Description = "",
                     Key = "hideIcons",
                     Name = "Hide icons",
                     View = "boolean"
