@@ -132,6 +132,7 @@ namespace umbraco.presentation.umbraco.dialogs
             // Load up membergrouops
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
+            _memberGroups.Height = 165;
             var selectedGroups = "";
 
             // get roles from the membership provider
