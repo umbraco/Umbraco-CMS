@@ -5,6 +5,7 @@
 
         var vm = this;
 
+        vm.datePickerSetup = datePickerSetup;
         vm.datePickerChange = datePickerChange;
         vm.datePickerShow = datePickerShow;
         vm.datePickerClose = datePickerClose;
@@ -16,18 +17,6 @@
 
         vm.firstSelectedDates = {};
         vm.currentUser = null;
-        vm.datePickerConfig = {
-            pickDate: true,
-            pickTime: true,
-            useSeconds: false,
-            format: "YYYY-MM-DD HH:mm",
-            icons: {
-                time: "icon-time",
-                date: "icon-calendar",
-                up: "icon-chevron-up",
-                down: "icon-chevron-down"
-            }
-        };
 
         function onInit() {
 
@@ -79,8 +68,23 @@
 
                 vm.currentUser = currentUser;
 
-                // format all dates to local
                 angular.forEach(vm.variants, function(variant) {
+
+                    // prevent selecting publish/unpublish date before today
+                    var now = new Date();
+                    var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
+
+                    var datePickerConfig = {
+                        enableTime: true,
+                        dateFormat: "Y-m-d H:i",
+                        time_24hr: true,
+                        minDate: nowFormatted,
+                        defaultDate: nowFormatted
+                    };
+
+                    variant.datePickerConfig = datePickerConfig;
+                    
+                    // format all dates to local
                     if(variant.releaseDate || variant.removeDate) {
                         formatDatesToLocal(variant);
                     }
@@ -90,22 +94,24 @@
 
         }
 
-        function datePickerChange(variant, event, type) {
+        function datePickerSetup(variant, datePickerInstance) {
+            variant.datePickerInstance = datePickerInstance;
+        };
+
+        function datePickerChange(variant, dateStr, type) {
             if (type === 'publish') {
-                setPublishDate(variant, event.date.format("YYYY-MM-DD HH:mm"));
+                setPublishDate(variant, dateStr);
             } else if (type === 'unpublish') {
-                setUnpublishDate(variant, event.date.format("YYYY-MM-DD HH:mm"));
+                setUnpublishDate(variant, dateStr);
             }
         }
 
         function datePickerShow() {
-            // prevent the overlay from closing when the date picker is open
             $scope.model.disableBackdropClick = true;
         }
 
         function datePickerClose() {
             $timeout(function(){
-                // allow the date picker to close now the date picker is closed
                 $scope.model.disableBackdropClick = false;
             });
         }
@@ -127,6 +133,8 @@
             formatDatesToLocal(variant);
 
             // store the first selected date so we can apply to other selected variants
+
+            // variant.datePickerInstance.set("maxDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
 
         }
 

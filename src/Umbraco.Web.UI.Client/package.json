@@ -5,6 +5,7 @@
     "build": "gulp"
   },
   "dependencies": {
+    "flatpickr": "^4.5.2",
     "npm": "^6.4.1"
   },
   "devDependencies": {
