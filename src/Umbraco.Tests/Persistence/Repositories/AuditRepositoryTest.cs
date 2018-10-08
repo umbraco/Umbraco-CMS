@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor)sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor)sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor)sp, Logger);
 
                 var query = sp.SqlContext.Query<IAuditItem>().Where(x => x.UserId == -1);
 
