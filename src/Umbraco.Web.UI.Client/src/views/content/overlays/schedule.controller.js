@@ -167,12 +167,18 @@
         function clearPublishDate(variant) {
             if(variant && variant.releaseDate) {
                 variant.releaseDate = null;
+                // we don't have a publish date anymore so we can clear the min date for unpublish
+                var now = new Date();
+                var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
+                variant.removeDatePickerInstance.set("minDate", nowFormatted);
             }
         }
 
         function clearUnpublishDate(variant) {
             if(variant && variant.removeDate) {
                 variant.removeDate = null;
+                // we don't have a unpublish date anymore so we can clear the max date for publish
+                variant.releaseDatePickerInstance.set("maxDate", null);
             }
         }
 
