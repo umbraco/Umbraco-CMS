@@ -94,6 +94,12 @@
 
         }
 
+        /**
+         * Callback when date is set up
+         * @param {any} variant
+         * @param {any} type publish or unpublish 
+         * @param {any} datePickerInstance The date picker instance
+         */
         function datePickerSetup(variant, type, datePickerInstance) {
             // store a date picker instance for publish and unpublish picker
             // so we can change the settings independently.
@@ -104,6 +110,12 @@
             }
         };
 
+        /**
+         * Callback when date picker date changes
+         * @param {any} variant 
+         * @param {any} dateStr Date string from the date picker
+         * @param {any} type publish or unpublish
+         */
         function datePickerChange(variant, dateStr, type) {
             if (type === 'publish') {
                 setPublishDate(variant, dateStr);
@@ -112,16 +124,57 @@
             }
         }
 
-        function datePickerShow() {
-            $scope.model.disableBackdropClick = true;
+        /**
+         * Add flag when a date picker opens is we can prevent the overlay from closing
+         * @param {any} variant 
+         * @param {any} type publish or unpublish
+         */
+        function datePickerShow(variant, type) {
+            if (type === 'publish') {
+                variant.releaseDatePickerOpen = true;
+            } else if (type === 'unpublish') {
+                variant.removeDatePickerOpen = true;
+            }
+            checkForBackdropClick();
         }
 
-        function datePickerClose() {
+        /**
+         * Remove flag when a date picker closes so the overlay can be closed again
+         * @param {any} variant 
+         * @param {any} type publish or unpublish
+         */
+        function datePickerClose(variant, type) {
             $timeout(function(){
-                $scope.model.disableBackdropClick = false;
-            });
+                if (type === 'publish') {
+                    variant.releaseDatePickerOpen = false;
+                } else if (type === 'unpublish') {
+                    variant.removeDatePickerOpen = false;
+                }
+                checkForBackdropClick();
+            }, 200);
         }
 
+        /**
+         * Prevent the overlay from closing if any date pickers are open
+         */
+        function checkForBackdropClick() {
+
+            var open = _.find(vm.variants, function (variant) {
+                return variant.releaseDatePickerOpen || variant.removeDatePickerOpen;
+            });
+
+            if(open) {
+                $scope.model.disableBackdropClick = true;
+            } else {
+                $scope.model.disableBackdropClick = false;
+            }
+        }
+
+        /**
+         * Sets the selected publish date
+         * @param {any} variant 
+         * @param {any} date The selected date
+         */
         function setPublishDate(variant, date) {
 
             if (!date) {
@@ -143,6 +196,11 @@
 
         }
 
+        /**
+         * Sets the selected unpublish date
+         * @param {any} variant 
+         * @param {any} date The selected date
+         */
         function setUnpublishDate(variant, date) {
 
             if (!date) {
@@ -164,6 +222,10 @@
 
         }
 
+        /**
+         * Clears the publish date
+         * @param {any} variant 
+         */
         function clearPublishDate(variant) {
             if(variant && variant.releaseDate) {
                 variant.releaseDate = null;
@@ -174,6 +236,10 @@
             }
         }
 
+        /**
+         * Clears the unpublish date
+         * @param {any} variant 
+         */
         function clearUnpublishDate(variant) {
             if(variant && variant.removeDate) {
                 variant.removeDate = null;
@@ -182,6 +248,10 @@
             }
         }
 
+        /**
+         * Formates the selected dates to fit the user culture
+         * @param {any} variant 
+         */
         function formatDatesToLocal(variant) {
             if(variant && variant.releaseDate) {
                 variant.releaseDateFormatted = dateHelper.getLocalDate(variant.releaseDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
@@ -190,7 +260,11 @@
                 variant.removeDateFormatted = dateHelper.getLocalDate(variant.removeDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
         }
-
+        
+        /**
+         * Called when new variants are selected or deselected
+         * @param {any} variant 
+         */
         function changeSelection(variant) {
             $scope.model.disableSubmitButton = !canSchedule();
             //need to set the Save state to true if publish is true
