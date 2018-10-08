@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
@@ -13,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Packages, Constants.Trees.Packages, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class PackagesTreeController : TreeController
@@ -26,10 +27,10 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
             
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Developer, Constants.Trees.Packages, "overview");
+            root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/overview";
            
             root.Icon = "icon-box";
-
+            
             return root;
         }
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -46,9 +47,7 @@ namespace Umbraco.Web.Trees
                         .Select(dt =>
                         {
                             var node = CreateTreeNode(dt.Data.Id.ToString(), id, queryStrings, dt.Data.Name, "icon-inbox", false,
-                                string.Format("/{0}/framed/{1}",
-                                    queryStrings.GetValue<string>("application"),
-                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));
+                                $"/{queryStrings.GetValue<string>("application")}/framed/{Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)}");
                             return node;
                         }));
             }
@@ -84,16 +83,16 @@ namespace Umbraco.Web.Trees
             // Root actions
             if (id == "-1")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
             }
             else if (id == "created")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
 
                 menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                    Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), true);
             }
             else
             {

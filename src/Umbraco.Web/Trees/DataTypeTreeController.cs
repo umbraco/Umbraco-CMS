@@ -17,7 +17,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:7)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:3)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree
@@ -126,7 +126,8 @@ namespace Umbraco.Web.Trees
                     //can delete data type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
                 }
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), hasSeparator: true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                    $"actions/{ActionRefresh.Instance.Alias}"), hasSeparator: true);
             }
             else
             {

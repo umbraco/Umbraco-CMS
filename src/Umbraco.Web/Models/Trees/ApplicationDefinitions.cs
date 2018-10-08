@@ -19,8 +19,8 @@ namespace Umbraco.Web.Models.Trees
     public class SettingsApplicationDefinition : IApplication
     { }
 
-    [Application(Constants.Applications.Developer, "Developer", ".traydeveloper", sortOrder: 3)]
-    public class DeveloperApplicationDefinition : IApplication
+    [Application(Constants.Applications.Packages, "Packages", ".traydeveloper", sortOrder: 3)]
+    public class PackagesApplicationDefinition : IApplication
     { }
 
     [Application(Constants.Applications.Users, "Users", ".trayusers", sortOrder: 4)]
