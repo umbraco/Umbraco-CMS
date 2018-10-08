@@ -49,17 +49,24 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="modelTypes">The model types map.</param>
         /// <returns>The actual Clr type.</returns>
         public static Type Map(Type type, Dictionary<string, Type> modelTypes)
+            => Map(type, modelTypes, false);
+
+        public static Type Map(Type type, Dictionary<string, Type> modelTypes, bool dictionaryIsInvariant)
         {
+            // it may be that senders forgot to send an invariant dictionary (garbage-in)
+            if (!dictionaryIsInvariant)
+                modelTypes = new Dictionary<string, Type>(modelTypes, StringComparer.InvariantCultureIgnoreCase);
+
             if (type is ModelType modelType)
             {
-                if (modelTypes.TryGetValue(modelType.ContentTypeAlias, out Type actualType))
+                if (modelTypes.TryGetValue(modelType.ContentTypeAlias, out var actualType))
                     return actualType;
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
             }
 
             if (type is ModelTypeArrayType arrayType)
             {
-                if (modelTypes.TryGetValue(arrayType.ContentTypeAlias, out Type actualType))
+                if (modelTypes.TryGetValue(arrayType.ContentTypeAlias, out var actualType))
                     return actualType.MakeArrayType();
                 throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
             }
@@ -70,7 +77,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (def == null)
                 throw new InvalidOperationException("panic");
 
-            var args = type.GetGenericArguments().Select(x => Map(x, modelTypes)).ToArray();
+            var args = type.GetGenericArguments().Select(x => Map(x, modelTypes, true)).ToArray();
             return def.MakeGenericType(args);
         }
 
@@ -81,7 +88,14 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <param name="map">The model types map.</param>
         /// <returns>The actual Clr type name.</returns>
         public static string MapToName(Type type, Dictionary<string, string> map)
+            => MapToName(type, map, false);
+
+        private static string MapToName(Type type, Dictionary<string, string> map, bool dictionaryIsInvariant)
         {
+            // it may be that senders forgot to send an invariant dictionary (garbage-in)
+            if (!dictionaryIsInvariant)
+                map = new Dictionary<string, string>(map, StringComparer.InvariantCultureIgnoreCase);
+
             if (type is ModelType modelType)
             {
                 if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
@@ -102,7 +116,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (def == null)
                 throw new InvalidOperationException("panic");
 
-            var args = type.GetGenericArguments().Select(x => MapToName(x, map)).ToArray();
+            var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
             var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));
             return defFullName + "<" + string.Join(", ", args) + ">";
         }

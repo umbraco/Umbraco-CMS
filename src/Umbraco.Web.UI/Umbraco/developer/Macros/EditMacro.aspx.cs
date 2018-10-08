@@ -24,7 +24,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
     {
         public EditMacro()
         {
-            CurrentApp = Constants.Applications.Developer.ToString();
+            CurrentApp = Constants.Applications.Packages.ToString();
         }
 
         protected PlaceHolder Buttons;
