@@ -153,7 +153,7 @@
     <key alias="titleOptional">Titel (optional)</key>
     <key alias="altTextOptional">Alternativtext (optional)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Veröffentlichung widerrufen</key>
+    <key alias="unpublish">Veröffentlichung widerrufen</key>
     <key alias="updateDate">Zuletzt bearbeitet am</key>
     <key alias="updateDateDesc" version="7.0">Letzter Änderungszeitpunkt des Dokuments</key>
     <key alias="uploadClear">Datei entfernen</key>

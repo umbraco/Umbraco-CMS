@@ -146,7 +146,7 @@
     <area alias="auditTrails">
         <key alias="atViewingFor">Viewing for</key>
         <key alias="delete">Delete Content performed by user</key>
-        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="unpublish">Unpublish performed by user</key>
         <key alias="publish">Save and Publish performed by user</key>
         <key alias="save">Save Content performed by user</key>
         <key alias="move">Move Content performed by user</key>
@@ -159,7 +159,7 @@
         <key alias="smallMove">Move</key>
         <key alias="smallSave">Save</key>
         <key alias="smallDelete">Delete</key>
-        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallUnpublish">Unpublish</key>
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
@@ -238,7 +238,7 @@
         <key alias="titleOptional">Title (optional)</key>
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
-        <key alias="unPublish">Unpublish</key>
+        <key alias="unpublish">Unpublish</key>
         <key alias="unpublished">Unpublished</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
@@ -687,6 +687,7 @@
         <key alias="embed">Embed</key>
         <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
+		<key alias="includeFromsubFolders">Include subfolders in search</key>
     </area>
 
     <area alias="colors">
@@ -1688,8 +1689,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
 
-		<key alias="compositionUsageHeading">Where is this composition used?</key>
-		<key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+        <key alias="compositionUsageHeading">Where is this composition used?</key>
+        <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
     </area>
 
     <area alias="modelsBuilder">
@@ -1863,7 +1864,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="goToProfile">Go to user profile</key>
         <key alias="groupsHelp">Add groups to assign access and permissions</key>
         <key alias="inviteAnotherUser">Invite another user</key>
-        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
+        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco. Invites last for 72 hours.</key>
         <key alias="language">Language</key>
         <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
         <key alias="lastLockoutDate">Last lockout date</key>
@@ -1927,6 +1928,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="userInvited">has been invited</key>
         <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
         <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
+        <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
         <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
         <key alias="writer">Writer</key>
         <key alias="translator">Translator</key>
@@ -2185,6 +2187,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="enableUrlTracker">Enable URL tracker</key>
         <key alias="originalUrl">Original URL</key>
         <key alias="redirectedTo">Redirected To</key>
+        <key alias="redirectUrlManagement">Redirect Url Management</key>
+        <key alias="panelInformation">The following URLs redirect to this content item:</key>
         <key alias="noRedirects">No redirects have been made</key>
         <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
         <key alias="removeButton">Remove</key>

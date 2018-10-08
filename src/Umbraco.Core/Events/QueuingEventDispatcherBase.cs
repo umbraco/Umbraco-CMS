@@ -307,7 +307,7 @@ namespace Umbraco.Core.Events
 
             // fixme see notes above
             // delete event args does NOT superceedes 'unpublished' event
-            if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "UnPublished")
+            if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "Unpublished")
                 return false;
 
             // found occurences, need to determine if this event args is superceded

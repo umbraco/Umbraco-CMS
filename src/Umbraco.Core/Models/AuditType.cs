@@ -32,7 +32,7 @@
         /// <summary>
         /// Used when nodes are unpublished
         /// </summary>
-        UnPublish,
+        Unpublish,
         /// <summary>
         /// Used when nodes are moved
         /// </summary>

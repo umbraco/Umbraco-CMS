@@ -27,10 +27,10 @@ namespace Umbraco.Web.Media
         /// in memory. Fallback to GDI which means loading the image in memory and thus
         /// use potentially large amounts of memory.</remarks>
         public static Size GetDimensions(Stream stream)
-        {
-            //Try to load with exif
+        {   
             try
             {
+                //Try to load with exif
                 var jpgInfo = ImageFile.FromStream(stream);
 
                 if (jpgInfo.Format != ImageFileFormat.Unknown
@@ -44,20 +44,22 @@ namespace Umbraco.Web.Media
                         return new Size(width, height);
                     }
                 }
+
+                //we have no choice but to try to read in via GDI
+                using (var image = Image.FromStream(stream))
+                {
+
+                    var fileWidth = image.Width;
+                    var fileHeight = image.Height;
+                    return new Size(fileWidth, fileHeight);
+                }
             }
             catch (Exception)
             {
                 //We will just swallow, just means we can't read exif data, we don't want to log an error either
+                return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
             }
-
-            //we have no choice but to try to read in via GDI
-            using (var image = Image.FromStream(stream))
-            {
-
-                var fileWidth = image.Width;
-                var fileHeight = image.Height;
-                return new Size(fileWidth, fileHeight);
-            }
+            
         }
 
         

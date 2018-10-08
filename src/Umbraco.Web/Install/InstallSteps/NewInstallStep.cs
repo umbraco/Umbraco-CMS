@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Web;
 using System.Web.Security;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
@@ -27,6 +29,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly HttpContextBase _http;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
+        private static HttpClient _httpClient;
         private readonly IGlobalSettings _globalSettings;
 
         public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
@@ -79,15 +82,18 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Username = user.Email.Trim();
 
             _userService.Save(admin);
-
-
+            
             if (user.SubscribeToNewsLetter)
             {
+                if (_httpClient == null)
+                    _httpClient = new HttpClient();
+
+                var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
+                var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
+
                 try
                 {
-                    var client = new System.Net.WebClient();
-                    var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
-                    client.UploadValues("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", values);
+                    var response = _httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
                 }
                 catch { /* fail in silence */ }
             }
@@ -114,11 +120,14 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return RequiresExecution(null)
-                //the user UI
+            get
+            {
+                return RequiresExecution(null)
+              //the user UI
                 ? "user"
-                //the continue install UI
-                : "continueinstall"; }
+              //the continue install UI
+              : "continueinstall";
+            }
         }
 
         public override bool RequiresExecution(UserModel model)

@@ -421,6 +421,34 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
+                //They've successfully set their password, we can now update their user account to be confirmed
+                //if user was only invited, then they have not been approved
+                //but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
+                //means we have verified their email
+                if (!UserManager.IsEmailConfirmed(model.UserId))
+                {
+                    await UserManager.ConfirmEmailAsync(model.UserId, model.ResetCode);
+                }
+
+                //if the user is invited, enable their account on forgot password
+                var identityUser = await UserManager.FindByIdAsync(model.UserId);
+                //invited is not approved, never logged in, invited date present
+                /*
+                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
+                    return UserState.Invited;
+                */
+                if (identityUser != null && !identityUser.IsApproved) 
+                {
+                    var user = Services.UserService.GetByUsername(identityUser.UserName);
+                    //also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
+                    if (user.LastLoginDate == default && user.InvitedDate != null)
+                    {
+                        user.IsApproved = true;
+                        user.InvitedDate = null;
+                        Services.UserService.Save(user);
+                    }
+                }
+
                 UserManager.RaiseForgotPasswordChangedSuccessEvent(model.UserId);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

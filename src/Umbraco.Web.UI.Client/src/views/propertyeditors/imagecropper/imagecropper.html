@@ -42,8 +42,9 @@
                     </umb-image-gravity>
                     <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
-
-                <ul class="umb-sortable-thumbnails cropList clearfix">
+            
+                
+                <ul ng-if="!imageSrc.endsWith('.svg')" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 
                         <umb-image-thumbnail center="model.value.focalPoint"

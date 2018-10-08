@@ -10,33 +10,51 @@ namespace Umbraco.Core.Persistence.Dtos
     {
         public const string TableName = Constants.DatabaseSchema.Tables.Language;
 
+        /// <summary>
+        /// Gets or sets the identifier of the language.
+        /// </summary>
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 2)]
         public short Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ISO code of the language.
+        /// </summary>
         [Column("languageISOCode")]
         [Index(IndexTypes.UniqueNonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(14)]
         public string IsoCode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the culture name of the language.
+        /// </summary>
         [Column("languageCultureName")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(100)]
         public string CultureName { get; set; }
 
         /// <summary>
-        /// Defines if this language is the default variant language when language variants are in use
+        /// Gets or sets a value indicating whether the language is the default language.
         /// </summary>
         [Column("isDefaultVariantLang")]
         [Constraint(Default = "0")]
-        public bool IsDefaultVariantLanguage { get; set; }
+        public bool IsDefault { get; set; }
 
         /// <summary>
-        /// If true, a variant node cannot be published unless this language variant is created
+        /// Gets or sets a value indicating whether the language is mandatory.
         /// </summary>
         [Column("mandatory")]
         [Constraint(Default = "0")]
-        public bool Mandatory { get; set; }
+        public bool IsMandatory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of a fallback language.
+        /// </summary>
+        [Column("fallbackLanguageId")]
+        [ForeignKey(typeof(LanguageDto), Column = "id")]
+        [Index(IndexTypes.NonClustered)]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? FallbackLanguageId { get; set; }
     }
 }

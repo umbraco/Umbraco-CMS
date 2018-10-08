@@ -161,7 +161,7 @@
     <key alias="titleOptional">Başlık (isteğe bağlı)</key>
     <key alias="altTextOptional">Alternatif metin (isteğe bağlı)</key>
     <key alias="type">tip</key>
-    <key alias="unPublish">Yayından</key>
+    <key alias="unpublish">Yayından</key>
     <key alias="updateDate">Son düzenleme</key>
     <key alias="updateDateDesc" version="7.0">Bu belgenin düzenlendiği tarih / zaman</key>
     <key alias="uploadClear">Dosya(ları) kaldırın</key>

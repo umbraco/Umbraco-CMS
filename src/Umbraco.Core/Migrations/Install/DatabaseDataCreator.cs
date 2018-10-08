@@ -233,7 +233,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateLanguageData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefaultVariantLanguage = true });
+            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefault = true });
         }
 
         private void CreateContentChildTypeData()

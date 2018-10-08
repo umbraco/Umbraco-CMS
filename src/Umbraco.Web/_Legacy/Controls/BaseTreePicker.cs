@@ -79,6 +79,8 @@ namespace Umbraco.Web._Legacy.Controls
         /// </summary>
         protected virtual string GetItemBreadcrumbs()
         {
+            //TODO: Shouldn't this use the same/similar logic as the EntityController.GetResultForAncestors ?
+
             if (!string.IsNullOrEmpty(ItemIdValue.Value))
             {
                 try

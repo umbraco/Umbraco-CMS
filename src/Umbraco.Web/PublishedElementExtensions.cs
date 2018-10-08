@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -98,6 +99,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
@@ -106,14 +108,21 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default)
+        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
+            // if we have a property, and it has a value, return that value
             if (property != null && property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue);
+            // else let fallback try to get a value
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property?.GetValue(culture, segment);
         }
 
         #endregion
@@ -128,6 +137,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
@@ -136,14 +146,21 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default)
+        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
+            // if we have a property, and it has a value, return that value
             if (property != null && property.HasValue(culture, segment))
                 return property.Value<T>(culture, segment);
 
-            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue);
+            // else let fallback try to get a value
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property == null ? default : property.Value<T>(culture, segment);
         }
 
         #endregion
