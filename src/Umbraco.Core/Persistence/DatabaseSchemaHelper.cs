@@ -11,6 +11,9 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Persistence
 {
 
+    /// <summary>
+    /// Helper class for working with databases and schemas.
+    /// </summary>
     public class DatabaseSchemaHelper
     {
         private readonly Database _db;
@@ -18,6 +21,22 @@ namespace Umbraco.Core.Persistence
         private readonly ISqlSyntaxProvider _syntaxProvider;
         private readonly BaseDataCreation _baseDataCreation;
 
+        /// <summary>
+        /// Intializes a new helper instance.
+        /// </summary>
+        /// <param name="db">The database to be used.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="syntaxProvider">The syntax provider.</param>
+        /// <example>
+        /// A new instance could be initialized like:
+        /// <code>
+        /// var schemaHelper = new DatabaseSchemaHelper(
+        ///     ApplicationContext.Current.DatabaseContext.Database,
+        ///     ApplicationContext.Current.ProfilingLogger.Logger,
+        ///     ApplicationContext.Current.DatabaseContext.SqlSyntax
+        /// );
+        /// </code>
+        /// </example>
         public DatabaseSchemaHelper(Database db, ILogger logger, ISqlSyntaxProvider syntaxProvider)
         {
             _db = db;
