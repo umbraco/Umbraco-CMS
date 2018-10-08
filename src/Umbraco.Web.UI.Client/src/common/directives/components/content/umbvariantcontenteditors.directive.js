@@ -186,14 +186,15 @@
                 } else {
                     vm.openVariants[editorIndex] = variant.language.culture;
                 }
-                
+
             }
 
             //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
                 return a.alias === "umbContent";
             });
-            contentApp.viewModel = variant;
+
+            contentApp.viewModel = _.omit(variant, 'apps');
 
             // make sure the same app it set to active in the new variant
             if(activeAppAlias) {

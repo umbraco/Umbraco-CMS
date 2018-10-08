@@ -1034,7 +1034,7 @@ namespace Umbraco.Core.Services.Implement
                     var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
                     if (!cannotBePublished)
                     {
-                        var mandatoryCultures = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode);
+                        var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
                         cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
                     }
 

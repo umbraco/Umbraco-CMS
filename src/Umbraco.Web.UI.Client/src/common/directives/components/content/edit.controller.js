@@ -3,7 +3,7 @@
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
-        serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper, 
+        serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, relationResource, overlayService) {
 
         var evts = [];
@@ -56,11 +56,11 @@
             }
 
             bindEvents();
-            
-            resetVariantFlags();            
+
+            resetVariantFlags();
         }
 
-        
+
         /**
          * This will reset isDirty flags if save is true.
          * When working with multiple variants, this will set the save/publish flags of each one to false.
@@ -85,7 +85,7 @@
                 $scope.content.variants[0].publish = false;
             }
         }
-        
+
         /** Returns true if the save/publish dialog should be shown when pressing the button */
         function showSaveOrPublishDialog() {
             return $scope.content.variants.length > 1;
@@ -144,7 +144,7 @@
          */
         function createButtons(content, app) {
 
-            // only create the save/publish/preview buttons if the 
+            // only create the save/publish/preview buttons if the
             // content app is "Conent"
             if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
@@ -173,7 +173,7 @@
                     schedulePublish: $scope.schedule
                 }
             });
-            
+
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
             $scope.page.showPreviewButton = true;
@@ -203,7 +203,7 @@
             if (infiniteMode || !path) {
                 return;
             }
-            
+
             if (!$scope.content.isChildOfListView) {
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
@@ -214,7 +214,7 @@
                 //it's a child item, just sync the ui node to the parent
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
 
-                //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
+                //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node
                 // from the server so that we can load in the actions menu.
                 umbRequestHelper.resourcePromise(
                     $http.get(content.treeNodeUrl),
@@ -224,9 +224,89 @@
             }
         }
 
+        function checkValidility(){
+            //Get all controls from the 'contentForm'
+            var allControls = $scope.contentForm.$getControls();
+
+            //An array to store items in when we find child form fields (no matter how many deep nested forms)
+            var childFieldsToMarkAsValid = [];
+
+            //Exclude known formControls 'contentHeaderForm' and 'tabbedContentForm'
+            //Check property - $name === "contentHeaderForm"
+            allControls = _.filter(allControls, function(obj){
+                return obj.$name !== 'contentHeaderForm' && obj.$name !== 'tabbedContentForm' && obj.hasOwnProperty('$submitted');
+            });
+
+            for (var i = 0; i < allControls.length; i++) {
+                var nestedForm = allControls[i];
+
+                //Get Nested Controls of this form in the loop
+                var nestedFormControls = nestedForm.$getControls();
+
+                //Need to recurse through controls (could be more nested forms)
+                childFieldsToMarkAsValid = recurseFormControls(nestedFormControls, childFieldsToMarkAsValid);
+            }
+
+            return childFieldsToMarkAsValid;
+        }
+
+        //Controls is the
+        function recurseFormControls(controls, array){
+
+            //Loop over the controls
+            for (var i = 0; i < controls.length; i++) {
+                var controlItem = controls[i];
+
+                //Check if the controlItem has a property ''
+                if(controlItem.hasOwnProperty('$submitted')){
+                    //This item is a form - so lets get the child controls of it & recurse again
+                    var childFormControls = controlItem.$getControls();
+                    recurseFormControls(childFormControls, array);
+                }
+                else {
+                    //We can assume its a field on a form
+                    if(controlItem.hasOwnProperty('$error')){
+                        //Set the validlity of the error/s to be valid
+                        //String of keys of error invalid messages
+                        var errorKeys = [];
+
+                        for(var key in controlItem.$error){
+                            errorKeys.push(key);
+                            controlItem.$setValidity(key, true);
+                        }
+
+                        //Create a basic obj - storing the control item & the error keys
+                        var obj = { 'control': controlItem, 'errorKeys': errorKeys };
+
+                        //Push the updated control into the array - so we can set them back
+                        array.push(obj);
+                    }
+                }
+            }
+            return array;
+        }
+
+        function resetNestedFieldValiation(array){
+            for (var i = 0; i < array.length; i++) {
+                var item = array[i];
+                //Item is an object containing two props
+                //'control' (obj) & 'errorKeys' (string array)
+                var fieldControl = item.control;
+                var fieldErrorKeys = item.errorKeys;
+
+                for(var i = 0; i < fieldErrorKeys.length; i++) {
+                    fieldControl.$setValidity(fieldErrorKeys[i], false);
+                }
+            }
+        }
+
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
             
+
+            //Used to check validility of nested form - coming from Content Apps mostly
+            //Set them all to be invalid
+            var fieldsToRollback = checkValidility();
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });
 
             return contentEditingHelper.contentEditorPerformSave({
@@ -236,23 +316,25 @@
                 action: args.action,
                 showNotifications: args.showNotifications
             }).then(function (data) {
-                //success            
+                //success
                 init($scope.content);
-
                 syncTreeNode($scope.content, data.path);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
+                resetNestedFieldValiation(fieldsToRollback);
+
                 return $q.when(data);
             },
                 function (err) {
-
                     syncTreeNode($scope.content, $scope.content.path);
 
                     //error
                     if (err) {
                         editorState.set($scope.content);
                     }
+
+                    resetNestedFieldValiation(fieldsToRollback);
 
                     return $q.reject(err);
                 });
@@ -388,7 +470,7 @@
                             overlayService.close();
                         }
                     };
-                    
+
                     overlayService.open(dialog);
                 }
             }
@@ -551,9 +633,9 @@
 
             if (!$scope.busy) {
 
-                // Chromes popup blocker will kick in if a window is opened 
+                // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
-                //  
+                //
                 var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
                 // Build the correct path so both /#/ and #/ work.

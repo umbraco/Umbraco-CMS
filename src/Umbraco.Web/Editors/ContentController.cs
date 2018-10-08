@@ -877,7 +877,7 @@ namespace Umbraco.Web.Editors
             var canPublish = true;
 
             //validate any mandatory variants that are not in the list
-            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(_allLangs.Value.Values).Where(x => x.Mandatory);
+            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(_allLangs.Value.Values).Where(x => x.IsMandatory);
 
             foreach (var lang in mandatoryLangs)
             {

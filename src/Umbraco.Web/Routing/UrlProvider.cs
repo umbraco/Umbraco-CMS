@@ -190,8 +190,16 @@ namespace Umbraco.Web.Routing
 
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
-            if (culture == null)
-                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            // (but only for variant content of course)
+            if (content.ContentType.VariesByCulture())
+            {
+                if (culture == null)
+                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            }
+            else
+            {
+                culture = null;
+            }
 
             if (current == null)
                 current = _umbracoContext.CleanedUmbracoUrl;

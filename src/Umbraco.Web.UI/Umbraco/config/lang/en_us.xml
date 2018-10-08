@@ -1713,10 +1713,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <area alias="languages">
         <key alias="addLanguage">Add language</key>
         <key alias="mandatoryLanguage">Mandatory language</key>
-        <key alias="mandatoryLanguageHelp">Properties on this language has to be filled out before the node can be published.</key>
+        <key alias="mandatoryLanguageHelp">Properties on this language have to be filled out before the node can be published.</key>
         <key alias="defaultLanguage">Default language</key>
         <key alias="defaultLanguageHelp">An Umbraco site can only have one default language set.</key>
         <key alias="changingDefaultLanguageWarning">Switching default language may result in default content missing.</key>
+        <key alias="fallsbackToLabel">Falls back to</key>
+        <key alias="noFallbackLanguageOption">No fall back language</key>
+        <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
+        <key alias="fallbackLanguage">Fall back language</key>
     </area>
 
     <area alias="modelsBuilder">
