@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
 
             Logger.Debug<ContentFinderByUrl>("Test route {Route}", route);
 
-            var node = docreq.UmbracoContext.ContentCache.GetByRoute(route, culture: docreq.Culture?.Name);
+            var node = docreq.UmbracoContext.ContentCache.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;
