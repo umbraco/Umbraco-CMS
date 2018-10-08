@@ -19,7 +19,7 @@ namespace Umbraco.Web.Trees
     /// This authorizes based on access to the content section even though it exists in the settings
     /// </remarks>
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, null, sortOrder: 10)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, null, sortOrder: 12)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.ContentBlueprints, "intro");
+            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
 
             return root;
         }
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
                     .Select(entity =>
                     {
                         var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-item-arrangement", true);
-                        treeNode.Path = string.Format("-1,{0}", entity.Id);
+                        treeNode.Path = $"-1,{entity.Id}";
                         treeNode.NodeType = "document-type-blueprints";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
                         treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
@@ -92,8 +92,9 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                    $"actions/{ActionRefresh.Instance.Alias}"), true);
                 return menu;
             }
             var cte = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);

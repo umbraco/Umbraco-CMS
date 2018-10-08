@@ -136,6 +136,8 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .Chain<FallbackLanguage>("{290C18EE-B3DE-4769-84F1-1F467F3F76DA}");
             // resume at {290C18EE-B3DE-4769-84F1-1F467F3F76DA}...
 
+            Chain<DropTaskTables>("{6A2C7C1B-A9DB-4EA9-B6AB-78E7D5B722A7}");
+
             //FINAL
 
 

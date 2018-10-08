@@ -9,10 +9,11 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
+    
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null, sortOrder: 0)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -21,7 +22,7 @@ namespace Umbraco.Web.Trees
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
-            var section = Constants.Applications.Settings;
+            var section = Constants.Applications.Translation;
             if (queryStrings["application"] != null)
                 section = queryStrings["application"];
 

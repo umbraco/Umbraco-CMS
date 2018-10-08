@@ -120,7 +120,6 @@ namespace Umbraco.Tests.TestHelpers
 
             var externalLoginService = GetLazyService<IExternalLoginService>(container, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(container, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
-            var taskService = GetLazyService<ITaskService>(container, c => new TaskService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITaskTypeRepository>(c), GetRepo<ITaskRepository>(c)));
             var domainService = GetLazyService<IDomainService>(container, c => new DomainService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDomainRepository>(c)));
             var auditService = GetLazyService<IAuditService>(container, c => new AuditService(scopeProvider, logger, eventMessagesFactory, GetRepo<IAuditRepository>(c), GetRepo<IAuditEntryRepository>(c)));
 
@@ -190,7 +189,6 @@ namespace Umbraco.Tests.TestHelpers
 
             return new ServiceContext(
                 publicAccessService,
-                taskService,
                 domainService,
                 auditService,
                 localizedTextService,
