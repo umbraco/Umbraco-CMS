@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="pt" intName="Portuguese Brazil" localName="Portuguese Brazil" lcid="" culture="pt-BR">
   <creator>
     <name>The Umbraco community</name>
@@ -104,7 +104,7 @@
     <key alias="statistics">Estatísticas</key>
     <key alias="titleOptional">Título (opcional)</key>
     <key alias="type">Tipo</key>
-    <key alias="unPublish">Des-Publicar</key>
+    <key alias="unpublish">Des-Publicar</key>
     <key alias="updateDate">Última edição</key>
     <key alias="uploadClear">Remover arquivo</key>
     <key alias="urls">Link ao documento</key>
@@ -131,27 +131,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -249,8 +244,6 @@
     <key alias="missingTitle">Favor digitar um título</key>
     <key alias="missingType">Favor escolher um tipo</key>
     <key alias="pictureResizeBiggerThanOrg">Você está prestes a tornar esta figura maior que o tamanho original. Tem certeza que deseja proceguir?</key>
-    <key alias="pythonErrorHeader">Erro no script python</key>
-    <key alias="pythonErrorText">O script pyton não foi salvo por que contém erro(s)</key>
     <key alias="startNodeDoesNotExists">Nó inicial removido, favor entrar em contato com seu administrador</key>
     <key alias="stylesMustMarkBeforeSelect">Favor marcar conteúdo antes de alterar o estilo</key>
     <key alias="stylesNoStylesOnPage">Nenhum estilo ativo disponível</key>
@@ -336,7 +329,8 @@
     <key alias="showPageOnSend">Mostrar página durante envio</key>
     <key alias="size">Tamanho</key>
     <key alias="sort">Classificar</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">Tipo</key>
     <key alias="typeToSearch">Digite para buscar...</key>
     <key alias="up">Acima</key>
@@ -465,7 +459,6 @@ Pressione <strong>"próximo"</strong> para iniciar o assistente.]]></key>
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
-    <key alias="topText">Bem vindo(a) à Umbraco, digite seu nome de usuário e senha nas caixas abaixo:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Painel</key>
@@ -680,10 +673,6 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="fileSavedHeader">Arquivo salvo</key>
     <key alias="fileSavedText">Arquivo salvo sem nenhum erro</key>
     <key alias="languageSaved">Linguagem salva</key>
-    <key alias="pythonErrorHeader">Script Python não salvo</key>
-    <key alias="pythonErrorText">Script python não pode ser salvo devido à erro</key>
-    <key alias="pythonSavedHeader">Script Python salvo</key>
-    <key alias="pythonSavedText">Nenhum erro no script python</key>
     <key alias="templateErrorHeader">Modelo não salvo</key>
     <key alias="templateErrorText">Favor confirmar que não existem 2 modelos com o mesmo apelido</key>
     <key alias="templateSavedHeader">Modelo salvo</key>
@@ -709,27 +698,20 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="template">Modelo</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
-
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
-
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
@@ -738,18 +720,12 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
-
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
-
     <key alias="styles">Styles</key>
     <key alias="stylesDetails">Configure what styling editors can change</key>
-
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
-
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
@@ -781,14 +757,7 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="withTime">Sim, com hora. Separador:</key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">Tarefas designadas à você</key>
-    <key alias="assignedTasksHelp"><![CDATA[A lista abaixo mostra as tarefas de tradução <strong>designadas à você</strong>. Para ver os detalhes, incluinddo comentários, clique em "Detalhes" ou no nome da página.
-Você também pode baixar a página como XML ao clicar no link "Download XML". <br />
-Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fechar".]]></key>
-    <key alias="closeTask">fechar tarefa</key>
     <key alias="details">Detalhes da Tradução</key>
-    <key alias="downloadAllAsXml">Download todas as tarefas de tradução como xml</key>
-    <key alias="downloadTaskAsXml">Download Xml</key>
     <key alias="DownloadXmlDTD">Download Xml DTD</key>
     <key alias="fields">Campos</key>
     <key alias="includeSubpages">Incluir sub-páginas</key>
@@ -805,15 +774,9 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
 
       Saudações do robô Umbraco
     ]]></key>
-    <key alias="mailSubject">Tarefa de tradução [%0%] para %1%</key>
     <key alias="noTranslators">Nenhum usuário tradutor encontrado. Favor criar um usuário tradutor antes que possa começar a enviar conteúdo para tradução</key>
-    <key alias="ownedTasks">Tarefas criadas por você</key>
-    <key alias="ownedTasksHelp"><![CDATA[A lista abaixo mostra as páginas <strong>criadas por você</strong>. Para ver os detalhes, incluindo comentários, clique em "Detalhes" ou no nome da página. Você também pode baixar a página em XML ao clicar no link "Download XML".
-Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fechar".]]></key>
     <key alias="pageHasBeenSendToTranslation">A página '%0%' foi enviada para tradução</key>
     <key alias="sendToTranslate">Enviar página '%0%' para tradução</key>
-    <key alias="taskAssignedBy">Designada por</key>
-    <key alias="taskOpened">Tarefa aberta</key>
     <key alias="totalWords">Total de palavras</key>
     <key alias="translateTo">Traduzir para</key>
     <key alias="translationDone">Tradução concluída.</key>
@@ -843,7 +806,6 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="documentTypes">Tipos de Documentos</key>
     <key alias="packager">Pacotes</key>
     <key alias="packages">Pacotes</key>
-    <key alias="python">Arquivos Python</key>
     <key alias="repositories">Instalar desde o repositório</key>
     <key alias="runway">Instalar Runway</key>
     <key alias="runwayModules">Módulos Runway</key>

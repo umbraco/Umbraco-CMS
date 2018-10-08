@@ -9,7 +9,8 @@
             <umb-variant-content-editors 
                 page="page"
                 content="content"
-                culture="culture">
+                culture="culture"
+                on-select-app="appChanged(app)">
             </umb-variant-content-editors>
 
             <umb-editor-footer>
@@ -37,14 +38,25 @@
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview"
-                        type="button" 
-                        button-style="info" 
+                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
+                        type="button"
+                        button-style="outline"
                         action="preview(content)"
-                        label="Preview page" 
                         label-key="buttons_showPage">
                     </umb-button>
 
+                    <umb-button 
+                        ng-if="page.showSaveButton"
+                        alias="save"
+                        type="button"
+                        button-style="info"
+                        state="page.saveButtonState"
+                        action="save(content)"
+                        label-key="buttons_save"
+                        shortcut="ctrl+s"
+                        add-ellipsis="{{page.saveButtonEllipsis}}">
+                    </umb-button>
+                    
                     <umb-button-group 
                         ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"

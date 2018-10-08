@@ -430,32 +430,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Get_Template_Tree()
-        {
-            // Arrange
-            using (ScopeProvider.CreateScope())
-            {
-                var repository = CreateRepository(ScopeProvider);
-
-                CreateHierarchy(repository);
-
-                // Act
-                var rootNode = repository.GetTemplateNode("parent");
-
-                // Assert
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "parent"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child1"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child2"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler1"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler2"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler3"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler4"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby1"));
-                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby2"));
-            }
-        }
-
-        [Test]
         public void Can_Get_All()
         {
             // Arrange

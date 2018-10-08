@@ -9,21 +9,45 @@
     public class NoopPublishedValueFallback : IPublishedValueFallback
     {
         /// <inheritdoc />
-        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue) => defaultValue;
+        public bool TryGetValue(IPublishedProperty property, string culture, string segment, Fallback fallback, object defaultValue, out object value)
+        {
+            value = default;
+            return false;
+        }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue) => defaultValue;
+        public bool TryGetValue<T>(IPublishedProperty property, string culture, string segment, Fallback fallback, T defaultValue, out T value)
+        {
+            value = default;
+            return false;
+        }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue) => defaultValue;
+        public bool TryGetValue(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
+        {
+            value = default;
+            return false;
+        }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue) => defaultValue;
+        public bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
+        {
+            value = default;
+            return false;
+        }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse) => defaultValue;
+        public bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value)
+        {
+            value = default;
+            return false;
+        }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse) => defaultValue;
+        public bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value)
+        {
+            value = default;
+            return false;
+        }
     }
 }

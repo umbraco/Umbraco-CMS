@@ -5,11 +5,10 @@
     /// </summary>
     public class Section
     {
-        public Section(string name, string @alias, string icon, int sortOrder)
+        public Section(string name, string @alias, int sortOrder)
         {
             Name = name;
             Alias = alias;
-            Icon = icon;
             SortOrder = sortOrder;
         }
 
@@ -20,7 +19,6 @@
 
         public string Name { get; set; }
         public string Alias { get; set; }
-        public string Icon { get; set; }
         public int SortOrder { get; set; }
     }
 }

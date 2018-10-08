@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
@@ -104,7 +104,7 @@
     <key alias="statistics">통계</key>
     <key alias="titleOptional">제목(옵션)</key>
     <key alias="type">유형</key>
-    <key alias="unPublish">발행취소</key>
+    <key alias="unpublish">발행취소</key>
     <key alias="updateDate">마지막 수정일</key>
     <key alias="uploadClear">파일 삭제</key>
     <key alias="urls">문서에 링크</key>
@@ -131,27 +131,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -252,8 +247,6 @@
     <key alias="missingTitle">제목을 넣어주세요</key>
     <key alias="missingType">유형을 선택해주세요</key>
     <key alias="pictureResizeBiggerThanOrg">원본크기보다 큰사이즈의 이미지를 만들려고 합니다. 계속하시겠습니까?</key>
-    <key alias="pythonErrorHeader">Python 스크립트 에러</key>
-    <key alias="pythonErrorText">에러를 포함하고 있어 Python 스크립트가 저장되지 않았습니다.</key>
     <key alias="startNodeDoesNotExists">시작노드가 삭제되었습니다. 관리자에게 문의하세요</key>
     <key alias="stylesMustMarkBeforeSelect">스타일을 변경하시기 전에 컨텐츠를 체크하세요</key>
     <key alias="stylesNoStylesOnPage">사용할 수 있는 스타일이 없습니다.</key>
@@ -339,7 +332,8 @@
     <key alias="showPageOnSend">전송된 페이지보기</key>
     <key alias="size">사이즈</key>
     <key alias="sort">정렬</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">타입</key>
     <key alias="typeToSearch">검색유형...</key>
     <key alias="up">위로</key>
@@ -473,7 +467,6 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
-    <key alias="topText">Umbraco 에 오신것을 환영합니다. 사용자명과 비밀번호를 입력하십시오:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">대시보드</key>
@@ -692,10 +685,6 @@
     <key alias="fileSavedHeader">파일 저장</key>
     <key alias="fileSavedText">파일이 에러없이 저장</key>
     <key alias="languageSaved">언어 저장됨</key>
-    <key alias="pythonErrorHeader">Python 스크립트가 저장되지 않았습니다.</key>
-    <key alias="pythonErrorText">Python 스크립트가 에러때문에 저장되지 않았습니다.</key>
-    <key alias="pythonSavedHeader">Python 스크립트 저장</key>
-    <key alias="pythonSavedText">Python 스크립트 에러없음</key>
     <key alias="templateErrorHeader">템플릿이 저장되지 않음</key>
     <key alias="templateErrorText">2 템플릿에 동일한 별칭이 적용되지 않았는지 확인하시기 바랍니다.</key>
     <key alias="templateSavedHeader">템플릿 저장</key>
@@ -721,27 +710,20 @@
     <key alias="template">템플릿</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
-
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
-
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
@@ -750,18 +732,12 @@
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
-
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
-
     <key alias="styles">Styles</key>
     <key alias="stylesDetails">Configure what styling editors can change</key>
-
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
-
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
@@ -793,16 +769,7 @@
     <key alias="withTime">예, 시간를 :로 구분하여</key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">할당된 작업</key>
-    <key alias="assignedTasksHelp"><![CDATA[ 아래 리스트는 <strong>당신에게 할당된</strong> 번역작업들을 볼 수 있습니다. 
-      상세내역을 보시려면 "상세" 나 페이지 이름을 클릭하세요.
-      "Xml 다운로드" 링크를 클릭하시면 Xml로 페이지를 다운로드 할 수 있습니다.<br/>
-      번역작업을 닫으시려면, 상세보기로 가셔서 "닫기" 버튼을 클릭하세요.
-  ]]></key>
-    <key alias="closeTask">작업 닫기</key>
     <key alias="details">번역 세부항목</key>
-    <key alias="downloadAllAsXml">모든 번역작업을 XML로 다운로드</key>
-    <key alias="downloadTaskAsXml">XML 다운로드</key>
     <key alias="DownloadXmlDTD">다운로드 xml DTD</key>
     <key alias="fields">필드</key>
     <key alias="includeSubpages">서브페이지 포함</key>
@@ -819,18 +786,9 @@
 
       좋은 하루 되세요!
     ]]></key>
-    <key alias="mailSubject">Translation task for %1%을 위한 [%0%] 번역작업</key>
     <key alias="noTranslators">번역자를 찾을 수 없습니다. 컨텐츠를 번역하기위해 발송하시기 전에 번역자를 생성하세요.</key>
-    <key alias="ownedTasks">생성한 작업</key>
-    <key alias="ownedTasksHelp"><![CDATA[ 리스트 아래에서 <strong>생성한 작업</strong> 페이지를 볼 수 있습니다. 
-      상세내역을 보시려면 "상세" 나 페이지 이름을 클릭하세요.
-      "Xml 다운로드" 링크를 클릭하시면 Xml로 페이지를 다운로드 할 수 있습니다.<br/>
-      번역작업을 닫으시려면, 상세보기로 가셔서 "닫기" 버튼을 클릭하세요.
-  ]]></key>
     <key alias="pageHasBeenSendToTranslation">'%0%' 페이지가 번역을 위해 전송되었습니다.</key>
     <key alias="sendToTranslate">번역을 위해 '%0%' 페이지 전송하기Send the page '%0%' to translation</key>
-    <key alias="taskAssignedBy">할당자</key>
-    <key alias="taskOpened">작업 열기</key>
     <key alias="totalWords">총 단어 수</key>
     <key alias="translateTo">번역</key>
     <key alias="translationDone">번역 완료</key>
@@ -857,10 +815,8 @@
     <key alias="memberGroups">구성원 그룹</key>
     <key alias="memberRoles">역할</key>
     <key alias="memberTypes">구성원 유형</key>
-    <key alias="docuemntTypes">문서 타입</key>
     <key alias="packager">패키지</key>
     <key alias="packages">패키지</key>
-    <key alias="python">Python 파일</key>
     <key alias="repositories">저장소에 설치</key>
     <key alias="runway">Runway 설치</key>
     <key alias="runwayModules">Runway 모듈</key>

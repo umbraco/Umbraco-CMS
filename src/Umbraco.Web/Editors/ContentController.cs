@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -24,6 +25,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -32,6 +34,7 @@ using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 
@@ -53,6 +56,8 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+
+        public object Domains { get; private set; }
 
         public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
         {
@@ -227,7 +232,7 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content");
+            apps.Add(ListViewContentAppDefinition.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content"));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
@@ -359,7 +364,7 @@ namespace Umbraco.Web.Editors
             var mapped = MapToDisplay(emptyContent);
 
             //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
+            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
             
             return mapped;
         }
@@ -380,7 +385,7 @@ namespace Umbraco.Web.Editors
             var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
             //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
+            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
 
             return mapped;
         }
@@ -457,10 +462,10 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "",
-                string cultureName = "")
+                string cultureName = "") // TODO it's not a NAME it's the ISO CODE
         {
             long totalChildren;
-            IContent[] children;
+            List<IContent> children;
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IContent> queryFilter = null;
@@ -472,16 +477,14 @@ namespace Umbraco.Web.Editors
                 }
 
                 children = Services.ContentService
-                    .GetPagedChildren(
-                        id, (pageNumber - 1), pageSize,
-                        out totalChildren,
-                        orderBy, orderDirection, orderBySystemField,
-                        queryFilter).ToArray();
+                    .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren,
+                        queryFilter,
+                        Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
             }
             else
             {
-                children = Services.ContentService.GetChildren(id).ToArray();
-                totalChildren = children.Length;
+                children = Services.ContentService.GetChildren(id).ToList();
+                totalChildren = children.Count;
             }
 
             if (totalChildren == 0)
@@ -494,15 +497,14 @@ namespace Umbraco.Web.Editors
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
-                        opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;                        
+
+                        opts.SetCulture(cultureName);                        
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
-                        if (string.IsNullOrWhiteSpace(includeProperties) == false)
-                        {
-                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
-                        }
-                    }));
-
+                        if (!includeProperties.IsNullOrWhiteSpace())
+                            opts.SetIncludedProperties(includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries));
+                    }))
+                .ToList(); // evaluate now
 
             return pagedResult;
         }
@@ -584,6 +586,17 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -864,7 +877,7 @@ namespace Umbraco.Web.Editors
             var canPublish = true;
 
             //validate any mandatory variants that are not in the list
-            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(_allLangs.Value.Values).Where(x => x.Mandatory);
+            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(_allLangs.Value.Values).Where(x => x.IsMandatory);
 
             foreach (var lang in mandatoryLangs)
             {
@@ -1112,39 +1125,87 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
-        /// <param name="id">The content id to unpublish</param>
-        /// <param name="culture">The culture variant for the content id to unpublish, if none specified will unpublish all variants of the content</param>
+        /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("id", 'U')]
+        [EnsureUserPermissionForContent("model.Id", 'U')]
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay PostUnPublish(int id, string culture = null)
+        public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));
 
             if (foundContent == null)
-                HandleContentNotFound(id);
+                HandleContentNotFound(model.Id);
 
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.GetUserId().ResultOr(0));
-
-            var content = MapToDisplay(foundContent);
-
-            if (!unpublishResult.Success)
+            var languageCount = _allLangs.Value.Count();
+            if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
             {
-                AddCancelMessage(content);
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
+                //this means that the entire content item will be unpublished
+                var unpublishResult = Services.ContentService.Unpublish(foundContent, userId: Security.GetUserId().ResultOr(0));
+
+                var content = MapToDisplay(foundContent);
+
+                if (!unpublishResult.Success)   
+                {
+                    AddCancelMessage(content);
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
+                }
+                else
+                {
+                    content.AddSuccessNotification(
+                        Services.TextService.Localize("content/unpublish"),
+                        Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                    return content;
+                }
             }
             else
             {
-                //fixme should have a better localized method for when we have the UnpublishResultType.SuccessMandatoryCulture status
+                //we only want to unpublish some of the variants
+                var results = new Dictionary<string, UnpublishResult>();
+                foreach(var c in model.Cultures)
+                {
+                    var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
+                    results[c] = result;
+                    if (result.Result == UnpublishResultType.SuccessMandatoryCulture)
+                    {
+                        //if this happens, it means they are all unpublished, we don't need to continue
+                        break;
+                    }
+                }
 
-                content.AddSuccessNotification(
-                    Services.TextService.Localize("content/unPublish"),
-                    unpublishResult.Result == UnpublishResultType.SuccessCulture
-                        ? Services.TextService.Localize("speechBubbles/contentVariationUnpublished", new[] { culture })
-                        : Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                var content = MapToDisplay(foundContent);
 
+                //check for this status and return the correct message
+                if (results.Any(x => x.Value.Result == UnpublishResultType.SuccessMandatoryCulture))
+                {
+                    content.AddSuccessNotification(
+                           Services.TextService.Localize("content/unpublish"),
+                           Services.TextService.Localize("speechBubbles/contentMandatoryCultureUnpublished"));
+                    return content;
+                }
+
+                //otherwise add a message for each one unpublished
+                foreach (var r in results)
+                {
+                    content.AddSuccessNotification(
+                           Services.TextService.Localize("content/unpublish"),
+                           Services.TextService.Localize("speechBubbles/contentCultureUnpublished", new[] { _allLangs.Value[r.Key].CultureName }));
+                }
                 return content;
+
             }
+
+        }
+
+        public ContentDomainsAndCulture GetCultureAndDomains(int id)
+        {
+            var nodeDomains = Services.DomainService.GetAssignedDomains(id, true).ToArray();
+            var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
+            var domains = nodeDomains.Where(d => !d.IsWildcard).Select(d => new DomainDisplay(d.DomainName, d.LanguageId.GetValueOrDefault(0)));
+            return new ContentDomainsAndCulture
+            {
+                Domains = domains,
+                Language = wildcard == null || !wildcard.LanguageId.HasValue ? "undefined" : wildcard.LanguageId.ToString()
+            };
         }
 
         [HttpPost]

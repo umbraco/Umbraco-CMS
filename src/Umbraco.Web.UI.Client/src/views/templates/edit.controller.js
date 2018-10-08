@@ -21,6 +21,7 @@
         // insert buttons
         vm.page.insertDefaultButton = {
             labelKey: "general_insert",
+            addEllipsis: "true",
             handler: function() {
                 vm.openInsertOverlay();
             }
@@ -28,24 +29,28 @@
         vm.page.insertSubButtons = [
             {
                 labelKey: "template_insertPageField",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openPageFieldOverlay();
                 }
             },
             {
                 labelKey: "template_insertPartialView",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openPartialOverlay();
                 }
             },
             {
                 labelKey: "template_insertDictionaryItem",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openDictionaryItemOverlay();
                 }
             },
             {
                 labelKey: "template_insertMacro",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openMacroOverlay()
                 }

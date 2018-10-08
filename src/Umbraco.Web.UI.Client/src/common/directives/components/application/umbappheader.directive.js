@@ -55,6 +55,11 @@
                 });
             }));
 
+            scope.searchClick = function() {
+                var showSearch = appState.getSearchState("show");
+                appState.setSearchState("show", !showSearch);
+            };
+
             // toggle the help dialog by raising the global app state to toggle the help drawer
             scope.helpClick = function () {
                 var showDrawer = appState.getDrawerState("showDrawer");

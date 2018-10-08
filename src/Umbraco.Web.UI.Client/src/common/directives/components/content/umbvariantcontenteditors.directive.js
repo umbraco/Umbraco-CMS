@@ -9,7 +9,8 @@
         bindings: {
             page: "<",
             content: "<", //TODO: Not sure if this should be = since we are changing the 'active' property of a variant
-            culture: "<"
+            culture: "<",
+            onSelectApp: "&?"
         },
         controllerAs: 'vm',
         controller: umbVariantContentEditorsController
@@ -39,8 +40,6 @@
 
         /** Called when the component initializes */
         function onInit() {
-            // set first app to active
-            vm.content.apps[0].active = true;
             prevContentDateUpdated = angular.copy(vm.content.updateDate);
             setActiveCulture();
         }
@@ -179,21 +178,23 @@
                         variant.variants[i].active = false;
                     }
                 }
+
+                // keep track of the open variants across the different split views
+                // push the first variant then update the variant index based on the editor index
+                if(vm.openVariants && vm.openVariants.length === 0) {
+                    vm.openVariants.push(variant.language.culture);
+                } else {
+                    vm.openVariants[editorIndex] = variant.language.culture;
+                }
+
             }
 
             //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
-                return a.alias === "content";
+                return a.alias === "umbContent";
             });
-            contentApp.viewModel = variant;
-            
-            // keep track of the open variants across the different split views
-            // push the first variant then update the variant index based on the editor index
-            if(vm.openVariants && vm.openVariants.length === 0) {
-                vm.openVariants.push(variant.language.culture);
-            } else {
-                vm.openVariants[editorIndex] = variant.language.culture;
-            }
+
+            contentApp.viewModel = _.omit(variant, 'apps');
 
             // make sure the same app it set to active in the new variant
             if(activeAppAlias) {
@@ -221,7 +222,7 @@
                 var editor = vm.editors[e];
                 for (var i = 0; i < editor.content.apps.length; i++) {
                     var app = editor.content.apps[i];
-                    if (app.alias === "content") {
+                    if (app.alias === "umbContent") {
                         app.active = true;
                     }
                     else {
@@ -310,6 +311,9 @@
         function selectApp(app) {
             if(app && app.alias) {
                 activeAppAlias = app.alias;
+            }
+            if(vm.onSelectApp) {
+                vm.onSelectApp({"app": app});
             }
         }
 

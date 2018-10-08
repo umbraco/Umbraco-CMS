@@ -324,9 +324,7 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
 
             public const string Tag = "cmsTags";
             public const string TagRelationship = "cmsTagRelationship";
-
-            public const string Task = "cmsTask";
-            public const string TaskType = "cmsTaskType";
+            
             // ReSharper restore UnusedMember.Local
         }
     }

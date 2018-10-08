@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 
@@ -17,13 +18,6 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
-        //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
-        [Obsolete("Use the overload specifying an UmbracoContext")]
-        internal static string ParseInternalLinks(string text, bool preview)
-        {
-            return ParseInternalLinks(text, preview, UmbracoContext.Current);
-        }
-
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -43,6 +37,11 @@ namespace Umbraco.Web.Templates
         public static string ParseInternalLinks(string text, UrlProvider urlProvider)
         {
             if (urlProvider == null) throw new ArgumentNullException("urlProvider");
+
+            if(string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
 
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
@@ -72,6 +71,11 @@ namespace Umbraco.Web.Templates
                 }
             }
 
+            if (UmbracoConfig.For.UmbracoSettings().Content.StripUdiAttributes)
+            {
+                text = StripUdiDataAttributes(text);
+            }
+            
             return text;
         }
 
@@ -82,6 +86,9 @@ namespace Umbraco.Web.Templates
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        private static readonly Regex UdiDataAttributePattern = new Regex("data-udi=\"[^\\\"]*\"",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// The RegEx matches any HTML attribute values that start with a tilde (~), those that match are passed to ResolveUrl to replace the tilde with the application path.
@@ -100,7 +107,7 @@ namespace Umbraco.Web.Templates
             {
                 // find all relative urls (ie. urls that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                Current.Logger.Debug(typeof(IOHelper), "After regex: {ElapsedMilliseconds} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                Current.Logger.Debug(typeof(IOHelper), "After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";
@@ -125,6 +132,22 @@ namespace Umbraco.Web.Templates
         public static string CleanForXss(string text, params char[] ignoreFromClean)
         {
             return text.CleanForXss(ignoreFromClean);
+        }
+        
+        /// <summary>
+        /// Strips data-udi attributes from rich text
+        /// </summary>
+        /// <param name="input">A html string</param>
+        /// <returns>A string stripped from the data-uid attributes</returns>
+        public static string StripUdiDataAttributes(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+
+            return UdiDataAttributePattern.Replace(input, string.Empty);
         }
     }
 }

@@ -27,25 +27,28 @@
                 {
                     "name": "Packages",
                     "icon": "icon-cloud",
-                    "view": "views/packager/views/repo.html",
-                    "active": !installPackageUri || installPackageUri === "navigation"
+                    "view": "views/packages/views/repo.html",
+                    "active": !installPackageUri || installPackageUri === "navigation",
+                    "alias": "umbPackages"
                 },
                 {
                     "name": "Installed",
                     "icon": "icon-box",
-                    "view": "views/packager/views/installed.html",
-                    "active": installPackageUri === "installed"
+                    "view": "views/packages/views/installed.html",
+                    "active": installPackageUri === "installed",
+                    "alias": "umbInstalled"
                 },
                 {
                     "name": "Install local",
                     "icon": "icon-add",
-                    "view": "views/packager/views/install-local.html",
-                    "active": installPackageUri === "local"
+                    "view": "views/packages/views/install-local.html",
+                    "active": installPackageUri === "local",
+                    "alias": "umbInstallLocal"
                 }
             ];
 
             $timeout(function () {
-                navigationService.syncTree({ tree: "packager", path: "-1" });
+                navigationService.syncTree({ tree: "packages", path: "-1" });
             });
         }
 

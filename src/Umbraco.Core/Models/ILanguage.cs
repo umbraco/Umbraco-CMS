@@ -4,34 +4,54 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
+    /// <summary>
+    /// Represents a language.
+    /// </summary>
     public interface ILanguage : IEntity, IRememberBeingDirty
     {
         /// <summary>
-        /// Gets or sets the Iso Code for the Language
+        /// Gets or sets the ISO code of the language.
         /// </summary>
         [DataMember]
         string IsoCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the Culture Name for the Language
+        /// Gets or sets the culture name of the language.
         /// </summary>
         [DataMember]
         string CultureName { get; set; }
 
         /// <summary>
-        /// Returns a <see cref="CultureInfo"/> object for the current Language
+        /// Gets the <see cref="CultureInfo"/> object for the language.
         /// </summary>
         [IgnoreDataMember]
         CultureInfo CultureInfo { get; }
 
         /// <summary>
-        /// Defines if this language is the default variant language when language variants are in use
+        /// Gets or sets a value indicating whether the language is the default language.
         /// </summary>
-        bool IsDefaultVariantLanguage { get; set; }
+        [DataMember]
+        bool IsDefault { get; set; }
 
         /// <summary>
-        /// If true, a variant node cannot be published unless this language variant is created
+        /// Gets or sets a value indicating whether the language is mandatory.
         /// </summary>
-        bool Mandatory { get; set; }
+        /// <remarks>
+        /// <para>When a language is mandatory, a multi-lingual document cannot be published
+        /// without that language being published, and unpublishing that language unpublishes
+        /// the entire document.</para>
+        /// </remarks>
+        [DataMember]
+        bool IsMandatory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of a fallback language.
+        /// </summary>
+        /// <remarks>
+        /// <para>The fallback language can be used in multi-lingual scenarios, to help
+        /// define fallback strategies when a value does not exist for a requested language.</para>
+        /// </remarks>
+        [DataMember]
+        int? FallbackLanguageId { get; set; }
     }
 }

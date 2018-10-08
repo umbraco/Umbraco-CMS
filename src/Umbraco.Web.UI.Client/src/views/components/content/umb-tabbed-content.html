@@ -14,5 +14,12 @@
             </div>
 
         </div>
+
+        <umb-empty-state
+            ng-if="content.tabs.length === 0"
+            position="center">
+            <localize key="content_noProperties"></localize>
+        </umb-empty-state>
+
     </ng-form>
 </div>

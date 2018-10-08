@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SupersededEvents2()
         {
-            Test_UnPublished += OnDoThingFail;
+            Test_Unpublished += OnDoThingFail;
             Test_Deleted += OnDoThingFail;
 
             var contentService = Mock.Of<IContentService>();
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Scoping
             var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
-                scope.Events.Dispatch(Test_UnPublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "UnPublished");
+                scope.Events.Dispatch(Test_Unpublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "Unpublished");
                 scope.Events.Dispatch(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new [] { content }), "Deleted");
 
                 // see U4-10764
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Scoping
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
 
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Test_UnPublished;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Test_Unpublished;
         public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Test_Deleted;
 
         public class TestEventArgs : CancellableObjectEventArgs

@@ -59,8 +59,6 @@ namespace Umbraco.Core.Migrations.Install
             typeof (RelationDto),
             typeof (TagDto),
             typeof (TagRelationshipDto),
-            typeof (TaskTypeDto),
-            typeof (TaskDto),
             typeof (ContentType2ContentTypeDto),
             typeof (ContentTypeAllowedContentTypeDto),
             typeof (User2NodeNotifyDto),

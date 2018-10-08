@@ -15,7 +15,23 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the default configuration.
         /// </summary>
+        /// <remarks>
+        /// <para>For basic configuration editors, this will be a dictionary of key/values. For advanced editors
+        /// which inherit from <see cref="ConfigurationEditor{TConfiguration}"/>, this will be the dictionary
+        /// equivalent of an actual configuration object (ie an instance of <c>TConfiguration</c>, obtained
+        /// via <see cref="ToConfigurationEditor"/>.</para>
+        /// </remarks>
         IDictionary<string, object> DefaultConfiguration { get; }
+
+        /// <summary>
+        /// Gets the default configuration object.
+        /// </summary>
+        /// <remarks>
+        /// <para>For basic configuration editors, this will be <see cref="DefaultConfiguration"/>, ie a
+        /// dictionary of key/values. For advanced editors which inherit from <see cref="ConfigurationEditor{TConfiguration}"/>,
+        /// this will be an actual configuration object (ie an instance of <c>TConfiguration</c>.</para>
+        /// </remarks>
+        object DefaultConfigurationObject { get; }
 
         /// <summary>
         /// Determines whether a configuration object is of the type expected by the configuration editor.
@@ -48,7 +64,7 @@ namespace Umbraco.Core.PropertyEditors
         IDictionary<string, object> ToConfigurationEditor(object configuration);
 
         /// <summary>
-        /// Converts the configuration object to values for the value editror.
+        /// Converts the configuration object to values for the value editor.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         IDictionary<string, object> ToValueEditor(object configuration);

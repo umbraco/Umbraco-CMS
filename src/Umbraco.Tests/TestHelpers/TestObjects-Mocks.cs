@@ -77,7 +77,6 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<ILocalizedTextService>(),
                 MockService<IAuditService>(),
                 MockService<IDomainService>(),
-                MockService<ITaskService>(),
                 MockService<IMacroService>());
         }
 

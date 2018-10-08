@@ -14,11 +14,11 @@
                 hide-alias="true">
             </umb-editor-header>
     
-            <umb-editor-container>
+            <umb-editor-container class="form-horizontal">
 
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-                <umb-box ng-if="!vm.loading" class="block-form">
+                <umb-box ng-if="!vm.loading">
                     <umb-box-content>
 
                         <umb-control-group label="@general_language" ng-if="vm.availableCultures">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
 
-                            <div class="umb-permission" ng-click="vm.toggleMandatory()" ng-class="{'umb-permission--disabled': vm.language.isDefault}">
+                            <div class="umb-permission" ng-click="vm.toggleMandatory()">
                                 <umb-toggle
                                     class="umb-permission__toggle"
                                     checked="vm.language.isMandatory">
@@ -63,6 +63,16 @@
                             </div>
 
                         </umb-control-group>
+
+                        <umb-property property="properties.fallbackLanguage">
+                            <div>
+                                <select name="fallbackLanguage"
+                                        ng-model="vm.language.fallbackLanguageId"
+                                        ng-options="l.id as l.name for l in vm.availableLanguages">
+                                    <option value="">{{vm.labels.noFallbackLanguageOption}}</option>
+                                </select>
+                            </div>
+                        </umb-property>
 
                     </umb-box-content>
                 </umb-box>

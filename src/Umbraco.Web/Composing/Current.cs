@@ -245,6 +245,8 @@ namespace Umbraco.Web.Composing
 
         public static IPublishedValueFallback PublishedValueFallback => CoreCurrent.PublishedValueFallback;
 
+        public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
+
         #endregion
     }
 }

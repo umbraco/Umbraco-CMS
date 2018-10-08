@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Media,
         Constants.Applications.Users,
         Constants.Applications.Settings,
-        Constants.Applications.Developer,
+        Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
@@ -47,10 +47,10 @@ namespace Umbraco.Web.Trees
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var langId = queryStrings?["culture"];
+            var culture = queryStrings?["culture"];
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
-            if (CanUserAccessNode(entity, allowedUserOptions, langId))
+            if (CanUserAccessNode(entity, allowedUserOptions, culture))
             {
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
@@ -74,11 +74,23 @@ namespace Umbraco.Web.Trees
                 {
                     var documentEntity = (IDocumentEntitySlim) entity;
 
-                    //fixme we need these statuses per variant but to do that we need to fix the issues listed in IDocumentEntitySlim
-                    if (!documentEntity.Published)
-                        node.SetNotPublishedStyle();
-                    //if (documentEntity.Edited)
-                    //    node.SetHasUnpublishedVersionStyle();
+                    if (!documentEntity.Variations.VariesByCulture())
+                    {
+                        if (!documentEntity.Published)
+                            node.SetNotPublishedStyle();
+                        else if (documentEntity.Edited)
+                            node.SetHasPendingVersionStyle();
+                    }
+                    else
+                    {
+                        if (!culture.IsNullOrWhiteSpace())
+                        {
+                            if (!documentEntity.PublishedCultures.Contains(culture))
+                                node.SetNotPublishedStyle();
+                            else if (documentEntity.EditedCultures.Contains(culture))
+                                node.SetHasPendingVersionStyle();
+                        }
+                    }
 
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
@@ -223,11 +235,10 @@ namespace Umbraco.Web.Trees
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             AddActionNode<ActionMove>(item, menu, true);
             AddActionNode<ActionCopy>(item, menu);
-            AddActionNode<ActionChangeDocType>(item, menu, convert: true);
 
             AddActionNode<ActionSort>(item, menu, true);
 
-            AddActionNode<ActionRollback>(item, menu, convert: true);
+            AddActionNode<ActionRollback>(item, menu);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
             AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);

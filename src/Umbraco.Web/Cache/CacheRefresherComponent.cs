@@ -310,7 +310,7 @@ namespace Umbraco.Web.Cache
         private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
         private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
         private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
-        private void ContentService_UnPublished(IContentService sender, PublishEventArgs<IContent> e) { }
+        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> e) { }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
         //{

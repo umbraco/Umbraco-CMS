@@ -1205,7 +1205,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_UnPublish_Content()
+        public void Can_Unpublish_Content()
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
@@ -2486,7 +2486,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langUk = new Language("en-UK") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2521,7 +2521,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langUk = new Language("en-UK") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2559,7 +2559,7 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
-            var langXx = new Language("pt-PT") { IsDefaultVariantLanguage = true };
+            var langXx = new Language("pt-PT") { IsDefault = true };
             var langFr = new Language("fr-FR");
             var langUk = new Language("en-UK");
             var langDe = new Language("de-DE");

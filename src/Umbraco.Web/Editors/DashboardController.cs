@@ -28,14 +28,15 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         public DashboardController()
-        {
-        }
+        { }
 
         public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
-        {
-        }
+        { }
 
+        //we have just one instance of HttpClient shared for the entire application
+        private static readonly HttpClient HttpClient = new HttpClient();
+        
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
@@ -63,13 +64,10 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch dashboard json and parse to JObject
-                        var json = await web.GetStringAsync(url);
-                        content = JObject.Parse(json);
-                        result = content;
-                    }
+                    //fetch dashboard json and parse to JObject
+                    var json = await HttpClient.GetStringAsync(url);
+                    content = JObject.Parse(json);
+                    result = content;
 
                     ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
                 }
@@ -102,17 +100,14 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch remote css
-                        content = await web.GetStringAsync(url);
+                    //fetch remote css
+                    content = await HttpClient.GetStringAsync(url);
 
-                        //can't use content directly, modified closure problem
-                        result = content;
+                    //can't use content directly, modified closure problem
+                    result = content;
 
-                        //save server content for 30 mins
-                        ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
-                    }
+                    //save server content for 30 mins
+                    ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {

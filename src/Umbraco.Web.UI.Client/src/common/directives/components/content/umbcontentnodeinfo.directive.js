@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -72,6 +72,9 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
+                //default setting for redirect url management
+                scope.urlTrackerDisabled = false;
+
                 // Declare a fallback URL for the <umb-node-preview/> directive
                 if (scope.documentType !== null) {
                     scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
@@ -139,7 +142,7 @@
 
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(function (currentUser) {
-                            angular.forEach(data.items, function(item) {
+                            angular.forEach(data.items, function (item) {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
@@ -156,6 +159,25 @@
                     });
 
             }
+            function loadRedirectUrls() {
+                scope.loadingRedirectUrls = true;
+                //check if Redirect Url Management is enabled
+                redirectUrlsResource.getEnableState().then(function (response) {
+                    scope.urlTrackerDisabled = response.enabled !== true;
+                    if (scope.urlTrackerDisabled === false) {
+
+                        redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
+                            .then(function (data) {
+                                scope.redirectUrls = data.searchResults;
+                                scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                                scope.loadingRedirectUrls = false;
+                            });
+                    }
+                    else {
+                        scope.loadingRedirectUrls = false;
+                    }
+                });
+            }
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
@@ -164,7 +186,7 @@
                         case "Publish":
                             item.logTypeColor = "success";
                             break;
-                        case "UnPublish":
+                        case "Unpublish":
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
@@ -312,12 +334,13 @@
                 });
             }
 
-            // load audit trail when on the info tab
+            // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
-                $timeout(function(){
-                    if (args.alias === "info") {
+                $timeout(function () {
+                    if (args.alias === "umbInfo") {
                         isInfoTab = true;
                         loadAuditTrail();
+                        loadRedirectUrls();
                     } else {
                         isInfoTab = false;
                     }
@@ -325,13 +348,14 @@
             }));
 
             // watch for content state updates
-            scope.$watch('node.updateDate', function(newValue, oldValue){
+            scope.$watch('node.updateDate', function (newValue, oldValue) {
 
-                if(!newValue) { return; }
-                if(newValue === oldValue) { return; }
+                if (!newValue) { return; }
+                if (newValue === oldValue) { return; }
 
                 if(isInfoTab) {
                     loadAuditTrail();
+                    loadRedirectUrls();
                     formatDatesToLocal();
                     setNodePublishStatus(scope.node);
                 }

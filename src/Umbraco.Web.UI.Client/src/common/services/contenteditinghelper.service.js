@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.save || !args.methods.unPublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -161,11 +161,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //publish action
                         return {
                             letter: ch,
-                            labelKey: args.content.variants && args.content.variants.length > 1 ? "buttons_saveAndPublishMany" : "buttons_saveAndPublish",
+                            labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "saveAndPublish"
+                            alias: "saveAndPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "H":
                         //send to publish
@@ -175,27 +176,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.sendToPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "sendToPublish"
-                        };
-                    case "A":
-                        //save
-                        return {
-                            letter: ch,
-                            labelKey: "buttons_save",
-                            handler: args.methods.save,
-                            hotKey: "ctrl+s",
-                            hotKeyWhenHidden: true,
-                            alias: "save"
+                            alias: "sendToPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "Z":
                         //unpublish
                         return {
                             letter: ch,
-                            labelKey: "content_unPublish",
-                            handler: args.methods.unPublish,
+                            labelKey: "content_unpublish",
+                            handler: args.methods.unpublish,
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
-                            alias: "unpublish"
+                            alias: "unpublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     default:
                         return null;
@@ -206,8 +199,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             buttons.subButtons = [];
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
-            // Publish, SendToPublish, Save
-            var buttonOrder = ["U", "H", "A"];
+            // Publish, SendToPublish
+            var buttonOrder = ["U", "H"];
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
@@ -249,7 +242,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
+                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
@@ -409,8 +403,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 case "Z":
                     return {
                         letter: ch,
-                        labelKey: "content_unPublish",
-                        handler: "unPublish"
+                        labelKey: "content_unpublish",
+                        handler: "unpublish"
                     };
 
                 default:
