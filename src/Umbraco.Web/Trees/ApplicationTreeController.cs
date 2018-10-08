@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -20,6 +22,14 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
+        private static readonly Lazy<IEnumerable<IGrouping<string, (Type, string)>>> CoreTrees
+            = new Lazy<IEnumerable<IGrouping<string, (Type, string)>>>(() =>
+                Current.Services.ApplicationTreeService.GetAllTypes()
+                .Select(x => (TreeType: x, TreeGroup: x.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
+                .GroupBy(x => x.TreeGroup)
+                .ToList());
+    
+        
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>
@@ -29,9 +39,11 @@ namespace Umbraco.Web.Trees
         /// <param name="onlyInitialized">An optional bool (defaults to true), if set to false it will also load uninitialized trees</param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
+        public async Task<IEnumerable<SectionRootNode>> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
             application = application.CleanForXss();
+
+            var rootNodeGroups = new List<SectionRootNode>();
 
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -56,7 +68,10 @@ namespace Umbraco.Web.Trees
 
                 //this will be null if it cannot convert to ta single root section
                 if (result != null)
-                    return result;
+                {
+                    rootNodeGroups.Add(result);
+                    return rootNodeGroups;
+                }
             }
 
             var collection = new TreeNodeCollection();
@@ -71,9 +86,90 @@ namespace Umbraco.Web.Trees
                 }
             }
 
-            var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
-            multiTree.Name = Services.TextService.Localize("sections/"+ application);
-            return multiTree;
+            //Don't apply fancy grouping logic futher down, if we are not 'settings' section
+            if(application != Constants.Applications.Settings)
+            {
+                var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+                multiTree.Name = Services.TextService.Localize("sections/" + application);
+
+                rootNodeGroups.Add(multiTree);
+                return rootNodeGroups;
+            }
+
+            //For settings section only
+            //Group trees by [CoreTree] attribute
+
+            //Core Trees contains all trees for all sections/applications
+            foreach(var treeSectionGroup in CoreTrees.Value)
+            {
+                var treeGroupName = treeSectionGroup.Key;
+                if (treeGroupName == null)
+                {
+                    //This is third party trees
+                    //Where user definied or [CoreTree] with no group is set
+                    var thirdPartyNodes = new TreeNodeCollection();
+
+                    //Only add trees to a new collection if they are from 'settings'
+                    foreach(var thirdPartyTree in treeSectionGroup)
+                    {
+                        //Item1 is the type
+                        var thirdPartyType = thirdPartyTree.Item1;
+
+                        var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == thirdPartyType);
+                        if (findAppTree != null)
+                        {
+                            //Now we need to get the 'TreeNode' which is in 'collection'
+                            var thirdPartyTreeNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
+
+                            if(thirdPartyTreeNode != null)
+                            {
+                                //Add to a new list/collection
+                                thirdPartyNodes.Add(thirdPartyTreeNode);
+                            }
+                        }
+                    }
+
+                    //Compared all 'null' grouped trees with appTreeTypes
+                    //Create third party node collection
+                    var thirdPartyRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, thirdPartyNodes);
+                    thirdPartyRoot.Name = "Third Party WARREN";
+
+                    rootNodeGroups.Add(thirdPartyRoot);
+                }
+                else
+                {
+                    var groupNodeCollection = new TreeNodeCollection();
+
+                    //Only add trees to a new collection if they are from 'settings'
+                    foreach (var thirdPartyTree in treeSectionGroup)
+                    {
+                        //Item1 is the type
+                        var thirdPartyType = thirdPartyTree.Item1;
+
+                        var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == thirdPartyType);
+                        if (findAppTree != null)
+                        {
+                            //Now we need to get the 'TreeNode' which is in 'collection'
+                            var thirdPartyTreeNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
+
+                            if (thirdPartyTreeNode != null)
+                            {
+                                //Add to a new list/collection
+                                groupNodeCollection.Add(thirdPartyTreeNode);
+                            }
+                        }
+                    }
+
+                    //Compared all 'null' grouped trees with appTreeTypes
+                    //Create third party node collection
+                    var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
+                    groupRoot.Name = treeGroupName;
+
+                    rootNodeGroups.Add(groupRoot);
+                }
+            }
+
+            return rootNodeGroups;
         }
 
         /// <summary>
