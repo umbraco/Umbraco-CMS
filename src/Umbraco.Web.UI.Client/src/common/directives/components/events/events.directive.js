@@ -173,6 +173,12 @@ angular.module('umbraco.directives')
                     return;
                 }
 
+                // ignore clicks in flatpickr datepicker
+                var flatpickr = $(event.target).closest(".flatpickr-calendar");
+                if (flatpickr.length === 1) {
+                    return;
+                }
+
                 //ignore clicks inside this element
                 if( $(element).has( $(event.target) ).length > 0 ){
                     return;
