@@ -222,8 +222,6 @@
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Composing\ComposingTestBase.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
@@ -258,8 +256,6 @@
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
     <Compile Include="Models\RelationTypeTests.cs" />
-    <Compile Include="Models\TaskTests.cs" />
-    <Compile Include="Models\TaskTypeTests.cs" />
     <Compile Include="Models\TemplateTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Models\UserTests.cs" />

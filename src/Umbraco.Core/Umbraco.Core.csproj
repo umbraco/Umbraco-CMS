@@ -71,7 +71,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="3.4.6" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="Serilog">
       <Version>2.7.1</Version>
@@ -801,8 +801,6 @@
     <Compile Include="Persistence\Dtos\ServerRegistrationDto.cs" />
     <Compile Include="Persistence\Dtos\TagDto.cs" />
     <Compile Include="Persistence\Dtos\TagRelationshipDto.cs" />
-    <Compile Include="Persistence\Dtos\TaskDto.cs" />
-    <Compile Include="Persistence\Dtos\TaskTypeDto.cs" />
     <Compile Include="Persistence\Dtos\TemplateDto.cs" />
     <Compile Include="Persistence\Dtos\User2NodeNotifyDto.cs" />
     <Compile Include="Persistence\Dtos\User2UserGroupDto.cs" />
@@ -824,8 +822,6 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TaggedEntity.cs" />
     <Compile Include="Models\TaggedProperty.cs" />
-    <Compile Include="Models\Task.cs" />
-    <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
@@ -900,8 +896,6 @@
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
-    <Compile Include="Persistence\Factories\TaskFactory.cs" />
-    <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
@@ -951,7 +945,6 @@
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\ServerRegistrationMapper.cs" />
     <Compile Include="Persistence\Mappers\TagMapper.cs" />
-    <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
     <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
@@ -1160,8 +1153,6 @@
     <Compile Include="Persistence\Repositories\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\ITagRepository.cs" />
-    <Compile Include="Persistence\Repositories\ITaskRepository.cs" />
-    <Compile Include="Persistence\Repositories\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserRepository.cs" />
@@ -1192,8 +1183,6 @@
     <Compile Include="Persistence\Repositories\Implement\SimpleGetRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TagRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TaskRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TupleExtensions.cs" />
     <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
@@ -1379,7 +1368,6 @@
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
-    <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
     <Compile Include="Services\Implement\LocalizedTextService.cs" />
@@ -1409,7 +1397,6 @@
     <Compile Include="Services\Implement\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
-    <Compile Include="Services\Implement\TaskService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UnpublishResult.cs" />
     <Compile Include="Services\UnpublishResultType.cs" />

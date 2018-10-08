@@ -1133,9 +1133,6 @@
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="_Legacy\BusinessLogic\Task.cs" />
-    <Compile Include="_Legacy\BusinessLogic\Tasks.cs" />
-    <Compile Include="_Legacy\BusinessLogic\TaskType.cs" />
     <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
     <Compile Include="_Legacy\Controls\DataAttributes.cs" />
     <Compile Include="_Legacy\Controls\feedback.cs" />
@@ -1343,13 +1340,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.cs">
-      <DependentUpon>sendToTranslation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.designer.cs">
-      <DependentUpon>sendToTranslation.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1361,36 +1351,7 @@
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Macro.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ContentType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.designer.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.cs">
-      <DependentUpon>details.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.designer.cs">
-      <DependentUpon>details.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.designer.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.cs">
-      <DependentUpon>xml.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.designer.cs">
-      <DependentUpon>xml.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
@@ -1450,11 +1411,6 @@
   <ItemGroup>
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
-    <Content Include="umbraco.presentation\umbraco\translation\default.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
@@ -1479,14 +1435,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
@@ -1542,6 +1496,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="umbraco.presentation\umbraco\settings\" />
+    <Folder Include="umbraco.presentation\umbraco\translation\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
