@@ -24,9 +24,9 @@
                         on-close="vm.datePickerClose()">
 
                         <div>
-                            <div ng-if="vm.variants[0].releaseDate" class="btn umb-button--xs">
+                            <button ng-if="vm.variants[0].releaseDate" class="btn umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].releaseDateFormatted}}
-                            </div>
+                            </button>
     
                             <a ng-hide="vm.variants[0].releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                 <localize key="content_setDate">Set date</localize>
@@ -53,13 +53,13 @@
                         options="vm.variants[0].datePickerConfig"
                         on-setup="vm.datePickerSetup(vm.variants[0], 'unpublish', fpItem)"
                         on-change="vm.datePickerChange(vm.variants[0], dateStr, 'unpublish')"
-                        on-show="vm.datePickerShow()"
+                        on-open="vm.datePickerShow()"
                         on-close="vm.datePickerClose()">
 
                         <div>
-                            <div ng-if="vm.variants[0].removeDate" class="btn umb-button--xs">
+                            <button ng-if="vm.variants[0].removeDate" class="btn umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].removeDateFormatted}}
-                            </div>
+                            </button>
             
                             <a ng-hide="vm.variants[0].removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                 <localize key="content_setDate">Set date</localize>
@@ -111,22 +111,23 @@
                                 <div style="font-size: 13px; margin-right: 5px;">Publish: </div>
             
                                 <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;">
-                                    <umb-date-time-picker 
-                                        options="vm.datePickerConfig"
-                                        on-change="vm.datePickerChange(variant, event, 'publish')"
-                                        on-show="vm.datePickerShow()"
-                                        on-hide="vm.datePickerClose()">
-            
-                                        <div ng-if="variant.releaseDate" class="btn umb-button--xxs">
-                                            {{variant.releaseDateFormatted}}
+                                    <umb-flatpickr
+                                        ng-model="variant.releaseDate"
+                                        options="variant.datePickerConfig"
+                                        on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
+                                        on-change="vm.datePickerChange(variant, dateStr, 'publish')"
+                                        on-open="vm.datePickerShow()"
+                                        on-close="vm.datePickerClose()">
+                                        <div>
+                                            <button ng-if="variant.releaseDate" class="btn umb-button--xxs" style="outline: none;">
+                                                {{variant.releaseDateFormatted}}
+                                            </button>
+                
+                                            <a ng-hide="variant.releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                                <localize key="content_setDate">Set date</localize>
+                                            </a>
                                         </div>
-            
-                                        <a ng-hide="variant.releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
-                                            <localize key="content_setDate">Set date</localize>
-                                        </a>
-            
-                                    </umb-date-time-picker>
-            
+                                    </umb-flatpickr>
                                     <a ng-if="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                                         <span class="icon icon-wrong"></span>
                                     </a>
@@ -135,22 +136,23 @@
                                 <div style="font-size: 13px; margin-right: 5px;">Unpublish:</div>
             
                                 <div class="btn-group flex" style="font-size: 14px;">
-                                    <umb-date-time-picker 
-                                        options="vm.datePickerConfig"
-                                        on-change="vm.datePickerChange(variant, event, 'unpublish')"
-                                        on-show="vm.datePickerShow()"
-                                        on-hide="vm.datePickerClose()">
-            
-                                        <div ng-if="variant.removeDate" class="btn umb-button--xxs">
-                                            {{variant.removeDateFormatted}}
+                                    <umb-flatpickr
+                                        ng-model="variant.removeDate"
+                                        options="variant.datePickerConfig"
+                                        on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
+                                        on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
+                                        on-open="vm.datePickerShow()"
+                                        on-close="vm.datePickerClose()">
+                                        <div>
+                                            <button ng-if="variant.removeDate" class="btn umb-button--xxs" style="outline: none;">
+                                                {{variant.removeDateFormatted}}
+                                            </button>
+                            
+                                            <a ng-hide="variant.removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                                <localize key="content_setDate">Set date</localize>
+                                            </a>
                                         </div>
-                        
-                                        <a ng-hide="variant.removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
-                                            <localize key="content_setDate">Set date</localize>
-                                        </a>
-            
-                                    </umb-date-time-picker>
-            
+                                    </umb-flatpickr>
                                     <a ng-if="variant.removeDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                                         <span class="icon icon-wrong"></span>
                                     </a>
