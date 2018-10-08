@@ -167,7 +167,7 @@ namespace Umbraco.Core.Persistence
         /// not do anything if the parameter is <c>false</c>.
         /// </summary>
         /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
-        /// <param name="modelType">The tpe representing the table.</param>
+        /// <param name="modelType">The the representing the table.</param>
         public void CreateTable(bool overwrite, Type modelType)
         {
             var tableDefinition = DefinitionFactory.GetTableDefinition(_syntaxProvider, modelType);
