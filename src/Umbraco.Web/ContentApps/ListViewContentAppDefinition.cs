@@ -58,8 +58,21 @@ namespace Umbraco.Web.ContentApps
                 Weight = Weight
             };
 
+            int dtdId;
+            switch(entityType)
+            {
+                case "content":
+                    dtdId = Core.Constants.DataTypes.DefaultContentListView;
+                    break;
+                case "media":
+                    dtdId = Core.Constants.DataTypes.DefaultMediaListView;
+                    break;
+                default:
+                    throw new NotSupportedException($"Entity type {entityType} is not supported here.");
+            }
+
             var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
-            var dtdId = Core.Constants.DataTypes.DefaultContentListView;
+            
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataType(customDtdName)
                      ?? dataTypeService.GetDataType(dtdId);
