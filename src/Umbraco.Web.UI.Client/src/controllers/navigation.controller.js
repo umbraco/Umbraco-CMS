@@ -184,9 +184,15 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Listen for section state changes
     evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
-        var f = args;
-        if (args.value.root && args.value.root.metaData.containsTrees === false) {
-            $rootScope.emptySection = true;
+        if (args.value.root.length > 0)
+        {
+            for (var i = 0; i < args.value.root.length; i++) {
+                var group = args.value.root[i];
+
+                if(group.metaData.containsTrees === false){
+                    $rootScope.emptySection = true;
+                }
+            }
         }
         else {
             $rootScope.emptySection = false;
@@ -422,7 +428,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //this reacts to the options item in the tree
     //TODO: migrate to nav service
-    //TODO: is this used? 
+    //TODO: is this used?
     $scope.searchShowMenu = function (ev, args) {
         //always skip default
         args.skipDefault = true;
