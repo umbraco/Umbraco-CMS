@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence
         /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
         /// <example>
         /// <code>
-        /// if (schemaHelper.TableExists("MyTable"))
+        /// if (schemaHelper.TableExist("MyTable"))
         /// {
         ///     // do something when the table exists
         /// }
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence
         /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
         /// <example>
         /// <code>
-        /// if (schemaHelper.TableExists&lt;MyDto&gt;)
+        /// if (schemaHelper.TableExist&lt;MyDto&gt;)
         /// {
         ///     // do something when the table exists
         /// }
