@@ -315,13 +315,17 @@
         //when this dialog is closed, clean up
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].schedule = false;
-                vm.variants[i].releaseDate = null;
-                vm.variants[i].releaseDateFormatted = null;
-                vm.variants[i].removeDate = null;
-                vm.variants[i].releaseDateFormatted = null;
                 vm.variants[i].save = false;
-            }
+                vm.variants[i].schedule = false;
+                // remove properties only needed for this dialog
+                delete vm.variants[i].releaseDateFormatted;
+                delete vm.variants[i].removeDateFormatted;
+                delete vm.variants[i].datePickerConfig;
+                delete vm.variants[i].releaseDatePickerInstance;
+                delete vm.variants[i].removeDatePickerInstance;
+                delete vm.variants[i].releaseDatePickerOpen;
+                delete vm.variants[i].removeDatePickerOpen;
+            } 
         });
 
     }
