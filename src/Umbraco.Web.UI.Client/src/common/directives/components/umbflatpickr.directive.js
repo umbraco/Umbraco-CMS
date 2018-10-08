@@ -1,3 +1,72 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbFlatpickr
+@restrict E
+@scope
+
+@description
+<b>Added in Umbraco version 8.0</b>
+This directive is a wrapper of the flatpickr library. Use it to render a date time picker.
+For extra details about options and events take a look here: https://flatpickr.js.org/
+
+Use this directive to render a date time picker
+
+<h3>Markup example</h3>
+<pre>
+	<div ng-controller="My.Controller as vm">
+
+		<umb-flatpickr
+			ng-model="vm.date"
+            options="vm.config"
+            on-change="vm.datePickerChange(selectedDates, dateStr, instance)">
+        </umb-flatpickr>
+
+	</div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+	(function () {
+		"use strict";
+
+		function Controller() {
+
+            var vm = this;
+
+            vm.date = "2018-10-10 10:00";
+
+            vm.config = {
+				enableTime: true,
+				dateFormat: "Y-m-d H:i",
+				time_24hr: true
+            };
+
+            vm.datePickerChange = datePickerChange;
+
+            function datePickerChange(selectedDates, dateStr, instance) {
+            	// handle change
+            }
+
+        }
+
+		angular.module("umbraco").controller("My.Controller", Controller);
+
+	})();
+</pre>
+
+@param {object} ngModel (<code>binding</code>): Config object for the date picker.
+@param {object} options (<code>binding</code>): Config object for the date picker.
+@param {callback} onSetup (<code>callback</code>): onSetup gets triggered when the date picker is initialized
+@param {callback} onChange (<code>callback</code>): onChange gets triggered when the user selects a date, or changes the time on a selected date.
+@param {callback} onOpen (<code>callback</code>): onOpen gets triggered when the calendar is opened.
+@param {callback} onClose (<code>callback</code>): onClose gets triggered when the calendar is closed.
+@param {callback} onMonthChange (<code>callback</code>): onMonthChange gets triggered when the month is changed, either by the user or programmatically.
+@param {callback} onYearChange (<code>callback</code>): onMonthChange gets triggered when the year is changed, either by the user or programmatically.
+@param {callback} onReady (<code>callback</code>): onReady gets triggered once the calendar is in a ready state.
+@param {callback} onValueUpdate (<code>callback</code>): onValueUpdate gets triggered when the input value is updated with a new date string.
+@param {callback} onDayCreate (<code>callback</code>): Take full control of every date cell with theonDayCreate()hook.
+**/
+
 (function() {
 	'use strict';
 
@@ -11,11 +80,15 @@
 		bindings: {
 			ngModel: '<',
 			options: '<',
-			onSetup: '&',
+			onSetup: '&?',
 			onChange: '&?',
 			onOpen: '&?',
 			onClose: '&?',
-			onMonthChange: '&?'
+			onMonthChange: '&?',
+			onYearChange: '&?',
+			onReady: '&?',
+			onValueUpdate: '&?',
+			onDayCreate: '&?'
 		}
     };
     
@@ -36,12 +109,6 @@
             });
 
 		};
-
-		ctrl.$onChanges = function() {
-            if(loaded) {
-                //grabElementAndRunFlatpickr();
-            }
-        };
 
 		function grabElementAndRunFlatpickr() {
 			$timeout(function() {
