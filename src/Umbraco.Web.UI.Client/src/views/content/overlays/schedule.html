@@ -18,7 +18,7 @@
                     <umb-flatpickr
                         ng-model="vm.variants[0].releaseDate"
                         options="vm.variants[0].datePickerConfig"
-                        on-setup="vm.datePickerSetup(vm.variants[0], fpItem)"
+                        on-setup="vm.datePickerSetup(vm.variants[0], 'publish', fpItem)"
                         on-change="vm.datePickerChange(vm.variants[0], dateStr, 'publish')"
                         on-open="vm.datePickerShow()"
                         on-close="vm.datePickerClose()">
@@ -51,6 +51,7 @@
                     <umb-flatpickr
                         ng-model="vm.variants[0].removeDate"
                         options="vm.variants[0].datePickerConfig"
+                        on-setup="vm.datePickerSetup(vm.variants[0], 'unpublish', fpItem)"
                         on-change="vm.datePickerChange(vm.variants[0], dateStr, 'unpublish')"
                         on-show="vm.datePickerShow()"
                         on-close="vm.datePickerClose()">

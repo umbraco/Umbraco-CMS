@@ -94,8 +94,14 @@
 
         }
 
-        function datePickerSetup(variant, datePickerInstance) {
-            variant.datePickerInstance = datePickerInstance;
+        function datePickerSetup(variant, type, datePickerInstance) {
+            // store a date picker instance for publish and unpublish picker
+            // so we can change the settings independently.
+            if (type === 'publish') {
+                variant.releaseDatePickerInstance = datePickerInstance;
+            } else if (type === 'unpublish') {
+                variant.removeDatePickerInstance = datePickerInstance;
+            }
         };
 
         function datePickerChange(variant, dateStr, type) {
@@ -132,9 +138,8 @@
             // make sure dates are formatted to the user's locale
             formatDatesToLocal(variant);
 
-            // store the first selected date so we can apply to other selected variants
-
-            // variant.datePickerInstance.set("maxDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
+            // make sure the unpublish date can't be before the publish date
+            variant.removeDatePickerInstance.set("minDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
 
         }
 
@@ -153,6 +158,9 @@
 
             // make sure dates are formatted to the user's locale
             formatDatesToLocal(variant);
+
+            // make sure the publish date can't be after the publish date
+            variant.releaseDatePickerInstance.set("maxDate", moment(variant.removeDate).format("YYYY-MM-DD HH:mm"));
 
         }
 
