@@ -2,10 +2,9 @@
     <umb-toggle
         checked="renderModel.value"
         on-click="toggle()"
-        show-labels="{{model.config.showLabels === '1' ? 'true' : 'false'}}"
-        label-position="{{model.config.labelPosition === '1' ? 'right' : 'left'}}"
+        show-labels="{{model.config.labelOn ? 'true': 'false'}}"
+        label-position="right"
         label-on="{{model.config.labelOn}}"
-        label-off="{{model.config.labelOff}}"
-        hide-icons="{{model.config.hideIcons === '1' ? 'true' : ''}}">
+        label-off="{{model.config.labelOn}}">
     </umb-toggle>
 </div>
