@@ -20,42 +20,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 Fields.Add(new PreValueField()
                 {
-                    Description = "",
-                    Key = "showLabels",
-                    Name = "Show labels",
-                    View = "boolean"
-                });
-
-                Fields.Add(new PreValueField()
-                {
-                    Description = "",
+                    Description = "Write a label text",
                     Key = "labelOn",
-                    Name = "Label on text",
+                    Name = "Label",
                     View = "textstring"
-                });
-
-                Fields.Add(new PreValueField()
-                {
-                    Description = "",
-                    Key = "labelOff",
-                    Name = "Label off text",
-                    View = "textstring"
-                });
-
-                Fields.Add(new PreValueField()
-                {
-                    Description = "",
-                    Key = "labelPosition",
-                    Name = "Label position",
-                    View = "views/propertyeditors/boolean/booleanWithLabels.prevalues.html"
-                });
-
-                Fields.Add(new PreValueField()
-                {
-                    Description = "",
-                    Key = "hideIcons",
-                    Name = "Hide icons",
-                    View = "boolean"
                 });
             }
         }
