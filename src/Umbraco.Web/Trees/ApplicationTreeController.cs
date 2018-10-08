@@ -27,6 +27,7 @@ namespace Umbraco.Web.Trees
                 Current.Services.ApplicationTreeService.GetAllTypes()
                 .Select(x => (TreeType: x, TreeGroup: x.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
                 .GroupBy(x => x.TreeGroup)
+                .OrderByDescending(x => x.Key)
                 .ToList());
     
         
@@ -103,70 +104,41 @@ namespace Umbraco.Web.Trees
             foreach(var treeSectionGroup in CoreTrees.Value)
             {
                 var treeGroupName = treeSectionGroup.Key;
+
+                var groupNodeCollection = new TreeNodeCollection();
+
+                //Only add trees to a new collection if they are from 'settings'
+                foreach (var treeItem in treeSectionGroup)
+                {
+                    //Item1 tuple - is the type from all tree types
+                    var treeItemType = treeItem.Item1;
+
+                    var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == treeItemType);
+                    if (findAppTree != null)
+                    {
+                        //Now we need to get the 'TreeNode' which is in 'collection'
+                        var treeItemNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
+
+                        if (treeItemNode != null)
+                        {
+                            //Add to a new list/collection
+                            groupNodeCollection.Add(treeItemNode);
+                        }
+                    }
+                }
+
+                //If treeGroupName == null then its third party
                 if (treeGroupName == null)
                 {
-                    //This is third party trees
-                    //Where user definied or [CoreTree] with no group is set
-                    var thirdPartyNodes = new TreeNodeCollection();
-
-                    //Only add trees to a new collection if they are from 'settings'
-                    foreach(var thirdPartyTree in treeSectionGroup)
-                    {
-                        //Item1 is the type
-                        var thirdPartyType = thirdPartyTree.Item1;
-
-                        var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == thirdPartyType);
-                        if (findAppTree != null)
-                        {
-                            //Now we need to get the 'TreeNode' which is in 'collection'
-                            var thirdPartyTreeNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
-
-                            if(thirdPartyTreeNode != null)
-                            {
-                                //Add to a new list/collection
-                                thirdPartyNodes.Add(thirdPartyTreeNode);
-                            }
-                        }
-                    }
-
-                    //Compared all 'null' grouped trees with appTreeTypes
-                    //Create third party node collection
-                    var thirdPartyRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, thirdPartyNodes);
-                    thirdPartyRoot.Name = "Third Party WARREN";
-
-                    rootNodeGroups.Add(thirdPartyRoot);
+                    //This is used for the localisation key
+                    //treeHeaders/thirdPartyGroup
+                    treeGroupName = "thirdPartyGroup";
                 }
-                else
-                {
-                    var groupNodeCollection = new TreeNodeCollection();
 
-                    //Only add trees to a new collection if they are from 'settings'
-                    foreach (var thirdPartyTree in treeSectionGroup)
-                    {
-                        //Item1 is the type
-                        var thirdPartyType = thirdPartyTree.Item1;
+                var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
+                groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
 
-                        var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == thirdPartyType);
-                        if (findAppTree != null)
-                        {
-                            //Now we need to get the 'TreeNode' which is in 'collection'
-                            var thirdPartyTreeNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
-
-                            if (thirdPartyTreeNode != null)
-                            {
-                                //Add to a new list/collection
-                                groupNodeCollection.Add(thirdPartyTreeNode);
-                            }
-                        }
-                    }
-
-                    //Compared all 'null' grouped trees with appTreeTypes
-                    //Create third party node collection
-                    var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
-                    groupRoot.Name = treeGroupName;
-
-                    rootNodeGroups.Add(groupRoot);
-                }
+                rootNodeGroups.Add(groupRoot);
             }
 
             return rootNodeGroups;
