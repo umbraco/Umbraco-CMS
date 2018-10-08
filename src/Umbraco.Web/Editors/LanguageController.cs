@@ -65,14 +65,20 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult DeleteLanguage(int id)
         {
             var language = Services.LocalizationService.GetLanguageById(id);
-            if (language == null) return NotFound();
+            if (language == null)
+            {
+                return NotFound();
+            }
 
             // the service would not let us do it, but test here nevertheless
-            if (language.IsDefaultVariantLanguage)
+            if (language.IsDefault)
             {
                 var message = $"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
+
+            // service is happy deleting a language that's fallback for another language,
+            // will just remove it - so no need to check here
 
             Services.LocalizationService.Delete(language);
 
@@ -112,31 +118,66 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
                 }
 
-                //create it
-                var newLang = new Umbraco.Core.Models.Language(culture.Name)
+                // create it (creating a new language cannot create a fallback cycle)
+                var newLang = new Core.Models.Language(culture.Name)
                 {
                     CultureName = culture.DisplayName,
-                    IsDefaultVariantLanguage = language.IsDefaultVariantLanguage,
-                    Mandatory = language.Mandatory
+                    IsDefault = language.IsDefault,
+                    IsMandatory = language.IsMandatory,
+                    FallbackLanguageId = language.FallbackLanguageId
                 };
+
                 Services.LocalizationService.Save(newLang);
                 return Mapper.Map<Language>(newLang);
             }
 
-            existing.Mandatory = language.Mandatory;
+            existing.IsMandatory = language.IsMandatory;
 
             // note that the service will prevent the default language from being "un-defaulted"
             // but does not hurt to test here - though the UI should prevent it too
-            if (existing.IsDefaultVariantLanguage && !language.IsDefaultVariantLanguage)
+            if (existing.IsDefault && !language.IsDefault)
             {
-                ModelState.AddModelError("IsDefaultVariantLanguage", "Cannot un-default the default language.");
+                ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            existing.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
+            existing.IsDefault = language.IsDefault;
+            existing.FallbackLanguageId = language.FallbackLanguageId;
+
+            // modifying an existing language can create a fallback, verify
+            // note that the service will check again, dealing with race conds
+            if (existing.FallbackLanguageId.HasValue)
+            {
+                var languages = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
+                if (!languages.ContainsKey(existing.FallbackLanguageId.Value))
+                {
+                    ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                }
+                if (CreatesCycle(existing, languages))
+                {
+                    ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existing.FallbackLanguageId.Value].IsoCode} would create a circular path.");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                }
+            }
 
             Services.LocalizationService.Save(existing);
             return Mapper.Map<Language>(existing);
-        }        
+        }
+
+        // see LocalizationService
+        private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
+        {
+            // a new language is not referenced yet, so cannot be part of a cycle
+            if (!language.HasIdentity) return false;
+
+            var id = language.FallbackLanguageId;
+            while (true) // assuming languages does not already contains a cycle, this must end
+            {
+                if (!id.HasValue) return false; // no fallback means no cycle
+                if (id.Value == language.Id) return true; // back to language = cycle!
+                id = languages[id.Value].FallbackLanguageId; // else keep chaining
+            }
+        }
     }
 }

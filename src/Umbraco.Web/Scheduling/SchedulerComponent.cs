@@ -117,7 +117,7 @@ namespace Umbraco.Web.Scheduling
         private IBackgroundTask RegisterScheduledPublishing()
         {
             // scheduled publishing/unpublishing
-            // install on all, will only run on non-slaves servers
+            // install on all, will only run on non-replica servers
             var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger, _userService);
             _publishingRunner.TryAdd(task);
             return task;
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Scheduling
         private IBackgroundTask RegisterLogScrubber(IUmbracoSettingsSection settings)
         {
             // log scrubbing
-            // install on all, will only run on non-slaves servers
+            // install on all, will only run on non-replica servers
             var task = new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger, _proflog);
             _scrubberRunner.TryAdd(task);
             return task;

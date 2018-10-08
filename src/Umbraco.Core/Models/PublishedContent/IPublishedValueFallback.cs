@@ -1,37 +1,122 @@
-﻿using Umbraco.Core.Composing;
-
-namespace Umbraco.Core.Models.PublishedContent
+﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
     /// Provides a fallback strategy for getting <see cref="IPublishedElement"/> values.
     /// </summary>
-    // fixme - IPublishedValueFallback is still WorkInProgress
-    // todo - properly document methods, etc
-    // todo - understand caching vs fallback (recurse etc)
     public interface IPublishedValueFallback
     {
-        // note that at property level, property.GetValue() does NOT implement fallback, and one has
-        // to get property.Value() or property.Value<T>() to trigger fallback
+        /// <summary>
+        /// Tries to get a fallback value for a property.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever property.Value(culture, segment, defaultValue) is called, and
+        /// property.HasValue(culture, segment) is false.</para>
+        /// <para>It can only fallback at property level (no recurse).</para>
+        /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
+        /// get property.Value() or property.Value{T}() to trigger fallback.</para>
+        /// <para>Note that <paramref name="culture"/> and <paramref name="segment"/> may not be contextualized,
+        /// so the variant context should be used to contextualize them (see our default implementation in
+        /// the web project.</para>
+        /// </remarks>
+        bool TryGetValue(IPublishedProperty property, string culture, string segment, Fallback fallback, object defaultValue, out object value);
 
-        // this method is called whenever property.Value(culture, segment, defaultValue) is called, and
-        // property.HasValue(culture, segment) is false. it can only fallback at property level (no recurse).
+        /// <summary>
+        /// Tries to get a fallback value for a property.
+        /// </summary>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="property">The property.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever property.Value{T}(culture, segment, defaultValue) is called, and
+        /// property.HasValue(culture, segment) is false.</para>
+        /// <para>It can only fallback at property level (no recurse).</para>
+        /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
+        /// get property.Value() or property.Value{T}() to trigger fallback.</para>
+        /// </remarks>
+        bool TryGetValue<T>(IPublishedProperty property, string culture, string segment, Fallback fallback, T defaultValue, out T value);
 
-        object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue);
+        /// <summary>
+        /// Tries to get a fallback value for a published element property.
+        /// </summary>
+        /// <param name="content">The published element.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever getting the property value for the specified alias, culture and
+        /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
+        /// <para>It can only fallback at element level (no recurse).</para>
+        /// </remarks>
+        bool TryGetValue(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value);
 
-        // this method is called whenever property.Value<T>(culture, segment, defaultValue) is called, and
-        // property.HasValue(culture, segment) is false. it can only fallback at property level (no recurse).
+        /// <summary>
+        /// Tries to get a fallback value for a published element property.
+        /// </summary>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="content">The published element.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever getting the property value for the specified alias, culture and
+        /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
+        /// <para>It can only fallback at element level (no recurse).</para>
+        /// </remarks>
+        bool TryGetValue<T>(IPublishedElement content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value);
 
-        T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue);
+        /// <summary>
+        /// Tries to get a fallback value for a published content property.
+        /// </summary>
+        /// <param name="content">The published element.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever getting the property value for the specified alias, culture and
+        /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
+        /// </remarks>
+        bool TryGetValue(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, object defaultValue, out object value);
 
-        // these methods to be called whenever getting the property value for the specified alias, culture and segment,
-        // either returned no property at all, or a property that does not HasValue for the specified culture and segment.
-
-        object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue);
-
-        T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue);
-
-        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse);
-
-        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse);
+        /// <summary>
+        /// Tries to get a fallback value for a published content property.
+        /// </summary>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="content">The published element.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The requested culture.</param>
+        /// <param name="segment">The requested segment.</param>
+        /// <param name="fallback">A fallback strategy.</param>
+        /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="value">The fallback value.</param>
+        /// <returns>A value indicating whether a fallback value could be provided.</returns>
+        /// <remarks>
+        /// <para>This method is called whenever getting the property value for the specified alias, culture and
+        /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
+        /// </remarks>
+        bool TryGetValue<T>(IPublishedContent content, string alias, string culture, string segment, Fallback fallback, T defaultValue, out T value);
     }
 }

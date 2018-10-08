@@ -147,7 +147,7 @@
     <key alias="statistics">Statistika</key>
     <key alias="titleOptional">Titulek (volitelně)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Nepublikovat</key>
+    <key alias="unpublish">Nepublikovat</key>
     <key alias="updateDate">Naposledy změněno</key>
     <key alias="updateDateDesc" version="7.0">Datum/čas poslední změny dokumentu</key>
     <key alias="uploadClear">Odebrat soubor(y)</key>

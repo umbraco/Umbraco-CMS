@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -36,6 +38,11 @@ namespace Umbraco.Web.Templates
         {
             if (urlProvider == null) throw new ArgumentNullException("urlProvider");
 
+            if(string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
             foreach (Match tag in tags)
@@ -64,6 +71,11 @@ namespace Umbraco.Web.Templates
                 }
             }
 
+            if (UmbracoConfig.For.UmbracoSettings().Content.StripUdiAttributes)
+            {
+                text = StripUdiDataAttributes(text);
+            }
+            
             return text;
         }
 
@@ -74,6 +86,9 @@ namespace Umbraco.Web.Templates
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        private static readonly Regex UdiDataAttributePattern = new Regex("data-udi=\"[^\\\"]*\"",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// The RegEx matches any HTML attribute values that start with a tilde (~), those that match are passed to ResolveUrl to replace the tilde with the application path.
@@ -117,6 +132,22 @@ namespace Umbraco.Web.Templates
         public static string CleanForXss(string text, params char[] ignoreFromClean)
         {
             return text.CleanForXss(ignoreFromClean);
+        }
+        
+        /// <summary>
+        /// Strips data-udi attributes from rich text
+        /// </summary>
+        /// <param name="input">A html string</param>
+        /// <returns>A string stripped from the data-uid attributes</returns>
+        public static string StripUdiDataAttributes(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+
+            return UdiDataAttributePattern.Replace(input, string.Empty);
         }
     }
 }

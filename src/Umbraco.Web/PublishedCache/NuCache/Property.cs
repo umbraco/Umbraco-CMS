@@ -90,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // determines whether a property has value
         public override bool HasValue(string culture = null, string segment = null)
         {
-            ContextualizeVariation(ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
 
             var value = GetSourceValue(culture, segment);
             var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -194,7 +194,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetSourceValue(string culture = null, string segment = null)
         {
-            ContextualizeVariation(ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
 
             if (culture == "" && segment == "")
                 return _sourceValue;
@@ -206,19 +206,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void ContextualizeVariation(ref string culture, ref string segment)
-        {
-            if (culture != null && segment != null) return;
-
-            // use context values
-            var publishedVariationContext = _content.VariationContextAccessor?.VariationContext;
-            if (culture == null) culture = _variations.VariesByCulture() ? publishedVariationContext?.Culture : "";
-            if (segment == null) segment = _variations.VariesBySegment() ? publishedVariationContext?.Segment : "";
-        }
-
         public override object GetValue(string culture = null, string segment = null)
         {
-            ContextualizeVariation(ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
 
             object value;
             lock (_locko)
@@ -239,7 +229,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetXPathValue(string culture = null, string segment = null)
         {
-            ContextualizeVariation(ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
 
             lock (_locko)
             {

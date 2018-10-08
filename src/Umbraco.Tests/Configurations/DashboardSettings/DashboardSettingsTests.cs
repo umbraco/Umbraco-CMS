@@ -66,9 +66,20 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Section_Tabs()
         {
-            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(0).Tabs.Count());
-            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(1).Tabs.Count());
+            //Element 0 Alias "StartupSettingsDashboardSection"
+            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(0).Tabs.Count());
+
+            //Element 1 Alias "StartupDeveloperDashboardSection"
+            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(1).Tabs.Count());
+
+            //Element 2 Alias "StartupMediaDashboardSection"
+            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(2).Tabs.Count());
+
+            //Element 3 Alias "StartupDashboardSection"
             Assert.AreEqual(3, SettingsSection.Sections.ElementAt(3).Tabs.Count());
+
+            //Element 4 Alias "StartupMemberDashboardSection"
+            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(4).Tabs.Count());
 
         }
 

@@ -748,7 +748,7 @@ ORDER BY colName";
 
             if (excludeUserGroups != null && excludeUserGroups.Length > 0)
             {
-                var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
+                const string subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
                     FROM umbracoUser
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
@@ -809,7 +809,7 @@ ORDER BY colName";
                 sql = new SqlTranslator<IUser>(sql, query).Translate();
 
             // get sorted and filtered sql
-            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql), orderDirection, orderBy);
+            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql, query != null), orderDirection, orderBy);
 
             // get a page of results and total count
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -820,11 +820,17 @@ ORDER BY colName";
             return pagedResult.Items.Select(UserFactory.BuildEntity);
         }
 
-        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql)
+        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, bool hasWhereClause)
         {
             if (filterSql == null) return sql;
 
-            sql.Append(SqlContext.Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
+            //ensure we don't append a WHERE if there is already one
+            var args = filterSql.Arguments;
+            var sqlFilter = hasWhereClause
+                ? filterSql.SQL
+                : " WHERE " + filterSql.SQL.TrimStart("AND ");
+
+            sql.Append(SqlContext.Sql(sqlFilter, args));
 
             return sql;
         }

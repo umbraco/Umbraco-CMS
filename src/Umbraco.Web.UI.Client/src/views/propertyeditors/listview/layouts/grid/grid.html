@@ -82,7 +82,7 @@
       </umb-empty-state>
 
       <umb-empty-state
-          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter.length > 0"
+          ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length > 0"
           position="center">
           <localize key="general_searchNoResult"></localize>
       </umb-empty-state>
