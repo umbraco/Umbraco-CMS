@@ -1452,6 +1452,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="userPermissions">Brugertilladelser</key>
     <key alias="userTypes">Bruger Typer</key>
     <key alias="users">Brugere</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>

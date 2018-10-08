@@ -1520,6 +1520,9 @@
         <key alias="templates">Plantillas</key>
         <key alias="analytics">Analíticas</key>
         <key alias="users">Usuarios</key>
+        <key alias="settingsGroup"></key>
+        <key alias="templatingGroup"></key>
+        <key alias="thirdPartyGroup"></key>
     </area>
     <area alias="update">
         <key alias="updateAvailable">Existe una nueva actualización</key>

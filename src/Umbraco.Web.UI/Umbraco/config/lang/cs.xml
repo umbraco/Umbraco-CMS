@@ -986,6 +986,9 @@
     <key alias="userPermissions">Oprávnění Uživatele</key>
     <key alias="userTypes">Typy Uživatelů</key>
     <key alias="users">Uživatelé</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nová aktualizace je připrvena</key>

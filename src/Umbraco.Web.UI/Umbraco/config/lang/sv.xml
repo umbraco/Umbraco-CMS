@@ -901,6 +901,9 @@
     <key alias="userPermissions">Användarrättigheter</key>
     <key alias="userTypes">Användartyper</key>
     <key alias="users">Användare</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny uppdatering tillgänglig</key>

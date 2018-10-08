@@ -1178,6 +1178,9 @@
     <key alias="stylesheets">樣式表</key>
     <key alias="templates">範本</key>
     <key alias="analytics">統計</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">有可用更新</key>

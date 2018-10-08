@@ -971,6 +971,9 @@ Vennlig hilsen Umbraco roboten
     <key alias="userPermissions">Brukertillatelser</key>
     <key alias="userTypes">Brukertyper typer</key>
     <key alias="users">Brukere</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny oppdatering er klar</key>

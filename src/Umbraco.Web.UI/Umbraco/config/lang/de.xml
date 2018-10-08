@@ -979,6 +979,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="userPermissions">Berechtigungen</key>
     <key alias="userTypes">Benutzertypen</key>
     <key alias="users">Benutzer</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>

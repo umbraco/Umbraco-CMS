@@ -871,6 +871,9 @@
     <key alias="userPermissions">사용자권한</key>
     <key alias="userTypes">사용자 유형</key>
     <key alias="users">사용자</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">새 업데이트가 준비되었습니다.</key>

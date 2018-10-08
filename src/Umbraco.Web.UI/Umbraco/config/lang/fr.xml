@@ -1818,6 +1818,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="analytics">Analytique</key>
     <key alias="users">Utilisateurs</key>
     <key alias="analytics">Analytique</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nouvelle mise à jour disponible</key>

@@ -1839,6 +1839,9 @@
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
     <key alias="users">Пользователи</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Доступны обновления</key>

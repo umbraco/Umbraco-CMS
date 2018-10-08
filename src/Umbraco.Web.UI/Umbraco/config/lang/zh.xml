@@ -1242,6 +1242,9 @@
     <key alias="users">Users</key>
     <key alias="partialViews">分部视图</key>
     <key alias="partialViewMacros">分部视图宏文件</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">有可用更新</key>

@@ -1296,6 +1296,9 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Sjablonen</key>
 	<key alias="analytics">Analytics</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>

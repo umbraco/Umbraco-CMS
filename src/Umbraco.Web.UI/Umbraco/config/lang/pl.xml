@@ -1496,6 +1496,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="analytics">Analizy</key>
 	<key alias="partialViews">Częściowe Widoki</key>
     <key alias="partialViewMacros">Pliki Makro Częściowych Widoków</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Aktualizacja jest gotowa</key>

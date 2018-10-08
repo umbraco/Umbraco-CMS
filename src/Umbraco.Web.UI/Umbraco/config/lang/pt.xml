@@ -854,6 +854,9 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="userPermissions">Permissões de usuário</key>
     <key alias="userTypes">Tipos de Usuários</key>
     <key alias="users">Usuários</key>
+    <key alias="settingsGroup"></key>
+    <key alias="templatingGroup"></key>
+    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nova atualização pronta</key>
