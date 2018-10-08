@@ -1,0 +1,16 @@
+﻿<div ng-controller="Umbraco.PrevalueEditors.ColorPickerController">
+    
+    <div ng-if="!isConfigured">
+        <localize key="colorpicker_noColors">You haven't defined any colors</localize>
+    </div>
+
+    <ul class="thumbnails color-picker">
+        <li ng-repeat="preval in model.prevalues" ng-class="{active: model.value === preval.value}">
+            <a ng-click="toggleItem(preval.value)" class="thumbnail" hex-bg-color="{{preval.val}}">
+
+            </a>
+        </li>
+    </ul>
+
+    <input type="hidden" name="modelValue" ng-model="model.value" />
+</div>
