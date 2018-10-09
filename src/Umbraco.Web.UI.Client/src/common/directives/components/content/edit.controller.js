@@ -97,14 +97,6 @@
                 eventsService.unsubscribe(evts[e]);
             }
 
-            evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
-            evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
             evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
                 if (args && args.documentType && args.documentType.key === content.documentType.key) {
@@ -177,7 +169,8 @@
                 methods: {
                     saveAndPublish: $scope.saveAndPublish,
                     sendToPublish: $scope.sendToPublish,
-                    unpublish: $scope.unpublish
+                    unpublish: $scope.unpublish,
+                    schedulePublish: $scope.schedule
                 }
             });
 
@@ -609,6 +602,30 @@
                     });
             }
 
+        };
+
+        $scope.schedule = function() {
+            clearNotifications($scope.content);
+            //before we launch the dialog we want to execute all client side validations first
+            if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
+
+                var dialog = {
+                    parentScope: $scope,
+                    view: "views/content/overlays/schedule.html",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabel: "Schedule",
+                    submit: function (model) {
+                        model.submitButtonState = "busy";
+                        clearNotifications($scope.content);
+                        model.submitButtonState = "success";
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+                overlayService.open(dialog);
+            }
         };
 
         $scope.preview = function (content) {
