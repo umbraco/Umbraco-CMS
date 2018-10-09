@@ -10,6 +10,11 @@
     }
 }
 
+.umb-toggle:focus .umb-toggle__toggle{
+    outline: 0;
+    box-shadow: 0 0 5px fade(@black, 30%);
+}
+
 .umb-toggle__handler {
     position: absolute;
     top: 0;
@@ -43,7 +48,6 @@
 /* Labels */
 
 .umb-toggle__label {
-    font-size: 12px;
     color: @gray-2;
 }
 
