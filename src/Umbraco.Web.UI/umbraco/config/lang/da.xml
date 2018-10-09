@@ -991,6 +991,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="updateEditCrop">Acceptér</key>
+    <key alias="undoEditCrop">Fortryd</key>
   </area>
 
 

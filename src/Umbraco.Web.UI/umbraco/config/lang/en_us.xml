@@ -1294,11 +1294,13 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="externalLinkPlaceholder">Enter the link</key>
     </area>
     <area alias="imagecropper">
-        <key alias="reset">Reset</key>
+        <key alias="reset">Reset crop</key>
         <key alias="defineCrop">Define crop</key>
         <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
         <key alias="saveCrop">Save crop</key>
         <key alias="addCrop">Add new crop</key>
+        <key alias="updateEditCrop">Done</key>
+        <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
         <key alias="currentVersion">Current version</key>
