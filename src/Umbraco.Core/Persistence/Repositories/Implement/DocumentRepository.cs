@@ -700,6 +700,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             Sql<ISqlContext> filterSql = null;
 
+            // Here we create a default where clause from a temp IContent which will look in the contentVersion table for the content name 
+            // if we are searching in a list view that contains variants, we want to look in the contentVersionCultureVariation table instead. 
+            // The resulting clause will be used in the foreach below to compare against the original clause that comes from the "filter" and if they are the same
+            // we know that we are searching a list view and the proper where clause will be replaced to look in contentVersionCultureVariation table for the names.
             var temp = Query<IContent>().Where(x => x.Name.Contains("foo"));
             var clause = temp.GetWhereClauses().First().Item1.Split(' ')[0];
 
@@ -709,8 +713,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var filterClause in filter.GetWhereClauses())
                 {
                     // fixme - is this the right way of doing it???
+
+                    //
                     var where = filterClause.Item1.Split(' ')[0] == clause
-                        // normally, this would be the field alias of the coalesce result between ContentVersionCulture and NodeDto names, however
+                        // normally, this would be the field alias (variantName) of the coalesce result between ContentVersionCulture and NodeDto names, however
                         // you can't refer to field alias in a WHERE clause so we have to put the coalesce calculation instead which refers to the original field
                         ? SqlContext.Visit<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql 
                         : filterClause.Item1;
