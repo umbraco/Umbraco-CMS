@@ -16,7 +16,7 @@
                 <div class="thumbnail span1" hex-bg-color="{{item.value}}" hex-bg-orig="transparent"></div>
                 <div class="color-picker-prediv">
                     <pre>#{{item.value}}</pre>
-                    <span ng-bind="item.value" ng-if="!labelEnabled"></span>
+                    <span ng-bind="item.label" ng-if="!labelEnabled"></span>
                     <input type="text" ng-if="labelEnabled" ng-model="item.label" val-server="item_{{$index}}" required />
                 </div>
             </div>
