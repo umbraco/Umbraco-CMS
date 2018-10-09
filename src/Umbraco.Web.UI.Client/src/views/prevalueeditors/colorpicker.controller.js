@@ -28,14 +28,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
                     continue;
 
                 if (oldValue.hasOwnProperty("value")) {
+                    var hexCode = toFullHex(oldValue.value);
                     items.push({
-                        value: toFullHex(oldValue.value),
+                        value: hexCode.substr(1, hexCode.length),
                         label: oldValue.label,
                         id: i
                     });
                 } else {
+                    var hexCode = toFullHex(oldValue);
                     items.push({
-                        value: toFullHex(oldValue),
+                        value: hexCode.substr(1, hexCode.length),
                         label: oldValue,
                         id: i
                     });
