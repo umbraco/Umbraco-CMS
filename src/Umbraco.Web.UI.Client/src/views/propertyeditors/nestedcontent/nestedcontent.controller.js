@@ -37,6 +37,18 @@
             });
         });
 
+        $scope.selectableDocTypesFor = function (config) {
+            // return all doctypes that are:
+            // 1. either already selected for this config, or
+            // 2. not selected in any other config
+            return _.filter($scope.model.docTypes, function (docType) {
+                return docType.alias === config.ncAlias || !_.find($scope.model.value, function(c) {
+                    return docType.alias === c.ncAlias;
+                });
+            });
+
+        }
+
         if (!$scope.model.value) {
             $scope.model.value = [];
             $scope.add();
@@ -231,6 +243,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             cursor: "move",
             handle: ".umb-nested-content__icon--move",
             start: function (ev, ui) {
+                updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
                 $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
