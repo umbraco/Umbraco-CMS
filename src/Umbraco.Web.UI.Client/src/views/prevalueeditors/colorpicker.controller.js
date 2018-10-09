@@ -23,6 +23,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
 
             for (var i in $scope.model.prevalues) {
                 var oldValue = $scope.model.prevalues[i];
+
+                if (!isValidHex(oldValue.value || oldValue))
+                    continue;
+
                 if (oldValue.hasOwnProperty("value")) {
                     items.push({
                         value: toFullHex(oldValue.value),
@@ -48,4 +52,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
             }
             return hex.toLowerCase();
         }
+
+        function isValidHex(str) {
+            console.log("str", str);
+            console.log("test", /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(str));
+            return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(str);
+        }
+
     });
