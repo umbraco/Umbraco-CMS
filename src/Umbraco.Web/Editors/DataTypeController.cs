@@ -290,7 +290,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoApplicationAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return Services.DataTypeService
@@ -307,7 +307,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = Services.DataTypeService
@@ -340,7 +340,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
@@ -373,7 +373,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return Current.PropertyEditors

@@ -1,7 +1,8 @@
 <ul class="umb-sub-views-nav" ng-show="showNavigation">
-    
+
     <li ng-repeat="item in navigation | limitTo: itemsLimit ">
-        <div ng-show="item.alias !== 'more'">
+        <div ng-show="item.alias !== 'more'"
+            ng-class="item.errorClass">
             <a data-element="sub-view-{{item.alias}}"
                tabindex="-1"
                class="umb-sub-views-nav-item js-umb-sub-views-nav-item"
