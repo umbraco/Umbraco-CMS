@@ -243,6 +243,21 @@ gulp.task('dependencies', function () {
             "src":  ["./node_modules/angular-messages/angular-messages.js"],
             "base": "./node_modules/angular-messages"
         },
+        {   
+            "name": "animejs",
+            "src":  ["./node_modules/animejs/anime.min.js"],
+            "base": "./node_modules/animejs"
+        },
+        {   
+            "name": "clipboard",
+            "src":  ["./node_modules/clipboard/dist/clipboard.min.js"],
+            "base": "./node_modules/clipboard/dist"
+        },
+        {   
+            "name": "jsdiff",
+            "src":  ["./node_modules/diff/dist/diff.min.js"],
+            "base": "./node_modules/diff/dist"
+        },
         {
             "name": "flatpickr",
             "src":  [
