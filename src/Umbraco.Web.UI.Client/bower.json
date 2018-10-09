@@ -16,16 +16,6 @@
         "tests"
     ],
     "dependencies": {
-        "angular": "~1.7.4",
-        "angular-cookies": "~1.7.4",
-        "angular-sanitize": "~1.7.4",
-        "angular-touch": "~1.7.4",
-        "angular-route": "~1.7.4",
-        "angular-animate": "~1.7.4",
-        "angular-i18n": "~1.7.4",
-        "signalr": "^2.2.1",
-        "typeahead.js": "~0.10.5",
-        "underscore": "~1.9.1",
         "rgrove-lazyload": "*",
         "bootstrap-social": "~4.8.0",
         "jquery": "2.2.4",
@@ -44,7 +34,6 @@
         "font-awesome": "~4.2",
         "animejs": "^2.2.0",
         "angular-ui-sortable": "0.14.4",
-        "angular-messages": "^1.7.2",
         "jsdiff": "^3.4.0"
     },
     "install": {
@@ -62,10 +51,6 @@
                 "bower_components/moment/min/moment-with-locales.min.js",
                 "bower_components/moment/locale/*.js"
             ],
-            "underscore": [
-                "bower_components/underscore/underscore-min.js",
-                "bower_components/underscore/underscore-min.map"
-            ],
             "jquery": [
                 "bower_components/jquery/dist/jquery.min.js",
                 "bower_components/jquery/dist/jquery.min.map"
@@ -82,7 +67,6 @@
                 "bower_components/tinymce/tinymce.min.js"
             ],
             "angular-i18n": "bower_components/angular-i18n/angular-locale_*.js",
-            "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
             "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
             "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
             "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",

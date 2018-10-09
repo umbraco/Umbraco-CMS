@@ -5,8 +5,19 @@
     "build": "gulp"
   },
   "dependencies": {
+    "angular": "1.7.5",
+    "angular-animate": "1.7.5",
+    "angular-cookies": "1.7.5",
+    "angular-i18n": "1.7.5",
+    "angular-messages": "1.7.5",
+    "angular-route": "1.7.5",
+    "angular-sanitize": "1.7.5",
+    "angular-touch": "1.7.5",
     "flatpickr": "4.5.2",
-    "npm": "^6.4.1"
+    "npm": "^6.4.1",
+    "signalr": "2.2.1",
+    "typeahead.js": "0.10.5",
+    "underscore": "1.9.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",

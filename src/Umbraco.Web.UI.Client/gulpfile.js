@@ -202,14 +202,80 @@ gulp.task('dependencies', function () {
     );
 
     // npm dependencies
-    // flatpickr
-    stream.add(
-        gulp.src([
-            "./node_modules/flatpickr/dist/flatpickr.js", 
-            "./node_modules/flatpickr/dist/flatpickr.css"],
-            { base: "./node_modules/flatpickr/dist" })
-            .pipe(gulp.dest(root + targets.lib + "/flatpickr"))
-    );
+    const nodeModules = [
+        {   
+            "name": "angular",
+            "src":  ["./node_modules/angular/angular.js"],
+            "base": "./node_modules/angular"
+        },
+        {   
+            "name": "angular-cookies",
+            "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
+            "base": "./node_modules/angular-cookies"
+        },
+        {   
+            "name": "angular-sanitize",
+            "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
+            "base": "./node_modules/angular-sanitize"
+        },
+        {   
+            "name": "angular-touch",
+            "src":  ["./node_modules/angular-touch/angular-touch.js"],
+            "base": "./node_modules/angular-touch"
+        },
+        {   
+            "name": "angular-route",
+            "src":  ["./node_modules/angular-route/angular-route.js"],
+            "base": "./node_modules/angular-route"
+        },
+        {   
+            "name": "angular-animate",
+            "src":  ["./node_modules/angular-animate/angular-animate.js"],
+            "base": "./node_modules/angular-animate"
+        },
+        {   
+            "name": "angular-i18n",
+            "src":  ["./node_modules/angular-i18n/angular-i18n.js"],
+            "base": "./node_modules/angular-i18n"
+        },
+        {   
+            "name": "angular-messages",
+            "src":  ["./node_modules/angular-messages/angular-messages.js"],
+            "base": "./node_modules/angular-messages"
+        },
+        {
+            "name": "flatpickr",
+            "src":  [
+                "./node_modules/flatpickr/dist/flatpickr.js", 
+                "./node_modules/flatpickr/dist/flatpickr.css"
+            ],
+            "base": "./node_modules/flatpickr/dist"
+        },
+        {
+            "name": "signalr",
+            "src":  ["./node_modules/signalr/jquery.signalR.js"],
+            "base": "./node_modules/signalr"
+        },
+        {
+            "name": "typeahead.js",
+            "src":  ["./node_modules/typeahead.js/dist/typeahead.bundle.min.js"],
+            "base": "./node_modules/typeahead.js/dist"
+        },
+        {
+            "name": "underscore",
+            "src":  ["node_modules/underscore/underscore-min.js"],
+            "base": "./node_modules/underscore"
+        }
+    ];
+
+    // add streams for node modules
+    nodeModules.forEach(module => {
+        stream.add(
+            gulp.src(module.src, 
+                { base: module.base })
+                .pipe(gulp.dest(root + targets.lib + "/" + module.name))
+        );
+    });
 
     //copy over libs which are not on bower (/lib) and 
     //libraries that have been managed by bower-installer (/lib-bower)
@@ -256,7 +322,7 @@ gulp.task('dependencies', function () {
     stream.add( 
             gulp.src("src/views/dashboard/default/*.jpg")
                 .pipe(gulp.dest(root + targets.views + "/dashboard/default"))
-        );		
+        ); 	
 
     return stream;
 });
