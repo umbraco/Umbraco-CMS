@@ -8,6 +8,7 @@ namespace Umbraco.Core.Models
         string DomainName { get; set; }
         int? RootContentId { get; set; }
         bool IsWildcard { get; }
+        int? SortOrder { get; set; }
 
         /// <summary>
         /// Readonly value of the language ISO code for the domain

@@ -22,6 +22,7 @@ namespace Umbraco.Core.Models
 
         private int? _contentId;
         private int? _languageId;
+        private int? _sortOrder;
         private string _domainName;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.RootContentId);
             public readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.LanguageId);
             public readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.SortOrder);
         }
 
         [DataMember]
@@ -52,6 +54,13 @@ namespace Umbraco.Core.Models
         {
             get { return _contentId; }
             set { SetPropertyValueAndDetectChanges(value, ref _contentId, Ps.Value.ContentSelector); }
+        }
+
+        [DataMember]
+        public int? SortOrder
+        {
+            get { return _sortOrder; }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         public bool IsWildcard

@@ -64,6 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .LeftJoin<LanguageDto>(SqlSyntax)
                     .On<DomainDto, LanguageDto>(SqlSyntax, dto => dto.DefaultLanguage, dto => dto.Id);
             }
+            sql.OrderBy<DomainDto>(dto => dto.SortOrder, SqlSyntax);
             
             return sql;
         }
