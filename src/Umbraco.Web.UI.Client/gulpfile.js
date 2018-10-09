@@ -144,7 +144,7 @@ gulp.task('docserve', function(cb) {
  **************************/
 gulp.task('dependencies', function () { 
 
-    //bower component specific copy rules
+    //bower component/npm specific copy rules
     //this is to patch the sometimes wonky rules these libs are distrbuted under
 
     //as we do multiple things in this task, we merge the multiple streams
@@ -199,6 +199,16 @@ gulp.task('dependencies', function () {
             "bower_components/codemirror/addon/dialog/*"],
             { base: "./bower_components/codemirror/" })
             .pipe(gulp.dest(root + targets.lib + "/codemirror"))
+    );
+
+    // npm dependencies
+    // flatpickr
+    stream.add(
+        gulp.src([
+            "./node_modules/flatpickr/dist/flatpickr.js", 
+            "./node_modules/flatpickr/dist/flatpickr.css"],
+            { base: "./node_modules/flatpickr/dist" })
+            .pipe(gulp.dest(root + targets.lib + "/flatpickr"))
     );
 
     //copy over libs which are not on bower (/lib) and 

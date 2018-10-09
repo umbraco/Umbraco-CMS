@@ -69,10 +69,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.RelationType))
                 CreateRelationTypeData();
-
-            if (tableName.Equals(Constants.DatabaseSchema.Tables.TaskType))
-                CreateTaskTypeData();
-
+            
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
@@ -186,7 +183,7 @@ namespace Umbraco.Core.Migrations.Install
         private void CreateUserGroup2AppData()
         {
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Content });
-            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Developer });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Packages });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Media });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Members });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Settings });
@@ -317,11 +314,6 @@ namespace Umbraco.Core.Migrations.Install
             relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
-        }
-
-        private void CreateTaskTypeData()
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.TaskType, "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
         }
 
         private void CreateKeyValueData()

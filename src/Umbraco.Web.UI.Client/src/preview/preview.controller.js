@@ -22,6 +22,20 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             // signalr hub
             var previewHub = $.connection.previewHub;
 
+            // visibility tracking
+            var dirtyContent = false;
+            var visibleContent = true;
+
+            document.addEventListener('visibilitychange', function () {
+                visibleContent = !document.hidden;
+                if (visibleContent && dirtyContent) {
+                    dirtyContent = false;
+                    console.log("Visible, reloading.")
+                    var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
+                    iframeDoc.location.reload();
+                }
+            });
+
             previewHub.client.refreshed = function (message, sender) {
                 console.log("Notified by SignalR preview hub (" + message + ").");
 
@@ -30,6 +44,13 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                     return;
                 }
 
+                if (!visibleContent) {
+                    console.log("Not visible, will reload.");
+                    dirtyContent = true;
+                    return;
+                }
+
+                console.log("Reloading.");
                 var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
                 iframeDoc.location.reload();
             };
