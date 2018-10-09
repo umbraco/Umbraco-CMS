@@ -12,15 +12,13 @@
 
                <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
 
-                   <!-- <div class="btn-group" ng-show="listViewAllowedTypes.length === 1 && !listViewAllowedTypes[0].blueprints"> -->
-                   <div class="btn-group">
+                   <div class="btn-group" ng-show="createAllowedButtonSingle == true">
                        <a class="btn" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </a>
                    </div>
 
-                   <!-- <div class="btn-group" ng-show="listViewAllowedTypes.length === 1 && listViewAllowedTypes[0].blueprints">-->
-                   <div class="btn-group">
+                   <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints == true">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
@@ -36,8 +34,7 @@
                        </ul>
                    </div>
 
-                   <!--<div class="btn-group" ng-show="listViewAllowedTypes.length > 1">-->
-                   <div class="btn-group">
+                   <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints == true">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>

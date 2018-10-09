@@ -58,6 +58,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       items: []
    };
 
+   $scope.createAllowedButtonSingle = false;
+   $scope.createAllowedButtonSingleWithBlueprints = false;
+   $scope.createAllowedButtonMultiWithBlueprints = false;
+
+
    //when this is null, we don't check permissions
    $scope.currentNodePermissions = null;
 
@@ -598,7 +603,28 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
+       //$scope.listViewAllowedTypes = getContentTypesCallback(id);
+      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+          var blueprints = false;
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+          angular.forEach(listViewAllowedTypes, function (allowedType) {
+              angular.forEach(allowedType.blueprints, function (value, key) {
+                  blueprints = true;
+              });
+          });
+
+          if (listViewAllowedTypes.length == 1 && blueprints == false) {
+              $scope.createAllowedButtonSingle = true;
+          }
+          if (listViewAllowedTypes.length == 1 && blueprints == true) {
+              $scope.createAllowedButtonSingleWithBlueprints = true;
+          }
+          if (listViewAllowedTypes.length > 1) {
+              $scope.createAllowedButtonMultiWithBlueprints = true;
+          }
+      });
+
 
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
