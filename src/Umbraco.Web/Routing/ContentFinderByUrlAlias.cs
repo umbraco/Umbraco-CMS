@@ -94,18 +94,18 @@ namespace Umbraco.Web.Routing
 					case 0:
 						DescendantDocumentById = "//node [@id={0}]";
 						DescendantDocumentByAlias = "//node[("
-							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
-							+ ")]";
+							+ "contains(concat(',',translate(translate(data [@alias='umbracoUrlAlias'], ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',{0},')"
+                            + " or contains(concat(',',translate(translate(data [@alias='umbracoUrlAlias'], ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',/{0},')"
+                            + ")]";
 						break;
 
 					// default XML schema as of 4.10
 					case 1:
 						DescendantDocumentById = "//* [@isDoc and @id={0}]";
 						DescendantDocumentByAlias = "//* [@isDoc and ("
-							+ "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
-							+ ")]";
+							+ "contains(concat(',',translate(translate(umbracoUrlAlias, ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',{0},')"
+                            + " or contains(concat(',',translate(translate(umbracoUrlAlias, ' ', ''),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),','),',/{0},')"
+                            + ")]";
 						break;
 
 					default:
