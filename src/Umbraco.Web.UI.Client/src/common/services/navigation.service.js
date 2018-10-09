@@ -661,10 +661,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     */
         hideDialog: function (showMenu) {
 
-            setMode("default");
-
-            if(showMenu){
+            if (showMenu) {
                 this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+            } else {
+                setMode("default");
             }
         },
         /**
