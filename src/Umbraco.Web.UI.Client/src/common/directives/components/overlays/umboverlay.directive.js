@@ -700,6 +700,12 @@ Opens an overlay to show a custom YSOD. </br>
 
          };
 
+        scope.outSideClick = function() {
+            if(!scope.model.disableBackdropClick) {
+                scope.closeOverLay();
+            }
+        };
+
         unsubscribe.push(unregisterOverlay);
         scope.$on('$destroy', function () {
            for (var i = 0; i < unsubscribe.length; i++) {

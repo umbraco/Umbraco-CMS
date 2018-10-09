@@ -126,6 +126,7 @@
     <key alias="saveAndSchedule">Save and schedule</key>
     <key alias="saveToPublish">Send for approval</key>
     <key alias="saveListView">Save list view</key>
+    <key alias="schedulePublish">Schedule</key>
     <key alias="showPage">Preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
@@ -223,7 +224,47 @@
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
-        <key alias="publishStatus">Publication Status</key><key alias="releaseDate">Publish at</key><key alias="unpublishDate">Unpublish at</key><key alias="removeDate">Clear Date</key><key alias="setDate">Set date</key><key alias="sortDone">Sortorder is updated</key><key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key><key alias="statistics">Statistics</key><key alias="titleOptional">Title (optional)</key><key alias="altTextOptional">Alternative text (optional)</key><key alias="type">Type</key><key alias="unpublish">Unpublish</key><key alias="unpublished">Draft</key><key alias="notCreated">Not created</key><key alias="updateDate">Last edited</key><key alias="updateDateDesc" version="7.0">Date/time this document was edited</key><key alias="uploadClear">Remove file(s)</key><key alias="urls">Link to document</key><key alias="memberof">Member of group(s)</key><key alias="notmemberof">Not a member of group(s)</key><key alias="childItems" version="7.0">Child items</key><key alias="target" version="7.0">Target</key><key alias="scheduledPublishServerTime">This translates to the following time on the server:</key><key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key><key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key><key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key><key alias="addTextBox">Add another text box</key><key alias="removeTextBox">Remove this text box</key><key alias="contentRoot">Content root</key><key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key><key alias="isSensitiveValue_short">This value is hidden.</key><key alias="languagesToPublish">What languages would you like to publish?</key><key alias="languagesToSave">What languages would you like to save?</key><key alias="languagesToSendForApproval">What languages would you like to send for approval?</key><key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key><key alias="publishedLanguages">Published Languages</key><key alias="unpublishedLanguages">Unpublished Languages</key><key alias="unmodifiedLanguages">Unmodified Languages</key><key alias="readyToPublish">Ready to Publish?</key><key alias="readyToSave">Ready to Save?</key><key alias="sendForApproval">Send for approval</key></area>
+    <key alias="publishStatus">Publication Status</key>
+    <key alias="releaseDate">Publish at</key>
+    <key alias="unpublishDate">Unpublish at</key>
+    <key alias="removeDate">Clear Date</key>
+    <key alias="setDate">Set date</key>
+    <key alias="sortDone">Sortorder is updated</key>
+    <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
+    <key alias="statistics">Statistics</key>
+    <key alias="titleOptional">Title (optional)</key>
+    <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="type">Type</key>
+    <key alias="unpublish">Unpublish</key>
+    <key alias="unpublished">Draft</key>
+    <key alias="notCreated">Not created</key>
+    <key alias="updateDate">Last edited</key>
+    <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
+    <key alias="uploadClear">Remove file(s)</key>
+    <key alias="urls">Link to document</key>
+    <key alias="memberof">Member of group(s)</key>
+    <key alias="notmemberof">Not a member of group(s)</key>
+    <key alias="childItems" version="7.0">Child items</key>
+    <key alias="target" version="7.0">Target</key>
+    <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key><key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key><key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
+    <key alias="addTextBox">Add another text box</key>
+    <key alias="removeTextBox">Remove this text box</key>
+    <key alias="contentRoot">Content root</key>
+    <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
+    <key alias="isSensitiveValue_short">This value is hidden.</key>
+    <key alias="languagesToPublish">What languages would you like to publish?</key>
+    <key alias="languagesToSave">What languages would you like to save?</key>
+    <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
+    <key alias="languagesToSchedule">What languages would you like to schedule?</key>
+    <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
+    <key alias="publishedLanguages">Published Languages</key>
+    <key alias="unpublishedLanguages">Unpublished Languages</key>
+    <key alias="unmodifiedLanguages">Unmodified Languages</key>
+    <key alias="readyToPublish">Ready to Publish?</key>
+    <key alias="readyToSave">Ready to Save?</key>
+    <key alias="sendForApproval">Send for approval</key>
+  </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
     <key alias="blankBlueprint">Blank</key>
