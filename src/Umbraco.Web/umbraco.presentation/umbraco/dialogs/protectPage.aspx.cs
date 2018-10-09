@@ -162,7 +162,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
 
             bt_selectMode.Text = ui.Text("buttons", "select");
-            bt_protect.Text = ui.Text("update");
+            bt_protect.Text = ui.Text("save");
             bt_buttonRemoveProtection.Text = ui.Text("paRemoveProtection");
 
             // Put user code to initialize the page here
