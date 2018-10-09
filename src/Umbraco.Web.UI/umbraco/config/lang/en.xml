@@ -1299,6 +1299,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
         <key alias="saveCrop">Save crop</key>
         <key alias="addCrop">Add new crop</key>
+        <key alias="automaticCropList">Automatic crops</key>
+        <key alias="customCropList">User defined crops</key>
     </area>
     <area alias="rollback">
         <key alias="currentVersion">Current version</key>
