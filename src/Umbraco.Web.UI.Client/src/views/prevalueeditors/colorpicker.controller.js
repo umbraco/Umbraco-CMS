@@ -1,12 +1,16 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerController",
     function ($scope) {
 
-        function toFullHex(hex) {
-            if (hex.length === 4 && hex.charAt(0) === "#") {
-                hex = "#" + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2) + hex.charAt(3) + hex.charAt(3);
-            }
-            return hex.toLowerCase();
-        }
+        //setup the default config
+        var config = {
+            useLabel: false
+        };
+
+        //map the user config
+        angular.extend(config, $scope.model.config);
+
+        //map back to the model
+        $scope.model.config = config;
 
         $scope.isConfigured = $scope.model.prevalues && _.keys($scope.model.prevalues).length > 0;
 
@@ -38,4 +42,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
             $scope.model.items = items;
         }
 
+        function toFullHex(hex) {
+            if (hex.length === 4 && hex.charAt(0) === "#") {
+                hex = "#" + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2) + hex.charAt(3) + hex.charAt(3);
+            }
+            return hex.toLowerCase();
+        }
     });
