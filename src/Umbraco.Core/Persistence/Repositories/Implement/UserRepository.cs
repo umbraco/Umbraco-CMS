@@ -421,8 +421,6 @@ ORDER BY colName";
         {
             var list = new List<string>
             {
-                "DELETE FROM cmsTask WHERE userId = @id",
-                "DELETE FROM cmsTask WHERE parentUserId = @id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
                 "DELETE FROM umbracoUser WHERE id = @id",
