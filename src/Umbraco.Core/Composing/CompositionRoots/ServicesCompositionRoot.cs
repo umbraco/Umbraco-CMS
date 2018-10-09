@@ -28,7 +28,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // register the services
             container.RegisterSingleton<IKeyValueService, KeyValueService>();
             container.RegisterSingleton<IPublicAccessService, PublicAccessService>();
-            container.RegisterSingleton<ITaskService, TaskService>();
             container.RegisterSingleton<IDomainService, DomainService>();
             container.RegisterSingleton<IAuditService, AuditService>();
             container.RegisterSingleton<ITagService, TagService>();

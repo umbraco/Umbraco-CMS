@@ -26,7 +26,7 @@ namespace umbraco.presentation.developer.packages
 
         public Installer()
         {
-            CurrentApp = Constants.Applications.Developer;
+            CurrentApp = Constants.Applications.Packages;
             _installer = new cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
         }
 

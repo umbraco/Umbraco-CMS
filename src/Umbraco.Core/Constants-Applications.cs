@@ -13,9 +13,9 @@
             public const string Content = "content";
 
             /// <summary>
-            /// Application alias for the developer section.
+            /// Application alias for the packages section.
             /// </summary>
-            public const string Developer = "developer";
+            public const string Packages = "packages";
 
             /// <summary>
             /// Application alias for the media section.
