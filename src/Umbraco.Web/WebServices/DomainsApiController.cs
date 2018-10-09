@@ -24,6 +24,25 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
+        [HttpGet]
+        public PostBackModel GetLanguageAndDomainsById(int nodeId)
+        {
+            var domains = Services.DomainService.GetAssignedDomains(nodeId, true).ToArray();
+
+            var model = new PostBackModel();
+            model.Domains = domains.Where(x => !x.IsWildcard).Select(x => new DomainModel(x.DomainName, x.LanguageId.GetValueOrDefault()){
+                SortOrder = x.SortOrder.GetValueOrDefault()
+            }).ToArray();
+
+            var language = domains.FirstOrDefault(x => x.IsWildcard);
+            if (language != null)
+            {
+                model.Language = language.LanguageId.GetValueOrDefault();
+            }
+
+            return model;
+        }
+
         [HttpPost]
         // can't pass multiple complex args in json post request...
         public PostBackModel SaveLanguageAndDomains(PostBackModel model)
@@ -184,6 +203,7 @@ namespace Umbraco.Web.WebServices
             public int Lang { get; private set; }
             public bool Duplicate { get; set; }
             public string Other { get; set; }
+            public int SortOrder { get; set; }
         }
 
         #endregion
