@@ -15,7 +15,7 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Macros, "Macros", sortOrder: 4)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class 
         MacrosTreeController : TreeController
     {
