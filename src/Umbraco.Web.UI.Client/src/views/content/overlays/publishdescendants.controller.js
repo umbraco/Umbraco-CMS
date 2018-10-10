@@ -5,6 +5,8 @@
 
         var vm = this;
 
+        vm.changeSelection = changeSelection;
+
         function onInit() {
 
             vm.includeUnpublished = false;
@@ -44,6 +46,24 @@
                 vm.labels.help.tokens.push(vm.variants[0].name);
             }
             
+        }
+
+        /** Returns true if publishing is possible based on if there are un-published mandatory languages */
+        function canPublish() {
+            var selected = [];
+            for (var i = 0; i < vm.variants.length; i++) {
+                var variant = vm.variants[i];
+                if (variant.publishDescendants) {
+                    selected.push(variant.publishDescendants);
+                }
+            }
+            return selected.length > 0;
+        }
+
+        function changeSelection(variant) {
+            $scope.model.disableSubmitButton = !canPublish();
+            //need to set the Save state to true if publish is true
+            variant.save = variant.publishDescendants;
         }
 
         //when this dialog is closed, reset all 'publish' flags
