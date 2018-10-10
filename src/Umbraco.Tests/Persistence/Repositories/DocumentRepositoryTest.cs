@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentRepositoryTest : TestWithDatabaseBase
+    public class DocumentRepositoryTest : TestWithDatabaseBase
     {
         public override void SetUp()
         {

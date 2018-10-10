@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a section defined in the app.config file
+    /// Represents a section defined in the app.config file.
     /// </summary>
     public class Section
     {
@@ -13,9 +13,7 @@
         }
 
         public Section()
-        {
-
-        }
+        { }
 
         public string Name { get; set; }
         public string Alias { get; set; }

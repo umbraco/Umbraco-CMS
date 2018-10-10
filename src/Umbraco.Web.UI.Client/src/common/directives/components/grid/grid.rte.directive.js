@@ -44,11 +44,11 @@ angular.module("umbraco.directives")
                         var stylesheets = [];
 
                         var styleFormats = [];
-                        var await = [];
+                        var requests = [];
 
                         //queue file loading
                         if (typeof (tinymce) === "undefined") {
-                                await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
+                            requests.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                         }
 
 
@@ -61,7 +61,7 @@ angular.module("umbraco.directives")
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
 
                                     stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + stylesheet + ".css");
-                                    await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
+                                    requests.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
                                           var r = {};
                                           var split = "";
@@ -97,7 +97,7 @@ angular.module("umbraco.directives")
 
                         //stores a reference to the editor
                         var tinyMceEditor = null;
-                        $q.all(await).then(function () {
+                        $q.all(requests).then(function () {
 
                             var uniqueId = scope.uniqueId;
 

@@ -112,78 +112,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        <umb-box data-element="node-info-scheduled-publishing">
-            <umb-box-header title-key="general_scheduledPublishing"></umb-box-header>
-            <umb-box-content class="block-form">
-
-                <div class="date-wrapper">
-
-                    <div class="flex items-center flex-column">
-
-
-                        <umb-date-time-picker data-element="node-info-publish"
-                                              options="datePickerConfig"
-                                              on-change="datePickerChange(event, 'publish')">
-
-                            <div class="date-container">
-
-                                <div class="date-container__title">
-                                    <localize key="content_releaseDate"></localize>
-                                </div>
-
-                                <div class="date-container__date" ng-if="node.releaseDate">
-                                    <div class="date-wrapper__date">{{node.releaseDateMonth}} {{node.releaseDateYear}}</div>
-                                    <div class="date-wrapper__number">{{node.releaseDateDayNumber}}</div>
-                                    <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDateTime}}</div>
-                                </div>
-
-                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
-
-                            </div>
-
-                        </umb-date-time-picker>
-
-                        <a ng-if="node.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
-                            <small><localize key="content_removeDate">Clear date</localize></small>
-                        </a>
-
-                    </div>
-
-                    <div class="date-separate"></div>
-
-                    <div class="flex items-center flex-column">
-                        <umb-date-time-picker data-element="node-info-unpublish"
-                                              options="datePickerConfig"
-                                              on-change="datePickerChange(event, 'unpublish')">
-
-                            <div class="date-container">
-
-                                <div class="date-container__title">
-                                    <localize key="content_unpublishDate"></localize>
-                                </div>
-
-                                <div class="date-container__date" ng-if="node.removeDate">
-                                    <div class="date-wrapper__date">{{node.removeDateMonth}} {{node.removeDateYear}}</div>
-                                    <div class="date-wrapper__number">{{node.removeDateDayNumber}}</div>
-                                    <div class="date-wrapper__date">{{node.removeDateDay}} {{node.removeDateTime}}</div>
-                                </div>
-
-                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
-
-                            </div>
-
-                        </umb-date-time-picker>
-
-                        <a ng-if="node.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
-                            <small><localize key="content_removeDate">Clear date</localize></small>
-                        </a>
-                    </div>
-
-                </div>
-
-
-            </umb-box-content>
-        </umb-box>
+        
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
