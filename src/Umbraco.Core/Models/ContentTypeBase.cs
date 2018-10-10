@@ -363,22 +363,28 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
-            //check if the property exist in one of our collections
-            if (PropertyGroups.Any(group => group.PropertyTypes.Any(pt => pt.Alias == propertyTypeAlias))
-                || _propertyTypes.Any(x => x.Alias == propertyTypeAlias))
-            {
-                //set the flag that a property has been removed
-                HasPropertyTypeBeenRemoved = true;
-            }
-
+            //check through each property group to see if we can remove the property type by alias from it
             foreach (var propertyGroup in PropertyGroups)
             {
-                propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
+                if (propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias))
+                {
+                    if (!HasPropertyTypeBeenRemoved)
+                    {
+                        HasPropertyTypeBeenRemoved = true;
+                        OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+                    }
+                    break;
+                }
             }
 
-            if (_propertyTypes.Any(x => x.Alias == propertyTypeAlias))
+            //check through each local property type collection (not assigned to a tab)
+            if (_propertyTypes.RemoveItem(propertyTypeAlias))
             {
-                _propertyTypes.RemoveItem(propertyTypeAlias);
+                if (!HasPropertyTypeBeenRemoved)
+                {
+                    HasPropertyTypeBeenRemoved = true;
+                    OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
+                }
             }
         }
 
@@ -410,27 +416,6 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         //fixme should we mark this as EditorBrowsable hidden since it really isn't ever used?
         internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes;
-
-        /// <summary>
-        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
-        /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>True if Property is dirty, otherwise False</returns>
-        public override bool IsPropertyDirty(string propertyName)
-        {
-            var existsInEntity = base.IsPropertyDirty(propertyName);
-            if (existsInEntity) return true;
-
-            //check properties types for this alias if it exists
-            if (PropertyTypeExists(propertyName))
-                return PropertyTypes.Any(x => x.IsPropertyDirty(propertyName));
-
-            //check property groups for this alias if it exists
-            if (PropertyGroups.Contains(propertyName))
-                return PropertyGroups.Any(x => x.IsPropertyDirty(propertyName));
-
-            return false;
-        }
 
         /// <summary>
         /// Indicates whether the current entity is dirty.
