@@ -83,7 +83,6 @@ namespace umbraco.settings
 			Panel1.hasMenu = true;
 			var save = Panel1.Menu.NewButton();
 			save.Click += save_click;
-			save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
 		    save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;

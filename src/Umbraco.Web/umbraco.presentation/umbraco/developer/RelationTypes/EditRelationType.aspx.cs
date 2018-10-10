@@ -192,10 +192,10 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			relationTypeTabPage.Controls.Add(this.objectTypePane);
 
 			var saveMenuImageButton =  tabControl.Menu.NewButton();
-			saveMenuImageButton.ToolTip = "save relation type";
 			saveMenuImageButton.Click +=saveMenuImageButton_Click;
 			saveMenuImageButton.CausesValidation = true;
             saveMenuImageButton.Text = ui.Text("save");
+            saveMenuImageButton.CssClass = "btn btn-primary";
 			saveMenuImageButton.ValidationGroup = "RelationType";
 
 			var relationsTabPage = this.tabControl.NewTabPage("Relations");
