@@ -27,7 +27,6 @@ namespace Umbraco.Web.Trees
                 Current.Services.ApplicationTreeService.GetAllTypes()
                 .Select(x => (TreeType: x, TreeGroup: x.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
                 .GroupBy(x => x.TreeGroup)
-                .OrderByDescending(x => x.Key)
                 .ToList());
     
         
@@ -135,13 +134,16 @@ namespace Umbraco.Web.Trees
                     treeGroupName = "thirdPartyGroup";
                 }
 
-                var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
-                groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
+                if (groupNodeCollection.Any())
+                {
+                    var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
+                    groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
 
-                rootNodeGroups.Add(groupRoot);
+                    rootNodeGroups.Add(groupRoot);
+                }
             }
 
-            return rootNodeGroups;
+            return rootNodeGroups.OrderBy(x => x.Name);
         }
 
         /// <summary>
