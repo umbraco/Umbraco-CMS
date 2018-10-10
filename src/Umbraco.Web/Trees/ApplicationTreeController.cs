@@ -116,7 +116,7 @@ namespace Umbraco.Web.Trees
                     if (findAppTree != null)
                     {
                         //Now we need to get the 'TreeNode' which is in 'collection'
-                        var treeItemNode = collection.SingleOrDefault(x => x.Name == findAppTree.Title);
+                        var treeItemNode = collection.SingleOrDefault(x => x.AdditionalData["treeAlias"].ToString() == findAppTree.Alias);
 
                         if (treeItemNode != null)
                         {
