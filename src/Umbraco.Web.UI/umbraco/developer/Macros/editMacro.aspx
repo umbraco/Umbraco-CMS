@@ -113,7 +113,7 @@
     <cc1:Pane ID="Pane1_4" runat="server" Title="Cache settings">
 
         <cc1:PropertyPanel runat="server" Text="Cache period">
-            <asp:TextBox ID="cachePeriod" runat="server" CssClass="guiInputText input-small"></asp:TextBox>&nbsp;Seconds
+            <asp:TextBox ID="cachePeriod" runat="server" CssClass="guiInputText input-small" type="number" min="0"></asp:TextBox>&nbsp;Seconds
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel runat="server" Text="Cache by page">
@@ -170,7 +170,7 @@
                     <td>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                          <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
-                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CssClass="-full-width-input" Text='<%#Eval("SortOrder")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CssClass="-full-width-input" Text='<%#Eval("SortOrder")%>' type="number" />
                     </td>
                     <td>
                         <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default btn-danger delete-button" />
