@@ -46,7 +46,7 @@
                             $scope.ancestors = anc;
                         });
                     $scope.$watch('culture',
-                        function(value, oldValue) {
+                        function (value, oldValue) {
                             entityResource.getAncestors(content.id, "document", value)
                                 .then(function (anc) {
                                     $scope.ancestors = anc;
@@ -154,7 +154,7 @@
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+            if (app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -163,7 +163,7 @@
             }
 
             // create the save button
-            if(_.contains($scope.content.allowedActions, "A")) {
+            if (_.contains($scope.content.allowedActions, "A")) {
                 $scope.page.showSaveButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
@@ -231,7 +231,7 @@
             }
         }
 
-        function checkValidility(){
+        function checkValidility() {
             //Get all controls from the 'contentForm'
             var allControls = $scope.contentForm.$getControls();
 
@@ -240,7 +240,7 @@
 
             //Exclude known formControls 'contentHeaderForm' and 'tabbedContentForm'
             //Check property - $name === "contentHeaderForm"
-            allControls = _.filter(allControls, function(obj){
+            allControls = _.filter(allControls, function (obj) {
                 return obj.$name !== 'contentHeaderForm' && obj.$name !== 'tabbedContentForm' && obj.hasOwnProperty('$submitted');
             });
 
@@ -258,26 +258,26 @@
         }
 
         //Controls is the
-        function recurseFormControls(controls, array){
+        function recurseFormControls(controls, array) {
 
             //Loop over the controls
             for (var i = 0; i < controls.length; i++) {
                 var controlItem = controls[i];
 
                 //Check if the controlItem has a property ''
-                if(controlItem.hasOwnProperty('$submitted')){
+                if (controlItem.hasOwnProperty('$submitted')) {
                     //This item is a form - so lets get the child controls of it & recurse again
                     var childFormControls = controlItem.$getControls();
                     recurseFormControls(childFormControls, array);
                 }
                 else {
                     //We can assume its a field on a form
-                    if(controlItem.hasOwnProperty('$error')){
+                    if (controlItem.hasOwnProperty('$error')) {
                         //Set the validlity of the error/s to be valid
                         //String of keys of error invalid messages
                         var errorKeys = [];
 
-                        for(var key in controlItem.$error){
+                        for (var key in controlItem.$error) {
                             errorKeys.push(key);
                             controlItem.$setValidity(key, true);
                         }
@@ -293,7 +293,7 @@
             return array;
         }
 
-        function resetNestedFieldValiation(array){
+        function resetNestedFieldValiation(array) {
             for (var i = 0; i < array.length; i++) {
                 var item = array[i];
                 //Item is an object containing two props
@@ -301,7 +301,7 @@
                 var fieldControl = item.control;
                 var fieldErrorKeys = item.errorKeys;
 
-                for(var i = 0; i < fieldErrorKeys.length; i++) {
+                for (var i = 0; i < fieldErrorKeys.length; i++) {
                     fieldControl.$setValidity(fieldErrorKeys[i], false);
                 }
             }
@@ -309,7 +309,7 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-            
+
 
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
@@ -416,7 +416,7 @@
             });
         }
 
-        $scope.unpublish = function() {
+        $scope.unpublish = function () {
             clearNotifications($scope.content);
             if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
                 var dialog = {
@@ -428,9 +428,9 @@
                     submit: function (model) {
 
                         model.submitButtonState = "busy";
-                        
-                        var selectedVariants = _.filter(model.variants, function(variant) { return variant.save; });
-                        var culturesForUnpublishing = _.map(selectedVariants, function(variant) { return variant.language.culture; });
+
+                        var selectedVariants = _.filter(model.variants, function (variant) { return variant.save; });
+                        var culturesForUnpublishing = _.map(selectedVariants, function (variant) { return variant.language.culture; });
 
                         contentResource.unpublish($scope.content.id, culturesForUnpublishing)
                             .then(function (data) {
@@ -444,8 +444,8 @@
                             }, function (err) {
                                 $scope.page.buttonGroupState = 'error';
                             });
-                        
-                        
+
+
                     },
                     close: function () {
                         overlayService.close();
@@ -454,7 +454,7 @@
                 overlayService.open(dialog);
             }
         };
-        
+
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
             if (showSaveOrPublishDialog()) {
@@ -471,7 +471,23 @@
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                            console.log("saving need to happen here");
+                            return performSave({
+                                saveMethod: contentResource.sendToPublish,
+                                action: "sendToPublish"
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            }, function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+                                //don't reject, we've handled the error
+                                return $q.when(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -483,10 +499,10 @@
             }
             else {
                 $scope.page.buttonGroupState = "busy";
-                return performSave({ 
-                    saveMethod: contentResource.sendToPublish, 
-                    action: "sendToPublish" 
-                }).then(function(){
+                return performSave({
+                    saveMethod: contentResource.sendToPublish,
+                    action: "sendToPublish"
+                }).then(function () {
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
@@ -542,10 +558,10 @@
                 //ensure the publish flag is set
                 $scope.content.variants[0].publish = true;
                 $scope.page.buttonGroupState = "busy";
-                return performSave({ 
-                    saveMethod: contentResource.publish, 
-                    action: "publish" 
-                }).then(function(){
+                return performSave({
+                    saveMethod: contentResource.publish,
+                    action: "publish"
+                }).then(function () {
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
@@ -600,13 +616,13 @@
             else {
                 $scope.page.saveButtonState = "busy";
                 return performSave({
-                        saveMethod: $scope.saveMethod(),
-                        action: "save" 
-                    }).then(function(){
-                        $scope.page.saveButtonState = "success";
-                    }, function () {
-                        $scope.page.saveButtonState = "error";
-                    });
+                    saveMethod: $scope.saveMethod(),
+                    action: "save"
+                }).then(function () {
+                    $scope.page.saveButtonState = "success";
+                }, function () {
+                    $scope.page.saveButtonState = "error";
+                });
             }
 
         };
@@ -729,7 +745,7 @@
          * Call back when a content app changes
          * @param {any} app
          */
-        $scope.appChanged = function(app) {
+        $scope.appChanged = function (app) {
             createButtons($scope.content, app);
         };
 
