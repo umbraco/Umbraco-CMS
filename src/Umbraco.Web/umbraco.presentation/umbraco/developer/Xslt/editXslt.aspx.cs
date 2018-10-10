@@ -38,9 +38,6 @@ namespace umbraco.cms.presentation.developer
 					.SetActiveTreeType(Constants.Trees.Xslt)
 					.SyncTree(path, false);
 			}
-
-
-
 		}
 
 		protected override void OnInit(EventArgs e)

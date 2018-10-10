@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.Trees;
+using umbraco.uicontrols;
 
 namespace umbraco.settings
 {
@@ -84,8 +85,8 @@ namespace umbraco.settings
 			var save = Panel1.Menu.NewButton();
 			save.Click += save_click;
             save.Text = ui.Text("save");
-		    save.ID = "save";
-            save.ButtonType = uicontrols.MenuButtonType.Primary;
+            save.ButtonType = MenuButtonType.Primary;
+            save.ID = "save";         
 	
 			Panel1.Text = ui.Text("language", "editLanguage");
 
