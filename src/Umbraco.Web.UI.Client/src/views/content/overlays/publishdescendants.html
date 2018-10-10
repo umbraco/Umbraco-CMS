@@ -1,24 +1,17 @@
 <div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm">
 
-        
     <div ng-if="vm.variants.length === 1">
         <div style="margin-bottom: 15px;">
-            Click <em>Publish with descendants</em> to publish <strong>{{vm.variants[0].name}}</strong> 
-            and all content items underneath and thereby making their content publicly available.
+            <p><localize key="{{vm.labels.help.key}}" tokens="vm.labels.help.tokens"></localize></p>
         </div>
 
         <div style="margin-bottom: 15px;">
-            <h5>Include drafts</h5>
             <label> 
                 <input 
-                    id="{{variant.htmlId}}"
-                    name="publishVariantSelector"
                     type="checkbox"
-                    ng-model="variant.publish"
-                    ng-change="vm.changeSelection(variant)"
-                    style="margin-right: 8px;"
-                    val-server-field="{{variant.htmlId}}" />
-                Also publish unpublished content items
+                    ng-model="vm.includeUnpublished"
+                    style="margin-right: 8px;" />
+                    <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
 
@@ -27,21 +20,16 @@
     <div ng-if="vm.variants.length > 1">
 
         <div style="margin-bottom: 15px;">
-            Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> 
-            and the same languages of all content items underneath and thereby making their content publicly available.
+            <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
         </div>
 
         <div style="margin-bottom: 15px;">
             <label> 
                 <input 
-                    id="{{variant.htmlId}}"
-                    name="publishVariantSelector"
                     type="checkbox"
-                    ng-model="variant.publish"
-                    ng-change="vm.changeSelection(variant)"
-                    style="margin-right: 8px;"
-                    val-server-field="{{variant.htmlId}}" />
-                    Include drafts: also publish unpublished Languages
+                    ng-model="vm.includeUnpublished"
+                    style="margin-right: 8px;" />
+                    <localize key="content_includeUnpublished"></localize>
             </label>
         </div>
 
@@ -55,7 +43,7 @@
                         <input id="{{variant.htmlId}}"
                             name="publishVariantSelector"
                             type="checkbox"
-                            ng-model="variant.publish"
+                            ng-model="variant.publishDescendants"
                             ng-change="vm.changeSelection(variant)"
                             style="margin-right: 8px;"
                             val-server-field="{{variant.htmlId}}" />
