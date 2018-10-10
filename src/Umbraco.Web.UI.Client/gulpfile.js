@@ -235,7 +235,10 @@ gulp.task('dependencies', function () {
         },
         {   
             "name": "angular-i18n",
-            "src":  ["./node_modules/angular-i18n/angular-i18n.js"],
+            "src":  [
+                "./node_modules/angular-i18n/angular-i18n.js", 
+                "./node_modules/angular-i18n/angular-locale_*.js"
+            ],
             "base": "./node_modules/angular-i18n"
         },
         {   
@@ -265,6 +268,34 @@ gulp.task('dependencies', function () {
                 "./node_modules/flatpickr/dist/flatpickr.css"
             ],
             "base": "./node_modules/flatpickr/dist"
+        },
+        {
+            "name": "jquery",
+            "src":  [
+                "./node_modules/jquery/dist/jquery.min.js", 
+                "./node_modules/jquery/dist/jquery.min.map"
+            ],
+            "base": "./node_modules/jquery/dist"
+        },
+        {
+            "name": "jquery-migrate",
+            "src":  ["./node_modules/jquery-migrate/jquery-migrate.min.js"],
+            "base": "./node_modules/jquery-migrate"
+        },
+        {
+            "name": "jquery-ui",
+            "src":  ["./node_modules/jquery-ui/jquery-ui.min.js"],
+            "base": "./node_modules/jquery"
+        },
+        {
+            "name": "jquery-validate",
+            "src":  ["./node_modules/jquery-validation/dist/jquery.validate.min.js"],
+            "base": "./node_modules/jquery-validation/dist"
+        },
+        {
+            "name": "jquery-validation-unobtrusive",
+            "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
+            "base": "./node_modules/jquery-validation-unobtrusive/dist"
         },
         {
             "name": "signalr",
