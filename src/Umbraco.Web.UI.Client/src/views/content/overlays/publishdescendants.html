@@ -1,0 +1,89 @@
+<div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm">
+
+        
+    <div ng-if="vm.variants.length === 1">
+        <div style="margin-bottom: 15px;">
+            Click <em>Publish with descendants</em> to publish <strong>{{vm.variants[0].name}}</strong> 
+            and all content items underneath and thereby making their content publicly available.
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h5>Include drafts</h5>
+            <label> 
+                <input 
+                    id="{{variant.htmlId}}"
+                    name="publishVariantSelector"
+                    type="checkbox"
+                    ng-model="variant.publish"
+                    ng-change="vm.changeSelection(variant)"
+                    style="margin-right: 8px;"
+                    val-server-field="{{variant.htmlId}}" />
+                Also publish unpublished content items
+            </label>
+        </div>
+
+    </div>
+
+    <div ng-if="vm.variants.length > 1">
+
+        <div style="margin-bottom: 15px;">
+            Click <em>Publish with descendants</em> to publish <strong>the selected languages</strong> 
+            and the same languages of all content items underneath and thereby making their content publicly available.
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label> 
+                <input 
+                    id="{{variant.htmlId}}"
+                    name="publishVariantSelector"
+                    type="checkbox"
+                    ng-model="variant.publish"
+                    ng-change="vm.changeSelection(variant)"
+                    style="margin-right: 8px;"
+                    val-server-field="{{variant.htmlId}}" />
+                    Include drafts: also publish unpublished Languages
+            </label>
+        </div>
+
+        <div class="bold" style="margin-bottom: 5px;">Languages</div>
+
+        <div class="umb-list umb-list--condensed">
+
+            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
+                <ng-form name="publishVariantSelectorForm">
+                    <div class="flex">
+                        <input id="{{variant.htmlId}}"
+                            name="publishVariantSelector"
+                            type="checkbox"
+                            ng-model="variant.publish"
+                            ng-change="vm.changeSelection(variant)"
+                            style="margin-right: 8px;"
+                            val-server-field="{{variant.htmlId}}" />
+                        <div>
+                            <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
+                                <span>{{ variant.language.name }}</span>
+                            </label>
+
+                            <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                            </div>
+
+                            <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
+                            </div>
+
+                            <div ng-repeat="notification in variant.notifications">
+                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </ng-form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
