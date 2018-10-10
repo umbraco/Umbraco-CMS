@@ -157,14 +157,6 @@ gulp.task('dependencies', function () {
             { base: "./bower_components/tinymce/" })
             .pipe(gulp.dest(root + targets.lib + "/tinymce"))
     );
-
-    //font-awesome
-    stream.add(
-        gulp.src(["./bower_components/font-awesome/fonts/*",
-            "./bower_components/font-awesome/css/font-awesome.min.css"],
-            { base: "./bower_components/font-awesome/" })
-            .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
-    );
     
     // ace Editor
     stream.add(
@@ -252,6 +244,11 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/animejs"
         },
         {   
+            "name": "bootstrap-social",
+            "src":  ["./node_modules/bootstrap-social/bootstrap-social.css"],
+            "base": "./node_modules/bootstrap-social"
+        },
+        {   
             "name": "clipboard",
             "src":  ["./node_modules/clipboard/dist/clipboard.min.js"],
             "base": "./node_modules/clipboard/dist"
@@ -270,6 +267,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/flatpickr/dist"
         },
         {
+            "name": "font-awesome",
+            "src":  [
+                "./node_modules/font-awesome/fonts/*", 
+                "./node_modules/font-awesome/css/font-awesome.min.css"
+            ],
+            "base": "./node_modules/font-awesome"
+        },
+        {
             "name": "jquery",
             "src":  [
                 "./node_modules/jquery/dist/jquery.min.js", 
@@ -285,7 +290,7 @@ gulp.task('dependencies', function () {
         {
             "name": "jquery-ui",
             "src":  ["./node_modules/jquery-ui/jquery-ui.min.js"],
-            "base": "./node_modules/jquery"
+            "base": "./node_modules/jquery-ui"
         },
         {
             "name": "jquery-validate",
@@ -296,6 +301,11 @@ gulp.task('dependencies', function () {
             "name": "jquery-validation-unobtrusive",
             "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
             "base": "./node_modules/jquery-validation-unobtrusive/dist"
+        },
+        {
+            "name": "ng-file-upload",
+            "src":  ["./node_modules/ng-file-upload/dist/ng-file-upload.min.js"],
+            "base": "./node_modules/ng-file-upload/dist"
         },
         {
             "name": "signalr",
