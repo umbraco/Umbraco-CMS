@@ -153,6 +153,7 @@
         <key alias="rollback">Content rollback performed by user</key>
         <key alias="sendtopublish">Content Send To Publish performed by user</key>
         <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="sort">Sort child items performed by user</key>
         <key alias="smallCopy">Copy</key>
         <key alias="smallPublish">Publish</key>
         <key alias="smallMove">Move</key>
@@ -162,6 +163,7 @@
         <key alias="smallRollBack">Rollback</key>
         <key alias="smallSendToPublish">Send To Publish</key>
         <key alias="smallSendToTranslate">Send To Translation</key>
+        <key alias="smallSort">Sort</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -267,7 +269,7 @@
         <key alias="dropFilesHere">Drop your files here...</key>
         <key alias="urls">Link to media</key>
         <key alias="orClickHereToUpload">or click here to choose files</key>
-        <key alias="dragFilesHereToUpload">You can drag files here to upload</key>
+        <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
         <key alias="onlyAllowedFiles">Only allowed file types are</key>
         <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
         <key alias="maxFileSize">Max file size is</key>
@@ -287,7 +289,7 @@
         <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
         <key alias="newFolder">New folder</key>
         <key alias="newDataType">New data type</key>
-        <key alias="newJavascriptFile">New javascript file</key>
+        <key alias="newJavascriptFile">New JavaScript file</key>
         <key alias="newEmptyPartialView">New empty partial view</key>
         <key alias="newPartialViewMacro">New partial view macro</key>
         <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
@@ -647,7 +649,7 @@
         <key alias="rights">Permissions</key>
         <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
-        <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="show">Show</key>
@@ -684,6 +686,7 @@
         <key alias="embed">Embed</key>
         <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
+		<key alias="includeFromsubFolders">Include subfolders in search</key>
     </area>
 
     <area alias="colors">
@@ -1216,7 +1219,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="publicAccess">
         <key alias="paAdvanced">Role based protection</key>
-        <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
+        <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
         <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
         <key alias="paErrorPage">Error Page</key>
         <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
@@ -1293,11 +1296,13 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="externalLinkPlaceholder">Enter the link</key>
     </area>
     <area alias="imagecropper">
-        <key alias="reset">Reset</key>
+        <key alias="reset">Reset crop</key>
         <key alias="defineCrop">Define crop</key>
         <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
         <key alias="saveCrop">Save crop</key>
         <key alias="addCrop">Add new crop</key>
+        <key alias="updateEditCrop">Done</key>
+        <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
         <key alias="currentVersion">Current version</key>
@@ -1688,8 +1693,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
 
-		<key alias="compositionUsageHeading">Where is this composition used?</key>
-		<key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+        <key alias="compositionUsageHeading">Where is this composition used?</key>
+        <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
     </area>
 
     <area alias="modelsBuilder">
@@ -1864,7 +1869,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="goToProfile">Go to user profile</key>
         <key alias="groupsHelp">Add groups to assign access and permissions</key>
         <key alias="inviteAnotherUser">Invite another user</key>
-        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco.</key>
+        <key alias="inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco. Invites last for 72 hours.</key>
         <key alias="language">Language</key>
         <key alias="languageHelp">Set the language you will see in menus and dialogs</key>
         <key alias="lastLockoutDate">Last lockout date</key>
@@ -1928,6 +1933,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="userInvited">has been invited</key>
         <key alias="userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</key>
         <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we just need you to setup a password and add a picture for your avatar.</key>
+        <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.</key>
         <key alias="userinviteAvatarMessage">Upload a picture to make it easy for other users to recognize you.</key>
         <key alias="writer">Writer</key>
         <key alias="translator">Translator</key>
@@ -2186,6 +2192,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="enableUrlTracker">Enable URL tracker</key>
         <key alias="originalUrl">Original URL</key>
         <key alias="redirectedTo">Redirected To</key>
+        <key alias="redirectUrlManagement">Redirect Url Management</key>
+        <key alias="panelInformation">The following URLs redirect to this content item:</key>
         <key alias="noRedirects">No redirects have been made</key>
         <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
         <key alias="removeButton">Remove</key>

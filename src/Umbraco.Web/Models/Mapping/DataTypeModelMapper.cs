@@ -116,7 +116,7 @@ namespace Umbraco.Web.Models.Mapping
                         var fields = editor.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
                         if (defaultVals != null)
                         {                           
-                            PreValueDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultVals);
+                            PreValueDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultVals, editor.Alias);
                         }
                         return fields;
                     });

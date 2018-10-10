@@ -35,6 +35,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 return $scope.model.config.idType === "udi" ? i.udi : i.id;                
             });
             $scope.model.value = trim(currIds.join(), ",");
+            angularHelper.getCurrentForm($scope).$setDirty();
 
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
@@ -185,7 +186,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
           if (angular.isArray(model.selection)) {
              _.each(model.selection, function (item, i) {
                   $scope.add(item);
-             });
+              });
+              angularHelper.getCurrentForm($scope).$setDirty();
           }
 
           $scope.contentPickerOverlay.show = false;

@@ -1,19 +1,4 @@
 {
-  "author": "Umbraco HQ",
-  "name": "umbraco",
-  "homepage": "https://github.com/umbraco/umbraco-cms/",
-  "version": "7.1.2",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/umbraco/Umbraco-CMS.git"
-  },
-  "bugs": {
-    "url": "https://issues.umbraco.org"
-  },
-  "engines": {
-    "node": ">= 0.8.4"
-  },
   "scripts": {
     "install": "bower-installer",
     "test": "karma start test/config/karma.conf.js --singlerun",
