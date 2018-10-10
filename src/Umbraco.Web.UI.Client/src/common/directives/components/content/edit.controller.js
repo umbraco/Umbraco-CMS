@@ -99,7 +99,7 @@
 
             evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
                 // if this content item uses the updated doc type we need to reload the content item
-                if (args && args.documentType && args.documentType.key === content.documentType.key) {
+                if (args && args.documentType && args.documentType.key === $scope.content.documentType.key) {
                     loadContent();
                 }
             }));
