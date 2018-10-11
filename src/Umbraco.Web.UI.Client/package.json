@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "test": "karma start test/config/karma.conf.js --singlerun",
     "build": "gulp"
