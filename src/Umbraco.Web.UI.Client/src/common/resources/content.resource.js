@@ -756,11 +756,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the saved content item.
           *
           */
-        sendToPublish: function (content, isNew, files) {
+        sendToPublish: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
-            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
+            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
         /**
