@@ -22,6 +22,11 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
+        /// <summary>
+        /// Fetches all registered trees and groups them together if they have a [CoreTree]
+        /// Attribute with a 'TreeGroup' property set
+        /// This allows the settings section trees to be grouped by Settings, Templating & Other
+        /// </summary>
         private static readonly Lazy<IEnumerable<IGrouping<string, (Type, string)>>> CoreTrees
             = new Lazy<IEnumerable<IGrouping<string, (Type, string)>>>(() =>
                 Current.Services.ApplicationTreeService.GetAllTypes()
@@ -86,8 +91,9 @@ namespace Umbraco.Web.Trees
                 }
             }
 
-            //Don't apply fancy grouping logic futher down, if we are not 'settings' section
-            if(application != Constants.Applications.Settings)
+            //Don't apply fancy grouping logic futher down, if we only have one group of items
+            var hasGroups = CoreTrees.Value.Any(x => x.Key != null);
+            if (hasGroups == false)
             {
                 var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
                 multiTree.Name = Services.TextService.Localize("sections/" + application);
@@ -95,28 +101,23 @@ namespace Umbraco.Web.Trees
                 rootNodeGroups.Add(multiTree);
                 return rootNodeGroups;
             }
-
-            //For settings section only
-            //Group trees by [CoreTree] attribute
-
-            //Core Trees contains all trees for all sections/applications
+            
+            //Group trees by [CoreTree] attribute with a TreeGroup property
             foreach(var treeSectionGroup in CoreTrees.Value)
             {
                 var treeGroupName = treeSectionGroup.Key;
 
                 var groupNodeCollection = new TreeNodeCollection();
-
-                //Only add trees to a new collection if they are from 'settings'
                 foreach (var treeItem in treeSectionGroup)
                 {
                     //Item1 tuple - is the type from all tree types
                     var treeItemType = treeItem.Item1;
 
-                    var findAppTree = appTrees.SingleOrDefault(x => x.GetRuntimeType() == treeItemType);
+                    var findAppTree = appTrees.FirstOrDefault(x => x.GetRuntimeType() == treeItemType);
                     if (findAppTree != null)
                     {
                         //Now we need to get the 'TreeNode' which is in 'collection'
-                        var treeItemNode = collection.SingleOrDefault(x => x.AdditionalData["treeAlias"].ToString() == findAppTree.Alias);
+                        var treeItemNode = collection.FirstOrDefault(x => x.AdditionalData["treeAlias"].ToString() == findAppTree.Alias);
 
                         if (treeItemNode != null)
                         {
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Trees
                     treeGroupName = "thirdPartyGroup";
                 }
 
-                if (groupNodeCollection.Any())
+                if (groupNodeCollection.Count > 0)
                 {
                     var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
                     groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
