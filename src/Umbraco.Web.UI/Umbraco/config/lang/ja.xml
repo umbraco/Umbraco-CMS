@@ -1073,9 +1073,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="userPermissions">ユーザーの権限</key>
     <key alias="userTypes">ユーザータイプ</key>
     <key alias="users">ユーザー</key>
-    <key alias="settingsGroup"></key>
-    <key alias="templatingGroup"></key>
-    <key alias="thirdPartyGroup"></key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>
