@@ -16,7 +16,6 @@
         "tests"
     ],
     "dependencies": {
-        "rgrove-lazyload": "*"
     },
     "install": {
         "path": "lib-bower",
@@ -27,10 +26,6 @@
             "ace-builds"
         ],
         "sources": {
-            "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js"
         }
-    },
-    "devDependencies": {
-        "angular-mocks": "~1.7.2"
     }
 }

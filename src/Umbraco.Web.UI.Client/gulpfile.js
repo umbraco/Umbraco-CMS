@@ -231,6 +231,11 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/angular-messages"
         },
         {   
+            "name": "angular-mocks",
+            "src":  ["./node_modules/angular/angular-mocks.js"],
+            "base": "./node_modules/angular-mocks"
+        },
+        {   
             "name": "animejs",
             "src":  ["./node_modules/animejs/anime.min.js"],
             "base": "./node_modules/animejs"
@@ -311,6 +316,11 @@ gulp.task('dependencies', function () {
             "name": "jquery-validation-unobtrusive",
             "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
             "base": "./node_modules/jquery-validation-unobtrusive/dist"
+        },
+        {
+            "name": "rgrove-lazyload",
+            "src":  ["./node_modules/lazyload-js/lazyload.js"],
+            "base": "./node_modules/lazyload-js"
         },
         // TODO: We can optimize here:
         // we don't have to ship with the moment-with-locales libraries
