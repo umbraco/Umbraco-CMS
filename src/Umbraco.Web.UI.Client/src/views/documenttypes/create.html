@@ -50,8 +50,10 @@
               val-form-manager>
 
             <div ng-show="error">
-                <h5 class="text-error">{{error.errorMsg}}</h5>
-                <p class="text-error">{{error.data.message}}</p>
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
             </div>
 
             <umb-control-group label="Enter a folder name" hide-label="false">
@@ -74,8 +76,10 @@
               val-form-manager>
 
             <div ng-show="error">
-                <h5 class="text-error">{{error.errorMsg}}</h5>
-                <p class="text-error">{{error.data.message}}</p>
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
             </div>
 
             <umb-control-group label="Name of the Parent Document Type" hide-label="false">
