@@ -355,6 +355,7 @@ gulp.task('dependencies', function () {
             "src":  [
                 "./node_modules/tinymce/tinymce.min.js",
                 "./node_modules/tinymce/plugins/**",
+                "./node_modules/tinymce/skins/**",
                 "./node_modules/tinymce/themes/**"
             ],
             "base": "./node_modules/tinymce"
