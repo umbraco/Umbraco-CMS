@@ -231,7 +231,7 @@ gulp.task('dependencies', function () {
         },
         {
             "name": "angular-mocks",
-            "src":  ["./node_modules/angular/angular-mocks.js"],
+            "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
             "base": "./node_modules/angular-mocks"
         },
         {
