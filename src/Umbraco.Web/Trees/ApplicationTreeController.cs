@@ -92,7 +92,8 @@ namespace Umbraco.Web.Trees
             }
 
             //Don't apply fancy grouping logic futher down, if we only have one group of items
-            if (CoreTrees.Value.Count() == 1)
+            var hasGroups = CoreTrees.Value.Any(x => x.Key != null);
+            if (hasGroups == false)
             {
                 var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
                 multiTree.Name = Services.TextService.Localize("sections/" + application);
