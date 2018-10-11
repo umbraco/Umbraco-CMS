@@ -62,17 +62,21 @@ namespace Umbraco.Tests.PublishedContent
 
         internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
+            var prop1Type = factory.CreatePropertyType("prop1", 1);
+            var welcomeType = factory.CreatePropertyType("welcomeText", 1);
+            var welcome2Type = factory.CreatePropertyType("welcomeText2", 1);
             var props = new[]
                 {
-                    factory.CreatePropertyType("prop1", 1),
-                    factory.CreatePropertyType("welcomeText", 1),
-                    factory.CreatePropertyType("welcomeText2", 1),
+                    prop1Type,
+                    welcomeType,
+                    welcome2Type,
                 };
             var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
             {
                 Alias = "welcomeText",
+                PropertyType = welcomeType
             };
             prop1.SetSourceValue("en-US", "Welcome", true);
             prop1.SetValue("en-US", "Welcome", true);
@@ -84,6 +88,7 @@ namespace Umbraco.Tests.PublishedContent
             var prop2 = new SolidPublishedPropertyWithLanguageVariants
             {
                 Alias = "welcomeText2",
+                PropertyType = welcome2Type
             };
             prop2.SetSourceValue("en-US", "Welcome", true);
             prop2.SetValue("en-US", "Welcome", true);
@@ -91,6 +96,7 @@ namespace Umbraco.Tests.PublishedContent
             var prop3 = new SolidPublishedPropertyWithLanguageVariants
             {
                 Alias = "welcomeText",
+                PropertyType = welcomeType
             };
             prop3.SetSourceValue("en-US", "Welcome", true);
             prop3.SetValue("en-US", "Welcome", true);

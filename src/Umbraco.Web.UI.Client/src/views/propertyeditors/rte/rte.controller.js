@@ -84,20 +84,20 @@ angular.module("umbraco")
             var toolbar = editorConfig.toolbar.join(" | ");
             var stylesheets = [];
             var styleFormats = [];
-            var await = [];
+            var requests = [];
             if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
-                await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
+                requests.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
             }
 
             //queue rules loading
             angular.forEach(editorConfig.stylesheets, function (val, key) {
                 stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css?" + new Date().getTime());
-                await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
+                requests.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                     angular.forEach(rules, function (rule) {
                         var r = {};
                         r.title = rule.name;
@@ -170,7 +170,7 @@ angular.module("umbraco")
             }
 
             //wait for queue to end
-            $q.all(await).then(function () {
+            $q.all(requests).then(function () {
                 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {

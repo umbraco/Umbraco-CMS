@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish || !args.methods.schedulePublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -190,6 +190,16 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             alias: "unpublish",
                             addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
+                    case "SCHEDULE":
+                        //schedule publish - schedule doesn't have a permission letter so
+                        // the button letter is made unique so it doesn't collide with anything else
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_schedulePublish",
+                            handler: args.methods.schedulePublish,
+                            alias: "schedulePublish",
+                            addEllipsis: "true"
+                        };
                     default:
                         return null;
                 }
@@ -200,7 +210,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
             // Publish, SendToPublish
-            var buttonOrder = ["U", "H"];
+            var buttonOrder = ["U", "H", "SCHEDULE"];
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
@@ -215,6 +225,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         break;
                     }
                 }
+
                 //Here's the special check, if the button still isn't set and we are creating and they have create access
                 //we need to add the Save button
                 if (!buttons.defaultButton && args.create && _.contains(args.content.allowedActions, "C")) {
@@ -237,6 +248,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     }
                 }
 
+                // if publishing is allowed also allow schedule publish
+                // we add this manually becuase it doesn't have a permission so it wont 
+                // get picked up by the loop through permissions
+                if( _.contains(args.content.allowedActions, "U")) {
+                    buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
+                }
 
                 // if we are not creating, then we should add unpublish too,
                 // so long as it's already published and if the user has access to publish
@@ -247,40 +264,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
-            }
-
-            // If we have a scheduled publish or unpublish date change the default button to 
-            // "save" and update the label to "save and schedule
-            if (args.content.releaseDate || args.content.removeDate) {
-
-                // if save button is alread the default don't change it just update the label
-                if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
-                    buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return buttons;
-                }
-
-                if (buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
-                    // save a copy of the default so we can push it to the sub buttons later
-                    var defaultButtonCopy = angular.copy(buttons.defaultButton);
-                    var newSubButtons = [];
-
-                    // if save button is not the default button - find it and make it the default
-                    angular.forEach(buttons.subButtons, function (subButton) {
-
-                        if (subButton.letter === "A") {
-                            buttons.defaultButton = subButton;
-                            buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                        } else {
-                            newSubButtons.push(subButton);
-                        }
-
-                    });
-
-                    // push old default button into subbuttons
-                    newSubButtons.push(defaultButtonCopy);
-                    buttons.subButtons = newSubButtons;
-                }
-
             }
 
             return buttons;
