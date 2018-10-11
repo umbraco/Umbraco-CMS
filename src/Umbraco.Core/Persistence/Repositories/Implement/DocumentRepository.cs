@@ -721,7 +721,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         : filterClause.Item1;
 
                     filterSql.Append(
-                        where.Contains("COALESCE") ? $"AND upper({where}) LIKE upper(@0)," : $"AND ({where})",
+                        where.Contains("COALESCE") ? $"AND upper({where}) LIKE upper(@0)" : $"AND ({where})",
                         filterClause.Item2);
                 }
             }
