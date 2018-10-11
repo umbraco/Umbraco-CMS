@@ -1,6 +1,5 @@
 {
   "scripts": {
-    "install": "bower-installer",
     "test": "karma start test/config/karma.conf.js --singlerun",
     "build": "gulp"
   },

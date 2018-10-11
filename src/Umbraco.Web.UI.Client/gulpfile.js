@@ -105,7 +105,6 @@ var sources = {
         less: "./src/less/**/*.less",
         js: "./src/*.js",
         lib: "./lib/**/*",
-        bower: "./lib-bower/**/*",
         assets: "./src/assets/**"    
     }
 };
@@ -318,8 +317,8 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery-validation-unobtrusive/dist"
         },
         {
-            "name": "rgrove-lazyload",
-            "src":  ["./node_modules/lazyload-js/lazyload.js"],
+            "name": "lazyload-js",
+            "src":  ["./node_modules/lazyload-js/lazyload-min.js"],
             "base": "./node_modules/lazyload-js"
         },
         // TODO: We can optimize here:
@@ -375,15 +374,9 @@ gulp.task('dependencies', function () {
         );
     });
 
-    //copy over libs which are not on bower (/lib) and 
-    //libraries that have been managed by bower-installer (/lib-bower)
+    //copy over libs which are not on npm (/lib)
     stream.add(
          gulp.src(sources.globs.lib)
-            .pipe(gulp.dest(root + targets.lib))
-        );
-
-    stream.add(
-         gulp.src(sources.globs.bower)
             .pipe(gulp.dest(root + targets.lib))
         );
 
