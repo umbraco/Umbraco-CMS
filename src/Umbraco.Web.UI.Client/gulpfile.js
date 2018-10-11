@@ -144,57 +144,28 @@ gulp.task('docserve', function(cb) {
  **************************/
 gulp.task('dependencies', function () { 
 
-    //bower component/npm specific copy rules
-    //this is to patch the sometimes wonky rules these libs are distrbuted under
-
     //as we do multiple things in this task, we merge the multiple streams
     var stream = new MergeStream();
 
-    //Tinymce plugins/themes
-    stream.add(
-        gulp.src(["./bower_components/tinymce/plugins/**",
-            "./bower_components/tinymce/themes/**"],
-            { base: "./bower_components/tinymce/" })
-            .pipe(gulp.dest(root + targets.lib + "/tinymce"))
-    );
-    
-    // ace Editor
-    stream.add(
-        gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-searchbox.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-settings_menu.js",
-            "bower_components/ace-builds/src-min-noconflict/snippets/text.js",
-            "bower_components/ace-builds/src-min-noconflict/snippets/javascript.js",
-            "bower_components/ace-builds/src-min-noconflict/theme-chrome.js",
-            "bower_components/ace-builds/src-min-noconflict/mode-razor.js",
-            "bower_components/ace-builds/src-min-noconflict/mode-javascript.js",
-            "bower_components/ace-builds/src-min-noconflict/worker-javascript.js"],
-            { base: "./bower_components/ace-builds/" })
-            .pipe(gulp.dest(root + targets.lib + "/ace-builds"))
-    );
-
-    // code mirror
-    stream.add(
-        gulp.src([
-            "bower_components/codemirror/lib/codemirror.js",
-            "bower_components/codemirror/lib/codemirror.css",
-
-            "bower_components/codemirror/mode/css/*",
-            "bower_components/codemirror/mode/javascript/*",
-            "bower_components/codemirror/mode/xml/*",
-            "bower_components/codemirror/mode/htmlmixed/*",
-
-            "bower_components/codemirror/addon/search/*",
-            "bower_components/codemirror/addon/edit/*",
-            "bower_components/codemirror/addon/selection/*",
-            "bower_components/codemirror/addon/dialog/*"],
-            { base: "./bower_components/codemirror/" })
-            .pipe(gulp.dest(root + targets.lib + "/codemirror"))
-    );
-
-    // npm dependencies
+    // Pick the dependencies we need from each package 
+    // so we don't just ship with a lot of files that aren't needed
     const nodeModules = [
+        {   
+            "name": "ace-builds",
+            "src":  [
+                "./node_modules/ace-builds/src-min-noconflict/ace.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-searchbox.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-settings_menu.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
+            ],
+            "base": "./node_modules/ace-builds"
+        },
         {   
             "name": "angular",
             "src":  ["./node_modules/angular/angular.js"],
@@ -224,6 +195,11 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/angular-touch"
         },
         {   
+            "name": "angular-ui-sortable",
+            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.js"],
+            "base": "./node_modules/angular-ui-sortable/dist"
+        },
+        {   
             "name": "angular-route",
             "src":  ["./node_modules/angular-route/angular-route.js"],
             "base": "./node_modules/angular-route"
@@ -240,6 +216,14 @@ gulp.task('dependencies', function () {
                 "./node_modules/angular-i18n/angular-locale_*.js"
             ],
             "base": "./node_modules/angular-i18n"
+        },
+        {   
+            "name": "angular-local-storage",
+            "src":  [
+                "./node_modules/angular-local-storage/dist/angular-local-storage.min.js", 
+                "./node_modules/angular-local-storage/dist/angular-local-storage.min.js.map"
+            ],
+            "base": "./node_modules/angular-local-storage/dist"
         },
         {   
             "name": "angular-messages",
@@ -260,6 +244,24 @@ gulp.task('dependencies', function () {
             "name": "clipboard",
             "src":  ["./node_modules/clipboard/dist/clipboard.min.js"],
             "base": "./node_modules/clipboard/dist"
+        },
+        {   
+            "name": "codemirror",
+            "src":  [
+                "./node_modules/codemirror/lib/codemirror.js",
+                "./node_modules/codemirror/lib/codemirror.css",
+    
+                "./node_modules/codemirror/mode/css/*",
+                "./node_modules/codemirror/mode/javascript/*",
+                "./node_modules/codemirror/mode/xml/*",
+                "./node_modules/codemirror/mode/htmlmixed/*",
+    
+                "./node_modules/codemirror/addon/search/*",
+                "./node_modules/codemirror/addon/edit/*",
+                "./node_modules/codemirror/addon/selection/*",
+                "./node_modules/codemirror/addon/dialog/*"
+            ],
+            "base": "./node_modules/codemirror"
         },
         {   
             "name": "jsdiff",
@@ -332,6 +334,15 @@ gulp.task('dependencies', function () {
             "name": "signalr",
             "src":  ["./node_modules/signalr/jquery.signalR.js"],
             "base": "./node_modules/signalr"
+        },
+        {
+            "name": "tinymce",
+            "src":  [
+                "./node_modules/tinymce/tinymce.min.js",
+                "./node_modules/tinymce/plugins/**",
+                "./node_modules/tinymce/themes/**"
+            ],
+            "base": "./node_modules/tinymce"
         },
         {
             "name": "typeahead.js",
