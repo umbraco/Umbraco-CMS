@@ -139,7 +139,7 @@ gulp.task('docserve', function(cb) {
 });
 
 /**************************
- * Task processes and copies all dependencies, either installed by bower, npm or stored locally in the project
+ * Task processes and copies all dependencies, either installed by npm or stored locally in the project
  **************************/
 gulp.task('dependencies', function () { 
 
@@ -318,7 +318,7 @@ gulp.task('dependencies', function () {
         },
         {
             "name": "lazyload-js",
-            "src":  ["./node_modules/lazyload-js/lazyload-min.js"],
+            "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
             "base": "./node_modules/lazyload-js"
         },
         // TODO: We can optimize here:
