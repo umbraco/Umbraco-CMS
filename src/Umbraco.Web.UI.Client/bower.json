@@ -78,11 +78,13 @@
                 "bower_components/angular-local-storage/dist/angular-local-storage.min.js",
                 "bower_components/angular-local-storage/dist/angular-local-storage.min.js.map"
             ],
-            "tinymce": [
-                "bower_components/tinymce/tinymce.min.js",
-                "bower_components/tinymce/skins/*",
-                "bower_components/tinymce/themes/*"
-            ],
+            "tinymce": {
+                "mapping": [
+                    { "bower_components/tinymce/skins/**": "skins" },
+                    { "bower_components/tinymce/themes/**": "themes" },
+                    { "bower_components/tinymce/tinymce.min.js": "tinymce.min.js" }
+                ]
+            },
             "angular-i18n": "bower_components/angular-i18n/angular-locale_*.js",
             "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
             "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
