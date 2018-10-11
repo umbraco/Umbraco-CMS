@@ -256,10 +256,10 @@ gulp.task('dependencies', function () {
                 "./node_modules/codemirror/lib/codemirror.js",
                 "./node_modules/codemirror/lib/codemirror.css",
     
-                "./node_modules/codemirror/mode/css/*",
-                "./node_modules/codemirror/mode/javascript/*",
-                "./node_modules/codemirror/mode/xml/*",
-                "./node_modules/codemirror/mode/htmlmixed/*",
+                "./node_modules/codemirror/mode/css/css.js",
+                "./node_modules/codemirror/mode/javascript/javascript.js",
+                "./node_modules/codemirror/mode/xml/xml.js",
+                "./node_modules/codemirror/mode/htmlmixed/htmlmixed.js",
     
                 "./node_modules/codemirror/addon/search/*",
                 "./node_modules/codemirror/addon/edit/*",
@@ -299,12 +299,12 @@ gulp.task('dependencies', function () {
         },
         {
             "name": "jquery-migrate",
-            "src":  ["./node_modules/jquery-migrate/jquery-migrate.min.js"],
-            "base": "./node_modules/jquery-migrate"
+            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.min.js"],
+            "base": "./node_modules/jquery-migrate/dist"
         },
         {
             "name": "jquery-ui",
-            "src":  ["./node_modules/jquery-ui/jquery-ui.min.js"],
+            "src":  ["./node_modules/jquery-ui/ui/widget.js"],
             "base": "./node_modules/jquery-ui"
         },
         {
@@ -331,7 +331,7 @@ gulp.task('dependencies', function () {
                 "./node_modules/moment/min/moment.min.js",
                 "./node_modules/moment/min/moment-with-locales.js",
                 "./node_modules/moment/min/moment-with-locales.min.js",
-                "./node_modules/moment/src/locale/*.js"
+                "./node_modules/moment/locale/*.js"
             ],
             "base": "./node_modules/moment/min"
         },
