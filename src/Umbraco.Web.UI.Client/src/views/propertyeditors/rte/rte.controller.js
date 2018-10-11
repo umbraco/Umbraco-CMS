@@ -74,7 +74,8 @@ angular.module("umbraco")
             promises.push(tinyMceService.getTinyMceEditorConfig({
                 htmlId: $scope.textAreaHtmlId,
                 stylesheets: editorConfig.stylesheets,
-                toolbar: editorConfig.toolbar
+                toolbar: editorConfig.toolbar,
+                theme: editorConfig.theme
             }));
 
             //wait for queue to end

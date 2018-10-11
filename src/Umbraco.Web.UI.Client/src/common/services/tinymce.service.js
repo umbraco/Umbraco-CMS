@@ -116,6 +116,11 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
         return language;
     }
 
+    /**
+     * Gets toolbars for the inlite theme
+     * @param {any} configuredToolbar
+     * @param {any} tinyMceConfig
+     */
     function getToolbars(configuredToolbar, tinyMceConfig) {
 
         //the commands for selection/all
@@ -182,7 +187,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 //create a baseline Config to exten upon
                 var config = {
                     selector: "#" + args.htmlId,
-                    theme: "inlite",
+                    theme: args.theme ? args.theme : "inlite",
                     inline: true,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
@@ -197,7 +202,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     language: getLanguage(),
 
                     //this would be for a theme other than inlite
-                    toolbar: args.toolbar,
+                    toolbar: args.toolbar.join(" "),
                     //these are for the inlite theme to work
                     insert_toolbar: toolbars.insertToolbar,
                     selection_toolbar: toolbars.selectionToolbar,
