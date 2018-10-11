@@ -90,7 +90,6 @@
             "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",
             "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
             "clipboard": "bower_components/clipboard/dist/clipboard.min.js",
-            "animejs": "bower_components/animejs/anime.min.js"
             "animejs": "bower_components/animejs/anime.min.js",
             "jquery-validate": "bower_components/jquery-validate/dist/jquery.validate.min.js",
             "jquery-validation-unobtrusive": "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js",

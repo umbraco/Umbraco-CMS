@@ -98,7 +98,9 @@ angular.module("umbraco")
 
                     //set the value and enable browser based spell checking
                     editor.on('init', function (e) {
-                        editor.setContent($scope.model.value);
+                        if ($scope.model.value) {
+                            editor.setContent($scope.model.value);
+                        }
                         editor.getBody().setAttribute('spellcheck', true);
                     });
 
