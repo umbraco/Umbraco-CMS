@@ -164,8 +164,6 @@ namespace Umbraco.Core.Xml.XPath
 #pragma warning disable 168
             var msg = string.Format(format, args); // unused if not writing, hence #pragma
 #pragma warning restore 168
-            //LogHelper.Debug<MacroNavigator>(msg); // beware! this can quicky overflow log4net
-            //Console.WriteLine(msg);
         }
 #endif
 

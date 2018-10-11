@@ -451,35 +451,6 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsTask_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<UserDto>();
-                helper.CreateTable<TaskTypeDto>();
-                helper.CreateTable<TaskDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_cmsTaskType_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<TaskTypeDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
         public void Can_Create_umbracoUser_Table()
         {
             using (var scope = ScopeProvider.CreateScope())

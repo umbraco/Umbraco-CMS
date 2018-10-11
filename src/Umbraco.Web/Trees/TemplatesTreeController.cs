@@ -19,7 +19,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:6)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class TemplatesTreeController : TreeController, ISearchableTree
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Trees
 
             //Create the normal create action
             var item = menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-            item.NavigateToRoute(string.Format("{0}/templates/edit/{1}?create=true", queryStrings.GetValue<string>("application"), id));
+            item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
             {

@@ -10,17 +10,37 @@
 
     function overlayService(eventsService, backdropService) {
 
-        function open(overlay) {
+        var currentOverlay = null;
+
+        function open(newOverlay) {
+
+            // prevent two open overlays at the same time
+            if(currentOverlay) {
+                return;
+            }
+
+            var backdropOptions = {};
+            var overlay = newOverlay;
+
+            // set the default overlay position to center
             if(!overlay.position) {
                 overlay.position = "center";
             }
+
+            // option to disable backdrop clicks
+            if(overlay.disableBackdropClick) {
+                backdropOptions.disableEventsOnClick = true;
+            }
+
             overlay.show = true;
-            backdropService.open();
+            backdropService.open(backdropOptions);
+            currentOverlay = overlay;
             eventsService.emit("appState.overlay", overlay);
         }
 
         function close() {
             backdropService.close();
+            currentOverlay = null;
             eventsService.emit("appState.overlay", null);
         }
 

@@ -150,6 +150,8 @@ UNION
 SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+UNION
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
@@ -160,7 +162,8 @@ ORDER BY colName";
                 {UserState.Active, (int) result[1].num},
                 {UserState.Disabled, (int) result[2].num},
                 {UserState.LockedOut, (int) result[3].num},
-                {UserState.Invited, (int) result[4].num}
+                {UserState.Invited, (int) result[4].num},
+                {UserState.Inactive, (int) result[5].num}
             };
         }
 
@@ -418,8 +421,6 @@ ORDER BY colName";
         {
             var list = new List<string>
             {
-                "DELETE FROM cmsTask WHERE userId = @id",
-                "DELETE FROM cmsTask WHERE parentUserId = @id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
                 "DELETE FROM umbracoUser WHERE id = @id",
@@ -745,7 +746,7 @@ ORDER BY colName";
 
             if (excludeUserGroups != null && excludeUserGroups.Length > 0)
             {
-                var subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
+                const string subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
                     FROM umbracoUser
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
@@ -764,6 +765,12 @@ ORDER BY colName";
                     if (userState.Contains(UserState.Active))
                     {
                         sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                        appended = true;
+                    }
+                    if (userState.Contains(UserState.Inactive))
+                    {
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
                         appended = true;
                     }
                     if (userState.Contains(UserState.Disabled))
@@ -800,7 +807,7 @@ ORDER BY colName";
                 sql = new SqlTranslator<IUser>(sql, query).Translate();
 
             // get sorted and filtered sql
-            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql), orderDirection, orderBy);
+            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql, query != null), orderDirection, orderBy);
 
             // get a page of results and total count
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -811,11 +818,17 @@ ORDER BY colName";
             return pagedResult.Items.Select(UserFactory.BuildEntity);
         }
 
-        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql)
+        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, bool hasWhereClause)
         {
             if (filterSql == null) return sql;
 
-            sql.Append(SqlContext.Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
+            //ensure we don't append a WHERE if there is already one
+            var args = filterSql.Arguments;
+            var sqlFilter = hasWhereClause
+                ? filterSql.SQL
+                : " WHERE " + filterSql.SQL.TrimStart("AND ");
+
+            sql.Append(SqlContext.Sql(sqlFilter, args));
 
             return sql;
         }

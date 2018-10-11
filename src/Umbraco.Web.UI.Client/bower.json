@@ -16,21 +16,23 @@
         "tests"
     ],
     "dependencies": {
-        "angular": "~1.7.2",
-        "angular-cookies": "~1.7.2",
-        "angular-sanitize": "~1.7.2",
-        "angular-touch": "~1.7.2",
-        "angular-route": "~1.7.2",
-        "angular-animate": "~1.7.2",
-        "angular-i18n": "~1.7.2",
+        "angular": "~1.7.4",
+        "angular-cookies": "~1.7.4",
+        "angular-sanitize": "~1.7.4",
+        "angular-touch": "~1.7.4",
+        "angular-route": "~1.7.4",
+        "angular-animate": "~1.7.4",
+        "angular-i18n": "~1.7.4",
         "signalr": "^2.2.1",
         "typeahead.js": "~0.10.5",
-        "underscore": "~1.7.0",
+        "underscore": "~1.9.1",
         "rgrove-lazyload": "*",
         "bootstrap-social": "~4.8.0",
         "jquery": "2.2.4",
         "jquery-ui": "~1.12.0",
         "jquery-migrate": "1.4.0",
+        "jquery-validate": "~1.17.0",
+        "jquery-validation-unobtrusive": "3.2.10",
         "angular-dynamic-locale": "~0.1.36",
         "ng-file-upload": "~12.2.13",
         "tinymce": "~4.8.0",
@@ -41,8 +43,9 @@
         "clipboard": "~2.0.0",
         "font-awesome": "~4.2",
         "animejs": "^2.2.0",
-        "angular-ui-sortable": "0.14.3",
-        "angular-messages": "^1.7.2"
+        "angular-ui-sortable": "0.14.4",
+        "angular-messages": "^1.7.2",
+        "jsdiff": "^3.4.0"
     },
     "install": {
         "path": "lib-bower",
@@ -88,6 +91,10 @@
             "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
             "clipboard": "bower_components/clipboard/dist/clipboard.min.js",
             "animejs": "bower_components/animejs/anime.min.js"
+            "animejs": "bower_components/animejs/anime.min.js",
+            "jquery-validate": "bower_components/jquery-validate/dist/jquery.validate.min.js",
+            "jquery-validation-unobtrusive": "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js",
+            "jsdiff": "bower_components/jsdiff/diff.min.js"
         }
     },
     "devDependencies": {

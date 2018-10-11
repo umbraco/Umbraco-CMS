@@ -136,8 +136,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             //create the callbacs based on whats been passed in.
             var callbacks = {
-                success: ((!opts || !opts.success) ? defaultSuccess : opts.success),
-                error: ((!opts || !opts.error) ? defaultError : opts.error)
+                success: (!opts || !opts.success) ? defaultSuccess : opts.success,
+                error: (!opts || !opts.error ? defaultError : opts.error)
             };
 
             return httpPromise.then(function (response) {
@@ -151,6 +151,13 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 return $q.resolve(result);
 
             }, function (response) {
+
+                if (!response.status && response.message && response.stack) {
+                    //this is a JS/angular error that we should deal with
+                    return $q.reject({
+                        errorMsg: response.message
+                    });
+                }
 
                 //invoke the callback
                 var result = callbacks.error.apply(this, [response.data, response.status, response.headers, response.config]);
@@ -181,12 +188,22 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     errorMsg: result.errorMsg,
                     data: result.data,
                     status: result.status
-                })
+                });
             });
 
         },
 
-        /** Used for saving content/media/members specifically */
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#postSaveContent
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Used for saving content/media/members specifically
+         * 
+         * @param {Object} args arguments object
+         * @returns {Promise} http promise object.
+         */
         postSaveContent: function (args) {
 
             if (!args.restApiUrl) {
@@ -203,6 +220,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             }
             if (!args.dataFormatter) {
                 throw "args.dataFormatter is a required argument";
+            }
+            if (args.showNotifications === null || args.showNotifications === undefined) {
+                args.showNotifications = true;
             }
             
             //save the active tab id so we can set it when the data is returned.
@@ -221,7 +241,12 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     for (var f in args.files) {
                         //each item has a property alias and the file object, we'll ensure that the alias is suffixed to the key
                         // so we know which property it belongs to on the server side
-                        formData.append("file_" + args.files[f].alias, args.files[f].file);
+                        var fileKey = "file_" + args.files[f].alias + "_" + (args.files[f].culture ? args.files[f].culture : "");
+
+                        if (angular.isArray(args.files[f].metaData) && args.files[f].metaData.length > 0) {
+                            fileKey += ("_" + args.files[f].metaData.join("_"));
+                        }
+                        formData.append(fileKey, args.files[f].file);
                     }
                 }).then(function (response) {
                     //success callback
@@ -234,7 +259,11 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         response.data.tabs[activeTabIndex].active = true;
                     }
 
-                    formHelper.showNotifications(response.data);
+                    if (args.showNotifications) {
+                        formHelper.showNotifications(response.data);
+                    }
+
+                    //TODO: Do we need to pass the result through umbDataFormatter.formatContentGetData? Right now things work so not sure but we should check
 
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
@@ -264,7 +293,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         }
 
                     }
-                    else {
+                    else if (args.showNotifications) {
                         formHelper.showNotifications(response.data);
                     }
 

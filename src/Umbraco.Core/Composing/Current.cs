@@ -58,6 +58,7 @@ namespace Umbraco.Core.Composing
         // resets *everything* that is 'current'
         internal static void Reset()
         {
+            _container?.Dispose();
             _container = null;
 
             _shortStringHelper = null;
@@ -157,6 +158,9 @@ namespace Umbraco.Core.Composing
 
         public static IPublishedValueFallback PublishedValueFallback
             => _publishedValueFallback ?? Container.GetInstance<IPublishedValueFallback>() ?? new NoopPublishedValueFallback();
+
+        public static IVariationContextAccessor VariationContextAccessor
+            => Container.GetInstance<IVariationContextAccessor>();
 
         #endregion
     }

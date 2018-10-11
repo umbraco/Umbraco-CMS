@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+            var contentTypesWhereCompositionIsUsed = source.GetWhereCompositionIsUsedInContentTypes(allContentTypes);
            return contentTypesWhereCompositionIsUsed
                 .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
                 .Select(x =>
@@ -206,9 +206,9 @@ namespace Umbraco.Web.Editors
             // works since that is based on aliases.
             var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
+            if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
             {
-                ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
             // execute the externam validators
@@ -275,7 +275,7 @@ namespace Umbraco.Web.Editors
                 catch (Exception ex)
                 {
                     var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
-                    if (responseEx != null) throw responseEx;
+                    throw responseEx ?? ex;
                 }
 
                 var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, newCt);
@@ -321,7 +321,7 @@ namespace Umbraco.Web.Editors
             if (result.Success)
             {
                 var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
                 return response;
             }
 
@@ -365,7 +365,7 @@ namespace Umbraco.Web.Editors
             {
                 var copy = result.Result.Entity;
                 var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new StringContent(copy.Path, Encoding.UTF8, "application/json");
+                response.Content = new StringContent(copy.Path, Encoding.UTF8, "text/plain");
                 return response;
             }
 

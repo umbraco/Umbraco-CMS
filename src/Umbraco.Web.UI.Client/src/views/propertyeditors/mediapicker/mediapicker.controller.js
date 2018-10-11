@@ -10,17 +10,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.allowEditMedia = false;
         $scope.allowAddMedia = false;
 
-        userService.getCurrentUser().then(function(userData) {
-            if (!$scope.model.config.startNodeId) {
-                $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-            }
-            // only allow users to add and edit media if they have access to the media section
-            var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
-            $scope.allowEditMedia = hasAccessToMedia;
-            $scope.allowAddMedia = hasAccessToMedia;
-        });
-
         function setupViewModel() {
             $scope.images = [];
             $scope.ids = [];
@@ -37,7 +26,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 // might require it's use. Therefore we need to use the metaData property to get at the thumbnail
                 // value.
 
-                entityResource.getByIds(ids, "Media").then(function(medias) {
+                entityResource.getByIds(ids, "Media").then(function (medias) {
 
                     // The service only returns item results for ids that exist (deleted items are silently ignored).
                     // This results in the picked items value to be set to contain only ids of picked items that could actually be found.
@@ -47,11 +36,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     // on whether it is simply resaved or not.
                     // This is done by remapping the int/guid ids into a new array of items, where we create "Deleted item" placeholders
                     // when there is no match for a selected id. This will ensure that the values being set on save, are the same as before.
-                    
+
                     medias = _.map(ids,
-                        function(id) {
+                        function (id) {
                             var found = _.find(medias,
-                                function(m) {
+                                function (m) {
                                     // We could use coercion (two ='s) here .. but not sure if this works equally well in all browsers and
                                     // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
                                     // compares and be completely sure it works.
@@ -72,7 +61,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         });
 
                     _.each(medias,
-                        function(media, i) {
+                        function (media, i) {
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
                             if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
@@ -87,95 +76,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             }
                         });
 
-                    $scope.sync();
+                    sync();
                 });
             }
         }
 
-        setupViewModel();
-
-        $scope.remove = function(index) {
-            $scope.images.splice(index, 1);
-            $scope.ids.splice(index, 1);
-            $scope.sync();
+        function sync() {
+            $scope.model.value = $scope.ids.join();
         };
 
-        $scope.editItem = function(item) {
-            var mediaEditor = {
-                id: item.id,
-                submit: function(model) {
-                    editorService.close();
-                    // update the selected media item to match the saved media item
-                    // the media picker is using media entities so we get the
-                    // entity so we easily can format it for use in the media grid
-                    if(model && model.mediaNode) {
-                        entityResource.getById(model.mediaNode.id, "media")
-                            .then(function (mediaEntity) {
-                                // if an image is selecting more than once 
-                                // we need to update all the media items
-                                angular.forEach($scope.images, function(image){
-                                    if(image.id === model.mediaNode.id) {
-                                        angular.extend(image, mediaEntity);
-                                        image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
-                                    }
-                                });
-                            });
-                    }
-                },
-                close: function(model) {
-                    editorService.close();
-                }
-            };
-            editorService.mediaEditor(mediaEditor);
-        };
-
-        $scope.add = function() {
-            var mediaPicker = {
-                startNodeId: $scope.model.config.startNodeId,
-                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-                multiPicker: multiPicker,
-                onlyImages: onlyImages,
-                disableFolderSelect: disableFolderSelect,
-                submit: function(model) {
-
-                    editorService.close();
-                    
-                    _.each(model.selectedImages, function(media, i) {
-                        // if there is no thumbnail, try getting one if the media is not a placeholder item
-                        if (!media.thumbnail && media.id && media.metaData) {
-                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                        }
- 
-                        $scope.images.push(media);
- 
-                        if ($scope.model.config.idType === "udi") {
-                            $scope.ids.push(media.udi);
-                        }
-                        else {
-                            $scope.ids.push(media.id);
-                        }
-
-                    });
-                    $scope.sync();
-                    reloadUpdatedMediaItems(model.updatedMediaNodes);
-                },
-                close: function(model) {
-                    editorService.close();
-                    reloadUpdatedMediaItems(model.updatedMediaNodes);
-                }
-            }
-
-            editorService.mediaPicker(mediaPicker);
-
-       };
-
-       function reloadUpdatedMediaItems(updatedMediaNodes) {
+        function reloadUpdatedMediaItems(updatedMediaNodes) {
             // because the images can be edited through the media picker we need to 
             // reload. We only reload the images that is already picked but has been updated.
             // We have to get the entities from the server because the media 
             // can be edited without being selected
-            _.each($scope.images, function(image, i) {
-                if(updatedMediaNodes.indexOf(image.udi) !== -1) {
+            _.each($scope.images, function (image, i) {
+                if (updatedMediaNodes.indexOf(image.udi) !== -1) {
                     image.loading = true;
                     entityResource.getById(image.udi, "media")
                         .then(function (mediaEntity) {
@@ -185,29 +101,129 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         });
                 }
             })
-       }
+        }
 
-       $scope.sortableOptions = {
-           disabled: !$scope.isMultiPicker,
-           items: "li:not(.add-wrapper)",
-           cancel: ".unsortable",
-           update: function(e, ui) {
-               var r = [];
-               // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
-               // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
-               // watch do all the rest.
-                $timeout(function(){
-                    angular.forEach($scope.images, function(value, key) {
+        function init() {
+
+            userService.getCurrentUser().then(function (userData) {
+                if (!$scope.model.config.startNodeId) {
+                    $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+                    $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
+                }
+                // only allow users to add and edit media if they have access to the media section
+                var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
+                $scope.allowEditMedia = hasAccessToMedia;
+                $scope.allowAddMedia = hasAccessToMedia;
+
+                setupViewModel();
+
+                //When the model value changes sync the view model
+                $scope.$watch("model.value",
+                    function (newVal, oldVal) {
+                        if (newVal !== oldVal) {
+                            setupViewModel();
+                        }
+                    });
+            });
+
+        }
+
+        $scope.remove = function (index) {
+            $scope.images.splice(index, 1);
+            $scope.ids.splice(index, 1);
+            sync();
+        };
+
+        $scope.editItem = function (item) {
+            var mediaEditor = {
+                id: item.id,
+                submit: function (model) {
+                    editorService.close();
+                    // update the selected media item to match the saved media item
+                    // the media picker is using media entities so we get the
+                    // entity so we easily can format it for use in the media grid
+                    if (model && model.mediaNode) {
+                        entityResource.getById(model.mediaNode.id, "media")
+                            .then(function (mediaEntity) {
+                                // if an image is selecting more than once 
+                                // we need to update all the media items
+                                angular.forEach($scope.images, function (image) {
+                                    if (image.id === model.mediaNode.id) {
+                                        angular.extend(image, mediaEntity);
+                                        image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                                    }
+                                });
+                            });
+                    }
+                },
+                close: function (model) {
+                    editorService.close();
+                }
+            };
+            editorService.mediaEditor(mediaEditor);
+        };
+
+        $scope.add = function () {
+            var mediaPicker = {
+                startNodeId: $scope.model.config.startNodeId,
+                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+                multiPicker: multiPicker,
+                onlyImages: onlyImages,
+                disableFolderSelect: disableFolderSelect,
+
+                allowMediaEdit: true,
+                submit: function(model) {
+
+                    editorService.close();
+
+                    _.each(model.selectedImages, function (media, i) {
+                        // if there is no thumbnail, try getting one if the media is not a placeholder item
+                        if (!media.thumbnail && media.id && media.metaData) {
+                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                        }
+
+                        $scope.images.push(media);
+
+                        if ($scope.model.config.idType === "udi") {
+                            $scope.ids.push(media.udi);
+                        }
+                        else {
+                            $scope.ids.push(media.id);
+                        }
+
+                    });
+                    sync();
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
+                },
+                close: function (model) {
+                    editorService.close();
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
+                }
+            }
+
+            editorService.mediaPicker(mediaPicker);
+
+        };
+
+        
+
+        $scope.sortableOptions = {
+            disabled: !$scope.isMultiPicker,
+            items: "li:not(.add-wrapper)",
+            cancel: ".unsortable",
+            update: function (e, ui) {
+                var r = [];
+                // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
+                // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
+                // watch do all the rest.
+                $timeout(function () {
+                    angular.forEach($scope.images, function (value, key) {
                         r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
                     });
                     $scope.ids = r;
-                    $scope.sync();
+                    sync();
                 }, 500, false);
             }
-        };
-
-        $scope.sync = function() {
-            $scope.model.value = $scope.ids.join();
         };
 
         $scope.showAdd = function () {
@@ -219,10 +235,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             return true;
         };
 
-        //here we declare a special method which will be called whenever the value has changed from the server
-        //this is instead of doing a watch on the model.value = faster
-        $scope.model.onValueChanged = function (newVal, oldVal) {
-            //update the display val again if it has changed from the server
-            setupViewModel();
-        };
+        init();
+        
     });

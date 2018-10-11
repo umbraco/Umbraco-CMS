@@ -8,7 +8,8 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Security.Identity;
+using Umbraco.Web.Security;
+
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 

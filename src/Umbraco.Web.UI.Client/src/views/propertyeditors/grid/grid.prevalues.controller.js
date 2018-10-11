@@ -28,7 +28,7 @@ angular.module("umbraco")
                     name: "1 column layout",
                     sections: [
                         {
-                            grid: 12,
+                            grid: 12
                         }
                     ]
                 },
@@ -36,7 +36,7 @@ angular.module("umbraco")
                     name: "2 column layout",
                     sections: [
                         {
-                            grid: 4,
+                            grid: 4
                         },
                         {
                             grid: 8
@@ -189,7 +189,7 @@ angular.module("umbraco")
             if(toggle){
                 collection = [];
             }else{
-                delete collection;
+                collection = null;
             }
         };
 

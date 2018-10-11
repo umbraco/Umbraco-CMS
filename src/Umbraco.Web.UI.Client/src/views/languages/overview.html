@@ -28,14 +28,38 @@
             </umb-editor-sub-header>
             
             <table class="table table-hover" ng-if="!vm.loading">
+                <thead>
+                    <tr>
+                        <th>Language</th>
+                        <th>Default</th>
+                        <th>Mandatory</th>
+                        <th>Fallback</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <tr ng-repeat="language in vm.languages" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
                             <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
                             <span class="bold">{{ language.name }}</span>
-                            <span ng-if="language.isDefault">- {{vm.labels.general}}</span>
                         </td>
-                        <td><span ng-if="language.isMandatory">{{vm.labels.mandatory}}</span></td>
+                        <td>
+                            <umb-checkmark
+                                ng-if="language.isDefault"
+                                checked="language.isDefault"
+                                size="xs">
+                            </umb-checkmark>
+                        </td>
+                        <td>
+                            <umb-checkmark
+                                ng-if="language.isMandatory"
+                                checked="language.isMandatory"
+                                size="xs">
+                            </umb-checkmark>
+                        </td>
+                        <td>
+                            <span ng-if="language.fallbackLanguageId">{{vm.getLanguageById(language.fallbackLanguageId).name}}</span>
+                            <span ng-if="!language.fallbackLanguageId">(none)</span>
+                        </td>
                         <td style="text-align: right;">
                             <umb-button
                                 ng-if="!language.isDefault"

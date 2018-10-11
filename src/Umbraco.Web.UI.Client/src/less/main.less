@@ -48,6 +48,7 @@ h5.-black {
     border: none
 }
 .bootstrap-datetimepicker-widget {
+  width: auto !important;
     td {
         &.active, span.active {
             background: @turquoise !important;
@@ -116,7 +117,7 @@ h5.-black {
 
 /* FORM GRID */
 .umb-pane {
-  margin: 30px 20px;
+  margin: 20px;
 }
 .umb-control-group {
   border-bottom: 1px solid @gray-10;
@@ -649,4 +650,13 @@ input[type=checkbox]:checked + .input-label--small {
 .bootstrap-datetimepicker-widget th,
 .bootstrap-datetimepicker-widget td span {
 	border-radius: 0 !important;
+}
+
+.diff del {
+  background-color: @red-l3;
+}
+
+.diff ins {
+  background-color: @green-l3;
+  text-decoration: none;
 }

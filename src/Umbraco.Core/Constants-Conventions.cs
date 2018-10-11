@@ -23,20 +23,12 @@ namespace Umbraco.Core
             {
                 public const string MemberUsernameRuleType = "MemberUsername";
                 public const string MemberRoleRuleType = "MemberRole";
-
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberIdRuleType = "MemberId";
             }
 
 
             public static class DataTypes
             {
                 public const string ListViewPrefix = "List View - ";
-            }
-
-            public static class PropertyGroups
-            {
-                public const string ListViewGroupName = "umbContainerView";
             }
 
             /// <summary>
@@ -99,6 +91,11 @@ namespace Umbraco.Core
                 /// Property alias for the Media's file extension.
                 /// </summary>
                 public const string Extension = "umbracoExtension";
+
+				/// <summary>
+				/// The default height/width of an image file if the size can't be determined from the metadata
+				/// </summary>
+				public const int DefaultSize = 200;
             }
 
             /// <summary>
@@ -330,6 +327,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }
         }
     }

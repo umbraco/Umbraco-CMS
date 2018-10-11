@@ -26,6 +26,7 @@ namespace Umbraco.Web.Install
 {
     public sealed class InstallHelper
     {
+        private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
@@ -116,7 +117,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
+                _logger.Error<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
         }
 
@@ -168,22 +169,23 @@ namespace Umbraco.Web.Install
 
         internal IEnumerable<Package> GetStarterKits()
         {
-            var packages = new List<Package>();
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
 
+            var packages = new List<Package>();
             try
             {
-                var requestUri = $"http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (var httpClient = new HttpClient())
-                using (var response = httpClient.SendAsync(request).Result)
                 {
+                    var response = _httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }
             catch (AggregateException ex)
             {
-                _logger.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                _logger.Error<InstallHelper>(ex, "Could not download list of available starter kits");
             }
 
             return packages;

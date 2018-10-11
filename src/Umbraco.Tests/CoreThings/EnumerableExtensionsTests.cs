@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.CoreThings
         }
 
         [Test]
-        public void Flatten_List_2()
+        public void SelectRecursive_2()
         {
             var hierarchy = new TestItem("1")
             {
@@ -50,19 +51,13 @@ namespace Umbraco.Tests.CoreThings
                         }
                 };
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = hierarchy.Children.FlattenList(x => x.Children);
-#pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
-            Assert.AreEqual(3, flattened.Count());
             Assert.AreEqual(3, selectRecursive.Count());
-
-            Assert.IsTrue(flattened.SequenceEqual(selectRecursive));
         }
 
         [Test]
-        public void Flatten_List()
+        public void SelectRecursive()
         {
             var hierarchy = new TestItem("1")
             {
@@ -117,17 +112,8 @@ namespace Umbraco.Tests.CoreThings
                 }
             };
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            var flattened = hierarchy.Children.FlattenList(x => x.Children);
-#pragma warning restore CS0618 // Type or member is obsolete
             var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
-
-            Assert.AreEqual(10, flattened.Count());
             Assert.AreEqual(10, selectRecursive.Count());
-
-            // both methods return the same elements, but not in the same order
-            Assert.IsFalse(flattened.SequenceEqual(selectRecursive));
-            foreach (var x in flattened) Assert.IsTrue(selectRecursive.Contains(x));
         }
 
         private class TestItem

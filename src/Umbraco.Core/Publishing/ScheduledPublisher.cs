@@ -35,7 +35,7 @@ namespace Umbraco.Core.Publishing
             var counter = 0;
             var contentForRelease = _contentService.GetContentForRelease().ToArray();
             if (contentForRelease.Length > 0)
-                _logger.Debug<ScheduledPublisher>(() => $"There's {contentForRelease.Length} item(s) of content to be published");
+                _logger.Debug<ScheduledPublisher>("There's {ContentItemsForRelease} item(s) of content to be published", contentForRelease.Length);
             foreach (var d in contentForRelease)
             {
                 try
@@ -43,26 +43,26 @@ namespace Umbraco.Core.Publishing
                     d.ReleaseDate = null;
                     d.PublishCulture(); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
-                    _logger.Debug<ContentService>(() => $"Result of publish attempt: {result.Result}");
+                    _logger.Debug<ContentService>("Result of publish attempt: {PublishResult}", result.Result);
                     if (result.Success == false)
                     {
-                        _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}");
+                        _logger.Error<ScheduledPublisher>(null, "Error publishing node {NodeId}", d.Id);
                     }
                     else
                     {
                         counter++;
                     }
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}", ee);
+                    _logger.Error<ScheduledPublisher>(ex, "Error publishing node {NodeId}", d.Id);
                     throw;
                 }
             }
 
             var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
             if (contentForExpiration.Length > 0)
-                _logger.Debug<ScheduledPublisher>(() => $"There's {contentForExpiration.Length} item(s) of content to be unpublished");
+                _logger.Debug<ScheduledPublisher>("There's {ContentItemsForExpiration} item(s) of content to be unpublished", contentForExpiration.Length);
             foreach (var d in contentForExpiration)
             {
                 try
@@ -74,9 +74,9 @@ namespace Umbraco.Core.Publishing
                         counter++;
                     }
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    _logger.Error<ScheduledPublisher>($"Error unpublishing node {d.Id}", ee);
+                    _logger.Error<ScheduledPublisher>(ex, "Error unpublishing node {NodeId}", d.Id);
                     throw;
                 }
             }

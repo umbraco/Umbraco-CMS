@@ -15,7 +15,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
     /// </summary>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly HealthCheckCollection _checks;
@@ -69,9 +69,9 @@ namespace Umbraco.Web.HealthCheck
                 //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);
                 return check.GetStatus();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>("Exception in health check: " + check.Name, e);
+                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}" + check.Name);
                 throw;
             }
         }

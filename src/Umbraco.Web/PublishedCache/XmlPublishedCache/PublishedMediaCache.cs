@@ -122,13 +122,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         //TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }
@@ -306,13 +306,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         //TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }
@@ -330,8 +330,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
             if (miss < ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                Current.Logger.Warn<PublishedMediaCache>(() => $"Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
-                    + " them from DB. This may indicate that the Examine index is corrupted.");
+                Current.Logger.Warn<PublishedMediaCache>("Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
+                    + " them from DB. This may indicate that the Examine index is corrupted.", ExamineIndexMissMax);
 
             return ConvertFromIMedia(media);
         }
@@ -348,8 +348,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            Current.Logger.Warn<PublishedMediaCache>(() =>
-                $"Could not retrieve media {id} from Examine index or from legacy library.GetMedia method");
+            Current.Logger.Warn<PublishedMediaCache>("Could not retrieve media {MediaId} from Examine index or from legacy library.GetMedia method", id);
 
             return null;
         }

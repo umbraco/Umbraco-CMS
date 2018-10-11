@@ -5,43 +5,13 @@
     <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
-            
-            <div class="umb-split-views">
-                <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
-                    
-                    <umb-load-indicator
-                        ng-if="editor.loading">
-                    </umb-load-indicator>
 
-                    <div class="umb-split-view__content" ng-if="!editor.loading">
-                        <umb-editor-header 
-                            menu="page.menu"
-                            hide-menu="page.hideActionsMenu"
-                            name="editor.content.name"
-                            hide-icon="true"
-                            hide-description="true" 
-                            hide-alias="true"
-                            navigation="editor.content.apps"
-                            variants="editor.content.variants"
-                            hide-change-variant="page.hideChangeVariant"
-                            on-back="backToListView()"
-                            show-back-button="page.listViewPath !== null"
-                            split-view-open="editors.length > 1"
-                            on-open-in-split-view="openInSplitView(variant)"
-                            on-close-split-view="closeSplitView($index, editor)">
-                        </umb-editor-header>
-
-                        <umb-editor-container>
-                            <umb-editor-sub-views 
-                                ng-if="!page.loading" 
-                                sub-views="editor.content.apps" 
-                                model="editor.content">
-                            </umb-editor-sub-views>    
-                        </umb-editor-container>
-                    </div>
-
-                </div>
-            </div>
+            <umb-variant-content-editors 
+                page="page"
+                content="content"
+                culture="culture"
+                on-select-app="appChanged(app)">
+            </umb-variant-content-editors>
 
             <umb-editor-footer>
 
@@ -68,14 +38,25 @@
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview"
-                        type="button" 
-                        button-style="info" 
+                        ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
+                        type="button"
+                        button-style="outline"
                         action="preview(content)"
-                        label="Preview page" 
                         label-key="buttons_showPage">
                     </umb-button>
 
+                    <umb-button 
+                        ng-if="page.showSaveButton"
+                        alias="save"
+                        type="button"
+                        button-style="info"
+                        state="page.saveButtonState"
+                        action="save(content)"
+                        label-key="buttons_save"
+                        shortcut="ctrl+s"
+                        add-ellipsis="{{page.saveButtonEllipsis}}">
+                    </umb-button>
+                    
                     <umb-button-group 
                         ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"

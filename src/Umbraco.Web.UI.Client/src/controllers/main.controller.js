@@ -8,13 +8,15 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService, editorService) {
+function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.editors = [];
     $scope.overlay = {};
+    $scope.drawer = {};
+    $scope.search = {};
     
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -39,6 +41,10 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         }
 
         eventsService.emit("app.closeDialogs", event);
+    };
+
+    $scope.closeSearch = function() {
+        appState.setSearchState("show", false);
     };
 
     var evts = [];
@@ -87,6 +93,8 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             $location.path("/").search("");
             historyService.removeAll();
             treeService.clearCache();
+            editorService.closeAll();
+            overlayService.close();
 
             //if the user changed, clearout local storage too - could contain sensitive data
             localStorageService.clearAll();
@@ -112,9 +120,15 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         };
     }));
 
+    // events for search
+    evts.push(eventsService.on("appState.searchState.changed", function (e, args) {
+        if (args.key === "show") {
+            $scope.search.show = args.value;
+        }
+    }));
+
     // events for drawer
     // manage the help dialog by subscribing to the showHelp appState
-    $scope.drawer = {};
     evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
         // set view
         if (args.key === "view") {
@@ -154,6 +168,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.backdrop = args;
     }));
 
+    // event for infinite editors
     evts.push(eventsService.on("appState.editors.add", function (name, args) {
         $scope.editors = args.editors;
     }));

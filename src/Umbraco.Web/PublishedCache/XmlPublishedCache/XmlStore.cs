@@ -194,9 +194,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
-            ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
 
             _withRepositoryEvents = true;
         }
@@ -213,9 +213,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
-            ContentTypeService.UowRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity -= OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
 
             _withRepositoryEvents = false;
         }
@@ -409,9 +409,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 }
                 dtd.Append(dtdInner);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Current.Logger.Error<ContentTypeService>("Failed to build a DTD for the Xml cache.", exception);
+                Current.Logger.Error<ContentTypeService>(ex, "Failed to build a DTD for the Xml cache.");
             }
 
             dtd.AppendLine("]>");
@@ -696,12 +696,12 @@ AND (umbracoNode.id=@id)";
 
                 Current.Logger.Info<XmlStore>("Saved Xml to file.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>("Failed to save Xml to file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -736,12 +736,12 @@ AND (umbracoNode.id=@id)";
 
                 Current.Logger.Info<XmlStore>("Saved Xml to file.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>("Failed to save Xml to file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -796,9 +796,9 @@ AND (umbracoNode.id=@id)";
                 Current.Logger.Warn<XmlStore>("Failed to load Xml, file does not exist.");
                 return null;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Current.Logger.Error<XmlStore>("Failed to load Xml from file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
                 try
                 {
                     DeleteXmlFile();
@@ -1038,7 +1038,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    Current.Logger.Debug<XmlStore>(() => $"Notified {payload.ChangeTypes} for content {payload.Id}.");
+                    Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                     {
@@ -1071,7 +1071,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
-                        Current.Logger.Debug<XmlStore>(() => $"Notified, content {payload.Id} has no published version.");
+                        Current.Logger.Debug<XmlStore>("Notified, content {ContentId} has no published version.", payload.Id);
+
                         if (current != null)
                         {
                             // remove from xml if exists
@@ -1109,7 +1110,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             if (dtos.MoveNext() == false)
                             {
                                 // gone fishing, remove (possible race condition)
-                                Current.Logger.Debug<XmlStore>(() => $"Notifified, content {payload.Id} gone fishing.");
+                                Current.Logger.Debug<XmlStore>("Notified, content {ContentId} gone fishing.", payload.Id);
+
                                 if (current != null)
                                 {
                                     // remove from xml if exists
@@ -1222,7 +1224,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>(() => $"Notified {payload.ChangeTypes} for content type {payload.Id}.");
+                Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
 
             if (ids.Length > 0) // must have refreshes, not only removes
                 RefreshContentTypes(ids);
@@ -1239,9 +1241,11 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // the types will be reloaded if/when needed
             foreach (var payload in payloads)
                 _contentTypeCache.ClearDataType(payload.Id);
-
+            
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>(() => $"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}.");
+                Current.Logger.Debug<XmlStore>("Notified {RemovedStatus} for data type {payload.Id}",
+                    payload.Removed ? "Removed" : "Refreshed",
+                    payload.Id);
 
             // that's all we need to do as the changes have NO impact whatsoever on the Xml content
 
@@ -1742,7 +1746,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // contentXml contains published content!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
@@ -1815,7 +1819,7 @@ WHERE cmsPreviewXml.nodeId IN (
             {
                 // .GetPagedResultsByQuery implicitely adds ({Constants.DatabaseSchema.Tables.Document}.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // previewXml contains edit content!
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
@@ -1888,7 +1892,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
@@ -1957,7 +1961,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

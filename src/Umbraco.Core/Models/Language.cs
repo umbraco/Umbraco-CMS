@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models
         private string _cultureName;
         private bool _isDefaultVariantLanguage;
         private bool _mandatory;
+        private int? _fallbackLanguageId;
 
         public Language(string isoCode)
         {
@@ -30,13 +31,12 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
             public readonly PropertyInfo CultureNameSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.CultureName);
-            public readonly PropertyInfo IsDefaultVariantLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsDefaultVariantLanguage);
-            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.Mandatory);
+            public readonly PropertyInfo IsDefaultVariantLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsDefault);
+            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsMandatory);
+            public readonly PropertyInfo FallbackLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, int?>(x => x.FallbackLanguageId);
         }
 
-        /// <summary>
-        /// Gets or sets the Iso Code for the Language
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string IsoCode
         {
@@ -44,9 +44,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _isoCode, Ps.Value.IsoCodeSelector);
         }
 
-        /// <summary>
-        /// Gets or sets the Culture Name for the Language
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string CultureName
         {
@@ -54,22 +52,29 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector);
         }
 
-        /// <summary>
-        /// Returns a <see cref="CultureInfo"/> object for the current Language
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         public CultureInfo CultureInfo => CultureInfo.GetCultureInfo(IsoCode);
 
-        public bool IsDefaultVariantLanguage
+        /// <inheritdoc />
+        public bool IsDefault
         {
             get => _isDefaultVariantLanguage;
             set => SetPropertyValueAndDetectChanges(value, ref _isDefaultVariantLanguage, Ps.Value.IsDefaultVariantLanguageSelector);
         }
 
-        public bool Mandatory
+        /// <inheritdoc />
+        public bool IsMandatory
         {
             get => _mandatory;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector);
+        }
+
+        /// <inheritdoc />
+        public int? FallbackLanguageId
+        {
+            get => _fallbackLanguageId;
+            set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageId, Ps.Value.FallbackLanguageSelector);
         }
     }
 }

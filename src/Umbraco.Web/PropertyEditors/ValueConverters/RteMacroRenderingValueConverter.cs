@@ -9,6 +9,7 @@ using System.Linq;
 using HtmlAgilityPack;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -73,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, UmbracoContext.Current);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly

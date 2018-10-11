@@ -6,8 +6,10 @@
         {
             // pure mocks
             Mock,
-            // log4net for tests
-            Log4Net
+            // Serilog for tests
+            Serilog,
+            // console logger
+            Console
         }
 
         public enum Database

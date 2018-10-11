@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -27,6 +28,45 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            var permissions = Services.UserService
+                .GetPermissions(Security.CurrentUser, nodeIds);
+
+            var permissionsDictionary = new Dictionary<int, string[]>();
+            foreach (var nodeId in nodeIds)
+            {
+                var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
+                permissionsDictionary.Add(nodeId, aggregatePerms);
+            }
+
+            return permissionsDictionary;
+        }
+
+        /// <summary>
+        /// Checks a nodes permission for the current user
+        /// </summary>
+        /// <param name="permissionToCheck"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public bool HasPermission(string permissionToCheck, int nodeId)
+        {
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Saves a tour status for the current user
         /// </summary>

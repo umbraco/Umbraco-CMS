@@ -447,7 +447,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), "Could not parse the json string: " + json, ex);
+                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
                 }
             }
 

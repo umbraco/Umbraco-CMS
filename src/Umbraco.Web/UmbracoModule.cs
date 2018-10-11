@@ -21,6 +21,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Web
 {
@@ -97,11 +98,6 @@ namespace Umbraco.Web
             httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
             // ok, process
-
-            // create the LegacyRequestInitializer
-            // and initialize legacy stuff
-            var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
-            legacyRequestInitializer.InitializeRequest();
 
             // create the UmbracoContext singleton, one per request, and assign
             // replace existing if any (eg during app startup, a temp one is created)
@@ -354,7 +350,10 @@ namespace Umbraco.Web
             var end = false;
             var response = context.Response;
 
-            logger.Debug<UmbracoModule>(() => $"Response status: Redirect={(pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none")}, Is404={(pcr.Is404 ? "true" : "false")}, StatusCode={pcr.ResponseStatusCode}");
+            logger.Debug<UmbracoModule>("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
+                pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
+                pcr.Is404 ? "true" : "false",
+                pcr.ResponseStatusCode);
 
             if(pcr.Cacheability != default)
                 response.Cache.SetCacheability(pcr.Cacheability);
@@ -489,7 +488,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not dispose item with key {Key}", k);
                 }
                 try
                 {
@@ -497,7 +496,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not dispose item key {Key}", k);
                 }
             }
         }
@@ -548,16 +547,26 @@ namespace Umbraco.Web
             // get our dependencies injected manually, through properties.
             Core.Composing.Current.Container.InjectProperties(this);
 
+            //Create a GUID to use as some form of request ID
+            var requestId = Guid.Empty;
+
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                Logger.Debug<UmbracoModule>(() => $"Begin request: {httpContext.Request.Url}.");
+
+                var httpRequestId = Guid.Empty;
+                LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
+
+                Logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}",
+                    httpRequestId,
+                    httpContext.Request.Url);
+
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
             //disable asp.net headers (security)
             // This is the correct place to modify headers according to MS:
-            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+            // https://our.umbraco.com/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
             app.PostReleaseRequestState += (sender, args) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
@@ -592,9 +601,16 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+                if (UmbracoContext.Current != null)
                 {
-                    Logger.Debug<UmbracoModule>(() => $"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
+                    var httpRequestId = Guid.Empty;
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
+
+                    Logger.Verbose<UmbracoModule>(
+                        "End request [{HttpRequestId}]: {RequestUrl} took {Duration}ms",
+                        httpRequestId,
+                        httpContext.Request.Url,
+                        DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
 
                 OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
@@ -651,7 +667,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not add reserved path route", ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not add reserved path route");
                 }
             }
 

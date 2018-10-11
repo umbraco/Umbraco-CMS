@@ -64,11 +64,9 @@
 
 .umb-editor-header {
 	background: @white;
-	// flex: 1 1 60px;
 	position: absolute;
 	padding: 0 20px;
-	z-index: 1;
-	// box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.16);
+	z-index: @zIndexEditor;
 	border-bottom: 1px solid @gray-9;
 	width: 100%;
 	box-sizing: border-box;
@@ -104,8 +102,14 @@ input.umb-editor-header__name-input {
 	background: @white;
 	border: 1px solid @gray-8;
 	&:hover {
-		background-color: @gray-10;
-		border: 1px solid @gray-8;
+		border-color: @turquoise-d1;
+	}
+}
+
+input.umb-editor-header__name-input:disabled {
+	background-color: @gray-10;
+	&:hover{
+		border-color: @gray-8;
 	}
 }
 
@@ -174,6 +178,11 @@ a.umb-variant-switcher__toggle {
 .umb-variant-switcher__name-wrapper:focus {
 	background-color: @gray-10;
 	outline: none;
+}
+
+.umb-variant-switcher_item--not-allowed:not(.umb-variant-switcher_item--current) .umb-variant-switcher__name-wrapper:hover {
+	background-color: @white !important;
+	cursor: default;
 }
 
 .umb-variant-switcher__item:hover .umb-variant-switcher__split-view {
@@ -245,15 +254,17 @@ a.umb-variant-switcher__toggle {
 	height: @editorFooterHeight;
 	padding: 10px 20px;
 	background: @white;
-	// box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.16);
 	border-top: 1px solid @gray-9;
 	z-index: 1;
 	bottom: 0;
+	display: flex;
+	align-items: center;
 }
 
 .umb-editor-footer-content {
 	display: flex;
 	align-items: center;
+	flex: 1 1 auto;
 }
   
 .umb-editor-footer-content__right-side {
@@ -265,4 +276,15 @@ a.umb-variant-switcher__toggle {
 .umb-editor-footer-content__left-side {
 	margin-right: auto;
 	padding-right: 10px;
+}
+
+/* Confirm */
+.umb-editor-confirm {
+	background-color: @white;
+	padding: 20px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 10;
+	box-shadow: 0 -3px 12px 0px rgba(0,0,0,0.16);
 }

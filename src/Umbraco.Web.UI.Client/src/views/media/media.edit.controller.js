@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http, eventsService) {
+function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http, eventsService) {
     
     var evts = [];
     var nodeId = null;
@@ -45,6 +45,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
 
+        if (infiniteMode) {
+            return;
+        }
+
         if (!$scope.content.isChildOfListView) {
             navigationService.syncTree({ tree: "media", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 $scope.page.menu.currentNode = syncArgs.node;
@@ -75,10 +79,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
                 editorState.set($scope.content);
 
-                // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-                init($scope.content);
+                init();
 
                 $scope.page.loading = false;
 
@@ -92,49 +93,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             });
     }
 
-    function init(content) {
+    function init() {
 
-        // prototype content and info apps
-        var contentApp = {
-            "name": "Content",
-            "alias": "content",
-            "icon": "icon-document",
-            "view": "views/media/apps/content/content.html"
-        };
-
-        var infoApp = {
-            "name": "Info",
-            "alias": "info",
-            "icon": "icon-info",
-            "view": "views/media/apps/info/info.html"
-        };
-
-        var listview = {
-            "name": "Child items",
-            "alias": "childItems",
-            "icon": "icon-list",
-            "view": "views/media/apps/listview/listview.html"
-        };
-
-        $scope.content.apps = [];
-
-        if($scope.content.contentTypeAlias === "Folder") {
-          // add list view app
-          $scope.content.apps.push(listview);
-            
-          // remove the list view tab
-          angular.forEach($scope.content.tabs, function(tab, index){
-            if(tab.alias === "Contents") {
-              tab.hide = true;
-            }
-          });
-
-        } else {
-            $scope.content.apps.push(contentApp);
-        }
-        
-        $scope.content.apps.push(infoApp);
-        
         // set first app to active
         $scope.content.apps[0].active = true;
 
@@ -166,13 +126,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
                     editorState.set($scope.content);
                     $scope.busy = false;
+                    
+                    syncTreeNode($scope.content, data.path);
 
-                    // when don't want to sync the tree when the editor is open in infinite mode
-                    if(!infiniteMode) {
-                        syncTreeNode($scope.content, data.path);
-                    }
-
-                    init($scope.content);
+                    init();
 
                     $scope.page.saveButtonState = "success";
 
@@ -220,7 +177,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
+                serverValidationManager.notifyAndClearAllSubscriptions();
 
                 if(!infiniteMode) {
                     syncTreeNode($scope.content, data.path, true); 
@@ -234,10 +191,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                         });
                 }
 
-                // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-                init($scope.content);
+                init();
 
                 $scope.page.loading = false;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.Web;
 using umbraco;
 using Umbraco.Core.Configuration;
@@ -345,7 +346,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public CultureInfo Culture
         {
-            get { return _culture; }
+            get { return _culture ?? Thread.CurrentThread.CurrentCulture; }
             set
             {
                 EnsureWriteable();
@@ -487,7 +488,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
-        // see: https://our.umbraco.org/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
+        // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
         internal HttpCacheability Cacheability { get; set; }
 
         /// <summary>

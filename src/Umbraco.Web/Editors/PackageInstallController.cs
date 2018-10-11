@@ -24,6 +24,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.UI;
+using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Editors
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
         /// <summary>
@@ -72,9 +73,9 @@ namespace Umbraco.Web.Editors
                     installed.Delete(Security.GetUserId().ResultOr(0));
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error<PackageInstallController>("Failed to uninstall.", e);
+                Logger.Error<PackageInstallController>(ex, "Failed to uninstall.");
                 throw;
             }
 
@@ -188,7 +189,7 @@ namespace Umbraco.Web.Editors
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    Logger.Debug<PackageInstallController>(() => $"executing undo actions: {actionsXml.OuterXml}");
+                    Logger.Debug<PackageInstallController>("Executing undo actions: {UndoActionsXml}", actionsXml.OuterXml);
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {
@@ -199,13 +200,13 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                            Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                    Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
                 }
             }
 
@@ -582,8 +583,9 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Logger);
-            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
+            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             //these bits are super old, but cant find another way to do this currently

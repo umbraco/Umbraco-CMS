@@ -31,8 +31,8 @@ namespace Umbraco.Web.Scheduling
 
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
-                    _logger.Debug<ScheduledPublishing>("Does not run on slave servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<ScheduledPublishing>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
                     _logger.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
@@ -62,9 +62,9 @@ namespace Umbraco.Web.Scheduling
                 var publisher = new ScheduledPublisher(_contentService, _logger, _userService);
                 var count = publisher.CheckPendingAndProcess();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error<ScheduledPublishing>("Failed.", e);
+                _logger.Error<ScheduledPublishing>(ex, "Failed.");
             }
 
             return true; // repeat

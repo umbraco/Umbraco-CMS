@@ -48,10 +48,6 @@ namespace Umbraco.Web.Cache
 
             runtimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
 
-            // fixme - this is for entity service, not sure why we do it here and nowhere else?
-            runtimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            runtimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
             var idsRemoved = new HashSet<int>();
 
             foreach (var payload in payloads)
@@ -110,9 +106,6 @@ namespace Umbraco.Web.Cache
                 // when a public version changes
                 Current.ApplicationCache.ClearPartialViewCache();
                 MacroCacheRefresher.ClearMacroContentCache(CacheHelper); // just the content
-                
-                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-                Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             }
 
             base.Refresh(payloads);

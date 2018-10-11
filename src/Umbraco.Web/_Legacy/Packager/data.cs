@@ -180,7 +180,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<data>("An error occurred in GetAllPackages", ex);
+                    Current.Logger.Error<data>(ex, "An error occurred in GetAllPackages");
                 }
             }
 

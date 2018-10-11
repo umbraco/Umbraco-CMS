@@ -218,7 +218,7 @@ angular.module("umbraco")
                 // Fade in control when sorting stops
                 ui.item.context.style.opacity = "1";
 
-                ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
+                ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr("id"));
@@ -337,7 +337,7 @@ angular.module("umbraco")
             }
         }
 
-        $scope.addRow = function (section, layout) {
+        $scope.addRow = function (section, layout, isInit) {
 
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
@@ -349,8 +349,9 @@ angular.module("umbraco")
             if (row) {
                 section.rows.push(row);
             }
-
-            currentForm.$setDirty();
+            if (!isInit) {
+                currentForm.$setDirty();
+            }
 
             $scope.showRowConfigurations = false;
 
@@ -732,7 +733,7 @@ angular.module("umbraco")
             if (!section.rows || section.rows.length === 0) {
                 section.rows = [];
                 if(section.$allowedLayouts.length === 1){
-                    $scope.addRow(section, section.$allowedLayouts[0]);
+                    $scope.addRow(section, section.$allowedLayouts[0], true);
                 }
             } else {
                 _.forEach(section.rows, function (row, index) {

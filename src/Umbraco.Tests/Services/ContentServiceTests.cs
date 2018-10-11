@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Services
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
-        [Test]
+        [Test, Explicit]
         public void List_Ambiguous_Events()
         {
             var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
@@ -1208,7 +1208,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_UnPublish_Content()
+        public void Can_Unpublish_Content()
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
@@ -1847,7 +1847,7 @@ namespace Umbraco.Tests.Services
             object obj =
                 new
                 {
-                    tags = "Hello,World"
+                    tags = "[\"Hello\",\"World\"]"
                 };
             var content1 = MockedContent.CreateBasicContent(contentType);
             content1.PropertyValues(obj);
@@ -2006,13 +2006,13 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             // value has been set but no tags have been created (not published)
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             var contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
             // reloading the content yields the same result
             content = (Content) contentService.GetById(content.Id);
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
@@ -2020,7 +2020,7 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content);
 
             // now tags have been set (published)
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(2, contentTags.Length);
 
@@ -2028,7 +2028,7 @@ namespace Umbraco.Tests.Services
             var copy = contentService.Copy(content, content.ParentId, false);
 
             // copy is not published, so property has value, but no tags have been created
-            Assert.AreEqual("hello,world", copy.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", copy.GetValue(propAlias));
             var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
             Assert.AreEqual(0, copiedTags.Length);
 
@@ -2489,7 +2489,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langUk = new Language("en-UK") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2524,7 +2524,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langUk = new Language("en-UK") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2562,7 +2562,7 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
-            var langXx = new Language("pt-PT") { IsDefaultVariantLanguage = true };
+            var langXx = new Language("pt-PT") { IsDefault = true };
             var langFr = new Language("fr-FR");
             var langUk = new Language("en-UK");
             var langDe = new Language("de-DE");
@@ -2624,9 +2624,9 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
 
-            // not published => must be edited
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
+            // not published => must be edited, if available
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
             // act
 
@@ -2666,8 +2666,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true), (langDe, false));
 
             // fr and uk, published without changes, not edited
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
@@ -2726,8 +2726,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true), (langDe, false));
 
             // we have changed values so now fr and uk are edited
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
@@ -2770,8 +2770,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true), (langDe, false));
 
             // and so, fr has to be edited
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
@@ -2817,8 +2817,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true), (langDe, false));
 
             // and so, fr has to be edited - uk still is
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
@@ -2859,8 +2859,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true), (langDe, false));
 
             // no change, back to published
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
@@ -2882,8 +2882,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true), (langDe, false));
 
             // now, uk is no more edited
-            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
-            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
+            AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, false));
+            AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, false));
 
             AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
             AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw

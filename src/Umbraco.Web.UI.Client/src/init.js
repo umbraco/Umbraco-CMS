@@ -43,8 +43,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         }
 
         var currentRouteParams = null;
-        var globalQueryStrings = ["mculture"];
-
+        
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -123,33 +122,25 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 $route.reload();
             }
             else {
-                //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
-                //used as a global persistent query string that does not change routes.
+                
+                //check if the location being changed is only due to global/state query strings which means the location change
+                //isn't actually going to cause a route change.
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
+                    //The location change will cause a route change. We need to ensure that the global/state
+                    //query strings have not been stripped out. If they have, we'll re-add them and re-route.
 
-                var currUrlParts = currentRouteParams;
-                var nextUrlParts = next.params;
-
-                var allowRoute = true;
-
-                //the only time that we want to cancel is if any of the globalQueryStrings have changed
-                //in which case the number of parts need to be equal before comparing values
-                if (_.keys(currUrlParts).length == _.keys(nextUrlParts).length) {
-                    var partsChanged = 0;
-                    _.each(currUrlParts, function (value, key) {
-                        if (globalQueryStrings.indexOf(key) === -1) {
-                            if (value.toLowerCase() !== nextUrlParts[key].toLowerCase()) {
-                                partsChanged++;
-                            }
-                        }
-                    });
-                    if (partsChanged === 0) {
-                        allowRoute = false; //nothing except our query strings chagned, so don't continue routing
+                    var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
+                    if (toRetain) {
+                        $route.updateParams(toRetain);
+                    }
+                    else {
+                        //continue the route
+                        $route.reload();
                     }
                 }
-
-                if (allowRoute) {
-                    //continue the route
-                    $route.reload();
+                else {
+                    //navigation is not changing but we should update the currentRouteParams to include all current parameters
+                    currentRouteParams = angular.copy(next.params); 
                 }
             }
         });

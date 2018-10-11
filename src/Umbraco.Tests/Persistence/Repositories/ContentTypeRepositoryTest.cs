@@ -63,8 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
-
-
+        
         [Test]
         public void Maps_Templates_Correctly()
         {
@@ -377,7 +376,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.Save(contentType);
                 
 
-                var dirty = ((ICanBeDirty)contentType).IsDirty();
+                var dirty = contentType.IsDirty();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);

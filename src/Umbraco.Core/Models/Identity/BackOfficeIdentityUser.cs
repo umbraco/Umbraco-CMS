@@ -93,14 +93,6 @@ namespace Umbraco.Core.Models.Identity
             _roles.CollectionChanged += _roles_CollectionChanged;
         }
 
-        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
-        {
-            // NOTE the authenticationType must match the umbraco one
-            // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await manager.CreateIdentityAsync(this, Constants.Security.BackOfficeAuthenticationType);
-            return userIdentity;
-        }
-
         /// <summary>
         /// Returns true if an Id has been set on this object this will be false if the object is new and not peristed to the database
         /// </summary>

@@ -88,7 +88,7 @@ namespace Umbraco.Core.Configuration
             if (_healthChecks == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IHealthChecks) + " from config file, ensure the web.config and healthchecks.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
                 throw ex;
             }
 
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Configuration
             if (_dashboardSection == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
                 throw ex;
             }
 
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Configuration
             if (_umbracoSettings == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>("Config error", ex);
+                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
                 throw ex;
             }
 

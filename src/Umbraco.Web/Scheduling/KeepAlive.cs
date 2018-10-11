@@ -12,6 +12,7 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
+        private static HttpClient _httpClient;
         private readonly ProfilingLogger _proflog;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
@@ -21,15 +22,17 @@ namespace Umbraco.Web.Scheduling
             _runtime = runtime;
             _logger = logger;
             _proflog = proflog;
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            // not on slaves nor unknown role servers
+            // not on replicas nor unknown role servers
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
-                    _logger.Debug<KeepAlive>("Does not run on slave servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<KeepAlive>("Does not run on replica servers.");
                     return true; // role may change!
                 case ServerRole.Unknown:
                     _logger.Debug<KeepAlive>("Does not run on servers with unknown role.");
@@ -57,15 +60,13 @@ namespace Umbraco.Web.Scheduling
                     }
 
                     var url = umbracoAppUrl + "/ping.aspx";
-                    using (var wc = new HttpClient())
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Get, url);
-                        var result = await wc.SendAsync(request, token);
-                    }
+
+                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    var result = await _httpClient.SendAsync(request, token);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<KeepAlive>(ex, "Failed (at '{UmbracoAppUrl}').", umbracoAppUrl);
                 }
             }
 

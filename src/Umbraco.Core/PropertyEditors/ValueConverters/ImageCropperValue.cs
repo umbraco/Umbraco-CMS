@@ -138,7 +138,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         /// </summary>
         /// <returns></returns>
         public bool HasFocalPoint()
-            => FocalPoint != null && FocalPoint.Left != 0.5m && FocalPoint.Top != 0.5m;
+            => FocalPoint != null && (FocalPoint.Left != 0.5m || FocalPoint.Top != 0.5m);
 
         /// <summary>
         /// Determines whether the value has a specified crop.

@@ -290,8 +290,7 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            //return the saveInternal method but catch rejections since this is the upper most caller
-            return saveInternal().catch(angular.noop); 
+            saveInternal();
         }
 
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
@@ -304,6 +303,9 @@
 
                 // reformat allowed content types to array if id's
                 vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+
+                //if this is a new item and it's creating a template, ensure that the template alias is synced correctly
+                syncTemplateAlias(vm.contentType);
 
                 return contentEditingHelper.contentEditorPerformSave({
                     saveMethod: contentTypeResource.save,
@@ -409,6 +411,24 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+        }
+
+        /** Syncs the template alias for new doc types before saving if a template is to be created */
+        function syncTemplateAlias(contentType) {
+            if (!noTemplate && contentType.id === 0) {
+                //sync default template that had the placeholder flag
+                if (contentType.defaultTemplate !== null && contentType.defaultTemplate.placeholder) {
+                    contentType.defaultTemplate.name = contentType.name;
+                    contentType.defaultTemplate.alias = contentType.alias;
+                }
+                //sync allowed templates that had the placeholder flag
+                angular.forEach(contentType.allowedTemplates, function (allowedTemplate) {
+                    if (allowedTemplate.placeholder) {
+                        allowedTemplate.name = contentType.name;
+                        allowedTemplate.alias = contentType.alias;
+                    }
+                });
+            }
         }
 
         function convertLegacyIcons(contentType) {

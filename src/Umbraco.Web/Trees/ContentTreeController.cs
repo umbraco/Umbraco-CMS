@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Media,
         Constants.Applications.Users,
         Constants.Applications.Settings,
-        Constants.Applications.Developer,
+        Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
@@ -47,10 +47,10 @@ namespace Umbraco.Web.Trees
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var langId = queryStrings?["culture"];
+            var culture = queryStrings?["culture"];
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
-            if (CanUserAccessNode(entity, allowedUserOptions, langId))
+            if (CanUserAccessNode(entity, allowedUserOptions, culture))
             {
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
@@ -74,11 +74,23 @@ namespace Umbraco.Web.Trees
                 {
                     var documentEntity = (IDocumentEntitySlim) entity;
 
-                    //fixme we need these statuses per variant but to do that we need to fix the issues listed in IDocumentEntitySlim
-                    if (!documentEntity.Published)
-                        node.SetNotPublishedStyle();
-                    //if (documentEntity.Edited)
-                    //    node.SetHasUnpublishedVersionStyle();
+                    if (!documentEntity.Variations.VariesByCulture())
+                    {
+                        if (!documentEntity.Published)
+                            node.SetNotPublishedStyle();
+                        else if (documentEntity.Edited)
+                            node.SetHasPendingVersionStyle();
+                    }
+                    else
+                    {
+                        if (!culture.IsNullOrWhiteSpace())
+                        {
+                            if (!documentEntity.PublishedCultures.Contains(culture))
+                                node.SetNotPublishedStyle();
+                            else if (documentEntity.EditedCultures.Contains(culture))
+                                node.SetHasPendingVersionStyle();
+                        }
+                    }
 
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
@@ -117,7 +129,7 @@ namespace Umbraco.Web.Trees
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "content", "content");
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -178,10 +190,7 @@ namespace Umbraco.Web.Trees
             return nodeMenu;
         }
 
-        protected override UmbracoObjectTypes UmbracoObjectType
-        {
-            get { return UmbracoObjectTypes.Document; }
-        }
+        protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Document;
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -226,18 +235,16 @@ namespace Umbraco.Web.Trees
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             AddActionNode<ActionMove>(item, menu, true);
             AddActionNode<ActionCopy>(item, menu);
-            AddActionNode<ActionChangeDocType>(item, menu, convert: true);
 
-            AddActionNode<ActionSort>(item, menu, true, true);
+            AddActionNode<ActionSort>(item, menu, true);
 
-            AddActionNode<ActionRollback>(item, menu, convert: true);
-            AddActionNode<ActionAudit>(item, menu, convert: true);
+            AddActionNode<ActionRollback>(item, menu);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
-            AddActionNode<ActionAssignDomain>(item, menu, convert: true);
+            AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);
             AddActionNode<ActionProtect>(item, menu, true, true);
-
-            AddActionNode<ActionNotify>(item, menu, true, true);
+            
+            AddActionNode<ActionNotify>(item, menu, true);
             AddActionNode<ActionSendToTranslate>(item, menu, convert: true);
 
             AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
@@ -281,13 +288,19 @@ namespace Umbraco.Web.Trees
 
             // we are getting the tree for a given culture,
             // for those items that DO support cultures, we need to get the proper name, IF it exists
-            // otherwise, invariant is fine
+            // otherwise, invariant is fine (with brackets)
 
-            if (docEntity.Variations.VariesByCulture() &&
-                docEntity.CultureNames.TryGetValue(culture, out var name) &&
-                !string.IsNullOrWhiteSpace(name))
+            if (docEntity.Variations.VariesByCulture())
             {
-                entity.Name = name;
+                if (docEntity.CultureNames.TryGetValue(culture, out var name) &&
+                    !string.IsNullOrWhiteSpace(name))
+                {
+                    entity.Name = name;
+                }
+                else
+                {
+                    entity.Name = "(" + entity.Name + ")";
+                }
             }
 
             if (string.IsNullOrWhiteSpace(entity.Name))

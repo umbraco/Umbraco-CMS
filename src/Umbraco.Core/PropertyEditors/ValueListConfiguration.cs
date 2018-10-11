@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class ValueListConfiguration
     {
-        [ConfigurationField("items", "Configure", "multivalues", Description = "Add and remove values for the list.")]
+        [ConfigurationField("items", "Configure", "multivalues", Description = "Add, remove or sort values for the list.")]
         public List<ValueListItem> Items { get; set; } = new List<ValueListItem>();
 
         public class ValueListItem

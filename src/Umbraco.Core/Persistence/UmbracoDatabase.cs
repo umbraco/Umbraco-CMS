@@ -190,13 +190,13 @@ namespace Umbraco.Core.Persistence
         }
 #endif
 
-        protected override void OnException(Exception x)
+        protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>("Exception (" + InstanceId + ").", x);
-            _logger.Debug<UmbracoDatabase>(() => "At:\r\n" + Environment.StackTrace);
+            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
+            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>(() => "Sql:\r\n" + CommandToString(LastSQL, LastArgs));
-            base.OnException(x);
+                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+            base.OnException(ex);
         }
 
         private DbCommand _cmd;
@@ -208,7 +208,7 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>(() => CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
+                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)

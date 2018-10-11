@@ -56,13 +56,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     Result = string.Format(xmlNode.Value ?? xmlNode.InnerText)
                 };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Current.Logger.Error<ConfigurationService>("Error trying to get configuration value", exception);
+                Current.Logger.Error<ConfigurationService>(ex, "Error trying to get configuration value");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
                 };
             }
         }
@@ -102,13 +102,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 xmlDocument.Save(_configFilePath);
                 return new ConfigurationServiceResult { Success = true };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Current.Logger.Error<ConfigurationService>("Error trying to update configuration", exception);
+                Current.Logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
                 };
             }
         }

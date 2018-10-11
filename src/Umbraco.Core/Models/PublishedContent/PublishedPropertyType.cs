@@ -194,17 +194,19 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
-        /// Determines whether a source value is an actual value, or not a value.
+        /// Determines whether a value is an actual value, or not a value.
         /// </summary>
         /// <remarks>Used by property.HasValue and, for instance, in fallback scenarios.</remarks>
-        public bool IsValue(object value)
+        public bool? IsValue(object value, PropertyValueLevel level)
         {
-            // if we have a converter, use the converter,
-            // otherwise use the old magic null & string comparisons
+            if (!_initialized) Initialize();
 
-            return _converter == null
-                ? value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false)
-                : _converter.IsValue(value);
+            // if we have a converter, use the converter
+            if (_converter != null)
+                return _converter.IsValue(value, level);
+
+            // otherwise use the old magic null & string comparisons
+            return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
         }
 
         /// <summary>

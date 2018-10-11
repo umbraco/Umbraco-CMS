@@ -167,7 +167,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public DateTime? GetCultureDate(string culture)
+        public DateTime? GetUpdateDate(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return null;
             if (!ContentTypeBase.VariesByCulture()) return null;
@@ -200,6 +200,12 @@ namespace Umbraco.Core.Models
 
                 Name = name; // may be null
             }
+        }
+
+        internal void TouchCulture(string culture)
+        {
+            if (ContentTypeBase.VariesByCulture() && _cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
+                _cultureInfos[culture] = (infos.Name, DateTime.Now);
         }
 
         protected void ClearCultureInfos()
@@ -280,26 +286,6 @@ namespace Umbraco.Core.Models
             Properties.Add(property);
         }
 
-        // HttpPostedFileBase is the base class that can be mocked
-        // HttpPostedFile is what we get in ASP.NET
-        // HttpPostedFileWrapper wraps sealed HttpPostedFile as HttpPostedFileBase
-
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, string culture = null, string segment = null)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), culture, segment);
-        }
-
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, string culture = null, string segment = null)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value, culture, segment);
-        }
-
         #endregion
 
         #region Copy
@@ -376,30 +362,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region Validation
-
-        /// <inheritdoc />
-        public bool IsValid(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
-
-            if (culture == null)
-            {
-                if (Name.IsNullOrWhiteSpace()) return false;
-                return ValidateProperties(null).Length == 0;
-            }
-
-            if (culture != "*")
-            {
-                var name = GetCultureName(culture);
-                if (name.IsNullOrWhiteSpace()) return false;
-                return ValidateProperties(culture).Length == 0;
-            }
-
-            // 'all cultures'
-            // those that have a name are ok, those without a name... we don't validate
-            return AvailableCultures.All(c => ValidateProperties(c).Length == 0);
-        }
-
+        
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = "*")
         {

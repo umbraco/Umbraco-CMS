@@ -17,6 +17,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
@@ -36,6 +37,7 @@ using Umbraco.Web.Services;
 using Umbraco.Examine;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.ContentApps;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
@@ -165,9 +167,14 @@ namespace Umbraco.Tests.Testing
                 Container.RegisterSingleton(f => Mock.Of<ILogger>());
                 Container.RegisterSingleton(f => Mock.Of<IProfiler>());
             }
-            else if (option == UmbracoTestOptions.Logger.Log4Net)
+            else if (option == UmbracoTestOptions.Logger.Serilog)
             {
-                Container.RegisterSingleton<ILogger>(f => new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))));
+                Container.RegisterSingleton<ILogger>(f => new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config"))));
+                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
+            }
+            else if (option == UmbracoTestOptions.Logger.Console)
+            {
+                Container.RegisterSingleton<ILogger>(f => new ConsoleLogger());
                 Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
             }
 
@@ -205,6 +212,9 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+
+            // register empty content apps collection
+            Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
         }
 
         protected virtual void ComposeCacheHelper()

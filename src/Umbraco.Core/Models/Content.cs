@@ -32,6 +32,7 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="culture">An optional culture.</param>
         public Content(string name, IContent parent, IContentType contentType, string culture = null)
             : this(name, parent, contentType, new PropertyCollection(), culture)
         { }
@@ -43,6 +44,7 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
+        /// <param name="culture">An optional culture.</param>
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parent, contentType, properties, culture)
         {
@@ -57,6 +59,7 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="culture">An optional culture.</param>
         public Content(string name, int parentId, IContentType contentType, string culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
@@ -68,6 +71,7 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
+        /// <param name="culture">An optional culture.</param>
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
@@ -215,15 +219,21 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public bool IsCulturePublished(string culture)
-            => _publishInfos != null && _publishInfos.ContainsKey(culture);
+            // just check _publishInfos
+            // a non-available culture could not become published anyways
+            =>  _publishInfos != null && _publishInfos.ContainsKey(culture); 
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
+            // just check _publishInfosOrig - a copy of _publishInfos
+            // a non-available culture could not become published anyways
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
-            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture));
+            => IsCultureAvailable(culture) && // is available, and
+               (!IsCulturePublished(culture) || // is not published, or
+                (_editedCultures != null && _editedCultures.Contains(culture))); // is edited
 
         /// <inheritdoc/>
         [IgnoreDataMember]
@@ -259,7 +269,7 @@ namespace Umbraco.Core.Models
             if (_publishInfos == null)
                 _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _publishInfos[culture] = (name, date);
+            _publishInfos[culture.ToLowerInvariant()] = (name, date);
         }
 
         private void ClearPublishInfos()
@@ -284,7 +294,7 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
             if (_editedCultures == null)
                 _editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _editedCultures.Add(culture);
+            _editedCultures.Add(culture.ToLowerInvariant());
         }
 
         // sets all publish edited

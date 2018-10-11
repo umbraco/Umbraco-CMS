@@ -25,6 +25,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -194,6 +195,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
+            var hideDisabledUsers = UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -214,6 +216,14 @@ namespace Umbraco.Web.Editors
             if (filter.IsNullOrWhiteSpace() == false)
             {
                 filterQuery.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+            }
+
+            if (hideDisabledUsers)
+            {
+                if (userStates == null || userStates.Any() == false)
+                {
+                    userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
+                }
             }
 
             long pageIndex = pageNumber - 1;

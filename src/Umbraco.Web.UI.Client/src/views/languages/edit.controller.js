@@ -29,7 +29,10 @@
                 "languages_mandatoryLanguageHelp",
                 "languages_defaultLanguage",
                 "languages_defaultLanguageHelp",
-                "languages_addLanguage"
+                "languages_addLanguage",
+                "languages_noFallbackLanguageOption",
+                "languages_fallbackLanguageDescription",
+                "languages_fallbackLanguage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -39,8 +42,17 @@
                 vm.labels.defaultLanguage = values[3];
                 vm.labels.defaultLanguageHelp = values[4];
                 vm.labels.addLanguage = values[5];
+                vm.labels.noFallbackLanguageOption = values[6];
 
-                if($routeParams.create) {
+                $scope.properties = {
+                    fallbackLanguage: {
+                        alias: "fallbackLanguage",
+                        description: values[7],
+                        label: values[8]
+                    }
+                };
+
+                if ($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
                     languageResource.getCultures().then(function (culturesDictionary) {
                         var cultures = [];
@@ -53,10 +65,17 @@
                         vm.availableCultures = cultures;
                     });
                 }
-
             });
 
-            if(!$routeParams.create) {
+            vm.loading = true;
+            languageResource.getAll().then(function (languages) {
+                vm.availableLanguages = languages.filter(function (l) {
+                    return $routeParams.id != l.id;
+                });
+                vm.loading = false;
+            });
+
+            if (!$routeParams.create) {
 
                 vm.loading = true;
 
@@ -122,9 +141,7 @@
         }
 
         function toggleMandatory() {
-            if(!vm.language.isDefault) {
-                vm.language.isMandatory = !vm.language.isMandatory;
-            }
+            vm.language.isMandatory = !vm.language.isMandatory;
         }
 
         function toggleDefault() {
@@ -136,7 +153,6 @@
 
             vm.language.isDefault = !vm.language.isDefault;
             if(vm.language.isDefault) {
-                vm.language.isMandatory = true;
                 vm.showDefaultLanguageInfo = true;
             } else {
                 vm.showDefaultLanguageInfo = false;

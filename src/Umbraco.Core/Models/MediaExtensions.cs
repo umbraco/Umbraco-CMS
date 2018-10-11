@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<ImageCropperValueConverter>("Could not parse the string " + jsonString + " to a json object", ex);
+                    logger.Error<ImageCropperValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", jsonString);
                     return string.Empty;
                 }
             }

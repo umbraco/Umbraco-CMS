@@ -27,6 +27,8 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        //we have just one instance of HttpClient shared for the entire application
+        private static readonly HttpClient HttpClient = new HttpClient();
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
@@ -54,19 +56,16 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch dashboard json and parse to JObject
-                        var json = await web.GetStringAsync(url);
-                        content = JObject.Parse(json);
-                        result = content;
-                    }
+                    //fetch dashboard json and parse to JObject
+                    var json = await HttpClient.GetStringAsync(url);
+                    content = JObject.Parse(json);
+                    result = content;
 
                     ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Debug<DashboardController>(() => $"Error getting dashboard content from '{url}': {ex.Message}\n{ex.InnerException}");
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from '{Url}'", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
                     ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
@@ -93,21 +92,18 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    using (var web = new HttpClient())
-                    {
-                        //fetch remote css
-                        content = await web.GetStringAsync(url);
+                    //fetch remote css
+                    content = await HttpClient.GetStringAsync(url);
 
-                        //can't use content directly, modified closure problem
-                        result = content;
+                    //can't use content directly, modified closure problem
+                    result = content;
 
-                        //save server content for 30 mins
+                    //save server content for 30 mins
                         ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
-                    }
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Debug<DashboardController>(() => string.Format("Error getting dashboard CSS from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from '{Url}'", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));

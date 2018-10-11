@@ -344,7 +344,7 @@ namespace Umbraco.Core.Services.Implement
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
             string content = GetViewContent(contentTypeAlias);
-            if (content.IsNullOrWhiteSpace() == false)
+            if (content != null)
             {
                 template.Content = content;
             }
@@ -369,26 +369,29 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success, evtMsgs, template);
         }
 
+        /// <summary>
+        /// Create a new template, setting the content if a view exists in the filesystem
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="masterTemplate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
+            // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, name)
             {
-                Content = content
+                Content = GetViewContent(name) ?? content
             };
-
-            // check that the template hasn't been created on disk before creating the content type
-            // if it exists, set the new template content to the existing file content
-            string existingContent = GetViewContent(template.Alias);
-            if (existingContent.IsNullOrWhiteSpace() == false)
-            {
-                template.Content = content;
-            }
-
+            
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
             }
+
             SaveTemplate(template, userId);
+
             return template;
         }
 
@@ -500,37 +503,6 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetChildren(masterTemplateId);
-            }
-        }
-
-        /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode GetTemplateNode(string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetTemplateNode(alias);
-            }
-        }
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.FindTemplateInTree(anyNode, alias);
             }
         }
 
@@ -681,11 +653,11 @@ namespace Umbraco.Core.Services.Implement
             if (fileName.IsNullOrWhiteSpace())
                 throw new ArgumentNullException(nameof(fileName));
 
-            if (!fileName.EndsWith(".cshtml")) 
-                fileName = string.Concat(fileName, ".cshtml");
+            if (!fileName.EndsWith(".cshtml"))
+                fileName = $"{fileName}.cshtml";
 
             var fs = _templateRepository.GetFileContentStream(fileName);
-            if (fs == null) return string.Empty;
+            if (fs == null) return null;
             using (var view = new StreamReader(fs))
             {
                 return view.ReadToEnd().Trim();

@@ -1,19 +1,18 @@
-﻿@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
-@using System.Web.Mvc.Html
+﻿@using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @{
     var loginModel = new LoginModel();
-    
+
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
-    Html.RequiresJs("/umbraco_client/ui/jquery.js");
-    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
-    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
+    Html.RequiresJs("/umbraco/lib/jquery/jquery.min.js");
+    Html.RequiresJs("/umbraco/lib/jquery-validate/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js");
 }
 
 @* NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed *@
@@ -23,7 +22,7 @@
 {
     <fieldset>
         <legend>Login</legend>
-        
+
         @Html.ValidationSummary("loginModel", true)
 
         @Html.LabelFor(m => loginModel.Username)
@@ -37,5 +36,5 @@
         <br />
 
         <button>Login</button>
-    </fieldset>  
+    </fieldset>
 }

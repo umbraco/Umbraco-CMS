@@ -272,6 +272,9 @@ namespace Umbraco.Web.PropertyEditors
 
             public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
             {
+                if (rawValue == null)
+                    yield break;
+
                 var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
                 if (value == null)
                     yield break;

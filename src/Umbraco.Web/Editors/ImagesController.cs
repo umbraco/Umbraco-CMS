@@ -2,7 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
@@ -16,33 +18,12 @@ namespace Umbraco.Web.Editors
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSection;
 
-        public ImagesController(MediaFileSystem mediaFileSystem)
+        public ImagesController(MediaFileSystem mediaFileSystem, IContentSection contentSection)
         {
             _mediaFileSystem = mediaFileSystem;
-        }
-
-        /// <summary>
-        /// Gets the big thumbnail image for the media id
-        /// </summary>
-        /// <param name="mediaId"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If there is no media, image property or image file is found then this will return not found.
-        /// </remarks>
-        public HttpResponseMessage GetBigThumbnail(int mediaId)
-        {
-            var media = Services.MediaService.GetById(mediaId);
-            if (media == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-
-            var imageProp = media.Properties[Constants.Conventions.Media.File];
-            if (imageProp == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-
-            //fixme doesn't take into account variants
-            var imagePath = imageProp.GetValue().ToString();
-            return GetBigThumbnail(imagePath);
+            _contentSection = contentSection;
         }
 
         /// <summary>
@@ -57,31 +38,7 @@ namespace Umbraco.Web.Editors
         {
             return string.IsNullOrWhiteSpace(originalImagePath)
                 ? Request.CreateResponse(HttpStatusCode.OK)
-                : GetResized(originalImagePath, 500, "big-thumb");
-        }
-
-        /// <summary>
-        /// Gets a resized image for the media id
-        /// </summary>
-        /// <param name="mediaId"></param>
-        /// <param name="width"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If there is no media, image property or image file is found then this will return not found.
-        /// </remarks>
-        public HttpResponseMessage GetResized(int mediaId, int width)
-        {
-            var media = Services.MediaService.GetById(mediaId);
-            if (media == null)
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            var imageProp = media.Properties[Constants.Conventions.Media.File];
-            if (imageProp == null)
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            //fixme doesn't take into account variants
-            var imagePath = imageProp.GetValue().ToString();
-            return GetResized(imagePath, width);
+                : GetResized(originalImagePath, 500);
         }
 
         /// <summary>
@@ -95,29 +52,18 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetResized(string imagePath, int width)
         {
-            return GetResized(imagePath, width, Convert.ToString(width));
-        }
-
-        /// <summary>
-        /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
-        /// </summary>
-        /// <param name="imagePath"></param>
-        /// <param name="width"></param>
-        /// <param name="sizeName"></param>
-        /// <returns></returns>
-        private HttpResponseMessage GetResized(string imagePath, int width, string sizeName)
-        {
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_mediaFileSystem.IsImageFile(ext) == false)
+            if (_contentSection.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
             var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&width={width}", UriKind.Relative );
+            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}", UriKind.Relative);
             return response;
         }
+        
     }
 }

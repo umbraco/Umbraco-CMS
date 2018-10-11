@@ -64,7 +64,7 @@
 (function () {
     'use strict';
 
-    function ToggleDirective(localizationService) {
+    function ToggleDirective(localizationService, eventsService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -73,6 +73,7 @@
 
             function onInit() {
                 setLabelText();
+                eventsService.emit("toggleValue", { value: scope.checked });
             }
 
             function setLabelText() {
@@ -98,7 +99,8 @@
             }
 
             scope.click = function() {
-                if(scope.onClick) {
+                if (scope.onClick) {
+                    eventsService.emit("toggleValue", { value: !scope.checked });
                     scope.onClick();
                 }
             };

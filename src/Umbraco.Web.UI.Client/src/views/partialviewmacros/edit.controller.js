@@ -17,6 +17,7 @@
         // insert buttons
         vm.page.insertDefaultButton = {
             labelKey: "general_insert",
+            addEllipsis: "true",
             handler: function() {
                 vm.openInsertOverlay();
             }
@@ -24,18 +25,21 @@
         vm.page.insertSubButtons = [
             {
                 labelKey: "template_insertPageField",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openPageFieldOverlay();
                 }
             },
             {
                 labelKey: "template_insertMacro",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openMacroOverlay()
                 }
             },
             {
                 labelKey: "template_insertDictionaryItem",
+                addEllipsis: "true",
                 handler: function () {
                     vm.openDictionaryItemOverlay();
                 }
@@ -154,50 +158,34 @@
         }
 
         function openMacroOverlay() {
-
-            vm.macroPickerOverlay = {
-                view: "macropicker",
+            var macroPicker = {
                 dialogData: {},
-                show: true,
                 submit: function (model) {
-
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
                     insert(macroObject.syntax);
-
-                    vm.macroPickerOverlay.show = false;
-                    vm.macroPickerOverlay = null;
-
+                    editorService.close();
                 },
-                close: function(oldModel) {
-                    // close the dialog
-                    vm.macroPickerOverlay.show = false;
-                    vm.macroPickerOverlay = null;
-                    // focus editor
+                close: function() {
+                    editorService.close();
                     vm.editor.focus();
                 }
             };
+            editorService.macroPicker(macroPicker);
         }
 
 
         function openPageFieldOverlay() {
-            vm.pageFieldOverlay = {
-                submitButtonLabel: "Insert",
-                closeButtonlabel: "Cancel",
-                view: "insertfield",
-                show: true,
+            var insertFieldEditor = {
                 submit: function (model) {
                     insert(model.umbracoField);
-                    vm.pageFieldOverlay.show = false;
-                    vm.pageFieldOverlay = null;
+                    editorService.close();
                 },
-                close: function (model) {
-                    // close the dialog
-                    vm.pageFieldOverlay.show = false;
-                    vm.pageFieldOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
+                close: function () {
+                    editorService.close();
+                    vm.editor.focus();                    
                 }
             };
+            editorService.insertField(insertFieldEditor);
         }
 
 

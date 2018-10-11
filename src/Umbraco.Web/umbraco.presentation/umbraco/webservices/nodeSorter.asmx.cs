@@ -10,7 +10,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.presentation.webservices
@@ -138,7 +137,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<nodeSorter>("Could not update media sort order", ex);
+                Current.Logger.Error<nodeSorter>(ex, "Could not update media sort order");
             }
         }
 
@@ -193,7 +192,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<nodeSorter>("Could not update content sort order", ex);
+                Current.Logger.Error<nodeSorter>(ex, "Could not update content sort order");
             }
         }
 

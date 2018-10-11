@@ -40,13 +40,15 @@ namespace Umbraco.Core.Configuration.Grid
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
                     if (File.Exists(gridConfig))
                     {
+                        var sourceString = File.ReadAllText(gridConfig);
+
                         try
                         {
-                            editors.AddRange(parser.ParseGridEditors(File.ReadAllText(gridConfig)));
+                            editors.AddRange(parser.ParseGridEditors(sourceString));
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<GridEditorsConfig>("Could not parse the contents of grid.editors.config.js into a JSON array", ex);
+                            _logger.Error<GridEditorsConfig>(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
                         }
                     }
 

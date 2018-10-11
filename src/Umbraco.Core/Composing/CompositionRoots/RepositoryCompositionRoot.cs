@@ -63,8 +63,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
             container.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
             container.RegisterSingleton<ITagRepository, TagRepository>();
-            container.RegisterSingleton<ITaskRepository, TaskRepository>();
-            container.RegisterSingleton<ITaskTypeRepository, TaskTypeRepository>();
             container.RegisterSingleton<ITemplateRepository, TemplateRepository>();
             container.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
             container.RegisterSingleton<IUserRepository, UserRepository>();

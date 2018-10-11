@@ -59,7 +59,7 @@ namespace Umbraco.Web.Install.InstallSteps
             else
             {
                 var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", Constants.System.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
-                logger.Error<DatabaseInstallStep>("", ex);
+                logger.Error<DatabaseInstallStep>(ex, "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
                 throw ex;
             }
         }

@@ -21,7 +21,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using Umbraco.Web.Security.Identity;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
@@ -406,20 +405,47 @@ namespace Umbraco.Web.Editors
                 var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
                 if (lockedOut)
                 {
-                    Logger.Info<AuthenticationController>(() => 
-                        $"User {model.UserId} is currently locked out, unlocking and resetting AccessFailedCount");
+                    Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>(() => $"Could not unlock for user {model.UserId} - error {unlockResult.Errors.First()}");
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>(() => $"Could not reset access failed count {model.UserId} - error {unlockResult.Errors.First()}");
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                    }
+                }
+
+                //They've successfully set their password, we can now update their user account to be confirmed
+                //if user was only invited, then they have not been approved
+                //but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
+                //means we have verified their email
+                if (!UserManager.IsEmailConfirmed(model.UserId))
+                {
+                    await UserManager.ConfirmEmailAsync(model.UserId, model.ResetCode);
+                }
+
+                //if the user is invited, enable their account on forgot password
+                var identityUser = await UserManager.FindByIdAsync(model.UserId);
+                //invited is not approved, never logged in, invited date present
+                /*
+                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
+                    return UserState.Invited;
+                */
+                if (identityUser != null && !identityUser.IsApproved) 
+                {
+                    var user = Services.UserService.GetByUsername(identityUser.UserName);
+                    //also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
+                    if (user.LastLoginDate == default && user.InvitedDate != null)
+                    {
+                        user.IsApproved = true;
+                        user.InvitedDate = null;
+                        Services.UserService.Save(user);
                     }
                 }
 
@@ -445,7 +471,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>(() => $"User {(User.Identity == null ? "UNKNOWN" : User.Identity.Name)} from IP address {owinContext.Request.RemoteIpAddress} has logged out");
+            Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
 
             if (UserManager != null)
             {

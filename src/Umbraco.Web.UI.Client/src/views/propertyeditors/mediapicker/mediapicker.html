@@ -7,6 +7,7 @@
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
+                <span class="label trashed" ng-if="image.trashed"><localize key="mediaPicker_trashed"></localize></span>
                 <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
                     <div class="umb-button__progress"></div>
                 </div>
@@ -20,7 +21,10 @@
 
                 <!-- FILE -->
                 <span class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
-                    <i class="icon {{image.icon}} large"></i>
+                    <span class="file-icon">
+                        <i class="icon {{image.icon}} large"></i>
+                        <span>.{{image.extension}}</span>
+                    </span>
                     <small>{{image.name}}</small>
                 </span>
 
@@ -40,13 +44,5 @@
             </li>
         </ul>
     </div>
-
-    <umb-overlay
-        data-element="overlay-media-picker"
-        ng-if="mediaPickerOverlay.show"
-        model="mediaPickerOverlay"
-        position="right"
-        view="mediaPickerOverlay.view">
-    </umb-overlay>
 
 </div>

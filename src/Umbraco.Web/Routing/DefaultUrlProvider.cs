@@ -43,8 +43,7 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>(() =>
-                    $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
+                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 
@@ -80,8 +79,11 @@ namespace Umbraco.Web.Routing
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.ContentCache.GetById(id);
+            if (node == null) return Enumerable.Empty<string>();
+
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
+            // look for domains, walking up the tree
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root

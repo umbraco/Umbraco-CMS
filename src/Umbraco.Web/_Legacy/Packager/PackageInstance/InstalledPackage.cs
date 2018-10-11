@@ -87,7 +87,7 @@ namespace umbraco.cms.businesslogic.packager {
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<InstalledPackage>("An error occured in isPackagedInstalled", ex);
+                Current.Logger.Error<InstalledPackage>(ex, "An error occured in isPackagedInstalled");
                 return false;
             }
         }

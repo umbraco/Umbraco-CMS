@@ -184,8 +184,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
-                //template = Services.FileService.GetTemplate(template.Id);
+                var template = Services.FileService.CreateTemplateWithIdentity(display.Alias, display.Content, master);
                 Mapper.Map(template, display);
             }
 

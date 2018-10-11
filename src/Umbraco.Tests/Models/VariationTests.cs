@@ -46,7 +46,9 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
 
-            var serviceContext = new ServiceContext(dataTypeService: dataTypeService);
+            var serviceContext = new ServiceContext(
+                dataTypeService: dataTypeService,
+                localizedTextService: Mock.Of<ILocalizedTextService>());
 
             Mock.Get(container)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
@@ -54,8 +56,10 @@ namespace Umbraco.Tests.Models
                 {
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
+                    if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
                     throw new Exception("oops");
                 });
+            
         }
 
         [Test]
@@ -426,14 +430,15 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.IsCultureAvailable(langUk));
             Assert.IsFalse(content.IsCulturePublished(langUk));
             Assert.IsNull(content.GetPublishName(langUk));
-            Assert.IsNull(content.GetPublishDate(langUk)); // not published
-            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+            Assert.IsNull(content.GetPublishDate(langUk)); // not published            
 
             Assert.IsFalse(content.IsCultureAvailable(langEs));
+            Assert.IsFalse(content.IsCultureEdited(langEs)); // not avail, so... not edited
             Assert.IsFalse(content.IsCulturePublished(langEs));
+
+            // not published!
             Assert.IsNull(content.GetPublishName(langEs));
-            Assert.IsNull(content.GetPublishDate(langEs)); // not published!
-            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+            Assert.IsNull(content.GetPublishDate(langEs)); 
 
             // cannot test IsCultureEdited here - as that requires the content service and repository
             // see: ContentServiceTests.Can_SaveRead_Variations

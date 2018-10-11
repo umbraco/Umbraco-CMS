@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<DataTypeConfigurationFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
-            var propEd = Current.PropertyEditors[editorAlias];
+            var propEd = _propertyEditors[editorAlias];
             if (propEd == null)
             {
                 throw new InvalidOperationException("Could not find property editor with alias " + editorAlias);
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Editors
             if (result.Success)
             {
                 var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
                 return response;
             }
 
@@ -290,7 +290,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoApplicationAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return Services.DataTypeService
@@ -307,7 +307,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = Services.DataTypeService
@@ -340,7 +340,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
@@ -373,7 +373,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return Current.PropertyEditors

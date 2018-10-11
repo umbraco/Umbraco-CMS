@@ -253,17 +253,15 @@ namespace Umbraco.Web
         /// </summary>
         public int? PageId
         {
-            // TODO - this is dirty old legacy tricks, we should clean it up at some point
-            // also, what is a "custom page" and when should this be either null, or different
-            // from PublishedContentRequest.PublishedContent.Id ??
-            // SD: Have found out it can be different when rendering macro contents in the back office, but really youshould just be able
-            // to pass a page id to the macro renderer instead but due to all the legacy bits that's real difficult.
             get
             {
                 try
                 {
-                    //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                    return int.Parse(HttpContext.Items["pageID"].ToString());
+                    // This was changed but the comments used to refer to
+                    // macros in the backoffice not working with this Id
+                    // it's probably not a problem any more though. Old comment:
+                    // https://github.com/umbraco/Umbraco-CMS/blob/7a615133ff9de84ee667fb7794169af65e2b4d7a/src/Umbraco.Web/UmbracoContext.cs#L256
+                    return Current.PublishedRequest.PublishedContent.Id;
                 }
                 catch
                 {

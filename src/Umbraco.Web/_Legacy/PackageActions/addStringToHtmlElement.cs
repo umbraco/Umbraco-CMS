@@ -123,7 +123,7 @@ namespace Umbraco.Web._Legacy.PackageActions
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<addStringToHtmlElement>("An error occurred", ex);
+                    Current.Logger.Error<addStringToHtmlElement>(ex, "An error occurred");
                 }
             }
             else
@@ -171,7 +171,7 @@ namespace Umbraco.Web._Legacy.PackageActions
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<addStringToHtmlElement>("An error occurred", ex);
+                    Current.Logger.Error<addStringToHtmlElement>(ex, "An error occurred");
                 }
             }
             else

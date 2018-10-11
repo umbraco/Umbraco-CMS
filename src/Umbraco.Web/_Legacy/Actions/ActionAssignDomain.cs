@@ -27,7 +27,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
+                return null;
             }
         }
 

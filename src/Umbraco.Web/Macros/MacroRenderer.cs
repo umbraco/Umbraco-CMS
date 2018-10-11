@@ -99,7 +99,7 @@ namespace Umbraco.Web.Macros
 
             if (macroContent == null) return null;
 
-            Current.Logger.Debug<MacroRenderer>(() => $"Macro content loaded from cache \"{model.CacheIdentifier}\".");
+            Current.Logger.Debug<MacroRenderer>("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Macros
                 priority: CacheItemPriority.NotRemovable
                 );
 
-            Current.Logger.Debug<MacroRenderer>(() => $"Macro content saved to cache \"{model.CacheIdentifier}\".");
+            Current.Logger.Debug<MacroRenderer>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
         }
 
         // gets the macro source file name
@@ -304,7 +304,7 @@ namespace Umbraco.Web.Macros
             {
                 Exceptions.Add(e);
 
-                _plogger.Logger.Warn<MacroRenderer>(e, () => $"Failed {msgIn}");
+                _plogger.Logger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {
