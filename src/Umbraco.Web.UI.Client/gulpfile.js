@@ -303,8 +303,8 @@ gulp.task('dependencies', function () {
         },
         {
             "name": "jquery-ui",
-            "src":  ["./node_modules/jquery-ui/ui/widget.js"],
-            "base": "./node_modules/jquery-ui"
+            "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
+            "base": "./node_modules/jquery-ui-dist"
         },
         {
             "name": "jquery-validate",

@@ -26,7 +26,7 @@
     "font-awesome": "4.2.0",
     "jquery": "2.2.4",
     "jquery-migrate": "1.4.0",
-    "jquery-ui": "1.12.1",
+    "jquery-ui-dist": "1.12.1",
     "jquery-validation": "1.17.0",
     "jquery-validation-unobtrusive": "3.2.10",
     "lazyload-js": "1.0.0",
