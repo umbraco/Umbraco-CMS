@@ -22,7 +22,7 @@
                             <localize key="user_newPassword">New password</localize>
                             <small style="font-size: 13px;">{{invitedUserPasswordModel.passwordPolicyText}}</small>
                         </label>
-                        <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
+                        <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" autocomplete="off" />
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
                         <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>
