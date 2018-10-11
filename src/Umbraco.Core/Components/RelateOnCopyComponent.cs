@@ -1,10 +1,12 @@
 ﻿using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
+
     //TODO: This should just exist in the content service/repo!
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent

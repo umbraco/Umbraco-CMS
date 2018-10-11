@@ -1048,7 +1048,7 @@ namespace Umbraco.Core.Persistence
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
-            var queryColumns = pd.QueryColumns;
+            var queryColumns = pd.QueryColumns.ToList();
 
             Dictionary<string, string> aliases = null;
 
@@ -1068,7 +1068,11 @@ namespace Umbraco.Core.Persistence
                     return fieldName;
                 }).ToArray();
 
-                queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToArray();
+                //only get the columns that exist in the selected names
+                queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToList();
+
+                //ensure the order of the columns in the expressions is the order in the result
+                queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
             }
 
             string GetAlias(PocoColumn column)

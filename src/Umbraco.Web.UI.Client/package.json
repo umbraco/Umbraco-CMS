@@ -5,13 +5,17 @@
     "build": "gulp"
   },
   "dependencies": {
+    "flatpickr": "4.5.2",
     "npm": "^6.4.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "autoprefixer": "^6.5.0",
     "bower-installer": "^1.2.0",
     "cssnano": "^3.7.6",
     "gulp": "^3.9.1",
+    "gulp-babel": "^8.0.0-beta.2",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "5.0.0",
     "gulp-eslint": "^5.0.0",

@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Umbraco\Translation\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -107,7 +108,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.22</Version>
+      <Version>8.0.0-alpha.24</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -341,7 +342,9 @@
     <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="default.aspx" />
-    <Content Include="Umbraco\Config\Lang\da.xml" />
+    <Content Include="Umbraco\Config\Lang\da.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
     <Content Include="Umbraco\Config\Lang\fr.xml" />
@@ -352,7 +355,6 @@
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco\Translation\details.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
@@ -405,7 +407,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
-    <Content Include="Umbraco\Translation\translationTasks.dtd" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -436,9 +437,6 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Translation\default.aspx" />
-    <Content Include="Umbraco\Translation\preview.aspx" />
-    <Content Include="Umbraco\Translation\xml.aspx" />
     <Content Include="Umbraco\Create\simple.ascx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />

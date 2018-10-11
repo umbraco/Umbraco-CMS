@@ -69,10 +69,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.RelationType))
                 CreateRelationTypeData();
-
-            if (tableName.Equals(Constants.DatabaseSchema.Tables.TaskType))
-                CreateTaskTypeData();
-
+            
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
@@ -317,11 +314,6 @@ namespace Umbraco.Core.Migrations.Install
             relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
-        }
-
-        private void CreateTaskTypeData()
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.TaskType, "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
         }
 
         private void CreateKeyValueData()
