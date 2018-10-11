@@ -473,7 +473,8 @@
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: contentResource.sendToPublish,
-                                action: "sendToPublish"
+                                action: "sendToPublish",
+                                showNotifications: false
                             }).then(function (data) {
                                 //show all notifications manually here since we disabled showing them automatically in the save method
                                 formHelper.showNotifications(data);

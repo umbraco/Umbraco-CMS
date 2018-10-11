@@ -69,10 +69,9 @@
             return (variant.state === "Published" && !variant.isDirty && !variant.active || variant.state === "NotCreated" && !variant.isDirty && !variant.active);
         }
 
-        //when this dialog is closed, reset all 'sendToPublish' flags
+        //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].sendToPublish = false;
                 vm.variants[i].save = false;
             }
         });
