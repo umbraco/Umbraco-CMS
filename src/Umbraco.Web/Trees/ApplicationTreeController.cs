@@ -27,8 +27,8 @@ namespace Umbraco.Web.Trees
         /// Attribute with a 'TreeGroup' property set
         /// This allows the settings section trees to be grouped by Settings, Templating & Other
         /// </summary>
-        private static readonly Lazy<IEnumerable<IGrouping<string, (Type, string)>>> CoreTrees
-            = new Lazy<IEnumerable<IGrouping<string, (Type, string)>>>(() =>
+        private static readonly Lazy<IReadOnlyCollection<IGrouping<string, (Type, string)>>> CoreTrees
+            = new Lazy<IReadOnlyCollection<IGrouping<string, (Type, string)>>>(() =>
                 Current.Services.ApplicationTreeService.GetAllTypes()
                 .Select(x => (TreeType: x, TreeGroup: x.GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
                 .GroupBy(x => x.TreeGroup)
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Trees
             }
 
             //Don't apply fancy grouping logic futher down, if we only have one group of items
-            var hasGroups = CoreTrees.Value.Any(x => x.Key != null);
+            var hasGroups = CoreTrees.Value.Count > 0;
             if (hasGroups == false)
             {
                 var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
