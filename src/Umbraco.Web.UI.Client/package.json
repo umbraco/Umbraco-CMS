@@ -10,7 +10,7 @@
     "angular-cookies": "1.7.5",
     "angular-dynamic-locale": "0.1.37",
     "angular-i18n": "1.7.5",
-    "angular-local-storage": "0.7.0",
+    "angular-local-storage": "0.7.1",
     "angular-messages": "1.7.5",
     "angular-mocks": "1.7.5",
     "angular-route": "1.7.5",
