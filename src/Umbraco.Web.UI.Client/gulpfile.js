@@ -206,6 +206,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/angular-cookies"
         },
         {   
+            "name": "angular-dynamic-locale",
+            "src":  [
+                "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js",
+                "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js.map"
+            ],
+            "base": "./node_modules/angular-dynamic-locale/dist"
+        },
+        {   
             "name": "angular-sanitize",
             "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
             "base": "./node_modules/angular-sanitize"
@@ -301,6 +309,19 @@ gulp.task('dependencies', function () {
             "name": "jquery-validation-unobtrusive",
             "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
             "base": "./node_modules/jquery-validation-unobtrusive/dist"
+        },
+        // TODO: We can optimize here:
+        // we don't have to ship with the moment-with-locales libraries
+        // we lazyload the user locale
+        {
+            "name": "moment",
+            "src":  [
+                "./node_modules/moment/min/moment.min.js",
+                "./node_modules/moment/min/moment-with-locales.js",
+                "./node_modules/moment/min/moment-with-locales.min.js",
+                "./node_modules/moment/src/locale/*.js"
+            ],
+            "base": "./node_modules/moment/min"
         },
         {
             "name": "ng-file-upload",

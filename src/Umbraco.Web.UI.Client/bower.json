@@ -17,11 +17,9 @@
     ],
     "dependencies": {
         "rgrove-lazyload": "*",
-        "angular-dynamic-locale": "~0.1.36",
         "tinymce": "~4.7.1",
         "codemirror": "~5.3.0",
         "angular-local-storage": "~0.7.1",
-        "moment": "~2.10.3",
         "ace-builds": "~1.3.0",
         "angular-ui-sortable": "0.14.4"
     },
@@ -34,16 +32,6 @@
             "ace-builds"
         ],
         "sources": {
-            "moment": [
-                "bower_components/moment/min/moment.min.js",
-                "bower_components/moment/min/moment-with-locales.js",
-                "bower_components/moment/min/moment-with-locales.min.js",
-                "bower_components/moment/locale/*.js"
-            ],
-            "angular-dynamic-locale": [
-                "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js",
-                "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js.map"
-            ],
             "angular-local-storage": [
                 "bower_components/angular-local-storage/dist/angular-local-storage.min.js",
                 "bower_components/angular-local-storage/dist/angular-local-storage.min.js.map"
