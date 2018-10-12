@@ -250,24 +250,6 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/clipboard/dist"
         },
         {
-            "name": "codemirror",
-            "src":  [
-                "./node_modules/codemirror/lib/codemirror.js",
-                "./node_modules/codemirror/lib/codemirror.css",
-
-                "./node_modules/codemirror/mode/css/css.js",
-                "./node_modules/codemirror/mode/javascript/javascript.js",
-                "./node_modules/codemirror/mode/xml/xml.js",
-                "./node_modules/codemirror/mode/htmlmixed/htmlmixed.js",
-
-                "./node_modules/codemirror/addon/search/*",
-                "./node_modules/codemirror/addon/edit/*",
-                "./node_modules/codemirror/addon/selection/*",
-                "./node_modules/codemirror/addon/dialog/*"
-            ],
-            "base": "./node_modules/codemirror"
-        },
-        {
             "name": "jsdiff",
             "src":  ["./node_modules/diff/dist/diff.min.js"],
             "base": "./node_modules/diff/dist"
