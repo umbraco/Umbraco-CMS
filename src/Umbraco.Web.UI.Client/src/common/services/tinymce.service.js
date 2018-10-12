@@ -186,9 +186,10 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
                 //create a baseline Config to exten upon
                 var config = {
+                    //fixed_toolbar_container: "#blah",
                     selector: "#" + args.htmlId,
                     theme: args.theme ? args.theme : "modern",
-                    inline: true,
+                    //inline: true,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
                     invalid_elements: tinyMceConfig.inValidElements,
