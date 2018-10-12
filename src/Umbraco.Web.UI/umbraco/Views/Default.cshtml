@@ -27,7 +27,7 @@
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
 <!DOCTYPE html>
-<html lang="@(language)">
+<html lang="@(language)" dir="@(rtl == true ? "rtl" : "ltr")">
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
