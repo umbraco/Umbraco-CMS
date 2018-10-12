@@ -59,7 +59,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         };
 
         $scope.selectStylesheet = function (css) {
-            
+
             var index = $scope.model.value.stylesheets.indexOf(css.name);
 
             if(css.selected && index === -1){
@@ -68,13 +68,13 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };
-        
+
         // map properties for specific commands
         function getFontIcon(alias) {
             var icon = { name: alias, isCustom: false };
 
             switch (alias) {
-                case "codemirror":
+                case "ace":
                     icon.name = "code";
                     icon.isCustom = false;
                     break;
@@ -111,7 +111,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
             $scope.model.value.toolbar = _.pluck(commands, "alias");
-            
+
         });
 
         // when the scope is destroyed we need to unsubscribe
