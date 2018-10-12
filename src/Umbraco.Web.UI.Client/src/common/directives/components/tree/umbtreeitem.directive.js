@@ -39,7 +39,7 @@ angular.module("umbraco.directives")
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\' : !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\' : !isRtl() && (!node.expanded || node.metaData.isContainer),\'icon-navigation-left\' : isRtl() && (!node.expanded || node.metaData.isContainer), \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
@@ -67,14 +67,8 @@ angular.module("umbraco.directives")
 
             function isRtl()
             {
-                var x = document.body;
-                var y = "";
-                if (x.currentStyle)
-                    y = x.currentStyle['direction'];
-                else if (window.getComputedStyle)
-                    y = document.defaultView.getComputedStyle(x,null).getPropertyValue('direction');
-                return y === "rtl" ? true : false;
-
+                var x = document.dir;
+                return x === "rtl" ? true : false;
             }
 
             // updates the node's DOM/styles
@@ -126,6 +120,11 @@ angular.module("umbraco.directives")
                     deleteAnimations = true;
                 }, 0, false);
             }
+
+            scope.isRtl = function () {
+                var x = document.dir;
+                return x === "rtl" ? true : false;
+            };
 
             /** Returns the css classses assigned to the node (div element) */
             scope.getNodeCssClass = function (node) {
