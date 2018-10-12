@@ -576,7 +576,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter]
         [ContentPostValidate]
         public ContentItemDisplay PostSaveBlueprint(
-            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+            [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
