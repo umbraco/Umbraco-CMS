@@ -205,7 +205,7 @@ angular.module("umbraco")
                             size: 'small',
                             submit: function (model) {
                                 console.log('HTML update', model.content);
-
+                                console.log(tinyMceEditor);
                                 tinyMceEditor.setContent(model.content);
                                 editorService.close();
                             },

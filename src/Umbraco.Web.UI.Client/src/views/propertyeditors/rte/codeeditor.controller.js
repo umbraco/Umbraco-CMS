@@ -19,6 +19,9 @@
                 enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
                 enableBasicAutocompletion: true,
                 enableLiveAutocompletion: false
+            },
+            onLoad: function(aceEditor) {
+                vm.aceEditor = aceEditor;
             }
         }
 
@@ -45,6 +48,10 @@
         }
 
         function submit(model) {
+
+            // refresh the model
+            model.content = vm.aceEditor.getValue();
+
             if($scope.model.submit) {
                 $scope.model.submit(model);
             }
