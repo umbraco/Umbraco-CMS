@@ -5,14 +5,16 @@
 	ng-init="init('https://umbraco.tv/videos/implementor/chapterrss?sort=no')" 
 	ng-controller="Umbraco.Dashboard.StartupVideosController">
 
-    <h4 ng-if="videos.length">To get you started:</h4>
-	<ul class="thumbnails" >
-		<li class="span2" ng-repeat="video in videos">
-	    	<div class="thumbnail" style="margin-right: 20px">
-		    	<a target="_blank" href="{{video.link}}" title="{{video.title}}">
-		    		<img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
-		    	</a>
-	    	</div>
-	    </li>
-	</ul>
+    <div ng-if="videos.length">
+        <h4>To get you started:</h4>
+        <ul class="thumbnails" >
+            <li class="span2" ng-repeat="video in videos">
+                <div class="thumbnail" style="margin-right: 20px">
+                    <a target="_blank" href="{{video.link}}" title="{{video.title}}">
+                        <img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
 </div>
