@@ -189,7 +189,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     //fixed_toolbar_container: "#blah",
                     selector: "#" + args.htmlId,
                     theme: args.theme ? args.theme : "modern",
-                    //inline: true,
+                    inline: true,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
                     invalid_elements: tinyMceConfig.inValidElements,
@@ -288,9 +288,6 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             var cfg = {};
             cfg.toolbar = ["code", "bold", "italic", "styleselect", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
             cfg.stylesheets = [];
-            cfg.dimensions = {
-                height: 500
-            };
             cfg.maxImageSize = 500;
             return cfg;
         },

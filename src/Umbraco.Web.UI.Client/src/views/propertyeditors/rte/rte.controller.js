@@ -85,8 +85,6 @@ angular.module("umbraco")
 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
-                    height: editorConfig.dimensions.height,
-                    width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize
                 };
 
