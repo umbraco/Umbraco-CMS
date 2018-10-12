@@ -187,9 +187,9 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 //create a baseline Config to exten upon
                 var config = {
                     selector: "#" + args.htmlId,
-                    theme: "silver",//args.theme ? args.theme : "inlite",
-                    //inline: true,
-                    //plugins: plugins,
+                    theme: args.theme ? args.theme : "inlite",
+                    inline: true,
+                    plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
                     invalid_elements: tinyMceConfig.inValidElements,
                     extended_valid_elements: extendedValidElements,
@@ -199,14 +199,13 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     autoresize_bottom_margin: 0,
                     content_css: styles.stylesheets,
                     style_formats: styles.styleFormats,
-                    //language: getLanguage(),
+                    language: getLanguage(),
 
                     //this would be for a theme other than inlite
-                    //toolbar: args.toolbar.join(" "),
-
+                    toolbar: args.toolbar.join(" "),
                     //these are for the inlite theme to work
-                    //insert_toolbar: toolbars.insertToolbar,
-                    //selection_toolbar: toolbars.selectionToolbar,
+                    insert_toolbar: toolbars.insertToolbar,
+                    selection_toolbar: toolbars.selectionToolbar,
 
                     body_class: 'umb-rte',
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix

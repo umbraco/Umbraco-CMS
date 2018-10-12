@@ -65,7 +65,7 @@ angular.module("umbraco")
 
             //queue file loading
             if (typeof tinymce === "undefined") { // Don't reload tinymce if already loaded
-                promises.push(assetsService.loadJs("lib/tinymce5/tinymce.min.js", $scope));
+                promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
             }
 
             //stores a reference to the editor

@@ -23,7 +23,7 @@ angular.module("umbraco.directives")
 
                 //queue file loading
                 if (typeof (tinymce) === "undefined") {
-                    promises.push(assetsService.loadJs("lib/tinymce5/tinymce.min.js", scope));
+                    promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                 }
 
                 var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"];
