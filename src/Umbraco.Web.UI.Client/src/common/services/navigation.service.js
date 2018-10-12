@@ -289,12 +289,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
 
-            if (mainTreeEventHandler) {                
-               
-                if (mainTreeEventHandler.syncTree) {
-                    //returns a promise,
-                    return mainTreeEventHandler.syncTree(args);
-                }
+            if (this.treeIsInitialized()) {
+                //returns a promise,
+                return mainTreeEventHandler.syncTree(args);
             }
 
             //couldn't sync
@@ -324,6 +321,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 mainTreeEventHandler.clearCache({ section: sectionAlias });
                 mainTreeEventHandler.load(sectionAlias);
             }
+        },
+
+        /**
+         * returns true if the tree is initialized and ready for use, false otherwise
+         */
+        treeIsInitialized: function () {
+            return !!(mainTreeEventHandler && mainTreeEventHandler.syncTree);
         },
 
         /**

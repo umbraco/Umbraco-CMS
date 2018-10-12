@@ -73,7 +73,7 @@
           // if there are any and then clear them so the collection no longer persists them.
           serverValidationManager.executeAndClearAllSubscriptions();
 
-          syncTreeNode($scope.content, data.path, true);
+          waitForTreeAndSyncTreeNode($scope.content, data.path, true);
 
           resetLastListPageNumber($scope.content);
 
@@ -101,6 +101,18 @@
       $scope.defaultButton = buttons.defaultButton;
       $scope.subButtons = buttons.subButtons;
 
+    }
+
+    // navigationService.setupTreeEvents() and umbTree.setupExternalEvents() are called rather nondeterministically,
+    // and we can't initialize the tree node before both have been called so we need to wait for it
+    function waitForTreeAndSyncTreeNode(content, path, initialLoad) {
+      if (!navigationService.treeIsInitialized()) {
+        $timeout(function() {
+          waitForTreeAndSyncTreeNode(content, path, initialLoad);
+        }, 100);
+        return;
+      }
+      syncTreeNode(content, path, initialLoad);
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
