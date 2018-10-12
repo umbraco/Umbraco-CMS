@@ -191,6 +191,34 @@ angular.module("umbraco")
                         editorService.macroPicker(macroPicker);
                     });
 
+                    tinyMceService.createAceCodeEditor(tinyMceEditor, $scope, function () {
+
+                        //TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
+                        /*
+                        var html = editor.getContent({source_view: true});
+                        html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
+                        editor.dom.remove(editor.dom.select('.CmCaReT'));
+	                    html = html.replace(/(<div class=".*?umb-macro-holder.*?mceNonEditable.*?"><!-- <\?UMBRACO_MACRO macroAlias="(.*?)".*?\/> --> *<ins>)[\s\S]*?(<\/ins> *<\/div>)/ig, "$1Macro alias: <strong>$2</strong>$3");
+                        */
+
+                        var aceEditor = {
+                            content: tinyMceEditor.getContent(),
+                            view: 'views/propertyeditors/rte/codeeditor.html',
+                            size: 'small',
+                            submit: function (model) {
+                                console.log('HTML update', model.content);
+
+                                tinyMceEditor.setContent(model.content);
+                                editorService.close();
+                            },
+                            close: function () {
+                                editorService.close();
+                            }
+                        };
+
+                        editorService.open(aceEditor);
+                    });
+
                     startWatch(editor);
                 };
 

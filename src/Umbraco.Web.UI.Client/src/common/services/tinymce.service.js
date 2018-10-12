@@ -324,6 +324,21 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             editor.insertContent(preview);
         },
 
+
+        createAceCodeEditor: function(editor, $scope, callback){
+
+            editor.addButton("ace", {
+                icon: "code",
+                text: "Code WARREN",
+                title: "Code WARREN",
+                tooltip: "Code WARREN",
+                onclick: function(){
+                    callback();
+                }
+            });
+
+        },
+
 		/**
 		 * @ngdoc method
 		 * @name umbraco.services.tinyMceService#createMediaPicker
