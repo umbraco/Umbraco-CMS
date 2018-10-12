@@ -2,7 +2,7 @@
  * @ngdoc service
  * @name umbraco.services.tinyMceService
  *
- *  
+ *
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
@@ -160,7 +160,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
         /**
          * Returns a promise of the configuration object to initialize the TinyMCE editor
          * @param {} args
-         * @returns {} 
+         * @returns {}
          */
         getTinyMceEditorConfig: function (args) {
 
@@ -252,7 +252,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 return $q.when(config);
 
             });
-            
+
         },
 
 		/**
@@ -300,7 +300,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * @description
 		 * Creates the umbrco insert embedded media tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance        
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
         createInsertEmbeddedMedia: function (editor, $scope, callback) {
@@ -326,9 +326,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
             editor.addButton("ace", {
                 icon: "code",
-                text: "Code WARREN",
-                title: "Code WARREN",
-                tooltip: "Code WARREN",
+                tooltip: "View Source Code",
                 onclick: function(){
                     callback();
                 }
@@ -344,7 +342,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * @description
 		 * Creates the umbrco insert media tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance        
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
         createMediaPicker: function (editor, $scope, callback) {
@@ -436,7 +434,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * @description
 		 * Creates the insert umbrco macro tinymce plugin
 		 *
-		 * @param {Object} editor the TinyMCE editor instance      
+		 * @param {Object} editor the TinyMCE editor instance
 		 * @param {Object} $scope the current controller scope
 		 */
         createInsertMacro: function (editor, $scope, callback) {
@@ -460,7 +458,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             });
 
 			/**
-			 * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
+			 * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
 			 * method will return the macro element if not wrapped in a p, or the p if the macro
 			 * element is the only one inside of it even if we are deep inside an element inside the macro
 			 */
@@ -468,7 +466,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 var e = $(element).closest(".umb-macro-holder");
                 if (e.length > 0) {
                     if (e.get(0).parentNode.nodeName === "P") {
-                        //now check if we're the only element                    
+                        //now check if we're the only element
                         if (element.parentNode.childNodes.length === 1) {
                             return e.get(0).parentNode;
                         }
@@ -502,7 +500,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
                                 //if the end selection is a macro then move the cursor
                                 //NOTE: we don't have to handle when the selection comes from a previous parent because
-                                // that is automatically taken care of with the normal onNodeChanged logic since the 
+                                // that is automatically taken care of with the normal onNodeChanged logic since the
                                 // evt.element will be the macro once it becomes part of the selection.
                                 var $testForMacro = $(endSelection).closest(".umb-macro-holder");
                                 if ($testForMacro.length > 0) {
@@ -622,7 +620,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     //set onNodeChanged event listener
                     editor.on('NodeChange', onNodeChanged);
 
-					/** 
+					/**
 					 * Listen for the keydown in the editor, we'll check if we are currently on a macro element, if so
 					 * we'll check if the key down is a supported key which requires an action, otherwise we ignore the request
 					 * so the macro cannot be edited.
@@ -1035,7 +1033,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * From the given string, generates a string array where each item is the id attribute value from a named anchor
 		 * 'some string <a id="anchor"></a>with a named anchor' returns ['anchor']
 		 *
-		 * @param {string} input the string to parse      
+		 * @param {string} input the string to parse
 		 */
         getAnchorNames: function (input) {
         var anchors = [];

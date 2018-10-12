@@ -4,8 +4,6 @@
     function CodeEditorController($scope, localizationService) {
 
         var vm = this;
-        vm.loading = false;
-
         vm.submit = submit;
         vm.close = close;
 
@@ -15,7 +13,7 @@
             theme: "chrome",
             showPrintMargin: false,
             advanced: {
-                fontSize: '14px',
+                fontSize: "14px",
                 enableSnippets: false, //The Razor mode snippets are awful (Need a way to override these)
                 enableBasicAutocompletion: true,
                 enableLiveAutocompletion: false
@@ -32,8 +30,6 @@
 
         function onInit() {
 
-            vm.loading = true;
-
             // set default title
             if(!$scope.model.title) {
                 // TODO change to a new key to get 'source code' or similar
@@ -41,10 +37,6 @@
                     $scope.model.title = value;
                 });
             }
-
-            //GO
-
-
         }
 
         function submit(model) {
@@ -64,7 +56,6 @@
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.PropertyEditors.RTECodeEditorController", CodeEditorController);
