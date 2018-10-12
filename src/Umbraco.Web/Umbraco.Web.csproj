@@ -823,6 +823,7 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
+    <Compile Include="WebApi\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
