@@ -20,7 +20,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             $scope.model.value.maxImageSize = cfg.maxImageSize;
         }
         if (!$scope.model.value.theme) {
-            $scope.model.value.theme = "inlite";
+            $scope.model.value.theme = "modern";
         }
 
         tinyMceService.configuration().then(function(config){

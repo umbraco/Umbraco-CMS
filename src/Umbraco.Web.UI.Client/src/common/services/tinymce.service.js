@@ -187,7 +187,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 //create a baseline Config to exten upon
                 var config = {
                     selector: "#" + args.htmlId,
-                    theme: args.theme ? args.theme : "inlite",
+                    theme: args.theme ? args.theme : "modern",
                     inline: true,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
