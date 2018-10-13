@@ -53,8 +53,10 @@ namespace Umbraco.Web.Editors
             if (currentUser.IsAdmin())
                 return Attempt<string>.Succeed();
 
-            var userGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
-            var missingAccess = groupAliases.Except(userGroups).ToArray();
+            var userGroups = currentUser.Groups.Select(x => x.Alias).ToList();
+                userGroups.AddRange(groupAliases);
+            var exceptGroups = userGroups.ToArray();
+            var missingAccess = groupAliases.Except(exceptGroups).ToArray();
             return missingAccess.Length == 0
                 ? Attempt<string>.Succeed()
                 : Attempt.Fail("User is not a member of " + string.Join(", ", missingAccess));
