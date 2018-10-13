@@ -28,11 +28,17 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [Required]
         public IEnumerable<PropertyMapping> PropertyMappings { get; set; }
+
+        /// <summary>
+        /// Whther document chnage was successful
+        /// </summary>
+        public bool Success { get; set; }
     }
 
     public class PropertyMapping
     {
         public string FromName { get; set; }
+        public string FromAlias { get; set; }
         public string ToName { get; set; }
         public string ToAlias { get; set; }
         public object Value { get; set; }

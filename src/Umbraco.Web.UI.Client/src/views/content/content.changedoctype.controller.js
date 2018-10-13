@@ -1,7 +1,7 @@
 ﻿(function () {
     "use strict";
 
-    function ChangeDocTypeController($scope, contentResource, contentTypeResource) {
+    function ChangeDocTypeController($scope, contentResource, contentTypeResource, navigationService, eventsService) {
 
         var vm = this;
 
@@ -53,6 +53,7 @@
                 PropertyMappings: vm.properties.map(function (p) {
                     return {
                         FromName: p.label,
+                        FromAlias: p.alias,
                         ToName: p.destination.label,
                         ToAlias: p.destination.alias,
                         Value: null
@@ -61,6 +62,9 @@
             };
 
             contentResource.saveChangeDocType(data).then(function () {
+                vm.success = data.Success;
+                syncTreeNode(vm.currentDocType.path);
+                eventsService.emit("content.saved", { content: $scope.content });
                 closeDialog();
             }, function (e) {
                 console.log(e);
@@ -68,7 +72,6 @@
         }
 
         function populateListOfValidAlternateDocumentTypes() {
-
             return contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
                 vm.docTypes = data;
                 vm.docTypesLength = vm.docTypes.length;
@@ -79,6 +82,7 @@
                 return false;
             });
         }
+
 
         function populateListOfTemplates(id) {
             contentTypeResource.getById(id).then(function (data) {
@@ -92,7 +96,6 @@
 
         function populatePropertyMappingWithSources(id) {
             contentTypeResource.getById(id).then(function (data) {
-                console.log(data);
                 vm.properties = data.groups[0].properties;
             });
         }
@@ -103,7 +106,6 @@
                 angular.forEach(vm.properties, function (prop) {
                     prop.destinations = [];
                     prop.destination = null;
-
                     angular.forEach(docTypProps, function (innerProp) {
                         if (prop.editor === innerProp.editor) {
                             prop.destinations.push(innerProp);
@@ -116,6 +118,14 @@
             });
         }
 
+        /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
+        function syncTreeNode(path) {
+            console.log(navigationService);
+            navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: true }).then(function (syncArgs) {
+                vm.currentNode = syncArgs.node;
+            });
+            navigationService.reloadNode(vm.currentNode);
+        }
         activate();
     }
     angular.module("umbraco").controller("Umbraco.Editors.Content.ChangeDocTypeController", ChangeDocTypeController);

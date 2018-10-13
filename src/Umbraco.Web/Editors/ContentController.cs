@@ -1048,11 +1048,16 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));
 
+            foreach (var propertyMapping in model.PropertyMappings)
+            {
+                propertyMapping.Value = foundContent.GetValue(propertyMapping.FromAlias);
+            }
+
             if (foundContent == null)
             {
                 HandleContentNotFound(model.Id);
             }
-            
+
             var wasPublished = foundContent.Published;
 
             var newDocType = Services.ContentTypeService.Get(model.NewDocType);
@@ -1076,25 +1081,7 @@ namespace Umbraco.Web.Editors
                 Services.ContentService.SaveAndPublish(foundContent, userId: user.Id);
             }
 
-            //// Sync the tree
-            //ClientTools.SyncTree(foundContent.Path, true);
-
-            //// Reload the page if the content was already being viewed
-            //ClientTools.ReloadLocation();
-
-            //// Display success message
-            //SuccessMessage.Text = Services.TextService.Localize("changeDocType/successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");
-            //PropertiesMappedMessage.Text = propertiesMappedMessageBuilder.ToString();
-            //if (wasPublished)
-            //{
-            //    ContentPublishedMessage.Text = Services.TextService.Localize("changeDocType/contentRepublished");
-            //    ContentPublishedMessage.Visible = true;
-            //}
-            //else
-            //{
-            //    ContentPublishedMessage.Visible = false;
-            //}
-
+            model.Success = true; 
             return model;
         }
 
