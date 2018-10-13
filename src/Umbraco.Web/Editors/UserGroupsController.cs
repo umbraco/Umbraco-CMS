@@ -51,6 +51,13 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
             //save the group
+            var missingAccess = userGroupSave.Users.Where(X => X == Security.CurrentUser.Id).ToArray();
+            if (missingAccess.Length == 0)
+            {
+                var addCurrentUser = userGroupSave.Users.ToList();
+                    addCurrentUser.Add(Security.CurrentUser.Id);
+                    userGroupSave.Users = addCurrentUser.ToArray();
+            }
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
             
             //deal with permissions
