@@ -1062,16 +1062,17 @@ namespace Umbraco.Web.Editors
 
             var newDocType = Services.ContentTypeService.Get(model.NewDocType);
             foundContent.ChangeContentType(newDocType, true);
-
             foundContent.Template = model.NewTemplateType > 0 ? Services.FileService.GetTemplate(model.NewTemplateType) : null;
 
-            var propertiesMappedMessageBuilder = new StringBuilder("<ul>");
             foreach (var propertyMapping in model.PropertyMappings)
             {
-                propertiesMappedMessageBuilder.AppendFormat("<li>{0} {1} {2}</li>", propertyMapping.FromName, Services.TextService.Localize("changeDocType/to"), propertyMapping.ToName);
+                if (foundContent.HasProperty(propertyMapping.ToAlias))
+                {
+                    model.ErrorMessage = Services.TextService.Localize("changeDocType/validationErrorPropertyWithMoreThanOneMapping");
+                    return model;
+                }
                 foundContent.SetValue(propertyMapping.ToAlias, propertyMapping.Value);
             }
-            propertiesMappedMessageBuilder.Append("</ul>");
 
             var user = Security.CurrentUser;
             Services.ContentService.Save(foundContent, user.Id);

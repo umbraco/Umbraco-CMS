@@ -30,8 +30,14 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<PropertyMapping> PropertyMappings { get; set; }
 
         /// <summary>
-        /// Whther document chnage was successful
+        /// Where applicable, returns error messege
         /// </summary>
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Whether document change was successful
+        /// </summary>
+        [Required]
         public bool Success { get; set; }
     }
 

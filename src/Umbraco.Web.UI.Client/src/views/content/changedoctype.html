@@ -1,7 +1,13 @@
 ﻿<div ng-controller="Umbraco.Editors.Content.ChangeDocTypeController as vm" ng-cloak>
     <div class="umb-dialog-body" ng-if="!vm.success">
+        <div ng-show="vm.error">
+            <div class="alert alert-error">
+                <div>{{vm.error}}</div>
+            </div>
+        </div>
         <umb-pane>
-            <p><localize key="changeDocType_changeDocTypeInstruction"></localize></p>
+            <p><localize key="changeDocType_changeDocTypeInstruction"></localize>
+            </p>
         </umb-pane>
         <umb-pane>
             <label for="changeDocType_selectedContent" class="control-label"><localize key="changeDocType_selectedContent"></localize></label>
@@ -12,7 +18,8 @@
             <p>{{vm.currentDocType.contentTypeName}}</p>
         </umb-pane>
         <umb-pane ng-if="vm.docTypesLength == 0">
-            <p><localize key="changeDocType_docTypeCannotBeChanged"></localize></p>
+            <p><localize key="changeDocType_docTypeCannotBeChanged"></localize>
+            </p>
         </umb-pane>
         <umb-pane ng-if="vm.docTypesLength> 0">
             <label for="changeDocType_newType" class="control-label"><localize key="changeDocType_newType"></localize></label>
@@ -53,17 +60,34 @@
     <div class="umb-dialog-body" ng-if="vm.success">
         <umb-pane>
             <label for="changeDocType_docTypeChanged" class="control-label"><localize key="changeDocType_docTypeChanged"></localize></label>
-            <p><localize key="changeDocType_successMessage"></localize></p>
-            <br/><br/>
-            <umb-button label-key="general_close"
-                        action="vm.closeDialog()"
-                        type="button"
-                        button-style="link">
-            </umb-button>
+            <div class="umb-el-wrap  hidelabel">
+                <table class="table">
+                    <tbody>
+                    <tr ng-repeat="prop in vm.properties">
+                        <td>
+                            <p>{{prop.label}}</p>
+                        </td>
+                        <td>
+                            <p><localize key="changeDocType_to"></localize></p>
+                        </td>
+                        <td>
+                            <p>{{prop.destination.label}}</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+                <umb-button label-key="general_close"
+                            action="vm.closeDialog()"
+                            type="button"
+                            button-style="link">
+                </umb-button>
+            </div>
         </umb-pane>
     </div>
 
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!vm.success">
         <umb-button label-key="general_cancel"
                     action="vm.closeDialog()"
                     type="button"

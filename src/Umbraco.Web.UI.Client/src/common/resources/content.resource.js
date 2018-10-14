@@ -504,7 +504,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         saveChangeDocType: function (model) {
-            console.log(model);
             return umbRequestHelper.resourcePromise( 
                 $http.post(
                     umbRequestHelper.getApiUrl(
