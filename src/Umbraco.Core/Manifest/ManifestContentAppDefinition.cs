@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
+
 
 namespace Umbraco.Core.Manifest
 {
@@ -82,9 +85,9 @@ namespace Umbraco.Core.Manifest
         public string[] Show { get; set; } = Array.Empty<string>();
 
         /// <inheritdoc />
-        public ContentApp GetContentAppFor(object o)
+        public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
-            string partA, partB;
+           string partA, partB;
 
             switch (o)
             {
@@ -112,6 +115,18 @@ namespace Umbraco.Core.Manifest
                 // else iterate over each entry
                 foreach (var rule in rules)
                 {
+                    if (rule.PartA == "role")
+                    {
+                        foreach (var group in userGroups)
+                        {
+                            if (rule.Matches(rule.PartA, group.Alias))
+                            {
+                                ok = rule.Show;
+                                break;
+                            }
+                        }
+                    }
+                    
                     // if the entry does not apply, skip it
                     if (!rule.Matches(partA, partB))
                         continue;
