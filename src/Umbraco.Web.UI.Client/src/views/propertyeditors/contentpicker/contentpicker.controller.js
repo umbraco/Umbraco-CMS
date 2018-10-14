@@ -33,6 +33,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     /** Performs validation based on the renderModel data */
     function validate() {
         if ($scope.contentPickerForm) {
+            angularHelper.getCurrentForm($scope).$setDirty();
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
@@ -199,6 +200,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 _.each(model.selection, function (item, i) {
                     $scope.add(item);
                 });
+              angularHelper.getCurrentForm($scope).$setDirty();
             }
             angularHelper.getCurrentForm($scope).$setDirty();
             editorService.close();

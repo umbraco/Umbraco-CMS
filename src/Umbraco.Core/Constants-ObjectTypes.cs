@@ -71,9 +71,6 @@ namespace Umbraco.Core
                 [Obsolete("This no longer exists in the database")]
                 internal const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
-                [Obsolete("This no longer exists in the database")]
-                internal const string StylesheetProperty = "5555da4f-a123-42b2-4488-dcdfb25e4111";
-
                 // ReSharper restore MemberHidesStaticFromOuterClass
             }
 

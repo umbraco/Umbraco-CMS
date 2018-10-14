@@ -11,6 +11,10 @@ namespace Umbraco.Core.Services
     /// Represents the result of a service operation.
     /// </summary>
     /// <typeparam name="TResultType">The type of the result type.</typeparam>
+    /// <remarks>Type <typeparamref name="TResultType"/> must be an enumeration, and its
+    /// underlying type must be byte. Values indicating success should be in the 0-127
+    /// range, while values indicating failure should be in the 128-255 range. See
+    /// <see cref="OperationResultType"/> for a base implementation.</remarks>
     public class OperationResult<TResultType>
         where TResultType : struct
     {
@@ -56,6 +60,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     /// <typeparam name="TResultType">The type of the result type.</typeparam>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    /// <remarks>Type <typeparamref name="TResultType"/> must be an enumeration, and its
+    /// underlying type must be byte. Values indicating success should be in the 0-127
+    /// range, while values indicating failure should be in the 128-255 range. See
+    /// <see cref="OperationResultType"/> for a base implementation.</remarks>
     public class OperationResult<TResultType, TEntity> : OperationResult<TResultType>
         where TResultType : struct
     {
@@ -111,7 +119,8 @@ namespace Umbraco.Core.Services
             return new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages);
         }
 
-        // fixme wtf?
+        // fixme - this exists to support services that still return Attempt<OperationResult>
+        // these services should directly return an OperationResult, and then this static class should be deleted
         internal static class Attempt
         {
             /// <summary>

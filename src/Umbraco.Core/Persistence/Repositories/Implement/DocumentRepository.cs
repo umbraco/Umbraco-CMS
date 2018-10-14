@@ -8,13 +8,12 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -168,7 +167,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var list = new List<string>
             {
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Task + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
@@ -504,7 +502,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
+                    {
+                        edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+
+                        // fixme - change tracking
+                        // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
+                        // culture has just been edited or not, so we don't update its update date - that date only changes
+                        // when the name is set, and it all works because the controller does it - but, if someone uses a
+                        // service to change a property value and save (without setting name), the update date does not change.
+                    }
 
                 // replace the content version variations (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
@@ -673,13 +680,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             PermissionRepository.Save(permission);
         }
 
-        /// <summary>
-        /// Gets paged content results.
-        /// </summary>
+        /// <inheritdoc />
         public override IEnumerable<IContent> GetPage(IQuery<IContent> query,
-            long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField,
-            IQuery<IContent> filter = null)
+            long pageIndex, int pageSize, out long totalRecords,            
+            IQuery<IContent> filter, Ordering ordering)
         {
             Sql<ISqlContext> filterSql = null;
 
@@ -692,8 +696,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x),
-                orderBy, orderDirection, orderBySystemField,
-                filterSql);
+                filterSql,
+                ordering);
         }
 
         public bool IsPathPublished(IContent content)
@@ -814,25 +818,59 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
+        protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
-            // NOTE see sortby.prevalues.controller.js for possible values
-            // that need to be handled here or in VersionableRepositoryBase
-
-            //Some custom ones
-            switch (orderBy.ToUpperInvariant())
+            // note: 'updater' is the user who created the latest draft version,
+            //       we don't have an 'updater' per culture (should we?)
+            if (ordering.OrderBy.InvariantEquals("updater"))
             {
-                case "UPDATER":
-                    // fixme orders by id not letter = bad
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.ContentVersion, "userId");
-                case "PUBLISHED":
-                    // fixme kill
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");
-                case "CONTENTTYPEALIAS":
-                    throw new NotSupportedException("Don't know how to support ContentTypeAlias.");
+                var joins = Sql()
+                    .InnerJoin<UserDto>("updaterUser").On<ContentVersionDto, UserDto>((version, user) => version.UserId == user.Id, aliasRight: "updaterUser");
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased
+                sql = Sql(InsertBefore(sql, "FROM", SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering"), sql.Arguments);
+
+                sql = InsertJoins(sql, joins);
+
+                return "ordering";
             }
 
-            return base.GetDatabaseFieldNameForOrderBy(orderBy);
+            if (ordering.OrderBy.InvariantEquals("published"))
+            {
+                // no culture = can only work on the global 'published' flag
+                if (ordering.Culture.IsNullOrWhiteSpace())
+                {
+                    // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                    // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
+                    sql = Sql(InsertBefore(sql, "FROM", ", (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) AS ordering "), sql.Arguments);
+                    return "ordering";
+                }
+
+                // invariant: left join will yield NULL and we must use pcv to determine published
+                // variant: left join may yield NULL or something, and that determines published
+
+                var joins = Sql()
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
+                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((pcv, ccv) => pcv.Id == ccv.VersionId, "pcv", "ccv"); // join on *published* content version
+
+                sql = InsertJoins(sql, joins);
+
+                // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
+                // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
+                var sqlText = InsertBefore(sql.SQL, "FROM",
+
+                    // when invariant, ie 'variations' does not have the culture flag (value 1), use the global 'published' flag on pcv.id,
+                    // otherwise check if there's a version culture variation for the lang, via ccv.id
+                    ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccv.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+
+                sql = Sql(sqlText, sql.Arguments);
+
+                return "ordering";
+            }
+
+            return base.ApplySystemOrdering(ref sql, ordering);
         }
 
         private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false)
@@ -1001,7 +1039,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
                     Name = dto.Name,
-                    Date = dto.Date
+                    Date = dto.UpdateDate
                 });
             }
 
@@ -1046,7 +1084,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetCultureDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1061,22 +1099,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
         private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
         {
-            foreach (var (culture, name) in content.CultureNames)
+            var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
+            foreach (var culture in allCultures)
                 yield return new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
-                    // if not published, always edited
-                    // no need to check for availability: it *is* available since it is in content.CultureNames
-                    Edited = !content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture))
+                    Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
+
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+
+                    Available = content.IsCultureAvailable(culture),
+                    Published = content.IsCulturePublished(culture),
+                    Edited = content.IsCultureAvailable(culture) &&
+                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
         }
 

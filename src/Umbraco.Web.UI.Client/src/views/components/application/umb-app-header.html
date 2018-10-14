@@ -9,26 +9,28 @@
 
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
-                <li class="umb-app-header__action">
+                <li data-element="global-search" class="umb-app-header__action">
                     <a href="#" hotkey="ctrl+space" ng-click="searchClick()" prevent-default style="font-size: 20px;">
-                        <i class="icon-search"></i>
+                        <i class="umb-app-header__action-icon icon-search"></i>
                     </a>
                 </li>
-                <li data-element="section-help" class="umb-app-header__action">
+                <li data-element="global-help" class="umb-app-header__action">
                     <a href="#" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
-                        <i class="icon-help-alt"></i>
+                        <i class="umb-app-header__action-icon icon-help-alt"></i>
+                    </a>
+                </li>
+                <li data-element="global-user" class="umb-app-header__action">
+                    <a ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
+                        <umb-avatar
+                            size="xxs"
+                            color="secondary"
+                            name="{{user.name}}"
+                            img-src="{{avatar[0].value}}"
+                            img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
+                        </umb-avatar>
                     </a>
                 </li>
             </ul>
-            <a ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
-                <umb-avatar
-                    size="xxs"
-                    color="secondary"
-                    name="{{user.name}}"
-                    img-src="{{avatar[0].value}}"
-                    img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
-                </umb-avatar>
-            </a>
         </div>
 
     </div>

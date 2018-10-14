@@ -66,7 +66,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 args.scope.busy = true;
 
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
+                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });
@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.save || !args.methods.unPublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish || !args.methods.schedulePublish) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -161,11 +161,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //publish action
                         return {
                             letter: ch,
-                            labelKey: args.content.variants && args.content.variants.length > 1 ? "buttons_saveAndPublishMany" : "buttons_saveAndPublish",
+                            labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "saveAndPublish"
+                            alias: "saveAndPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "H":
                         //send to publish
@@ -175,27 +176,29 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.sendToPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
-                            alias: "sendToPublish"
-                        };
-                    case "A":
-                        //save
-                        return {
-                            letter: ch,
-                            labelKey: "buttons_save",
-                            handler: args.methods.save,
-                            hotKey: "ctrl+s",
-                            hotKeyWhenHidden: true,
-                            alias: "save"
+                            alias: "sendToPublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
                         };
                     case "Z":
                         //unpublish
                         return {
                             letter: ch,
-                            labelKey: "content_unPublish",
-                            handler: args.methods.unPublish,
+                            labelKey: "content_unpublish",
+                            handler: args.methods.unpublish,
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
-                            alias: "unpublish"
+                            alias: "unpublish",
+                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
+                        };
+                    case "SCHEDULE":
+                        //schedule publish - schedule doesn't have a permission letter so
+                        // the button letter is made unique so it doesn't collide with anything else
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_schedulePublish",
+                            handler: args.methods.schedulePublish,
+                            alias: "schedulePublish",
+                            addEllipsis: "true"
                         };
                     default:
                         return null;
@@ -206,8 +209,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             buttons.subButtons = [];
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
-            // Publish, SendToPublish, Save
-            var buttonOrder = ["U", "H", "A"];
+            // Publish, SendToPublish
+            var buttonOrder = ["U", "H", "SCHEDULE"];
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
@@ -222,6 +225,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         break;
                     }
                 }
+
                 //Here's the special check, if the button still isn't set and we are creating and they have create access
                 //we need to add the Save button
                 if (!buttons.defaultButton && args.create && _.contains(args.content.allowedActions, "C")) {
@@ -244,49 +248,22 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     }
                 }
 
+                // if publishing is allowed also allow schedule publish
+                // we add this manually becuase it doesn't have a permission so it wont 
+                // get picked up by the loop through permissions
+                if( _.contains(args.content.allowedActions, "U")) {
+                    buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
+                }
 
                 // if we are not creating, then we should add unpublish too,
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
+                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
-            }
-
-            // If we have a scheduled publish or unpublish date change the default button to 
-            // "save" and update the label to "save and schedule
-            if (args.content.releaseDate || args.content.removeDate) {
-
-                // if save button is alread the default don't change it just update the label
-                if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
-                    buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return;
-                }
-
-                if (buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
-                    // save a copy of the default so we can push it to the sub buttons later
-                    var defaultButtonCopy = angular.copy(buttons.defaultButton);
-                    var newSubButtons = [];
-
-                    // if save button is not the default button - find it and make it the default
-                    angular.forEach(buttons.subButtons, function (subButton) {
-
-                        if (subButton.letter === "A") {
-                            buttons.defaultButton = subButton;
-                            buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                        } else {
-                            newSubButtons.push(subButton);
-                        }
-
-                    });
-
-                    // push old default button into subbuttons
-                    newSubButtons.push(defaultButtonCopy);
-                    buttons.subButtons = newSubButtons;
-                }
-
             }
 
             return buttons;
@@ -409,8 +386,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 case "Z":
                     return {
                         letter: ch,
-                        labelKey: "content_unPublish",
-                        handler: "unPublish"
+                        labelKey: "content_unpublish",
+                        handler: "unpublish"
                     };
 
                 default:
@@ -439,8 +416,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    "notifications",
-                    "ModelState",
+                    
                     "tabs",
                     "properties",
                     "apps",
@@ -599,8 +575,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        for (var e in modelState) {
-                            notificationsService.error("Validation", modelState[e][0]);
+                        for (var e in args.err.data.ModelState) {
+                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
                         }
                     }
 

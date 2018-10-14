@@ -11,10 +11,17 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class DataTypeConfigurationFieldDisplayResolver
     {
+        private readonly ILogger _logger;
+
+        public DataTypeConfigurationFieldDisplayResolver(ILogger logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         /// <summary>
         /// Maps pre-values in the dictionary to the values for the fields
         /// </summary>
-        internal static void MapConfigurationFields(DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
+        internal static void MapConfigurationFields(ILogger logger, DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -24,8 +31,12 @@ namespace Umbraco.Web.Models.Mapping
             {
                 if (configuration.TryGetValue(field.Key, out var value))
                     field.Value = value;
-                else // weird - just leave the field without a value - but warn
-                    Current.Logger.Warn<DataTypeConfigurationFieldDisplayResolver>("Could not find a value for configuration field '{ConfigField}'", field.Key);
+                else
+                {
+                    // weird - just leave the field without a value - but warn
+                    logger.Warn<DataTypeConfigurationFieldDisplayResolver>("Could not find a value for configuration field '{ConfigField}'", field.Key);
+                }
+                
             }
         }
 
@@ -45,7 +56,7 @@ namespace Umbraco.Web.Models.Mapping
             var fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
             var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
-            MapConfigurationFields(fields, configurationDictionary);
+            MapConfigurationFields(_logger, fields, configurationDictionary);
 
             return fields;
         }

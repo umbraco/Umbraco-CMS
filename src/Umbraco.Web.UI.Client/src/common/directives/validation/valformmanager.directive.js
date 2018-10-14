@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:valFormManager
 * @restrict A
 * @require formController
-* @description Used to broadcast an event to all elements inside this one to notify that form validation has 
+* @description Used to broadcast an event to all elements inside this one to notify that form validation has
 * changed. If we don't use this that means you have to put a watch for each directive on a form's validation
 * changing which would result in much higher processing. We need to actually watch the whole $error collection of a form
 * because just watching $valid or $invalid doesn't acurrately trigger form validation changing.
@@ -19,7 +19,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
     var SAVED_EVENT_NAME = "formSubmitted";
 
     return {
-        require: "form",
+        require: ["form", "^^?valFormManager", "^^?valSubView"],
         restrict: "A",
         controller: function($scope) {
             //This exposes an API for direct use with this directive
@@ -35,6 +35,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 }));
             };
 
+            this.showValidation = $scope.showValidation === true;
+
             //Ensure to remove the event handlers when this instance is destroyted
             $scope.$on('$destroy', function () {
                 for (var u in unsubscribe) {
@@ -42,8 +44,17 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 }
             });
         },
-        link: function (scope, element, attr, formCtrl) {
+        link: function (scope, element, attr, ctrls) {
 
+            function notifySubView() {
+                if (subView){
+                    subView.valStatusChanged({ form: formCtrl, showValidation: scope.showValidation });
+                }
+            }
+
+            var formCtrl = ctrls[0];
+            var parentFormMgr = ctrls.length > 0 ? ctrls[1] : null;
+            var subView = ctrls.length > 1 ? ctrls[2] : null;
             var labels = {};
 
             var labelKeys = [
@@ -78,7 +89,9 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 return sum;
             }, function (e) {
                 scope.$broadcast("valStatusChanged", { form: formCtrl });
-                
+
+                notifySubView();
+
                 //find all invalid elements' .control-group's and apply the error class
                 var inError = element.find(".control-group .ng-invalid").closest(".control-group");
                 inError.addClass("error");
@@ -89,15 +102,17 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
 
             });
 
-            //This tracks if the user is currently saving a new item, we use this to determine 
+            //This tracks if the user is currently saving a new item, we use this to determine
             // if we should display the warning dialog that they are leaving the page - if a new item
             // is being saved we never want to display that dialog, this will also cause problems when there
             // are server side validation issues.
             var isSavingNewItem = false;
 
             //we should show validation if there are any msgs in the server validation collection
-            if (serverValidationManager.items.length > 0) {
+            if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.showValidation)) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
+                scope.showValidation = true;
+                notifySubView();
             }
 
             var unsubscribe = [];
@@ -105,7 +120,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             //listen for the forms saving event
             unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function(ev, args) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
-
+                scope.showValidation = true;
+                notifySubView();
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
             }));
@@ -114,9 +130,10 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             unsubscribe.push(scope.$on(SAVED_EVENT_NAME, function(ev, args) {
                 //remove validation class
                 element.removeClass(SHOW_VALIDATION_CLASS_NAME);
-
+                scope.showValidation = false;
+                notifySubView();
                 //clear form state as at this point we retrieve new data from the server
-                //and all validation will have cleared at this point    
+                //and all validation will have cleared at this point
                 formCtrl.$setPristine();
             }));
 
@@ -197,7 +214,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             $timeout(function(){
                 formCtrl.$setPristine();
             }, 1000);
-            
+
         }
     };
 }

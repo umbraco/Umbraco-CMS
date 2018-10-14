@@ -28,11 +28,11 @@ namespace Umbraco.Web.Scheduling
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            // not on slaves nor unknown role servers
+            // not on replicas nor unknown role servers
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
-                    _logger.Debug<KeepAlive>("Does not run on slave servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<KeepAlive>("Does not run on replica servers.");
                     return true; // role may change!
                 case ServerRole.Unknown:
                     _logger.Debug<KeepAlive>("Does not run on servers with unknown role.");

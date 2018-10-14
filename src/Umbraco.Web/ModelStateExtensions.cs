@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Core;
 
 namespace Umbraco.Web
 {
@@ -37,20 +38,7 @@ namespace Umbraco.Web
         {
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
-
-
-        //NOTE: we used this alot in v5 when we had editors in MVC, this was really handy for knockout editors using JS
-
-        ///// <summary>
-        ///// Adds an error to the model state that has to do with data validation, this is generally used for JSON responses
-        ///// </summary>
-        ///// <param name="state"></param>
-        ///// <param name="errorMessage"></param>
-        //public static void AddDataValidationError(this ModelStateDictionary state, string errorMessage)
-        //{
-        //    state.AddModelError("DataValidation", errorMessage);
-        //}
-
+        
         /// <summary>
         /// Adds the error to model state correctly for a property so we can use it on the client side.
         /// </summary>
@@ -64,6 +52,25 @@ namespace Umbraco.Web
             if (culture == null)
                 culture = "";
             modelState.AddValidationError(result, "_Properties", propertyAlias, culture);
+        }
+
+        /// <summary>
+        /// Returns a list of cultures that have property errors
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetCulturesWithPropertyErrors(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        {
+            //Add any culture specific errors here
+            var cultureErrors = modelState.Keys
+                .Select(x => x.Split('.')) //split into parts
+                .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
+                .Select(x => x[2]) //select the culture part
+                .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                .Distinct()
+                .ToList();
+
+            return cultureErrors;
         }
 
         /// <summary>

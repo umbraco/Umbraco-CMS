@@ -118,6 +118,8 @@ namespace Umbraco.Core.Services.Implement
             // - content type alias changed
             // - content type property removed, or alias changed
             // - content type composition removed (not testing if composition had properties...)
+            // - content type variation changed
+            // - property type variation changed
             //
             // because these are the changes that would impact the raw content data
 
@@ -132,7 +134,8 @@ namespace Umbraco.Core.Services.Implement
                 var dirty = (IRememberBeingDirty)contentType;
 
                 // skip new content types
-                var isNewContentType = dirty.WasPropertyDirty("HasIdentity");
+                //TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
+                var isNewContentType = dirty.WasPropertyDirty("Id");
                 if (isNewContentType)
                 {
                     AddChange(changes, contentType, ContentTypeChangeTypes.Create);
@@ -149,12 +152,12 @@ namespace Umbraco.Core.Services.Implement
                         throw new Exception("oops");
 
                     // skip new properties
-                    var isNewProperty = dirtyProperty.WasPropertyDirty("HasIdentity");
+                    //TODO: This used to be WasPropertyDirty("HasIdentity") but i don't think that actually worked for detecting new entities this does seem to work properly
+                    var isNewProperty = dirtyProperty.WasPropertyDirty("Id");
                     if (isNewProperty) return false;
 
                     // alias change?
-                    var hasPropertyAliasBeenChanged = dirtyProperty.WasPropertyDirty("Alias");
-                    return hasPropertyAliasBeenChanged;
+                    return dirtyProperty.WasPropertyDirty("Alias");
                 });
 
                 // removed properties?
@@ -163,8 +166,15 @@ namespace Umbraco.Core.Services.Implement
                 // removed compositions?
                 var hasAnyCompositionBeenRemoved = dirty.WasPropertyDirty("HasCompositionTypeBeenRemoved");
 
+                // variation changed?
+                var hasContentTypeVariationChanged = dirty.WasPropertyDirty("Variations");
+
+                // property variation change?
+                var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
+
                 // main impact on properties?
-                var hasPropertyMainImpact = hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
+                var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
+                    || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
 
                 if (hasAliasChanged || hasPropertyMainImpact)
                 {
@@ -336,6 +346,9 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<TItem> GetComposedOf(int id)
         {
+            //fixme: this is essentially the same as ContentTypeServiceExtensions.GetWhereCompositionIsUsedInContentTypes which loads
+            // all content types to figure this out, this instead makes quite a few queries so should be replaced
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);

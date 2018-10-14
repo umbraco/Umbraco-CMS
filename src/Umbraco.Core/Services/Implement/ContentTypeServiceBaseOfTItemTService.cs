@@ -20,12 +20,12 @@ namespace Umbraco.Core.Services.Implement
         internal static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> Changed;
 
         // that one is always immediate (transactional)
-        public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> UowRefreshedEntity;
+        public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> ScopedRefreshedEntity;
 
         // used by tests to clear events
         internal static void ClearScopeEvents()
         {
-            UowRefreshedEntity = null;
+            ScopedRefreshedEntity = null;
         }
 
         // these must be dispatched
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services.Implement
         protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
         {
             // that one is always immediate (not dispatched, transactional)
-            UowRefreshedEntity.RaiseEvent(args, This);
+            ScopedRefreshedEntity.RaiseEvent(args, This);
         }
         
         protected bool OnSavingCancelled(IScope scope, SaveEventArgs<TItem> args)

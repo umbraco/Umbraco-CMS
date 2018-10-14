@@ -80,22 +80,23 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Umbraco\Translation\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="ClientDependency" Version="1.9.6" />
+    <PackageReference Include="ClientDependency" Version="1.9.7" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.9.2.19" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.9.0" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="1.0.8" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.0" />
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
       <PrivateAssets>all</PrivateAssets>
       <!-- development dependency -->
@@ -107,7 +108,7 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.0.0-alpha.22</Version>
+      <Version>8.0.0-alpha.24</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -283,9 +284,6 @@
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
-    <None Include="Config\metablogConfig.Release.config">
-      <DependentUpon>metablogConfig.config</DependentUpon>
-    </None>
     <None Include="Config\ExamineSettings.Release.config">
       <DependentUpon>ExamineSettings.config</DependentUpon>
     </None>
@@ -330,13 +328,17 @@
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
+    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\endPreview.aspx" />
-    <Content Include="Umbraco\Dialogs\Preview.aspx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="default.aspx" />
-    <Content Include="Umbraco\Config\Lang\da.xml" />
+    <Content Include="Umbraco\Config\Lang\da.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
     <Content Include="Umbraco\Config\Lang\fr.xml" />
@@ -347,7 +349,6 @@
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco\Translation\details.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
@@ -383,9 +384,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\Empty %28ForUseWithCustomViews%29.cshtml">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Breadcrumb.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
@@ -403,7 +401,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
-    <Content Include="Umbraco\Translation\translationTasks.dtd" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -420,18 +417,7 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
-    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
     <Content Include="Umbraco\Views\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
@@ -445,9 +431,6 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Translation\default.aspx" />
-    <Content Include="Umbraco\Translation\preview.aspx" />
-    <Content Include="Umbraco\Translation\xml.aspx" />
     <Content Include="Umbraco\Create\simple.ascx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
@@ -462,8 +445,6 @@
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="App_Browsers\w3cvalidator.browser" />
-    <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
@@ -472,7 +453,6 @@
     <Content Include="Config\Dashboard.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\metablogConfig.config" />
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>

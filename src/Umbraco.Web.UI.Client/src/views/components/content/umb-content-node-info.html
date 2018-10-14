@@ -22,6 +22,23 @@
                 </ul>
             </umb-box-content>
         </umb-box>
+        <umb-box data-element="node-info-redirects" style="display:none;" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
+            <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
+            <umb-box-content class="block-form">
+                <div style="position: relative;">
+                    <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
+                    <div ng-show="hasRedirects">
+                        <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
+                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                            <li ng-repeat="redirectUrl in redirectUrls">
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </umb-box-content>
+        </umb-box>
 
         <umb-box data-element="node-info-history">
             <umb-box-header title-key="general_history"></umb-box-header>
@@ -47,11 +64,12 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar color="secondary"
-                                                size="xs"
-                                                name="{{item.userName}}"
-                                                img-src="{{item.userAvatars[3]}}"
-                                                img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    <umb-avatar 
+                                        color="secondary"
+                                        size="xs"
+                                        name="{{item.userName}}"
+                                        img-src="{{item.userAvatars[3]}}"
+                                        img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
                                     </umb-avatar>
                                 </div>
 
@@ -62,9 +80,11 @@
                             </div>
 
                             <div class="history-item__break">
-                                <umb-badge size="xs"
-                                           color="{{item.logTypeColor}}">
-                                  
+                                <umb-badge
+                                    class="history-item__badge"
+                                    size="xs"
+                                    color="{{item.logTypeColor}}">
+
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
                                 <span>
@@ -92,78 +112,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        <umb-box data-element="node-info-scheduled-publishing">
-            <umb-box-header title-key="general_scheduledPublishing"></umb-box-header>
-            <umb-box-content class="block-form">
-
-                <div class="date-wrapper">
-
-                    <div class="flex items-center flex-column">
-
-
-                        <umb-date-time-picker data-element="node-info-publish"
-                                              options="datePickerConfig"
-                                              on-change="datePickerChange(event, 'publish')">
-
-                            <div class="date-container">
-
-                                <div class="date-container__title">
-                                    <localize key="content_releaseDate"></localize>
-                                </div>
-
-                                <div class="date-container__date" ng-if="node.releaseDate">
-                                    <div class="date-wrapper__date">{{node.releaseDateMonth}} {{node.releaseDateYear}}</div>
-                                    <div class="date-wrapper__number">{{node.releaseDateDayNumber}}</div>
-                                    <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDateTime}}</div>
-                                </div>
-
-                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
-
-                            </div>
-
-                        </umb-date-time-picker>
-
-                        <a ng-if="node.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
-                            <small><localize key="content_removeDate">Clear date</localize></small>
-                        </a>
-
-                    </div>
-
-                    <div class="date-separate"></div>
-
-                    <div class="flex items-center flex-column">
-                        <umb-date-time-picker data-element="node-info-unpublish"
-                                              options="datePickerConfig"
-                                              on-change="datePickerChange(event, 'unpublish')">
-
-                            <div class="date-container">
-
-                                <div class="date-container__title">
-                                    <localize key="content_unpublishDate"></localize>
-                                </div>
-
-                                <div class="date-container__date" ng-if="node.removeDate">
-                                    <div class="date-wrapper__date">{{node.removeDateMonth}} {{node.removeDateYear}}</div>
-                                    <div class="date-wrapper__number">{{node.removeDateDayNumber}}</div>
-                                    <div class="date-wrapper__date">{{node.removeDateDay}} {{node.removeDateTime}}</div>
-                                </div>
-
-                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
-
-                            </div>
-
-                        </umb-date-time-picker>
-
-                        <a ng-if="node.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
-                            <small><localize key="content_removeDate">Clear date</localize></small>
-                        </a>
-                    </div>
-
-                </div>
-
-
-            </umb-box-content>
-        </umb-box>
+        
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
@@ -177,7 +126,7 @@
                     </div>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
@@ -193,6 +142,7 @@
                 </umb-control-group>
 
                 <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+
                     <div class="flex items-center">
                         <select class="input-block-level"
                                 ng-model="node.template"
@@ -206,7 +156,7 @@
                     </div>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-id" label="Id">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>

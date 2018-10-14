@@ -124,10 +124,11 @@ namespace Umbraco.Core.Models
             return this.Any(x => x.Alias == propertyAlias);
         }
 
-        public void RemoveItem(string propertyTypeAlias)
+        public bool RemoveItem(string propertyTypeAlias)
         {
             var key = IndexOfKey(propertyTypeAlias);
             if (key != -1) RemoveItem(key);
+            return key != -1;
         }
 
         public int IndexOfKey(string key)

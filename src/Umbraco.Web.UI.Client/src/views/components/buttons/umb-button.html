@@ -10,24 +10,21 @@
     <a ng-if="vm.type === 'link'" ng-href="{{vm.href}}" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
             <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
-            <localize ng-if="vm.labelKey" key="{{vm.labelKey}}">{{vm.label}}</localize>
-            <span ng-if="!vm.labelKey">{{vm.label}}</span>
+            {{vm.buttonLabel}}
         </span>
     </a>
 
     <button ng-if="vm.type === 'button'" type="button" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" ng-click="vm.clickButton($event)" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
             <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
-            <localize ng-if="vm.labelKey" key="{{vm.labelKey}}">{{vm.label}}</localize>
-            <span ng-if="!vm.labelKey">{{vm.label}}</span>
+            {{vm.buttonLabel}}
         </span>
     </button>
 
     <button ng-if="vm.type === 'submit'" type="submit" class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}}" hotkey="{{vm.shortcut}}" hotkey-when-hidden="{{vm.shortcutWhenHidden}}" ng-disabled="vm.disabled">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
             <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon"></i>
-            <localize ng-if="vm.labelKey" key="{{vm.labelKey}}">{{vm.label}}</localize>
-            <span ng-if="!vm.labelKey">{{vm.label}}</span>
+            {{vm.buttonLabel}}
         </span>
     </button>
 

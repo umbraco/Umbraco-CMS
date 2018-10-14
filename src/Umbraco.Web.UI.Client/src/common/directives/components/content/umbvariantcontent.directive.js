@@ -2,133 +2,104 @@
     'use strict';
 
     /**
-     * A directive to encapsulate each variant editor which includes the name header and all content apps for a given variant
-     * @param {any} $timeout
-     * @param {any} $location
+     * A component to encapsulate each variant editor which includes the name header and all content apps for a given variant
      */
-    function variantContentDirective($timeout, $location) {
+    var umbVariantContent = {
+        templateUrl: 'views/components/content/umb-variant-content.html',
+        bindings: {
+            content: "<",
+            page: "<",
+            editor: "<",
+            editorIndex: "<",
+            editorCount: "<",
+            openVariants: "<",
+            onCloseSplitView: "&",
+            onSelectVariant: "&",
+            onOpenSplitView: "&",
+            onSelectApp: "&"
+        },
+        controllerAs: 'vm',
+        controller: umbVariantContentController
+    };
+    
+    function umbVariantContentController($scope, $element, $location) {
 
-        var directive = {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/content/umb-variant-content.html',
-            link: function (scope) {
+        var unsubscribe = [];
 
-                /**
-                 * Adds a new editor to the editors array to show content in a split view
-                 * @param {any} selectedVariant
-                 */
-                scope.openInSplitView = function (selectedVariant) {
+        var vm = this;
 
-                    var selectedCulture = selectedVariant.language.culture;
+        vm.$onInit = onInit;
+        vm.$postLink = postLink;
+        vm.$onDestroy = onDestroy;
 
-                    //only the content app can be selected since no other apps are shown, and because we copy all of these apps
-                    //to the "editors" we need to update this across all editors
-                    for (var e = 0; e < scope.editors.length; e++) {
-                        var editor = scope.editors[e];
-                        for (var i = 0; i < editor.content.apps.length; i++) {
-                            var app = editor.content.apps[i];
-                            if (app.alias === "content") {
-                                app.active = true;
-                            }
-                            else {
-                                app.active = false;
-                            }
-                        }
+        vm.selectVariant = selectVariant;
+        vm.openSplitView = openSplitView;
+        vm.selectApp = selectApp;
+
+        function onInit() {
+            // disable the name field if the active content app is not "Content"
+            vm.nameDisabled = false;
+            angular.forEach(vm.editor.content.apps, function(app){
+                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+                    vm.nameDisabled = true;
+                }
+            });
+        }
+        
+        /** Called when the component has linked all elements, this is when the form controller is available */
+        function postLink() {
+            //set the content to dirty if the header changes
+            unsubscribe.push($scope.$watch("contentHeaderForm.$dirty",
+                function(newValue, oldValue) {
+                    if (newValue === true) {
+                        vm.editor.content.isDirty = true;
                     }
-
-                    //Find the whole variant model based on the culture that was chosen
-                    var variant = _.find(scope.content.variants, function (v) {
-                        return v.language.culture === selectedCulture;
-                    });
-
-                    var editor = {
-                        content: scope.initVariant({ variant: variant})
-                    };
-                    scope.editors.push(editor);
-
-                    //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
-                    editor.collapsed = true;
-                    editor.loading = true;
-                    $timeout(function () {
-                        editor.collapsed = false;
-                        editor.loading = false;
-                        scope.onSplitViewChanged();
-                    }, 100);
-                };
-
-                /**
-                 * Changes the currently selected variant
-                 * @param {any} variantDropDownItem
-                 */
-                scope.selectVariant = function (variantDropDownItem) {
-
-                    var editorIndex = _.findIndex(scope.editors, function (e) {
-                        return e === scope.editor;
-                    });
-
-                    //if the editor index is zero, then update the query string to track the lang selection, otherwise if it's part
-                    //of a 2nd split view editor then update the model directly.
-                    if (editorIndex === 0) {
-                        //if we've made it this far, then update the query string
-                        $location.search("cculture", variantDropDownItem.language.culture);
-                    }
-                    else {
-                        //set all variant drop down items as inactive for this editor and then set the selected on as active
-                        for (var i = 0; i < scope.editor.content.variants.length; i++) {
-                            scope.editor.content.variants[i].active = false;
-                        }
-                        variantDropDownItem.active = true;
-
-                        //get the variant content model and initialize the editor with that
-                        var variant = _.find(scope.content.variants, function (v) {
-                            return v.language.culture === variantDropDownItem.language.culture;
-                        });
-                        scope.editor.content = scope.initVariant({ variant: variant });
-                    }
-                };
-
-                /** Closes the split view */
-                scope.closeSplitView = function () {
-                    //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
-                    scope.editor.loading = true;
-                    scope.editor.collapsed = true;
-                    $timeout(function () {
-                        var index = _.findIndex(scope.editors, function(e) {
-                            return e === scope.editor;
-                        });
-                        scope.editors.splice(index, 1);
-                        scope.onSplitViewChanged();
-                    }, 400);
-                };
-
-                //set the content to dirty if the header changes
-                scope.$watch("contentHeaderForm.$dirty",
-                    function (newValue, oldValue) {
-                        if (newValue === true) {
-                            scope.editor.content.isDirty = true;
-                        }
-                    });
-
-            },
-            scope: {
-                //TODO: This should be turned into a proper component
-
-                page: "=",
-                content: "=",
-                editor: "=",
-                editors: "=",
-                //TODO: I don't like having this callback defined and would like to make this directive a bit less
-                // coupled but right now don't have time
-                initVariant: "&",
-                onSplitViewChanged: "&"
+                }));
+        }
+        
+        function onDestroy() {
+            for (var i = 0; i < unsubscribe.length; i++) {
+                unsubscribe[i]();
             }
-        };
+        }
 
-        return directive;
+        /**
+         * Used to proxy a callback
+         * @param {any} variant
+         */
+        function selectVariant(variant) {
+            if (vm.onSelectVariant) {
+                vm.onSelectVariant({ "variant": variant });
+            }
+        }
 
+        /**
+         * Used to proxy a callback
+         * @param {any} item
+         */
+        function selectApp(item) {
+            // disable the name field if the active content app is not "Content" or "Info"
+            vm.nameDisabled = false;
+            if(item && item.alias !== "umbContent" && item.alias !== "umbInfo") {
+                vm.nameDisabled = true;
+            }
+            // call the callback if any is registered
+            if(vm.onSelectApp) {
+                vm.onSelectApp({"app": item});
+            }
+        }
+
+        /**
+         * Used to proxy a callback
+         * @param {any} variant
+         */
+        function openSplitView(variant) {
+            if (vm.onOpenSplitView) {
+                vm.onOpenSplitView({ "variant": variant });
+            }
+        }
     }
 
-    angular.module('umbraco.directives').directive('umbVariantContent', variantContentDirective);
+    angular.module('umbraco.directives').component('umbVariantContent', umbVariantContent);
 
 })();

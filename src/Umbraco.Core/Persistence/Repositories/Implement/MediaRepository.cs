@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -136,7 +137,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var list = new List<string>
             {
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Task + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
@@ -455,11 +455,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
-        /// <summary>
-        /// Gets paged media results.
-        /// </summary>
-        public override IEnumerable<IMedia> GetPage(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter = null)
+        /// <inheritdoc />
+        public override IEnumerable<IMedia> GetPage(IQuery<IMedia> query,
+            long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMedia> filter, Ordering ordering)
         {
             Sql<ISqlContext> filterSql = null;
 
@@ -471,8 +470,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField,
-                filterSql);
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
         }
 
         private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)

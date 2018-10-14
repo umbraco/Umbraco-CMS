@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -45,6 +46,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2012 = 5,
             V2014 = 6,
             V2016 = 7,
+            V2017 = 8,
             Other = 99
         }
 
@@ -71,37 +73,35 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             public void Initialize()
             {
-                var firstPart = string.IsNullOrWhiteSpace(ProductVersion) ? "??" : ProductVersion.Split('.')[0];
-                switch (firstPart)
-                {
-                    case "??":
-                        ProductVersionName = VersionName.Invalid;
-                        break;
-                    case "13":
-                        ProductVersionName = VersionName.V2016;
-                        break;
-                    case "12":
-                        ProductVersionName = VersionName.V2014;
-                        break;
-                    case "11":
-                        ProductVersionName = VersionName.V2012;
-                        break;
-                    case "10":
-                        ProductVersionName = VersionName.V2008;
-                        break;
-                    case "9":
-                        ProductVersionName = VersionName.V2005;
-                        break;
-                    case "8":
-                        ProductVersionName = VersionName.V2000;
-                        break;
-                    case "7":
-                        ProductVersionName = VersionName.V7;
-                        break;
-                    default:
-                        ProductVersionName = VersionName.Other;
-                        break;
-                }
+                ProductVersionName = MapProductVersion(ProductVersion);
+            }
+        }
+
+        private static VersionName MapProductVersion(string productVersion)
+        {
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            switch (firstPart)
+            {
+                case "??":
+                    return VersionName.Invalid;
+                case "14":
+                    return VersionName.V2017;
+                case "13":
+                    return VersionName.V2016;
+                case "12":
+                    return VersionName.V2014;
+                case "11":
+                    return VersionName.V2012;
+                case "10":
+                    return VersionName.V2008;
+                case "9":
+                    return VersionName.V2005;
+                case "8":
+                    return VersionName.V2000;
+                case "7":
+                    return VersionName.V7;
+                default:
+                    return VersionName.Other;
             }
         }
 
@@ -136,6 +136,33 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
+        internal static VersionName GetVersionName(string connectionString, string providerName)
+        {
+            var factory = DbProviderFactories.GetFactory(providerName);
+            var connection = factory.CreateConnection();
+
+            if (connection == null)
+                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
+
+            connection.ConnectionString = connectionString;
+            using (connection)
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT SERVERPROPERTY('ProductVersion');";
+                    var productVersion = command.ExecuteScalar().ToString();
+                    connection.Close();
+                    return MapProductVersion(productVersion);
+                }
+                catch
+                {
+                    return VersionName.Unknown;
+                }
+            }
+        }
+
         /// <summary>
         /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
         /// server type that does this, therefore this method doesn't exist on any other syntax provider
@@ -143,19 +170,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// <returns></returns>
         public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TableName = t.Name,ColumnName = c.Name,dc.Name,dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id");
+            var items = db.Fetch<dynamic>("SELECT TableName = t.Name, ColumnName = c.Name, dc.Name, dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id INNER JOIN sys.schemas as s on t.[schema_id] = s.[schema_id] WHERE s.name = (SELECT SCHEMA_NAME())");
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
         public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS");
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return
                 items.Select(
                     item =>
@@ -168,7 +195,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             var items =
                 db.Fetch<dynamic>(
-                    "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE");
+                    "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
@@ -177,7 +204,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             var items =
                 db.Fetch<dynamic>(
-                    "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE");
+                    "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
@@ -191,7 +218,8 @@ CASE WHEN I.is_unique_constraint = 1 OR  I.is_unique = 1 THEN 1 ELSE 0 END AS [U
 from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id]
    inner join sys.index_columns as IC on IC.[object_id] = I.[object_id] and IC.[index_id] = I.[index_id]
    inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id]
-WHERE I.is_primary_key = 0
+   inner join sys.schemas as S on T.[schema_id] = S.[schema_id]
+WHERE S.name = (SELECT SCHEMA_NAME()) AND I.is_primary_key = 0
 order by T.name, I.name");
             return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME,
                 item.UNIQUE == 1)).ToList();
@@ -201,7 +229,7 @@ order by T.name, I.name");
         public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
-                db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName",
+                db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())",
                                        new { TableName = tableName });
 
             return result > 0;

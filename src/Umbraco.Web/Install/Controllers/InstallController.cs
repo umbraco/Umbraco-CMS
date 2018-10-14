@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Security;
+using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.Web.Install.Controllers
 {

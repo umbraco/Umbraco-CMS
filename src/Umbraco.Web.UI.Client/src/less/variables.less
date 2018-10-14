@@ -195,7 +195,7 @@
 @bodyBackground:        @gray-10;
 @textColor:             @gray-2;
 
-@editorHeaderHeight:    80px;
+@editorHeaderHeight:    70px;
 @editorFooterHeight:    50px;
 
 
@@ -330,6 +330,10 @@
 
 @zindexUmbOverlay:        7500;
 @zindexOverlayBackdrop:   2000;
+
+// these are used for the tour which should be on top of everything else
+@zindexTourBackdrop:      9999;
+@zindexTourModal:        10000;
 
 // Sticky bar has a z-index of "500", which is set from javascript in directive
 // so set z-index of cropper should be lower to be behind sticky bar.

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Web;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -82,6 +83,45 @@ namespace Umbraco.Web
             // return the corresponding url segment, or null if none
             var cultureInfo = content.GetCulture(culture);
             return cultureInfo?.UrlSegment;
+		}
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                // fixme - perfs? nothing cached here
+                var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                return publishedContentContentType.IsAllowedTemplate(templateId);
+            }
+
+            return true;
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            // fixme - perfs? nothing cached here
+            var template = Current.Services.FileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id);
+        }
+
+        #endregion
+
+        #region IsComposedOf
+
+        /// <summary>
+        /// Gets a value indicating whether the content is of a content type composed of the given alias
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
+        public static bool IsComposedOf(this IPublishedContent content, string alias)
+        {
+            return content.ContentType.CompositionAliases.Contains(alias);
         }
 
         #endregion
@@ -146,30 +186,30 @@ namespace Umbraco.Web
         #region Value
 
         /// <summary>
-        /// Recursively the value of a content's property identified by its alias, if it exists, otherwise a default value.
+        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false)
+        public static object Value(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
+            // if we have a property, and it has a value, return that value
             if (property != null && property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, recurse);
+            // else let fallback try to get a value
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property?.GetValue(culture, segment);
         }
 
         #endregion
@@ -177,35 +217,35 @@ namespace Umbraco.Web
         #region Value<T>
 
         /// <summary>
-        /// Recursively gets the value of a content's property identified by its alias, converted to a specified type.
+        /// Gets the value of a content's property identified by its alias, converted to a specified type.
         /// </summary>
         /// <typeparam name="T">The target property type.</typeparam>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <c>default(T)</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
+            // if we have a property, and it has a value, return that value
             if (property != null && property.HasValue(culture, segment))
                 return property.Value<T>(culture, segment);
 
-            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, recurse);
+            // else let fallback try to get a value
+            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property == null ? default : property.Value<T>(culture, segment);
         }
 
         // fixme - .Value() refactoring - in progress
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", int fallback = 0)
         {
             var aliasesA = aliases.Split(',');
             if (aliasesA.Length == 0)

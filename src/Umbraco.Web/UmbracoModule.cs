@@ -21,6 +21,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Web
 {
@@ -97,11 +98,6 @@ namespace Umbraco.Web
             httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
             // ok, process
-
-            // create the LegacyRequestInitializer
-            // and initialize legacy stuff
-            var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
-            legacyRequestInitializer.InitializeRequest();
 
             // create the UmbracoContext singleton, one per request, and assign
             // replace existing if any (eg during app startup, a temp one is created)
@@ -558,10 +554,13 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                //Create a new Request ID/GUID
-                requestId = Guid.NewGuid();
+                var httpRequestId = Guid.Empty;
+                LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
 
-                Logger.Verbose<UmbracoModule>("Begin request [{RequestId}]: {RequestUrl}", requestId, httpContext.Request.Url);
+                Logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}",
+                    httpRequestId,
+                    httpContext.Request.Url);
+
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -604,9 +603,12 @@ namespace Umbraco.Web
 
                 if (UmbracoContext.Current != null)
                 {
+                    var httpRequestId = Guid.Empty;
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out httpRequestId);
+
                     Logger.Verbose<UmbracoModule>(
-                        "End Request [{RequestId}]: {RequestUrl} ({RequestTotalMilliseconds}ms)",
-                        requestId,
+                        "End request [{HttpRequestId}]: {RequestUrl} took {Duration}ms",
+                        httpRequestId,
                         httpContext.Request.Url,
                         DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -16,11 +17,11 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class DataTypeMapperProfile : Profile
     {
-        public DataTypeMapperProfile(PropertyEditorCollection propertyEditors)
+        public DataTypeMapperProfile(PropertyEditorCollection propertyEditors, ILogger logger)
         {
             // create, capture, cache
             var availablePropertyEditorsResolver = new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content);
-            var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
+            var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver(logger);
             var databaseTypeResolver = new DatabaseTypeResolver();
 
             CreateMap<IDataEditor, PropertyEditorBasic>();
@@ -119,7 +120,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         var defaultConfiguration = configurationEditor.DefaultConfiguration;
                         if (defaultConfiguration != null)
-                            DataTypeConfigurationFieldDisplayResolver.MapConfigurationFields(fields, defaultConfiguration);
+                            DataTypeConfigurationFieldDisplayResolver.MapConfigurationFields(logger, fields, defaultConfiguration);
 
                         return fields;
                     });

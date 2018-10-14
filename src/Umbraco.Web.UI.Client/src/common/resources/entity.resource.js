@@ -288,17 +288,19 @@ function entityResource($q, $http, umbRequestHelper) {
          * Gets ancestor entities for a given item
          *        
          * 
-         * @param {string} type Object type name        
+         * @param {string} type Object type name
+         * @param {string} culture Culture
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type) {            
+        getAncestors: function (id, type, culture) {
+            if (culture === undefined) culture = "";
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [{id: id}, {type: type}])),
+                        [{ id: id }, { type: type }, { culture: culture }])),
                'Failed to retrieve ancestor data for id ' + id);
         },
         

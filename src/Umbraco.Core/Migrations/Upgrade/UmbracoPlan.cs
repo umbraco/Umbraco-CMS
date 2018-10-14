@@ -107,16 +107,37 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             Chain<UserForeignKeys>("{3E44F712-E2E3-473A-AE49-5D7F8E67CE3F}");  // shannon added that one - let's keep it as the default path
             //Chain<AddTypedLabels>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}"); // stephan added that one = merge conflict, remove,
-            Chain<AddTypedLabels>("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");   // but it after shannon's, with a new target state,
+            Chain<AddTypedLabels>("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");   // but add it after shannon's, with a new target state,
             Add<UserForeignKeys>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}", "{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}"); // and provide a path out of the conflict state
             // resume at {4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4} ...
 
             Chain<ContentVariationMigration>("{1350617A-4930-4D61-852F-E3AA9E692173}");
             Chain<UpdateUmbracoConsent>("{39E5B1F7-A50B-437E-B768-1723AEC45B65}"); // from 7.12.0
+            //Chain<FallbackLanguage>("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}"); // andy added that one = merge conflict, remove
             Chain<AddRelationTypeForMediaFolderOnDelete>("{0541A62B-EF87-4CA2-8225-F0EB98ECCC9F}"); // from 7.12.0
             Chain<IncreaseLanguageIsoCodeColumnLength>("{EB34B5DC-BB87-4005-985E-D983EA496C38}"); // from 7.12.0
             Chain<RenameTrueFalseField>("{517CE9EA-36D7-472A-BF4B-A0D6FB1B8F89}"); // from 7.12.0
             Chain<SetDefaultTagsStorageType>("{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}"); // from 7.12.0
+            //Chain<UpdateDefaultMandatoryLanguage>("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}"); // stephan added that one = merge conflict, remove
+            
+            Chain<FallbackLanguage>("{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // add andy's after others, with a new target state
+            From("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}") // and provide a path out of andy's
+                .CopyChain("{39E5B1F7-A50B-437E-B768-1723AEC45B65}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}", "{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // to next
+            // resume at {8B14CEBD-EE47-4AAD-A841-93551D917F11} ...
+
+            Chain<UpdateDefaultMandatoryLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}"); // add stephan's after others, with a new target state
+            From("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}") // and provide a path out of stephan's
+                .Chain<FallbackLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}"); // to next
+            // resume at {5F4597F4-A4E0-4AFE-90B5-6D2F896830EB} ...
+
+            //Chain<RefactorVariantsModel>("{B19BF0F2-E1C6-4AEB-A146-BC559D97A2C6}");
+            Chain<RefactorVariantsModel>("{290C18EE-B3DE-4769-84F1-1F467F3F76DA}");
+            From("{B19BF0F2-E1C6-4AEB-A146-BC559D97A2C6}")
+                .Chain<FallbackLanguage>("{290C18EE-B3DE-4769-84F1-1F467F3F76DA}");
+            // resume at {290C18EE-B3DE-4769-84F1-1F467F3F76DA}...
+
+            Chain<DropTaskTables>("{6A2C7C1B-A9DB-4EA9-B6AB-78E7D5B722A7}");
+
             //FINAL
 
 

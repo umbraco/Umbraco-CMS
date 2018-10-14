@@ -28,7 +28,25 @@ namespace Umbraco.Core.Persistence.Dtos
         [Ignore]
         public string Culture { get; set; }
 
+        // authority on whether a culture has been edited
         [Column("edited")]
         public bool Edited { get; set; }
+
+        // de-normalized for perfs
+        // (means there is a current content version culture variation for the language)
+        [Column("available")]
+        public bool Available { get; set; }
+
+        // de-normalized for perfs
+        // (means there is a published content version culture variation for the language)
+        [Column("published")]
+        public bool Published { get; set; }
+
+        // de-normalized for perfs
+        // (when available, copies name from current content version culture variation for the language)
+        // (otherwise, it's the published one, 'cos we need to have one)
+        [Column("name")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Name { get; set; }
     }
 }

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     //We need to set the culture in the mapping context since this is needed to ensure that the correct property values
                     //are resolved during the mapping
-                    context.Items[ResolutionContextExtensions.CultureKey] = x.IsoCode;
+                    context.Options.SetCulture(x.IsoCode);
                     return context.Mapper.Map<IContent, ContentVariantDisplay>(source, null, context);
                 }).ToList();
 

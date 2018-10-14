@@ -8,7 +8,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MemberTypes, null, sortOrder: 1)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MemberTypes, null, sortOrder: 2)]
     public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase
     {
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormDataCollection queryStrings)

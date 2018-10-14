@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+            var contentTypesWhereCompositionIsUsed = source.GetWhereCompositionIsUsedInContentTypes(allContentTypes);
            return contentTypesWhereCompositionIsUsed
                 .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
                 .Select(x =>
@@ -206,9 +206,9 @@ namespace Umbraco.Web.Editors
             // works since that is based on aliases.
             var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
+            if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
             {
-                ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
             // execute the externam validators

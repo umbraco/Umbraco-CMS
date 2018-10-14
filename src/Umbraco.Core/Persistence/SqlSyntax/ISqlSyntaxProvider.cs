@@ -44,9 +44,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string TruncateTable { get; }
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
-
-        [Obsolete("This is never used, use the Format(ForeignKeyDefinition) instead")]
-        string CreateForeignKeyConstraint { get; }
+        
         string DeleteDefaultConstraint { get; }
         string FormatDateTime(DateTime date, bool includeTime = true);
         string Format(TableDefinition table);

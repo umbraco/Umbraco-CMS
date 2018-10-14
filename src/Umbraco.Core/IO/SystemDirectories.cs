@@ -40,6 +40,7 @@ namespace Umbraco.Core.IO
 
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
+        [Obsolete("This will be removed, there is no more umbraco_client folder")]
         public static string UmbracoClient => IOHelper.ReturnPath("umbracoClientPath", "~/umbraco_client");
 
         public static string UserControls => IOHelper.ReturnPath("umbracoUsercontrolsPath", "~/usercontrols");

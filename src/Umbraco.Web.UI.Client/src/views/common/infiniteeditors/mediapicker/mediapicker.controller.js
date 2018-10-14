@@ -249,7 +249,8 @@ angular.module("umbraco")
                 // make sure that last opened node is on the same path as start node
                 var nodePath = node.path.split(",");
 
-                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
+                // also make sure the node is not trashed
+                if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
                     $scope.gotoFolder({ id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder" });
                     return true;
                 } else {
@@ -312,7 +313,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 $scope.loading = true;
-                entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
+                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", $scope.searchOptions)
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function(mediaItem) {

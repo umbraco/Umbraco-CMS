@@ -204,40 +204,25 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper, editorService, $location, $routeParams) {
+    function EditorHeaderDirective(editorService) {
 
-        function link(scope, el, attr, ctrl) {
-
+        function link(scope) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
 
-            function onInit() {
-                setCurrentVariant();
-            }
-
-            function setCurrentVariant() {
-                angular.forEach(scope.variants, function (variant) {
-                    if (variant.active) {
-                        scope.vm.currentVariant = variant;
-                    }
-                });
-            }
-
             scope.goBack = function () {
                 if (scope.onBack) {
-                    $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + scope.menu.currentNode.parentId);
+                    scope.onBack();
                 }
             };
 
-            scope.selectVariant = function (event, variant) {
-
-                if (scope.onSelectVariant) {
-                    scope.vm.dropdownOpen = false;
-                    scope.onSelectVariant({ "variant": variant });
+            scope.selectNavigationItem = function(item) {
+                if(scope.onSelectNavigationItem) {
+                    scope.onSelectNavigationItem({"item": item});
                 }
-            };
+            }
 
             scope.openIconPicker = function () {
                 var iconPicker = {
@@ -262,39 +247,7 @@ Use this directive to construct a header inside the main editor window.
                 editorService.iconPicker(iconPicker);
             };
 
-            scope.closeSplitView = function () {
-                if (scope.onCloseSplitView) {
-                    scope.onCloseSplitView();
-                }
-            };
-
-            scope.openInSplitView = function (event, variant) {
-                if (scope.onOpenInSplitView) {
-                    scope.vm.dropdownOpen = false;
-                    scope.onOpenInSplitView({ "variant": variant });
-                }
-            };
-
-            onInit();
-
-            //watch for the active culture changing, if it changes, update the current variant
-            if (scope.variants) {
-                scope.$watch(function () {
-                    for (var i = 0; i < scope.variants.length; i++) {
-                        var v = scope.variants[i];
-                        if (v.active) {
-                            return v.language.culture;
-                        }
-                    }
-                    return scope.vm.currentVariant.language.culture; //should never get here
-                }, function (newValue, oldValue) {
-                    if (newValue !== scope.vm.currentVariant.language.culture) {
-                        setCurrentVariant();
-                    }
-                });
-            }
         }
-
 
         var directive = {
             transclude: true,
@@ -302,8 +255,6 @@ Use this directive to construct a header inside the main editor window.
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-header.html',
             scope: {
-                tabs: "=",
-                actions: "=",
                 name: "=",
                 nameLocked: "=",
                 menu: "=",
@@ -315,16 +266,11 @@ Use this directive to construct a header inside the main editor window.
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",
-                variants: "=",
-                hideChangeVariant: "<?",
                 navigation: "=",
+                onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "<?",
-                splitViewOpen: "=?",
-                onOpenInSplitView: "&?",
-                onCloseSplitView: "&?",
-                onSelectVariant: "&?"
+                showBackButton: "<?"
             },
             link: link
         };
