@@ -12,7 +12,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
             var sectionItemsWidth = [];
             var evts = [];
-            var maxSections = 7;
+            var maxSections = 8;
 
             //setup scope vars
             scope.maxSections = maxSections;
@@ -46,8 +46,8 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                     var sectionsWidth = 0;
                     scope.totalSections = scope.sections.length;
                     scope.maxSections = maxSections;
-                    scope.overflowingSections = 0;
-                    scope.needTray = false;
+                    scope.overflowingSections = scope.maxSections - scope.totalSections;
+                    scope.needTray = scope.sections.length > scope.maxSections;
 
                     // detect how many sections we can show on the screen
                     for (var i = 0; i < sectionItemsWidth.length; i++) {
