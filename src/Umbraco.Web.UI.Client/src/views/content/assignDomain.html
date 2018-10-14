@@ -15,7 +15,10 @@
                             <small><localize key="assignDomain_setLanguageHelp"></localize></small>
                         </label>
                         <div class="controls">
-                            <select id="setLanguage" ng-options="language.Id as language.Name for language in model.AvailableLanguages" ng-model="model.Language"></select>
+                            <select id="setLanguage" ng-model="model.Language">
+                                <option value="" ng-selected="model.Language == null"><localize key="assignDomain_inherit">Inherit</localize></option>
+                                <option ng-repeat="language in model.AvailableLanguages" ng-value="language.Id" ng-bind="language.Name" ng-selected="model.Language == language.Id"></option>
+                            </select>
                         </div>
                     </div>
                 </div>

@@ -55,8 +55,8 @@
 
             $scope.model.Domains.push({
                 Name: "",
-                Lang: $scope.model.AvailableLanguages[0],
-                Sort: $scope.model.Domains.length
+                Lang: $scope.model.AvailableLanguages[0].Id,
+                SortOrder: $scope.model.Domains.length
             })
         };
 
