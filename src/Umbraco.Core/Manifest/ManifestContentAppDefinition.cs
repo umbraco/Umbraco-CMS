@@ -115,7 +115,7 @@ namespace Umbraco.Core.Manifest
                 // else iterate over each entry
                 foreach (var rule in rules)
                 {
-                    if (rule.PartA == "role")
+                    if (rule.PartA.InvariantEquals("role"))
                     {
                         foreach (var group in userGroups)
                         {
