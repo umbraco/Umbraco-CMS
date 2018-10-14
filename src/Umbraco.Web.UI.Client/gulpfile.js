@@ -52,7 +52,7 @@ function processLess(files, out) {
 
     var processors = [
          autoprefixer,
-         cssnano({zindex: false}),
+         cssnano({zindex: false})
     ];
 
     return gulp.src(files)
@@ -329,7 +329,7 @@ gulp.task('dependencies', function () {
             "src":  [
                 "./node_modules/moment/min/moment.min.js",
                 "./node_modules/moment/min/moment-with-locales.js",
-                "./node_modules/moment/min/moment-with-locales.min.js",
+                "./node_modules/moment/min/moment-with-locales.min.js"
             ],
             "base": "./node_modules/moment/min"
         },
