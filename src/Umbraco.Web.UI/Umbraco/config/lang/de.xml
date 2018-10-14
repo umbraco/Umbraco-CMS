@@ -535,6 +535,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Geruhsamen Sontag</key>
     <key alias="greeting1">Schönen Montag</key>
     <key alias="greeting2">Einen großartigen Dienstag</key>
     <key alias="greeting3">Wunderbaren Mittwoch</key>
