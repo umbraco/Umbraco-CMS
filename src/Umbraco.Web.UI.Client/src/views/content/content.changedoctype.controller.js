@@ -68,7 +68,8 @@
                         ToAlias: p.destination.alias
                     };
                 }),
-                Success: false
+                Success: false,
+                Error: false
         };
 
             contentResource.saveChangeDocType(data).then(function (returnData) {
@@ -119,7 +120,6 @@
                 prop.destination = prop.destinations[0];
                 prop.destinations.unshift({ label: "None" });
             });
-
         }
 
         activate();

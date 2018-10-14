@@ -1068,7 +1068,7 @@ namespace Umbraco.Web.Editors
             {
                 if (foundContent.HasProperty(propertyMapping.ToAlias))
                 {
-                    model.ErrorMessage = Services.TextService.Localize("changeDocType/validationErrorPropertyWithMoreThanOneMapping");
+                    model.ErrorMessage = true;
                     return model;
                 }
                 foundContent.SetValue(propertyMapping.ToAlias, propertyMapping.Value);
@@ -1082,6 +1082,7 @@ namespace Umbraco.Web.Editors
                 Services.ContentService.SaveAndPublish(foundContent, userId: user.Id);
             }
 
+            model.ErrorMessage = false;
             model.Success = true; 
             return model;
         }

@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// Where applicable, returns error messege
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public bool ErrorMessage { get; set; }
 
         /// <summary>
         /// Whether document change was successful

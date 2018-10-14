@@ -649,7 +649,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 var found = _.find(data, function(item) {
                     return item.id === node.id;
                 });
-                console.log(found);
 
                 if (found) {
                     //now we need to find the node in the parent.children collection to replace
