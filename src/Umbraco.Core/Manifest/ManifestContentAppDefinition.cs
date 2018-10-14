@@ -87,7 +87,7 @@ namespace Umbraco.Core.Manifest
         /// <inheritdoc />
         public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
-           string partA, partB;
+            string partA, partB;
 
             switch (o)
             {
@@ -112,35 +112,49 @@ namespace Umbraco.Core.Manifest
             {
                 var ok = false;
 
-                // else iterate over each entry
-                foreach (var rule in rules)
+                //if any role specific rules, deal with them first.
+                if (rules.Where(x => x.PartA.InvariantEquals("role")).Any())
                 {
-                    if (rule.PartA.InvariantEquals("role"))
+                    foreach (var rule in rules)
                     {
-                        foreach (var group in userGroups)
+                        if (rule.PartA.InvariantEquals("role"))
                         {
-                            if (rule.Matches(rule.PartA, group.Alias))
+                            foreach (var group in userGroups)
                             {
-                                ok = rule.Show;
-                                break;
+                                if (rule.Matches(rule.PartA, group.Alias))
+                                {
+                                    ok = rule.Show;
+                                    break;
+                                }
                             }
                         }
                     }
-                    
-                    // if the entry does not apply, skip it
-                    if (!rule.Matches(partA, partB))
-                        continue;
-
-                    // if the entry applies,
-                    // if it's an exclude entry, exit, do not display the content app
-                    if (!rule.Show)
+                    // if a role entry, don't let anything else override it.
+                    if (!ok)
+                    {
                         return null;
-
-                    // else break - ok to display
-                    ok = true;
-                    break;
+                    }
                 }
+                else
+                {
+                    // else iterate over each entry to check for show/hide rules.
+                    foreach (var rule in rules)
+                    {
 
+                        // if the entry does not apply, skip it
+                        if (!rule.Matches(partA, partB))
+                            continue;
+
+                        // if the entry applies,
+                        // if it's an exclude entry, exit, do not display the content app
+                        if (!rule.Show)
+                            return null;
+
+                        // else break - ok to display
+                        ok = true;
+                        break;
+                    }
+                }
                 // when 'show' is specified, default is to *not* show the content app
                 if (!ok)
                     return null;
