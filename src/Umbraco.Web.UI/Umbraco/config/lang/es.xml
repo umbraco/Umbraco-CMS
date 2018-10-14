@@ -696,6 +696,7 @@
     <key alias="renewSession">Renovar su sesión para guardar sus cambios</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Feliz super domingo</key>
     <key alias="greeting1">Feliz lunes</key>
     <key alias="greeting2">Tremendo martes</key>
     <key alias="greeting3">Maravilloso miércoles</key>

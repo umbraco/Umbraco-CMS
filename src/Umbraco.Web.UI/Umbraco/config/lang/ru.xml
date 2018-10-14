@@ -911,7 +911,7 @@
     <key alias="renewSession">Обновите сейчас, чтобы сохранить сделанные изменения</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
+    <key alias="greeting0">Сегодня же выходной!</key>
     <key alias="greeting1">Понедельник — день тяжелый...</key>
     <key alias="greeting2">Вот уже вторник...</key>
     <key alias="greeting3">Берегите окружающую среду</key>
@@ -920,6 +920,7 @@
     <key alias="greeting6">Понедельник начинается в субботу</key>
     <key alias="instruction">Укажите имя пользователя и пароль</key>
     <key alias="timeout">Время сессии истекло</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
     <key alias="forgottenPassword">Забыли пароль?</key>
     <key alias="forgottenPasswordInstruction">На email-адрес будет выслано письмо со ссылкой для сброса пароля</key>
     <key alias="requestPasswordResetConfirmation">Будет выслано письмо с инструкциями по сбросу пароля на указанный email-адрес, если он совпадает с адресом пользователя</key>

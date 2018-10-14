@@ -501,7 +501,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
@@ -511,6 +511,7 @@
     <key alias="instruction">Logga in nedan</key>
     <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Översikt</key>

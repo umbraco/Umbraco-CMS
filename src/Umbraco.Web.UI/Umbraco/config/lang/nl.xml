@@ -609,6 +609,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="renewSession">Vernieuw je sessie om je wijzigingen te behouden</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Goede zondag</key>
     <key alias="greeting1">Fijne maandag</key>
     <key alias="greeting2">Fijne dinsdag</key>
     <key alias="greeting3">Fijne woensdag</key>

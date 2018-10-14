@@ -625,6 +625,7 @@
     <key alias="renewSession">已更新，繼續工作。</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">超級星期天快樂</key>
     <key alias="greeting1">瘋狂星期一快樂</key>
     <key alias="greeting2">熱鬧星期二快樂</key>
     <key alias="greeting3">美妙星期三快樂</key>

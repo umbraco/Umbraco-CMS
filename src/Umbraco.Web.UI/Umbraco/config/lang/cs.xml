@@ -537,6 +537,7 @@
     <key alias="renewSession">Obnovte nyní pro uložení práce</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Šťastnou super neděli</key>
     <key alias="greeting1">Šťastné šílené pondělí</key>
     <key alias="greeting2">Šťastné husté úterý</key>
     <key alias="greeting3">Šťastnou překrásnou středu</key>
