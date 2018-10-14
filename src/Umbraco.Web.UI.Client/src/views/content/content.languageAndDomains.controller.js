@@ -1,7 +1,14 @@
 (function () {
     "use strict";
 
-    function ContentLanguageAndDomainsController($scope, contentResource) {
+    function ContentLanguageAndDomainsController(
+        $scope,
+        contentResource,
+        notificationsService,
+        navigationService,
+        localizationService,
+        formHelper,
+        contentEditingHelper) {
 
         $scope.sortableOptions = {
             axis: 'y',
@@ -61,11 +68,11 @@
 
             // Update sort value
             for (var i = 0; i < $scope.model.Domains.length; i++) {
-                $scope.model.Domains[i].Sort = i;
+                $scope.model.Domains[i].SortOrder = i;
             }
 
             if (formHelper.submitForm({
-                scope: $scope.model,
+                scope: $scope,
                 formCtrl: this.languageAndDomainsForm,
                 statusMessage: "Saving language and domains..."
             })) {
@@ -73,7 +80,7 @@
                 contentResource.saveLanguageAndDomains($scope.model)
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: $scope.model, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                         navigationService.hideMenu();
                     },
@@ -92,7 +99,7 @@
         function init() {
             $scope.loading = true;
 
-            contentResource.getLanguagesAndDomains($scope.currentNode.id).then(function (languageAndDomains) {
+            contentResource.getLanguageAndDomains($scope.$parent.currentNode.id).then(function (languageAndDomains) {
                 $scope.model = languageAndDomains;
                 $scope.loading = false;
             });

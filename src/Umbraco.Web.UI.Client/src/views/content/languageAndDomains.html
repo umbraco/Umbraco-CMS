@@ -1,40 +1,46 @@
 <div ng-controller="Umbraco.Editors.Content.LanguageAndDomainsController">
     <form name="languageAndDomainsForm"
           novalidate
-          ng-submit="create()"
+          ng-submit="save()"
           val-form-manager>
 
         <umb-load-indicator ng-if="loading"></umb-load-indicator>
         <div class="umb-pane" ng-show="!loading">
 
+            <div class="umb-property">
+                <div class="control-group umb-control-group">
+                    <div class="umb-el-wrap">
+                        <label class="control-label" for="setLanguage">
+                            <span><localize key="assignDomain_setLanguage"></localize></span>
+                            <small><localize key="assignDomain_setLanguageHelp"></localize></small>
+                        </label>
+                        <div class="controls">
+                            <select id="setLanguage" ng-options="language.Id as language.Name for language in model.AvailableLanguages" ng-model="model.Language"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <umb-control-group label="@assignDomain_setLanguage" description="@assignDomain_setLanguageHelp">
-                <select ng-options="languages.Id as language.Name for language in model.AvailableLanguages" ng-model="model.Language"></select>
-            </umb-control-group>
-
-            <umb-control-group label="@assignDomain_setDomains" description="@assignDomain_setDomainsHelp">
-                <table class="table domains" data-bind="visible: domains().length > 0" style="">
-                    <thead>
-                        <tr>
-                            <th ng-bind="@assignDomain_domain">Domain</th>
-                            <th ng-bind="@assignDomain_language">Language</th>
-                            <th>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody ui-sortable="vm.sortableOptions">
-                        <tr ng-repeat="domain in model.Domains">
-                            <td valign="top"><input class="domain" ng-model="domain.Name"></td>
-                            <td valign="top"><select ng-options="languages.Id as language.Name for language in model.AvailableLanguages" ng-model="domain.Lang"></select></td>
-                            <td valign="top">
-                                <i class="icon icon-navigation handle"></i>
-                                <button type="button" class="btn btn-danger" ng-click="remove(item, $event)"><i class="icon icon-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button class="btn btn-info" ng-click="add($event)"><localize key="assignDomain_addNew">Add new domain</localize></button>
-            </umb-control-group>
+            <table class="table domains" data-bind="visible: model.Domains.length > 0" style="">
+                <thead>
+                    <tr>
+                        <th><localize key="assignDomain_domain">Domain</localize></th>
+                        <th><localize key="assignDomain_language">Language</localize></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody ui-sortable="sortableOptions">
+                    <tr ng-repeat="domain in model.Domains">
+                        <td valign="top"><input type="text" class="domain" ng-model="domain.Name"></td>
+                        <td valign="top"><select ng-options="language.Id as language.Name for language in model.AvailableLanguages" ng-model="domain.Lang" style="width:6em"></select></td>
+                        <td valign="top">
+                            <button type="button" class="btn btn-link danger" ng-click="remove(item, $event)"><i class="icon icon-trash"></i></button>
+                            <i class="icon icon-navigation handle"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-info" ng-click="add($event)"><localize key="assignDomain_addNew">Add new domain</localize></button>
 
         </div>
 
@@ -47,7 +53,7 @@
                         button-style="link">
             </umb-button>
 
-            <umb-button label-key="general_save"
+            <umb-button label-key="buttons_save"
                         type="submit"
                         button-style="success">
             </umb-button>

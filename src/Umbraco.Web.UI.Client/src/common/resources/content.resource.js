@@ -617,7 +617,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to get permissions');
         },
 
-        getLanguagesAndDomains: function (nodeId) {
+        getLanguageAndDomains: function (nodeId) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -626,6 +626,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         { nodeId: nodeId }
                     )),
                 'Failed to get language and domains');
+        },
+
+        saveLanguageAndDomains: function (content) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                    "domainsApiBaseUrl",
+                    "SaveLanguageAndDomains"
+                    ),
+                    content),
+            'Failed to save langauge and domains');
         },
 
         /**

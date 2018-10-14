@@ -177,8 +177,7 @@ namespace Umbraco.Web.Routing
             return domains
                 .Where(d => d.IsWildcard == false)
                 .Select(SanitizeForBackwardCompatibility)
-                .Select(d => new DomainAndUri(d, scheme))
-                .OrderByDescending(d => d.Uri.ToString());
+                .Select(d => new DomainAndUri(d, scheme));
         }
 
         #endregion

@@ -41,6 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoDomains.id in (@ids)", new { ids = ids });
             }
+            sql.OrderBy<DomainDto>(dto => dto.SortOrder, SqlSyntax);
 
             return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
         }
@@ -64,7 +65,6 @@ namespace Umbraco.Core.Persistence.Repositories
                     .LeftJoin<LanguageDto>(SqlSyntax)
                     .On<DomainDto, LanguageDto>(SqlSyntax, dto => dto.DefaultLanguage, dto => dto.Id);
             }
-            sql.OrderBy<DomainDto>(dto => dto.SortOrder, SqlSyntax);
             
             return sql;
         }
@@ -195,7 +195,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     Id = dto.Id,
                     LanguageId = dto.DefaultLanguage,
-                    RootContentId = dto.RootStructureId
+                    RootContentId = dto.RootStructureId,
+                    SortOrder = dto.SortOrder
                 };
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -205,7 +206,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             public DomainDto BuildDto(IDomain entity)
             {
-                var dto = new DomainDto { DefaultLanguage = entity.LanguageId, DomainName = entity.DomainName, Id = entity.Id, RootStructureId = entity.RootContentId };
+                var dto = new DomainDto { DefaultLanguage = entity.LanguageId, DomainName = entity.DomainName, Id = entity.Id, RootStructureId = entity.RootContentId, SortOrder = entity.SortOrder };
                 return dto;
             }
         }

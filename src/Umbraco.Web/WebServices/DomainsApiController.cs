@@ -30,6 +30,7 @@ namespace Umbraco.Web.WebServices
             var domains = Services.DomainService.GetAssignedDomains(nodeId, true).ToArray();
 
             var model = new PostBackModel();
+            model.NodeId = nodeId;
             model.Domains = domains.Where(x => !x.IsWildcard).Select(x => new DomainModel(x.DomainName, x.LanguageId.GetValueOrDefault()){
                 SortOrder = x.SortOrder.GetValueOrDefault()
             }).ToArray();
@@ -136,6 +137,7 @@ namespace Umbraco.Web.WebServices
                 }
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
+                domain.SortOrder = domainModel.SortOrder;
                 if (domain != null)
                 {
                     domain.LanguageId = language.Id;
@@ -166,6 +168,7 @@ namespace Umbraco.Web.WebServices
                     // yet there is a race condition here...
                     var newDomain = new UmbracoDomain(name)
                     {
+                        SortOrder = domainModel.SortOrder,
                         LanguageId = domainModel.Lang,
                         RootContentId = model.NodeId
                     };
