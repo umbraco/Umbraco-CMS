@@ -5,6 +5,7 @@ Umbraco.Sys = {};
 Umbraco.Sys.ServerVariables = {
     umbracoUrls: {
         "contentApiBaseUrl": "/umbraco/UmbracoApi/Content/",
+        "domainsApiBaseUrl": "/umbraco/Api/DomainsApi/",
         "mediaApiBaseUrl": "/umbraco/UmbracoApi/Media/",
         "dataTypeApiBaseUrl": "/umbraco/UmbracoApi/DataType/",
         "sectionApiBaseUrl": "/umbraco/UmbracoApi/Section/",

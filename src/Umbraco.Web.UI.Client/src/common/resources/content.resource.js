@@ -617,6 +617,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to get permissions');
         },
 
+        getLanguagesAndDomains: function (nodeId) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "domainsApiBaseUrl",
+                        "GetLanguageAndDomainsById",
+                        { nodeId: nodeId }
+                    )),
+                'Failed to get language and domains');
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#save

@@ -40,6 +40,10 @@ namespace Umbraco.Web.WebServices
                 model.Language = language.LanguageId.GetValueOrDefault();
             }
 
+            var languages = Services.LocalizationService.GetAllLanguages();
+
+            model.AvailableLanguages = languages.Select(x => new LanguageModel(x.Id, x.IsoCode)).ToArray();
+
             return model;
         }
 
@@ -189,6 +193,18 @@ namespace Umbraco.Web.WebServices
             public int NodeId { get; set; }
             public int Language { get; set; }
             public DomainModel[] Domains { get; set; }
+            public LanguageModel[] AvailableLanguages { get; set; }
+        }
+
+        public class LanguageModel
+        {
+            public LanguageModel(int id, string name)
+            {
+                Name = name;
+                Id = id;
+            }
+            public string Name { get; set; }
+            public int Id { get; set; }
         }
 
         public class DomainModel

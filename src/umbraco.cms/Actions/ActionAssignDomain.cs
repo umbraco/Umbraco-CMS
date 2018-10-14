@@ -12,81 +12,28 @@ namespace umbraco.BusinessLogic.Actions
 	[ActionMetadata(Constants.Conventions.PermissionCategories.AdministrationCategory)]
 	public class ActionAssignDomain : IAction
     {
-		//create singleton
-#pragma warning disable 612,618
-		private static readonly ActionAssignDomain m_instance = new ActionAssignDomain();
-#pragma warning restore 612,618
+        private static readonly ActionAssignDomain instance = new ActionAssignDomain();
 
-		/// <summary>
-		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-		/// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-		/// When this applicatio is refactored, this constuctor should be made private.
-		/// </summary>
-		[Obsolete("Use the singleton instantiation instead of a constructor")]
-		public ActionAssignDomain() { }
+        public static ActionAssignDomain Instance
+        {
+            get { return instance; }
+        }
 
-		public static ActionAssignDomain Instance
-		{
-			get { return m_instance; }
-		}
+        public char Letter { get; private set; }
+        public bool ShowInNotifier { get; private set; }
+        public bool CanBePermissionAssigned { get; private set; }
+        public string Icon { get; private set; }
+        public string Alias { get; private set; }
+        public string JsFunctionName { get; private set; }
+        public string JsSource { get; private set; }
 
-		#region IAction Members
+        public ActionAssignDomain()
+        {
+            Letter = 'I';
+            CanBePermissionAssigned = true;
+            Icon = "home";
+            Alias = "languageAndDomains";
+        }
 
-		public char Letter
-		{
-			get
-			{
-				return 'I';
-			}
-		}
-
-		public string JsFunctionName
-		{
-			get
-			{
-				return string.Format("{0}.actionAssignDomain()", ClientTools.Scripts.GetAppActions);
-			}
-		}
-
-		public string JsSource
-		{
-			get
-			{
-				return null;
-			}
-		}
-
-		public string Alias
-		{
-			get
-			{
-				return "assignDomain";
-			}
-		}
-
-		public string Icon
-		{
-			get
-			{
-                return "home";
-			}
-		}
-
-		public bool ShowInNotifier
-		{
-			get
-			{
-				return false;
-			}
-		}
-		public bool CanBePermissionAssigned
-		{
-			get
-			{
-				return true;
-			}
-		}
-        #endregion
-        
     }
 }

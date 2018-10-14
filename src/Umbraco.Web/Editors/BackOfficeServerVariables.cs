@@ -141,6 +141,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.PostSave(null))
                         },
                         {
+                            "domainsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DomainsApiController>(
+                                controller => controller.GetLanguageAndDomainsById(0))
+                        },
+                        {
                             "mediaApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MediaController>(
                                 controller => controller.GetRootMedia())
                         },
