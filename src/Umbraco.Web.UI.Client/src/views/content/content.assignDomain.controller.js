@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentLanguageAndDomainsController(
+    function ContentAssignDomainController(
         $scope,
         contentResource,
         notificationsService,
@@ -110,6 +110,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Content.LanguageAndDomainsController", ContentLanguageAndDomainsController);
+    angular.module("umbraco").controller("Umbraco.Editors.Content.AssignDomainController", ContentAssignDomainController);
 
 })();

@@ -32,7 +32,7 @@ namespace umbraco.BusinessLogic.Actions
             Letter = 'I';
             CanBePermissionAssigned = true;
             Icon = "home";
-            Alias = "languageAndDomains";
+            Alias = "assignDomain";
         }
 
     }
