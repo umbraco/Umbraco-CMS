@@ -16,6 +16,14 @@
         left: 0;
         opacity: 0;
 
+        &:focus ~ .umb-radiobuttons__state{
+            box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
+        }
+
+        &:focus:checked ~ .umb-radiobuttons__state{
+            box-shadow: none;
+        }
+
         &:checked ~ .umb-radiobuttons__state{
             &:before{
                 width: 100%;
