@@ -529,6 +529,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">İşinizi kaydetmek için şimdi Yenile</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Pazar</key>
     <key alias="greeting1">Pazartesi </key>
     <key alias="greeting2">Salı</key>
     <key alias="greeting3">Çarşamba</key>
