@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.BaseRest;
 using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
@@ -20,35 +24,33 @@ namespace Umbraco.Core.Configuration
 
         private static readonly Lazy<UmbracoConfig> Lazy = new Lazy<UmbracoConfig>(() => new UmbracoConfig());
 
-        public static UmbracoConfig For => Lazy.Value;
+        public static UmbracoConfig For
+        {
+            get { return Lazy.Value; }            
+        }
 
         #endregion
 
         /// <summary>
-        /// Default constructor
+        /// Default constructor 
         /// </summary>
         private UmbracoConfig()
         {
-            // note: need to use SafeCallContext here because ConfigurationManager.GetSection ends up getting AppDomain.Evidence
-            // which will want to serialize the call context including anything that is in there - what a mess!
-
             if (_umbracoSettings == null)
             {
-                IUmbracoSettingsSection umbracoSettings;
-                using (new SafeCallContext())
-                {
-                    umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
-                }
+                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;                
                 SetUmbracoSettings(umbracoSettings);
+            }
+
+            if (_baseRestExtensions == null)
+            {
+                var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;                
+                SetBaseRestExtensions(baseRestExtensions);
             }
 
             if (_dashboardSection == null)
             {
-                IDashboardSection dashboardConfig;
-                using (new SafeCallContext())
-                {
-                    dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
-                }
+                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;                
                 SetDashboardSettings(dashboardConfig);
             }
 
@@ -63,22 +65,22 @@ namespace Umbraco.Core.Configuration
         /// Constructor - can be used for testing
         /// </summary>
         /// <param name="umbracoSettings"></param>
+        /// <param name="baseRestSettings"></param>
         /// <param name="dashboardSettings"></param>
         /// <param name="healthChecks"></param>
-        /// <param name="globalSettings"></param>
-        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IDashboardSection dashboardSettings, IHealthChecks healthChecks, IGlobalSettings globalSettings)
+        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IBaseRestSection baseRestSettings, IDashboardSection dashboardSettings, IHealthChecks healthChecks)
         {
             SetHealthCheckSettings(healthChecks);
             SetUmbracoSettings(umbracoSettings);
+            SetBaseRestExtensions(baseRestSettings);
             SetDashboardSettings(dashboardSettings);
-            SetGlobalConfig(globalSettings);
         }
 
         private IHealthChecks _healthChecks;
         private IDashboardSection _dashboardSection;
         private IUmbracoSettingsSection _umbracoSettings;
+        private IBaseRestSection _baseRestExtensions;
         private IGridConfig _gridConfig;
-        private IGlobalSettings _globalSettings;
 
         /// <summary>
         /// Gets the IHealthCheck config
@@ -88,7 +90,7 @@ namespace Umbraco.Core.Configuration
             if (_healthChecks == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IHealthChecks) + " from config file, ensure the web.config and healthchecks.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 
@@ -103,13 +105,13 @@ namespace Umbraco.Core.Configuration
             if (_dashboardSection == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 
             return _dashboardSection;
-        }
-
+        }        
+        
         /// <summary>
         /// Only for testing
         /// </summary>
@@ -138,23 +140,6 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetGlobalConfig(IGlobalSettings value)
-        {
-            _globalSettings = value;
-        }
-
-        /// <summary>
-        /// Gets the IGlobalSettings
-        /// </summary>
-        public IGlobalSettings GlobalSettings()
-        {
-            return _globalSettings ?? (_globalSettings = new GlobalSettings());
-        }
-
-        /// <summary>
         /// Gets the IUmbracoSettings
         /// </summary>
         public IUmbracoSettingsSection UmbracoSettings()
@@ -162,11 +147,35 @@ namespace Umbraco.Core.Configuration
             if (_umbracoSettings == null)
             {
                 var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
-                Current.Logger.Error<UmbracoConfig>(ex, "Config error");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
                 throw ex;
             }
 
             return _umbracoSettings;
+        }
+        
+        /// <summary>
+        /// Only for testing
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetBaseRestExtensions(IBaseRestSection value)
+        {
+            _baseRestExtensions = value;
+        }
+
+        /// <summary>
+        /// Gets the IBaseRestSection
+        /// </summary>
+        public IBaseRestSection BaseRestExtensions()
+        {
+            if (_baseRestExtensions == null)
+            {
+                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IBaseRestSection) + " from config file, ensure the web.config and BaseRestExtensions.config files are formatted correctly");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                throw ex;
+            }
+
+            return _baseRestExtensions;
         }
 
         /// <summary>

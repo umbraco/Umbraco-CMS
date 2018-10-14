@@ -31,7 +31,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 ##### Before Submitting A Bug Report
 
-  * Most importantly, check **if you can reproduce the problem** in the [latest version of Umbraco](https://our.umbraco.org/download/). We might have already fixed your particular problem.
+  * Most importantly, check **if you can reproduce the problem** in the [latest version of Umbraco](https://our.umbraco.com/download/). We might have already fixed your particular problem.
   * It also helps tremendously to check if the issue you're experiencing is present in **a clean install** of the Umbraco version you're currently using. Custom code can have side-effects that don't occur in a clean install.
   * **Use the Google**. Whatever you're experiencing, Google it plus "Umbraco" - usually you can get some pretty good hints from the search results, including open issues and further troubleshooting hints.
   * If you do find and existing issue has **and the issue is still open**, add a comment to the existing issue if you have additional information. If you have the same problem and no new info to add, just "star" the issue.
@@ -65,7 +65,7 @@ Most of the suggestions in the [reporting bugs](#reporting-bugs) section also co
 Some additional hints that may be helpful:
 
   * **Include screenshots and animated GIFs** which help you demonstrate the steps or point out the part of Umbraco which the suggestion is related to.
-  * **Explain why this enhancement would be useful to most Umbraco users** and isn't something that can or should be implemented as a [community package](https://our.umbraco.org/projects/).
+  * **Explain why this enhancement would be useful to most Umbraco users** and isn't something that can or should be implemented as a [community package](https://our.umbraco.com/projects/).
 
 ### Your First Code Contribution
 
@@ -80,7 +80,7 @@ The most successful pull requests usually look a like this:
   * Fill in the required template
   * Include screenshots and animated GIFs in your pull request whenever possible.
   * Unit tests, while optional are awesome, thank you!
-  * New code is commented with documentation from which [the reference documentation](https://our.umbraco.org/documentation/Reference/) is generated
+  * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated
 
 Again, these are guidelines, not strict requirements. 
 
@@ -116,8 +116,8 @@ There's two big areas that you should know about:
 
 To find the general areas of something you're looking to fix or improve, have a look at the following two parts of the API documentation.
 
-  * [The AngularJS based backoffice files](https://our.umbraco.org/apidocs/ui/#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
-  * [The rest](https://our.umbraco.org/apidocs/csharp/)
+  * [The AngularJS based backoffice files](https://our.umbraco.com/apidocs/ui/#/api) (to be found  in `src\Umbraco.Web.UI.Client\src`)
+  * [The rest](https://our.umbraco.com/apidocs/csharp/)
 
 ### What branch should I target for my contributions?
 
