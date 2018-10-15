@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if(tableName.Equals("umbracoNode"))
             {
-                CreateUmbracNodeData();
+                CreateUmbracoNodeData();
             }
 
             if (tableName.Equals("umbracoLock"))
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
-        private void CreateUmbracNodeData()
+        private void CreateUmbracoNodeData()
         {
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -1, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1", SortOrder = 0, UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"), Text = "SYSTEM DATA: umbraco master root", NodeObjectType = new Guid(Constants.ObjectTypes.SystemRoot), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -20, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-20", SortOrder = 0, UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"), Text = "Recycle Bin", NodeObjectType = new Guid(Constants.ObjectTypes.ContentRecycleBin), CreateDate = DateTime.Now });

@@ -244,7 +244,10 @@ angular.module("umbraco")
             $scope.onUploadComplete = function(files) {
                 $scope.gotoFolder($scope.currentFolder).then(function() {
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
-                        selectImage($scope.images[$scope.images.length - 1]);
+                        var image = $scope.images[$scope.images.length - 1];
+                        $scope.target = image;
+                        $scope.target.url = mediaHelper.resolveFile(image);
+                        selectImage(image);
                     }
                 });
             };
@@ -325,6 +328,23 @@ angular.module("umbraco")
                 debounceSearchMedia();
             };
 
+            /**
+                * Toggle the $scope.model.allowAsRoot value to either true or false
+             */
+            $scope.toggle = function(){
+
+                // Make sure to activate the changeSearch function everytime the toggle is clicked
+                $scope.changeSearch();
+
+                // Toggle the showChilds option
+                if($scope.showChilds){
+                    $scope.showChilds = false;
+                    return;
+                }
+
+                $scope.showChilds = true;
+            }
+
             $scope.changePagination = function(pageNumber) {
                 $scope.loading = true;
                 $scope.searchOptions.pageNumber = pageNumber;
@@ -333,7 +353,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 $scope.loading = true;
-                entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
+                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", $scope.searchOptions)
                     .then(function(data) {
                         // update image data to work with image grid
                         angular.forEach(data.items,

@@ -21,6 +21,6 @@ The following items will now be automatically included when creating a deploy pa
 system: umbraco, umbraco_client, config\splashes and global.asax.
 
 Please read the release notes on our.umbraco.com:
-http://our.umbraco.com/contribute/releases
+https://our.umbraco.com/download/releases
 
 - Umbraco

@@ -102,7 +102,8 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public override async Task ValidateIdentity(CookieValidateIdentityContext context)
         {
-            EnsureCulture(context);
+            //ensure the thread culture is set
+            context?.Identity?.EnsureCulture();
 
             await EnsureValidSessionId(context);
 
@@ -120,21 +121,5 @@ namespace Umbraco.Core.Security
             if (_appCtx.IsConfigured && _appCtx.IsUpgrading == false)
                 await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
         }
-
-        private void EnsureCulture(CookieValidateIdentityContext context)
-        {
-            var umbIdentity = context.Identity as UmbracoBackOfficeIdentity;
-            if (umbIdentity != null && umbIdentity.IsAuthenticated)
-            {
-                Thread.CurrentThread.CurrentCulture =
-                    Thread.CurrentThread.CurrentUICulture =
-                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
-            }
-        }
-
-        /// <summary>
-        /// Used so that we aren't creating a new CultureInfo object for every single request
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
     }
 }

@@ -147,6 +147,7 @@
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
     <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
     <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="sort">Brugeren har sorteret de underliggende sider</key>
     <key alias="smallCopy">Kopieret</key>
     <key alias="smallPublish">Udgivet</key>
     <key alias="smallMove">Flyttet</key>
@@ -156,6 +157,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+    <key alias="smallSort">Sorteret</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -259,7 +261,7 @@
     <key alias="dropFilesHere">Slip filerne her...</key>
     <key alias="urls">Link til medie</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
-    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade.</key>
     <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
@@ -989,6 +991,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="updateEditCrop">Acceptér</key>
+    <key alias="undoEditCrop">Fortryd</key>
   </area>
 
 

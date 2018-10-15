@@ -46,7 +46,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function() {
           *        $scope.complete = true;
           *    });
-          * </pre> 
+          * </pre>
           * @param {Object} args arguments object
           * @param {Int} args.parentId the ID of the parent node
           * @param {Array} options.sortedIds array of node IDs as they should be sorted
@@ -87,9 +87,9 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function() {
           *        alert("node was moved");
           *    }, function(err){
-          *      alert("node didnt move:" + err.data.Message); 
+          *      alert("node didnt move:" + err.data.Message);
           *    });
-          * </pre> 
+          * </pre>
           * @param {Object} args arguments object
           * @param {Int} args.idd the ID of the node to move
           * @param {Int} args.parentId the ID of the parent node to move to
@@ -109,11 +109,23 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                    $http.post(umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostMove"),
-                         {
-                             parentId: args.parentId,
-                             id: args.id
-                         }),
-                   'Failed to move media');
+                        {
+                            parentId: args.parentId,
+                            id: args.id
+                        }),
+                        {
+                        error: function(data){
+                            var errorMsg = 'Failed to move media';
+
+                            if(data.parentId === data.id){
+                                errorMsg = 'Media can\'t be moved into itself';
+                            }
+
+                            return {
+                                errorMsg: errorMsg
+                            };
+                       }
+                   });
         },
 
 
@@ -129,12 +141,12 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * <pre>
           * mediaResource.getById(1234)
           *    .then(function(media) {
-          *        var myMedia = media; 
+          *        var myMedia = media;
           *        alert('its here!');
           *    });
-          * </pre> 
-          * 
-          * @param {Int} id id of media item to return        
+          * </pre>
+          *
+          * @param {Int} id id of media item to return
           * @returns {Promise} resourcePromise object containing the media item.
           *
           */
@@ -163,9 +175,9 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function() {
           *        alert('its gone!');
           *    });
-          * </pre> 
-          * 
-          * @param {Int} id id of media item to delete        
+          * </pre>
+          *
+          * @param {Int} id id of media item to delete
           * @returns {Promise} resourcePromise object.
           *
           */
@@ -191,12 +203,12 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * <pre>
           * mediaResource.getByIds( [1234,2526,28262])
           *    .then(function(mediaArray) {
-          *        var myDoc = contentArray; 
+          *        var myDoc = contentArray;
           *        alert('they are here!');
           *    });
-          * </pre> 
-          * 
-          * @param {Array} ids ids of media items to return as an array        
+          * </pre>
+          *
+          * @param {Array} ids ids of media items to return as an array
           * @returns {Promise} resourcePromise object containing the media items array.
           *
           */
@@ -223,28 +235,28 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @description
           * Returns a scaffold of an empty media item, given the id of the media item to place it underneath and the media type alias.
-          * 
+          *
           * - Parent Id must be provided so umbraco knows where to store the media
-          * - Media Type alias must be provided so umbraco knows which properties to put on the media scaffold 
-          * 
+          * - Media Type alias must be provided so umbraco knows which properties to put on the media scaffold
+          *
           * The scaffold is used to build editors for media that has not yet been populated with data.
-          * 
+          *
           * ##usage
           * <pre>
           * mediaResource.getScaffold(1234, 'folder')
           *    .then(function(scaffold) {
           *        var myDoc = scaffold;
-          *        myDoc.name = "My new media item"; 
+          *        myDoc.name = "My new media item";
           *
           *        mediaResource.save(myDoc, true)
           *            .then(function(media){
           *                alert("Retrieved, updated and saved again");
           *            });
           *    });
-          * </pre> 
-          * 
+          * </pre>
+          *
           * @param {Int} parentId id of media item to return
-          * @param {String} alias mediatype alias to base the scaffold on        
+          * @param {String} alias mediatype alias to base the scaffold on
           * @returns {Promise} resourcePromise object containing the media scaffold.
           *
           */
@@ -283,11 +295,11 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * <pre>
           * mediaResource.getChildren(1234, {pageSize: 10, pageNumber: 2})
           *    .then(function(contentArray) {
-          *        var children = contentArray; 
+          *        var children = contentArray;
           *        alert('they are here!');
           *    });
-          * </pre> 
-          * 
+          * </pre>
+          *
           * @param {Int} parentid id of content item to return children of
           * @param {Object} options optional options object
           * @param {Int} options.pageSize if paging data, number of nodes per page, default = 0
@@ -363,9 +375,9 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @description
           * Saves changes made to a media item, if the media item is new, the isNew paramater must be passed to force creation
-          * if the media item needs to have files attached, they must be provided as the files param and passed separately 
-          * 
-          * 
+          * if the media item needs to have files attached, they must be provided as the files param and passed separately
+          *
+          *
           * ##usage
           * <pre>
           * mediaResource.getById(1234)
@@ -376,11 +388,11 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *                alert("Retrieved, updated and saved again");
           *            });
           *    });
-          * </pre> 
-          * 
+          * </pre>
+          *
           * @param {Object} media The media item object with changes applied
-          * @param {Bool} isNew set to true to create a new item or to update an existing 
-          * @param {Array} files collection of files for the media item      
+          * @param {Bool} isNew set to true to create a new item or to update an existing
+          * @param {Array} files collection of files for the media item
           * @returns {Promise} resourcePromise object containing the saved media item.
           *
           */
@@ -402,10 +414,10 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function(folder) {
           *        alert('New folder');
           *    });
-          * </pre> 
+          * </pre>
           *
           * @param {string} name Name of the folder to create
-          * @param {int} parentId Id of the media item to create the folder underneath         
+          * @param {int} parentId Id of the media item to create the folder underneath
           * @returns {Promise} resourcePromise object.
           *
           */
@@ -429,18 +441,18 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * Retrieves all media children with types used as folders.
           * Uses the convention of looking for media items with mediaTypes ending in
           * *Folder so will match "Folder", "bannerFolder", "secureFolder" etc,
-          * 
+          *
           * NOTE: This will return a max of 500 folders, if more is required it needs to be paged
-          * 
+          *
           * ##usage
           * <pre>
           * mediaResource.getChildFolders(1234)
           *    .then(function(data) {
           *        alert('folders');
           *    });
-          * </pre> 
+          * </pre>
           *
-          * @param {int} parentId Id of the media item to query for child folders    
+          * @param {int} parentId Id of the media item to query for child folders
           * @returns {Promise} resourcePromise object.
           *
           */
@@ -475,8 +487,8 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function() {
           *        alert('its empty!');
           *    });
-          * </pre> 
-          *         
+          * </pre>
+          *
           * @returns {Promise} resourcePromise object.
           *
           */
@@ -503,8 +515,8 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    .then(function(searchResult) {
           *        alert('it's here!');
           *    });
-          * </pre> 
-          *           
+          * </pre>
+          *
           * @param {string} query The search query
           * @param {int} pageNumber The page number
           * @param {int} pageSize The number of media items on a page
@@ -515,7 +527,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
         search: function (query, pageNumber, pageSize, searchFrom) {
 
             var args = [
-                { "query": query }, 
+                { "query": query },
                 { "pageNumber": pageNumber },
                 { "pageSize": pageSize },
                 { "searchFrom": searchFrom }
