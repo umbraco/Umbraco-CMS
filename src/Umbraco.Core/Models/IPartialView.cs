@@ -2,6 +2,6 @@
 {
     public interface IPartialView : IFile
     {
-        
+        PartialViewType ViewType { get; }
     }
 }

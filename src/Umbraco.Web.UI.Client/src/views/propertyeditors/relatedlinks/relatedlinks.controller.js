@@ -19,13 +19,13 @@
             $scope.hasError = false;
 
             $scope.internal = function($event) {
-
                $scope.currentEditLink = null;
 
                $scope.contentPickerOverlay = {};
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
 
@@ -43,14 +43,14 @@
                $event.preventDefault();
             };
 
-            $scope.selectInternal = function($event, link) {
-
+            $scope.selectInternal = function ($event, link) {
                $scope.currentEditLink = link;
 
                $scope.contentPickerOverlay = {};
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
 
@@ -86,6 +86,10 @@
             };
 
             $scope.add = function ($event) {
+				if (!angular.isArray($scope.model.value)) {
+                  $scope.model.value = [];
+				}
+				
                 if ($scope.newCaption == "") {
                     $scope.hasError = true;
                 } else {
@@ -163,7 +167,7 @@
                 placeholder: 'sortable-placeholder',
                 forcePlaceholderSize: true,
                 helper: function (e, ui) {
-                    // When sorting table rows, the cells collapse. This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                    // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
                     ui.children().each(function () {
                         $(this).width($(this).width());
                     });
@@ -185,7 +189,7 @@
                 start: function (e, ui) {
                     //ui.placeholder.html("<td colspan='5'></td>");
 
-                    // Build a placeholder cell that spans all the cells in the row: http://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                    // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
                     var cellCount = 0;
                     $('td, th', ui.helper).each(function () {
                         // For each td or th try and get it's colspan attribute, and add that or 1 to the total
@@ -223,12 +227,12 @@
 
             function select(data) {
                 if ($scope.currentEditLink != null) {
-                    $scope.currentEditLink.internal = data.id;
+                    $scope.currentEditLink.internal = $scope.model.config.idType === "udi" ? data.udi : data.id;
                     $scope.currentEditLink.internalName = data.name;
                     $scope.currentEditLink.internalIcon = iconHelper.convertFromLegacyIcon(data.icon);
-                    $scope.currentEditLink.link = data.id;
+                    $scope.currentEditLink.link = $scope.model.config.idType === "udi" ? data.udi : data.id;
                 } else {
-                    $scope.newInternal = data.id;
+                    $scope.newInternal = $scope.model.config.idType === "udi" ? data.udi : data.id;
                     $scope.newInternalName = data.name;
                     $scope.newInternalIcon = iconHelper.convertFromLegacyIcon(data.icon);
                 }

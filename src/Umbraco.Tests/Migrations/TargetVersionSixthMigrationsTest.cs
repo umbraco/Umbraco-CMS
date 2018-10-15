@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Migrations
 
             var migrationRunner = new MigrationRunner(
                 Mock.Of<IMigrationEntryService>(),
-                Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                Logger, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName);
 
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 

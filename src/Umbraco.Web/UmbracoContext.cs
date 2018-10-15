@@ -10,6 +10,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
+using Umbraco.Core.CodeAnnotations;
 using GlobalSettings = umbraco.GlobalSettings;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
@@ -19,7 +20,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
+    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         internal const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
@@ -258,7 +259,7 @@ namespace Umbraco.Web
 
             var requestUrl = new Uri("http://localhost");
             var request = GetRequestFromContext();
-            if (request != null)
+            if (request != null && request.Url != null)
             {
                 requestUrl = request.Url;
             }
@@ -324,7 +325,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
-        [Obsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
+        [UmbracoWillObsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ApplicationContext Application { get; private set; }
 

@@ -11,6 +11,7 @@ using umbraco;
 
 namespace Umbraco.Web.Media
 {
+    [Obsolete("This is no longer used and will be removed in future versions")]
     public class ImageUrl
     {
         [Obsolete("Use TryGetImageUrl() instead")]

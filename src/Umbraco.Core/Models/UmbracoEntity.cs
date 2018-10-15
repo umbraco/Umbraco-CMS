@@ -51,6 +51,8 @@ namespace Umbraco.Core.Models
         private string _contentTypeIcon;
         private string _contentTypeThumbnail;
 
+        public static readonly UmbracoEntity Root = new UmbracoEntity(false) {Path = "-1", Name = "root", HasChildren = true};
+
         public UmbracoEntity()
         {
             AdditionalData = new Dictionary<string, object>();

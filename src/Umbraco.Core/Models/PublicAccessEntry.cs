@@ -110,6 +110,12 @@ namespace Umbraco.Core.Models
             _ruleCollection.Clear();
         }
 
+
+        internal void ClearRemovedRules()
+        {
+            _removedRules.Clear();
+        }
+
         [DataMember]
         public int LoginNodeId
         {

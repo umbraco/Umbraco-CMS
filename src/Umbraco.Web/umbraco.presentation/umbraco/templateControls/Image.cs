@@ -1,10 +1,12 @@
-﻿using System.Web.UI;
+﻿using System;
+using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core.Media;
 using Umbraco.Web.Media;
 
 namespace umbraco.presentation.templateControls
 {
+    [Obsolete("This is no longer used and will be removed in future versions")]
     public class Image : HtmlImage
     {
         public string NodeId { get; set; }

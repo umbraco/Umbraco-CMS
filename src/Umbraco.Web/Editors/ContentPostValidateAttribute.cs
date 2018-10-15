@@ -22,18 +22,21 @@ namespace Umbraco.Web.Editors
         private readonly IContentService _contentService;
         private readonly WebSecurity _security;
         private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
 
         public ContentPostValidateAttribute()
         {            
         }
 
-        public ContentPostValidateAttribute(IContentService contentService, IUserService userService, WebSecurity security)
+        public ContentPostValidateAttribute(IContentService contentService, IUserService userService, IEntityService entityService, WebSecurity security)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
             if (security == null) throw new ArgumentNullException("security");
             _contentService = contentService;
             _userService = userService;
+            _entityService = entityService;
             _security = security;
         }
 
@@ -50,6 +53,11 @@ namespace Umbraco.Web.Editors
         private IUserService UserService
         {
             get { return _userService ?? ApplicationContext.Current.Services.UserService; }
+        }
+
+        private IEntityService EntityService
+        {
+            get { return _entityService ?? ApplicationContext.Current.Services.EntityService; }
         }
 
         public override bool AllowMultiple
@@ -86,10 +94,10 @@ namespace Umbraco.Web.Editors
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SaveNew:
-                    //Save new requires both ActionNew AND ActionUpdate
+                    //Save new requires ActionNew
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
+
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = ContentService.GetById(contentItem.ParentId);
@@ -101,7 +109,7 @@ namespace Umbraco.Web.Editors
                     }
                     break;
                 case ContentSaveAction.SendPublishNew:
-                    //Send new requires both ActionToPublish AND ActionUpdate
+                    //Send new requires both ActionToPublish AND ActionNew
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
                     permissionToCheck.Add(ActionToPublish.Instance.Letter);
@@ -117,6 +125,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.PublishNew:
                     //Publish new requires both ActionNew AND ActionPublish
+                    //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
                     permissionToCheck.Add(ActionNew.Instance.Letter);
                     permissionToCheck.Add(ActionPublish.Instance.Letter);
@@ -140,6 +149,7 @@ namespace Umbraco.Web.Editors
                 Security.CurrentUser,
                 UserService,
                 ContentService,
+                EntityService,
                 contentIdToCheck,
                 permissionToCheck.ToArray(),
                 contentToCheck) == false)

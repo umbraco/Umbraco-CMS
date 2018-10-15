@@ -1,3 +1,10 @@
 <div class="umb-editor umb-boolean" ng-controller="Umbraco.PropertyEditors.BooleanController">
-    <input type="checkbox" ng-model="renderModel.value" id="{{model.alias}}" />    
+    <umb-toggle
+        checked="renderModel.value"
+        on-click="toggle()"
+        show-labels="{{model.config.labelOn ? 'true': 'false'}}"
+        label-position="right"
+        label-on="{{model.config.labelOn}}"
+        label-off="{{model.config.labelOn}}">
+    </umb-toggle>
 </div>

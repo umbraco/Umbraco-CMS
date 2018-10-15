@@ -4,13 +4,22 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-	public static partial class Constants
+   
+    public static partial class Constants
 	{
 		/// <summary>
 		/// Defines the identifiers for property-type alias conventions that are used within the Umbraco core.
 		/// </summary>
 		public static class Conventions
 		{
+		    internal static class PermissionCategories
+		    {
+		        public const string ContentCategory = "content";
+		        public const string AdministrationCategory = "administration";
+		        public const string StructureCategory = "structure";
+		        public const string OtherCategory = "other";
+		    }
+
 		    public static class PublicAccess
 		    {
                 public const string MemberUsernameRuleType = "MemberUsername";               
@@ -101,6 +110,11 @@ namespace Umbraco.Core
 				/// Property alias for the Media's file extension.
 				/// </summary>
 				public const string Extension = "umbracoExtension";
+
+				/// <summary>
+				/// The default height/width of an image file if the size can't be determined from the metadata
+				/// </summary>
+				public const int DefaultSize = 200;
 			}
 
 			/// <summary>
@@ -332,6 +346,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }
 		}
 	}

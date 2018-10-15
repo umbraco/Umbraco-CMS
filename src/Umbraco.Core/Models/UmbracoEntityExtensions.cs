@@ -113,6 +113,11 @@ namespace Umbraco.Core.Models
             }
         }
 
+        /// <summary>
+        /// When resolved from EntityService this checks if the entity has the HasChildren flag
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static bool HasChildren(this IUmbracoEntity entity)
         {
             if (entity.AdditionalData.ContainsKey("HasChildren"))
@@ -133,6 +138,11 @@ namespace Umbraco.Core.Models
             return entity.AdditionalData.GetValueIgnoreCase(key, defaultVal);
         }
 
+        /// <summary>
+        /// When resolved from EntityService this checks if the entity has the IsContainer flag
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static bool IsContainer(this IUmbracoEntity entity)
         {
             if (entity.AdditionalData.ContainsKeyIgnoreCase("IsContainer") == false) return false;

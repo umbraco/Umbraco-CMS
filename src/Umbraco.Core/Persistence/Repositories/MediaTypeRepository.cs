@@ -22,23 +22,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
-
-        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MediaTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        private FullDataSetRepositoryCachePolicyFactory<IMediaType, int> _cachePolicyFactory;
-        protected override IRepositoryCachePolicyFactory<IMediaType, int> CachePolicyFactory
+        protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
-            get
-            {
-                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMediaType, int>(
-                    RuntimeCache, GetEntityId, () => PerformGetAll(),
-                    //allow this cache to expire
-                    expires: true));
-            }
+            return new FullDataSetRepositoryCachePolicy<IMediaType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
         }
 
         protected override IMediaType PerformGet(int id)
@@ -110,7 +101,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<string>
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
                                "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",

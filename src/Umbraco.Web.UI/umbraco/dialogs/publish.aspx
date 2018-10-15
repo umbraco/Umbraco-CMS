@@ -80,7 +80,7 @@
 
 
         <div id="feedbackMsg" data-bind="visible: processStatus() == 'complete'">
-            <div data-bind="css: { success: isSuccessful(), error: !isSuccessful() }">
+            <div data-bind="css: { 'text-success': isSuccessful(), 'text-error': !isSuccessful() }">
                 <span data-bind="text: resultMessage, visible: resultMessages().length == 0"></span>
                 <ul data-bind="foreach: resultMessages, visible: resultMessages().length > 1">
                     <li data-bind="text: message"></li>

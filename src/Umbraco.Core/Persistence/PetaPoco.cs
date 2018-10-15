@@ -167,12 +167,12 @@ namespace Umbraco.Core.Persistence
 			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
+				if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName) == false)
 					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
-				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+				throw new NullReferenceException("Can't find a connection string with the name '" + connectionStringName + "'");
 			}
 
 			// Store factory and connection string
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence
 			CommonConstruct();
 		}
 
-		internal enum DBType
+		public enum DBType
 		{
 			SqlServer,
 			SqlServerCE,
@@ -190,7 +190,9 @@ namespace Umbraco.Core.Persistence
 			Oracle,
             SQLite
 		}
-		DBType _dbType = DBType.SqlServer;
+		private DBType _dbType = DBType.SqlServer;
+
+        public DBType DatabaseType { get { return _dbType; } }
 
 		// Common initialization
 		private void CommonConstruct()
@@ -224,13 +226,18 @@ namespace Umbraco.Core.Persistence
 		// Automatically close one open shared connection
 		public void Dispose()
 		{
-			// Automatically close one open connection reference
-			//  (Works with KeepConnectionAlive and manually opening a shared connection)
-			CloseSharedConnection();
+		    Dispose(true);
 		}
 
-		// Set to true to keep the first opened connection alive until this object is disposed
-		public bool KeepConnectionAlive { get; set; }
+	    protected virtual void Dispose(bool disposing)
+	    {
+            // Automatically close one open connection reference
+            //  (Works with KeepConnectionAlive and manually opening a shared connection)
+            CloseSharedConnection();
+        }
+
+        // Set to true to keep the first opened connection alive until this object is disposed
+        public bool KeepConnectionAlive { get; set; }
 
 		// Open a connection (can be nested)
 		public void OpenSharedConnection()
@@ -325,8 +332,16 @@ namespace Umbraco.Core.Persistence
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
-				_transactionCancelled = false;
+			    try
+			    {
+			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
+			    }
+
+			    catch (Exception)
+			    {
+			        throw;
+			    }
+                _transactionCancelled = false;
 				OnBeginTransaction();
 			}
             else if (isolationLevel > _transaction.IsolationLevel)
@@ -387,7 +402,7 @@ namespace Umbraco.Core.Persistence
         }
 
         // Helper to handle named parameters from object properties
-		static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public static string ProcessParams(string _sql, object[] args_src, List<object> args_dest)
 		{
 			return rxParams.Replace(_sql, m =>
@@ -530,7 +545,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Create a command
-		static Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args)
 		{
 			// Perform named argument replacements
@@ -651,8 +666,8 @@ namespace Umbraco.Core.Persistence
 			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
 		}
 
-		Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
-		Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
 			if (sql.StartsWith(";"))
@@ -686,9 +701,9 @@ namespace Umbraco.Core.Persistence
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
 
-		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+	    static readonly Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -708,10 +723,9 @@ namespace Umbraco.Core.Persistence
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
 			else
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
-
-
-			// Look for an "ORDER BY <whatever>" clause
-			m = rxOrderBy.Match(sqlCount);
+            
+		    // Look for an "ORDER BY <whatever>" clause
+            m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
 			{
 				sqlOrderBy = null;
@@ -722,8 +736,7 @@ namespace Umbraco.Core.Persistence
 				sqlOrderBy = g.ToString();
 				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
 			}
-
-			return true;
+            return true;
 		}
 
 	    /// <summary>
@@ -805,7 +818,7 @@ namespace Umbraco.Core.Persistence
 			result.CurrentPage = page;
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
-			result.TotalPages = result.TotalItems / itemsPerPage;
+		    result.TotalPages = result.TotalItems / itemsPerPage;
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 
@@ -2481,9 +2494,9 @@ namespace Umbraco.Core.Persistence
 			// Now do rhs
 			if (_rhs != null)
 				_rhs.Build(sb, args, this);
-		}
+        }
 
-		public Sql Where(string sql, params object[] args)
+        public Sql Where(string sql, params object[] args)
 		{
 			return Append(new Sql("WHERE (" + sql + ")", args));
 		}
@@ -2496,9 +2509,14 @@ namespace Umbraco.Core.Persistence
 		public Sql Select(params object[] columns)
 		{
 			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
-		}
+        }
 
-		public Sql From(params object[] tables)
+        public Sql AndSelect(params object[] columns)
+        {
+            return Append(new Sql(", " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+        }
+
+        public Sql From(params object[] tables)
 		{
 			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
 		}
@@ -2533,5 +2551,4 @@ namespace Umbraco.Core.Persistence
 			}
 		}
 	}
-
 }

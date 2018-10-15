@@ -3,12 +3,12 @@
 
 /* Modalcolumn is used for menu panels */
 .umb-modalcolumn {
-	background: white;
+	background: @white;
 }
 
 .umb-modalcolumn-header {
-  background: @grayLighter;
-  border-bottom: 1px solid @grayLight;
+  background: @gray-10;
+  border-bottom: 1px solid @purple-l3;
   height: 94px;
   padding: 5px 20px 0px 20px;
   white-space: nowrap
@@ -76,13 +76,6 @@
 	padding: 0px;
 }
 
-.umb-dialog .umb-btn-toolbar {
-	text-align: right;
-	padding: 15px 20px 10px 20px;
-	margin-top: 30px;
-	clear: both;
-	background: #fff;
-}
 .umb-dialog .umb-btn-toolbar .umb-control-group{
 	border: none;
 	padding: none;
@@ -94,20 +87,79 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 90px;
+    bottom: 52px;
 }
 .umb-dialog-body .umb-pane{margin-top: 15px;}
 
 .umb-dialog-footer{
-		border-top: #efefef 1px solid;
-		position: absolute;
-	    overflow:auto;
-	    text-align: right;
-	    
-	    height: 60px;
-	    left: 0px;
-	    right: 0px;
-	    bottom: 0px;
+	position: absolute;
+	overflow:auto;
+	text-align: right; 
+	height: 32px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+    padding: 10px 20px;
+    margin: 0;
+    background: @gray-10;
+    border-top: 1px solid @purple-l3;
+}
+
+.umb-dialog .propertyItemheader {
+    width: 140px !Important;
+}
+
+.umb-dialog .diffDropdown
+{
+    width:400px;
+}
+
+.umb-dialog .diffPanel {
+    height: 400px;
+}
+
+
+.umb-dialog .diff {
+    margin-top: 10px;
+    height: 100%;
+    overflow: auto;
+    border-top: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 5px;
+}
+.umb-dialog .diff table{
+    width:95%;
+    max-width:95%;
+    margin: 0 3px;
+}
+.umb-dialog .diff table th {
+    padding: 5px;
+    width: 25%;
+    border-bottom: 1px solid #ccc;
+}
+
+.umb-dialog .diff table td {
+    border-bottom: 1px solid #ccc;
+    padding: 3px;
+}
+
+.umb-dialog .diff del {
+    background: rgb(255, 230, 230) none repeat scroll 0%;
+    -moz-background-clip: -moz-initial;
+    -moz-background-origin: -moz-initial;
+    -moz-background-inline-policy: -moz-initial;
+}
+
+.umb-dialog .diff ins {
+    background: rgb(230, 255, 230) none repeat scroll 0%;
+    -moz-background-clip: -moz-initial;
+    -moz-background-origin: -moz-initial;
+    -moz-background-inline-policy: -moz-initial;
+}
+
+.umb-dialog .diff .diffnotice {
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 /*we will always make sure to wrap iframe dialogs in proper padding*/
@@ -186,7 +238,7 @@
 	width: 640px !important;
 }
 .umb-modal i {
-  font-size: 14px;
+  font-size: 20px;
 } 
 .umb-modal .breadcrumb {
 	background: none;

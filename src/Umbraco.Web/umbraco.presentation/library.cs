@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -660,10 +661,23 @@ namespace umbraco
         /// Returns an MD5 hash of the string specified
         /// </summary>
         /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 has of the string</returns>
+        /// <returns>Md5 hash of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string md5(string text)
         {
-			return text.ToMd5();
+            return text.ToMd5();
+        }
+
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>hash of the string</returns>
+        public static string CreateHash(string text)
+        {
+            return text.GenerateHash();
         }
 
         /// <summary>
@@ -1379,15 +1393,25 @@ namespace umbraco
         /// <returns>An XpathNodeIterator containing the current page as Xml.</returns>
         public static XPathNodeIterator GetXmlNodeCurrent()
         {
+            var pageId = "";
+
             try
             {
                 var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.GetXPathNavigator();
-                nav.MoveToId(HttpContext.Current.Items["pageID"].ToString());
+                var pageIdItem = HttpContext.Current.Items["pageID"];
+
+                if (pageIdItem == null)
+                {
+                    throw new NullReferenceException("pageID not found in the current HTTP context");
+                }
+
+                pageId = pageIdItem.ToString();
+                nav.MoveToId(pageId);
                 return nav.Select(".");
             }
             catch (Exception ex)
             {
-                LogHelper.Error<library>("Could not retrieve current xml node", ex);
+                LogHelper.Error<library>(string.Concat("Could not retrieve current xml node for page Id ",pageId), ex);
             }
 
             XmlDocument xd = new XmlDocument();
@@ -1590,6 +1614,7 @@ namespace umbraco
         {
             try
             {
+                var mailSender = new EmailSender();
                 using (var mail = new MailMessage())
                 {
                     mail.From = new MailAddress(fromMail.Trim());
@@ -1598,8 +1623,7 @@ namespace umbraco
                     mail.Subject = subject;
                     mail.IsBodyHtml = isHtml;
                     mail.Body = body;
-                    using (var smtpClient = new SmtpClient())
-                        smtpClient.Send(mail);
+                    mailSender.Send(mail);
                 }
             }
             catch (Exception ee)

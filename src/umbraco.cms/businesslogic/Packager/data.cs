@@ -302,7 +302,11 @@ namespace umbraco.cms.businesslogic.packager
             XmlHelper.SetAttribute(Source, xmlDef, "enableSkins", package.EnableSkins.ToString());
             XmlHelper.SetAttribute(Source, xmlDef, "skinRepoGuid", package.SkinRepoGuid.ToString());
             XmlHelper.SetAttribute(Source, xmlDef, "iconUrl", package.IconUrl);
-            XmlHelper.SetAttribute(Source, xmlDef, "umbVersion", package.UmbracoVersion.ToString(3));
+            if (package.UmbracoVersion != null)
+            {
+                XmlHelper.SetAttribute(Source, xmlDef, "umbVersion", package.UmbracoVersion.ToString(3));
+            }
+            
 
             var licenseNode = xmlDef.SelectSingleNode("license");
             if (licenseNode == null)

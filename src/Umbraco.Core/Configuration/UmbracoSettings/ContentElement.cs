@@ -112,7 +112,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get
             {
-                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
+                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""z-index:99999; position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
             }
         }
 
@@ -141,6 +141,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"}); }
         }
 
+        [ConfigurationProperty("allowedUploadFiles")]
+        internal CommaDelimitedConfigurationElement AllowedUploadFiles
+        {
+            get { return GetOptionalDelimitedElement("allowedUploadFiles", new string[0]); }
+        }
+
         [ConfigurationProperty("cloneXmlContent")]
         internal InnerTextConfigurationElement<bool> CloneXmlContent
         {
@@ -159,6 +165,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("defaultDocumentTypeProperty", "Textstring"); }
         }
 
+        [ConfigurationProperty("showDeprecatedPropertyEditors")]
+        internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors
+        {
+            get { return GetOptionalTextElement("showDeprecatedPropertyEditors", false); }
+        }
+
         [ConfigurationProperty("EnableInheritedDocumentTypes")]
         internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes
         {
@@ -169,6 +181,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes
         {
             get { return GetOptionalTextElement("EnableInheritedMediaTypes", true); }
+        }
+
+        [ConfigurationProperty("EnablePropertyValueConverters")]
+        internal InnerTextConfigurationElement<bool> EnablePropertyValueConverters
+        {
+            get { return GetOptionalTextElement("EnablePropertyValueConverters", false); }
+        }
+
+        [ConfigurationProperty("loginBackgroundImage")]
+        internal InnerTextConfigurationElement<string> LoginBackgroundImage
+        {
+            get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
         }
 
         string IContentSection.NotificationEmailAddress
@@ -291,6 +315,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return DisallowedUploadFiles; }
         }
 
+        IEnumerable<string> IContentSection.AllowedUploadFiles
+        {
+            get { return AllowedUploadFiles; }
+        }
+
         bool IContentSection.CloneXmlContent
         {
             get { return CloneXmlContent; }
@@ -306,6 +335,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return DefaultDocumentTypeProperty; }
         }
 
+        bool IContentSection.ShowDeprecatedPropertyEditors
+        {
+            get { return ShowDeprecatedPropertyEditors; }
+        }
+
         bool IContentSection.EnableInheritedDocumentTypes
         {
             get { return EnableInheritedDocumentTypes; }
@@ -315,5 +349,15 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return EnableInheritedMediaTypes; }
         }
+        bool IContentSection.EnablePropertyValueConverters
+        {
+            get { return EnablePropertyValueConverters; }
+        }
+
+        string IContentSection.LoginBackgroundImage
+        {
+            get { return LoginBackgroundImage; }
+        }
+        
     }
 }

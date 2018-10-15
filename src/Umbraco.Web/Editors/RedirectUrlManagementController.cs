@@ -12,6 +12,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Editors
             var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
 
-            var redirects = string.IsNullOrWhiteSpace(searchTerm) 
+            var redirects = string.IsNullOrWhiteSpace(searchTerm)
                 ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
@@ -53,11 +54,32 @@ namespace Umbraco.Web.Editors
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
-            
+
             return searchResult;
 
         }
-
+        /// <summary>
+        /// This lists the RedirectUrls for a particular content item
+        /// Do we need to consider paging here?
+        /// </summary>
+        /// <param name="contentUdi">Udi of content item to retrieve RedirectUrls for</param>
+        /// <returns></returns>
+        [HttpGet]
+        public RedirectUrlSearchResult RedirectUrlsForContentItem(string contentUdi)
+        {
+            var redirectsResult = new RedirectUrlSearchResult();
+            if (GuidUdi.TryParse(contentUdi, out var guidIdi))
+            {
+                var redirectUrlService = Services.RedirectUrlService;
+                var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
+                redirectsResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+                //not doing paging 'yet'
+                redirectsResult.TotalCount = redirects.Count();
+                redirectsResult.CurrentPage = 1;
+                redirectsResult.PageCount = 1;
+            }
+            return redirectsResult;
+        }
         [HttpPost]
         public IHttpActionResult DeleteRedirectUrl(Guid id)
         {
@@ -72,8 +94,7 @@ namespace Umbraco.Web.Editors
             var userIsAdmin = Umbraco.UmbracoContext.Security.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
-                var errorMessage = string.Format("User of type {0} is not allowed to toggle the URL tracker", 
-                    Umbraco.UmbracoContext.Security.CurrentUser.UserType.Alias);
+                var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
                 LogHelper.Debug<RedirectUrlManagementController>(errorMessage);
                 throw new UserAuthorizationException(errorMessage);
             }

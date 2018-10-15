@@ -1,6 +1,7 @@
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -11,6 +12,14 @@ namespace Umbraco.Tests.TestHelpers
 {
     public static class MockHelper
     {
+        public static IScopeUnitOfWork GetMockedUnitOfWork()
+        {
+            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
+            unitOfWorkMock.Setup(x => x.Messages).Returns(() => new EventMessages());
+            unitOfWorkMock.Setup(x => x.Events).Returns(() => new PassThroughEventDispatcher());
+            return unitOfWorkMock.Object;
+        }
+
         public static ServiceContext GetMockedServiceContext()
         {
             return new ServiceContext(

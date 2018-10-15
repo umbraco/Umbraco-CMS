@@ -20,8 +20,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       getListResultsCallback = contentResource.getPagedResults;
       deleteItemCallback = contentResource.deleteByKey;
       getIdCallback = function (selected) {
-         var selectedKey = getItemKey(selected.id);
-         return selectedKey;
+         return selected.key;
       };
       createEditUrlCallback = function (item) {
          return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;
@@ -53,29 +52,32 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.isNew = false;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];
+   $scope.folders = [];   
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
    };
 
-   $scope.currentNodePermissions = {}
+   //when this is null, we don't check permissions
+   $scope.currentNodePermissions = null;
 
-   //Just ensure we do have an editorState
-   if (editorState.current) {
-      //Fetch current node allowed actions for the current user
-      //This is the current node & not each individual child node in the list
-      var currentUserPermissions = editorState.current.allowedActions;
+   if ($scope.entityType === "content") {
+       //Just ensure we do have an editorState
+       if (editorState.current) {
+           //Fetch current node allowed actions for the current user
+           //This is the current node & not each individual child node in the list
+           var currentUserPermissions = editorState.current.allowedActions;
 
-      //Create a nicer model rather than the funky & hard to remember permissions strings
-      $scope.currentNodePermissions = {
-         "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-         "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-         "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
-         "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-         "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-      };
+           //Create a nicer model rather than the funky & hard to remember permissions strings
+           $scope.currentNodePermissions = {
+               "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+               "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+               "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+               "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+               "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+           };
+       }
    }
 
    //when this is null, we don't check permissions
@@ -214,10 +216,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             },
             500);
 
-        if (reload === true) {
-            $scope.reloadView($scope.contentId);
-        }
-
         if (err.data && angular.isArray(err.data.notifications)) {
             for (var i = 0; i < err.data.notifications.length; i++) {
                 notificationsService.showNotification(err.data.notifications[i]);
@@ -250,9 +248,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
    with simple values */
 
-   $scope.reloadView = function (id) {
+   $scope.getContent = function() {
+       $scope.reloadView($scope.contentId);
+   }
 
+   $scope.reloadView = function (id) {
       $scope.viewLoaded = false;
+      $scope.folders = [];
 
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
@@ -265,20 +267,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          if ($scope.listViewResultSet.items) {
             _.each($scope.listViewResultSet.items, function (e, index) {
                setPropertyValues(e);
+               if (e.contentTypeAlias === 'Folder') {
+                   $scope.folders.push(e);
+               }
             });
          }
 
-         if ($scope.entityType === 'media') {
-
-            mediaResource.getChildFolders($scope.contentId)
-                    .then(function (folders) {
-                       $scope.folders = folders;
-                       $scope.viewLoaded = true;
-                    });
-
-         } else {
-            $scope.viewLoaded = true;
-         }
+          $scope.viewLoaded = true;
 
          //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
          // if you have more than one page and you delete all items on the last page. In this case, we need to reset to the last
@@ -316,7 +311,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    function makeSearch() {
       if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
          $scope.options.pageNumber = 1;
-         //$scope.actionInProgress = true;
          $scope.reloadView($scope.contentId);
       }
    }
@@ -483,7 +477,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                    //we need to do a double sync here: first refresh the node where the content was moved,
                    // then refresh the node where the content was moved from
                    navigationService.syncTree({
-                           tree: target.nodeType,
+                           tree: target.nodeType ? target.nodeType : (target.metaData.treeAlias),
                            path: newPath,
                            forceReload: true,
                            activate: false

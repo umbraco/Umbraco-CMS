@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -12,7 +13,8 @@ namespace Umbraco.Core.Publishing
     {
         public PublishStatus(IContent content, PublishStatusType statusType, EventMessages eventMessages)
             : base(content, statusType, eventMessages)
-        {            
+        {
+            InvalidProperties = Enumerable.Empty<Property>();
         }
 
         /// <summary>
@@ -20,8 +22,7 @@ namespace Umbraco.Core.Publishing
         /// </summary>
         public PublishStatus(IContent content, EventMessages eventMessages)
             : this(content, PublishStatusType.Success, eventMessages)
-        {
-        }
+        { }
 
         public IContent ContentItem
         {

@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 9, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 9, Constants.System.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
         public AlterTagsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
@@ -18,13 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         public override void Up()
         {
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
             
             //add a foreign key to the parent id column too!
 

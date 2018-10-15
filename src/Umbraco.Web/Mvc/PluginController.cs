@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
+using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// A base class for all plugin controllers to inherit from
     /// </summary>
-    public abstract class PluginController : Controller
+    public abstract class PluginController : Controller, IDiscoverable
     {
         /// <summary>
         /// stores the metadata about plugin controllers

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -16,66 +17,110 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>    
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : Entity, IUser
+    public class User : Entity, IUser, IProfile
     {
-        public User(IUserType userType)
+        /// <summary>
+        /// Constructor for creating a new/empty user
+        /// </summary>
+        public User()
         {
-            if (userType == null) throw new ArgumentNullException("userType");
-
-            _userType = userType;
-            _defaultPermissions = _userType.Permissions == null ? Enumerable.Empty<string>() : new List<string>(_userType.Permissions);
-            //Groups = new List<object> { userType };
             SessionTimeout = 60;
-            _sectionCollection = new ObservableCollection<string>();
-            _addedSections = new List<string>();
-            _removedSections = new List<string>();
+            _userGroups = new HashSet<IReadOnlyUserGroup>();
             _language = GlobalSettings.DefaultUILanguage;
-            _sectionCollection.CollectionChanged += SectionCollectionChanged;
             _isApproved = true;
             _isLockedOut = false;
-            _startContentId = -1;
-            _startMediaId = -1;
+            _startContentIds = new int[] { };
+            _startMediaIds = new int[] { };
             //cannot be null
             _rawPasswordValue = "";
         }
 
-        public User(string name, string email, string username, string rawPasswordValue, IUserType userType)
-            : this(userType)
+        /// <summary>
+        /// Constructor for creating a new/empty user
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue"></param>
+        public User(string name, string email, string username, string rawPasswordValue)
+            : this()
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrEmpty(rawPasswordValue)) throw new ArgumentException("Value cannot be null or empty.", "rawPasswordValue");
+
             _name = name;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
+            _userGroups = new HashSet<IReadOnlyUserGroup>();
             _isApproved = true;
             _isLockedOut = false;
-            _startContentId = -1;
-            _startMediaId = -1;
+            _startContentIds = new int[] { };
+            _startMediaIds = new int[] { };
+            
         }
 
-        private IUserType _userType;
+        /// <summary>
+        /// Constructor for creating a new User instance for an existing user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue"></param>
+        /// <param name="userGroups"></param>
+        /// <param name="startContentIds"></param>
+        /// <param name="startMediaIds"></param>
+        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
+            : this()
+        {
+            //we allow whitespace for this value so just check null
+            if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");
+            if (userGroups == null) throw new ArgumentNullException("userGroups");
+            if (startContentIds == null) throw new ArgumentNullException("startContentIds");
+            if (startMediaIds == null) throw new ArgumentNullException("startMediaIds");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");            
+
+            Id = id;
+            _name = name;
+            _email = email;
+            _username = username;
+            _rawPasswordValue = rawPasswordValue;
+            _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
+            _isApproved = true;
+            _isLockedOut = false;
+            _startContentIds = startContentIds;
+            _startMediaIds = startMediaIds;
+        }
+
         private string _name;
         private string _securityStamp;
-        private List<string> _addedSections;
-        private List<string> _removedSections;
-        private ObservableCollection<string> _sectionCollection;
+        private string _avatar;
+        private string _tourData;
         private int _sessionTimeout;
-        private int _startContentId;
-        private int _startMediaId;
+        private int[] _startContentIds;
+        private int[] _startMediaIds;
         private int _failedLoginAttempts;
 
         private string _username;
+        private DateTime? _emailConfirmedDate;
+        private DateTime? _invitedDate;
         private string _email;
         private string _rawPasswordValue;
+        private IEnumerable<string> _allowedSections;
+        private HashSet<IReadOnlyUserGroup> _userGroups;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
-
-        private IEnumerable<string> _defaultPermissions; 
-        
         private bool _defaultToLiveEditing;
+        private IDictionary<string, object> _additionalData;
+        private object _additionalDataLock = new object();
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -87,10 +132,11 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo LastPasswordChangeDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime>(x => x.LastPasswordChangeDate);
 
             public readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
+            public readonly PropertyInfo AvatarSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Avatar);
+            public readonly PropertyInfo TourDataSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.TourData);
             public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
-            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartContentId);
-            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.StartMediaId);
-            public readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
+            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartContentIds);
+            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartMediaIds);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
 
             public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
@@ -99,9 +145,18 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo IsLockedOutSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsLockedOut);
             public readonly PropertyInfo IsApprovedSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsApproved);
             public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
+            public readonly PropertyInfo EmailConfirmedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.EmailConfirmedDate);
+            public readonly PropertyInfo InvitedDateSelector = ExpressionHelper.GetPropertyInfo<User, DateTime?>(x => x.InvitedDate);
 
             public readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
-            public readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
+
+            public readonly PropertyInfo UserGroupsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<IReadOnlyUserGroup>>(x => x.Groups);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
+                new DelegateEqualityComparer<IEnumerable<int>>(
+                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                    enum1 => enum1.GetHashCode());
         }
         
         #region Implementation of IMembershipUser
@@ -112,8 +167,19 @@ namespace Umbraco.Core.Models.Membership
             get { return Id; }
             set { throw new NotSupportedException("Cannot set the provider user key for a user"); }
         }
-
-
+        
+        [DataMember]
+        public DateTime? EmailConfirmedDate
+        {
+            get { return _emailConfirmedDate; }
+            set { SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, Ps.Value.EmailConfirmedDateSelector); }
+        }
+        [DataMember]
+        public DateTime? InvitedDate
+        {
+            get { return _invitedDate; }
+            set { SetPropertyValueAndDetectChanges(value, ref _invitedDate, Ps.Value.InvitedDateSelector); }
+        }
         [DataMember]
         public string Username
         {
@@ -189,6 +255,26 @@ namespace Umbraco.Core.Models.Membership
         
         #region Implementation of IUser
 
+        public UserState UserState
+        {
+            get
+            {
+                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
+                    return UserState.Invited;
+
+                if (IsLockedOut)
+                    return UserState.LockedOut;
+                if (IsApproved == false)
+                    return UserState.Disabled;
+
+                // User is not disabled or locked and has never logged in before
+                if (LastLoginDate == default && IsApproved && IsLockedOut == false)
+                    return UserState.Inactive;
+
+                    return UserState.Active;
+            }
+        }
+
         [DataMember]
         public string Name
         {
@@ -198,28 +284,175 @@ namespace Umbraco.Core.Models.Membership
 
         public IEnumerable<string> AllowedSections
         {
-            get { return _sectionCollection; }
+            get { return _allowedSections ?? (_allowedSections = new List<string>(_userGroups.SelectMany(x => x.AllowedSections).Distinct())); }
         }
 
-        public void RemoveAllowedSection(string sectionAlias)
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUserType IUser.UserType
         {
-            if (_sectionCollection.Contains(sectionAlias))
+            get
             {
-                _sectionCollection.Remove(sectionAlias);
+                //the best we can do here is to return the user's first user group as a IUserType object
+                //but we should attempt to return any group that is the built in ones first
+                var groups = Groups.ToArray();
+                if (groups.Length == 0)
+                {
+                    //In backwards compatibility land, a user type cannot be null! so we need to return a fake one. 
+                    return new UserType
+                    {
+                        Alias = "temp",
+                        Id = int.MinValue,
+                        Key = Guid.Empty,
+                        CreateDate = default(DateTime),
+                        DeletedDate = null,
+                        Name = "Temp",
+                        Permissions = new List<string>(),
+                        UpdateDate = default(DateTime)
+                    };
+                }
+                var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", "translator" };
+                var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
+                IUserGroup realGroup;
+                if (foundBuiltIn != null)
+                {
+                    //if the group isn't IUserGroup we'll need to look it up
+                    realGroup = foundBuiltIn as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(foundBuiltIn.Id);
+
+                    //return a mapped version of the group
+                    return new UserType
+                    {
+                        Alias = realGroup.Alias,
+                        Id = realGroup.Id,
+                        Key = realGroup.Key,
+                        CreateDate = realGroup.CreateDate,
+                        DeletedDate = realGroup.DeletedDate,
+                        Name = realGroup.Name,
+                        Permissions = realGroup.Permissions,
+                        UpdateDate = realGroup.UpdateDate
+                    };
+                }
+
+                //otherwise return the first
+                //if the group isn't IUserGroup we'll need to look it up
+                realGroup = groups[0] as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(groups[0].Id);
+                //return a mapped version of the group
+                return new UserType
+                {
+                    Alias = realGroup.Alias,
+                    Id = realGroup.Id,
+                    Key = realGroup.Key,
+                    CreateDate = realGroup.CreateDate,
+                    DeletedDate = realGroup.DeletedDate,
+                    Name = realGroup.Name,
+                    Permissions = realGroup.Permissions,
+                    UpdateDate = realGroup.UpdateDate
+                };
+            }
+            set
+            {
+                //if old APIs are still using this lets first check if  the user is part of the user group with the alias specified
+                if (Groups.Any(x => x.Alias == value.Alias))
+                    return;
+
+                //the only other option we have here is to lookup the group (and we'll need to use singletons here :( )
+                var found = ApplicationContext.Current.Services.UserService.GetUserGroupByAlias(value.Alias);
+                if (found == null)
+                    throw new InvalidOperationException("No user group was found with the alias " + value.Alias + ", this API (IUser.UserType) is obsolete, use user groups instead");
+
+                //if it's found, all we can do is add it, we can't really replace them
+                AddGroup(found.ToReadOnlyGroup());
             }
         }
 
-        public void AddAllowedSection(string sectionAlias)
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void IUser.RemoveAllowedSection(string sectionAlias)
         {
-            if (_sectionCollection.Contains(sectionAlias) == false)
+            //don't do anything if they aren't allowed it already
+            if (AllowedSections.Contains(sectionAlias) == false)
+                return;
+
+            var groups = Groups.ToArray();
+            //our only option here is to check if a custom group is created for this user, if so we can remove it from that group, otherwise we'll throw
+            //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
+            //this comes in the alias form of userName + 'Group'
+            var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
+            if (customUserGroup != null)
             {
-                _sectionCollection.Add(sectionAlias);
+                //if the group isn't IUserGroup we'll need to look it up
+                var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                realGroup.RemoveAllowedSection(sectionAlias);
+                //now we need to flag this for saving (hack!) 
+                GroupsToSave.Add(realGroup);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot remove the allowed section using this obsolete API. Modify the user's groups instead");
+            }
+            
+        }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void IUser.AddAllowedSection(string sectionAlias)
+        {
+            //don't do anything if they are allowed it already
+            if (AllowedSections.Contains(sectionAlias))
+                return;
+
+            //This is here for backwards compat only.
+            //First we'll check if the user is part of the 'admin' group. If so then we can ensure that the admin group has this section available to it.
+            //otherwise, the only thing we can do is create a custom user group for this user and add this section.
+            //We are checking for admin here because if the user is an admin and an allowed section is being added, then it's assumed it's to be added 
+            //for the whole admin group (i.e. Forms installer does this for admins)
+            var groups = Groups.ToArray();
+            var admin = groups.FirstOrDefault(x => x.Alias == Constants.Security.AdminGroupAlias);
+            if (admin != null)
+            {
+                //if the group isn't IUserGroup we'll need to look it up
+                var realGroup = admin as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(admin.Id);
+                realGroup.AddAllowedSection(sectionAlias);
+                //now we need to flag this for saving (hack!) 
+                GroupsToSave.Add(realGroup);
+            }
+            else
+            {
+                //now we'll check if the user has a special 1:1 user group created for itself. This will occur if this method is used and also during an upgrade.
+                //this comes in the alias form of userName + 'Group'
+                var customUserGroup = groups.FirstOrDefault(x => x.Alias == (Username + "Group"));
+                if (customUserGroup != null)
+                {
+                    //if the group isn't IUserGroup we'll need to look it up
+                    var realGroup = customUserGroup as IUserGroup ?? ApplicationContext.Current.Services.UserService.GetUserGroupById(customUserGroup.Id);
+                    realGroup.AddAllowedSection(sectionAlias);
+                    //now we need to flag this for saving (hack!) 
+                    GroupsToSave.Add(realGroup);
+                }
+
+                //ok, so the user doesn't have a 1:1 group, we'll need to flag it for creation
+                var newUserGroup = new UserGroup
+                {
+                    Alias = Username + "Group",
+                    Name = "Group for " + Username
+                };
+                newUserGroup.AddAllowedSection(sectionAlias);
+                //add this user to this new group
+                AddGroup(newUserGroup);
+                GroupsToSave.Add(newUserGroup);
             }
         }
+
+        /// <summary>
+        /// This used purely for hacking backwards compatibility into this class for &lt; 7.7 compat
+        /// </summary>
+        [DoNotClone]
+        [IgnoreDataMember]
+        internal List<IUserGroup> GroupsToSave = new List<IUserGroup>();        
 
         public IProfile ProfileData
         {
-            get { return new UserProfile(this); }
+            get { return new WrappedUserProfile(this); }
         }
 
         /// <summary>
@@ -232,20 +465,21 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _securityStamp, Ps.Value.SecurityStampSelector); }
         }
 
-        /// <summary>
-        /// Used internally to check if we need to add a section in the repository to the db
-        /// </summary>
-        internal IEnumerable<string> AddedSections
+        [DataMember]
+        public string Avatar
         {
-            get { return _addedSections; }
+            get { return _avatar; }
+            set { SetPropertyValueAndDetectChanges(value, ref _avatar, Ps.Value.AvatarSelector); }
         }
 
         /// <summary>
-        /// Used internally to check if we need to remove  a section in the repository to the db
+        /// A Json blob stored for recording tour data for a user
         /// </summary>
-        internal IEnumerable<string> RemovedSections
+        [DataMember]
+        public string TourData
         {
-            get { return _removedSections; }
+            get { return _tourData; }
+            set { SetPropertyValueAndDetectChanges(value, ref _tourData, Ps.Value.TourDataSelector); }
         }
 
         /// <summary>
@@ -261,6 +495,18 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _sessionTimeout, Ps.Value.SessionTimeoutSelector); }
         }
 
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int IUser.StartContentId
+        {
+            get
+            {
+                var calculatedStartNodes = this.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                return calculatedStartNodes.Length == 0 ? -1 : calculatedStartNodes[0];
+            }
+            set { StartContentIds = new[] { value }; }
+        }
+
         /// <summary>
         /// Gets or sets the start content id.
         /// </summary>
@@ -268,10 +514,23 @@ namespace Umbraco.Core.Models.Membership
         /// The start content id.
         /// </value>
         [DataMember]
-        public int StartContentId
+        [DoNotClone]
+        public int[] StartContentIds
         {
-            get { return _startContentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
+            get { return _startContentIds; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdSelector, Ps.Value.IntegerEnumerableComparer); }
+        }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int IUser.StartMediaId
+        {
+            get
+            {
+                var calculatedStartNodes = this.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService);
+                return calculatedStartNodes.Length == 0 ? -1 : calculatedStartNodes[0];
+            }
+            set { StartMediaIds = new[] {value}; }
         }
 
         /// <summary>
@@ -281,10 +540,11 @@ namespace Umbraco.Core.Models.Membership
         /// The start media id.
         /// </value>
         [DataMember]
-        public int StartMediaId
+        [DoNotClone]
+        public int[] StartMediaIds
         {
-            get { return _startMediaId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
+            get { return _startMediaIds; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdSelector, Ps.Value.IntegerEnumerableComparer); }
         }
 
         [DataMember]
@@ -294,14 +554,6 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
         }
 
-        //TODO: This should be a private set
-        [DataMember]
-        public IEnumerable<string> DefaultPermissions
-        {
-            get {  return _defaultPermissions;}
-            set { _defaultPermissions = value; }
-        }
-
         [IgnoreDataMember]
         internal bool DefaultToLiveEditing
         {
@@ -309,78 +561,107 @@ namespace Umbraco.Core.Models.Membership
             set { SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, Ps.Value.DefaultToLiveEditingSelector); }
         }
 
-        [IgnoreDataMember]
-        public IUserType UserType
+        /// <summary>
+        /// Gets the groups that user is part of
+        /// </summary>
+        [DataMember]
+        public IEnumerable<IReadOnlyUserGroup> Groups
         {
-            get { return _userType; }
-            set
+            get { return _userGroups; }
+        }
+        
+        public void RemoveGroup(string group)
+        {
+            foreach (var userGroup in _userGroups.ToArray())
             {
-                if (value.HasIdentity == false)
+                if (userGroup.Alias == group)
                 {
-                    throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
+                    _userGroups.Remove(userGroup);
+                    //reset this flag so it's rebuilt with the assigned groups
+                    _allowedSections = null;
+                    OnPropertyChanged(Ps.Value.UserGroupsSelector);
                 }
-
-                SetPropertyValueAndDetectChanges(value, ref _userType, Ps.Value.UserTypeSelector);                
             }
+        }
+
+        public void ClearGroups()
+        {
+            if (_userGroups.Count > 0)
+            {
+                _userGroups.Clear();
+                //reset this flag so it's rebuilt with the assigned groups
+                _allowedSections = null;
+                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+            }        
+        }
+
+        public void AddGroup(IReadOnlyUserGroup group)
+        {
+            if (_userGroups.Add(group))
+            {
+                //reset this flag so it's rebuilt with the assigned groups
+                _allowedSections = null;
+                OnPropertyChanged(Ps.Value.UserGroupsSelector);
+            }            
         }
 
         #endregion
 
         /// <summary>
-        /// Whenever resetting occurs, clear the remembered add/removed collections, even if 
-        /// rememberPreviouslyChangedProperties is true, the AllowedSections property will still
-        /// be flagged as dirty.
+        /// This is used as an internal cache for this entity - specifically for calculating start nodes so we don't re-calculated all of the time
         /// </summary>
-        /// <param name="rememberPreviouslyChangedProperties"></param>
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        [IgnoreDataMember]
+        [DoNotClone]
+        internal IDictionary<string, object> AdditionalData
         {
-            _addedSections.Clear();
-            _removedSections.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
-        }
-
-        /// <summary>
-        /// Handles the collection changed event in order for us to flag the AllowedSections property as changed
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void SectionCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(Ps.Value.AllowedSectionsSelector);
-
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            get
             {
-                var item = e.NewItems.Cast<string>().First();
-
-                if (_addedSections.Contains(item) == false)
+                lock (_additionalDataLock)
                 {
-                    _addedSections.Add(item);
+                    return _additionalData ?? (_additionalData = new Dictionary<string, object>());
                 }
             }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                var item = e.OldItems.Cast<string>().First();
-
-                if (_removedSections.Contains(item) == false)
-                {
-                    _removedSections.Add(item);    
-                }
-
-            }
         }
+
+        [IgnoreDataMember]
+        [DoNotClone]
+        internal object AdditionalDataLock { get { return _additionalDataLock; } }
 
         public override object DeepClone()
         {
             var clone = (User)base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
+            //manually clone the start node props
+            clone._startContentIds = _startContentIds.ToArray();
+            clone._startMediaIds = _startMediaIds.ToArray();
+
+            // this value has been cloned and points to the same object
+            // which obviously is bad - needs to point to a new object
+            clone._additionalDataLock = new object();
+
+            if (_additionalData != null)
+            {
+                // clone._additionalData points to the same dictionary, which is bad, because
+                // changing one clone impacts all of them - so we need to reset it with a fresh
+                // dictionary that will contain the same values - and, if some values are deep
+                // cloneable, they should be deep-cloned too
+                var cloneAdditionalData = clone._additionalData = new Dictionary<string, object>();
+
+                lock (_additionalDataLock)
+                {
+                    foreach (var kvp in _additionalData)
+                    {
+                        var deepCloneable = kvp.Value as IDeepCloneable;
+                        cloneAdditionalData[kvp.Key] = deepCloneable == null ? kvp.Value : deepCloneable.DeepClone();
+                    } 
+                }
+            }
+                   
             //need to create new collections otherwise they'll get copied by ref
-            clone._addedSections = new List<string>();
-            clone._removedSections = new List<string>();
-            clone._sectionCollection = new ObservableCollection<string>(_sectionCollection.ToList());
-            clone._defaultPermissions = new List<string>(_defaultPermissions.ToList());
+            clone._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
+            clone._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
             //re-create the event handler
-            clone._sectionCollection.CollectionChanged += clone.SectionCollectionChanged;
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
             //re-enable tracking
@@ -392,28 +673,26 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>
-        private class UserProfile : IProfile
+        private class WrappedUserProfile : IProfile
         {
             private readonly IUser _user;
 
-            public UserProfile(IUser user)
+            public WrappedUserProfile(IUser user)
             {
                 _user = user;
             }
 
-            public object Id
+            public int Id
             {
                 get { return _user.Id; }
-                set { _user.Id = (int)value; }
             }
 
             public string Name
             {
                 get { return _user.Name; }
-                set { _user.Name = value; }
             }
 
-            protected bool Equals(UserProfile other)
+            private bool Equals(WrappedUserProfile other)
             {
                 return _user.Equals(other._user);
             }
@@ -423,7 +702,7 @@ namespace Umbraco.Core.Models.Membership
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((UserProfile) obj);
+                return Equals((WrappedUserProfile) obj);
             }
 
             public override int GetHashCode()
@@ -431,5 +710,6 @@ namespace Umbraco.Core.Models.Membership
                 return _user.GetHashCode();
             }
         }
+
     }
 }

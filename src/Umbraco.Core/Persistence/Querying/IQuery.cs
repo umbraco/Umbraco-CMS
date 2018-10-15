@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence.Querying
@@ -16,6 +17,11 @@ namespace Umbraco.Core.Persistence.Querying
         /// <returns>This instance so calls to this method are chainable</returns>
         IQuery<T> Where(Expression<Func<T, bool>> predicate);
 
-        
+        /// <summary>
+        /// Adds a set of OR-ed where clauses to the query.
+        /// </summary>
+        /// <param name="predicates"></param>
+        /// <returns>This instance so calls to this method are chainable.</returns>
+        IQuery<T> WhereAny(IEnumerable<Expression<Func<T, bool>>> predicates);
     }
 }

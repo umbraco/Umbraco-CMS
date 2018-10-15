@@ -32,6 +32,12 @@ namespace UmbracoExamine
     /// </summary>
     public abstract class BaseUmbracoIndexer : LuceneIndexer
     {
+        // note
+        // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
+        // context because they will fork a thread/task/whatever which should *not* capture our
+        // call context (and the database it can contain)! ideally we should be able to override
+        // SafelyProcessQueueItems but that's not possible in the current version of Examine.
+
         #region Constructors
 
         /// <summary>
@@ -144,7 +150,7 @@ namespace UmbracoExamine
             {
                 //By default, we will be using the UmbracoDataService
                 //generally this would only need to be set differently for unit testing
-                DataService = new UmbracoDataService();
+                DataService = CreateDefaultUmbracoDataService();
             }
 
             DataService.LogService.LogLevel = LoggingLevel.Normal;
@@ -203,6 +209,11 @@ namespace UmbracoExamine
         }
 
         #endregion
+
+        protected virtual IDataService CreateDefaultUmbracoDataService()
+        {
+            return new UmbracoDataService();
+        }
 
         /// <summary>
         /// Used to aquire the internal searcher
@@ -282,7 +293,12 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.RebuildIndex();
+                // remove the db from lcc
+                using (new SafeCallContext())
+                //using (ApplicationContext.Current.DatabaseContext.UseSafeDatabase())
+                {
+                    base.RebuildIndex();
+                } // will try to re-instate the original DB *but* if a DB has been created in the meantime what shall we do?
             }
         }
 
@@ -296,7 +312,10 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.IndexAll(type);
+                using (new SafeCallContext())
+                {
+                    base.IndexAll(type);
+                }
             }
         }
 
@@ -307,7 +326,10 @@ namespace UmbracoExamine
                 if (!SupportedTypes.Contains(type))
                     return;
 
-                base.ReIndexNode(node, type);
+                using (new SafeCallContext())
+                {
+                    base.ReIndexNode(node, type);
+                }
             }
         }
 
@@ -321,7 +343,10 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                base.DeleteFromIndex(nodeId);
+                using (new SafeCallContext())
+                {
+                    base.DeleteFromIndex(nodeId);
+                }
             }            
         }
 
@@ -463,31 +488,32 @@ namespace UmbracoExamine
         }
         #endregion
 
-        
         [Obsolete("This method is not be used, it will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         private void AddNodesToIndex(string xPath, string type)
         {
-            // Get all the nodes of nodeTypeAlias == nodeTypeAlias
-            XDocument xDoc = GetXDocument(xPath, type);
-            if (xDoc != null)
+            using (new SafeCallContext())
             {
-                var rootNode = xDoc.Root;
-                if (rootNode != null)
+                // Get all the nodes of nodeTypeAlias == nodeTypeAlias
+                XDocument xDoc = GetXDocument(xPath, type);
+                if (xDoc != null)
                 {
-                    //the result will either be a single doc with an id as the root, or it will
-                    // be multiple docs with a <nodes> wrapper, we need to check for this
-                    if (rootNode.HasAttributes)
+                    var rootNode = xDoc.Root;
+                    if (rootNode != null)
                     {
-                        AddNodesToIndex(new[] {rootNode}, type);
-                    }
-                    else
-                    {
-                        AddNodesToIndex(rootNode.Elements(), type);
+                        //the result will either be a single doc with an id as the root, or it will
+                        // be multiple docs with a <nodes> wrapper, we need to check for this
+                        if (rootNode.HasAttributes)
+                        {
+                            AddNodesToIndex(new[] { rootNode }, type);
+                        }
+                        else
+                        {
+                            AddNodesToIndex(rootNode.Elements(), type);
+                        }
                     }
                 }
             }
-
         }
     }
 }

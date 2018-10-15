@@ -1,0 +1,101 @@
+<div class="umb-minilistview">
+
+    <div ng-repeat="miniListView in miniListViews" ng-animate="getMiniListViewAnimation()">
+
+        <div class="umb-mini-list-view__title">
+            <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}"></i>
+            <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
+        </div>
+
+        <div class="flex" style="margin-bottom: 10px;">
+
+            <a ng-if="showBackButton()" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView()">
+                <i class="icon-arrow-left umb-mini-list-view__back-icon"></i>
+                <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
+            </a>
+
+            <umb-breadcrumbs
+                ng-if="breadcrumb && breadcrumb.length > 0"
+                ancestors="breadcrumb"
+                entity-type="content"
+                on-open="clickBreadcrumb(ancestor)">
+            </umb-breadcrumbs>
+
+        </div>
+
+        <div class="umb-table umb-table--condensed">
+
+            <!-- Head -->
+            <div class="umb-table-head">
+                <div class="umb-table-row">
+                    <div class="umb-table-cell" style="display: none;"></div>
+                    <div class="umb-table-cell" style="padding-top: 8px; padding-bottom: 8px;">
+                        <form class="form-search -no-margin-bottom" style="width: 100%; margin-right: 0;" novalidate>
+                            <div class="inner-addon left-addon">
+                                <i class="icon icon-search" style="font-size: 14px;"></i>
+                                <input
+                                    style="width: 100%;"
+                                    class="form-control search-input"
+                                    type="text"
+                                    localize="placeholder"
+                                    placeholder="@general_typeToSearch"
+                                    ng-model="search"
+                                    ng-change="searchMiniListView(search, miniListView)"
+                                    prevent-enter-submit
+                                    no-dirty-check>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="umb-table-body">
+
+                <!-- Load indicator when the list has items -->
+                <div class="umb-table__loading-overlay" ng-if="miniListView.loading && miniListView.children.length > 0">
+                    <umb-load-indicator></umb-load-indicator>
+                </div>
+
+                <!-- Items -->
+                <div class="umb-table-row"
+                    ng-repeat="child in miniListView.children"
+                    ng-click="selectNode(child)"
+                    ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
+                    <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
+                        <div class="flex items-center">
+                            <ins class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.hasChildren !== true}">&nbsp;</ins>
+                            <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></i>
+                            <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                        </div>
+                    </div>
+                    <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>
+                </div>
+
+                <!-- Load indicator when the list doesn't have items -->
+                <div ng-if="!miniListView.loading && !miniListView.children" class="umb-table-row umb-table-row--empty">
+                    <span ng-if="search === ''"><localize key="general_noItemsInList"></localize></span>
+                    <span ng-if="search !== ''"><localize key="general_searchNoResult"></localize></span>
+                </div>
+
+                <!-- Load indicator when the list doesn't have items -->
+                <div ng-if="miniListView.loading && !miniListView.children" class="umb-table-row umb-table-row--empty">
+                    <umb-load-indicator></umb-load-indicator>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="flex justify-center">
+            <umb-pagination
+                ng-if="miniListView.pagination.totalPages > 0 && !miniListView.loading"
+                page-number="miniListView.pagination.pageNumber"
+                total-pages="miniListView.pagination.totalPages"
+                on-change="goToPage(pageNumber, miniListView)">
+            </umb-pagination>
+        </div>
+
+    </div>
+
+</div>

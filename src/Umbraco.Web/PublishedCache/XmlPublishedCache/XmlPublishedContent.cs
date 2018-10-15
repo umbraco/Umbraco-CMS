@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -33,6 +34,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
+
+	    private readonly object _initializeLock = new object();
 
         private bool _nodeInitialized;
 	    private bool _parentInitialized;
@@ -67,15 +70,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
-                if (_childrenInitialized == false) InitializeChildren();
+                EnsureNodeInitialized(andChildren: true);
 				return _children;
 			}
 		}
 
 		public override IPublishedProperty GetProperty(string alias)
 		{
-            if (_nodeInitialized == false) InitializeNode();
+            EnsureNodeInitialized();
             IPublishedProperty property;
 		    return _properties.TryGetValue(alias, out property) ? property : null;
 		}
@@ -113,8 +115,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
-                if (_parentInitialized == false) InitializeParent();
+                EnsureNodeInitialized(andParent: true);
 				return _parent;
 			}
 		}
@@ -123,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _id;
 			}
 		}
@@ -132,7 +133,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_nodeInitialized == false) InitializeNode();
+	            EnsureNodeInitialized();
 	            return _key;
 	        }
 	    }
@@ -141,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _template;
 			}
 		}
@@ -150,7 +151,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _sortOrder;
 			}
 		}
@@ -159,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _name;
 			}
 		}
@@ -168,7 +169,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _docTypeAlias;
 			}
 		}
@@ -177,7 +178,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _docTypeId;
 			}
 		}
@@ -186,7 +187,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _writerName;
 			}
 		}
@@ -195,7 +196,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _creatorName;
 			}
 		}
@@ -204,7 +205,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _writerId;
 			}
 		}
@@ -213,7 +214,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _creatorId;
 			}
 		}
@@ -222,7 +223,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _path;
 			}
 		}
@@ -231,7 +232,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _createDate;
 			}
 		}
@@ -240,7 +241,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _updateDate;
 			}
 		}
@@ -249,7 +250,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _version;
 			}
 		}
@@ -258,7 +259,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _urlName;
 			}
 		}
@@ -267,7 +268,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _level;
 			}
 		}
@@ -276,7 +277,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_nodeInitialized == false) InitializeNode();
+	            EnsureNodeInitialized();
 	            return _isDraft;
 	        }
 	    }
@@ -285,7 +286,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _properties.Values;
 			}
 		}
@@ -294,7 +295,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             get
             {
-                if (_nodeInitialized == false) InitializeNode();
+                EnsureNodeInitialized();
                 return _contentType;
             }
         }
@@ -309,103 +310,186 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
 		        _parent = Get(parent, _isPreviewing);
 
-            // warn: this is not thread-safe...
             _parentInitialized = true;
 		}
 
-		private void InitializeNode()
-		{
-		    if (_xmlNode == null) return;
+	    private void EnsureNodeInitialized(bool andChildren = false, bool andParent = false)
+	    {
+            // In *theory* XmlPublishedContent are a per-request thing, and so should not
+            // end up being involved into multi-threaded situations - however, it's been
+            // reported that some users ended up seeing 100% CPU due to infinite loops in
+            // the properties dictionary in InitializeNode, which would indicate that the
+            // dictionary *is* indeed involved in some multi-threaded operation. No idea
+            // what users are doing that cause this, but let's be friendly and use a true
+            // lock around initialization.
 
-		    if (_xmlNode.Attributes != null)
+	        lock (_initializeLock)
+	        {
+	            if (_nodeInitialized == false) InitializeNode();
+                if (andChildren && _childrenInitialized == false) InitializeChildren();
+	            if (andParent && _parentInitialized == false) InitializeParent();
+	        }
+	    }
+
+	    private void InitializeNode()
+	    {
+            InitializeNode(_xmlNode, UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema, _isPreviewing,
+                out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
+                out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
+                out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
+                PublishedContentType.Get);
+
+            _nodeInitialized = true;
+        }
+
+        // internal for some benchmarks
+        internal static void InitializeNode(XmlNode xmlNode, bool legacy, bool isPreviewing,
+            out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
+            out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
+            out Guid version, out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
+            out PublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
+            Func<PublishedItemType, string, PublishedContentType> getPublishedContentType)
+        {
+            //initialize the out params with defaults:
+            writerName = null;
+            docTypeAlias = null;
+            id = template = sortOrder = template = creatorId = writerId = docTypeId = level = default(int);
+            key = version = default(Guid);
+            name = writerName = urlName = creatorName = docTypeAlias = path = null;
+            createDate = updateDate = default(DateTime);
+            isDraft = false;
+            contentType = null;
+            properties = null;
+
+            //return if this is null
+            if (xmlNode == null)
+            {
+		        return;
+		    }
+
+		    if (xmlNode.Attributes != null)
 		    {
-		        _id = int.Parse(_xmlNode.Attributes.GetNamedItem("id").Value);
-                if (_xmlNode.Attributes.GetNamedItem("key") != null) // because, migration
-    		        _key = Guid.Parse(_xmlNode.Attributes.GetNamedItem("key").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("template") != null)
-		            _template = int.Parse(_xmlNode.Attributes.GetNamedItem("template").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("sortOrder") != null)
-		            _sortOrder = int.Parse(_xmlNode.Attributes.GetNamedItem("sortOrder").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("nodeName") != null)
-		            _name = _xmlNode.Attributes.GetNamedItem("nodeName").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("writerName") != null)
-		            _writerName = _xmlNode.Attributes.GetNamedItem("writerName").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("urlName") != null)
-		            _urlName = _xmlNode.Attributes.GetNamedItem("urlName").Value;
+		        id = int.Parse(xmlNode.Attributes.GetNamedItem("id").Value);
+                if (xmlNode.Attributes.GetNamedItem("key") != null) // because, migration
+    		        key = Guid.Parse(xmlNode.Attributes.GetNamedItem("key").Value);
+		        if (xmlNode.Attributes.GetNamedItem("template") != null)
+		            template = int.Parse(xmlNode.Attributes.GetNamedItem("template").Value);
+		        if (xmlNode.Attributes.GetNamedItem("sortOrder") != null)
+		            sortOrder = int.Parse(xmlNode.Attributes.GetNamedItem("sortOrder").Value);
+		        if (xmlNode.Attributes.GetNamedItem("nodeName") != null)
+		            name = xmlNode.Attributes.GetNamedItem("nodeName").Value;
+		        if (xmlNode.Attributes.GetNamedItem("writerName") != null)
+		            writerName = xmlNode.Attributes.GetNamedItem("writerName").Value;
+		        if (xmlNode.Attributes.GetNamedItem("urlName") != null)
+		            urlName = xmlNode.Attributes.GetNamedItem("urlName").Value;
 		        // Creatorname is new in 2.1, so published xml might not have it!
 		        try
 		        {
-		            _creatorName = _xmlNode.Attributes.GetNamedItem("creatorName").Value;
+		            creatorName = xmlNode.Attributes.GetNamedItem("creatorName").Value;
 		        }
 		        catch
 		        {
-		            _creatorName = _writerName;
+		            creatorName = writerName;
 		        }
 
 		        //Added the actual userID, as a user cannot be looked up via full name only...
-		        if (_xmlNode.Attributes.GetNamedItem("creatorID") != null)
-		            _creatorId = int.Parse(_xmlNode.Attributes.GetNamedItem("creatorID").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
-		            _writerId = int.Parse(_xmlNode.Attributes.GetNamedItem("writerID").Value);
+		        if (xmlNode.Attributes.GetNamedItem("creatorID") != null)
+		            creatorId = int.Parse(xmlNode.Attributes.GetNamedItem("creatorID").Value);
+		        if (xmlNode.Attributes.GetNamedItem("writerID") != null)
+		            writerId = int.Parse(xmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
+                if (legacy)
 		        {
-		            if (_xmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
-		                _docTypeAlias = _xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
+		            if (xmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
+		                docTypeAlias = xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
 		        }
 		        else
 		        {
-		            _docTypeAlias = _xmlNode.Name;
+		            docTypeAlias = xmlNode.Name;
 		        }
 
-		        if (_xmlNode.Attributes.GetNamedItem("nodeType") != null)
-		            _docTypeId = int.Parse(_xmlNode.Attributes.GetNamedItem("nodeType").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("path") != null)
-		            _path = _xmlNode.Attributes.GetNamedItem("path").Value;
-		        if (_xmlNode.Attributes.GetNamedItem("version") != null)
-		            _version = new Guid(_xmlNode.Attributes.GetNamedItem("version").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("createDate") != null)
-		            _createDate = DateTime.Parse(_xmlNode.Attributes.GetNamedItem("createDate").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("updateDate") != null)
-		            _updateDate = DateTime.Parse(_xmlNode.Attributes.GetNamedItem("updateDate").Value);
-		        if (_xmlNode.Attributes.GetNamedItem("level") != null)
-		            _level = int.Parse(_xmlNode.Attributes.GetNamedItem("level").Value);
+		        if (xmlNode.Attributes.GetNamedItem("nodeType") != null)
+		            docTypeId = int.Parse(xmlNode.Attributes.GetNamedItem("nodeType").Value);
+		        if (xmlNode.Attributes.GetNamedItem("path") != null)
+		            path = xmlNode.Attributes.GetNamedItem("path").Value;
+		        if (xmlNode.Attributes.GetNamedItem("version") != null)
+		            version = new Guid(xmlNode.Attributes.GetNamedItem("version").Value);
+		        if (xmlNode.Attributes.GetNamedItem("createDate") != null)
+		            createDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("createDate").Value);
+		        if (xmlNode.Attributes.GetNamedItem("updateDate") != null)
+		            updateDate = DateTime.Parse(xmlNode.Attributes.GetNamedItem("updateDate").Value);
+		        if (xmlNode.Attributes.GetNamedItem("level") != null)
+		            level = int.Parse(xmlNode.Attributes.GetNamedItem("level").Value);
 
-                _isDraft = (_xmlNode.Attributes.GetNamedItem("isDraft") != null);
+                isDraft = (xmlNode.Attributes.GetNamedItem("isDraft") != null);
             }
 
-		    // load data
-            var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
-		    var nodes = _xmlNode.SelectNodes(dataXPath);
+		    //dictionary to store the property node data
+            var propertyNodes = new Dictionary<string, XmlNode>();
 
-		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
-
-		    var propertyNodes = new Dictionary<string, XmlNode>();
-            if (nodes != null)
-                foreach (XmlNode n in nodes)
-                {
-                    var attrs = n.Attributes;
-                    if (attrs == null) continue;
-                    var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                        ? attrs.GetNamedItem("alias").Value
-                        : n.Name;
-                    propertyNodes[alias.ToLowerInvariant()] = n;
+            foreach (XmlNode n in xmlNode.ChildNodes)
+            {
+                var e = n as XmlElement;
+                if (e == null) continue;
+		        if (legacy)
+		        {
+		            if (n.Name == "data")
+		            {
+		                PopulatePropertyNodes(propertyNodes, e, true);
+		            }
+		            else break; //we are not longer on property elements
                 }
+		        else
+		        {
+		            if (e.HasAttribute("isDoc") == false)
+		            {
+                        PopulatePropertyNodes(propertyNodes, e, false);
+		            }
+		            else break; //we are not longer on property elements
+		        }
+		    }
 
-		    _properties = _contentType.PropertyTypes.Select(p =>
+            //lookup the content type and create the properties collection
+            try
+            {
+                contentType = getPublishedContentType(PublishedItemType.Content, docTypeAlias);
+
+            }
+            catch (InvalidOperationException e)
+            {
+                content.Instance.RefreshContentFromDatabase();
+                
+
+                throw new InvalidOperationException(
+                    string.Format("{0}. This usually indicates that the content cache is corrupt; the content cache has been rebuilt in an attempt to self-fix the issue.", 
+                    //keep the original message but don't use this as an inner exception because we want the above message to be displayed, if we use the inner exception
+                    //we can keep the stack trace but the header message will be the original message and the one we really want to display will be hidden below the fold.
+                    e.Message));
+            }
+            properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
+
+            //fill in the property collection
+		    foreach (var propertyType in contentType.PropertyTypes)
 		    {
-		        XmlNode n;
-		        return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-		            ? new XmlPublishedProperty(p, _isPreviewing, n)
-		            : new XmlPublishedProperty(p, _isPreviewing);
-		    }).Cast<IPublishedProperty>().ToDictionary(
-		        x => x.PropertyTypeAlias,
-		        x => x,
-		        StringComparer.OrdinalIgnoreCase);
+                XmlNode n;
+		        var val = propertyNodes.TryGetValue(propertyType.PropertyTypeAlias.ToLowerInvariant(), out n)
+		            ? new XmlPublishedProperty(propertyType, isPreviewing, n)
+		            : new XmlPublishedProperty(propertyType, isPreviewing);
 
-            // warn: this is not thread-safe...
-            _nodeInitialized = true;
+		        properties[propertyType.PropertyTypeAlias] = val;
+		    }
 		}
+
+        private static void PopulatePropertyNodes(IDictionary<string, XmlNode> propertyNodes, XmlNode n, bool legacy)
+        {
+            var attrs = n.Attributes;
+	        if (attrs == null) return;
+
+            var alias = legacy
+                ? attrs.GetNamedItem("alias").Value
+                : n.Name;
+            propertyNodes[alias.ToLowerInvariant()] = n;
+        }
 
 	    private void InitializeChildren()
 	    {
@@ -423,7 +507,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            // warn: this is not thread-safe
             _childrenInitialized = true;
 	    }
 

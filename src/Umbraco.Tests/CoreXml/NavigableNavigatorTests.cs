@@ -419,7 +419,6 @@ namespace Umbraco.Tests.CoreXml
         {
             var source = new TestSource5();
             var nav = new NavigableNavigator(source);
-            TestContent content;
 
             Assert.AreEqual(NavigableNavigator.StatePosition.Root, nav.InternalState.Position);
             Assert.IsTrue(nav.MoveToFirstChild());

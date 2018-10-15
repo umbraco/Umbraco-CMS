@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
@@ -34,8 +35,7 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
             return jsonObject;
         }
 
@@ -47,6 +47,7 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static JsonPayload FromContentType(IContentTypeBase contentType, bool isDeleted = false)
         {
+            var contentTypeService = (ContentTypeService) ApplicationContext.Current.Services.ContentTypeService;
             var payload = new JsonPayload
             {
                 Alias = contentType.Alias,
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Cache
                     : (contentType is IMediaType)
                         ? typeof(IMediaType).Name
                         : typeof(IMemberType).Name,
-                DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
+                DescendantPayloads = contentTypeService.GetDescendants(contentType).Select(x => FromContentType(x)).ToArray(),
                 WasDeleted = isDeleted,
                 PropertyRemoved = contentType.WasPropertyDirty("HasPropertyTypeBeenRemoved"),
                 AliasChanged = contentType.WasPropertyDirty("Alias"),
@@ -78,9 +79,8 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static string SerializeToJsonPayload(bool isDeleted, params IContentTypeBase[] contentTypes)
         {
-            var serializer = new JavaScriptSerializer();
             var items = contentTypes.Select(x => FromContentType(x, isDeleted)).ToArray();
-            var json = serializer.Serialize(items);
+            var json = JsonConvert.SerializeObject(items);
             return json;
         }
 
@@ -184,11 +184,10 @@ namespace Umbraco.Web.Cache
         {
             var needsContentRefresh = false;
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
             foreach (var payload in payloads)
             {
+                ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
+
                 //clear the cache for each item
                 ClearContentTypeCache(payload);
 

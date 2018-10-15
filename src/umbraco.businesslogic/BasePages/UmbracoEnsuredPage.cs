@@ -1,12 +1,13 @@
 using System;
-using Umbraco.Core.Logging;
 using System.Linq;
 using System.Web;
+using umbraco.businesslogic.Exceptions;
+using umbraco.BusinessLogic;
+using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
 namespace umbraco.BasePages
@@ -17,6 +18,40 @@ namespace umbraco.BasePages
     [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.UmbracoEnsuredPage")]
     public class UmbracoEnsuredPage : BasePage
     {
+        /// <summary>
+        /// Performs an authorization check for the user against the requested entity/path and permission set, this is only relevant to content and media
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <param name="objectType"></param>
+        /// <param name="actionToCheck"></param>
+        protected void CheckPathAndPermissions(int entityId, UmbracoObjectTypes objectType, IAction actionToCheck)
+        {
+            if (objectType == UmbracoObjectTypes.Document || objectType == UmbracoObjectTypes.Media)
+            {
+                //check path access                    
+
+                var entity = entityId == Constants.System.Root
+                    ? UmbracoEntity.Root
+                    : Services.EntityService.Get(
+                        entityId,
+                        objectType);
+                var hasAccess = CurrentUser.UserEntity.HasPathAccess(
+                    entity,
+                    Services.EntityService,
+                    objectType == UmbracoObjectTypes.Document ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia);
+                if (hasAccess == false)
+                    throw new UserAuthorizationException(string.Format("The current user doesn't have access to the path '{0}'", entity.Path));
+
+                //only documents have action permissions
+                if (objectType == UmbracoObjectTypes.Document)
+                {
+                    var allowedActions = ActionsResolver.Current.FromActionSymbols(CurrentUser.UserEntity.GetPermissions(entity.Path, Services.UserService)).ToArray();
+                    if (allowedActions.Contains(actionToCheck) == false)
+                        throw new UserAuthorizationException(string.Format("The current user doesn't have permission to {0} on the path '{1}'", actionToCheck.Alias, entity.Path));
+                }
+            }
+        }
+
         /// <summary>
         /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office 
         /// so we'll force authentication.
@@ -130,7 +165,7 @@ namespace umbraco.BasePages
                         throw new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                 }
             }
-            catch (UserAuthorizationException ex)
+            catch (UserAuthorizationException)
             {
                 LogHelper.Warn<UmbracoEnsuredPage>(string.Format("{0} tried to access '{1}'", CurrentUser.Id, CurrentApp));
                 throw;

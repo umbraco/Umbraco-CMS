@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
@@ -23,8 +24,11 @@ namespace Umbraco.Tests.Persistence
 		[SetUp]
 		public void Setup()
 		{
+            // bah
+            SafeCallContext.Clear();
+
             _dbContext = new DatabaseContext(
-                new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Mock.Of<ILogger>()),
+                new ScopeProvider(new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Mock.Of<ILogger>())),
                 Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), Constants.DatabaseProviders.SqlCe);
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
@@ -34,7 +38,7 @@ namespace Umbraco.Tests.Persistence
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true
-				};			
+				};
 		}
 
 		[TearDown]
@@ -43,6 +47,13 @@ namespace Umbraco.Tests.Persistence
 			_dbContext = null;
 			ApplicationContext.Current = null;
 		}
+
+        [Test]
+        public void Database_Connection()
+        {
+            var db = _dbContext.Database;
+            Assert.IsNull(db.Connection);
+        }
 
         [Test]
         public void Can_Verify_Single_Database_Instance()
@@ -76,7 +87,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             //by default the conn string is: Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;
             //we'll just replace the sdf file with our custom one:
@@ -88,9 +99,10 @@ namespace Umbraco.Tests.Persistence
             }
 
             var dbFactory = new DefaultDatabaseFactory(connString, Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
+            var scopeProvider = new ScopeProvider(dbFactory);
             //re-map the dbcontext to the new conn string
             _dbContext = new DatabaseContext(
-                dbFactory,
+                scopeProvider,
                 Mock.Of<ILogger>(),
                 new SqlCeSyntaxProvider(),
                 dbFactory.ProviderName);
@@ -98,8 +110,8 @@ namespace Umbraco.Tests.Persistence
             var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             var appCtx = new ApplicationContext(
-                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
-                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
+                _dbContext,
+                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()),
                 CacheHelper.CreateDisabledCacheHelper(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 

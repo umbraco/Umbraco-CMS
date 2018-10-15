@@ -27,7 +27,20 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IContent,DocumentDto>
 
-        public static IContent BuildEntity(DocumentDto dto, IContentType contentType)
+        /// <summary>
+        /// Builds a IContent item from the dto(s) and content type
+        /// </summary>
+        /// <param name="dto">
+        /// This DTO can contain all of the information to build an IContent item, however in cases where multiple entities are being built,
+        /// a separate <see cref="DocumentPublishedReadOnlyDto"/> publishedDto entity will be supplied in place of the <see cref="DocumentDto"/>'s own 
+        /// ResultColumn DocumentPublishedReadOnlyDto
+        /// </param>
+        /// <param name="contentType"></param>
+        /// <param name="publishedDto">
+        /// When querying for multiple content items the main DTO will not contain the ResultColumn DocumentPublishedReadOnlyDto and a separate publishedDto instance will be supplied
+        /// </param>
+        /// <returns></returns>
+        public static IContent BuildEntity(DocumentDto dto, IContentType contentType, DocumentPublishedReadOnlyDto publishedDto = null)
         {
             var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, contentType);
 
@@ -52,8 +65,16 @@ namespace Umbraco.Core.Persistence.Factories
                 content.ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null;
                 content.ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null;
                 content.Version = dto.ContentVersionDto.VersionId;
+
                 content.PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished;
-                content.PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId;
+
+                //Check if the publishedDto has been supplied, if not the use the dto's own DocumentPublishedReadOnlyDto value
+                content.PublishedVersionGuid = publishedDto == null
+                    ? (dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId)
+                    : publishedDto.VersionId;
+                content.PublishedDate = publishedDto == null
+                    ? (dto.DocumentPublishedReadOnlyDto == null ? default(DateTime) : dto.DocumentPublishedReadOnlyDto.VersionDate)
+                    : publishedDto.VersionDate;
 
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
@@ -77,18 +98,18 @@ namespace Umbraco.Core.Persistence.Factories
         {
             //NOTE Currently doesn't add Alias (legacy that eventually will go away)
             var documentDto = new DocumentDto
-                                  {
-                                      Newest = true,
-                                      NodeId = entity.Id,
-                                      Published = entity.Published,
-                                      Text = entity.Name,
-                                      UpdateDate = entity.UpdateDate,
-                                      WriterUserId = entity.WriterId,
-                                      VersionId = entity.Version,
-                                      ExpiresDate = null,
-                                      ReleaseDate = null,
-                                      ContentVersionDto = BuildContentVersionDto(entity)
-                                  };
+            {
+                Newest = true,
+                NodeId = entity.Id,
+                Published = entity.Published,
+                Text = entity.Name,
+                UpdateDate = entity.UpdateDate,
+                WriterUserId = entity.WriterId,
+                VersionId = entity.Version,
+                ExpiresDate = null,
+                ReleaseDate = null,
+                ContentVersionDto = BuildContentVersionDto(entity)
+            };
 
             if (entity.Template != null && entity.Template.Id > 0)
                 documentDto.TemplateId = entity.Template.Id;

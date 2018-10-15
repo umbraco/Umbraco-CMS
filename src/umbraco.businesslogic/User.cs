@@ -1,19 +1,14 @@
 using System;
 using System.Collections;
-using System.Web.Caching;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using umbraco.DataLayer;
+using Umbraco.Core.Persistence.Querying;
 
 namespace umbraco.BusinessLogic
 {
@@ -72,7 +67,7 @@ namespace umbraco.BusinessLogic
         {
             SetupUser(getUserId(Login));
         }
-
+        
         private void SetupUser(int ID)
         {
             UserEntity = ApplicationContext.Current.Services.UserService.GetUserById(ID);
@@ -260,6 +255,19 @@ namespace umbraco.BusinessLogic
             }
         }
 
+        /// <summary>
+        /// Gets the security stamp
+        /// </summary>
+        /// <value>The loginname.</value>
+        internal string SecurityStamp
+        {
+            get
+            {
+                if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+                return UserEntity.SecurityStamp;
+            }            
+        }
+
         private static bool EnsureUniqueLoginName(string loginName, User currentUser)
         {
             User[] u = User.getAllByLoginName(loginName);
@@ -315,24 +323,6 @@ namespace umbraco.BusinessLogic
                 return (tmp != null);
             }
         }
-
-        /// <summary>
-        /// Gets or sets the type of the user.
-        /// </summary>
-        /// <value>The type of the user.</value>
-        public UserType UserType
-        {
-            get
-            {
-                if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return new UserType(UserEntity.UserType);
-            }
-            set
-            {
-                UserEntity.UserType = value.UserTypeItem;
-            }
-        }
-
 
         /// <summary>
         /// Gets all users
@@ -450,10 +440,9 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The full name.</param>
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
-        /// <param name="ut">The user type.</param>
-        public static User MakeNew(string name, string lname, string passw, UserType ut)
+        public static User MakeNew(string name, string lname, string passw)
         {
-            var user = new Umbraco.Core.Models.Membership.User(name, "", lname, passw, ut.UserTypeItem);
+            var user = new Umbraco.Core.Models.Membership.User(name, "", lname, passw);
             ApplicationContext.Current.Services.UserService.Save(user);
 
             var u = new User(user);
@@ -470,10 +459,9 @@ namespace umbraco.BusinessLogic
         /// <param name="lname">The lname.</param>
         /// <param name="passw">The passw.</param>
         /// <param name="email">The email.</param>
-        /// <param name="ut">The ut.</param>        
-        public static User MakeNew(string name, string lname, string passw, string email, UserType ut)
+        public static User MakeNew(string name, string lname, string passw, string email)
         {
-            var user = new Umbraco.Core.Models.Membership.User(name, email, lname, passw, ut.UserTypeItem);
+            var user = new Umbraco.Core.Models.Membership.User(name, email, lname, passw);
             ApplicationContext.Current.Services.UserService.Save(user);
 
             var u = new User(user);
@@ -490,8 +478,7 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The name.</param>
         /// <param name="lname">The lname.</param>
         /// <param name="email">The email.</param>
-        /// <param name="ut">The ut.</param>
-        public static void Update(int id, string name, string lname, string email, UserType ut)
+        public static void Update(int id, string name, string lname, string email)
         {
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
@@ -501,11 +488,10 @@ namespace umbraco.BusinessLogic
             found.Name = name;
             found.Username = lname;
             found.Email = email;
-            found.UserType = ut.UserTypeItem;
             ApplicationContext.Current.Services.UserService.Save(found);
         }
 
-        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole, UserType ut)
+        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole)
         {
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
@@ -515,7 +501,6 @@ namespace umbraco.BusinessLogic
             found.Name = name;
             found.Username = lname;
             found.Email = email;
-            found.UserType = ut.UserTypeItem;
             found.IsApproved = disabled == false;
             found.IsLockedOut = noConsole;
             ApplicationContext.Current.Services.UserService.Save(found);
@@ -593,32 +578,15 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Gets the users permissions based on a nodes path
         /// </summary>
-        /// <param name="Path">The path.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public string GetPermissions(string Path)
+        public string GetPermissions(string path)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            var defaultPermissions = UserType.DefaultPermissions;
-
-            var cachedPermissions = ApplicationContext.Current.Services.UserService.GetPermissions(UserEntity)
-                .ToArray();
-
-            // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
-            // set for the current node
-            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1)) : int.Parse(Path);
-            if (cachedPermissions.Any(x => x.EntityId == nodeId))
-            {
-                var found = cachedPermissions.First(x => x.EntityId == nodeId);
-                return string.Join("", found.AssignedPermissions);
-            }
-
-            // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (string.IsNullOrEmpty(defaultPermissions) && Path == "-1")
-                defaultPermissions = "F";
-
-            // else return default user type cruds
-            return defaultPermissions;
+            var userService = ApplicationContext.Current.Services.UserService;
+            return string.Join("",
+                userService.GetPermissionsForPath(UserEntity, path).GetAllPermissions());
         }
 
         /// <summary>
@@ -690,58 +658,35 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Clears the list of applications the user has access to, ensure to call Save afterwords
+        /// Clears the list of groups the user is in, ensure to call Save afterwords
         /// </summary>
-        public void ClearApplications()
+        public void ClearGroups()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            foreach (var s in UserEntity.AllowedSections.ToArray())
-            {
-                UserEntity.RemoveAllowedSection(s);
-            }
+            UserEntity.ClearGroups();
         }
 
         /// <summary>
-        /// Clears the list of applications the user has access to.
+        /// Adds a group to the list of groups for the user, ensure to call Save() afterwords
         /// </summary>
-        [Obsolete("This method will implicitly cause a database save and will reset the current user's dirty property, do not use this method, use the ClearApplications method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
-        public void clearApplications()
+        public void AddGroup(string groupAlias)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-
-            foreach (var s in UserEntity.AllowedSections.ToArray())
-            {
-                UserEntity.RemoveAllowedSection(s);
-            }
-
-            //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(UserEntity);
+            var group = ApplicationContext.Current.Services.UserService.GetUserGroupByAlias(groupAlias);
+            if (group != null)
+                UserEntity.AddGroup(group.ToReadOnlyGroup());
         }
 
         /// <summary>
-        /// Adds a application to the list of allowed applications, ensure to call Save() afterwords
+        /// Returns the assigned user group aliases for the user
         /// </summary>
-        /// <param name="appAlias"></param>
-        public void AddApplication(string appAlias)
+        /// <returns></returns>
+        public string[] GetGroups()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            UserEntity.AddAllowedSection(appAlias);
+            return UserEntity.Groups.Select(x => x.Alias).ToArray();
         }
 
-        /// <summary>
-        /// Adds a application to the list of allowed applications
-        /// </summary>
-        /// <param name="AppAlias">The app alias.</param>
-        [Obsolete("This method will implicitly cause a multiple database saves and will reset the current user's dirty property, do not use this method, use the AddApplication method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
-        public void addApplication(string AppAlias)
-        {
-            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-
-            UserEntity.AddAllowedSection(AppAlias);
-
-            //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(UserEntity);
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has access to the Umbraco back end.
@@ -776,39 +721,32 @@ namespace umbraco.BusinessLogic
                 UserEntity.IsApproved = value == false;
             }
         }
-
-        /// <summary>
-        /// <summary>
-        /// Gets or sets the start content node id.
-        /// </summary>
-        /// <value>The start node id.</value>
+        
+        [Obsolete("This should not be used, it will return invalid data because a user can have multiple start nodes, this will only return the first")]
         public int StartNodeId
         {
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartContentId;
+                return UserEntity.StartContentIds == null || UserEntity.StartContentIds.Length == 0 ? -1 : UserEntity.StartContentIds[0];
             }
             set
             {
-                UserEntity.StartContentId = value;
+                UserEntity.StartContentIds = new int[] { value };
             }
         }
 
-        /// <summary>
-        /// Gets or sets the start media id.
-        /// </summary>
-        /// <value>The start media id.</value>
+        [Obsolete("This should not be used, it will return invalid data because a user can have multiple start nodes, this will only return the first")]
         public int StartMediaId
         {
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return UserEntity.StartMediaId;
+                return UserEntity.StartMediaIds == null || UserEntity.StartMediaIds.Length == 0 ? -1 : UserEntity.StartMediaIds[0];
             }
             set
             {
-                UserEntity.StartMediaId = value;
+                UserEntity.StartMediaIds = new int[] { value };
             }
         }
 
@@ -838,6 +776,23 @@ namespace umbraco.BusinessLogic
             return new User(result);
         }
 
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups and the IUserService instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void AddApplication(string appAlias)
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            UserEntity.AddAllowedSection(appAlias);
+        }
+
+        [Obsolete("This method will implicitly cause a multiple database saves and will reset the current user's dirty property, do not use this method, use the AddApplication method instead and then call Save() when you are done performing all user changes to persist the chagnes in one transaction")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void addApplication(string AppAlias)
+        {
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+            UserEntity.AddAllowedSection(AppAlias);
+            //For backwards compatibility this requires an implicit save
+            ApplicationContext.Current.Services.UserService.Save(UserEntity);
+        }
 
         //EVENTS
         /// <summary>

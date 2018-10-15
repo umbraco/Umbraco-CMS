@@ -36,6 +36,7 @@ namespace umbraco.cms.businesslogic.macro
         /// </summary>
         public MacroProperty()
         {
+            Key = Guid.NewGuid();
         }
 
         /// <summary>
@@ -76,6 +77,11 @@ namespace umbraco.cms.businesslogic.macro
         public int Id { get; private set; }
 
         /// <summary>
+        /// Gets the key.
+        /// </summary>
+        public Guid Key { get; set; }
+
+        /// <summary>
         /// Gets or sets the macro.
         /// </summary>
         /// <value>The macro.</value>
@@ -95,7 +101,8 @@ namespace umbraco.cms.businesslogic.macro
                 if (_type == null)
                 {
                     //we'll try to create one based on the resolved new parameter editors
-                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias);
+                    // we need to show the depracated ones for backwards compatibility
+                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias, true);
                     if (found == null)
                     {
                         return null;
@@ -147,10 +154,11 @@ namespace umbraco.cms.businesslogic.macro
         private void Setup()
         {
             using (var sqlHelper = Application.SqlHelper)
-            using (var dr = sqlHelper.ExecuteReader("select macro, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", sqlHelper.CreateParameter("@id", Id)))
+            using (var dr = sqlHelper.ExecuteReader("select uniqueId, macro, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", sqlHelper.CreateParameter("@id", Id)))
             {
                 if (dr.Read())
                 {
+                    Key = dr.GetGuid("uniqueId");
                     Macro = new Macro(dr.GetInt("macro"));
                     SortOrder = (int)dr.GetByte("macroPropertySortOrder");
                     Alias = dr.GetString("macroPropertyAlias");

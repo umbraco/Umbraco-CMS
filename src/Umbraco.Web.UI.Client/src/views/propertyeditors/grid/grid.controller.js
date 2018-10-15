@@ -1,6 +1,21 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
+    function (
+        $scope,
+        $http,
+        assetsService,
+        localizationService,
+        $rootScope,
+        dialogService,
+        gridService,
+        mediaResource,
+        imageHelper,
+        $timeout,
+        umbRequestHelper,
+        angularHelper,
+        $element,
+        eventsService
+    ) {
 
         // Grid status variables
         var placeHolder = "";
@@ -81,6 +96,7 @@ angular.module("umbraco")
 
         var notIncludedRte = [];
         var cancelMove = false;
+        var startingArea;
 
         $scope.sortableOptionsCell = {
             distance: 10,
@@ -112,9 +128,11 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
-                var allowedEditors = $(event.target).scope().area.allowed;
+                var area = $(event.target).scope().area;
+                var allowedEditors = area.allowed;
 
-                if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
+                if (($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                        (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                     $scope.$apply(function () {
                         $(event.target).scope().area.dropNotAllowed = true;
@@ -168,6 +186,10 @@ angular.module("umbraco")
 
             start: function (e, ui) {
 
+                //Get the starting area for reference
+                var area = $(e.target).scope().area;
+                startingArea = area;
+
                 // fade out control when sorting
                 ui.item.context.style.display = "block";
                 ui.item.context.style.opacity = "0.5";
@@ -196,7 +218,7 @@ angular.module("umbraco")
                 // Fade in control when sorting stops
                 ui.item.context.style.opacity = "1";
 
-                ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
+                ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr("id"));
@@ -254,15 +276,17 @@ angular.module("umbraco")
        $scope.openEditorOverlay = function(event, area, index, key) {
           $scope.editorOverlay = {
               view: "itempicker",
-              filter: false,
+              filter: area.$allowedEditors.length > 15,
               title: localizationService.localize("grid_insertControl"),
               availableItems: area.$allowedEditors,
               event: event,
               show: true,
-              submit: function(model) {
-                  $scope.addControl(model.selectedItem, area, index);
-                  $scope.editorOverlay.show = false;
-                  $scope.editorOverlay = null;
+              submit: function (model) {
+                  if (model.selectedItem) {
+                      $scope.addControl(model.selectedItem, area, index);
+                      $scope.editorOverlay.show = false;
+                      $scope.editorOverlay = null;
+                  }
               }
           };
        };
@@ -311,7 +335,7 @@ angular.module("umbraco")
             }
         }
 
-        $scope.addRow = function (section, layout) {
+        $scope.addRow = function (section, layout, isInit) {
 
             //copy the selected layout into the rows collection
             var row = angular.copy(layout);
@@ -323,10 +347,13 @@ angular.module("umbraco")
             if (row) {
                 section.rows.push(row);
             }
-
-            currentForm.$setDirty();
+            if (!isInit) {
+                currentForm.$setDirty();
+            }
 
             $scope.showRowConfigurations = false;
+
+            eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
         };
 
@@ -577,6 +604,8 @@ angular.module("umbraco")
 
             cell.controls.push(newControl);
 
+            eventsService.emit("grid.itemAdded", { scope: $scope, element: $element, cell: cell, item: newControl });
+
         };
 
         $scope.addTinyMce = function (cell) {
@@ -633,16 +662,16 @@ angular.module("umbraco")
             var clear = true;
 
             //settings indicator shortcut
-            if ( ($scope.model.config.items.config && $scope.model.config.items.config.length > 0) || ($scope.model.config.items.styles && $scope.model.config.items.styles.length > 0)) {
+            if (($scope.model.config.items.config && $scope.model.config.items.config.length > 0) || ($scope.model.config.items.styles && $scope.model.config.items.styles.length > 0)) {
                 $scope.hasSettings = true;
             }
 
             //ensure the grid has a column value set,
             //if nothing is found, set it to 12
-            if ($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)) {
-                $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
-            } else {
+            if (!$scope.model.config.items.columns){
                 $scope.model.config.items.columns = 12;
+            } else if (angular.isString($scope.model.config.items.columns)) {
+                $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0 && $scope.model.value.sections[0].rows && $scope.model.value.sections[0].rows.length > 0) {
@@ -702,7 +731,7 @@ angular.module("umbraco")
             if (!section.rows || section.rows.length === 0) {
                 section.rows = [];
                 if(section.$allowedLayouts.length === 1){
-                    $scope.addRow(section, section.$allowedLayouts[0]);
+                    $scope.addRow(section, section.$allowedLayouts[0], true);
                 }
             } else {
                 _.forEach(section.rows, function (row, index) {
@@ -853,12 +882,25 @@ angular.module("umbraco")
         gridService.getGridEditors().then(function (response) {
             $scope.availableEditors = response.data;
 
+            //Localize the grid editor names
+            angular.forEach($scope.availableEditors, function (value, key) {
+                //If no translation is provided, keep using the editor name from the manifest
+                if (localizationService.dictionary.hasOwnProperty("grid_" + value.alias)) {
+                    value.name = localizationService.localize("grid_" + value.alias);
+                }
+            });
+
             $scope.contentReady = true;
 
             // *********************************************
             // Init grid
             // *********************************************
+
+            eventsService.emit("grid.initializing", { scope: $scope, element: $element });
+
             $scope.initContent();
+
+            eventsService.emit("grid.initialized", { scope: $scope, element: $element });
 
         });
 

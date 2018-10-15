@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 logger,
                 configuredVersion,
                 targetVersion,
-                GlobalSettings.UmbracoMigrationName,
+                Constants.System.UmbracoMigrationName,
                 //pass in explicit migrations
                 new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(sql, logger),
                 new DeleteAppTables(sql, logger),

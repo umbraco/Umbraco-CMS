@@ -5,8 +5,8 @@ namespace umbraco.interfaces
 	/// <summary>
 	/// Summary description for ActionI.
 	/// </summary>
-	public interface IAction
-	{
+	public interface IAction : IDiscoverable
+    {
 		char Letter {get;}
 		bool ShowInNotifier {get;}
 		bool CanBePermissionAssigned {get;}

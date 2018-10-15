@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
-    [Migration("7.3.0", 15, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.3.0", 15, Constants.System.UmbracoMigrationName)]
     public class RemoveUmbracoLoginsTable : MigrationBase
     {
         public RemoveUmbracoLoginsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger)

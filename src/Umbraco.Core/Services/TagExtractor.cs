@@ -9,10 +9,15 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// A simple utility class to extract the tag values from a property/property editor and set them on the content
+    /// A utility class to extract the tag values from a property/property editor and set them on the content
     /// </summary>
-    internal class TagExtractor
+    public class TagExtractor
     {
+        /// <summary>
+        /// Will return the <see cref="SupportTagsAttribute"/> for the given <see cref="PropertyEditor"/>
+        /// </summary>
+        /// <param name="propEd"></param>
+        /// <returns></returns>
         public static SupportTagsAttribute GetAttribute(PropertyEditor propEd)
         {
             if (propEd == null) return null;
@@ -23,9 +28,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sets the tag values on the content property based on the property editor's tags attribute
         /// </summary>
-        /// <param name="property"></param>
-        /// <param name="propertyData"></param>
-        /// <param name="convertedPropertyValue"></param>
+        /// <param name="property">The content's Property</param>
+        /// <param name="propertyData">The data that has been submitted to be saved for a content property</param>
+        /// <param name="convertedPropertyValue">
+        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string, 
+        /// otherwise if it is <see cref="TagValueType.CustomTagList"/> then this is expected to be IEnumerable{string}
+        /// </param>
         /// <param name="attribute"></param>
         public static void SetPropertyTags(Property property, ContentPropertyData propertyData, object convertedPropertyValue, SupportTagsAttribute attribute)
         {
@@ -51,7 +59,20 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public static void SetPropertyTags(Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType, TagCacheStorageType storageType)
+        /// <summary>
+        /// Sets the tag values on the content property based on the property editor's tags attribute
+        /// </summary>
+        /// <param name="property">The content's Property</param>
+        /// <param name="convertedPropertyValue">
+        /// If the <see cref="TagValueType"/> is <see cref="TagValueType.FromDelimitedValue"/> then this is expected to be a delimited string, 
+        /// otherwise if it is <see cref="TagValueType.CustomTagList"/> then this is expected to be IEnumerable{string}
+        /// </param>
+        /// <param name="delimiter">The delimiter for the value if convertedPropertyValue is a string delimited value</param>
+        /// <param name="replaceTags">Whether or not to replace the tags with the new value or append them (true to replace, false to append)</param>
+        /// <param name="tagGroup">The tag group to use when tagging</param>
+        /// <param name="valueType">Defines how the tag values will be extracted</param>
+        /// <param name="storageType">Defines how to store the tags in cache (CSV or Json)</param>
+        internal static void SetPropertyTags(Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType, TagCacheStorageType storageType)
         {
             if (convertedPropertyValue == null)
             {
@@ -65,7 +86,7 @@ namespace Umbraco.Core.Services
                     property.SetTags(storageType, property.Alias, tags, replaceTags, tagGroup);
                     break;
                 case TagValueType.CustomTagList:
-                    //for this to work the object value must be IENumerable<string>
+                    //for this to work the object value must be IEnumerable<string>
                     var stringList = convertedPropertyValue as IEnumerable<string>;
                     if (stringList != null)
                     {

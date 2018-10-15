@@ -1,24 +1,27 @@
 <div ng-controller="Umbraco.PrevalueEditors.TreePickerController" class="umb-editor umb-contentpicker">
 
-	<ul class="unstyled list-icons" 
-		ng-model="renderModel">	
-		<li ng-repeat="node in renderModel">
-			
-			<i class="icon icon-delete red hover-show pull-right" ng-click="remove($index)"></i>
+	<div ng-model="renderModel">
+		<umb-node-preview
+			ng-repeat="node in renderModel"
+			icon="node.icon"
+			name="node.name"
+			published="node.published"
+			description="node.path"
+			sortable="sortable"
+			allow-remove="allowRemove"
+			allow-edit="allowEdit"
+			on-remove="remove($index)"
+			on-edit="openContentPicker()">
+		</umb-node-preview>
+	</div>
 
-			<i class="icon {{node.icon}} hover-hide"></i>
-			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
-		</li>
-	</ul>
-
-	<ul class="unstyled list-icons" ng-show="multipicker || renderModel.length === 0">	
-		<li>
-			<i class="icon icon-add blue"></i>
-			<a href ng-click="openContentPicker()" prevent-default>
-				<localize key="general_add">Add</localize>
-			</a>
-		</li>
-	</ul>
+	<a ng-show="model.config.multiPicker === true || renderModel.length === 0"
+		class="umb-node-preview-add"
+		href=""
+		ng-click="openContentPicker()"
+		prevent-default>
+		<localize key="general_add">Add</localize>
+	</a>
 
 	<umb-overlay
 		ng-if="treePickerOverlay.show"

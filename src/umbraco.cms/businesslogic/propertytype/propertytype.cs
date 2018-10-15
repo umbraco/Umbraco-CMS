@@ -56,7 +56,7 @@ namespace umbraco.cms.businesslogic.propertytype
         {
             var found = ApplicationContext.Current.DatabaseContext.Database
                 .SingleOrDefault<dynamic>(
-                    "Select mandatory, DataTypeId, propertyTypeGroupId, contentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
+                    "Select mandatory as mandatory, dataTypeId as dataTypeId, propertyTypeGroupId as propertyTypeGroupId, contentTypeId as contentTypeId, sortOrder as sortOrder, alias as alias, name as name, validationRegExp as validationRegExp, description as description from cmsPropertyType where id=@id",
                     new {id = id});
 
             if (found == null)
@@ -76,7 +76,7 @@ namespace umbraco.cms.businesslogic.propertytype
             _alias = found.alias;
             _name = found.name;
             _validationRegExp = found.validationRegExp;
-            _DataTypeId = found.DataTypeId;
+            _DataTypeId = found.dataTypeId;
             _contenttypeid = found.contentTypeId;
             _description = found.description;
         }

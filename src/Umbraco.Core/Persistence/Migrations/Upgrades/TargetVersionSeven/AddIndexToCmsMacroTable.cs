@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// <summary>
     /// Creates a unique index on the macro alias so we cannot have duplicates by alias
     /// </summary>
-    [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 4, Constants.System.UmbracoMigrationName)]
     public class AddIndexToCmsMacroTable : MigrationBase
     {
         private readonly bool _forTesting;
@@ -30,13 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         public override void Up()
         {
             var dbIndexes = _forTesting ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             //make sure it doesn't already exist
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias")) == false)

@@ -14,12 +14,12 @@
 }
 
 .umb-checkbox-list__item:hover {
-    background-color: @grayLighter;
+    background-color: @gray-10;
 }
 
 .umb-checkbox-list__item.-selected,
 .umb-checkbox-list__item.-disabled {
-    background-color: fade(@blueDark, 4%);
+    background-color: @gray-10;
     font-weight: bold;
 }
 
@@ -28,22 +28,21 @@
   justify-content: center;
   align-items: center;
   flex: 0 0 30px;
-  height: 30px;
-  margin-right: 10px;
-}
-
-.umb-checkbox-list__item-checkbox.-selected {
-  background: @blue;
+  margin-right: 5px;
 }
 
 .umb-checkbox-list__item-icon {
   margin-right: 5px;
+  font-size: 16px;
 }
 
 .umb-checkbox-list__item-text {
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 0;
   flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
 }
 
 .umb-checkbox-list__item-text.-faded {
@@ -55,14 +54,14 @@
 }
 
 .umb-checkbox-list__item-caption {
-    font-size: 11px;
+    font-size: 12px;
     margin-left: 2px;
 }
 
 .umb-checkbox-list__no-data {
   text-align: center;
   padding-top: 50px;
-  color: #ccc;
+  color: @gray-7;
   font-size: 16px;
   line-height: 1.8em;
 }

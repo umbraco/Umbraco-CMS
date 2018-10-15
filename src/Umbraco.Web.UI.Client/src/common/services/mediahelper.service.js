@@ -365,6 +365,28 @@ function mediaHelper(umbRequestHelper) {
 
            return newFileTypesArray.join(",");
 
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#getFileExtension
+         * @methodOf umbraco.services.mediaHelper
+         * @function
+         *
+         * @description
+         * Returns file extension
+         *
+         * @param {string} filePath File path, ex /media/1234/my-image.jpg
+         */
+        getFileExtension: function(filePath) {
+
+            if (!filePath) {
+                return false;
+            }
+
+            var lowered = filePath.toLowerCase();
+            var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
+            return ext;
         }
         
     };

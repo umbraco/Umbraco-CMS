@@ -17,11 +17,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// <param name="configFilePath">The absolute file location of the configuration file</param>
         /// <param name="xPath">The XPath to select the value</param>
         /// <returns></returns>
-        public ConfigurationService(string configFilePath, string xPath)
+        public ConfigurationService(string configFilePath, string xPath, ILocalizedTextService textService)
         {
             _configFilePath = configFilePath;
             _xPath = xPath;
-            _textService = UmbracoContext.Current.Application.Services.TextService;
+            _textService = textService;
         }
 
         /// <summary>

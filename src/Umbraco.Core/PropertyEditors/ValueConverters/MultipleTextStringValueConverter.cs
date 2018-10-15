@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IEnumerable<string>))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
@@ -16,6 +17,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
         }
+
+        private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -37,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // splitting by newline
             //
             //   RS: SD/Stephan Please consider post before deciding to remove 
-            //// https://our.umbraco.org/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
+            //// https://our.umbraco.com/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
             var values = new List<string>();
             var pos = sourceString.IndexOf("<value>", StringComparison.Ordinal);
             while (pos >= 0)
@@ -52,7 +55,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Fall back on normal behaviour
             if (values.Any() == false)
             {
-                return sourceString.Split(Environment.NewLine.ToCharArray());
+                return sourceString.Split(NewLineDelimiters, StringSplitOptions.None);
             }
 
             return values.ToArray();

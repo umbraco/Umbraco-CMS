@@ -133,7 +133,66 @@ namespace Umbraco.Web.Editors
                 .ToList();
         }
 
+        /// <summary>
+        /// Returns a list of content types where a particular composition content type is used
+        /// </summary>
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="contentTypeId">Id of composition content type</param>
+        /// <returns></returns>
+        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
+            UmbracoObjectTypes type)
+        {
+            IContentTypeComposition source = null;
 
+            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
+
+            IContentTypeComposition[] allContentTypes;
+
+            switch (type)
+            {
+                case UmbracoObjectTypes.DocumentType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MediaType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MemberType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.MemberTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("The entity type was not a content type");
+            }
+
+            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+           return contentTypesWhereCompositionIsUsed
+                .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
+                .Select(x =>
+                {
+                    //translate the name
+                    x.Name = TranslateItem(x.Name);               
+
+                    return x;
+                })
+                .ToList();
+        }
         protected string TranslateItem(string text)
         {
             if (text == null)
@@ -168,9 +227,9 @@ namespace Umbraco.Web.Editors
             // works since that is based on aliases.
             var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
+            if (exists && (ctId == 0 || ct.Alias.InvariantEquals(contentTypeSave.Alias) == false))
             {
-                ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
             }
 
             //now let the external validators execute

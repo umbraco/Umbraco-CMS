@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI;
+using Semver;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -22,6 +23,7 @@ namespace Umbraco.Web.Install
 {
     internal class InstallHelper
     {
+        private static HttpClient _httpClient;
         private readonly UmbracoContext _umbContext;
         private InstallationType? _installationType;
 
@@ -29,7 +31,6 @@ namespace Umbraco.Web.Install
         {
             _umbContext = umbContext;
         }
-
 
         /// <summary>
         /// Get the installer steps
@@ -43,14 +44,15 @@ namespace Umbraco.Web.Install
             return new List<InstallSetupStep>
             {
                 new NewInstallStep(_umbContext.HttpContext, _umbContext.Application),
-                new UpgradeStep(),
+                new UpgradeStep(_umbContext.Application),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),
                 new Version73FileCleanup(_umbContext.HttpContext, _umbContext.Application.ProfilingLogger.Logger),
                 new DatabaseConfigureStep(_umbContext.Application),
+                new ConfigureMachineKey(_umbContext.Application),
                 new DatabaseInstallStep(_umbContext.Application),
                 new DatabaseUpgradeStep(_umbContext.Application),
-                new StarterKitDownloadStep(_umbContext.Application),
+                new StarterKitDownloadStep(_umbContext.Application, _umbContext.Security, _umbContext.HttpContext),
                 new StarterKitInstallStep(_umbContext.Application, _umbContext.HttpContext),
                 new StarterKitCleanupStep(_umbContext.Application),
                 new SetUmbracoVersionStep(_umbContext.Application, _umbContext.HttpContext),
@@ -146,7 +148,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false)
                 {
@@ -190,17 +192,17 @@ namespace Umbraco.Web.Install
 
         internal IEnumerable<Package> GetStarterKits()
         {
-            var packages = new List<Package>();
+            if (_httpClient == null)
+                _httpClient = new HttpClient();
 
+            var packages = new List<Package>();
             try
             {
-                var requestUri = string.Format("http://our.umbraco.org/webapi/StarterKit/Get/?umbracoVersion={0}",
-                    UmbracoVersion.Current);
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                using (var httpClient = new HttpClient())
-                using (var response = httpClient.SendAsync(request).Result)
                 {
+                    var response = _httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }

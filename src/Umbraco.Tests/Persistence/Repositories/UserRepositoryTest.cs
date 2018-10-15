@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,13 +31,39 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
+        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out IMediaTypeRepository mediaTypeRepository)
         {
-            userTypeRepository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, userTypeRepository);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var repository = new MediaRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository)
+        {
+            ITemplateRepository tr;
+            return CreateContentRepository(unitOfWork, out contentTypeRepository, out tr);
+        }
+
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
+        {
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            return repository;
+        }
+
+        private UserRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        {
+            var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return repository;
+        }
+
+        private UserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork unitOfWork)
+        {
+            return new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+        }
 
         [Test]
         public void Can_Perform_Add_On_UserRepository()
@@ -46,11 +71,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
 
                 // Act
                 repository.AddOrUpdate(user);
@@ -62,17 +85,47 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Add_With_Group()
+        {
+            var group = MockedUserGroup.CreateUserGroup();
+
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateUserGroupRepository(unitOfWork))
+            {
+                repository.AddOrUpdate(group);
+                unitOfWork.Commit();
+            }
+
+            using (var repository = CreateRepository(unitOfWork))
+            {                
+                IUser user = MockedUser.CreateUser();
+                user.AddGroup(group.ToReadOnlyGroup());
+
+                // Act
+                repository.AddOrUpdate(user);
+                unitOfWork.Commit();
+
+                user = repository.Get(user.Id);
+
+                // Assert
+                Assert.That(user.HasIdentity, Is.True);
+                Assert.AreEqual(1, user.Groups.Count());
+                Assert.AreEqual(group.Alias, user.Groups.ElementAt(0).Alias);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-
-                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
-                var use2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2");
+                var user1 = MockedUser.CreateUser("1");
+                var use2 = MockedUser.CreateUser("2");
 
                 // Act
                 repository.AddOrUpdate(user1);
@@ -92,10 +145,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
 
@@ -111,49 +163,63 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Update_On_UserRepository()
         {
+            var ct = MockedContentTypes.CreateBasicContentType("test");
+            var content = MockedContent.CreateBasicContent(ct);
+            var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
+            var media = MockedMedia.CreateSimpleMedia(mt, "asdf", -1);
+
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            IContentTypeRepository contentTypeRepo;
+            IMediaTypeRepository mediaTypeRepo;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepo))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepo))
+            using (contentTypeRepo)
+            using(mediaTypeRepo)
+            using (var userRepository = CreateRepository(unitOfWork))
+            using (var userGroupRepository = CreateUserGroupRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
-                repository.AddOrUpdate(user);
+                contentTypeRepo.AddOrUpdate(ct);
+                mediaTypeRepo.AddOrUpdate(mt);
                 unitOfWork.Commit();
 
+                contentRepository.AddOrUpdate(content);
+                mediaRepository.AddOrUpdate(media);
+                unitOfWork.Commit();
+
+                var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository, unitOfWork);
+
                 // Act
-                var resolved = (User)repository.Get((int)user.Id);
+                var resolved = (User)userRepository.Get((int)user.Id);
 
                 resolved.Name = "New Name";
-                //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
-                //resolved.DefaultPermissions = "ZYX";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.RawPasswordValue = "new";
                 resolved.IsLockedOut = true;
-                resolved.StartContentId = 10;
-                resolved.StartMediaId = 11;
+                resolved.StartContentIds = new[] { content.Id };
+                resolved.StartMediaIds = new[] { media.Id };
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
-                resolved.RemoveAllowedSection("content");
 
-                repository.AddOrUpdate(resolved);
+                userRepository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = (User)repository.Get((int)user.Id);
+                var updatedItem = (User)userRepository.Get((int)user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
                 Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-                //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
                 Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
                 Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(resolved.RawPasswordValue));
                 Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
-                Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
-                Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
+                Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(resolved.StartContentIds));
+                Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds));
                 Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
                 Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
-                Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(1));
+                Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
+                Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
                 Assert.IsTrue(updatedItem.AllowedSections.Contains("media"));
             }
         }
@@ -164,19 +230,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
 
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
+                var user = MockedUser.CreateUser();
 
                 // Act
                 repository.AddOrUpdate(user);
                 unitOfWork.Commit();
                 var id = user.Id;
 
-                using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
+                using (var repository2 = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
                 {
                     repository2.Delete(user);
                     unitOfWork.Commit();
@@ -195,8 +259,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //    // Arrange
         //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
         //    var unitOfWork = provider.GetUnitOfWork();
-        //    UserTypeRepository userTypeRepository;
-        //using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+        //using (var repository = CreateRepository(unitOfWork))
         //{
 
         //    var user = MockedUser.CreateUser(CreateAndCommitUserType());
@@ -225,15 +288,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
+            using (var userGroupRepository = CreateUserGroupRepository(unitOfWork))
             {
-                var user = MockedUser.CreateUser(CreateAndCommitUserType());
-                repository.AddOrUpdate(user);
-                unitOfWork.Commit();
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository, unitOfWork);
 
                 // Act
-                var updatedItem = repository.Get((int) user.Id);
+                var updatedItem = repository.Get((int)user.Id);
 
                 // Assert
                 AssertPropertyValues(updatedItem, user);
@@ -246,8 +307,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -266,8 +326,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -287,8 +346,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -308,8 +366,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -327,8 +384,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
@@ -337,166 +393,71 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.Count(query);
 
                 // Assert
-                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                Assert.AreEqual(2, result);
             }
         }
 
         [Test]
-        public void Can_Remove_Section_For_User()
+        public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+                var query = Query<IUser>.Builder.Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+
+                try
+                {
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            filter: Query<IUser>.Builder.Where(x => x.Id > -1));
+
+                    // Assert
+                    Assert.AreEqual(2, totalRecs);
+                }
+                finally
+                {
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_With_Filter_And_Groups()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
-                // Act
+                try
+                {
+                    DatabaseContext.Database.EnableSqlTrace = true;
+                    DatabaseContext.Database.EnableSqlCount();
 
-                //add and remove a few times, this tests the internal collection
-                users[0].RemoveAllowedSection("content");
-                users[0].RemoveAllowedSection("content");
-                users[0].AddAllowedSection("content");
-                users[0].RemoveAllowedSection("content");
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        filter: Query<IUser>.Builder.Where(x => x.Id == 0));
 
-                users[1].RemoveAllowedSection("media");
-                users[1].RemoveAllowedSection("media");
-
-                repository.AddOrUpdate(users[0]);
-                repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
-
-                // Assert
-                var result = repository.GetAll((int) users[0].Id, (int) users[1].Id).ToArray();
-                Assert.AreEqual(1, result[0].AllowedSections.Count());
-                Assert.AreEqual("media", result[0].AllowedSections.First());
-                Assert.AreEqual(1, result[1].AllowedSections.Count());
-                Assert.AreEqual("content", result[1].AllowedSections.First());
-            }
-        }
-
-        [Test]
-        public void Can_Add_Section_For_User()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
-            {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
-
-                // Act
-
-                //add and remove a few times, this tests the internal collection
-                users[0].AddAllowedSection("settings");
-                users[0].AddAllowedSection("settings");
-                users[0].RemoveAllowedSection("settings");
-                users[0].AddAllowedSection("settings");
-
-                users[1].AddAllowedSection("developer");
-
-                //add the same even though it's already there
-                users[2].AddAllowedSection("content");
-
-                repository.AddOrUpdate(users[0]);
-                repository.AddOrUpdate(users[1]);
-                unitOfWork.Commit();
-
-                // Assert
-                var result = repository.GetAll((int) users[0].Id, (int) users[1].Id, (int) users[2].Id).ToArray();
-                Assert.AreEqual(3, result[0].AllowedSections.Count());
-                Assert.IsTrue(result[0].AllowedSections.Contains("content"));
-                Assert.IsTrue(result[0].AllowedSections.Contains("media"));
-                Assert.IsTrue(result[0].AllowedSections.Contains("settings"));
-                Assert.AreEqual(3, result[1].AllowedSections.Count());
-                Assert.IsTrue(result[1].AllowedSections.Contains("content"));
-                Assert.IsTrue(result[1].AllowedSections.Contains("media"));
-                Assert.IsTrue(result[1].AllowedSections.Contains("developer"));
-                Assert.AreEqual(2, result[2].AllowedSections.Count());
-                Assert.IsTrue(result[1].AllowedSections.Contains("content"));
-                Assert.IsTrue(result[1].AllowedSections.Contains("media"));
-            }
-        }
-
-        [Test]
-        public void Can_Update_Section_For_User()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
-            {
-                var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
-
-                // Act
-
-                users[0].RemoveAllowedSection("content");
-                users[0].AddAllowedSection("settings");
-
-                repository.AddOrUpdate(users[0]);
-                unitOfWork.Commit();
-
-                // Assert
-                var result = repository.Get((int) users[0].Id);
-                Assert.AreEqual(2, result.AllowedSections.Count());
-                Assert.IsTrue(result.AllowedSections.Contains("settings"));
-                Assert.IsTrue(result.AllowedSections.Contains("media"));
-            }
-        }
-
-
-        [Test]
-        public void Get_Users_Assigned_To_Section()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            UserTypeRepository userTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
-            {
-                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
-                var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2", "media", "settings");
-                var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3", "test", "settings");
-                repository.AddOrUpdate(user1);
-                repository.AddOrUpdate(user2);
-                repository.AddOrUpdate(user3);
-                unitOfWork.Commit();
-
-                // Act
-
-                var users = repository.GetUsersAssignedToSection("test");
-
-                // Assert            
-                Assert.AreEqual(2, users.Count());
-                var names = users.Select(x => x.Username).ToArray();
-                Assert.IsTrue(names.Contains("TestUser1"));
-                Assert.IsTrue(names.Contains("TestUser3"));
-            }
-        }
-
-        [Test]
-        public void Default_User_Permissions_Based_On_User_Type()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo))
-            { 
-
-                // Act
-                var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
-                repository.AddOrUpdate(user1);
-                unitOfWork.Commit();
-
-                // Assert
-                Assert.AreEqual(3, user1.DefaultPermissions.Count());
-                Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
-                Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
-                Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
+                    // Assert
+                    Assert.AreEqual(1, totalRecs);
+                }
+                finally
+                {
+                    DatabaseContext.Database.EnableSqlTrace = false;
+                    DatabaseContext.Database.DisableSqlCount();
+                }
             }
         }
 
@@ -504,13 +465,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
-            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
             Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
-            Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
-            Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
+            Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
+            Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
@@ -518,29 +478,30 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
         }
 
+        private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository, IDatabaseUnitOfWork unitOfWork)
+        {
+            
+            var user = MockedUser.CreateUser();
+            repository.AddOrUpdate(user);
+            unitOfWork.Commit();
+
+            var group = MockedUserGroup.CreateUserGroup();
+            userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] {user.Id});
+            unitOfWork.Commit();
+
+            return user;
+        }
+
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository, IUnitOfWork unitOfWork)
         {
-            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
-            var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2");
-            var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3");
+            var user1 = MockedUser.CreateUser("1");
+            var user2 = MockedUser.CreateUser("2");
+            var user3 = MockedUser.CreateUser("3");
             repository.AddOrUpdate(user1);
             repository.AddOrUpdate(user2);
             repository.AddOrUpdate(user3);
             unitOfWork.Commit();
             return new IUser[] { user1, user2, user3 };
-        }
-
-        private IUserType CreateAndCommitUserType()
-        {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
-            {
-                var userType = MockedUserType.CreateUserType();
-                repository.AddOrUpdate(userType);
-                unitOfWork.Commit();
-                return userType;
-            }
         }
     }
 }

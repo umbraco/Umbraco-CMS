@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,7 +9,9 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Security
 {
@@ -27,23 +30,24 @@ namespace Umbraco.Core.Security
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
+            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
             return CheckPassword(password, hashedPassword);
         }
 
         /// <summary>
-        /// Providers can override this setting, default is 7
+        /// Providers can override this setting, default is 10
         /// </summary>
         public virtual int DefaultMinPasswordLength
         {
-            get { return 7; }
+            get { return 10; }
         }
 
         /// <summary>
-        /// Providers can override this setting, default is 1
+        /// Providers can override this setting, default is 0
         /// </summary>
         public virtual int DefaultMinNonAlphanumericChars
         {
-            get { return 1; }
+            get { return 0; }
         }
 
         /// <summary>
@@ -64,6 +68,19 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
 
+        /// <summary>
+        /// Returns the raw password value for a given user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will return an invalid attempt, inheritors will need to override this to support it
+        /// </remarks>
+        protected virtual Attempt<string> GetRawPassword(string username)
+        {
+            return Attempt<string>.Fail();
+        }
+
         private string _applicationName;
         private bool _enablePasswordReset;
         private bool _enablePasswordRetrieval;
@@ -76,7 +93,8 @@ namespace Umbraco.Core.Security
         private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
         private string _customHashAlgorithmType ;
-        internal bool UseLegacyEncoding;
+
+        public bool UseLegacyEncoding { get; private set; }
 
         #region Properties
 
@@ -222,7 +240,7 @@ namespace Umbraco.Core.Security
             base.Initialize(name, config);
 
             _enablePasswordRetrieval = config.GetValue("enablePasswordRetrieval", false);
-            _enablePasswordReset = config.GetValue("enablePasswordReset", false);
+            _enablePasswordReset = config.GetValue("enablePasswordReset", true);
             _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
@@ -297,7 +315,7 @@ namespace Umbraco.Core.Security
         /// Processes a request to update the password for a membership user.
         /// </summary>
         /// <param name="username">The user to update the password for.</param>
-        /// <param name="oldPassword">This property is ignore for this provider</param>
+        /// <param name="oldPassword">Required to change a user password if the user is not new and AllowManuallyChangingPassword is false</param>
         /// <param name="newPassword">The new password for the specified user.</param>
         /// <returns>
         /// true if the password was updated successfully; otherwise, false.
@@ -307,10 +325,17 @@ namespace Umbraco.Core.Security
         /// </remarks>       
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
+            string rawPasswordValue = string.Empty;
             if (oldPassword.IsNullOrWhiteSpace() && AllowManuallyChangingPassword == false)
             {
-                //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
-                throw new NotSupportedException("This provider does not support manually changing the password");
+                //we need to lookup the member since this could be a brand new member without a password set
+                var rawPassword = GetRawPassword(username);
+                rawPasswordValue = rawPassword.Success ? rawPassword.Result : string.Empty;
+                if (rawPassword.Success == false || rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix) == false)
+                {
+                    //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
+                    throw new NotSupportedException("This provider does not support manually changing the password");
+                }
             }
 
             var args = new ValidatePasswordEventArgs(username, newPassword, false);
@@ -321,6 +346,18 @@ namespace Umbraco.Core.Security
                 if (args.FailureInformation != null)
                     throw args.FailureInformation;
                 throw new MembershipPasswordException("Change password canceled due to password validation failure.");
+            }
+
+            //Special cases to allow changing password without validating existing credentials
+            // * the member is new and doesn't have a password set
+            // * during installation to set the admin password
+            if (AllowManuallyChangingPassword == false
+                && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
+                    || (ApplicationContext.Current != null
+                        && ApplicationContext.Current.IsConfigured == false
+                        && oldPassword == "default")))
+            {
+                return PerformChangePassword(username, oldPassword, newPassword);
             }
 
             if (AllowManuallyChangingPassword == false)
@@ -511,7 +548,11 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            if (EnablePasswordReset == false)
+            var userService = ApplicationContext.Current == null ? null : ApplicationContext.Current.Services.UserService;
+
+            var canReset = this.CanResetPassword(userService);                
+
+            if (canReset == false)
             {
                 throw new NotSupportedException("Password reset is not supported");
             }
@@ -638,11 +679,7 @@ namespace Umbraco.Core.Security
 
         internal static bool IsEmailValid(string email)
         {
-            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
-                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
-                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
-
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return new EmailAddressAttribute().IsValid(email);
         }
 
         protected internal string EncryptOrHashPassword(string pass, string salt)
@@ -659,7 +696,7 @@ namespace Umbraco.Core.Security
             if (PasswordFormat == MembershipPasswordFormat.Clear)
                 return pass;
             var bytes = Encoding.Unicode.GetBytes(pass);
-            var numArray1 = Convert.FromBase64String(salt);
+            var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
             if (PasswordFormat == MembershipPasswordFormat.Hashed)
@@ -669,22 +706,27 @@ namespace Umbraco.Core.Security
                 if (algorithm != null)
                 {
                     var keyedHashAlgorithm = algorithm;
-                    if (keyedHashAlgorithm.Key.Length == numArray1.Length)
-                        keyedHashAlgorithm.Key = numArray1;
-                    else if (keyedHashAlgorithm.Key.Length < numArray1.Length)
+                    if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
                     {
+                        //if the salt bytes is the required key length for the algorithm, use it as-is
+                        keyedHashAlgorithm.Key = saltBytes;
+                    }
+                    else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
+                    {
+                        //if the salt bytes is too long for the required key length for the algorithm, reduce it
                         var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                        Buffer.BlockCopy(numArray1, 0, numArray2, 0, numArray2.Length);
+                        Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
                         keyedHashAlgorithm.Key = numArray2;
                     }
                     else
                     {
+                        //if the salt bytes is too short for the required key length for the algorithm, extend it
                         var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
                         var dstOffset = 0;
                         while (dstOffset < numArray2.Length)
                         {
-                            var count = Math.Min(numArray1.Length, numArray2.Length - dstOffset);
-                            Buffer.BlockCopy(numArray1, 0, numArray2, dstOffset, count);
+                            var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
+                            Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
                             dstOffset += count;
                         }
                         keyedHashAlgorithm.Key = numArray2;
@@ -693,9 +735,9 @@ namespace Umbraco.Core.Security
                 }
                 else
                 {
-                    var buffer = new byte[numArray1.Length + bytes.Length];
-                    Buffer.BlockCopy(numArray1, 0, buffer, 0, numArray1.Length);
-                    Buffer.BlockCopy(bytes, 0, buffer, numArray1.Length, bytes.Length);
+                    var buffer = new byte[saltBytes.Length + bytes.Length];
+                    Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
+                    Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
                     inArray = hashAlgorithm.ComputeHash(buffer);
                 }
             }
@@ -703,9 +745,9 @@ namespace Umbraco.Core.Security
             {
                 //this code is copied from the sql membership provider - pretty sure this could be nicely re-written to completely
                 // ignore the salt stuff since we are not salting the password when encrypting.
-                var password = new byte[numArray1.Length + bytes.Length];
-                Buffer.BlockCopy(numArray1, 0, password, 0, numArray1.Length);
-                Buffer.BlockCopy(bytes, 0, password, numArray1.Length, bytes.Length);
+                var password = new byte[saltBytes.Length + bytes.Length];
+                Buffer.BlockCopy(saltBytes, 0, password, 0, saltBytes.Length);
+                Buffer.BlockCopy(bytes, 0, password, saltBytes.Length, bytes.Length);
                 inArray = EncryptPassword(password, MembershipPasswordCompatibilityMode.Framework40);
             }
             return Convert.ToBase64String(inArray);
@@ -719,6 +761,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         protected internal bool CheckPassword(string password, string dbPassword)
         {
+            if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "dbPassword");
             switch (PasswordFormat)
             {
                 case MembershipPasswordFormat.Encrypted:
@@ -780,6 +823,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         internal string StoredPassword(string storedString, out string salt)
         {
+            if (string.IsNullOrWhiteSpace(storedString)) throw new ArgumentException("Value cannot be null or whitespace.", "storedString");
             if (UseLegacyEncoding)
             {
                 salt = string.Empty;

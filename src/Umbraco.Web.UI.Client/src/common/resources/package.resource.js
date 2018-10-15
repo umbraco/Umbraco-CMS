@@ -57,7 +57,7 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.packageInstallResource
          *
          * @description
-         * Downloads a package file from our.umbraco.org to the website server.
+         * Downloads a package file from our.umbraco.com to the website server.
          * 
          * ##usage
          * <pre>
@@ -121,6 +121,16 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                       "packageInstallApiBaseUrl",
                       "InstallFiles"), package),
               'Failed to install package. Error during the step "InstallFiles" ');
+        }, 
+
+        checkRestart: function (package) {
+
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "packageInstallApiBaseUrl",
+                "CheckRestart"), package),
+            'Failed to install package. Error during the step "CheckRestart" ');
         }, 
 
         installData: function (package) {

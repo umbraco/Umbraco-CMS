@@ -1,0 +1,59 @@
+<div class="umb-package-details">
+    <div class="umb-package-details__main-content">
+        <umb-box data-element="node-info-urls">
+            <umb-box-header title-key="general_links"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-empty-state
+                    ng-if="!nodeUrl"
+                    size="small">
+                    <localize key="content_noMediaLink"></localize>
+                </umb-empty-state>
+
+                <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
+                    <li>
+                        <a href="{{nodeUrl}}" target="_blank">
+                            <i class="icon icon-window-popin"></i>
+                            <span>{{nodeUrl}}</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </umb-box-content>
+        </umb-box>
+
+    </div>
+
+    <div class="umb-package-details__sidebar">
+        <umb-box data-element="node-info-general">
+            <umb-box-header title-key="general_general"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@content_createDate">
+                    {{node.createDateFormatted}} by {{ node.owner.name }}
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-update-date" label="@content_updateDate">
+                    {{node.updateDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group data-element="node-info-media-type" label="@content_mediatype">
+                    <umb-node-preview
+                        style="max-width: 100%; margin-bottom: 0px;"
+                        icon="node.icon"
+                        name="node.contentTypeName"
+                        allow-open="allowOpen"
+                        on-open="openMediaType(mediaType)">
+                    </umb-node-preview>
+                </umb-control-group>
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
+                    <div>{{ node.id }}</div>
+                    <small>{{ node.key }}</small>
+                </umb-control-group>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+
+</div>

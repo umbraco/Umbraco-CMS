@@ -1,17 +1,16 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Content = umbraco.cms.businesslogic.Content;
-using Umbraco.Core;
 
 namespace umbraco.editorControls
 {
@@ -91,7 +90,7 @@ namespace umbraco.editorControls
             //now check the file type
             var extension = Path.GetExtension(postedFile.FileName).TrimStart(".");
 
-            return UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
+            return UmbracoConfig.For.UmbracoSettings().Content.IsFileAllowedForUpload(extension);
         }
 
         public string Text

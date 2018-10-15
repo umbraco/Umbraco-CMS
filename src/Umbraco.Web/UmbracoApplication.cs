@@ -34,9 +34,9 @@ namespace Umbraco.Web
 	            var appPluginFolder = IOHelper.MapPath("~/App_Plugins/");
 	            if (Directory.Exists(appPluginFolder))
 	            {
-                    _mw = new ManifestWatcher(LoggerResolver.Current.Logger);
-                    _mw.Start(Directory.GetDirectories(IOHelper.MapPath("~/App_Plugins/")));
-                }
+                        _mw = new ManifestWatcher(LoggerResolver.Current.Logger);
+                        _mw.Start(Directory.GetDirectories(appPluginFolder));
+                    }
 	        }
 	    }
 

@@ -1,0 +1,21 @@
+<div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable, 'umb-node-preview--unpublished': published === false }">
+    <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
+    <div class="umb-node-preview__content">
+        
+        <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
+        <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
+
+        <div class="umb-user-group-preview__permission" ng-if="permissions">
+            <span>
+                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
+                <span ng-repeat="permission in permissions">{{ permission.name }}<span ng-if="!$last">, </span></span>
+            </span>
+        </div>
+    </div>
+    <div class="umb-node-preview__actions">
+        <a class="umb-node-preview__action" title="Edit" href="{{editUrl}}" ng-if="allowEdit"  ng-click="onEdit()"><localize key="general_edit">Edit</localize></a>
+        <a class="umb-node-preview__action" title="Open" href="{{openUrl}}" ng-if="allowOpen"  ng-click="onOpen()"><localize key="general_open">Open</localize></a>
+        <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" href="{{removeUrl}}" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></i></a>
+    </div>
+
+</div>
