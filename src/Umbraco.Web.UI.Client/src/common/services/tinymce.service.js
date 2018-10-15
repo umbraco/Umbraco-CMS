@@ -184,12 +184,45 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                 plugins.push("autoresize");
                 plugins.push("noneditable");
 
+                var modeTheme = '';
+                var modeInline = false;
+
+
+                //Based on mode set
+                //classic = Theme: modern, inline: false
+                //inline = Theme: modern, inline: true,
+                //distraction-free = Theme: inlite, inline: true
+                switch (args.mode) {
+                    case "classic":
+                        modeTheme  = "modern";
+                        modeInline = false;
+                        break;
+
+                    case "inline":
+                        modeTheme = "modern";
+                        modeInline = true;
+                        break;
+
+                    case "distraction-free":
+                        modeTheme = "inlite";
+                        modeInline = true;
+                        break;
+
+                    default:
+                        //Will default to 'classic'
+                        modeTheme  = "modern";
+                        modeInline = false;
+                        break;
+                }
+
+
+
                 //create a baseline Config to exten upon
                 var config = {
                     //fixed_toolbar_container: "#blah",
                     selector: "#" + args.htmlId,
-                    theme: args.theme ? args.theme : "modern",
-                    inline: true,
+                    theme: modeTheme,
+                    inline: modeInline,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
                     invalid_elements: tinyMceConfig.inValidElements,

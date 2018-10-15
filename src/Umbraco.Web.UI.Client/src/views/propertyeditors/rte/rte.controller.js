@@ -75,7 +75,7 @@ angular.module("umbraco")
                 htmlId: $scope.textAreaHtmlId,
                 stylesheets: editorConfig.stylesheets,
                 toolbar: editorConfig.toolbar,
-                theme: editorConfig.theme
+                mode: editorConfig.mode
             }));
 
             //wait for queue to end
