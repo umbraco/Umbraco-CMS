@@ -382,10 +382,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (orderDirection == Direction.Descending)
                 {
                     sortedSql.OrderByDescending("CustomPropData.CustomPropVal");
+                    sortedSql.OrderByDescending("umbracoNode.id");
                 }
                 else
                 {
                     sortedSql.OrderBy("CustomPropData.CustomPropVal");
+                    sortedSql.OrderBy("umbracoNode.id");
                 }
             }
 
