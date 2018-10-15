@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout) {
+    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $locale, $timeout) {
         return {
             scope: {
                 uniqueId: '=',
@@ -97,6 +97,44 @@ angular.module("umbraco.directives")
 
                         //stores a reference to the editor
                         var tinyMceEditor = null;
+
+                        // these languages are available for localization
+                        var availableLanguages = [
+                            'da',
+                            'de',
+                            'en',
+                            'en_us',
+                            'fi',
+                            'fr',
+                            'he',
+                            'it',
+                            'ja',
+                            'nl',
+                            'no',
+                            'pl',
+                            'pt',
+                            'ru',
+                            'sv',
+                            'zh'
+                        ];
+
+                        //define fallback language
+                        var language = 'en_us';
+                        //get locale from angular and match tinymce format. Angular localization is always in the format of ru-ru, de-de, en-gb, etc.
+                        //wheras tinymce is in the format of ru, de, en, en_us, etc.
+                        var localeId = $locale.id.replace('-', '_');
+                        //try matching the language using full locale format
+                        var languageMatch = _.find(availableLanguages, function (o) { return o === localeId; });
+                        //if no matches, try matching using only the language
+                        if (languageMatch === undefined) {
+                            var localeParts = localeId.split('_');
+                            languageMatch = _.find(availableLanguages, function (o) { return o === localeParts[0]; });
+                        }
+                        //if a match was found - set the language
+                        if (languageMatch !== undefined) {
+                            language = languageMatch;
+                        }
+
                         $q.all(await).then(function () {
 
                             var uniqueId = scope.uniqueId;
@@ -116,8 +154,10 @@ angular.module("umbraco.directives")
                                 content_css: stylesheets,
                                 style_formats: styleFormats,
                                 autoresize_bottom_margin: 0,
+                                language: language,
                                 //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
-                                cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
+                                cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
+                                directionality: Umbraco.Sys.ServerVariables.application.isRtl ? "rtl" : "ltr"
                             };
 
 

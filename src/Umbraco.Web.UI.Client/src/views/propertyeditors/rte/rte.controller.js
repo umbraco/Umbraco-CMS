@@ -159,7 +159,8 @@ angular.module("umbraco")
                     style_formats: styleFormats,
                     language: language,
                     //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
-                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster,
+                    directionality: Umbraco.Sys.ServerVariables.application.isRtl ? "rtl" : "ltr"
                 };
 
                 if (tinyMceConfig.customConfig) {
@@ -207,6 +208,7 @@ angular.module("umbraco")
                     //enable browser based spell checking
                     editor.on('init', function (e) {
                         editor.getBody().setAttribute('spellcheck', true);
+
                     });
 
                     //We need to listen on multiple things here because of the nature of tinymce, it doesn't
