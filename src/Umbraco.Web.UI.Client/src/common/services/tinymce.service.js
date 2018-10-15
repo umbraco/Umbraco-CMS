@@ -192,11 +192,6 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                         modeInline = false;
                         break;
 
-                    case "inline":
-                        modeTheme = "modern";
-                        modeInline = true;
-                        break;
-
                     case "distraction-free":
                         modeTheme = "inlite";
                         modeInline = true;
