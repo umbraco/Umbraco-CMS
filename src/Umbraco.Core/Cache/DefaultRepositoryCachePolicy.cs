@@ -46,9 +46,9 @@ namespace Umbraco.Core.Cache
             return string.Format("uRepo_{0}_", typeof(TEntity).Name);
         }
 
-        protected virtual void InsertEntity(string cacheKey, TEntity entity)
+        protected virtual void InsertEntity(TEntity entity)
         {
-            Cache.InsertCacheItem(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            InsertCacheItem(entity);
         }
 
         protected virtual void InsertEntities(TId[] ids, TEntity[] entities)
@@ -65,8 +65,7 @@ namespace Umbraco.Core.Cache
                 // individually cache each item
                 foreach (var entity in entities)
                 {
-                    var capture = entity;
-                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => capture, TimeSpan.FromMinutes(5), true);
+                    InsertCacheItem(entity);
                 }
             }
         }
@@ -80,11 +79,7 @@ namespace Umbraco.Core.Cache
             {
                 persistNew(entity);
 
-                // just to be safe, we cannot cache an item without an identity
-                if (entity.HasIdentity)
-                {
-                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
-                }
+                InsertCacheItem(entity);
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                 Cache.ClearCacheItem(GetEntityTypeCacheKey());
@@ -112,11 +107,7 @@ namespace Umbraco.Core.Cache
             {
                 persistUpdated(entity);
 
-                // just to be safe, we cannot cache an item without an identity
-                if (entity.HasIdentity)
-                {
-                    Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
-                }
+                InsertCacheItem(entity);
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                 Cache.ClearCacheItem(GetEntityTypeCacheKey());
@@ -166,7 +157,7 @@ namespace Umbraco.Core.Cache
             var entity = performGet(id);
 
             if (entity != null && entity.HasIdentity)
-                InsertEntity(cacheKey, entity);
+                InsertEntity(entity);
 
             return entity;
         }
@@ -245,6 +236,20 @@ namespace Umbraco.Core.Cache
         public override void ClearAll()
         {
             Cache.ClearAllCache();
+        }
+
+        private void InsertCacheItem(IEntity entity)
+        {
+            // just to be safe, we cannot cache an item without an identity
+            if (entity.HasIdentity == false)
+            {
+                return;
+            }
+
+            // update the cache by id and key, as both can be used for lookup
+            const int ttl = 5;
+            Cache.InsertCacheItem(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(ttl), true);
+            Cache.InsertCacheItem(GetEntityCacheKey(entity.Key), () => entity, TimeSpan.FromMinutes(ttl), true);
         }
     }
 }
