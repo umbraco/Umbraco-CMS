@@ -41,11 +41,12 @@
         </div>
     </umb-control-group>
 
-    <umb-control-group label="Theme" description="Select theme">
+    <umb-control-group label="Mode" description="Select mode">
         <div class="vertical-align-items">
             <select ng-model="model.value.theme">
-                <option value="modern">Modern</option>
-                <option value="inlite">Inline</option>
+                <option value="modern">Classic</option> <!-- Theme:modern & inline:false-->
+                <option value="modern">Inline</option> <!-- Theme:modern & inline:true -->
+                <option value="inlite">Distraction Free</option> <!-- Theme:inlite & inline:true -->
             </select>
         </div>
     </umb-control-group>
