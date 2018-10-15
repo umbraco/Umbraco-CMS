@@ -1,36 +1,23 @@
 // Styles for the RTE, the whole stylesheet is used in Tiny and these are specific to it's content
 // -------------------------
 
-.umb-rte {
-    overflow: hidden;
+.umb-rte .mce-tinymce {
+    box-shadow: none;
 }
 
 .umb-rte .umb-rte-editor{
     border:1px solid @gray-8;
-    min-height:25px;
+    min-height: 100px;
 }
 
 .umb-rte.mce-content-body {
-    padding: 10px;
-    background-color: #fff;
-    font-size: 14px;
+    background-color: @white;
     line-height: 1.5em;
-    scrollbar-3dlight-color: #f0f0ee;
-    scrollbar-arrow-color: #676662;
-    scrollbar-base-color: #f0f0ee;
-    scrollbar-darkshadow-color: #ddd;
-    scrollbar-face-color: #e0e0dd;
-    scrollbar-highlight-color: #f0f0ee;
-    scrollbar-shadow-color: #f0f0ee;
-    scrollbar-track-color: #f5f5f5;
 }
 
 /* loader for macro loading in tinymce*/
 .umb-rte.mce-content-body .umb-macro-holder.loading {
     background: url(img/loader.gif) right no-repeat;
-    -moz-background-size: 18px;
-    -o-background-size: 18px;
-    -webkit-background-size: 18px;
     background-size: 18px;
     background-position-x: 99%;
 }

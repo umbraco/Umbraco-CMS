@@ -44,12 +44,6 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
         var styleFormats = [];
         var promises = [$q.when(true)]; //a collection of promises, the first one is an empty promise
 
-        //get the umbraco stylesheet loaded and use that href to inject into tinymce.
-        //strip off the query string since tiny will append our cache buster itself.
-        stylesheets.push(_.find(document.styleSheets, function (s) {
-            return s.href && s.href.indexOf("assets/css/umbraco.css") !== -1
-        }).href.split("?")[0]);
-
         //queue rules loading
         if (configuredStylesheets) {
             angular.forEach(configuredStylesheets, function (val, key) {
@@ -230,7 +224,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     menubar: false,
                     statusbar: false,
                     relative_urls: false,
-                    autoresize_bottom_margin: 0,
+                    autoresize_bottom_margin: 10,
                     content_css: styles.stylesheets,
                     style_formats: styles.styleFormats,
                     language: getLanguage(),
