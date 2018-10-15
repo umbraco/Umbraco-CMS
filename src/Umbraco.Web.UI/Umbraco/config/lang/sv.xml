@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
@@ -85,7 +85,6 @@
     <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="select">Välj</key>
-    <key alias="selectCurrentFolder">Välj aktuell mapp</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
     <key alias="somethingElse">Ångra</key>
@@ -158,7 +157,7 @@
     <key alias="target">Mål</key>
     <key alias="titleOptional">Titel (valfritt)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Avpublicera</key>
+    <key alias="unpublish">Avpublicera</key>
     <key alias="unpublishDate">Avpubliceras</key>
     <key alias="updateDate">Senast redigerad</key>
     <key alias="updateDateDesc">Datum/tid detta dokument ändrats</key>
@@ -190,27 +189,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -267,18 +261,11 @@
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowAtRoot">Tillåt i roten</key>
-    <key alias="allowAtRootDesc">Endast innehållstyper med denna markerad kan skapas i roten av innehåll samt media</key>
     <key alias="allowedchildnodetypes">Tillåtna typer för underliggande noder</key>
-    <key alias="contenttypecompositions">Dokumenttypssammansättning</key>
     <key alias="create">Skapa</key>
     <key alias="createListView">Skapa en anpassad listvy</key>
-    <key alias="currentListView">Aktuell listvy</key>
-    <key alias="currentListViewDesc">Datatyp för markerad listvy</key>
     <key alias="deletetab">Ta bort flik</key>
     <key alias="description">Beskrivning</key>
-    <key alias="hasListView">Aktivera listvy</key>
-    <key alias="hasListViewDesc">Konfigurerar innehållet till att visa en sorterbar &amp; sökbar lista av nodens barn, barnen kommer ej att visas i trädet.</key>
     <key alias="newtab">Ny flik</key>
     <key alias="removeListView">Radera anpassad listvy</key>
     <key alias="tab">Flik</key>
@@ -315,12 +302,9 @@
     <key alias="contentTypeAliasAndNameNotNull">Du måste ange både alias och namn för den nya egenskapstypen!</key>
     <key alias="dissallowedMediaType">Filtypen är icke godkännd av administratören</key>
     <key alias="filePermissionsError">Ett fel upptäcktes i läsningen/skrivningen till den aktuella filen eller mappen</key>
-    <key alias="missingPropertyEditorErrorMessage">Det finns ett konfigurationsfel med datatypen som används för denna egenskapen, vänligen undersök datatypen</key>
     <key alias="missingTitle">Du måste skriva en rubrik</key>
     <key alias="missingType">Du måste välja en typ</key>
     <key alias="pictureResizeBiggerThanOrg">Du kommer att göra bilden större än originalstorleken. Är du säker på att du vill fortsätta?</key>
-    <key alias="pythonErrorHeader">Ett fel inträffade i pythonscriptet</key>
-    <key alias="pythonErrorText">Pythonscriptet har inte sparats eftersom det innehåller ett eller flera fel.</key>
     <key alias="startNodeDoesNotExists">Startsidan har tagits bort, var vänlig kontakta administratören</key>
     <key alias="stylesMustMarkBeforeSelect">Du måste markera något innan du kan göra stiländringar</key>
     <key alias="stylesNoStylesOnPage">Det finns inga tillgängliga stilar</key>
@@ -380,7 +364,6 @@
     <key alias="logoff">Logga ut</key>
     <key alias="logout">Logga ut</key>
     <key alias="macro">Makro</key>
-    <key alias="more">Fler</key>
     <key alias="move">Flytta</key>
     <key alias="name">Namn</key>
     <key alias="new">Nytt</key>
@@ -519,7 +502,6 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
-    <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
@@ -537,7 +519,6 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
-    <key alias="dropFilesHere">Släpp dina filer här...</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -600,7 +581,6 @@
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
-    <key alias="usernamehint">Ditt användarnamn är vanligtvis din e-postadress</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
@@ -649,7 +629,7 @@
     <key alias="saveCrop">spara beskärning</key>
     <key alias="addCrop">Lägg till ny beskärning</key>
   </area>
-    <area alias="rollback">
+  <area alias="rollback">
     <key alias="currentVersion">Nuvarande version</key>
     <key alias="diffHelp"><![CDATA[Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet har återgått till en tidigare version</key>
@@ -662,7 +642,6 @@
     <key alias="editscript">Redigera script</key>
   </area>
   <area alias="sections">
-    <key alias="analytics">Analytics</key>
     <key alias="concierge">Concierge</key>
     <key alias="content">Innehåll</key>
     <key alias="courier">Courier</key>
@@ -695,8 +674,6 @@
     <key alias="tab">Flik</key>
     <key alias="tabname">Fliknamn</key>
     <key alias="tabs">Flikar</key>
-    <key alias="masterDocumentType">Huvuddokumenttyp</key>
-    <key alias="createMatchingTemplate">Skapa matchande mall</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sort order</key>
@@ -746,10 +723,6 @@
     <key alias="partialViewErrorText">Ett fel uppstod när filen sparades</key>
     <key alias="partialViewSavedHeader">Partial view sparad</key>
     <key alias="partialViewSavedText">Partial view sparad utan fel!</key>
-    <key alias="pythonErrorHeader">Pythonscriptet har inte sparats</key>
-    <key alias="pythonErrorText">Pythonscriptet kunde inte sparas på grund av ett fel</key>
-    <key alias="pythonSavedHeader">Pythonscriptet har sparats</key>
-    <key alias="pythonSavedText">Inga fel i pythonscriptet</key>
     <key alias="templateErrorHeader">Sidmallen har inte sparats</key>
     <key alias="templateErrorText">Kontrollera att du inte har två sidmallar med samma alias</key>
     <key alias="templateSavedHeader">Sidmallen har sparats</key>
@@ -775,18 +748,13 @@
     <key alias="template">Sidmall</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">Lägg till</key>
     <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
-    <key alias="stylesApplied">Styles applied</key>
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
@@ -807,7 +775,6 @@
     <key alias="settingsDetails">Konfigurera vilka inställningar redaktörer kan ändra</key>
     <key alias="styles">Stilar</key>
     <key alias="stylesDetails">Konfigurera vilken styling redaktörer kan ändra</key>
-    <key alias="settingDialogDetails">Inställningarna kommer bara att sparas om det inmatade json-konfigurationen är giltig</key>
     <key alias="allowAllEditors">Tillåt alla editors</key>
     <key alias="allowAllRowConfigurations">Tillåt alla rad- konfigurationer</key>
   </area>
@@ -842,24 +809,14 @@
     <key alias="withTime">Ja, med tid. Separator:</key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">Arbetsuppgifter som tilldelats dig</key>
-    <key alias="assignedTasksHelp"><![CDATA[Listan nedan visar de översättningsjobb <strong>som har tilldelats dig</strong>. För att se en detaljvy med kommentarer, klicka på "Detaljer" eller på sidans namn. Du kan också ladda ned sidan i XML-format genom att klicka på länken "Ladda ned XML".<br/> För att markera ett översättningsjobb som avslutat, gå till detaljvyn och klicka på knappen "Stäng".]]></key>
-    <key alias="closeTask">Stäng arbetsuppgift</key>
     <key alias="details">Översättningsdetaljer</key>
-    <key alias="downloadAllAsXml">Ladda ned alla översättningsjobb i XML-format</key>
-    <key alias="downloadTaskAsXml">Ladda ned i XML-format</key>
     <key alias="DownloadXmlDTD">Ladda hem DTD för XML</key>
     <key alias="fields">Fält</key>
     <key alias="includeSubpages">Inkludera undersidor</key>
     <key alias="mailBody">Hej %0%. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1%' till '%5%' skickad av %2%. För att redigera, besök http://%3%/translation/details.aspx?id=%4%. För att få en översikt över dina översättningsuppgigter loggar du in i Umbraco på: http://%3%</key>
-    <key alias="mailSubject">[%0%] Översättningsuppgift för %1%</key>
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
-    <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>
-    <key alias="ownedTasksHelp"><![CDATA[Listan nedan visar sidor <strong>som du har skapat</strong>. För att se en detaljvy med kommentarer, klicka på "Detaljer" eller på sidans namn. Du kan också ladda ned sidan i XML-format genom att klicka på länken "Ladda ned XML".<br/> För att markera ett översättningsjobb som avslutat, gå till detaljvyn och klicka på knappen "Stäng".]]></key>
     <key alias="pageHasBeenSendToTranslation">Sidan %0% har skickats för översättning</key>
     <key alias="sendToTranslate">Skicka sidan %0% för översättning</key>
-    <key alias="taskAssignedBy">Tilldelat av</key>
-    <key alias="taskOpened">Arbetsuppgift öppnad</key>
     <key alias="totalWords">Totalt antal ord</key>
     <key alias="translateTo">Översätt till</key>
     <key alias="translationDone">Översättning klar.</key>
@@ -870,7 +827,6 @@
     <key alias="uploadTranslationXml">Ladda upp översättning i XML-format</key>
   </area>
   <area alias="treeHeaders">
-    <key alias="analytics">Analytics</key>
     <key alias="cacheBrowser">Cacha webbläsare</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>
@@ -890,7 +846,6 @@
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="packager">Paket</key>
     <key alias="packages">Paket</key>
-    <key alias="python">Python-filer</key>
     <key alias="repositories">Installera från gemensamt bibliotek</key>
     <key alias="runway">Installera Runway</key>
     <key alias="runwayModules">Runway-moduler</key>
@@ -948,7 +903,6 @@
     <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
-    <key alias="translator">Översättare</key>
     <key alias="yourProfile">Din profil</key>
   </area>
 </language>

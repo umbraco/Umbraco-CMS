@@ -92,7 +92,6 @@ namespace Umbraco.Web.Services
                                 doc.Root.Add(new XElement("add",
                                     new XAttribute("alias", attr.Alias),
                                     new XAttribute("name", attr.Name),
-                                    new XAttribute("icon", attr.Icon),
                                     new XAttribute("sortOrder", attr.SortOrder)));
                                 count++;
                             }
@@ -201,7 +200,7 @@ namespace Umbraco.Web.Services
                 }, true);
 
                 //raise event
-                OnNew(new Section(name, alias, icon, sortOrder), new EventArgs());
+                OnNew(new Section(name, alias, sortOrder), new EventArgs());
             }
         }
 
@@ -255,7 +254,6 @@ namespace Umbraco.Web.Services
                     var sortOrderAttr = addElement.Attribute("sortOrder");
                     tmp.Add(new Section(addElement.Attribute("name").Value,
                                         addElement.Attribute("alias").Value,
-                                        addElement.Attribute("icon").Value,
                                         sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
                 }
                 return false;
@@ -300,7 +298,7 @@ namespace Umbraco.Web.Services
                     //we need to interrogate the attributes for the data. Would be better to have a base class that contains
                     //metadata populated by the attribute. Oh well i guess.
                     var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single());
-                    return Enumerable.ToArray<Section>(attrs.Select(x => new Section(x.Name, x.Alias, x.Icon, x.SortOrder)));
+                    return Enumerable.ToArray<Section>(attrs.Select(x => new Section(x.Name, x.Alias, x.SortOrder)));
                 });
             }
 

@@ -360,6 +360,19 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
+                // look for cycles - within write-lock
+                if (language.FallbackLanguageId.HasValue)
+                {
+                    var languages = _languageRepository.GetMany().ToDictionary(x => x.Id, x => x);
+                    if (!languages.ContainsKey(language.FallbackLanguageId.Value))
+                        throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback id={language.FallbackLanguageId.Value} which is not a valid language id.");
+                    if (CreatesCycle(language, languages))
+                        throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback {languages[language.FallbackLanguageId.Value].IsoCode} as it would create a fallback cycle.");
+                }
+
                 var saveEventArgs = new SaveEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
                 {
@@ -377,6 +390,20 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
+        {
+            // a new language is not referenced yet, so cannot be part of a cycle
+            if (!language.HasIdentity) return false;
+
+            var id = language.FallbackLanguageId;
+            while (true) // assuming languages does not already contains a cycle, this must end
+            {
+                if (!id.HasValue) return false; // no fallback means no cycle
+                if (id.Value == language.Id) return true; // back to language = cycle!
+                id = languages[id.Value].FallbackLanguageId; // else keep chaining
+            }
+        }
+
         /// <summary>
         /// Deletes a <see cref="ILanguage"/> by removing it (but not its usages) from the db
         /// </summary>
@@ -386,6 +413,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
                 var deleteEventArgs = new DeleteEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
                 {
@@ -393,8 +423,7 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                //NOTE: There isn't any constraints in the db, so possible references aren't deleted
-
+                // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
                 _languageRepository.Delete(language);
                 deleteEventArgs.CanCancel = false;
 

@@ -1,4 +1,4 @@
-@using Umbraco.Core.Models
+@using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
@@ -9,13 +9,12 @@
     - It uses a custom Razor helper called Traverse() to select and display the markup and links.
 *@
 
-@{ var selection = Model.Content.Site(); }
+@{ var selection = Model.Content.Root(); }
 
 <div class="sitemap">
     @* Render the sitemap by passing the root node to the traverse helper, below *@
     @Traverse(selection)
 </div>
-
 
 @* Helper method to traverse through all descendants *@
 @helper Traverse(IPublishedContent node)

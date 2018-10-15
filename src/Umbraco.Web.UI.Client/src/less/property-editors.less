@@ -133,27 +133,6 @@ div.umb-codeeditor .umb-btn-toolbar {
 //
 // Color picker
 // --------------------------------------------------
-ul.color-picker li {
-    padding: 2px;
-    margin: 3px;
-    border: 2px solid transparent;
-    width: 60px;
-
-    .thumbnail{
-        min-width: auto;
-        width: inherit;
-        padding: 0;
-    }
-
-    a {
-        height: 50px;
-        display:flex;
-        align-items: center;
-        justify-content: center;
-        cursor:pointer;
-        margin: 0 0 5px;
-    }
-}
 
 /* pre-value editor */
 .control-group.color-picker-preval {
@@ -174,7 +153,7 @@ ul.color-picker li {
     div.color-picker-prediv {
         display: inline-flex;
         align-items: center;
-        max-width: 80%;
+        max-width: 85%;
 
         pre {
             display: inline-flex;
@@ -357,12 +336,29 @@ ul.color-picker li {
     text-align: center;
 }
 
-.umb-sortable-thumbnails .umb-icon-holder .icon{
+.umb-sortable-thumbnails .umb-icon-holder .icon {
     font-size: 40px;
     line-height: 50px;
     color: @gray-3;
     display: block;
 }
+
+.umb-sortable-thumbnails .umb-icon-holder .file-icon > span {
+    color: @white;
+    background: @gray-4;
+    padding: 1px 3px;
+    font-size: 10px;
+    line-height: 130%;
+    display: block;
+    margin-top: -30px;
+    width: 2em;
+}
+
+.umb-sortable-thumbnails .umb-icon-holder .file-icon + small {
+    display: block;
+    margin-top: 1em;
+}
+
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
     width: 124px;

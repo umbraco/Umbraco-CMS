@@ -17,6 +17,7 @@ namespace Umbraco.Web.Scheduling
 
     internal class ScheduledTasks : RecurringTaskBase
     {
+        private static HttpClient _httpClient;
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
@@ -65,35 +66,36 @@ namespace Umbraco.Web.Scheduling
 
         private async Task<bool> GetTaskByHttpAync(string url, CancellationToken token)
         {
-            using (var wc = new HttpClient())
+            if (_httpClient == null)
+                _httpClient = new HttpClient
+                {
+                    BaseAddress = _runtime.ApplicationUrl
+                };
+            
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            //TODO: pass custom the authorization header, currently these aren't really secured!
+            //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+
+            try
             {
-                // url could be relative, so better set a base url for the http client
-                wc.BaseAddress = _runtime.ApplicationUrl;
-
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-                //TODO: pass custom the authorization header, currently these aren't really secured!
-                //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
-
-                try
-                {
-                    var result = await wc.SendAsync(request, token).ConfigureAwait(false); // ConfigureAwait(false) is recommended? http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
-                    return result.StatusCode == HttpStatusCode.OK;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<ScheduledTasks>(ex, "An error occurred calling web task for url: {Url}", url);
-                }
-                return false;
+                var result = await _httpClient.SendAsync(request, token).ConfigureAwait(false); // ConfigureAwait(false) is recommended? http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
+                return result.StatusCode == HttpStatusCode.OK;
             }
+            catch (Exception ex)
+            {
+                    _logger.Error<ScheduledTasks>(ex, "An error occurred calling web task for url: {Url}", url);
+
+            }
+            return false;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
-                    _logger.Debug<ScheduledTasks>("Does not run on slave servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<ScheduledTasks>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
                     _logger.Debug<ScheduledTasks>("Does not run on servers with unknown role.");

@@ -80,13 +80,13 @@ namespace Umbraco.Core.Models
         bool IsCultureAvailable(string culture);
 
         /// <summary>
-        /// Gets the date a culture was created.
+        /// Gets the date a culture was updated.
         /// </summary>
         /// <remarks>
         /// <para>When <paramref name="culture" /> is <c>null</c>, returns <c>null</c>.</para>
         /// <para>If the specified culture is not available, returns <c>null</c>.</para>
         /// </remarks>
-        DateTime? GetCultureDate(string culture);
+        DateTime? GetUpdateDate(string culture);
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Models
         // fixme validate published cultures?
         
         /// <summary>
-        /// Validates the content item's properties.
+        /// Validates the content item's properties pass variant rules
         /// </summary>
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
         /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>

@@ -1,0 +1,34 @@
+
+<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keyup="vm.handleKeyUp($event)">
+
+    <div class="flex items-center">
+        <i class="umb-search-input-icon icon-search" ng-click="vm.focusSearch()"></i>
+        <input 
+            class="umb-search-input" 
+            type="text" 
+            ng-model="vm.searchQuery"
+            ng-model-options="{ debounce: 200 }"
+            ng-change="vm.search(vm.searchQuery)" 
+            placeholder="Search..." 
+            focus-when="{{vm.searchHasFocus}}" />
+        <button ng-if="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">Clear</button>
+    </div>
+
+    <div class="umb-search-results">
+        <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults">
+            <div class="umb-search-group__title">{{key}}</div>
+            <ul class="umb-search-items">
+                <li class="umb-search-item" ng-repeat="result in group.results">
+                    <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
+                        <i class="umb-search-result__icon {{result.icon}}"></i>
+                        <span class="umb-search-result__meta">
+                            <span class="umb-search-result__name">{{result.name}}</span>
+                            <span class="umb-search-result__description" ng-show="result.subTitle">{{result.subTitle}}</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

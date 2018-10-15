@@ -20,7 +20,7 @@ namespace umbraco.presentation.developer.packages
 
         public _Default()
         {
-            CurrentApp = Constants.Applications.Developer.ToString();
+            CurrentApp = Constants.Applications.Packages.ToString();
 
         }
         public Umbraco.Web._Legacy.Controls.TabPage packageInfo;

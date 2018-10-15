@@ -46,7 +46,7 @@
     <key alias="addNew">添加域名</key>
     <key alias="remove">移除</key>
     <key alias="invalidNode">错误的节点</key>
-    <key alias="invalidDomain">域名错误</key> 
+    <key alias="invalidDomain">域名错误</key>
     <key alias="duplicateDomain">域名重复</key>
     <key alias="language">语言</key>
     <key alias="domain">域名</key>
@@ -70,7 +70,6 @@
   <area alias="buttons">
     <key alias="clearSelection">清除选择</key>
     <key alias="select">选择</key>
-    <key alias="selectCurrentFolder">选择当前目录</key>
     <key alias="somethingElse">其它功能</key>
     <key alias="bold">粗体</key>
     <key alias="deindent">取消段落缩进</key>
@@ -99,28 +98,27 @@
     <key alias="styleChoose">选择样式</key>
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
-    <key alias="generateModels">生成模型</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">要更改所选节点的文档类型，先在列表中选择合适的文档类型。</key>
     <key alias="changeDocTypeInstruction2">然后设置当前文档类型到新文档类型的各字段间的对应映射关系并保存。</key>
-    <key alias="contentRepublished">内容已被重新发布</key>    
+    <key alias="contentRepublished">内容已被重新发布</key>
     <key alias="currentProperty">当前属性</key>
     <key alias="currentType">当前类型</key>
     <key alias="docTypeCannotBeChanged">不能改变文档类型，因为没有可替代的类型。</key>
-    <key alias="docTypeChanged">文档类型已更改</key>    
+    <key alias="docTypeChanged">文档类型已更改</key>
     <key alias="mapProperties">要映射的字段</key>
     <key alias="mapToProperty">映射字段</key>
     <key alias="newTemplate">新模板</key>
     <key alias="newType">新类型</key>
-    <key alias="none">无</key>    
+    <key alias="none">无</key>
     <key alias="selectedContent">内容</key>
     <key alias="selectNewDocType">选择新的文档类型</key>
     <key alias="successMessage">选中文档的类型已被成功更改为[new type]，以下字段被映射：</key>
     <key alias="to">至</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成字段映射，因为存在一个字段映射至多字段的问题。</key>
-    <key alias="validDocTypesNote">仅显示可作为替代的文档类型。</key>    
-  </area> 
+    <key alias="validDocTypesNote">仅显示可作为替代的文档类型。</key>
+  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">已发布</key>
     <key alias="about">关于本页</key>
@@ -164,7 +162,7 @@
     <key alias="titleOptional">标题（可选）</key>
     <key alias="altTextOptional">Alternative text (optional)</key>
     <key alias="type">类型</key>
-    <key alias="unPublish">取消发布</key>
+    <key alias="unpublish">取消发布</key>
     <key alias="updateDate">最近编辑</key>
     <key alias="updateDateDesc" version="7.0">编辑此文档的日期/时间</key>
     <key alias="uploadClear">移除文件</key>
@@ -178,10 +176,7 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">点击上传</key>
-    <key alias="dropFilesHere">将文件放在此处..</key>
-	  <key alias="urls">链接到媒体</key>
     <key alias="orClickHereToUpload">或单击此处选择文件</key>
-    <key alias="onlyAllowedFiles">仅允许的文件类型为</key>
     <key alias="maxFileSize">最大文件大小为</key>
   </area>
   <area alias="member">
@@ -213,29 +208,24 @@
     <key alias="unsavedChanges">您有未保存的更改</key>
     <key alias="unsavedChangesWarning">确实要离开此页吗？-您有未保存的更改</key>
   </area>
-    <area alias="bulk">
+  <area alias="bulk">
     <key alias="done">完成</key>
-    
     <key alias="deletedItem">已删除 %0% 项</key>
     <key alias="deletedItems">已删除 %0% 项</key>
     <key alias="deletedItemOfItem">已删除 %0% 项，共 %1% 项</key>
     <key alias="deletedItemOfItems">已删除 %0% 项，共 %1% 项</key>
-
     <key alias="publishedItem">已发布 %0% 项</key>
     <key alias="publishedItems">已发布 %0% 项</key>
     <key alias="publishedItemOfItem">已发布 %0% 项，共 %1% 项</key>
     <key alias="publishedItemOfItems">已发布 %0% 项，共 %1% 项</key>
-
     <key alias="unpublishedItem">已取消发布 %0% 项</key>
     <key alias="unpublishedItems">已取消发布 %0% 项</key>
     <key alias="unpublishedItemOfItem">已取消发布 %0% 项，共 %1% 项</key>
     <key alias="unpublishedItemOfItems">已取消发布 %0% 项，共 %1% 项</key>
-
     <key alias="movedItem">已移动 %0% 项</key>
     <key alias="movedItems">已移动 %0% 项</key>
     <key alias="movedItemOfItem">已移动 %0% 项，共 %1% 项</key>
     <key alias="movedItemOfItems">已移动 %0% 项，共 %1% 项</key>
-
     <key alias="copiedItem">已复制 %0% 项</key>
     <key alias="copiedItems">已复制 %0% 项</key>
     <key alias="copiedItemOfItem">已复制 %0% 项，共 %1% 项</key>
@@ -288,7 +278,6 @@
     <key alias="thumbnailimageclickfororiginal">点击图片查看完整大小</key>
     <key alias="treepicker">拾取项</key>
     <key alias="viewCacheItem">查看缓存项</key>
-    <key alias="createFolder">创建文件夹...</key>
     <key alias="relateToOriginalLabel">与原始连接</key>
     <key alias="includeDescendants">包括后代</key>
     <key alias="theFriendliestCommunity">最友好的社区</key>
@@ -319,12 +308,9 @@
        为字典项编辑不同语言的版本‘<em>%0%</em>’<br/>您可以在左侧的“语言”中添加一种语言
     ]]></key>
     <key alias="displayName">语言名称</key>
-    <key alias="changeKey">编辑字典项的键。</key>
-    <key alias="changeKeyError">
-      <![CDATA[
+    <key alias="changeKeyError"><![CDATA[
       关键字 '%0%' 已经存在。
-   ]]>
-    </key>
+   ]]></key>
   </area>
   <area alias="placeholders">
     <key alias="username">输入您的用户名</key>
@@ -340,20 +326,13 @@
     <key alias="email">输入您的电子邮件</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowAtRoot" version="7.2">允许在根目录</key>
-    <key alias="allowAtRootDesc" version="7.2">只能在内容和媒体树的根级别创建具有选中的内容类型</key>
     <key alias="allowedchildnodetypes">允许子项节点类型</key>
-    <key alias="contenttypecompositions">文档类型组合</key>
     <key alias="create">创建</key>
     <key alias="deletetab">删除选项卡</key>
     <key alias="description">描述</key>
     <key alias="newtab">新建选项卡</key>
     <key alias="tab">选项卡</key>
     <key alias="thumbnail">缩略图</key>
-    <key alias="hasListView">启用列表视图</key>
-    <key alias="hasListViewDesc" version="7.2">配置内容项以显示可排序和搜索的子项列表, 这些子项将不会显示在树中</key>
-    <key alias="currentListView" version="7.2">当前列表视图</key>
-    <key alias="currentListViewDesc" version="7.2">活动列表视图数据类型</key>
     <key alias="createListView" version="7.2">创建自定义列表视图</key>
     <key alias="removeListView" version="7.2">删除自定义列表视图</key>
   </area>
@@ -391,19 +370,14 @@
     <key alias="filePermissionsError">权限有问题，访问指定文件或文件夹失败！</key>
     <key alias="macroErrorLoadingPartialView">加载Partial视图脚本时出错(文件: %0%)</key>
     <key alias="macroErrorLoadingUsercontrol">加载 userControl 时出错 '%0%'</key>
-    <key alias="macroErrorLoadingCustomControl">加载 customControl 时出错(程序集: %0%, 类型: '%1%')</key>
-    <key alias="macroErrorLoadingMacroEngineScript">加载 MacroEngine 脚本时出错 (文件: %0%)</key>
     <key alias="missingTitle">请输入标题</key>
     <key alias="missingType">请选择类型</key>
     <key alias="pictureResizeBiggerThanOrg">图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?</key>
-    <key alias="pythonErrorHeader">python脚本错误</key>
-    <key alias="pythonErrorText">python脚本未保存，因为包含错误。</key>
     <key alias="startNodeDoesNotExists">默认打开页面不存在，请联系管理员</key>
     <key alias="stylesMustMarkBeforeSelect">请先选择内容，再设置样式。</key>
     <key alias="stylesNoStylesOnPage">没有可用的样式</key>
     <key alias="tableColMergeLeft">请把光标放在您要合并的两个单元格中的左边单元格</key>
     <key alias="tableSplitNotSplittable">非合并单元格不能分离。</key>
-    <key alias="missingPropertyEditorErrorMessage">此属性使用的数据类型存在配置错误, 请检查数据类型</key>
   </area>
   <area alias="general">
     <key alias="about">关于</key>
@@ -462,7 +436,6 @@
     <key alias="macro">宏</key>
     <key alias="mandatory">必填项</key>
     <key alias="move">移动</key>
-    <key alias="more">更多</key>
     <key alias="name">名称</key>
     <key alias="new">新的</key>
     <key alias="next">下一步</key>
@@ -491,7 +464,8 @@
     <key alias="showPageOnSend">在发送时预览</key>
     <key alias="size">大小</key>
     <key alias="sort">排序</key>
-    <key alias="submit">提交</key> <!-- TODO: Translate this -->
+    <key alias="submit">提交</key>
+    <!-- TODO: Translate this -->
     <key alias="type">类型</key>
     <key alias="typeToSearch">输入内容开始查找…</key>
     <key alias="up">上</key>
@@ -519,35 +493,23 @@
     <key alias="embed">嵌入</key>
     <key alias="selected">已选择</key>
   </area>
-
   <area alias="colors">
-    <key alias="black">黑色</key>
-    <key alias="green">绿色</key>
-    <key alias="yellow">黄色</key>
-    <key alias="orange">橙色</key>
     <key alias="blue">蓝色</key>
-    <key alias="red">红色</key>
   </area>
-
   <area alias="shortcuts">
-      <key alias="addTab">添加选项卡</key>
-      <key alias="addProperty">添加属性</key>
-      <key alias="addEditor">添加编辑器</key>
-      <key alias="addTemplate">添加模板</key>
-      <key alias="addChildNode">添加子节点</key>
-      <key alias="addChild">添加子项</key>
-
-      <key alias="editDataType">编辑数据类型</key>
-
-      <key alias="navigateSections">导航节</key>
-
-      <key alias="shortcut">快捷方式</key>
-      <key alias="showShortcuts">显示快捷方式</key>
-
-      <key alias="toggleListView">切换列表视图</key>
-      <key alias="toggleAllowAsRoot">切换允许作为根</key>
+    <key alias="addTab">添加选项卡</key>
+    <key alias="addProperty">添加属性</key>
+    <key alias="addEditor">添加编辑器</key>
+    <key alias="addTemplate">添加模板</key>
+    <key alias="addChildNode">添加子节点</key>
+    <key alias="addChild">添加子项</key>
+    <key alias="editDataType">编辑数据类型</key>
+    <key alias="navigateSections">导航节</key>
+    <key alias="shortcut">快捷方式</key>
+    <key alias="showShortcuts">显示快捷方式</key>
+    <key alias="toggleListView">切换列表视图</key>
+    <key alias="toggleAllowAsRoot">切换允许作为根</key>
   </area>
-
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
     <key alias="bold">粗体</key>
@@ -555,7 +517,6 @@
     <key alias="font">字体</key>
     <key alias="text">文本</key>
   </area>
-
   <area alias="headers">
     <key alias="page">页面</key>
   </area>
@@ -585,7 +546,6 @@
       </p>    
     ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[数据库已更新到版本 %0%。<br />点击<strong>下一步</strong>继续。]]></key>
-
     <key alias="databaseUpToDate"><![CDATA[您的数据库已安装！点击<strong>下一步</strong>继续]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>需要修改默认密码！</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>默认账户已禁用或无权访问系统！</strong></p><p>点击<b>下一步</b>继续。]]></key>
@@ -678,7 +638,6 @@
     <key alias="renewSession">已更新，继续工作。</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">星期一快乐</key>
     <key alias="greeting1">星期二快乐</key>
     <key alias="greeting2">星期三快乐</key>
     <key alias="greeting3">星期四快乐</key>
@@ -697,9 +656,7 @@
     <key alias="setPasswordConfirmation">您的密码已更新</key>
     <key alias="resetCodeExpired">您单击的链接无效或已过期</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: 重置密码</key>
-    <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<p>您的用户名登录到 Umbraco 后台是: <strong>%0%</strong></p><p>点击 <a href="%1%"><strong>这里</strong></a> 重置密码，或复制链接粘贴到您的浏览器访问:</p><p><em>%1%</em></p>]]>
-    </key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>您的用户名登录到 Umbraco 后台是: <strong>%0%</strong></p><p>点击 <a href="%1%"><strong>这里</strong></a> 重置密码，或复制链接粘贴到您的浏览器访问:</p><p><em>%1%</em></p>]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">仪表板</key>
@@ -831,11 +788,9 @@
     <key alias="paSimpleHelp">如果您只希望提供一个用户名和密码就能访问</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">
-      <![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% 无法发布, 因为该项在计划发布中。
-    ]]>
-    </key>
+    ]]></key>
     <key alias="contentPublishedFailedExpired"><![CDATA[
       %0% 无法发布, 因为该项已过期。
     ]]></key>
@@ -847,7 +802,7 @@
     ]]></key>
     <key alias="contentPublishedFailedByParent"><![CDATA[
       %0% 不能发布，因为上级页面没有发布。
-    ]]></key>  
+    ]]></key>
     <key alias="includeUnpublished">包含未发布的子项</key>
     <key alias="inProgress">正在发布，请稍候…</key>
     <key alias="inProgressCounter">%0% 中的 %1% 页面已发布…</key>
@@ -900,12 +855,8 @@
     <key alias="users">用户</key>
     <key alias="help" version="7.0">帮助</key>
     <key alias="forms">窗体</key>
-    <key alias="analytics">统计</key>
   </area>
   <area alias="help">
-    <key alias="goTo">转到</key>
-    <key alias="helpTopicsFor">帮助主题</key>
-    <key alias="videoChaptersFor">视频章节</key>
     <key alias="theBestUmbracoVideoTutorials">最佳 Umbraco 视频教程</key>
   </area>
   <area alias="settings">
@@ -925,8 +876,6 @@
     <key alias="contentTypeUses">该文档类型使用</key>
     <key alias="asAContentMasterType">作为主控文档类型. 主控文档类型的标签只能在主控文档类型里修改。</key>
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
-    <key alias="masterDocumentType">主控文档类型</key>
-    <key alias="createMatchingTemplate">创建匹配模板</key>
     <key alias="addIcon">添加图标</key>
   </area>
   <area alias="sort">
@@ -937,8 +886,8 @@
     <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…]]></key>
   </area>
   <area alias="speechBubbles">
-	<key alias="validationFailedHeader">验证</key>
-	<key alias="validationFailedMessage">在保存项之前必须修复验证错误</key>
+    <key alias="validationFailedHeader">验证</key>
+    <key alias="validationFailedMessage">在保存项之前必须修复验证错误</key>
     <key alias="operationFailedHeader">失败</key>
     <key alias="invalidUserPermissionsText">用户权限不足, 无法完成操作</key>
     <key alias="operationCancelledHeader">取消</key>
@@ -980,10 +929,6 @@
     <key alias="languageSaved">语言已保存</key>
     <key alias="mediaTypeSavedHeader">已保存媒体类型</key>
     <key alias="memberTypeSavedHeader">已保存成员类型</key>
-    <key alias="pythonErrorHeader">Python脚本未保存</key>
-    <key alias="pythonErrorText">Python脚本因为错误未能保存</key>
-    <key alias="pythonSavedHeader">Python已保存</key>
-    <key alias="pythonSavedText">Python脚本无错误</key>
     <key alias="templateErrorHeader">模板未保存</key>
     <key alias="templateErrorText">模板别名相同</key>
     <key alias="templateSavedHeader">模板已保存</key>
@@ -993,11 +938,6 @@
     <key alias="partialViewSavedText">片段视图保存，无错误。</key>
     <key alias="partialViewErrorHeader">片段视图未保存</key>
     <key alias="partialViewErrorText">片段视图因为错误未能保存</key>
-    <key alias="scriptSavedHeader">已保存脚本视图</key>
-    <key alias="scriptSavedText">脚本视图保存时没有发生任何错误!</key>
-    <key alias="scriptErrorHeader">未保存脚本视图</key>
-    <key alias="scriptErrorText">保存文件时出错。</key>
-    <key alias="cssErrorText">保存文件时出错。</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">使用CSS语法，如：h1、.redHeader、.blueTex。</key>
@@ -1019,27 +959,20 @@
     <key alias="template">模板</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">选择内容类别</key>
     <key alias="chooseLayout">选择一项布局</key>
     <key alias="addRows">添加一行</key>
     <key alias="addElement">添加内容</key>
     <key alias="dropElement">丢弃内容</key>
     <key alias="settingsApplied">设置已应用</key>
-
     <key alias="contentNotAllowed">此处不允许有该内容</key>
     <key alias="contentAllowed">此处允许有该内容</key>
-
     <key alias="clickToEmbed">点击嵌入</key>
     <key alias="clickToInsertImage">点击添加图片</key>
     <key alias="placeholderImageCaption">图片说明...</key>
     <key alias="placeholderWriteHere">在这里输入...</key>
-
     <key alias="gridLayouts">网格布局</key>
     <key alias="gridLayoutsDetail">布局是网格编辑器的整体工作区域, 通常只需要一个或两个不同的布局</key>
     <key alias="addGridLayout">添加网络布局</key>
@@ -1048,18 +981,12 @@
     <key alias="rowConfigurationsDetail">行是水平排列的预定义单元格</key>
     <key alias="addRowConfiguration">添加行配置</key>
     <key alias="addRowConfigurationDetail">通过设置单元格宽度和添加其他单元格来调整行</key>
-
     <key alias="columns">列</key>
     <key alias="columnsDetails">网格布局中的总和列数</key>
-
     <key alias="settings">设置</key>
     <key alias="settingsDetails">配置编辑器可以更改的设置</key>
-
     <key alias="styles">样式</key>
     <key alias="stylesDetails">配置编辑器可以更改的样式</key>
-
-    <key alias="settingDialogDetails">输入的 json 配置有效, 设置才可保存</key>
-
     <key alias="allowAllEditors">允许所有的编辑器</key>
     <key alias="allowAllRowConfigurations">允许所有行配置</key>
     <key alias="setAsDefault">设置为默认值</key>
@@ -1067,69 +994,46 @@
     <key alias="chooseDefault">选择默认值</key>
     <key alias="areAdded">已增加</key>
   </area>
-
   <area alias="contentTypeEditor">
-
-      <key alias="compositions">组合</key>
-      <key alias="noTabs">您没有添加任何选项卡</key>
-      <key alias="addNewTab">添加新选项卡</key>
-      <key alias="addAnotherTab">添加其他选项卡</key>
-      <key alias="inheritedFrom">继承自</key>
-      <key alias="addProperty">添加属性</key>
-      <key alias="requiredLabel">必需的标签</key>
-
-      <key alias="enableListViewHeading">启用列表视图</key>
-      <key alias="enableListViewDescription">配置内容项以显示其子项的可排序和搜索列表, 这些子项将不会显示在树中</key>
-
-      <key alias="allowedTemplatesHeading">允许的模板</key>
-      <key alias="allowedTemplatesDescription">选择允许在该类型的内容上使用哪些模板编辑器</key>
-
-      <key alias="allowAsRootHeading">允许作为根</key>
-      <key alias="allowAsRootDescription">允许编辑器在内容树的根目录中创建此类型的内容</key>
-      <key alias="allowAsRootCheckbox">是 - 允许根中的此类型的内容</key>
-
-      <key alias="childNodesHeading">允许的子节点类型</key>
-      <key alias="childNodesDescription">允许在该类型的内容下方创建指定类型的内容</key>
-
-      <key alias="chooseChildNode">选择子节点</key>
-
-      <key alias="compositionsDescription">从现有文档类型继承选项卡和属性。如果存在同名的选项卡, 则新选项卡将添加到当前文档类型或合并。</key>
-      <key alias="compositionInUse">此内容类型在组合中使用, 因此不能自行组成。</key>
-      <key alias="noAvailableCompositions">没有可供组合使用的内容类型。</key>
-
-      <key alias="availableEditors">可用编辑器</key>
-      <key alias="reuse">重用</key>
-      <key alias="editorSettings">编辑器设置</key>
-
-      <key alias="configuration">配置</key>
-
-      <key alias="yesDelete">是，删除</key>
-
-      <key alias="movedUnderneath">被移动到下方</key>
-      <key alias="copiedUnderneath">被复制到下面</key>
-      <key alias="folderToMove">选择要移动的文件夹</key>
-      <key alias="folderToCopy">选择要复制的文件夹</key>
-      <key alias="structureBelow">在下面的树结构中</key>
-
-      <key alias="allDocumentTypes">所有文档类型</key>
-      <key alias="allDocuments">所有文档</key>
-      <key alias="allMediaItems">所有媒体项目</key>
-
-      <key alias="usingThisDocument">使用此文档类型将被永久删除, 请确认您还要删除这些文件。</key>
-      <key alias="usingThisMedia">使用此媒体类型将被永久删除, 请确认您也要删除这些。</key>
-      <key alias="usingThisMember">使用此成员类型将被永久删除, 请确认您想要删除这些</key>
-
-      <key alias="andAllDocuments">和所有使用此类型的文档</key>
-      <key alias="andAllMediaItems">和所有使用此类型的媒体项目</key>
-      <key alias="andAllMembers">和使用此类型的所有成员</key>
-
-      <key alias="thisEditorUpdateSettings">使用此编辑器将用新设置更新</key>
-
-      <key alias="memberCanEdit">成员可编辑</key>
-      <key alias="showOnMemberProfile">显示成员配置文件</key>
-
+    <key alias="compositions">组合</key>
+    <key alias="noTabs">您没有添加任何选项卡</key>
+    <key alias="inheritedFrom">继承自</key>
+    <key alias="addProperty">添加属性</key>
+    <key alias="requiredLabel">必需的标签</key>
+    <key alias="enableListViewHeading">启用列表视图</key>
+    <key alias="enableListViewDescription">配置内容项以显示其子项的可排序和搜索列表, 这些子项将不会显示在树中</key>
+    <key alias="allowedTemplatesHeading">允许的模板</key>
+    <key alias="allowedTemplatesDescription">选择允许在该类型的内容上使用哪些模板编辑器</key>
+    <key alias="allowAsRootHeading">允许作为根</key>
+    <key alias="allowAsRootDescription">允许编辑器在内容树的根目录中创建此类型的内容</key>
+    <key alias="childNodesHeading">允许的子节点类型</key>
+    <key alias="childNodesDescription">允许在该类型的内容下方创建指定类型的内容</key>
+    <key alias="chooseChildNode">选择子节点</key>
+    <key alias="compositionsDescription">从现有文档类型继承选项卡和属性。如果存在同名的选项卡, 则新选项卡将添加到当前文档类型或合并。</key>
+    <key alias="compositionInUse">此内容类型在组合中使用, 因此不能自行组成。</key>
+    <key alias="noAvailableCompositions">没有可供组合使用的内容类型。</key>
+    <key alias="availableEditors">可用编辑器</key>
+    <key alias="reuse">重用</key>
+    <key alias="editorSettings">编辑器设置</key>
+    <key alias="configuration">配置</key>
+    <key alias="yesDelete">是，删除</key>
+    <key alias="movedUnderneath">被移动到下方</key>
+    <key alias="copiedUnderneath">被复制到下面</key>
+    <key alias="folderToMove">选择要移动的文件夹</key>
+    <key alias="folderToCopy">选择要复制的文件夹</key>
+    <key alias="structureBelow">在下面的树结构中</key>
+    <key alias="allDocumentTypes">所有文档类型</key>
+    <key alias="allDocuments">所有文档</key>
+    <key alias="allMediaItems">所有媒体项目</key>
+    <key alias="usingThisDocument">使用此文档类型将被永久删除, 请确认您还要删除这些文件。</key>
+    <key alias="usingThisMedia">使用此媒体类型将被永久删除, 请确认您也要删除这些。</key>
+    <key alias="usingThisMember">使用此成员类型将被永久删除, 请确认您想要删除这些</key>
+    <key alias="andAllDocuments">和所有使用此类型的文档</key>
+    <key alias="andAllMediaItems">和所有使用此类型的媒体项目</key>
+    <key alias="andAllMembers">和使用此类型的所有成员</key>
+    <key alias="memberCanEdit">成员可编辑</key>
+    <key alias="showOnMemberProfile">显示成员配置文件</key>
   </area>
-
   <area alias="templateEditor">
     <key alias="alternativeField">替代字段</key>
     <key alias="alternativeText">替代文本</key>
@@ -1161,15 +1065,7 @@
     <key alias="withTime">是，含时间，分隔符为： </key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">标记为您的任务</key>
-    <key alias="assignedTasksHelp"><![CDATA[ 下面的翻译任务<strong>分配给您</strong>. 查看详情, 点击“详情”或页名。 
-     如果需要XML格式，请点击“下载 XML”链接。<br/>
-     关闭翻译任务，请返回详细视图点击“关闭”按钮。
-    ]]></key>
-    <key alias="closeTask">关闭任务</key>
     <key alias="details">翻译详情</key>
-    <key alias="downloadAllAsXml">将翻译任务下载为xml</key>
-    <key alias="downloadTaskAsXml">下载 XML</key>
     <key alias="DownloadXmlDTD">下载 XML DTD</key>
     <key alias="fields">字段</key>
     <key alias="includeSubpages">包含子页</key>
@@ -1188,18 +1084,9 @@
 
       来自Umbraco 机器人的祝福
     ]]></key>
-    <key alias="mailSubject">[%0%]翻译任务：%1%</key>
     <key alias="noTranslators">没有翻译员，请创建翻译员角色的用户。</key>
-    <key alias="ownedTasks">您创建的任务</key>
-    <key alias="ownedTasksHelp"><![CDATA[ 下面是<strong>您创建</strong>的页面. 查看详情, 点击“详情” 或页名. 
-     如果需要XML格式，请点击“下载 Xml”链接。<br/>
-     关闭翻译任务，请返回详细视图点击“关闭”按钮。
-    ]]></key>
     <key alias="pageHasBeenSendToTranslation">页面'%0%'已经发送给翻译</key>
-    <key alias="noLanguageSelected">请选择内容应翻译成的语言</key>
     <key alias="sendToTranslate">发送页面'%0%'以便翻译</key>
-    <key alias="taskAssignedBy">分配者</key>
-    <key alias="taskOpened">任务开启</key>
     <key alias="totalWords">总字数</key>
     <key alias="translateTo">翻译到</key>
     <key alias="translationDone">翻译完成。</key>
@@ -1230,7 +1117,6 @@
     <key alias="relationTypes">关系类型</key>
     <key alias="packager">扩展包</key>
     <key alias="packages">扩展包</key>
-    <key alias="python">Python文件</key>
     <key alias="repositories">从在线程序库安装</key>
     <key alias="runway">安装Runway</key>
     <key alias="runwayModules">Runway模块</key>
@@ -1288,120 +1174,103 @@
     <key alias="usertype">用户类型</key>
     <key alias="userTypes">用户类型</key>
     <key alias="writer">撰稿人</key>
-    <key alias="translator">翻译人</key>
     <key alias="change">更改</key>
     <key alias="yourProfile" version="7.0">你的资料</key>
     <key alias="yourHistory" version="7.0">你最近的历史信息</key>
     <key alias="sessionExpires" version="7.0">会话过期于</key>
   </area>
   <area alias="validation">
-      <key alias="validation">验证</key>
-      <key alias="validateAsEmail">验证为电子邮件</key>
-      <key alias="validateAsNumber">验证为数字</key>
-      <key alias="validateAsUrl">验证为 url</key>
-      <key alias="enterCustomValidation">...或输入自定义验证</key>
-      <key alias="fieldIsMandatory">字段是强制性的</key>
+    <key alias="validation">验证</key>
+    <key alias="validateAsEmail">验证为电子邮件</key>
+    <key alias="validateAsNumber">验证为数字</key>
+    <key alias="validateAsUrl">验证为 url</key>
+    <key alias="enterCustomValidation">...或输入自定义验证</key>
+    <key alias="fieldIsMandatory">字段是强制性的</key>
   </area>
   <area alias="healthcheck">
-	  <!-- The following keys get these tokens passed in:
+    <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: XPath
 		   3: Configuration file path
 	  -->
     <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
-	  <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
+    <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
     <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
-
-	  <!-- The following keys get these tokens passed in:
+    <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 	  -->
-	  <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
-	  <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
-	  <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
-
-	  <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
-	  <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
-	  <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
-
-	  <!-- The following keys get these tokens passed in:
+    <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
+    <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
+    <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-	  <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
-	  <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
-	  <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
-
-	  <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-	  <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
-	  <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
-	  <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
-
-	  <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-	  <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-	  <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
-
-	  <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
-	  <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-	  <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
-	  <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-	  <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-	  <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
-	  <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
-
-	  <!-- The following keys don't get tokens passed in -->
-	  <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
-	  <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
-	  <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
-
-	  <key alias="rectifyButton">Fix</key>
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+    <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
+    <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
+    <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
+    <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
+    <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
+    <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+    <key alias="rectifyButton">Fix</key>
     <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
     <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
     <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
-
-	  <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
-	  <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
-	  <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
-
-	  <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
-	  <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
-	  <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
-
+    <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
+    <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+    <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
+    <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
     <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
-
     <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
-
     <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
     <key alias="setHeaderInConfig">Set Header in Config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
     <key alias="setHeaderInConfigError">Could not update web.config file. Error: %0%</key>
-
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
-
     <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
     <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
     <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
-
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
   </area>

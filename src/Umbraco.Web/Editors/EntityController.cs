@@ -10,15 +10,18 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using Umbraco.Core.Models;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -211,7 +214,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            var ancestors = GetAncestors(id, type);
+            var ancestors = GetResultForAncestors(id, type);
 
             //if content, skip the first node for replicating NiceUrl defaults
             if(type == UmbracoEntityTypes.Document) {
@@ -226,13 +229,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        [Obsolete("Use GetyById instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
-        {
-            return GetResultForKey(id, type);
-        }
-
+     
         /// <summary>
         /// Gets an entity by a xpath query
         /// </summary>
@@ -588,9 +585,10 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type)
+        [HttpQueryStringFilter("queryStrings")]
+        public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, FormDataCollection queryStrings)
         {
-            return GetResultForAncestors(id, type);
+            return GetResultForAncestors(id, type, queryStrings);
         }
 
         /// <summary>
@@ -632,7 +630,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType)
+        private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, FormDataCollection queryStrings = null)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
@@ -672,12 +670,14 @@ namespace Umbraco.Web.Editors
                     ids = lids.ToArray();
                 }
 
+                var culture = queryStrings?.GetValue<string>("culture");
+
                 return ids.Length == 0
                     ? Enumerable.Empty<EntityBasic>()
                     : Services.EntityService.GetAll(objectType.Value, ids)
                         .WhereNotNull()
                         .OrderBy(x => x.Level)
-                        .Select(Mapper.Map<EntityBasic>);
+                        .Select(x => Mapper.Map<EntityBasic>(x, opts => { opts.SetCulture(culture);}));
             }
             //now we need to convert the unknown ones
             switch (entityType)

@@ -4,9 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Web.WebApi;
+using Newtonsoft.Json.Converters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -22,8 +20,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "createDate")]
         public DateTime CreateDate { get; set; }
 
+        /// <summary>
+        /// Boolean indicating if this item is published or not based on it's <see cref="State"/>
+        /// </summary>
         [DataMember(Name = "published")]
-        public bool Published { get; set; }
+        public bool Published => State == ContentSavedState.Published || State == ContentSavedState.PublishedPendingChanges;
 
         /// <summary>
         /// Determines if the content item is a draft
@@ -43,6 +44,16 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
+
+        /// <summary>
+        /// The saved/published state of an item
+        /// </summary>
+        /// <remarks>
+        /// This is nullable since it's only relevant for content (non-content like media + members will be null)
+        /// </remarks>
+        [DataMember(Name = "state")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ContentSavedState? State { get; set; }
 
         protected bool Equals(ContentItemBasic other)
         {

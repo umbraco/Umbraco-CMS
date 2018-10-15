@@ -63,7 +63,6 @@
   </area>
   <area alias="buttons">
     <key alias="select">Auswählen</key>
-    <key alias="selectCurrentFolder">Aktuellen Ordner auswählen</key>
     <key alias="somethingElse">Etwas anderes machen</key>
     <key alias="bold">Fett</key>
     <key alias="deindent">Ausrücken</key>
@@ -153,7 +152,7 @@
     <key alias="titleOptional">Titel (optional)</key>
     <key alias="altTextOptional">Alternativtext (optional)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Veröffentlichung widerrufen</key>
+    <key alias="unpublish">Veröffentlichung widerrufen</key>
     <key alias="updateDate">Zuletzt bearbeitet am</key>
     <key alias="updateDateDesc" version="7.0">Letzter Änderungszeitpunkt des Dokuments</key>
     <key alias="uploadClear">Datei entfernen</key>
@@ -165,7 +164,6 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Für Upload klicken</key>
-    <key alias="dropFilesHere">Dateien hier fallen lassen ...</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Neues Mitglied anlegen</key>
@@ -195,27 +193,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -284,20 +277,13 @@
     <key alias="usernameHint">Der Benutzername ist normalerweise Ihre E-Mail-Adresse</key>
   </area>
   <area alias="editcontenttype">
-    <key alias="allowAtRoot" version="7.2">Auf oberster Ebene erlauben</key>
-    <key alias="allowAtRootDesc" version="7.2">Nur diese Dokumenttypen können auf oberster Ebene in Inhalte und Medien angelegt werden</key>
     <key alias="allowedchildnodetypes">Dokumenttypen, die unterhalb dieses Typs erlaubt sind</key>
-    <key alias="contenttypecompositions">Zusammengesetzte Dokumenttypen</key>
     <key alias="create">Erstellen</key>
     <key alias="deletetab">Registerkarte löschen</key>
     <key alias="description">Beschreibung</key>
     <key alias="newtab">Neue Registerkarte</key>
     <key alias="tab">Registerkarte</key>
     <key alias="thumbnail">Illustration</key>
-    <key alias="hasListView">Listenansicht aktivieren</key>
-    <key alias="hasListViewDesc" version="7.2">Aktiviert eine durchsuch- und sortierbare Listendarstellung der untergeordneten Elemente anstelle diese in der Baumstruktur anzuzeigen</key>
-    <key alias="currentListView" version="7.2">Aktuelle Listenansicht</key>
-    <key alias="currentListViewDesc" version="7.2">Der Datentyp für die aktuelle Ansicht der Liste</key>
     <key alias="createListView" version="7.2">Angepasste Listenansicht erstellen</key>
     <key alias="removeListView" version="7.2">Angepasste Listenansicht entfernen</key>
   </area>
@@ -335,14 +321,11 @@
     <key alias="missingTitle">Bitte geben Sie einen Titel ein</key>
     <key alias="missingType">Bitte wählen Sie einen Typ</key>
     <key alias="pictureResizeBiggerThanOrg">Soll die Abbildung wirklich über die Originalgröße hinaus vergrößert werden?</key>
-    <key alias="pythonErrorHeader">Fehler im Python-Skript</key>
-    <key alias="pythonErrorText">Das Python-Skript ist fehlerhaft und wurde daher nicht gespeichert.</key>
     <key alias="startNodeDoesNotExists">Startelement gelöscht, bitte kontaktieren Sie den System-Administrator.</key>
     <key alias="stylesMustMarkBeforeSelect">Bitte markieren Sie den gewünschten Text, bevor Sie einen Stil auswählen</key>
     <key alias="stylesNoStylesOnPage">Keine aktiven Stile vorhanden</key>
     <key alias="tableColMergeLeft">Bitte platzieren Sie den Mauszeiger in die erste der zusammenzuführenden Zellen</key>
     <key alias="tableSplitNotSplittable">Sie können keine Zelle trennen, die nicht zuvor aus mehreren zusammengeführt wurde.</key>
-    <key alias="missingPropertyEditorErrorMessage">Es liegt ein Konfigurationsfehler beim Datentyp dieser Eigenschaft vor. Bitte prüfen Sie den Datentyp bzw. die Eigenschaft.</key>
   </area>
   <area alias="general">
     <key alias="about">Info</key>
@@ -397,7 +380,6 @@
     <key alias="logout">Abmelden</key>
     <key alias="macro">Makro</key>
     <key alias="move">Verschieben</key>
-    <key alias="more">Mehr</key>
     <key alias="name">Name</key>
     <key alias="new">Neu</key>
     <key alias="next">Weiter</key>
@@ -426,7 +408,8 @@
     <key alias="showPageOnSend">Seite beim Senden anzeigen</key>
     <key alias="size">Größe</key>
     <key alias="sort">Sortieren</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Durchsuchen ...</key>
     <key alias="up">nach oben</key>
@@ -552,7 +535,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Einen wunderbaren Sonntag</key>
     <key alias="greeting1">Schönen Montag</key>
     <key alias="greeting2">Einen großartigen Dienstag</key>
     <key alias="greeting3">Wunderbaren Mittwoch</key>
@@ -595,8 +577,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
       Einen schönen Tag wünscht
       Ihr freundlicher Umbraco-Robot
     </key>
-    <key alias="mailBodyHtml">
-<![CDATA[<p>Hallo %0%</p>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hallo %0%</p>
 		  <p>Dies ist eine automatisch E-Mail, welche Sie informiert, dass die Aufgabe <strong>'%1%'</strong> 
 		  an der Seite <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  vom Benutzer <strong>'%3%'</strong> ausgeführt wurde.
@@ -622,8 +603,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 		  <p>Einen schönen Tag wünscht<br /><br />
 			  Ihr freundlicher Umbraco-Robot
 		  </p>
-]]>
-</key>
+]]></key>
     <key alias="mailSubject">[%0%] Benachrichtigung: %1% ausgeführt an Seite '%2%' </key>
     <key alias="notifications">Benachrichtigungen</key>
   </area>
@@ -732,12 +712,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="users">Benutzer</key>
     <key alias="help" version="7.0">Hilfe</key>
     <key alias="forms">Formulare</key>
-    <key alias="analytics">Auswertungen</key>
   </area>
   <area alias="help">
-    <key alias="goTo">go to</key>
-    <key alias="helpTopicsFor">Hilfethemen zu</key>
-    <key alias="videoChaptersFor">Video-Tutorials für</key>
     <key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
   </area>
   <area alias="settings">
@@ -757,8 +733,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
     <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
     <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
-    <key alias="masterDocumentType">Masterdokumenttyp</key>
-    <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sortierreihenfolge</key>
@@ -807,10 +781,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="fileSavedHeader">Datei gespeichert</key>
     <key alias="fileSavedText">Datei erfolgreich gespeichert</key>
     <key alias="languageSaved">Sprache gespeichert</key>
-    <key alias="pythonErrorHeader">Python-Skript nicht gespeichert</key>
-    <key alias="pythonErrorText">Das Python-Skript enthält Fehler</key>
-    <key alias="pythonSavedHeader">Python-Skript gespeichert</key>
-    <key alias="pythonSavedText">Keine Fehler im Python-Skript</key>
     <key alias="templateErrorHeader">Vorlage wurde nicht gespeichert</key>
     <key alias="templateErrorText">Bitte prüfen Sie, ob möglicherweise zwei Vorlagen den gleichen Alias verwenden.</key>
     <key alias="templateSavedHeader">Vorlage gespeichert</key>
@@ -820,11 +790,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="partialViewSavedText">Partielle Ansicht ohne Fehler gespeichert.</key>
     <key alias="partialViewErrorHeader">Partielle Ansicht nicht gespeichert</key>
     <key alias="partialViewErrorText">Fehler beim Speichern der Datei.</key>
-    <key alias="scriptSavedHeader">Skript gespeichert</key>
-    <key alias="scriptSavedText">Skript fehlerfrei gespeichert!</key>
-    <key alias="scriptErrorHeader">Skript nicht gespeichert</key>
-    <key alias="scriptErrorText">Fehler beim Speichern der Datei.</key>
-    <key alias="cssErrorText">Fehler beim Speichern der Datei.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gewünschter CSS-Selektor, zum Beispiel 'h1', '.bigHeader' oder 'p.infoText'</key>
@@ -846,12 +811,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="template">Vorlage</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
     <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
@@ -874,7 +835,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="settingsDetails">Legen Sie fest, welche Einstellungen die Autoren anpassen können.</key>
     <key alias="styles">CSS-Stile</key>
     <key alias="stylesDetails">Legen Sie fest, welche Stile die Autoren anpassen können.</key>
-    <key alias="settingDialogDetails">Die Einstellungen werden nur gespeichert, wenn die angegebene JSON-Konfiguration gültig ist.</key>
     <key alias="allowAllEditors">Alle Elemente erlauben</key>
     <key alias="allowAllRowConfigurations">Alle Zeilenlayouts erlauben</key>
   </area>
@@ -909,12 +869,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="withTime">Datum und Zeit mit Trennzeichen: </key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">Ihre Aufgaben</key>
-    <key alias="assignedTasksHelp">Die Liste unten zeigt &lt;strong&gt;ihre&lt;/strong&gt; Übersetzungsaufträge. Um eine ausführliche Liste mit Kommentaren zu sehen, klicken Sie auf "Details" oder einfach auf den Seitennamen. Sie können die Seite auch direkt als XML herunterladen, indem Sie den Link "XML herunterladen" anklicken. &lt;br/&gt;Um eine Übersetzung abzuschließen, gehen Sie bitte auf die Detailansicht und klicken Sie auf "Aufgabe abschließen".</key>
-    <key alias="closeTask">Aufgabe abschließen</key>
     <key alias="details">Details zur Übersetzung</key>
-    <key alias="downloadAllAsXml">Alle Übersetzungsaufgaben als XML-Datei herunterladen</key>
-    <key alias="downloadTaskAsXml">XML herunterladen</key>
     <key alias="DownloadXmlDTD">Herunterladen der XML-Defintionen (XML-DTD)</key>
     <key alias="fields">Felder</key>
     <key alias="includeSubpages">Einschließlich der Unterseiten</key>
@@ -930,14 +885,9 @@ Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwa
 Einen schönen Tag wünscht
 Ihr freundlicher Umbraco-Robot
 	</key>
-    <key alias="mailSubject">[%0%] Aufgabe zur Übersetzung von '%1%'</key>
     <key alias="noTranslators">Bitte erstellen Sie zuerst mindestens einen Übersetzer.</key>
-    <key alias="ownedTasks">Von Ihnen erstellte Aufgaben</key>
-    <key alias="ownedTasksHelp">Die Liste unten zeigt die von &lt;strong&gt;Ihnen&lt;/strong&gt; erstellten Seiten. Um eine ausführliche Liste mit Kommentaren zu sehen, klicken Sie auf "Details" oder einfach auf den Seitennamen. Sie können die Seite auch direkt als XML herunterladen, indem Sie den Link "XML herunterladen" anklicken. Um eine Übersetzung abzuschließen, gehen Sie bitte auf die Detailansicht und klicken Sie auf "Aufgabe abschließen".</key>
     <key alias="pageHasBeenSendToTranslation">Die Seite '%0%' wurde zur Übersetzung gesendet</key>
     <key alias="sendToTranslate">Sendet die Seite '%0%' zur Übersetzung</key>
-    <key alias="taskAssignedBy">Zugewiesen von</key>
-    <key alias="taskOpened">Aufgabe aktiviert</key>
     <key alias="totalWords">Anzahl der Wörter</key>
     <key alias="translateTo">Übersetzen in</key>
     <key alias="translationDone">Übersetzung abgeschlossen.</key>
@@ -967,7 +917,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="documentTypes">Dokumententypen</key>
     <key alias="packager">Pakete</key>
     <key alias="packages">Pakete</key>
-    <key alias="python">Python-Dateien</key>
     <key alias="repositories">Paket-Repositories</key>
     <key alias="runway">'Runway' installieren</key>
     <key alias="runwayModules">Runway-Module</key>
@@ -975,7 +924,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="scripts">Client-Skripte</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Vorlagen</key>
-    <key alias="analytics">Auswertungen</key>
     <key alias="userPermissions">Berechtigungen</key>
     <key alias="userTypes">Benutzertypen</key>
     <key alias="users">Benutzer</key>
@@ -1024,7 +972,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="usertype">Rolle</key>
     <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
-    <key alias="translator">Übersetzer</key>
     <key alias="yourProfile" version="7.0">Ihr Profil</key>
     <key alias="yourHistory" version="7.0">Ihr Verlauf</key>
     <key alias="sessionExpires" version="7.0">Sitzung läuft ab in</key>

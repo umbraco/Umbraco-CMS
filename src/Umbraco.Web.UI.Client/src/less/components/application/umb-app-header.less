@@ -13,23 +13,31 @@
     list-style: none;
     align-items: center;
     margin: 0;
-    margin-right: 10px;
+    margin-right: -10px;
 }
 
 .umb-app-header__action a {
-    color: @white;
-    opacity: 0.6;
-    font-size: 22px;
     padding-left: 10px;
     padding-right: 10px;
     text-decoration: none;
     display: flex;
     align-items: center;
+    height: @appHeaderHeight;
 }
 
 .umb-app-header__action a:hover,
 .umb-app-header__action a:focus {
-    opacity: 1;
     outline: none;
+}
+
+.umb-app-header__action-icon {
+    opacity: 0.6;
+    color: @white;
+    font-size: 22px;
+}
+
+.umb-app-header__action a:hover .umb-app-header__action-icon,
+.umb-app-header__action a:focus .umb-app-header__action-icon {
+    opacity: 1;
 }
 

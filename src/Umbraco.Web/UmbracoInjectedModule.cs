@@ -91,11 +91,6 @@ namespace Umbraco.Web
 
             // ok, process
 
-            // create the LegacyRequestInitializer
-            // and initialize legacy stuff
-            var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
-            legacyRequestInitializer.InitializeRequest();
-
             // create the UmbracoContext singleton, one per request, and assign
             // replace existing if any (eg during app startup, a temp one is created)
             UmbracoContext.EnsureContext(
@@ -483,7 +478,10 @@ namespace Umbraco.Web
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                _logger.Verbose<UmbracoModule>("Begin request {RequestUrl}", httpContext.Request.Url);
+
+                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
+
+                _logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -526,7 +524,9 @@ namespace Umbraco.Web
 
                 if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
                 {
-                    _logger.Verbose<UmbracoModule>("End Request {RequestUrl} ({RequestDuration}ms)", httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
+
+                    _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
 
                 UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));

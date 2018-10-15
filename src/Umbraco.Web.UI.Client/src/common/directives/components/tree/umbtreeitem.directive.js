@@ -73,7 +73,15 @@ angular.module("umbraco.directives")
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
                 }
-                
+
+                //is this the current action node (this is not the same as the current selected node!)
+                var actionNode = appState.getMenuState("currentNode");
+                if (actionNode) {
+                    if (actionNode.id === node.id) {
+                        css.push("active");
+                    }
+                }
+
                 return css.join(" ");
             };
 

@@ -18,21 +18,24 @@
                            type="checkbox"
                            ng-model="variant.publish"
                            ng-change="vm.changeSelection(variant)"
-                           ng-disabled="variant.active === true"
                            style="margin-right: 8px;"
                            val-server-field="{{variant.htmlId}}" />
                     <div>
-                        <label for="{{variant.htmlId}}">
-                            <span style="margin-bottom: 2px;">{{ variant.language.name }}</span>
-                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                        <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
+                            <span>{{ variant.language.name }}</span>
                         </label>
 
-                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid">
-                            <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                            <umb-variant-state variant="variant"></umb-variant-state>
+                            <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                         </div>
 
                         <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
+                        </div>
+
+                        <div ng-repeat="notification in variant.notifications">
+                            <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
                         </div>
 
                     </div>
@@ -54,7 +57,15 @@
                     <span>{{ variant.language.name }}</span>
                     <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                 </div>
-                <umb-variant-state variant="variant"></umb-variant-state>
+
+                <div ng-if="!(variant.notifications && variant.notifications.length > 0)">
+                    <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
+                </div>
+
+                <div ng-repeat="notification in variant.notifications">
+                    <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                </div>
+                
             </div>
         </div>
     </div>

@@ -202,7 +202,6 @@ namespace Umbraco.Web.Templates
             // handlers like default.aspx will want it and most macros currently need it
             request.UmbracoPage = new page(request);
             //now, set the new ones for this page execution
-            _umbracoContext.HttpContext.Items["pageID"] = request.PublishedContent.Id;
             _umbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
             _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContext.PublishedRequest = request;
@@ -214,8 +213,8 @@ namespace Umbraco.Web.Templates
         private void SaveExistingItems()
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
-            //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal.
-            _oldPageId = _umbracoContext.HttpContext.Items["pageID"];
+            //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal            
+            _oldPageId = _umbracoContext.PageId;
             _oldPageElements = _umbracoContext.HttpContext.Items["pageElements"];
             _oldPublishedRequest = _umbracoContext.PublishedRequest;
             _oldAltTemplate = _umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate];
@@ -227,7 +226,6 @@ namespace Umbraco.Web.Templates
         private void RestoreItems()
         {
             _umbracoContext.PublishedRequest = _oldPublishedRequest;
-            _umbracoContext.HttpContext.Items["pageID"] = _oldPageId;
             _umbracoContext.HttpContext.Items["pageElements"] = _oldPageElements;
             _umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = _oldAltTemplate;
         }

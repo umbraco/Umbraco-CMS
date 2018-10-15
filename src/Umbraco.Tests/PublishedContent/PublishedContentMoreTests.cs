@@ -1,90 +1,95 @@
-﻿using System;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Collections.ObjectModel;
-using System.Web.Routing;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using Umbraco.Core.Composing;
-using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
     [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
-    public class PublishedContentMoreTests : PublishedContentTestBase
+    public class PublishedContentMoreTests : PublishedContentSnapshotTestBase
     {
-        // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
-        // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
-        // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
-
-        public override void SetUp()
+        internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            base.SetUp();
+            var props = new[]
+                {
+                    factory.CreatePropertyType("prop1", 1),
+                };
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
 
-            var umbracoContext = GetUmbracoContext();
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
-        }
+            cache.Add(new SolidPublishedContent(contentType1)
+            {
+                Id = 1,
+                SortOrder = 0,
+                Name = "Content 1",
+                UrlSegment = "content-1",
+                Path = "/1",
+                Level = 1,
+                Url = "/content-1",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                    {
+                        new SolidPublishedProperty
+                        {
+                            Alias = "prop1",
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
+                        }
+                    }
+            });
 
-        protected override void Compose()
-        {
-            base.Compose();
+            cache.Add(new SolidPublishedContent(contentType2)
+            {
+                Id = 2,
+                SortOrder = 1,
+                Name = "Content 2",
+                UrlSegment = "content-2",
+                Path = "/2",
+                Level = 1,
+                Url = "/content-2",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                    {
+                        new SolidPublishedProperty
+                        {
+                            Alias = "prop1",
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
+                        }
+                    }
+            });
 
-            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
-        }
-
-        protected override TypeLoader CreatePluginManager(IContainer f)
-        {
-            var pluginManager = base.CreatePluginManager(f);
-
-            // this is so the model factory looks into the test assembly
-            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
-                .Union(new[] { typeof (PublishedContentMoreTests).Assembly })
-                .ToList();
-
-            return pluginManager;
-        }
-
-        private UmbracoContext GetUmbracoContext()
-        {
-            RouteData routeData = null;
-
-            var publishedSnapshot = CreatePublishedSnapshot();
-
-            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
-            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
-
-            var globalSettings = TestObjects.GetGlobalSettings();
-
-            var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var umbracoContext = new UmbracoContext(
-                httpContext,
-                publishedSnapshotService.Object,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                globalSettings,
-                new TestVariationContextAccessor());
-
-            return umbracoContext;
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            Current.Reset();
+            cache.Add(new SolidPublishedContent(contentType2Sub)
+            {
+                Id = 3,
+                SortOrder = 2,
+                Name = "Content 2Sub",
+                UrlSegment = "content-2sub",
+                Path = "/3",
+                Level = 1,
+                Url = "/content-2sub",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
+                    {
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
+                    }
+                }
+            });
         }
 
         [Test]
@@ -195,96 +200,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);
             Assert.AreEqual(2, result[1].Id);
-        }
-
-        private static SolidPublishedSnapshot CreatePublishedSnapshot()
-        {
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
-
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
-            var caches = new SolidPublishedSnapshot();
-            var cache = caches.InnerContentCache;
-
-            var props = new[]
-            {
-                factory.CreatePropertyType("prop1", 1),
-            };
-
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
-
-            cache.Add(new SolidPublishedContent(contentType1)
-                {
-                    Id = 1,
-                    SortOrder = 0,
-                    Name = "Content 1",
-                    UrlSegment = "content-1",
-                    Path = "/1",
-                    Level = 1,
-                    Url = "/content-1",
-                    ParentId = -1,
-                    ChildIds = new int[] {},
-                    Properties = new Collection<IPublishedProperty>
-                    {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
-                    }
-                });
-
-            cache.Add(new SolidPublishedContent(contentType2)
-                {
-                    Id = 2,
-                    SortOrder = 1,
-                    Name = "Content 2",
-                    UrlSegment = "content-2",
-                    Path = "/2",
-                    Level = 1,
-                    Url = "/content-2",
-                    ParentId = -1,
-                    ChildIds = new int[] { },
-                    Properties = new Collection<IPublishedProperty>
-                    {
-                        new SolidPublishedProperty
-                        {
-                            Alias = "prop1",
-                            SolidHasValue = true,
-                            SolidValue = 1234,
-                            SolidSourceValue = "1234"
-                        }
-                    }
-                });
-
-            cache.Add(new SolidPublishedContent(contentType2Sub)
-            {
-                Id = 3,
-                SortOrder = 2,
-                Name = "Content 2Sub",
-                UrlSegment = "content-2sub",
-                Path = "/3",
-                Level = 1,
-                Url = "/content-2sub",
-                ParentId = -1,
-                ChildIds = new int[] { },
-                Properties = new Collection<IPublishedProperty>
-                {
-                    new SolidPublishedProperty
-                    {
-                        Alias = "prop1",
-                        SolidHasValue = true,
-                        SolidValue = 1234,
-                        SolidSourceValue = "1234"
-                    }
-                }
-            });
-
-            return caches;
         }
     }
 }

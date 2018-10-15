@@ -85,6 +85,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             appState.setSectionState("showSearchResults", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
+			appState.setMenuState("currentNode", null);
 
             if (appState.getGlobalState("isTablet") === true) {
                 appState.setGlobalState("showNavigation", false);
@@ -202,6 +203,29 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                     $location.search(k, currentSearch[k]);
                 }
             });
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#retainQueryStrings
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Will check the next route parameters to see if any of the query strings that should be retained from the previous route are missing,
+         * if they are they will be merged and an object containing all route parameters is returned. If nothing should be changed, then null is returned.
+         * @param {Object} currRouteParams The current route parameters
+         * @param {Object} nextRouteParams The next route parameters
+         */
+        retainQueryStrings: function (currRouteParams, nextRouteParams) {
+            var toRetain = angular.copy(nextRouteParams);
+            var updated = false;
+            _.each(retainedQueryStrings, function (r) {
+                if (currRouteParams[r] && !nextRouteParams[r]) {
+                    toRetain[r] = currRouteParams[r];
+                    updated = true;
+                }
+            });
+            return updated ? toRetain : null;
         },
 
         /**
@@ -342,7 +366,8 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
             if (appState.getGlobalState("isTablet") === true && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
-                appState.setSectionState("currentSection", $routeParams.section);
+				appState.setSectionState("currentSection", $routeParams.section);
+
                 setMode("default-hidesectiontree");
             }
 

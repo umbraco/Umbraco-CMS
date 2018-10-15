@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +8,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
-using Umbraco.Core.Media.Exif;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
@@ -27,8 +25,6 @@ namespace Umbraco.Core.IO
             Logger = Current.Container.GetInstance<ILogger>();
             MediaPathScheme = Current.Container.GetInstance<IMediaPathScheme>();
             MediaPathScheme.Initialize(this);
-
-            UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
         }
 
         private IMediaPathScheme MediaPathScheme { get; }
@@ -36,9 +32,7 @@ namespace Umbraco.Core.IO
         private IContentSection ContentConfig { get; }
 
         private ILogger Logger { get; }
-
-        internal UploadAutoFillProperties UploadAutoFillProperties { get; }
-
+        
         /// <summary>
         /// Deletes all files passed in.
         /// </summary>
@@ -205,113 +199,9 @@ namespace Umbraco.Core.IO
             return filepath;
         }
 
-        // gets or creates a property for a content item.
-        private static Property GetProperty(IContentBase content, string propertyTypeAlias)
-        {
-            var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (property != null) return property;
-
-            var propertyType = content.GetContentType().CompositionPropertyTypes
-                .FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
-                throw new Exception("No property type exists with alias " + propertyTypeAlias + ".");
-
-            property = new Property(propertyType);
-            content.Properties.Add(property);
-            return property;
-        }
-
-        // fixme - what's below belongs to the upload property editor, not the media filesystem!
-
-        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
-        {
-            var property = GetProperty(content, propertyTypeAlias);
-            var oldpath = property.GetValue(culture, segment) is string svalue ? GetRelativePath(svalue) : null;
-            var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
-            property.SetValue(GetUrl(filepath), culture, segment);
-            SetUploadFile(content, property, filepath, filestream, culture, segment);
-        }
-
-        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filepath, string culture = null, string segment = null)
-        {
-            var property = GetProperty(content, propertyTypeAlias);
-            // fixme delete?
-            var oldpath = property.GetValue(culture, segment) is string svalue ? GetRelativePath(svalue) : null;
-            if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
-                DeleteFile(oldpath);
-            property.SetValue(GetUrl(filepath), culture, segment);
-            using (var filestream = OpenFile(filepath))
-            {
-                SetUploadFile(content, property, filepath, filestream, culture, segment);
-            }
-        }
-
-        // sets a file for the FileUpload property editor
-        // ie generates thumbnails and populates autofill properties
-        private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream, string culture = null, string segment = null)
-        {
-            // will use filepath for extension, and filestream for length
-            UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, culture, segment);
-        }
+        
 
         #endregion
-
-        #region Image
-
-        /// <summary>
-        /// Gets a value indicating whether the file extension corresponds to an image.
-        /// </summary>
-        /// <param name="extension">The file extension.</param>
-        /// <returns>A value indicating whether the file extension corresponds to an image.</returns>
-        public bool IsImageFile(string extension)
-        {
-            if (extension == null) return false;
-            extension = extension.TrimStart('.');
-            return ContentConfig.ImageFileTypes.InvariantContains(extension);
-        }
-
-        /// <summary>
-        /// Gets the dimensions of an image.
-        /// </summary>
-        /// <param name="stream">A stream containing the image bytes.</param>
-        /// <returns>The dimension of the image.</returns>
-        /// <remarks>First try with EXIF as it is faster and does not load the entire image
-        /// in memory. Fallback to GDI which means loading the image in memory and thus
-        /// use potentially large amounts of memory.</remarks>
-        public Size GetDimensions(Stream stream)
-        {
-            //Try to load with exif
-            try
-            {
-                var jpgInfo = ImageFile.FromStream(stream);
-
-                if (jpgInfo.Format != ImageFileFormat.Unknown
-                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
-                    && jpgInfo.Properties.ContainsKey(ExifTag.PixelXDimension))
-                {
-                    var height = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelYDimension].Value);
-                    var width = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelXDimension].Value);
-                    if (height > 0 && width > 0)
-                    {
-                        return new Size(width, height);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                //We will just swallow, just means we can't read exif data, we don't want to log an error either
-            }
-
-            //we have no choice but to try to read in via GDI
-            using (var image = Image.FromStream(stream))
-            {
-
-                var fileWidth = image.Width;
-                var fileHeight = image.Height;
-                return new Size(fileWidth, fileHeight);
-            }
-        }
-
-        #endregion
+        
     }
 }

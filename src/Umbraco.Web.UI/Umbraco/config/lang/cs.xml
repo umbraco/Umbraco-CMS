@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="cs" intName="Czech" localName="česky" lcid="5" culture="cs-CZ">
   <creator>
     <name>umbraco</name>
@@ -62,7 +62,6 @@
   </area>
   <area alias="buttons">
     <key alias="select">Vybrat</key>
-    <key alias="selectCurrentFolder">Vybrat aktuální složku</key>
     <key alias="somethingElse">Dělat něco jiného</key>
     <key alias="bold">Tučně</key>
     <key alias="deindent">Zrušit odsazení odstavce</key>
@@ -147,7 +146,7 @@
     <key alias="statistics">Statistika</key>
     <key alias="titleOptional">Titulek (volitelně)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Nepublikovat</key>
+    <key alias="unpublish">Nepublikovat</key>
     <key alias="updateDate">Naposledy změněno</key>
     <key alias="updateDateDesc" version="7.0">Datum/čas poslední změny dokumentu</key>
     <key alias="uploadClear">Odebrat soubor(y)</key>
@@ -159,7 +158,6 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klikněte pro nahrání</key>
-    <key alias="dropFilesHere">Upusťte soubory zde...</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Kde chcete vytvořit nový %0%</key>
@@ -185,27 +183,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -278,7 +271,6 @@
     <key alias="newtab">Nová záložka</key>
     <key alias="tab">Záložka</key>
     <key alias="thumbnail">Miniatura</key>
-    <key alias="hasListView">Povolit zobrazení jako seznam</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Přidat předlohu</key>
@@ -314,14 +306,11 @@
     <key alias="missingTitle">Uveďte, prosím, titulek</key>
     <key alias="missingType">Vyberte, prosím, typ</key>
     <key alias="pictureResizeBiggerThanOrg">Chystáte se obrázek zvětšit více, než je jeho původní rozměr. Opravdu chcete pokračovat?</key>
-    <key alias="pythonErrorHeader">Chyba ve skriptu python</key>
-    <key alias="pythonErrorText">Skript python nebyl ještě uložen, protože obsahuje chyby</key>
     <key alias="startNodeDoesNotExists">Počáteční uzel je odstraněný, kontaktujte, prosím, administrátora</key>
     <key alias="stylesMustMarkBeforeSelect">Před změnou stylu označte, prosím, obsah</key>
     <key alias="stylesNoStylesOnPage">Žádne aktivní styly nejsou dostupné</key>
     <key alias="tableColMergeLeft">Umístěte, prosím, kurzor nalevo od těch dvou buňek, které chcete sloučit</key>
     <key alias="tableSplitNotSplittable">Nemužete rozdělit buňku, která nebyla sloučená.</key>
-    <key alias="missingPropertyEditorErrorMessage">V nastavení datového typu použitého pro tuto vlastnost je chyba, zkontrolujte, prosím, datový typ</key>
   </area>
   <area alias="general">
     <key alias="about">O...</key>
@@ -376,7 +365,6 @@
     <key alias="logout">Odhlášení</key>
     <key alias="macro">Makro</key>
     <key alias="move">Přesunout</key>
-    <key alias="more">Více</key>
     <key alias="name">Název</key>
     <key alias="new">Nový</key>
     <key alias="next">Následující</key>
@@ -405,7 +393,8 @@
     <key alias="showPageOnSend">Zobrazit stránku při odeslání</key>
     <key alias="size">Rozměr</key>
     <key alias="sort">Seřadit</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Pro hledání pište...</key>
     <key alias="up">Nahoru</key>
@@ -548,7 +537,6 @@
     <key alias="renewSession">Obnovte nyní pro uložení práce</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Šťastnou super neděli</key>
     <key alias="greeting1">Šťastné šílené pondělí</key>
     <key alias="greeting2">Šťastné husté úterý</key>
     <key alias="greeting3">Šťastnou překrásnou středu</key>
@@ -680,11 +668,9 @@
     <key alias="paSimpleHelp">Jestliže chcete nastavit jenom jednoduchou ochranu prostřednictvím uživatelského jména a hesla</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">
-      <![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% nemůže být publikována, protože položka je naplánovaná k uvolnění.
-    ]]>
-    </key>
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% nemůže být publikována, protože tyto vlastnosti: %1%  nesplňují validační pravidla.
     ]]></key>
@@ -807,10 +793,6 @@
     <key alias="fileSavedHeader">Soubor byl uložen</key>
     <key alias="fileSavedText">Soubor byl uložen bez chyb</key>
     <key alias="languageSaved">Jazyk byl uložen</key>
-    <key alias="pythonErrorHeader">Skript python nebyl uložen</key>
-    <key alias="pythonErrorText">Skript python nemohl být uložen kvůli chybě</key>
-    <key alias="pythonSavedHeader">Skript python byl uložen</key>
-    <key alias="pythonSavedText">Ve skriptu python nejsou žádné chyby</key>
     <key alias="templateErrorHeader">Šablona nebyla uložena</key>
     <key alias="templateErrorText">Ujistěte se, prosím, že nemáte 2 šablony se stejným aliasem</key>
     <key alias="templateSavedHeader">Šablona byla uložena</key>
@@ -841,27 +823,20 @@
     <key alias="template">Šablona</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
-
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
-
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
@@ -876,7 +851,6 @@
     <key alias="settingsDetails">Configure what settings editors can change</key>
     <key alias="styles">Styles</key>
     <key alias="stylesDetails">Configure what styling editors can change</key>
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
@@ -909,15 +883,7 @@
     <key alias="withTime">Ano, s časem. Oddělovač: </key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">Úlohy přidělené Vám</key>
-    <key alias="assignedTasksHelp"><![CDATA[ Seznam níže zobrazuje překladatelské úlohy <strong>přidělené Vám</strong>. Chcete-li vidět podrobné zobrazení včetně komentářů, klikněte na "Podrobnosti" nebo pouze na název stránky. 
-     Můžete také přímo stáhnout stránku jako XML kliknutím na odkaz "Stáhnout Xml". <br/>
-     Pro zavření překladatelské úlohy přejděte, prosím, na zobrazení Podrobnosti a klikněte na tlačítko "Zavřít".
-    ]]></key>
-    <key alias="closeTask">zavřít úlohu</key>
     <key alias="details">Podrobnosti překladu</key>
-    <key alias="downloadAllAsXml">Stáhnout všechny překladatelské úlohy jako xml</key>
-    <key alias="downloadTaskAsXml">Stáhnout xml</key>
     <key alias="DownloadXmlDTD">Stáhnout xml DTD</key>
     <key alias="fields">Pole</key>
     <key alias="includeSubpages">Zahrnout podstránky</key>
@@ -936,16 +902,9 @@
 
       Zdraví umbraco robot
     ]]></key>
-    <key alias="mailSubject">[%0%] Překladatelská úloha pro %1%</key>
     <key alias="noTranslators">Žádní uživatelé překladatelé nebyli nalezeni. Vytvořte, prosím, překladatele před tím, než začnete posílat obsah k překladu</key>
-    <key alias="ownedTasks">Úlohy vytvořené Vámi</key>
-    <key alias="ownedTasksHelp"><![CDATA[Seznam níže zobrazuje stránky <strong>vytvořené Vámi</strong>. Chcete-li vidět podrobné zobrazení včetně komentářů, klikněte na "Podrobnosti" nebo pouze na název stránky. Můžete také přímo stáhnout stránku jako XML kliknutím na odkaz "Stáhnout Xml". 
-     Pro zavření překladatelské úlohy přejděte, prosím, na zobrazení Podrobnosti a klikněte na tlačítko "Zavřít".
-    ]]></key>
     <key alias="pageHasBeenSendToTranslation">Stránka '%0%' byla poslána k překladu</key>
     <key alias="sendToTranslate">Poslat stránku '%0%' k překladu</key>
-    <key alias="taskAssignedBy">Přiděleno uživatelem</key>
-    <key alias="taskOpened">Otevřené úlohy</key>
     <key alias="totalWords">Slov celkem</key>
     <key alias="translateTo">Přeložit do</key>
     <key alias="translationDone">Překlad hotov.</key>
@@ -975,7 +934,6 @@
     <key alias="documentTypes">Typy dokumentů</key>
     <key alias="packager">Balíčky</key>
     <key alias="packages">Balíčky</key>
-    <key alias="python">Soubory python</key>
     <key alias="repositories">Instalovat z úložiště</key>
     <key alias="runway">Instalovat Runway</key>
     <key alias="runwayModules">Moduly Runway</key>

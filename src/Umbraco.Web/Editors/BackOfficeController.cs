@@ -23,12 +23,13 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security.Identity;
+
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
+using Umbraco.Web.Security;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Editors
     /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
-    [DisableClientCache]
+    [DisableBrowserCache]
     public class BackOfficeController : UmbracoController
     {
         private readonly ManifestParser _manifestParser;
@@ -85,6 +86,16 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public async Task<ActionResult> VerifyInvite(string invite)
         {
+            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
+            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
+            //dumped at the default admin view with no detail
+            if(Security.IsAuthenticated())
+            {
+                AuthenticationManager.SignOut(
+                    Core.Constants.Security.BackOfficeAuthenticationType,
+                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            }
+            
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -128,16 +139,15 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded == false)
             {
                 Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
-                return RedirectToAction("Default");
+                return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
             //sign the user in
-
-            AuthenticationManager.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
+            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
             await SignInManager.SignInAsync(identityUser, false, false);
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
+            identityUser.LastLoginDateUtc = previousLastLoginDate;
+            await UserManager.UpdateAsync(identityUser);
 
             return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
         }
@@ -195,7 +205,8 @@ namespace Umbraco.Web.Editors
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
 
-            var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
@@ -214,7 +225,7 @@ namespace Umbraco.Web.Editors
                 var initJs = new JsInitialization(_manifestParser);
                 var initCss = new CssInitialization(_manifestParser);
                 var assets = new List<string>();
-                assets.AddRange(initJs.GetScriptFiles(HttpContext, Enumerable.Empty<string>()));
+                assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
                 assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
                 return new JArray(assets);
             }

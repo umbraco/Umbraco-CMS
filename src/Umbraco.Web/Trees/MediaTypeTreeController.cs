@@ -16,7 +16,7 @@ using Umbraco.Web.Search;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:9)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:1)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MediaTypeTreeController : TreeController, ISearchableTree
@@ -73,8 +73,9 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                    $"actions/{ActionRefresh.Instance.Alias}"));
                 return menu;
             }
 
@@ -84,9 +85,9 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
                 {
                     Icon = "icon icon-edit"
                 });
@@ -94,9 +95,10 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
                 }
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                    $"actions/{ActionRefresh.Instance.Alias}"), hasSeparator: true);
             }
             else
             {
@@ -105,28 +107,29 @@ namespace Umbraco.Web.Trees
 
                 if (enableInheritedMediaTypes)
                 {
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
 
                     //no move action if this is a child doc type
                     if (parent == null)
                     {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize($"actions/{ActionMove.Instance.Alias}"), true);
                     }
                 }
                 else
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
+                    menu.Items.Add<ActionMove>(Services.TextService.Localize($"actions/{ActionMove.Instance.Alias}"));
                     //no move action if this is a child doc type
                     if (parent == null)
                     {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize($"actions/{ActionMove.Instance.Alias}"), true);
                     }
                 }
 
-                menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                menu.Items.Add<ActionCopy>(Services.TextService.Localize($"actions/{ActionCopy.Instance.Alias}"));
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
                 if (enableInheritedMediaTypes)
-                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                        $"actions/{ActionRefresh.Instance.Alias}"), true);
             }
 
             return menu;

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Web;
 using Moq;
 using Umbraco.Core;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -127,30 +126,6 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties["title"], Is.Not.Null);
             Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
         }
-
-        [Test]
-        public void Can_Set_Property_Value_As_HttpPostedFileBase()
-        {
-            // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            var stream = new MemoryStream(System.Text.Encoding.Default.GetBytes("TestContent"));
-            var postedFileMock = new Mock<HttpPostedFileBase>();
-            postedFileMock.Setup(x => x.ContentLength).Returns(Convert.ToInt32(stream.Length));
-            postedFileMock.Setup(x => x.ContentType).Returns("text/plain");
-            postedFileMock.Setup(x => x.FileName).Returns("sample.txt");
-            postedFileMock.Setup(x => x.InputStream).Returns(stream);
-
-            // Assert
-            content.SetValue("title", postedFileMock.Object);
-
-            // Assert
-            Assert.That(content.Properties.Any(), Is.True);
-            Assert.That(content.Properties["title"], Is.Not.Null);
-            Assert.IsTrue(content.Properties["title"].GetValue().ToString().Contains("sample.txt"));
-        }
-
 
         [Test]
         public void Can_Clone_Content_With_Reset_Identity()

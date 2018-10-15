@@ -24,6 +24,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.UI;
+using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Editors
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
         /// <summary>
@@ -582,8 +583,9 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Logger);
-            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
+            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             //these bits are super old, but cant find another way to do this currently

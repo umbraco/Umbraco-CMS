@@ -37,7 +37,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(logger)) { Id = 1},
+                new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
                 new DataType(new RichTextPropertyEditor(logger)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
@@ -337,11 +337,11 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        public void GetPropertyValueRecursiveTest()
+        public void Get_Property_Value_Recursive()
         {
             var doc = GetNode(1174);
-            var rVal = doc.Value("testRecursive", recurse: true);
-            var nullVal = doc.Value("DoNotFindThis", recurse: true);
+            var rVal = doc.Value("testRecursive", fallback: Fallback.ToAncestors);
+            var nullVal = doc.Value("DoNotFindThis", fallback: Fallback.ToAncestors);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }

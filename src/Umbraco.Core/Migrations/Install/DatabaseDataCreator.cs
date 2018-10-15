@@ -69,10 +69,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.RelationType))
                 CreateRelationTypeData();
-
-            if (tableName.Equals(Constants.DatabaseSchema.Tables.TaskType))
-                CreateTaskTypeData();
-
+            
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
@@ -152,6 +149,7 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MemberTypes, Name = "MemberTypes" });
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MemberTree, Name = "MemberTree" });
             _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Domains, Name = "Domains" });
+            _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.Languages, Name = "Languages" });
         }
 
         private void CreateContentTypeData()
@@ -185,7 +183,7 @@ namespace Umbraco.Core.Migrations.Install
         private void CreateUserGroup2AppData()
         {
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Content });
-            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Developer });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Packages });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Media });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Members });
             _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Settings });
@@ -232,7 +230,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateLanguageData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)" });
+            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefault = true });
         }
 
         private void CreateContentChildTypeData()
@@ -316,11 +314,6 @@ namespace Umbraco.Core.Migrations.Install
             relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
-        }
-
-        private void CreateTaskTypeData()
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.TaskType, "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
         }
 
         private void CreateKeyValueData()

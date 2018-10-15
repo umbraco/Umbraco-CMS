@@ -40,10 +40,9 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
-        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 </head>
-<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <noscript>
         <div style="margin: 10px;">
@@ -77,8 +76,9 @@
 
             </div>
 
-            <umb-tour ng-if="tour.show"
-                      model="tour">
+            <umb-tour 
+                ng-if="tour.show"
+                model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
@@ -87,6 +87,8 @@
 
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+
+        <umb-search ng-if="search.show" on-close="closeSearch()"></umb-search>
 
     </div>
 
@@ -100,7 +102,8 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
-                 view="overlay.view">
+                 view="overlay.view"
+                 parent-scope="overlay.parentScope">
     </umb-overlay>
 
     <umb-overlay ng-if="ysodOverlay.show"

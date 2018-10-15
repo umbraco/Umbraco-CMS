@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -174,7 +175,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var list = new List<string>
             {
-                "DELETE FROM cmsTask WHERE nodeId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
                 "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                 "DELETE FROM umbracoRelation WHERE parentId = @id",
@@ -492,8 +492,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Gets paged member results.
         /// </summary>
-        public override IEnumerable<IMember> GetPage(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null)
+        public override IEnumerable<IMember> GetPage(IQuery<IMember> query,
+            long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMember> filter,
+            Ordering ordering)
         {
             Sql<ISqlContext> filterSql = null;
 
@@ -505,8 +507,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField,
-                filterSql);
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
         }
 
         private string _pagedResultsByQueryWhere;
@@ -523,20 +526,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return _pagedResultsByQueryWhere;
         }
 
-        protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
+        protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
-            //Some custom ones
-            switch (orderBy.ToUpperInvariant())
-            {
-                case "EMAIL":
-                    return GetDatabaseFieldNameForOrderBy("cmsMember", "email");
-                case "LOGINNAME":
-                    return GetDatabaseFieldNameForOrderBy("cmsMember", "loginName");
-                case "USERNAME":
-                    return GetDatabaseFieldNameForOrderBy("cmsMember", "loginName");
-            }
+            if (ordering.OrderBy.InvariantEquals("email"))
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.Email);
 
-            return base.GetDatabaseFieldNameForOrderBy(orderBy);
+            if (ordering.OrderBy.InvariantEquals("loginName"))
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
+
+            if (ordering.OrderBy.InvariantEquals("userName"))
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
+
+            return base.ApplySystemOrdering(ref sql, ordering);
         }
 
         private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)

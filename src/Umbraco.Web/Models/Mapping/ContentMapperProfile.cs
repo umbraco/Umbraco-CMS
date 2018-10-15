@@ -1,9 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -21,12 +20,9 @@ namespace Umbraco.Web.Models.Mapping
             TabsAndPropertiesResolver<IContent, ContentVariantDisplay> tabsAndPropertiesResolver,
             ContentAppResolver contentAppResolver,
             IUserService userService,
-            ILocalizedTextService textService,
             IContentService contentService,
             IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILogger logger)
+            ILocalizationService localizationService)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
@@ -36,7 +32,6 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var variantResolver = new ContentVariantResolver(localizationService);
-            var contentSavedStateResolver = new ContentSavedStateResolver();
             
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
@@ -70,7 +65,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentSavedStateResolver<ContentPropertyDisplay>>())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
@@ -83,11 +79,61 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<UpdateDateResolver>())
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
         }
-    }
+
+        /// <summary>
+        /// Resolves the update date for a content item/content variant
+        /// </summary>
+        private class UpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
+        {
+            public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
+            {
+                // invariant = global date
+                if (!source.ContentType.VariesByCulture()) return source.UpdateDate;
+
+                // variant = depends on culture
+                var culture = context.Options.GetCulture();
+
+                // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
+                if (culture == null)
+                    throw new InvalidOperationException("Missing culture in mapping options.");
+
+                // if we don't have a date for a culture, it means the culture is not available, and
+                // hey we should probably not be mapping it, but it's too late, return a fallback date
+                var date = source.GetUpdateDate(culture);
+                return date ?? source.UpdateDate;
+            }
+        }
+
+        /// <summary>
+        /// Resolves the name for a content item/content variant
+        /// </summary>
+        private class NameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
+        {
+            public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
+            {
+                // invariant = only 1 name
+                if (!source.ContentType.VariesByCulture()) return source.Name;
+
+                // variant = depends on culture
+                var culture = context.Options.GetCulture();
+
+                // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
+                if (culture == null)
+                    throw new InvalidOperationException("Missing culture in mapping options.");
+
+                // if we don't have a name for a culture, it means the culture is not available, and
+                // hey we should probably not be mapping it, but it's too late, return a fallback name
+                return source.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
+            }
+        }
+    }    
 }

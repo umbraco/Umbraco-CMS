@@ -25,6 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
             CreateMap<EntitySlim, EntityBasic>()
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
@@ -178,6 +179,34 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
                   .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
+        }
+
+        /// <summary>
+        /// Resolves the name for a content item/content variant
+        /// </summary>
+        private class NameResolver : IValueResolver<EntitySlim, EntityBasic, string>
+        {
+            public string Resolve(EntitySlim source, EntityBasic destination, string destMember, ResolutionContext context)
+            {
+                if (!(source is DocumentEntitySlim doc))
+                    return source.Name;
+
+                // invariant = only 1 name
+                if (!doc.Variations.VariesByCulture()) return source.Name;
+
+                // variant = depends on culture
+                var culture = context.Options.GetCulture();
+
+                // if there's no culture here, the issue is somewhere else (UI, whatever) - throw!
+                if (culture == null)
+                    //throw new InvalidOperationException("Missing culture in mapping options.");
+                    // fixme we should throw, but this is used in various places that won't set a culture yet
+                    return source.Name;
+
+                // if we don't have a name for a culture, it means the culture is not available, and
+                // hey we should probably not be mapping it, but it's too late, return a fallback name
+                return doc.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ function ContentEditController($scope, $rootScope, $routeParams, contentResource
     //This is so we can listen to changes on the cculture parameter since that will not cause a route change
     // and then we can pass in the updated culture to the editor
     $scope.$on('$routeUpdate', function (event, next) {
-        $scope.culture = next.params.cculture;
+        $scope.culture = next.params.cculture ? next.params.cculture : $routeParams.mculture;
     });
 }
 

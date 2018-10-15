@@ -58,6 +58,9 @@ namespace Umbraco.Core.PropertyEditors
         public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
 
         /// <inheritdoc />
+        public virtual object DefaultConfigurationObject => DefaultConfiguration;
+
+        /// <inheritdoc />
         public virtual bool IsConfiguration(object obj) => obj is IDictionary<string, object>;
 
         /// <inheritdoc />
@@ -97,7 +100,7 @@ namespace Umbraco.Core.PropertyEditors
 
             // clone the default configuration, and apply the current configuration values
             var d = new Dictionary<string, object>(DefaultConfiguration);
-            foreach ((var key, var value) in c)
+            foreach (var (key, value) in c)
                 d[key] = value;
             return d;
         }

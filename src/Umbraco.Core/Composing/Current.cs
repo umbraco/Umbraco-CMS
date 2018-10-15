@@ -158,6 +158,9 @@ namespace Umbraco.Core.Composing
         public static IPublishedValueFallback PublishedValueFallback
             => _publishedValueFallback ?? Container.GetInstance<IPublishedValueFallback>() ?? new NoopPublishedValueFallback();
 
+        public static IVariationContextAccessor VariationContextAccessor
+            => Container.GetInstance<IVariationContextAccessor>();
+
         #endregion
     }
 }

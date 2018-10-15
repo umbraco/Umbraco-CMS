@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -28,6 +30,14 @@ namespace Umbraco.Tests.Strings
         {
             var helper = Current.ShortStringHelper;
             Assert.IsInstanceOf<MockShortStringHelper>(helper);
+        }
+
+        [TestCase("hello-world.png", "Hello World")]
+        [TestCase("hello-world .png", "Hello World")]
+        [TestCase("_hello-world __1.png", "Hello World 1")]
+        public void To_Friendly_Name(string first, string second)
+        {
+            Assert.AreEqual(first.ToFriendlyName(), second);
         }
 
         [TestCase("hello", "world", false)]

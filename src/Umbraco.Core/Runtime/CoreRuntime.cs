@@ -369,7 +369,7 @@ namespace Umbraco.Core.Runtime
             _state.CurrentMigrationState = state;
             _state.FinalMigrationState = umbracoPlan.FinalState;
 
-            logger.Debug<CoreRuntime>("Final upgrade state is '{FinalMigrationState}', database contains {DatabaseState}", _state.FinalMigrationState, state ?? "<null>");
+            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, state ?? "<null>");
 
             return state == _state.FinalMigrationState;
         }

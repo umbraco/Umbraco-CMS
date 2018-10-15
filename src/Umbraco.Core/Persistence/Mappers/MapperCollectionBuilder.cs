@@ -47,7 +47,6 @@ namespace Umbraco.Core.Persistence.Mappers
             Add<RelationTypeMapper>();
             Add<ServerRegistrationMapper>();
             Add<TagMapper>();
-            Add<TaskTypeMapper>();
             Add<TemplateMapper>();
             Add<UmbracoEntityMapper>();
             Add<UserMapper>();

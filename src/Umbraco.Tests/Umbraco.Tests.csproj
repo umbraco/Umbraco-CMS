@@ -78,11 +78,14 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.8.9</Version>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
@@ -96,7 +99,7 @@
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="NPoco" Version="3.9.3" />
+    <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -121,6 +124,8 @@
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
@@ -223,8 +228,6 @@
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Composing\ComposingTestBase.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
@@ -259,8 +262,6 @@
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
     <Compile Include="Models\RelationTypeTests.cs" />
-    <Compile Include="Models\TaskTests.cs" />
-    <Compile Include="Models\TaskTypeTests.cs" />
     <Compile Include="Models\TemplateTests.cs" />
     <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Models\UserTests.cs" />

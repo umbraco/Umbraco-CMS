@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
   <creator>
     <name>The Umbraco community</name>
@@ -105,7 +105,7 @@
     <key alias="statistics">סטטיסטיקות</key>
     <key alias="titleOptional">כותרת (לא חובה)</key>
     <key alias="type">סוג</key>
-    <key alias="unPublish">ממתין לפירסום</key>
+    <key alias="unpublish">ממתין לפירסום</key>
     <key alias="updateDate">נערך לאחרונה</key>
     <key alias="uploadClear">הסר קובץ</key>
     <key alias="urls">קשר למסמך</key>
@@ -132,27 +132,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -254,8 +249,6 @@
     <key alias="missingTitle">אנא בחר כותרת</key>
     <key alias="missingType">אנא בחר סוג</key>
     <key alias="pictureResizeBiggerThanOrg">הינך עומד לשנות את התמונה לגודל גדול יותר מהמקור, האם ברצונך להמשיך</key>
-    <key alias="pythonErrorHeader">שגיאות ב- python script</key>
-    <key alias="pythonErrorText">ה- python script לא נשמר, מכיל שגיאות</key>
     <key alias="startNodeDoesNotExists">הפריט תוכן ההתחלתי נמחק, צור קשר עם מנהל האתר.</key>
     <key alias="stylesMustMarkBeforeSelect">תחילה יש לסמן תוכן לפני שינוי עיצוב</key>
     <key alias="stylesNoStylesOnPage">סגנונות עיצוב פעילים לא זמינים</key>
@@ -341,7 +334,8 @@
     <key alias="showPageOnSend">הצג עמוד בשליחה</key>
     <key alias="size">גודל</key>
     <key alias="sort">סדר</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">סוג</key>
     <key alias="typeToSearch">הקלד לחיפוש...</key>
     <key alias="up">למעלה</key>
@@ -489,7 +483,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
-    <key alias="topText">ברוכים הבאים לאומברקו, יש להזין שם משתמש וסיסמה בשדות למטה:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">לוח הבקרה</key>
@@ -710,10 +703,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fileSavedHeader">הקובץ נשמר</key>
     <key alias="fileSavedText">הקובץ נשמר ללא שגיאות</key>
     <key alias="languageSaved">שפה נשמרה</key>
-    <key alias="pythonErrorHeader">Python script לא נשמרו</key>
-    <key alias="pythonErrorText">Python script לא נשמרו עקב שגיאות</key>
-    <key alias="pythonSavedHeader">Python script נשמר</key>
-    <key alias="pythonSavedText">לא נמצאו שגיאות ב- python script</key>
     <key alias="templateErrorHeader">התבנית לא נשמרה</key>
     <key alias="templateErrorText">שים לב שאין 2 תבניות עם אותו השם/כינוי</key>
     <key alias="templateSavedHeader">התבנית נשמרה</key>
@@ -739,27 +728,20 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">תבנית</key>
   </area>
   <area alias="grid">
-      <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
-
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
-
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
@@ -768,18 +750,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
-
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
-
     <key alias="styles">Styles</key>
     <key alias="stylesDetails">Configure what styling editors can change</key>
-
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
-
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
@@ -811,15 +787,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="withTime">כן, עם שעה. תו מפריד: </key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">משימות משוייכות אליך</key>
-    <key alias="assignedTasksHelp"><![CDATA[ הרשימה הבאה מציגה את משימות התרגום <strong>שמשוייכות אלייך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, יש ללחוץ על "פרטים" או על שם העמוד. 
-     ניתן בנוסף להוריד את הקובץ כ XML ישירות למחשב על ידי לחיצה ב"הורד קובץ XML".<br/>
-     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
-    ]]></key>
-    <key alias="closeTask">סגור משימה</key>
     <key alias="details">פרטי תירגום</key>
-    <key alias="downloadAllAsXml">הורד את כל התירגומים כקובץ xml</key>
-    <key alias="downloadTaskAsXml">הורד קובץ  xml</key>
     <key alias="DownloadXmlDTD">הורד xml DTD</key>
     <key alias="fields">שדות</key>
     <key alias="includeSubpages">כלול דפי משנה</key>
@@ -837,17 +805,9 @@ To manage your website, simply open the Umbraco back office and start adding con
       המשך יום נעים.
 	  
     ]]></key>
-    <key alias="mailSubject">[%0%] משימות תירגום עבור %1%</key>
     <key alias="noTranslators">לא נמצאו משתמשמים המוגדרים כמתרגמים. יש ליצור משתמש המוגדר כמתרגם לפני שליחת תוכן לתירגום</key>
-    <key alias="ownedTasks">משימות שנוצרו על ידך</key>
-    <key alias="ownedTasksHelp"><![CDATA[ הרשימה הבאה מציגה עמודים <strong>שנוצרו על ידיך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, 
-     יש ללחוץ על "פרטי תרגום" או על ידי שם העמוד. ניתן בנוסף להוריד את העמוד כקובץ XML ישירות למחשב על ידי לחיצה על "הורד קובץ XML". 
-     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
-    ]]></key>
     <key alias="pageHasBeenSendToTranslation">העמוד '%0%' נשלח לתירגום</key>
     <key alias="sendToTranslate">שלח את העמוד '%0%' לתירגום</key>
-    <key alias="taskAssignedBy">הוקצה על ידי</key>
-    <key alias="taskOpened">משימה נפתחה</key>
     <key alias="totalWords">סך הכל מילים</key>
     <key alias="translateTo">תרגם עבור</key>
     <key alias="translationDone">התירגום הושלם.</key>
@@ -877,7 +837,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypes">סוגי מסמכים</key>
     <key alias="packager">חבילות</key>
     <key alias="packages">חבילות</key>
-    <key alias="python">קבצי פייתון</key>
     <key alias="repositories">התקן מתוך מאגר</key>
     <key alias="runway">התקן Runway</key>
     <key alias="runwayModules">מודולי Runway</key>

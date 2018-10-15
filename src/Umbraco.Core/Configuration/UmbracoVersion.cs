@@ -22,7 +22,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the version comment of the executing code (eg "beta").
         /// </summary>
-        public static string CurrentComment => "alpha.49";
+        public static string CurrentComment => "alpha.52";
 
         /// <summary>
         /// Gets the assembly version of Umbraco.Code.dll.

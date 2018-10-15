@@ -82,7 +82,7 @@ namespace umbraco
                 //check for published content and get its value using that
                 if (publishedContent != null && (publishedContent.HasProperty(_fieldName) || recursive))
                 {
-                    var pval = publishedContent.Value(_fieldName, recurse: recursive);
+                    var pval = publishedContent.Value(_fieldName, fallback: Fallback.ToAncestors);
                     var rval = pval == null ? string.Empty : pval.ToString();
                     _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                 }
@@ -102,7 +102,7 @@ namespace umbraco
                     {
                         if (publishedContent != null && (publishedContent.HasProperty(altFieldName) || recursive))
                         {
-                            var pval = publishedContent.Value(altFieldName, recurse: recursive);
+                            var pval = publishedContent.Value(altFieldName, fallback: Fallback.ToAncestors);
                             var rval = pval == null ? string.Empty : pval.ToString();
                             _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                         }

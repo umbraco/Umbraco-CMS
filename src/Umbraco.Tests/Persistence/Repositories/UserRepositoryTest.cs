@@ -8,17 +8,19 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
     public class UserRepositoryTest : TestWithDatabaseBase
     {
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out IMediaTypeRepository mediaTypeRepository)
@@ -50,14 +52,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, CacheHelper.Disabled, Mock.Of<ILogger>(), Mock.Of<IMapperCollection>(), TestObjects.GetGlobalSettings());
+            var repository = new UserRepository(accessor, CacheHelper.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, CacheHelper.Disabled, Mock.Of<ILogger>());
+            return new UserGroupRepository(accessor, CacheHelper.Disabled, Logger);
         }
 
         [Test]
@@ -338,7 +340,72 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.Count(query);
 
                 // Assert
-                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+                var query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+
+                    // Assert
+                    Assert.AreEqual(2, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+            
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_With_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+
+                    // Assert
+                    Assert.AreEqual(1, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
             }
         }
 

@@ -92,18 +92,7 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>The flatten list.</summary>
-        /// <param name="e">The items.</param>
-        /// <param name="f">The select child.</param>
-        /// <typeparam name="T">Item type</typeparam>
-        /// <returns>list of TItem</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Do not use, use SelectRecursive instead which has far less potential of re-iterating an iterator which may cause significantly more SQL queries")]
-        public static IEnumerable<T> FlattenList<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
-        {
-            return e.SelectMany(c => f(c).FlattenList(f)).Concat(e);
-        }
-
+        
         /// <summary>
         /// Returns true if all items in the other collection exist in this collection
         /// </summary>
