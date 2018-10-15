@@ -39,7 +39,7 @@ angular.module("umbraco.directives")
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\' : !isRtl() && (!node.expanded || node.metaData.isContainer),\'icon-navigation-left\' : isRtl() && (!node.expanded || node.metaData.isContainer), \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins data-element="tree-item-expand" ng-class="getInsClass(node)" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
@@ -65,19 +65,13 @@ angular.module("umbraco.directives")
                 }
             }
 
-            function isRtl()
-            {
-                var x = document.dir;
-                return x === "rtl" ? true : false;
-            }
-
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
                 
                 //get the first div element
                 element.children(":first")
                     //set the padding
-                    .css("padding-" + (isRtl() === true ? "right" : "left"), (node.level * 20) + "px");
+                    .css("padding-" + (Umbraco.Sys.ServerVariables.application.isRtl === true ? "right" : "left"), (node.level * 20) + "px");
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
@@ -121,12 +115,20 @@ angular.module("umbraco.directives")
                 }, 0, false);
             }
 
-            scope.isRtl = function () {
-                var x = document.dir;
-                return x === "rtl" ? true : false;
+            scope.getInsClass = function (node) {
+                if (!node.expanded || node.metaData.isContainer) {
+                    if (Umbraco.Sys.ServerVariables.application.isRtl) {
+                        return "icon-navigation-left";
+                    }
+                    return "icon-navigation-right";            
+                }
+                if (node.expanded && !node.metaData.isContainer) {
+                    return "icon-navigation-down";
+                }
+                return "";
             };
 
-            /** Returns the css classses assigned to the node (div element) */
+            /** Returns the css classes assigned to the node (div element) */
             scope.getNodeCssClass = function (node) {
                 if (!node) {
                     return '';
