@@ -7,8 +7,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-
 
 namespace Umbraco.Core.Manifest
 {
@@ -106,43 +104,28 @@ namespace Umbraco.Core.Manifest
             }
 
             var rules = _showRules ?? (_showRules = ShowRule.Parse(Show).ToArray());
+            var userGroupsList = userGroups.ToList();
 
-            // if no 'show' is specified, then always display the content app
-            if (rules.Length > 0)
+            var okRole = false;
+            var hasRole = false;
+            var okType = false;
+            var hasType = false;
+
+            foreach (var rule in rules)
             {
-                var ok = false;
-
-                //if any role specific rules, deal with them first.
-                if (rules.Where(x => x.PartA.InvariantEquals("role")).Any())
+                if (rule.PartA.InvariantEquals("role"))
                 {
-                    foreach (var rule in rules)
-                    {
-                        if (rule.PartA.InvariantEquals("role"))
-                        {
-                            foreach (var group in userGroups)
-                            {
-                                if (rule.Matches(rule.PartA, group.Alias))
-                                {
-                                    ok = rule.Show;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    // if a role entry, don't let anything else override it.
-                    if (!ok)
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    // else iterate over each entry to check for show/hide rules.
-                    foreach (var rule in rules)
-                    {
+                    // if roles have been ok-ed already, skip the rule
+                    if (okRole)
+                        continue;
 
-                        // if the entry does not apply, skip it
-                        if (!rule.Matches(partA, partB))
+                    // remember we have role rules
+                    hasRole = true;
+
+                    foreach (var group in userGroupsList)
+                    {
+                        // if the entry does not apply, skip
+                        if (!rule.Matches("role", group.Alias))
                             continue;
 
                         // if the entry applies,
@@ -150,16 +133,41 @@ namespace Umbraco.Core.Manifest
                         if (!rule.Show)
                             return null;
 
-                        // else break - ok to display
-                        ok = true;
+                        // else ok to display, remember roles are ok, break from userGroupsList
+                        okRole = rule.Show;
                         break;
                     }
                 }
-                // when 'show' is specified, default is to *not* show the content app
-                if (!ok)
-                    return null;
+                else // it is a type rule
+                {
+                    // if type has been ok-ed already, skip the rule
+                    if (okType)
+                        continue;
+
+                    // remember we have type rules
+                    hasType = true;
+
+                    // if the entry does not apply, skip it
+                    if (!rule.Matches(partA, partB))
+                        continue;
+
+                    // if the entry applies,
+                    // if it's an exclude entry, exit, do not display the content app
+                    if (!rule.Show)
+                        return null;
+
+                    // else ok to display, remember type rules are ok
+                    okType = true;
+                }
             }
 
+            // if roles rules are specified but not ok,
+            // or if type roles are specified but not ok,
+            // cannot display the content app
+            if ((hasRole && !okRole) || (hasType && !okType))
+                return null;
+
+            // else
             // content app can be displayed
             return _app ?? (_app = new ContentApp
             {
