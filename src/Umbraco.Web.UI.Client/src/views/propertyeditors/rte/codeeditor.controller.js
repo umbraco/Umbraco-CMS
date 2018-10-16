@@ -32,10 +32,8 @@
 
             // set default title
             if(!$scope.model.title) {
-                // TODO change to a new key to get 'source code' or similar
-                localizationService.localize("defaultdialogs_selectUsers").then(function(value){
-                    $scope.model.title = value;
-                });
+                // TODO localize
+                $scope.model.title = "Edit source code";
             }
         }
 

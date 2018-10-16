@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout) {
+    .directive('gridRte', function (tinyMceService, angularHelper, assetsService, $q, $timeout) {
         return {
             scope: {
                 uniqueId: '=',
@@ -71,61 +71,19 @@ angular.module("umbraco.directives")
                         });
 
                         // pin toolbar to top of screen if we have focus and it scrolls off the screen
-                        var pinToolbar = function () {
-
-                           var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                           var toolbarHeight = _toolbar.height();
-
-                           var _tinyMce = $(editor.editorContainer);
-                           var tinyMceRect = _tinyMce[0].getBoundingClientRect();
-                           var tinyMceTop = tinyMceRect.top;
-                           var tinyMceBottom = tinyMceRect.bottom;
-                           var tinyMceWidth = tinyMceRect.width;
-
-                           var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
-
-                           // set padding in top of mce so the content does not "jump" up
-                           _tinyMceEditArea.css("padding-top", toolbarHeight);
-
-                           if (tinyMceTop < 177 && ((177 + toolbarHeight) < tinyMceBottom)) {
-                               _toolbar
-                                   .css("visibility", "visible")
-                                   .css("position", "fixed")
-                                   .css("top", "177px")
-                                   .css("margin-top", "0")
-                                   .css("width", tinyMceWidth);
-                           } else {
-                               _toolbar
-                                   .css("visibility", "visible")
-                                   .css("position", "absolute")
-                                   .css("top", "auto")
-                                   .css("margin-top", "0")
-                                   .css("width", tinyMceWidth);
-                           }
-
-                        };
+                        function pinToolbar() {
+                            tinyMceService.pinToolbar(editor);
+                        }
 
                         // unpin toolbar to top of screen
-                        var unpinToolbar = function() {
-
-                           var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                           var _tinyMce = $(editor.editorContainer);
-                           var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
-
-                           // reset padding in top of mce so the content does not "jump" up
-                           _tinyMceEditArea.css("padding-top", "0");
-
-                           _toolbar.css("position", "static");
-
-                        };
+                        function unpinToolbar() {
+                            tinyMceService.unpinToolbar(editor);
+                        } 
 
                         //when we leave the editor (maybe)
                         editor.on('blur', function (e) {
                             angularHelper.safeApply(scope, function () {
                                 scope.value = editor.getContent();
-
-                                var _toolbar = $(editor.editorContainer)
-                                    .find(".mce-toolbar");
 
                                 if (scope.onBlur) {
                                     scope.onBlur();
@@ -133,7 +91,6 @@ angular.module("umbraco.directives")
 
                                 unpinToolbar();
                                 $('.umb-panel-body').off('scroll', pinToolbar);
-
                             });
                         });
 
@@ -147,7 +104,6 @@ angular.module("umbraco.directives")
 
                                 pinToolbar();
                                 $('.umb-panel-body').on('scroll', pinToolbar);
-
                             });
                         });
 
@@ -244,6 +200,8 @@ angular.module("umbraco.directives")
                     // element might still be there even after the modal has been hidden.
                     scope.$on('$destroy', function () {
                         unsubscribe();
+                        //ensure we unbind this in case the blur doesn't fire above
+                        $('.umb-panel-body').off('scroll', pinToolbar);
                         if (tinyMceEditor !== undefined && tinyMceEditor != null) {
                             tinyMceEditor.destroy()
                         }

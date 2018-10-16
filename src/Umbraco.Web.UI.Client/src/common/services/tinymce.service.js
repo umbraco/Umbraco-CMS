@@ -1166,6 +1166,49 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
             insertLink();
 
+        },
+
+        pinToolbar : function (editor) {
+
+            var tinyMce = $(editor.editorContainer);
+            var toolbar = tinyMce.find(".mce-toolbar");
+            var toolbarHeight = toolbar.height();
+            var tinyMceRect = tinyMce[0].getBoundingClientRect();
+            var tinyMceTop = tinyMceRect.top;
+            var tinyMceBottom = tinyMceRect.bottom;
+            var tinyMceWidth = tinyMceRect.width;
+
+            var tinyMceEditArea = tinyMce.find(".mce-edit-area");
+
+            // set padding in top of mce so the content does not "jump" up
+            tinyMceEditArea.css("padding-top", toolbarHeight);
+
+            if (tinyMceTop < 177 && ((177 + toolbarHeight) < tinyMceBottom)) {
+                toolbar
+                    .css("visibility", "visible")
+                    .css("position", "fixed")
+                    .css("top", "177px")
+                    .css("margin-top", "0")
+                    .css("width", tinyMceWidth);
+            } else {
+                toolbar
+                    .css("visibility", "visible")
+                    .css("position", "absolute")
+                    .css("top", "auto")
+                    .css("margin-top", "0")
+                    .css("width", tinyMceWidth);
+            } 
+
+        },
+
+        unpinToolbar: function (editor) {
+
+            var tinyMce = $(editor.editorContainer);
+            var toolbar = tinyMce.find(".mce-toolbar");
+            var tinyMceEditArea = tinyMce.find(".mce-edit-area");
+            // reset padding in top of mce so the content does not "jump" up
+            tinyMceEditArea.css("padding-top", "0");
+            toolbar.css("position", "static");
         }
 
     };
