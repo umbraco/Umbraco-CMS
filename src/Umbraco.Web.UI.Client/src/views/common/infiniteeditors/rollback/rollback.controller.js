@@ -18,6 +18,17 @@
             vm.variantVersions = [];
             vm.diff = null;
 
+            // preselect the active language
+            if($scope.model.node.variants.length > 1) {
+                var active = _.find($scope.model.node.variants, function (v) {
+                    return v.active;
+                });
+
+                if(active) {
+                    vm.selectedVariant = active;
+                }
+            }
+
             // set default title
             if(!$scope.model.title) {
                 localizationService.localize("actions_rollback").then(function(value){

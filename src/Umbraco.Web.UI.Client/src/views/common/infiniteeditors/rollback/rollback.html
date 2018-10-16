@@ -18,6 +18,17 @@
 
             <umb-box>
                 <umb-box-content>
+
+                    <div ng-if="model.node.variants.length > 1">
+                        <h5><localize key="general_language"></localize></h5>
+                        <select 
+                            class="input-block-level"
+                            ng-model="vm.selectedVariant"
+                            ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
+                            ng-change="vm.loadVariant(variant)">
+                            <option value=""><localize key="general_choose">Choose</localize>...</option>
+                        </select>
+                    </div>
                     
                     <div>
                                             
