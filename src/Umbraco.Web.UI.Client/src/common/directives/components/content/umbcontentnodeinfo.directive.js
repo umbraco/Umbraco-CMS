@@ -103,6 +103,16 @@
 
             scope.openRollback = function() {
                 console.log("rollback");
+                var rollback = {
+                    node: scope.node,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.rollback(rollback);
             };
 
             function loadAuditTrail() {
