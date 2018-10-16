@@ -34,12 +34,13 @@ namespace Umbraco.Web.Models.Trees
         /// </summary>
         /// <param name="children"></param>
         /// <returns></returns>
-        public static TreeRootNode CreateGroupNode(TreeNodeCollection children)
+        public static TreeRootNode CreateGroupNode(TreeNodeCollection children, string section)
         {
             var sectionRoot = new TreeRootNode(RootId, string.Empty, string.Empty)
             {
                 IsGroup = true,
-                Children = children
+                Children = children,
+                RoutePath = section
             };
 
             return sectionRoot;

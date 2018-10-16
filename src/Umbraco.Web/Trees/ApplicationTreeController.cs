@@ -133,7 +133,7 @@ namespace Umbraco.Web.Trees
 
                 if (groupNodeCollection.Count > 0)
                 {
-                    var groupRoot = TreeRootNode.CreateGroupNode(groupNodeCollection);
+                    var groupRoot = TreeRootNode.CreateGroupNode(groupNodeCollection, application);
                     groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
 
                     rootNodeGroups.Add(groupRoot);
