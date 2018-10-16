@@ -4,7 +4,6 @@ using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Composing;
 using Umbraco.Web._Legacy.Actions;
 
@@ -43,17 +42,7 @@ namespace Umbraco.Web
         {
             return mgr.GetTypes<UmbracoApiController>();
         }
-
-        /// <summary>
-        /// Returns all available ITrees in application
-        /// </summary>
-        /// <param name="mgr"></param>
-        /// <returns></returns>
-        internal static IEnumerable<Type> GetTrees(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<BaseTree>();
-        }
-
+        
         /// <summary>
         /// Returns all available ISearchableTrees in application
         /// </summary>

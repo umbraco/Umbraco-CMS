@@ -9,6 +9,8 @@ namespace Umbraco.Web.Models.Trees
     [DataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection
     {
+        public static MenuItemCollection Empty => new MenuItemCollection();
+
         private readonly MenuItemList _menuItems = new MenuItemList();
 
         public MenuItemCollection()
