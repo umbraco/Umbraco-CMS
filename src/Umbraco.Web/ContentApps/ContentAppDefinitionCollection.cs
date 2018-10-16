@@ -19,10 +19,19 @@ namespace Umbraco.Web.ContentApps
             _logger = logger;
         }
 
+        private IEnumerable<IReadOnlyUserGroup> GetCurrentUserGroups()
+        {
+            var umbracoContext = Composing.Current.UmbracoContext;
+            var currentUser = umbracoContext?.Security?.CurrentUser;
+            return currentUser == null
+                ? Enumerable.Empty<IReadOnlyUserGroup>()
+                : currentUser.Groups;
+
+        }
+
         public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups=null)
         {
-            var currentUser = UmbracoContext.Current.Security.CurrentUser;
-            var roles = currentUser.Groups;
+            var roles = GetCurrentUserGroups();
             var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
 
             var aliases = new HashSet<string>();
