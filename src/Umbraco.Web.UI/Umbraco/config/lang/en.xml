@@ -801,6 +801,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday </key>
     <key alias="greeting2">Happy tubular Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>

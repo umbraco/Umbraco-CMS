@@ -119,10 +119,6 @@
     &npm install >> $log 2>&1
     Write-Output ">> $? $($error.Count)" >> $log 2>&1
 
-    Write-Output "### install bower" >> $log 2>&1
-    &npm install -g bower >> $log 2>&1
-    $error.Clear() # that one fails 'cos bower is deprecated - ignore
-
     Write-Output "### install gulp" >> $log 2>&1
     &npm install -g gulp >> $log 2>&1
     $error.Clear() # that one fails 'cos deprecated stuff - ignore
