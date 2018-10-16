@@ -167,12 +167,6 @@ namespace Umbraco.Web.Trees
                 return null;
             }
 
-            var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url, configTree.ApplicationAlias);
-            if (legacyAttempt.Success)
-            {
-                return legacyAttempt.Result;
-            }
-
             throw new ApplicationException("Could not get root node for tree type " + configTree.Alias);
         }
 
@@ -215,23 +209,6 @@ namespace Umbraco.Web.Trees
                 }
                 return sectionRoot;
 
-            }
-            var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
-            if (legacyAttempt.Success)
-            {
-                var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
-                   rootId,
-                   "", //TODO: I think we'll need this in this situation!
-                   Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
-                        + "&parentId=" + rootId
-                        + "&treeType=" + application
-                        + "&section=" + application,
-                   "", //TODO: I think we'll need this in this situation!
-                   legacyAttempt.Result);
-
-
-                sectionRoot.AdditionalData.Add("treeAlias", configTree.Alias);
-                return sectionRoot;
             }
 
             throw new ApplicationException("Could not render a tree for type " + configTree.Alias);

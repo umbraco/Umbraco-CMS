@@ -177,6 +177,7 @@
     <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\SessionIdValidator.cs" />
+    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
@@ -510,17 +511,12 @@
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
-    <Compile Include="Trees\UsersTreeController.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
@@ -637,7 +633,6 @@
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeUrlGenerator.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
@@ -961,11 +956,7 @@
     <Compile Include="Models\Trees\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
-    <Compile Include="Trees\LegacyTreeController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
-    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
-    <Compile Include="Trees\LegacyTreeJavascript.cs" />
-    <Compile Include="Trees\LegacyTreeParams.cs" />
     <Compile Include="Models\Trees\MenuItem.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
@@ -1326,23 +1317,11 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\NodeActionsEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeRequestParams.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Macro.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ContentType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeService.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx.cs">
       <DependentUpon>CheckForUpgrade.asmx</DependentUpon>

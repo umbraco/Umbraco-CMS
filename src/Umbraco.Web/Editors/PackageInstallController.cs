@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using umbraco.cms.businesslogic.packager;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -249,7 +248,6 @@ namespace Umbraco.Web.Editors
             // trigger the UninstalledPackage event
             PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, false));
 
-            TreeDefinitionCollection.Instance.ReRegisterTrees();
         }
 
         /// <summary>
@@ -587,9 +585,6 @@ namespace Umbraco.Web.Editors
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
-            //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
-            //these bits are super old, but cant find another way to do this currently
-            global::umbraco.cms.presentation.Trees.TreeDefinitionCollection.Instance.ReRegisterTrees();
 
             var redirectUrl = "";
             if (ins.Control.IsNullOrWhiteSpace() == false)

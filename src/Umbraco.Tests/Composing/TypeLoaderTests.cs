@@ -276,13 +276,6 @@ AnotherContentFinder
         }
 
         [Test]
-        public void Resolves_Trees()
-        {
-            var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(1, trees.Count());
-        }
-
-        [Test]
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
