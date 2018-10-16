@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
@@ -18,9 +19,11 @@ namespace Umbraco.Web.ContentApps
             _logger = logger;
         }
 
-        public IEnumerable<ContentApp> GetContentAppsFor(object o)
+        public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups=null)
         {
-            var apps = this.Select(x => x.GetContentAppFor(o)).WhereNotNull().OrderBy(x => x.Weight).ToList();
+            var currentUser = UmbracoContext.Current.Security.CurrentUser;
+            var roles = currentUser.Groups;
+            var apps = this.Select(x => x.GetContentAppFor(o, roles)).WhereNotNull().OrderBy(x => x.Weight).ToList();
 
             var aliases = new HashSet<string>();
             List<string> dups = null;
