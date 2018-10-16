@@ -174,6 +174,29 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 
             }
 
+            /** This will check the section tree loaded and return all actual root nodes based on a tree type (non group nodes, non section groups) */
+            function getTreeRootNodes() {
+                var roots;
+                if ($scope.tree.root.containsGroups) {
+                    //all children in this case are group nodes, so we want the children of these children
+                    roots = _.reduce(
+                        //get the array of array of children
+                        _.map($scope.tree.root.children, function (n) {
+                            return n.children
+                        }), function (m, p) {
+                            //combine the arrays to one array
+                            return m.concat(p)
+                        });
+                }
+                else {
+                    roots = [$scope.tree.root].concat($scope.tree.root.children);
+                }
+
+                return _.filter(roots, function (node) {
+                    return node && node.metaData && node.metaData.treeAlias;
+                });
+            }
+
             //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
             function loadActiveTree(treeAlias) {
                 
@@ -189,12 +212,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     return $scope.activeTree;
                 }
 
-                var childrenAndSelf = [$scope.tree.root].concat($scope.tree.root.children);
-                $scope.activeTree = _.find(childrenAndSelf, function (node) {
-                    if (node && node.metaData && node.metaData.treeAlias) {
-                        return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
-                    }
-                    return false;
+                var treeRoots = getTreeRootNodes();
+                $scope.activeTree = _.find(treeRoots, function (node) {
+                    return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
                 });
 
                 if (!$scope.activeTree) {

@@ -542,11 +542,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         root: data
                     };
 
-                    for (var i = 0; i < result.root.length; i++) {
-                        var group = result.root[i];
+                    //format the root
+                    self._formatNodeDataForUseInUI(result.root, result.root.children, args.section);
 
-                        //we need to format/modify some of the node data to be used in our app.
-                        self._formatNodeDataForUseInUI(group, group.children, args.section);
+                    //if this is a root that contains group nodes, we need to format those manually too
+                    if (result.root.containsGroups) {
+                        for (var i = 0; i < result.root.children.length; i++) {
+                            var group = result.root.children[i];
+
+                            //we need to format/modify some of the node data to be used in our app.
+                            self._formatNodeDataForUseInUI(group, group.children, args.section);
+                        }
                     }
 
                     //cache this result if a cache key is specified - generally a cache key should ONLY
@@ -700,12 +706,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!angular.isFunction(node.parent)) {
                 throw "node.parent is not a function, the path cannot be resolved";
             }
-            //all root nodes have metadata key 'treeAlias'
+
             var reversePath = [];
             var current = node;
             while (current != null) {
                 reversePath.push(current.id);
-                if (current.metaData && current.metaData["treeAlias"]) {
+
+                //all tree root nodes (non group, not section root) have a treeAlias so exit if that is the case
+                //or exit if we cannot traverse further up
+                if ((current.metaData && current.metaData["treeAlias"]) || !current.parent) {
                     current = null;
                 }
                 else {
@@ -714,7 +723,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
             return reversePath.reverse();
         },
-
+        
         syncTree: function(args) {
 
             if (!args) {

@@ -184,19 +184,17 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Listen for section state changes
     evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
-        if (args.value.root.length > 0)
-        {
-            for (var i = 0; i < args.value.root.length; i++) {
-                var group = args.value.root[i];
+        if (args.key === "currentRootNode") {
 
-                if(group.metaData.containsTrees === false){
-                    $rootScope.emptySection = true;
-                }
+            //if the changed state is the currentRootNode, determine if this is a full screen app
+            if (args.value.root && args.value.root.containsTrees === false) {
+                $rootScope.emptySection = true;
+            }
+            else {
+                $rootScope.emptySection = false;
             }
         }
-        else {
-            $rootScope.emptySection = false;
-        }
+        
     }));
 
     //Listen for section state changes

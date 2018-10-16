@@ -44,15 +44,11 @@ namespace Umbraco.Web.Trees
         /// <param name="onlyInitialized">An optional bool (defaults to true), if set to false it will also load uninitialized trees</param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public async Task<IEnumerable<SectionRootNode>> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
+        public async Task<TreeRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
             application = application.CleanForXss();
 
-            var rootNodeGroups = new List<SectionRootNode>();
-
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
             var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
@@ -71,11 +67,10 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     application);
 
-                //this will be null if it cannot convert to ta single root section
+                //this will be null if it cannot convert to a single root section
                 if (result != null)
                 {
-                    rootNodeGroups.Add(result);
-                    return rootNodeGroups;
+                    return result;
                 }
             }
 
@@ -93,17 +88,18 @@ namespace Umbraco.Web.Trees
 
             //Don't apply fancy grouping logic futher down, if we only have one group of items
             var hasGroups = CoreTrees.Value.Count > 0;
-            if (hasGroups == false)
+            if (!hasGroups)
             {
-                var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+                var multiTree = TreeRootNode.CreateMultiTreeRoot(collection);
                 multiTree.Name = Services.TextService.Localize("sections/" + application);
 
-                rootNodeGroups.Add(multiTree);
-                return rootNodeGroups;
+                return multiTree;
             }
-            
+
+            var rootNodeGroups = new List<TreeRootNode>();
+
             //Group trees by [CoreTree] attribute with a TreeGroup property
-            foreach(var treeSectionGroup in CoreTrees.Value)
+            foreach (var treeSectionGroup in CoreTrees.Value)
             {
                 var treeGroupName = treeSectionGroup.Key;
 
@@ -137,14 +133,14 @@ namespace Umbraco.Web.Trees
 
                 if (groupNodeCollection.Count > 0)
                 {
-                    var groupRoot = SectionRootNode.CreateMultiTreeSectionRoot(rootId, groupNodeCollection);
+                    var groupRoot = TreeRootNode.CreateGroupNode(groupNodeCollection);
                     groupRoot.Name = Services.TextService.Localize("treeHeaders/" + treeGroupName);
 
                     rootNodeGroups.Add(groupRoot);
                 }
             }
 
-            return rootNodeGroups.OrderBy(x => x.Name);
+            return TreeRootNode.CreateGroupedMultiTreeRoot(new TreeNodeCollection(rootNodeGroups.OrderBy(x => x.Name)));
         }
 
         /// <summary>
@@ -188,7 +184,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="application"></param>
         /// <returns></returns>
-        private async Task<SectionRootNode> GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
+        private async Task<TreeRootNode> GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
         {
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (configTree == null) throw new ArgumentNullException(nameof(configTree));
@@ -202,26 +198,16 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
-                //if the root node has a route path, we cannot create a single root section because by specifying the route path this would
-                //override the dashboard route and that means there can be no dashboard for that section which is a breaking change.
-                if (string.IsNullOrWhiteSpace(rootNode.Result.RoutePath) == false
-                    && rootNode.Result.RoutePath != "#"
-                    && rootNode.Result.RoutePath != application)
-                {
-                    //null indicates this cannot be converted
-                    return null;
-                }
-
-                var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
+                var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
                     rootId,
                     rootNode.Result.ChildNodesUrl,
                     rootNode.Result.MenuUrl,
                     rootNode.Result.Name,
                     byControllerAttempt.Result);
 
-                //This can't be done currently because the root will default to routing to a dashboard and if we disable dashboards for a section
-                //that is really considered a breaking change. See above.
-                //sectionRoot.RoutePath = rootNode.Result.RoutePath;
+                //assign the route path based on the root node, this means it will route there when the section is navigated to
+                //and no dashboards will be available for this section
+                sectionRoot.RoutePath = rootNode.Result.RoutePath;
 
                 foreach (var d in rootNode.Result.AdditionalData)
                 {
@@ -233,7 +219,7 @@ namespace Umbraco.Web.Trees
             var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
-                var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
+                var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
                    rootId,
                    "", //TODO: I think we'll need this in this situation!
                    Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
