@@ -1,6 +1,6 @@
-<form name="IconPickerForm" 
-    ng-controller="Umbraco.Editors.IconPickerController as vm" 
-    novalidate 
+<form name="IconPickerForm"
+    ng-controller="Umbraco.Editors.IconPickerController as vm"
+    novalidate
     val-form-manager>
 
 <umb-editor-view>
@@ -30,17 +30,18 @@
                                 no-dirty-check />
                     </div>
                 </div>
-                
+
                 <div class="umb-control-group">
-                    <umb-color-swatches 
+                    <umb-color-swatches
+                        use-color-class="true"
                         colors="vm.colors"
                         selected-color="vm.color"
                         size="s">
                     </umb-color-swatches>
                 </div>
-                
+
                 <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
-            
+
                 <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
                     <ul class="umb-iconpicker" ng-class="vm.color" ng-show="vm.icons">
                         <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm) track by $id(icon)">
@@ -50,7 +51,7 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <umb-empty-state
                     ng-if="filtered.length === 0"
                     position="center">
