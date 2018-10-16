@@ -101,6 +101,10 @@
                 scope.node.template = templateAlias;
             };
 
+            scope.openRollback = function() {
+                console.log("rollback");
+            };
+
             function loadAuditTrail() {
 
                 scope.loadingAuditTrail = true;
