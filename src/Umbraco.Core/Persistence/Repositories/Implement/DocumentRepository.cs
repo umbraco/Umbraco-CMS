@@ -341,6 +341,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // persist the variations
             if (content.ContentType.VariesByCulture())
             {
+                // bump dates to align cultures to version
+                if (publishing)
+                    content.AdjustDates(contentVersionDto.VersionDate);
+
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
@@ -499,6 +503,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (content.ContentType.VariesByCulture())
             {
+                // bump dates to align cultures to version
+                if (publishing)
+                    content.AdjustDates(contentVersionDto.VersionDate);
+
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
