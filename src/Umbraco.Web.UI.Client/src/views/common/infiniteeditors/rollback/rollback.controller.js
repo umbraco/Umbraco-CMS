@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, localizationService, assetsService) {
+    function RollbackController($scope, contentResource, localizationService, assetsService) {
         
         var vm = this;
 
@@ -57,13 +57,14 @@
                     ]
                 };
 
-                vm.previousVersions = [
-                    {
-                        "id": 2,
-                        "name": "Forside",
-                        "createDate": "21/08/2018 19.25"
-                    }
-                ];
+                const nodeId = $scope.model.node.id;
+                const culture = vm.selectedVariant ? vm.selectedVariant.language.culture : null;
+
+                contentResource.getRollbackVersions(nodeId, culture)
+                    .then(function(data){
+                        console.log(data);
+                        vm.previousVersions = data;
+                    });
 
                 vm.loading = false;
 

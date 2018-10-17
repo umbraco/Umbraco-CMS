@@ -808,6 +808,38 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to create blueprint from content with id " + contentId
             );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getRollbackVersions
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns an array of previous version id's, given a node id and a culture
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getRollbackVersions(id, culture)
+          *    .then(function(versions) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object containing the url.
+          *
+          */
+        getRollbackVersions: function (contentId, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersions", {
+                        contentId: contentId, cultureName: culture
+                    })
+                ),
+                "Failed to get rollback versions for content item with id " + contentId
+            );
         }
 
 
