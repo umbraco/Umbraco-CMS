@@ -102,7 +102,7 @@
             };
 
             scope.openRollback = function() {
-                console.log("rollback");
+                
                 var rollback = {
                     node: scope.node,
                     submit: function(model) {
