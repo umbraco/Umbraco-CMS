@@ -102,11 +102,11 @@ div.umb-codeeditor {
   border: 1px solid @gray-8;
 }
 div.umb-codeeditor .umb-el-wrap {
-  padding: 0px;
+  padding: 0;
 }
 div.umb-codeeditor .umb-btn-toolbar {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   border-bottom: @gray-8 1px solid;
   background: @gray-10;
 }
@@ -122,7 +122,7 @@ div.umb-codeeditor .umb-btn-toolbar {
         position: absolute;
     }
 }
-.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0px !important;}
+.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0 !important;}
 .mce-panel{background: @gray-10 !important; border-color: @gray-8 !important;}
 .mce-btn-group, .mce-btn{border: none !important; background: none !important;}
 .mce-ico{font-size: 12px !important; color: @gray-1 !important;}
@@ -176,7 +176,7 @@ div.umb-codeeditor .umb-btn-toolbar {
             margin-bottom: 0;
             vertical-align: middle;
             padding: 6px 10px;
-            background: #f7f7f7;
+            background: @grayMed;
             flex: 0 0 auto;
         }
 
@@ -203,11 +203,11 @@ div.umb-codeeditor .umb-btn-toolbar {
     }
 
     label {
-        border: 1px solid #fff;
+        border: 1px solid @white;
         padding: 6px 10px;
         font-family: monospace;
         border: 1px solid #dfdfe1;
-        background: #f7f7f7;
+        background: @grayMed;
         margin: 0 15px 0 3px;
         border-radius: 3px;
     }
@@ -735,8 +735,8 @@ div.umb-codeeditor .umb-btn-toolbar {
 
 
 .umb-photo-folder .picrow div, .umb-photo-preview{
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   border: none;
   display: inline-block;
   vertical-align: top;
@@ -773,9 +773,9 @@ div.umb-codeeditor .umb-btn-toolbar {
 //this is a temp hack, to provide selectors in the dialog:
 .umb-photo-folder .pic:hover .selector-overlay {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 5px;
   background: @black;
   z-index: 100;
@@ -855,7 +855,7 @@ div.umb-codeeditor .umb-btn-toolbar {
 .umb-fileupload ul {
   list-style: none;
   vertical-align: middle;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .umb-fileupload label {
