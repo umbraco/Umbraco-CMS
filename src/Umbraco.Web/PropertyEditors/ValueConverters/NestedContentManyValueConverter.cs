@@ -55,18 +55,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_proflog.DebugDuration<PublishedPropertyType>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
-                var value = (string)inter;
-                if (string.IsNullOrWhiteSpace(value)) return null;
-
-                var objects = JsonConvert.DeserializeObject<List<JObject>>(value);
-                if (objects.Count == 0)
-                    return Enumerable.Empty<IPublishedElement>();
-
                 var configuration = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
                 var contentTypes = configuration.ContentTypes;
                 var elements = contentTypes.Length > 1
                     ? new List<IPublishedElement>()
                     : PublishedModelFactory.CreateModelList(contentTypes[0].Alias);
+
+                var value = (string)inter;
+                if (string.IsNullOrWhiteSpace(value)) return elements;
+
+                var objects = JsonConvert.DeserializeObject<List<JObject>>(value);
+                if (objects.Count == 0) return elements;
 
                 foreach (var sourceObject in objects)
                 {

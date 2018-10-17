@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
   <creator>
     <name>The Umbraco community</name>
@@ -105,7 +105,7 @@
     <key alias="statistics">סטטיסטיקות</key>
     <key alias="titleOptional">כותרת (לא חובה)</key>
     <key alias="type">סוג</key>
-    <key alias="unPublish">ממתין לפירסום</key>
+    <key alias="unpublish">ממתין לפירסום</key>
     <key alias="updateDate">נערך לאחרונה</key>
     <key alias="uploadClear">הסר קובץ</key>
     <key alias="urls">קשר למסמך</key>
@@ -132,27 +132,22 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
-
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
-
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
-
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
-
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
-
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -254,8 +249,6 @@
     <key alias="missingTitle">אנא בחר כותרת</key>
     <key alias="missingType">אנא בחר סוג</key>
     <key alias="pictureResizeBiggerThanOrg">הינך עומד לשנות את התמונה לגודל גדול יותר מהמקור, האם ברצונך להמשיך</key>
-    <key alias="pythonErrorHeader">שגיאות ב- python script</key>
-    <key alias="pythonErrorText">ה- python script לא נשמר, מכיל שגיאות</key>
     <key alias="startNodeDoesNotExists">הפריט תוכן ההתחלתי נמחק, צור קשר עם מנהל האתר.</key>
     <key alias="stylesMustMarkBeforeSelect">תחילה יש לסמן תוכן לפני שינוי עיצוב</key>
     <key alias="stylesNoStylesOnPage">סגנונות עיצוב פעילים לא זמינים</key>
@@ -341,7 +334,8 @@
     <key alias="showPageOnSend">הצג עמוד בשליחה</key>
     <key alias="size">גודל</key>
     <key alias="sort">סדר</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
     <key alias="type">סוג</key>
     <key alias="typeToSearch">הקלד לחיפוש...</key>
     <key alias="up">למעלה</key>
@@ -381,7 +375,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
-              Click the <strong>retry</strong> button when 
+              Click the <strong>retry</strong> button when
               done.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
@@ -392,9 +386,9 @@
       Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
-      </p>    
+      </p>
       ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
+    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
@@ -429,7 +423,7 @@
     ]]></key>
     <key alias="runwayFromScratch">אני רוצה להתחיל מאתר ריק</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
+        Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
@@ -443,8 +437,8 @@
     <key alias="runwaySimpleSite">ברצוני להתחיל עם אתר פשוט</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However, 
+      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
+        but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However,
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
@@ -465,9 +459,9 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">אומברקו %0% מותקנת ומוכנה לשימוש</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
+    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
         manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
 To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
@@ -489,7 +483,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
-    <key alias="topText">ברוכים הבאים לאומברקו, יש להזין שם משתמש וסיסמה בשדות למטה:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">לוח הבקרה</key>
@@ -522,13 +515,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
-		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
+		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong>
 		  has been performed on the page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -540,7 +533,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 
@@ -710,10 +703,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fileSavedHeader">הקובץ נשמר</key>
     <key alias="fileSavedText">הקובץ נשמר ללא שגיאות</key>
     <key alias="languageSaved">שפה נשמרה</key>
-    <key alias="pythonErrorHeader">Python script לא נשמרו</key>
-    <key alias="pythonErrorText">Python script לא נשמרו עקב שגיאות</key>
-    <key alias="pythonSavedHeader">Python script נשמר</key>
-    <key alias="pythonSavedText">לא נמצאו שגיאות ב- python script</key>
     <key alias="templateErrorHeader">התבנית לא נשמרה</key>
     <key alias="templateErrorText">שים לב שאין 2 תבניות עם אותו השם/כינוי</key>
     <key alias="templateSavedHeader">התבנית נשמרה</key>
@@ -739,27 +728,20 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">תבנית</key>
   </area>
   <area alias="grid">
-      <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
-
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
-
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
@@ -768,18 +750,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
-
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
-
     <key alias="styles">Styles</key>
     <key alias="stylesDetails">Configure what styling editors can change</key>
-
-    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
-
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
@@ -811,15 +787,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="withTime">כן, עם שעה. תו מפריד: </key>
   </area>
   <area alias="translation">
-    <key alias="assignedTasks">משימות משוייכות אליך</key>
-    <key alias="assignedTasksHelp"><![CDATA[ הרשימה הבאה מציגה את משימות התרגום <strong>שמשוייכות אלייך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, יש ללחוץ על "פרטים" או על שם העמוד. 
-     ניתן בנוסף להוריד את הקובץ כ XML ישירות למחשב על ידי לחיצה ב"הורד קובץ XML".<br/>
-     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
-    ]]></key>
-    <key alias="closeTask">סגור משימה</key>
     <key alias="details">פרטי תירגום</key>
-    <key alias="downloadAllAsXml">הורד את כל התירגומים כקובץ xml</key>
-    <key alias="downloadTaskAsXml">הורד קובץ  xml</key>
     <key alias="DownloadXmlDTD">הורד xml DTD</key>
     <key alias="fields">שדות</key>
     <key alias="includeSubpages">כלול דפי משנה</key>
@@ -833,21 +801,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       באפשרותך גם להיכנס למערכת על מנת לראות את כל משימות התירגום
       http://%3%
-      
+
       המשך יום נעים.
-	  
+
     ]]></key>
-    <key alias="mailSubject">[%0%] משימות תירגום עבור %1%</key>
     <key alias="noTranslators">לא נמצאו משתמשמים המוגדרים כמתרגמים. יש ליצור משתמש המוגדר כמתרגם לפני שליחת תוכן לתירגום</key>
-    <key alias="ownedTasks">משימות שנוצרו על ידך</key>
-    <key alias="ownedTasksHelp"><![CDATA[ הרשימה הבאה מציגה עמודים <strong>שנוצרו על ידיך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, 
-     יש ללחוץ על "פרטי תרגום" או על ידי שם העמוד. ניתן בנוסף להוריד את העמוד כקובץ XML ישירות למחשב על ידי לחיצה על "הורד קובץ XML". 
-     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
-    ]]></key>
     <key alias="pageHasBeenSendToTranslation">העמוד '%0%' נשלח לתירגום</key>
     <key alias="sendToTranslate">שלח את העמוד '%0%' לתירגום</key>
-    <key alias="taskAssignedBy">הוקצה על ידי</key>
-    <key alias="taskOpened">משימה נפתחה</key>
     <key alias="totalWords">סך הכל מילים</key>
     <key alias="translateTo">תרגם עבור</key>
     <key alias="translationDone">התירגום הושלם.</key>
@@ -877,7 +837,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypes">סוגי מסמכים</key>
     <key alias="packager">חבילות</key>
     <key alias="packages">חבילות</key>
-    <key alias="python">קבצי פייתון</key>
     <key alias="repositories">התקן מתוך מאגר</key>
     <key alias="runway">התקן Runway</key>
     <key alias="runwayModules">מודולי Runway</key>

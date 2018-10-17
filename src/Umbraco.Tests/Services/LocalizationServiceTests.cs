@@ -193,6 +193,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Delete_Language_Used_As_Fallback()
+        {
+            var danish = ServiceContext.LocalizationService.GetLanguageByIsoCode("da-DK");
+            var norwegian = new Language("nb-NO") { CultureName = "Norwegian", FallbackLanguageId = danish.Id };
+            ServiceContext.LocalizationService.Save(norwegian, 0);
+            var languageId = danish.Id;
+
+            ServiceContext.LocalizationService.Delete(danish);
+
+            var language = ServiceContext.LocalizationService.GetLanguageById(languageId);
+            Assert.Null(language);
+        }
+
+        [Test]
         public void Can_Create_DictionaryItem_At_Root()
         {
             var english = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
@@ -362,21 +376,21 @@ namespace Umbraco.Tests.Services
         {
             var localizationService = ServiceContext.LocalizationService;
             var language = new Core.Models.Language("en-AU");
-            language.IsDefaultVariantLanguage = true;
+            language.IsDefault = true;
             localizationService.Save(language);
             var result = localizationService.GetLanguageById(language.Id);
 
-            Assert.IsTrue(result.IsDefaultVariantLanguage);
+            Assert.IsTrue(result.IsDefault);
 
             var language2 = new Core.Models.Language("en-NZ");
-            language2.IsDefaultVariantLanguage = true;
+            language2.IsDefault = true;
             localizationService.Save(language2);
             var result2 = localizationService.GetLanguageById(language2.Id);
             //re-get
             result = localizationService.GetLanguageById(language.Id);
 
-            Assert.IsTrue(result2.IsDefaultVariantLanguage);
-            Assert.IsFalse(result.IsDefaultVariantLanguage);
+            Assert.IsTrue(result2.IsDefault);
+            Assert.IsFalse(result.IsDefault);
         }
 
         [Test]

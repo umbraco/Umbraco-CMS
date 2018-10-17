@@ -23,9 +23,6 @@ namespace Umbraco.Core
             {
                 public const string MemberUsernameRuleType = "MemberUsername";
                 public const string MemberRoleRuleType = "MemberRole";
-
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberIdRuleType = "MemberId";
             }
 
 
@@ -94,6 +91,11 @@ namespace Umbraco.Core
                 /// Property alias for the Media's file extension.
                 /// </summary>
                 public const string Extension = "umbracoExtension";
+
+				/// <summary>
+				/// The default height/width of an image file if the size can't be determined from the metadata
+				/// </summary>
+				public const int DefaultSize = 200;
             }
 
             /// <summary>

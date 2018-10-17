@@ -8,14 +8,12 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -169,7 +167,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var list = new List<string>
             {
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Task + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
@@ -344,6 +341,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // persist the variations
             if (content.ContentType.VariesByCulture())
             {
+                // bump dates to align cultures to version
+                if (publishing)
+                    content.AdjustDates(contentVersionDto.VersionDate);
+
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
@@ -502,10 +503,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (content.ContentType.VariesByCulture())
             {
+                // bump dates to align cultures to version
+                if (publishing)
+                    content.AdjustDates(contentVersionDto.VersionDate);
+
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
+                    {
+                        edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
+
+                        // fixme - change tracking
+                        // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
+                        // culture has just been edited or not, so we don't update its update date - that date only changes
+                        // when the name is set, and it all works because the controller does it - but, if someone uses a
+                        // service to change a property value and save (without setting name), the update date does not change.
+                    }
 
                 // replace the content version variations (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
@@ -1033,7 +1047,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
                     Name = dto.Name,
-                    Date = dto.Date
+                    Date = dto.UpdateDate
                 });
             }
 
@@ -1078,7 +1092,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetCultureDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1093,22 +1107,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
+                    UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
         private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
         {
-            foreach (var (culture, name) in content.CultureNames)
+            var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
+            foreach (var culture in allCultures)
                 yield return new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
-                    // if not published, always edited
-                    // no need to check for availability: it *is* available since it is in content.CultureNames
-                    Edited = !content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture))
+                    Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
+
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+
+                    Available = content.IsCultureAvailable(culture),
+                    Published = content.IsCulturePublished(culture),
+                    Edited = content.IsCultureAvailable(culture) &&
+                             (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
         }
 

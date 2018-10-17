@@ -26,7 +26,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var defaultId = int.MaxValue;
             foreach (var dto in dtos)
             {
-                if (dto.IsDefaultVariantLanguage)
+                if (dto.IsDefault)
                 {
                     defaultId = dto.Id;
                     break;
@@ -38,8 +38,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             // update, so that language with that id is now default and mandatory
             var updateDefault = Sql()
                 .Update<LanguageDto>(u => u
-                    .Set(x => x.IsDefaultVariantLanguage, true)
-                    .Set(x => x.Mandatory, true))
+                    .Set(x => x.IsDefault, true)
+                    .Set(x => x.IsMandatory, true))
                 .Where<LanguageDto>(x => x.Id == defaultId);
 
             Database.Execute(updateDefault);

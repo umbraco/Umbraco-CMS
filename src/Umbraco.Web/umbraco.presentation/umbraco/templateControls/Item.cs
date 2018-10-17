@@ -203,9 +203,9 @@ namespace umbraco.presentation.templateControls
                     return nodeIdInt;
                 }
             }
-            else if (PageElements["pageID"] != null)
+            else if (UmbracoContext.Current.PageId != null)
             {
-                return int.Parse(PageElements["pageID"].ToString());
+                return UmbracoContext.Current.PageId.Value;
             }
             return null;
         }

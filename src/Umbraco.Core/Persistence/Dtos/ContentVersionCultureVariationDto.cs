@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class ContentVersionCultureVariationDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
-        private int? _publishedUserId;
+        private int? _updateUserId;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -33,16 +33,12 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("name")]
         public string Name { get; set; }
 
-        [Column("date")]
-        public DateTime Date { get; set; }
+        [Column("date")] // fixme: db rename to 'updateDate'
+        public DateTime UpdateDate { get; set; }
 
-        // fixme want?
-        [Column("availableUserId")]
+        [Column("availableUserId")] // fixme: db rename to 'updateDate'
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int? PublishedUserId { get => _publishedUserId == 0 ? null : _publishedUserId; set => _publishedUserId = value; } //return null if zero
-
-        [Column("edited")]
-        public bool Edited { get; set; }
+        public int? UpdateUserId { get => _updateUserId == 0 ? null : _updateUserId; set => _updateUserId = value; } //return null if zero
     }
 }

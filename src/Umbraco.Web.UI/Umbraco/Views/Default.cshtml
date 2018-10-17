@@ -88,6 +88,8 @@
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
 
+        <umb-search ng-if="search.show" on-close="closeSearch()"></umb-search>
+
     </div>
 
     <umb-backdrop ng-if="backdrop.show"
@@ -122,7 +124,7 @@
         }
     </script>
 
-    <script src="lib/rgrove-lazyload/lazyload.js"></script>
+    <script src="lib/lazyload-js/lazyload.min.js"></script>
     <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
     @if (isDebug)

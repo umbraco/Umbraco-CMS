@@ -16,7 +16,7 @@
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
-                       <umb-dropdown class="umb-actions" ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                             <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                 <a ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                                     {{::contentType.name}}

@@ -36,7 +36,7 @@ namespace Umbraco.Web
 
         public override string AssignedApp
         {
-            get { return Constants.Applications.Developer.ToString(); }
+            get { return Constants.Applications.Packages.ToString(); }
         }
     }
 }

@@ -25,12 +25,9 @@ namespace Umbraco.Tests.Persistence
             using (var scope = ScopeProvider.CreateScope())
             {
                 var database = scope.Database;
-                database.Execute("SET IDENTITY_INSERT umbracoLock ON");
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 1, Name = "Lock.1" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 2, Name = "Lock.2" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 3, Name = "Lock.3" });
-                database.Execute("SET IDENTITY_INSERT umbracoLock OFF");
-                database.CompleteTransaction();
                 scope.Complete();
             }
         }

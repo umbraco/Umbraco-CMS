@@ -65,17 +65,14 @@ angular.module('umbraco.services')
             return path;
         }
 
-        /**
-         * Loads in moment.js requirements during the _loadInitAssets call
-         */
-        function loadMomentLocaleForCurrentUser() {
+        function getMomentLocales(locales, supportedLocales) {
 
-            var self = this;
-
-            function loadLocales(currentUser, supportedLocales) {
-                var locale = currentUser.locale.toLowerCase();
+            var localeUrls = [];
+            var locales = locales.split(',');
+            for (var i = 0; i < locales.length; i++) {
+                var locale = locales[i].toString().toLowerCase();
                 if (locale !== 'en-us') {
-                    var localeUrls = [];
+
                     if (supportedLocales.indexOf(locale + '.js') > -1) {
                         localeUrls.push('lib/moment/' + locale + '.js');
                     }
@@ -85,16 +82,35 @@ angular.module('umbraco.services')
                             localeUrls.push('lib/moment/' + majorLocale);
                         }
                     }
-                    return self.load(localeUrls, $rootScope);
-                }
-                else {
-                    $q.when(true);
                 }
             }
 
+            return localeUrls;
+        }
+
+        /**
+         * Loads specific Moment.js Locales.
+         * @param {any} locales
+         * @param {any} supportedLocales
+         */
+        function loadLocales(locales, supportedLocales) {
+            var localeUrls = getMomentLocales(locales, supportedLocales);
+            if (localeUrls.length >= 1) {
+                return assetsService.load(localeUrls, $rootScope);
+            }
+            else {
+                $q.when(true);
+            }
+        }
+
+        /**
+         * Loads in moment.js requirements during the _loadInitAssets call
+         */
+        function loadMomentLocaleForCurrentUser() {
+
             userService.getCurrentUser().then(function (currentUser) {
                 return javascriptLibraryResource.getSupportedLocalesForMoment().then(function (supportedLocales) {
-                    return loadLocales(currentUser, supportedLocales);
+                    return loadLocales(currentUser.locale, supportedLocales);
                 });
             });
 
@@ -125,10 +141,6 @@ angular.module('umbraco.services')
                     var self = this;
                     return self.loadJs(umbRequestHelper.getApiUrl("serverVarsJs", "", ""), $rootScope).then(function () {
                         initAssetsLoaded = true;
-
-                        //now we need to go get the legacyTreeJs - but this can be done async without waiting.
-                        self.loadJs(umbRequestHelper.getApiUrl("legacyTreeJs", "", ""), $rootScope);
-
                         return loadMomentLocaleForCurrentUser();
                     });
                 }
@@ -136,7 +148,9 @@ angular.module('umbraco.services')
                     return $q.when(true);
                 }
             },
-            
+
+            loadLocales: loadLocales,
+
             /**
              * @ngdoc method
              * @name umbraco.services.assetsService#loadCss

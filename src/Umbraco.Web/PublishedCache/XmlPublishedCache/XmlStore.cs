@@ -194,9 +194,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
-            ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
 
             _withRepositoryEvents = true;
         }
@@ -213,9 +213,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
-            ContentTypeService.UowRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity -= OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
 
             _withRepositoryEvents = false;
         }

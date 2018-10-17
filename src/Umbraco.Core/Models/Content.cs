@@ -227,7 +227,27 @@ namespace Umbraco.Core.Models
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
+
+        // adjust dates to sync between version, cultures etc
+        // used by the repo when persisting
+        internal void AdjustDates(DateTime date)
+        {
+            foreach (var culture in PublishedCultures.ToList())
+            {
+                if (_publishInfos == null || !_publishInfos.TryGetValue(culture, out var publishInfos))
+                    continue;
+
+                if (_publishInfosOrig != null && _publishInfosOrig.TryGetValue(culture, out var publishInfosOrig)
+                    && publishInfosOrig.Date == publishInfos.Date)
+                    continue;
+
+                _publishInfos[culture] = (publishInfos.Name, date);
+
+                if (CultureNames.TryGetValue(culture, out var name))
+                    SetCultureInfo(culture, name, date);
+            }
+        }
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
@@ -269,7 +289,7 @@ namespace Umbraco.Core.Models
             if (_publishInfos == null)
                 _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _publishInfos[culture] = (name, date);
+            _publishInfos[culture.ToLowerInvariant()] = (name, date);
         }
 
         private void ClearPublishInfos()
@@ -294,7 +314,7 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
             if (_editedCultures == null)
                 _editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _editedCultures.Add(culture);
+            _editedCultures.Add(culture.ToLowerInvariant());
         }
 
         // sets all publish edited
@@ -342,6 +362,12 @@ namespace Umbraco.Core.Models
                         return false;
                     SetPublishInfo(c, name, DateTime.Now);
                 }
+            }
+            else if (culture == null) // invariant culture
+            {
+                if (string.IsNullOrWhiteSpace(Name))
+                    return false;
+                // PublishName set by repository - nothing to do here
             }
             else // one single culture
             {

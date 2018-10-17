@@ -167,7 +167,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public DateTime? GetCultureDate(string culture)
+        public DateTime? GetUpdateDate(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return null;
             if (!ContentTypeBase.VariesByCulture()) return null;
@@ -200,6 +200,12 @@ namespace Umbraco.Core.Models
 
                 Name = name; // may be null
             }
+        }
+
+        internal void TouchCulture(string culture)
+        {
+            if (ContentTypeBase.VariesByCulture() && _cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
+                _cultureInfos[culture] = (infos.Name, DateTime.Now);
         }
 
         protected void ClearCultureInfos()

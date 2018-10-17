@@ -8,6 +8,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -98,6 +99,7 @@ namespace Umbraco.Core.Manifest
             var propertyEditors = new List<IDataEditor>();
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
+            var contentApps = new List<IContentAppDefinition>();
 
             foreach (var manifest in manifests)
             {
@@ -106,6 +108,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.PropertyEditors != null) propertyEditors.AddRange(manifest.PropertyEditors);
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
+                if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
             }
 
             return new PackageManifest
@@ -114,7 +117,8 @@ namespace Umbraco.Core.Manifest
                 Stylesheets = stylesheets.ToArray(),
                 PropertyEditors = propertyEditors.ToArray(),
                 ParameterEditors = parameterEditors.ToArray(),
-                GridEditors = gridEditors.ToArray()
+                GridEditors = gridEditors.ToArray(),
+                ContentApps = contentApps.ToArray()
             };
         }
 
@@ -146,7 +150,8 @@ namespace Umbraco.Core.Manifest
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
-                new ValueValidatorConverter(_validators));
+                new ValueValidatorConverter(_validators),
+                new ContentAppDefinitionConverter());
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)

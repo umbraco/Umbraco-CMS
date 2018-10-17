@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -20,9 +19,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Name { get; set; }
 
         [DataMember(Name = "isDefault")]
-        public bool IsDefaultVariantLanguage { get; set; }
+        public bool IsDefault { get; set; }
 
         [DataMember(Name = "isMandatory")]
-        public bool Mandatory { get; set; }
+        public bool IsMandatory { get; set; }
+
+        [DataMember(Name = "fallbackLanguageId")]
+        public int? FallbackLanguageId { get; set; }
     }
 }

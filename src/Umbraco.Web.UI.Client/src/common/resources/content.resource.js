@@ -206,7 +206,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
-          * @name umbraco.resources.contentResource#unPublish
+          * @name umbraco.resources.contentResource#unpublish
           * @methodOf umbraco.resources.contentResource
           *
           * @description
@@ -214,7 +214,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * ##usage
           * <pre>
-          * contentResource.unPublish(1234)
+          * contentResource.unpublish(1234)
           *    .then(function() {
           *        alert("node was unpulished");
           *    }, function(err){
@@ -225,22 +225,59 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object.
           *
           */
-        unPublish: function (id, culture) {
+        unpublish: function (id, cultures) {
             if (!id) {
                 throw "id cannot be null";
             }
 
-            if (!culture) {
-                culture = null;
+            if (!cultures) {
+                cultures = [];
             }
 
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "PostUnPublish",
-                        { id: id, culture: culture })),
+                        "PostUnpublish"), { id: id, cultures: cultures }),
                 'Failed to publish content with id ' + id);
+        },
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getCultureAndDomains
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Gets the culture and hostnames for a content item with the given Id
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getCultureAndDomains(1234)
+          *    .then(function(data) {
+          *        alert(data.Domains, data.Language);
+          *    });
+          * </pre>
+          * @param {Int} id the ID of the node to get the culture and domains for.
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+        getCultureAndDomains: function (id) {
+            if (!id) {
+                throw "id cannot be null";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetCultureAndDomains", { id: id })),
+                'Failed to retreive culture and hostnames for ' + id);
+        },
+        saveLanguageAndDomains: function (model) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "PostSaveLanguageAndDomains"),
+                        model));
         },
         /**
           * @ngdoc method
@@ -334,26 +371,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         getById: function (id) {
             return umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "contentApiBaseUrl",
-                            "GetById",
-                            { id: id })),
-                    'Failed to retrieve data for content id ' + id)
-                .then(function(result) {
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetById",
+                        { id: id })),
+                'Failed to retrieve data for content id ' + id)
+                .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
 
         getBlueprintById: function (id) {
             return umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "contentApiBaseUrl",
-                            "GetBlueprintById",
-                            [{ id: id }])),
-                    'Failed to retrieve data for content id ' + id)
-                .then(function(result) {
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetBlueprintById",
+                        [{ id: id }])),
+                'Failed to retrieve data for content id ' + id)
+                .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
@@ -410,15 +447,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             });
 
             return umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "contentApiBaseUrl",
-                            "GetByIds",
-                            idQuery)),
-                    'Failed to retrieve data for content with multiple ids')
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetByIds",
+                        idQuery)),
+                'Failed to retrieve data for content with multiple ids')
                 .then(function (result) {
                     //each item needs to be re-formatted
-                    _.each(result, function(r) {
+                    _.each(result, function (r) {
                         umbDataFormatter.formatContentGetData(r)
                     });
                     return $q.when(result);
@@ -461,13 +498,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getScaffold: function (parentId, alias) {
 
             return umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "contentApiBaseUrl",
-                            "GetEmpty",
-                            [{ contentTypeAlias: alias }, { parentId: parentId }])),
-                    'Failed to retrieve data for empty content item type ' + alias)
-                .then(function(result) {
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmpty",
+                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                'Failed to retrieve data for empty content item type ' + alias)
+                .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
@@ -475,13 +512,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getBlueprintScaffold: function (parentId, blueprintId) {
 
             return umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "contentApiBaseUrl",
-                            "GetEmpty",
-                            [{ blueprintId: blueprintId }, { parentId: parentId }])),
-                    'Failed to retrieve blueprint for id ' + blueprintId)
-                .then(function(result) {
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmpty",
+                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                'Failed to retrieve blueprint for id ' + blueprintId)
+                .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },

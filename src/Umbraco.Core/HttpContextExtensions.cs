@@ -24,11 +24,19 @@ namespace Umbraco.Core
             {
                 return "Unknown, httpContext is null";
             }
-            if (httpContext.Request == null)
+
+            HttpRequestBase request;
+            try
+            {
+                // is not null - throws
+                request = httpContext.Request;
+            }
+            catch
             {
                 return "Unknown, httpContext.Request is null";
             }
-            if (httpContext.Request.ServerVariables == null)
+
+            if (request.ServerVariables == null)
             {
                 return "Unknown, httpContext.Request.ServerVariables is null";
             }
@@ -37,16 +45,16 @@ namespace Umbraco.Core
 
             try
             {
-                var ipAddress = httpContext.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+                var ipAddress = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
                 if (string.IsNullOrEmpty(ipAddress))
-                    return httpContext.Request.UserHostAddress;
+                    return request.UserHostAddress;
 
                 var addresses = ipAddress.Split(',');
                 if (addresses.Length != 0)
                     return addresses[0];
 
-                return httpContext.Request.UserHostAddress;
+                return request.UserHostAddress;
             }
             catch (System.Exception ex)
             {

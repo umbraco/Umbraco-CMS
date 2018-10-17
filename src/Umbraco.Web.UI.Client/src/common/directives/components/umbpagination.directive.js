@@ -90,9 +90,9 @@ Use this directive to generate a pagination.
 
       function link(scope, el, attr, ctrl) {
 
-          scope.pagination = [];
-
          function activate() {
+
+            scope.pagination = [];
              
             var i = 0;
 

@@ -608,6 +608,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region UnitOfWork Events
 
+        //fixme: The reason these events are in the repository is for legacy, the events should exist at the service
+        // level now since we can fire these events within the transaction... so move the events to service level
+
         public class ScopedEntityEventArgs : EventArgs
         {
             public ScopedEntityEventArgs(IScope scope, TEntity entity)

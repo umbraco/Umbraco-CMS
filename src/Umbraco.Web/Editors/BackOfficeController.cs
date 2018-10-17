@@ -82,6 +82,16 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public async Task<ActionResult> VerifyInvite(string invite)
         {
+            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
+            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
+            //dumped at the default admin view with no detail
+            if(Security.IsAuthenticated())
+            {
+                AuthenticationManager.SignOut(
+                    Core.Constants.Security.BackOfficeAuthenticationType,
+                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            }
+            
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -125,16 +135,15 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded == false)
             {
                 Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
-                return RedirectToAction("Default");
+                return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
             //sign the user in
-
-            AuthenticationManager.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
+            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
             await SignInManager.SignInAsync(identityUser, false, false);
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
+            identityUser.LastLoginDateUtc = previousLastLoginDate;
+            await UserManager.UpdateAsync(identityUser);
 
             return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
         }
@@ -511,38 +520,6 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        /// <summary>
-        /// Returns the JavaScript blocks for any legacy trees declared
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [MinifyJavaScriptResult(Order = 1)]
-        public JavaScriptResult LegacyTreeJs()
-        {
-            Func<string> getResult = () =>
-            {
-                var javascript = new StringBuilder();
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyTreeJavascript());
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyIActionJavascript());
-                //add all of the menu blocks
-                foreach (var file in GetLegacyActionJs(LegacyJsActionType.JsBlock))
-                {
-                    javascript.AppendLine(file);
-                }
-                return javascript.ToString();
-            };
-
-            //cache the result if debugging is disabled
-            var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
-                    typeof(BackOfficeController) + "LegacyTreeJs",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
-
-            return JavaScript(result);
-        }
-
         internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
         {
             var blockList = new List<string>();
@@ -573,7 +550,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Renders out all JavaScript references that have bee declared in IActions
+        /// Renders out all JavaScript references that have been declared in IActions
         /// </summary>
         private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
         {

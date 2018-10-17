@@ -334,6 +334,8 @@
     <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Manifest\ContentAppDefinitionConverter.cs" />
+    <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
@@ -354,17 +356,23 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables2.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DropTaskTables.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
     <Compile Include="Models\ConsentState.cs" />
+    <Compile Include="Models\ContentEditing\ContentApp.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
@@ -386,12 +394,14 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\Fallback.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
     <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\VariationContext.cs" />
     <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
@@ -722,7 +732,6 @@
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
-    <Compile Include="Models\PropertyTagChange.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
@@ -796,8 +805,6 @@
     <Compile Include="Persistence\Dtos\ServerRegistrationDto.cs" />
     <Compile Include="Persistence\Dtos\TagDto.cs" />
     <Compile Include="Persistence\Dtos\TagRelationshipDto.cs" />
-    <Compile Include="Persistence\Dtos\TaskDto.cs" />
-    <Compile Include="Persistence\Dtos\TaskTypeDto.cs" />
     <Compile Include="Persistence\Dtos\TemplateDto.cs" />
     <Compile Include="Persistence\Dtos\User2NodeNotifyDto.cs" />
     <Compile Include="Persistence\Dtos\User2UserGroupDto.cs" />
@@ -819,8 +826,6 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TaggedEntity.cs" />
     <Compile Include="Models\TaggedProperty.cs" />
-    <Compile Include="Models\Task.cs" />
-    <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
@@ -895,8 +900,6 @@
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
-    <Compile Include="Persistence\Factories\TaskFactory.cs" />
-    <Compile Include="Persistence\Factories\TaskTypeFactory.cs" />
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
@@ -946,7 +949,6 @@
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\ServerRegistrationMapper.cs" />
     <Compile Include="Persistence\Mappers\TagMapper.cs" />
-    <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
     <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
@@ -1155,8 +1157,6 @@
     <Compile Include="Persistence\Repositories\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\ITagRepository.cs" />
-    <Compile Include="Persistence\Repositories\ITaskRepository.cs" />
-    <Compile Include="Persistence\Repositories\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserRepository.cs" />
@@ -1187,8 +1187,6 @@
     <Compile Include="Persistence\Repositories\Implement\SimpleGetRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TagRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TaskRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\TupleExtensions.cs" />
     <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
@@ -1374,7 +1372,6 @@
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
-    <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
     <Compile Include="Services\Implement\LocalizedTextService.cs" />
@@ -1404,7 +1401,6 @@
     <Compile Include="Services\Implement\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
-    <Compile Include="Services\Implement\TaskService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UnpublishResult.cs" />
     <Compile Include="Services\UnpublishResultType.cs" />

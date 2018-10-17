@@ -76,26 +76,7 @@ namespace Umbraco.Core.Persistence
             var (s, a) = sql.SqlContext.Visit(predicate, alias);
             return sql.Where(s, a);
         }
-
-        /// <summary>
-        /// Appends an AND clause to a WHERE Sql statement.
-        /// </summary>
-        /// <typeparam name="TDto">The type of the Dto.</typeparam>
-        /// <param name="sql">The Sql statement.</param>
-        /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
-        /// <param name="alias">An optional alias for the table.</param>
-        /// <returns>The Sql statement.</returns>
-        /// <remarks>
-        /// <para>Chaining <c>.Where(...).Where(...)</c> in NPoco works because it merges the two WHERE statements,
-        /// however if the first statement is not an explicit WHERE statement, chaining fails and two WHERE
-        /// statements appear in the resulting Sql. This allows for adding an AND clause without problems.</para>
-        /// </remarks>
-        public static Sql<ISqlContext> AndWhere<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
-        {
-            var (s, a) = sql.SqlContext.Visit(predicate, alias);
-            return sql.Append("AND (" + s + ")", a);
-        }
-
+        
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>
@@ -412,6 +393,23 @@ namespace Umbraco.Core.Persistence
         #region Joins
 
         /// <summary>
+        /// Appends a CROSS JOIN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="alias">An optional alias for the joined table.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> CrossJoin<TDto>(this Sql<ISqlContext> sql, string alias = null)
+        {
+            var type = typeof(TDto);
+            var tableName = type.GetTableName();
+            var join = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
+            if (alias != null) join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+
+            return sql.Append("CROSS JOIN " + join);
+        }
+
+        /// <summary>
         /// Appends an INNER JOIN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -548,6 +546,25 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> On<TDto1, TDto2>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, bool>> predicate, string aliasLeft = null, string aliasRight = null)
         {
             var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlJoin.SqlContext, aliasLeft, aliasRight);
+            var onExpression = expresionist.Visit(predicate);
+            return sqlJoin.On(onExpression, expresionist.GetSqlParameters());
+        }
+
+        /// <summary>
+        /// Appends an ON clause to a SqlJoin statement.
+        /// </summary>
+        /// <typeparam name="TDto1">The type of Dto 1.</typeparam>
+        /// <typeparam name="TDto2">The type of Dto 2.</typeparam>
+        /// <typeparam name="TDto3">The type of Dto 3.</typeparam>
+        /// <param name="sqlJoin">The SqlJoin statement.</param>
+        /// <param name="predicate">A predicate to transform and use as the ON clause body.</param>
+        /// <param name="aliasLeft">An optional alias for Dto 1 table.</param>
+        /// <param name="aliasRight">An optional alias for Dto 2 table.</param>
+        /// <param name="aliasOther">An optional alias for Dto 3 table.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> On<TDto1, TDto2, TDto3>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, TDto3, bool>> predicate, string aliasLeft = null, string aliasRight = null, string aliasOther = null)
+        {
+            var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3>(sqlJoin.SqlContext, aliasLeft, aliasRight, aliasOther);
             var onExpression = expresionist.Visit(predicate);
             return sqlJoin.On(onExpression, expresionist.GetSqlParameters());
         }
@@ -1019,7 +1036,7 @@ namespace Umbraco.Core.Persistence
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
-            var queryColumns = pd.QueryColumns;
+            var queryColumns = pd.QueryColumns.ToList();
 
             Dictionary<string, string> aliases = null;
 
@@ -1039,7 +1056,11 @@ namespace Umbraco.Core.Persistence
                     return fieldName;
                 }).ToArray();
 
-                queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToArray();
+                //only get the columns that exist in the selected names
+                queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToList();
+
+                //ensure the order of the columns in the expressions is the order in the result
+                queryColumns.Sort((a, b) => names.IndexOf(a.Key).CompareTo(names.IndexOf(b.Key)));
             }
 
             string GetAlias(PocoColumn column)
