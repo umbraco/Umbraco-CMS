@@ -18,11 +18,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 			searchFromId: null,
 			searchFromName: null,
 			showSearch: false,
-      bypassUserPermissions: dialogOptions.bypassUserPermissions,
+            bypassUserPermissions: dialogOptions.bypassUserPermissions,
 			results: [],
 			selectedSearchResults: []
 		};
-    $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
+        $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
 		$scope.showTarget = $scope.model.hideTarget !== true;
 
 		if (dialogOptions.currentTarget) {
@@ -107,19 +107,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 		$scope.switchToMediaPicker = function () {
 			userService.getCurrentUser().then(function (userData) {
-        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+            var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+            var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
-        if (dialogOptions.bypassUserPermissions) {
-            startNodeId = -1;
-            startNodeIsVirtual = true;
-        }
+            if (dialogOptions.bypassUserPermissions) {
+                startNodeId = -1;
+                startNodeIsVirtual = true;
+            }
 				$scope.mediaPickerOverlay = {
 					view: "mediapicker",
 					startNodeId: startNodeId,
 					startNodeIsVirtual: startNodeIsVirtual,
 					show: true,
-          bypassUserPermissions: dialogOptions.bypassUserPermissions,  
+                    bypassUserPermissions: dialogOptions.bypassUserPermissions,  
 					submit: function (model) {
 						var media = model.selectedImages[0];
 
