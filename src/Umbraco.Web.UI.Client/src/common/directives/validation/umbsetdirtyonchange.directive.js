@@ -7,7 +7,7 @@
 
             var formCtrl = ctrls[0];
             
-            if (ctrls.length > 1) {
+            if (ctrls.length > 1 && ctrls[1]) {
                 //if an ngModel is supplied, assign a render function which is called when the model is changed
                 var modelCtrl = ctrls[1];
                 var oldRender = modelCtrl.$render;
@@ -17,8 +17,9 @@
                     if (oldRender) {
                         oldRender();
                     }
-                };
-            } else {
+                }
+            }
+            else {
                 var initValue = attr.umbSetDirtyOnChange;
                 
                 attr.$observe("umbSetDirtyOnChange", function (newValue) {

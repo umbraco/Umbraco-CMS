@@ -888,8 +888,8 @@ angular.module("umbraco")
             angular.forEach($scope.availableEditors, function (value, key) {
                 //If no translation is provided, keep using the editor name from the manifest
                 if (localizationService.dictionary.hasOwnProperty("grid_" + value.alias)) {
-                    localizationService.localize("grid_" + value.alias).then(function(value){
-                        value.name = value;
+                    localizationService.localize("grid_" + value.alias).then(function(v){
+                        value.name = v;
                     });
                 }
             });

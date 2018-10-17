@@ -446,7 +446,7 @@
       Stiskněte tlačítko <strong>povýšit</strong> pro povýšení Vaší databáze na Umbraco %0%</p>
       <p>
       Neobávejte se - žádný obsah nebude odstraněn a všechno bude fungovat jak má!
-      </p>    
+      </p>
       ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Vaše databáze byla povýšená na konečnou verzi %0%.<br />Stiskněte <strong>Následující</strong> pro pokračování. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Vaše současná databáze je aktuální!. Klikněte na <strong>následující</strong>, pro pokračování konfiguračního průvodce]]></key>
@@ -482,7 +482,7 @@
     ]]></key>
     <key alias="runwayFromScratch">Chci začít od nuly</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        V tuto chíli je Váš web úplně prázdný, takže je ideální chvíle začít od nuly a vytvořit si vlastní typy dokumentu a šablon. 
+        V tuto chíli je Váš web úplně prázdný, takže je ideální chvíle začít od nuly a vytvořit si vlastní typy dokumentu a šablon.
         (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">zjistěte jak</a>)
         Stále se můžete později rozhodnout nainstalovat Runway. Za tím účelem navštivte Vývojářskou sekci a zvolte Balíčky.
       ]]></key>
@@ -516,7 +516,7 @@
     Abyste získali pomoc od naší oceňované komunity, projděte si dokumentaci, nebo si pusťte některá videa zdarma o tom, jak vytvořit jednoduchý web, jak používat balíčky a rychlý úvod do terminologie umbraca]]></key>
     <key alias="theEndHeader">Umbraco %0% je nainstalováno a připraveno k použití</key>
     <key alias="theEndInstallFailed"><![CDATA[Pro dokončení instalace budete muset ručně změnit <strong>soubor /web.config</strong> a upravit klíč AppSetting <strong>umbracoConfigurationStatus</strong> dole na hodnotu <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Můžete <strong>ihned začít</strong> kliknutím na tlačítko "Spustit Umbraco" níže. <br />Jestliže <strong>je pro Vás umbraco nové</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[Můžete <strong>ihned začít</strong> kliknutím na tlačítko "Spustit Umbraco" níže. <br />Jestliže <strong>je pro Vás umbraco nové</strong>,
     spoustu zdrojů naleznete na naších stránkách "začínáme".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Spustit Umbraco</h3>
     Chcete-li spravovat Váš web, jednoduše přejděte do administrace umbraca a začněte přidávat obsah, upravovat šablony a stylopisy, nebo přidávat nové funkce]]></key>
@@ -537,6 +537,7 @@
     <key alias="renewSession">Obnovte nyní pro uložení práce</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Šťastnou super neděli</key>
     <key alias="greeting1">Šťastné šílené pondělí</key>
     <key alias="greeting2">Šťastné husté úterý</key>
     <key alias="greeting3">Šťastnou překrásnou středu</key>
@@ -583,13 +584,13 @@
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
-		  <p>Toto je automatická zpráva informující Vás, že úloha <strong>'%1%'</strong> 
+		  <p>Toto je automatická zpráva informující Vás, že úloha <strong>'%1%'</strong>
 		  byla provedena na stránce <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  uživatelem <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -601,7 +602,7 @@
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

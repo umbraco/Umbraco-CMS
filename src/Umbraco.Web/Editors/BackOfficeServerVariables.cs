@@ -112,7 +112,6 @@ namespace Umbraco.Web.Editors
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
-                        {"legacyTreeJs", _urlHelper.Action("LegacyTreeJs", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
                         //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -9,12 +8,9 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using umbraco.cms.presentation.Trees;
 using System.Linq;
-using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Controls;
 

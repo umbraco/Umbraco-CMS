@@ -21,6 +21,7 @@ namespace Umbraco.Web.Services
         private readonly ILogger _logger;
         private readonly CacheHelper _cache;
         private Lazy<IEnumerable<ApplicationTree>> _allAvailableTrees;
+        private IEnumerable<Type> _treeTypes;
         internal const string TreeConfigFileName = "trees.config";
         private static string _treeConfig;
         private static readonly object Locker = new object();
@@ -249,6 +250,11 @@ namespace Umbraco.Web.Services
         public IEnumerable<ApplicationTree> GetAll()
         {
             return GetAppTrees().OrderBy(x => x.SortOrder);
+        }
+
+        public IEnumerable<Type> GetAllTypes()
+        {
+            return _treeTypes ?? (_treeTypes = GetAll().Select(x => x.GetRuntimeType()));
         }
 
         /// <summary>
