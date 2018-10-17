@@ -840,7 +840,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to get rollback versions for content item with id " + contentId
             );
+        },
+
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getRollbackVersion
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a previous version of a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getRollbackVersion(versionId)
+          *    .then(function(version) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} versionId The version Id
+          * @returns {Promise} resourcePromise object containing the url.
+          *
+          */
+        getRollbackVersion: function (versionId) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersion", {
+                        versionId: versionId
+                    })
+                ),
+                "Failed to get version for content item with id " + versionId
+            );
         }
+
 
 
     };
