@@ -1702,5 +1702,61 @@ namespace Umbraco.Web.Editors
             Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
         }
 
+        [HttpGet]
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string cultureName)
+        {
+            var rollbackVersions = new List<RollbackVersion>();
+
+            //Return a list of all versions of a specific content node
+            var versions = Services.ContentService.GetVersions(contentId);
+            
+            //Not all nodes are variants & thus culture can be null
+            //Only filter the collection
+            if(cultureName != null)
+            {
+                versions = versions.Where(x => x.PublishDate == x.GetPublishDate(cultureName));
+            }
+
+            foreach(var version in versions)
+            {
+                var rollbackVersion = new RollbackVersion();
+
+                //Version ID
+                rollbackVersion.VersionId = version.VersionId;
+
+                //Date of version
+                var cultureDate = version.GetPublishDate(cultureName);
+                if (cultureDate.HasValue)
+                {
+                    rollbackVersion.VersionDate = cultureDate.Value;
+                }
+                else if (version.PublishDate.HasValue)
+                {
+                    rollbackVersion.VersionDate = version.PublishDate.Value;
+                }
+
+                //Name of publisher
+                //TODO: Reviewer would this extra info be expensive?
+                var publisherId = version.PublisherId;
+
+                if (publisherId.HasValue)
+                {
+                    var publisher = Services.UserService.GetUserById(version.PublisherId.Value);                    
+                    rollbackVersion.VersionAuthorName = publisher.Name;
+                }
+
+                rollbackVersions.Add(rollbackVersion);
+            }
+            
+            return rollbackVersions;
+        }
+
+        //[EnsureUserPermissionForContent("id", 'D')]
+        [HttpPost]
+        public void PostRollback()
+        {
+
+        }
+
     }
 }
