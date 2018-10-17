@@ -47,9 +47,10 @@
                 id="addcropheight"
             />
 
-            <button class="btn btn-info add" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+            <button class="btn btn-info add" ng-hide="editMode" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+            <button class="btn btn-info add" ng-show="editMode" ng-click="add($event)"><localize key="general_update">Update</localize></button>
 
-            <a href class="btn btn-link" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
+            <a href class="btn btn-link" ng-show="editMode" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
         </div>
     </div>
 
