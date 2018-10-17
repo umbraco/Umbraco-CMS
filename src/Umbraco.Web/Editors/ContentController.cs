@@ -1749,11 +1749,20 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public ContentItemDisplay GetRollbackVersion(int versionId)
+        public ContentVariantDisplay GetRollbackVersion(int versionId, string culture = null)
         {
             var version = Services.ContentService.GetVersion(versionId);
             var content = MapToDisplay(version);
-            return content;
+
+
+            //No culture set - so this is an invariant node - so just list me the first item in here
+            //TODO: Tripple check invariant nodes still has one item in the collection but with a language of null
+            if (culture == null)
+            {
+                return content.Variants.FirstOrDefault();
+            }
+
+            return content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
         [HttpPost]
