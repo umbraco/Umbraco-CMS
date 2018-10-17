@@ -1703,7 +1703,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string cultureName = null)
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
         {
             var rollbackVersions = new List<RollbackVersion>();
 
@@ -1712,10 +1712,10 @@ namespace Umbraco.Web.Editors
             
             //Not all nodes are variants & thus culture can be null
             //Only filter the collection
-            if(cultureName != null)
-            {
-                versions = versions.Where(x => x.PublishDate == x.GetPublishDate(cultureName));
-            }
+            //if(cultureName != null)
+            //{
+            //    versions = versions.Where(x => x.PublishDate == x.GetPublishDate(culture));
+            //}
 
             foreach(var version in versions)
             {
@@ -1725,7 +1725,7 @@ namespace Umbraco.Web.Editors
                 rollbackVersion.VersionId = version.VersionId;
 
                 //Date of version
-                var cultureDate = version.GetPublishDate(cultureName);
+                var cultureDate = version.GetPublishDate(culture);
                 if (cultureDate.HasValue)
                 {
                     rollbackVersion.VersionDate = cultureDate.Value;
@@ -1748,12 +1748,40 @@ namespace Umbraco.Web.Editors
             return rollbackVersions;
         }
 
-        //[EnsureUserPermissionForContent("id", 'D')]
-        [HttpPost]
-        public void PostRollback()
+        [HttpGet]
+        public ContentItemDisplay GetRollbackVersion(int versionId)
         {
-
+            var version = Services.ContentService.GetVersion(versionId);
+            var content = MapToDisplay(version);
+            return content;
         }
 
+        [HttpPost]
+        public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
+        {
+            //TODO: Do we log something - so there is a trail in the logs
+            //Of who performed the rollback of what document, time
+
+            //Get the current copy of the node
+            var content = Services.ContentService.GetById(contentId);
+
+            //Get the version
+            var version = Services.ContentService.GetVersion(versionId);
+
+            //Copy the changes from the version
+            content.CopyFrom(version);
+            
+            //Save & Publish the update
+            var publishResult = Services.ContentService.SaveAndPublish(content, culture, Security.GetUserId().ResultOr(0));
+            if (publishResult.Success == false)
+            {
+                var notificationModel = new SimpleNotificationModel();
+                AddMessageForPublishStatus(publishResult, notificationModel);
+                return Request.CreateValidationErrorResponse(notificationModel);
+            }
+
+            //return ok
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
     }
 }

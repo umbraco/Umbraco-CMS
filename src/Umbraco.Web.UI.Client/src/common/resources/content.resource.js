@@ -835,7 +835,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersions", {
-                        contentId: contentId, cultureName: culture
+                        contentId: contentId, culture: culture
                     })
                 ),
                 "Failed to get rollback versions for content item with id " + contentId
