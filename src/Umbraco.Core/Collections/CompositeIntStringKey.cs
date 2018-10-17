@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Collections
 {
+
     /// <summary>
     /// Represents a composite key of (int, string) for fast dictionaries.
     /// </summary>

@@ -8,6 +8,7 @@ using System.Threading;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Represents a collection of <see cref="PropertyGroup"/> objects
     /// </summary>
@@ -168,7 +169,7 @@ namespace Umbraco.Core.Models
             var clone = new PropertyGroupCollection();
             foreach (var group in this)
             {
-                clone.Add((PropertyGroup) group.DeepClone());
+                clone.Add((PropertyGroup)group.DeepClone());
             }
             return clone;
         }

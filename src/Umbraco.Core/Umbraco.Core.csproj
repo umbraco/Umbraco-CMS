@@ -109,6 +109,7 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
+    <Compile Include="Collections\IReadOnlyKeyedCollection.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
@@ -374,6 +375,8 @@
     <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
+    <Compile Include="Models\CultureName.cs" />
+    <Compile Include="Models\CultureNameCollection.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
     <Compile Include="Models\Editors\ContentPropertyFile.cs" />
     <Compile Include="Models\Entities\BeingDirty.cs" />

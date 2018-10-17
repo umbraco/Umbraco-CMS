@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
@@ -20,8 +21,8 @@ namespace Umbraco.Core.Models
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private Dictionary<string, (string Name, DateTime Date)> _publishInfos;
-        private Dictionary<string, (string Name, DateTime Date)> _publishInfosOrig;
+        private CultureNameCollection _publishInfos;
+        private CultureNameCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -221,13 +222,13 @@ namespace Umbraco.Core.Models
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
-            =>  _publishInfos != null && _publishInfos.ContainsKey(culture); 
+            =>  _publishInfos != null && _publishInfos.Contains(culture); 
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.Contains(culture); 
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
@@ -237,7 +238,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
+        public IReadOnlyKeyedCollection<string, CultureName> PublishNames => _publishInfos ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -267,9 +268,11 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
 
             if (_publishInfos == null)
-                _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+                _publishInfos = new CultureNameCollection();
 
-            _publishInfos[culture.ToLowerInvariant()] = (name, date);
+            //TODO: Track changes?
+
+            _publishInfos.AddOrUpdate(culture, name, date);
         }
 
         private void ClearPublishInfos()
@@ -430,7 +433,11 @@ namespace Umbraco.Core.Models
             // take care of publish infos
             _publishInfosOrig = _publishInfos == null
                 ? null
-                : new Dictionary<string, (string Name, DateTime Date)>(_publishInfos, StringComparer.OrdinalIgnoreCase);
+                : new CultureNameCollection(_publishInfos);
+
+            if (_publishInfos != null)
+                foreach (var cultureName in _publishInfos)
+                    cultureName.ResetDirtyProperties(rememberDirty);
         }
 
         /// <summary>

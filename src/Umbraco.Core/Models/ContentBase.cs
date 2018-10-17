@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Web;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -19,14 +20,14 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-        protected static readonly Dictionary<string, string> NoNames = new Dictionary<string, string>();
+        protected static readonly CultureNameCollection NoNames = new CultureNameCollection();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private Dictionary<string, (string Name, DateTime Date)> _cultureInfos;
+        private CultureNameCollection _cultureInfos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.CultureNames);
+            public readonly PropertyInfo CultureNamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyCollection<CultureName>>(x => x.CultureNames);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -147,18 +148,18 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public IEnumerable<string> AvailableCultures
-            => _cultureInfos?.Select(x => x.Key) ?? Enumerable.Empty<string>();
+            => _cultureInfos?.Keys ?? Enumerable.Empty<string>();
 
         /// <inheritdoc />
         public bool IsCultureAvailable(string culture)
-            => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
+            => _cultureInfos != null && _cultureInfos.Contains(culture);
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> CultureNames => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
-
+        public virtual IReadOnlyKeyedCollection<string, CultureName> CultureNames => _cultureInfos ?? NoNames;
+        
         /// <inheritdoc />
-        public virtual string GetCultureName(string culture)
+        public string GetCultureName(string culture)
         {
             if (culture.IsNullOrWhiteSpace()) return Name;
             if (!ContentTypeBase.VariesByCulture()) return null;
@@ -176,7 +177,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void SetCultureName(string name, string culture)
+        public void SetCultureName(string name, string culture)
         {
             if (ContentTypeBase.VariesByCulture()) // set on variant content type
             {
@@ -202,16 +203,18 @@ namespace Umbraco.Core.Models
             }
         }
 
+        //fixme: this isn't used anywhere
         internal void TouchCulture(string culture)
         {
             if (ContentTypeBase.VariesByCulture() && _cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
-                _cultureInfos[culture] = (infos.Name, DateTime.Now);
+                _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
         }
 
         protected void ClearCultureInfos()
         {
+            if (_cultureInfos != null)
+                _cultureInfos.Clear();
             _cultureInfos = null;
-            OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
         protected void ClearCultureInfo(string culture)
@@ -223,7 +226,6 @@ namespace Umbraco.Core.Models
             _cultureInfos.Remove(culture);
             if (_cultureInfos.Count == 0)
                 _cultureInfos = null;
-            OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
         // internal for repository
@@ -236,10 +238,22 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
 
             if (_cultureInfos == null)
-                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+            {
+                _cultureInfos = new CultureNameCollection();
+                _cultureInfos.CollectionChanged += CultureNamesCollectionChanged;
+            }   
 
-            _cultureInfos[culture.ToLowerInvariant()] = (name, date);
-            OnPropertyChanged(Ps.Value.NamesSelector);
+            _cultureInfos.AddOrUpdate(culture, name, date);
+        }
+
+        /// <summary>
+        /// Event handler for when the culture names collection is modified
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CultureNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(Ps.Value.CultureNamesSelector);
         }
 
         #endregion
@@ -387,6 +401,11 @@ namespace Umbraco.Core.Models
             // also reset dirty changes made to user's properties
             foreach (var prop in Properties)
                 prop.ResetDirtyProperties(rememberDirty);
+
+            // take care of culture names
+            if (_cultureInfos != null)
+                foreach (var cultureName in _cultureInfos)
+                    cultureName.ResetDirtyProperties(rememberDirty);
         }
 
         /// <inheritdoc />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -57,7 +58,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> CultureNames { get; }
+        IReadOnlyKeyedCollection<string, CultureName> CultureNames { get; }
 
         /// <summary>
         /// Gets the available cultures.

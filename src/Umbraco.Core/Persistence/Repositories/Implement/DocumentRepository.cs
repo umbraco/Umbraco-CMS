@@ -1172,8 +1172,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName)
-                    ? cultureName
-                    : content.CultureNames.First().Value;
+                    ? cultureName.Name
+                    : content.CultureNames[0].Name;
             }
             else
             {
@@ -1234,7 +1234,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishNames.ContainsKey(culture))
+                if (publishing && content.PublishNames.Contains(culture))
                     content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }

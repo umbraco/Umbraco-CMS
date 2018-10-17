@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Core.Models
 {
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> PublishNames { get; }
+        IReadOnlyKeyedCollection<string, CultureName> PublishNames { get; }
 
         /// <summary>
         /// Gets the published cultures.
