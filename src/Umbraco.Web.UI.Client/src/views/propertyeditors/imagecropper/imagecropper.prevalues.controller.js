@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesController",
-	function ($scope, $timeout) {
+	function ($scope) {
 
 	    if (!$scope.model.value) {
 	        $scope.model.value = [];
@@ -25,7 +25,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    $scope.add = function (evt) {
 	        evt.preventDefault();
 
-	        if ($scope.newItem && $scope.newItem.alias && 
+	        if ($scope.newItem && $scope.newItem.alias &&
                 angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
                 $scope.newItem.width > 0 && $scope.newItem.height > 0) {
 
