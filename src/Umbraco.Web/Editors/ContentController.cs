@@ -1703,7 +1703,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string cultureName)
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string cultureName = null)
         {
             var rollbackVersions = new List<RollbackVersion>();
 
@@ -1730,20 +1730,17 @@ namespace Umbraco.Web.Editors
                 {
                     rollbackVersion.VersionDate = cultureDate.Value;
                 }
-                else if (version.PublishDate.HasValue)
+                else
                 {
-                    rollbackVersion.VersionDate = version.PublishDate.Value;
+                    rollbackVersion.VersionDate = version.UpdateDate;
                 }
 
                 //Name of publisher
                 //TODO: Reviewer would this extra info be expensive?
                 var publisherId = version.PublisherId;
-
-                if (publisherId.HasValue)
-                {
-                    var publisher = Services.UserService.GetUserById(version.PublisherId.Value);                    
-                    rollbackVersion.VersionAuthorName = publisher.Name;
-                }
+                var userId = version.PublisherId.HasValue ? version.PublisherId.Value : version.WriterId;
+                var publisher = Services.UserService.GetUserById(userId);
+                rollbackVersion.VersionAuthorName = publisher.Name;
 
                 rollbackVersions.Add(rollbackVersion);
             }
