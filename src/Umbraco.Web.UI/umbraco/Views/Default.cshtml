@@ -17,17 +17,16 @@
         }
     }
 
-    var rtl = System.Globalization.CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
-    var language = System.Globalization.CultureInfo.CurrentCulture.Name;
+    var rtl = System.Globalization.CultureInfo.CreateSpecificCulture(GlobalSettings.DefaultUILanguage).TextInfo.IsRightToLeft;
+    var language = GlobalSettings.DefaultUILanguage;
 
     Html
-        .RequiresCss("assets/" + (rtl == true ? "rtl" : "css") + "/umbraco.css", "Umbraco")
         .RequiresCss("tree/treeicons.css", "UmbracoClient")
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
 <!DOCTYPE html>
-<html lang="@(language)" dir="@(rtl == true ? "rtl" : "ltr")">
+<html lang="@(language)" dir="@(rtl ? "rtl" : "ltr")">
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
@@ -39,6 +38,8 @@
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
+    <link ng-href="@(IOHelper.ResolveUrl(SystemDirectories.Umbraco))/assets/{{$root.rtlcss}}/umbraco.css" href="@(IOHelper.ResolveUrl(SystemDirectories.Umbraco))/assets/@(rtl ? "rtl" : "css")/umbraco.css" type="text/css" rel="stylesheet"/>
+
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
@@ -47,7 +48,8 @@
 
     <div ng-hide="!authenticated" ng-cloak>
 
-        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
+        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift
+            400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
 
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">

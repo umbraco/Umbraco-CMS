@@ -14,6 +14,13 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
             }
         });
 
+      if (Umbraco.Sys.ServerVariables.application.defaultIsRtl) {
+          $rootScope.rtlcss = "rtl";
+      }
+      else {
+          $rootScope.rtlcss = "css";
+      }
+
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
             
@@ -82,6 +89,15 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 }
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
+            }
+
+            if (Umbraco.Sys.ServerVariables.application.isRtl !== undefined) {
+                if (Umbraco.Sys.ServerVariables.application.isRtl) {
+                    $rootScope.rtlcss = "rtl";
+                }
+                else {
+                    $rootScope.rtlcss = "css";
+                }
             }
 
             //reset the editorState on each successful route chage
