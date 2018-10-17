@@ -20,7 +20,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     ];
     $scope.touchDevice = appState.getGlobalState("touchDevice");
 
-
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
     };
@@ -52,6 +51,13 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     evts.push(eventsService.on("app.notAuthenticated", function () {
         $scope.authenticated = null;
         $scope.user = null;
+        if (Umbraco.Sys.ServerVariables.application.defaultIsRtl) {
+            $rootScope.rtlcss = "rtl";
+        }
+        else {
+            $rootScope.rtlcss = "css";
+        }
+
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {

@@ -53,7 +53,7 @@ namespace Umbraco.Web.Editors
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
-                {"application", new[] {"applicationPath", "cacheBuster"}},
+                {"application", new[] {"applicationPath", "cacheBuster", "defaultLang", "defaultIsRtl" }},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
             };
@@ -421,6 +421,8 @@ namespace Umbraco.Web.Editors
             // These will allow us and third party packages to support Right to Left Languages
             app.Add("isRtl", System.Globalization.CultureInfo.CurrentCulture.TextInfo.IsRightToLeft);
             app.Add("lang", System.Globalization.CultureInfo.CurrentCulture.Name);
+            app.Add("defaultLang", GlobalSettings.DefaultUILanguage);
+            app.Add("defaultIsRtl", System.Globalization.CultureInfo.CreateSpecificCulture(GlobalSettings.DefaultUILanguage).TextInfo.IsRightToLeft);
 
             return app;
         }

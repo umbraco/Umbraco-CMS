@@ -102,7 +102,7 @@
                   }
                     
                   vm.culture = user.culture;
-
+                  
                   vm.loading = false;
                 });
             });
