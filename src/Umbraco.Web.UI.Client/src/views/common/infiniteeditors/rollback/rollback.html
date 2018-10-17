@@ -23,9 +23,9 @@
                         <h5><localize key="general_language"></localize></h5>
                         <select 
                             class="input-block-level"
-                            ng-model="vm.selectedVariant"
+                            ng-model="vm.selectedLanguage"
                             ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
-                            ng-change="vm.loadVariant(variant)">
+                            ng-change="vm.changeLanguage(vm.selectedLanguage)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
                     </div>
@@ -40,7 +40,7 @@
                             class="input-block-level"
                             ng-model="vm.selectedVersion"
                             ng-options="version.versionDate for version in vm.previousVersions track by version.versionId"
-                            ng-change="vm.loadVersion(vm.selectedVersion.id)">
+                            ng-change="vm.changeVersion(vm.selectedVersion.id)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
                     </div>

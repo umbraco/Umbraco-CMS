@@ -7,6 +7,8 @@
 
         vm.rollback = rollback;
         vm.loadVersion = loadVersion;
+        vm.changeLanguage = changeLanguage;
+        vm.changeVersion = changeVersion;
         vm.submit = submit;
         vm.close = close;
 
@@ -17,15 +19,23 @@
             vm.loading = true;
             vm.variantVersions = [];
             vm.diff = null;
+            vm.currentVersion = null;
 
-            // preselect the active language
+            // find the current version for invariant nodes
+            if($scope.model.node.variants.length === 1) {
+                vm.currentVersion = $scope.model.node.variants[0];
+            }
+
+            // find the current version for nodes with variants
             if($scope.model.node.variants.length > 1) {
                 var active = _.find($scope.model.node.variants, function (v) {
                     return v.active;
                 });
 
+                // preselect the language in the dropdown
                 if(active) {
-                    vm.selectedVariant = active;
+                    vm.selectedLanguage = active;
+                    vm.currentVersion = active;
                 }
             }
 
@@ -39,37 +49,33 @@
             // Load in diff library
             assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {
 
-                vm.currentVersion = {
-                    "id": 1,
-                    "createDate": "22/08/2018 13.32",
-                    "name": "Forside",
-                    "properties": [
-                        {
-                            "alias": "headline",
-                            "label": "Headline",
-                            "value": "Velkommen"
-                        },
-                        {
-                            "alias": "text",
-                            "label": "Text",
-                            "value": "This is my danish Content"
-                        }
-                    ]
-                };
-
-                const nodeId = $scope.model.node.id;
-                const culture = vm.selectedVariant ? vm.selectedVariant.language.culture : null;
-
-                contentResource.getRollbackVersions(nodeId, culture)
-                    .then(function(data){
-                        console.log(data);
-                        vm.previousVersions = data;
-                    });
-
-                vm.loading = false;
+                getVersions().then(function(){
+                    vm.loading = false;
+                });
 
             });
             
+        }
+
+        function changeLanguage(language) {
+            vm.currentVersion = language;
+            getVersions();
+        }
+
+        function changeVersion(version) {
+            console.log("version", version);
+        }
+
+        function getVersions() {
+
+            const nodeId = $scope.model.node.id;
+            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
+
+            return contentResource.getRollbackVersions(nodeId, culture)
+                .then(function(data){
+                    console.log("new", data);
+                    vm.previousVersions = data;
+                });
         }
 
         function rollback() {
