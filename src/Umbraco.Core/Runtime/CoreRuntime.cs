@@ -237,10 +237,10 @@ namespace Umbraco.Core.Runtime
             // and only these things - the rest should be composed in runtime components
 
             // register basic things
+            // logging, runtime state, configuration
             container.RegisterSingleton<IProfiler, LogProfiler>();
             container.RegisterSingleton<ProfilingLogger>();
             container.RegisterSingleton<IRuntimeState, RuntimeState>();
-
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
             // register caches
@@ -254,8 +254,8 @@ namespace Umbraco.Core.Runtime
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
-            // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
+            // register the type loader
+            container.RegisterSingleton<TypeLoader>();
 
             // register syntax providers - required by database factory
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
