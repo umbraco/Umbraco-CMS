@@ -65,8 +65,8 @@
             console.log("version", version);
             contentResource.getRollbackVersion(version.versionId)
                 .then(function(data){
-                    console.log(data);
-                    //createDiff(vm.currentVersion, data);
+                    const previousVersion = data;
+                    createDiff(vm.currentVersion, previousVersion);
                 });
 
         }
@@ -78,7 +78,6 @@
 
             return contentResource.getRollbackVersions(nodeId, culture)
                 .then(function(data){
-                    console.log("new", data);
                     vm.previousVersions = data;
                 });
         }
@@ -92,42 +91,24 @@
          */
         function createDiff(currentVersion, previousVersion) {
 
-            // fake load version
-
             vm.diff = {};
             vm.diff.properties = [];
 
-            var oldVersion = {
-                "id": 2,
-                "name": "Foride",
-                "properties": [
-                    {
-                        "alias": "headline",
-                        "label": "Headline",
-                        "value": ""
-                    },
-                    {
-                        "alias": "text",
-                        "label": "Text",
-                        "value": "This is my danish Content Test"
-                    }
-                ]
-            };
-
             // find diff in name
-            vm.diff.name = JsDiff.diffWords(vm.currentVersion.name, oldVersion.name);
+            vm.diff.name = JsDiff.diffWords(vm.currentVersion.name, previousVersion.name);
 
-            // find diff in properties
-            angular.forEach(vm.currentVersion.properties, 
-                function(newProperty, index){
-                    var oldProperty = oldVersion.properties[index];
+            // extract all properties from the tabs and create new object for the diff
+            vm.currentVersion.tabs.forEach((tab, tabIndex) => {
+                tab.properties.forEach((property, propertyIndex) => {
+                    var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
                     var diffProperty = {
-                        "alias": newProperty.alias,
-                        "label": newProperty.label,
-                        "diff": JsDiff.diffWords(newProperty.value, oldProperty.value)
+                        "alias": property.alias,
+                        "label": property.label,
+                        "diff": JsDiff.diffWords(property.value, oldProperty.value)
                     };
                     vm.diff.properties.push(diffProperty);
                 });
+            });
 
         }
 
