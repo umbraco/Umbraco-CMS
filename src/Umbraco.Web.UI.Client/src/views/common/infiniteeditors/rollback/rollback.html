@@ -40,7 +40,7 @@
                             class="input-block-level"
                             ng-model="vm.selectedVersion"
                             ng-options="version.versionDate for version in vm.previousVersions track by version.versionId"
-                            ng-change="vm.changeVersion(vm.selectedVersion.id)">
+                            ng-change="vm.changeVersion(vm.selectedVersion)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
                     </div>

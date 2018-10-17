@@ -6,7 +6,6 @@
         var vm = this;
 
         vm.rollback = rollback;
-        vm.loadVersion = loadVersion;
         vm.changeLanguage = changeLanguage;
         vm.changeVersion = changeVersion;
         vm.submit = submit;
@@ -64,6 +63,12 @@
 
         function changeVersion(version) {
             console.log("version", version);
+            contentResource.getRollbackVersion(version.versionId)
+                .then(function(data){
+                    console.log(data);
+                    //createDiff(vm.currentVersion, data);
+                });
+
         }
 
         function getVersions() {
@@ -85,7 +90,7 @@
         /**
          * This will load in a new version
          */
-        function loadVersion(id) {
+        function createDiff(currentVersion, previousVersion) {
 
             // fake load version
 
