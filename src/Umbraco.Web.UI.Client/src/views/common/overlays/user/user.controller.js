@@ -33,10 +33,14 @@ angular.module("umbraco")
                 $scope.model.close();
             });
 
-
+             
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
             $scope.model.close();
             $location.path("/logout");
+
+            if (Umbraco.Sys.ServerVariables.application.defaultLang !== $scope.user.locale) {
+                location.reload(true);
+            }
         };
 
         $scope.gotoHistory = function (link) {
