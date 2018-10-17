@@ -141,7 +141,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql
                 .LeftJoin<ContentVersionCultureVariationDto>(nested =>
                     nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv") 
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, "pcv", "ccv");
 
             sql
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
@@ -882,10 +882,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // variant: left join may yield NULL or something, and that determines published
 
                 var joins = Sql()
-                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
-                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
-                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((pcv, ccv) => pcv.Id == ccv.VersionId, "pcv", "ccv"); // join on *published* content version
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
 
                 sql = InsertJoins(sql, joins);
 
