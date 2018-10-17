@@ -18,7 +18,7 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:1)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

@@ -31,13 +31,15 @@ angular.module("umbraco.directives")
         return {
             restrict: 'E',
             scope:{
-                key: '@'
+                key: '@',
+                tokens: '='
             },
             replace: true,
 
             link: function (scope, element, attrs) {
                 var key = scope.key;
-                localizationService.localize(key).then(function(value){
+                var tokens = scope.tokens ? scope.tokens : null;
+                localizationService.localize(key, tokens).then(function(value){
                     element.html(value);
                 });
             }

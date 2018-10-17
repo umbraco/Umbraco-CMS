@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -40,6 +41,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns>Returns a ApplicationTree Array</returns>
         IEnumerable<ApplicationTree> GetAll();
+
+
+        IEnumerable<Type> GetAllTypes();
 
         /// <summary>
         /// Gets the application tree for the applcation with the specified alias
@@ -109,6 +113,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns>Returns a ApplicationTree Array</returns>
         public IEnumerable<ApplicationTree> GetAll()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IEnumerable<Type> GetAllTypes()
         {
             throw new System.NotImplementedException();
         }

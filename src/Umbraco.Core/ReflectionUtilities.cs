@@ -295,7 +295,7 @@ namespace Umbraco.Core
         /// <exception cref="InvalidOperationException">Occurs when the constructor does not exist and <paramref name="mustExist"/> is <c>true</c>.</exception>
         /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when <paramref name="declaring"/>
         /// is specified and does not match the function's returned type.</exception>
-        public static TLambda EmitCtor<TLambda>(bool mustExist = true, Type declaring = null)
+        public static TLambda EmitConstuctor<TLambda>(bool mustExist = true, Type declaring = null)
         {
             var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
@@ -313,7 +313,7 @@ namespace Umbraco.Core
             }
 
             // emit
-            return EmitCtorSafe<TLambda>(lambdaParameters, lambdaReturned, ctor);
+            return EmitConstructorSafe<TLambda>(lambdaParameters, lambdaReturned, ctor);
         }
 
         /// <summary>
@@ -325,16 +325,16 @@ namespace Umbraco.Core
         /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when its generic
         /// arguments do not match those of <paramref name="ctor"/>.</exception>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="ctor"/> is null.</exception>
-        public static TLambda EmitCtor<TLambda>(ConstructorInfo ctor)
+        public static TLambda EmitConstructor<TLambda>(ConstructorInfo ctor)
         {
             if (ctor == null) throw new ArgumentNullException(nameof(ctor));
 
             var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
-            return EmitCtorSafe<TLambda>(lambdaParameters, lambdaReturned, ctor);
+            return EmitConstructorSafe<TLambda>(lambdaParameters, lambdaReturned, ctor);
         }
 
-        private static TLambda EmitCtorSafe<TLambda>(Type[] lambdaParameters, Type returned, ConstructorInfo ctor)
+        private static TLambda EmitConstructorSafe<TLambda>(Type[] lambdaParameters, Type returned, ConstructorInfo ctor)
         {
             // get type and args
             var ctorDeclaring = ctor.DeclaringType;
@@ -350,7 +350,7 @@ namespace Umbraco.Core
                 ThrowInvalidLambda<TLambda>("ctor", ctorDeclaring, ctorParameters);
 
             // emit
-            return EmitCtor<TLambda>(ctorDeclaring, ctorParameters, ctor);
+            return EmitConstructor<TLambda>(ctorDeclaring, ctorParameters, ctor);
         }
 
         /// <summary>
@@ -367,17 +367,17 @@ namespace Umbraco.Core
         /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when its generic
         /// arguments do not match those of <paramref name="ctor"/>.</exception>
         /// <exception cref="ArgumentNullException">Occurs when <paramref name="ctor"/> is null.</exception>
-        public static TLambda EmitCtorUnsafe<TLambda>(ConstructorInfo ctor)
+        public static TLambda EmitConstructorUnsafe<TLambda>(ConstructorInfo ctor)
         {
             if (ctor == null) throw new ArgumentNullException(nameof(ctor));
 
             var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
             // emit - unsafe - use lambda's args and assume they are correct
-            return EmitCtor<TLambda>(lambdaReturned, lambdaParameters, ctor);
+            return EmitConstructor<TLambda>(lambdaReturned, lambdaParameters, ctor);
         }
 
-        private static TLambda EmitCtor<TLambda>(Type declaring, Type[] lambdaParameters, ConstructorInfo ctor)
+        private static TLambda EmitConstructor<TLambda>(Type declaring, Type[] lambdaParameters, ConstructorInfo ctor)
         {
             // gets the method argument types
             var ctorParameters = GetParameters(ctor);
