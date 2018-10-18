@@ -1057,11 +1057,26 @@ namespace Umbraco.Web
             BottomLeft = 3
         }
 
-        public IHtmlString EditLink(IPublishedContent thisPage,
-            EditLinkPosition position = EditLinkPosition.TopLeft, string linkColour = "#00aea2", string editMessage = "Edit",
-            int margin = 10, int zindex = 999, string umbracoPath = "/umbraco",
-            int fontSize = 16, string outerPosition = "fixed", string linkPosition = "absolute",
-            string outerClassName = "edit-link-outer", string linkClassName = "edit-link-inner")
+        /// <summary>
+        /// This will render an edit link on the page. You can override all of the default settings to position and style it yourself.
+        /// </summary>
+        /// <param name="contentId">The id of the page which will be edited</param>
+        /// <param name="position">The position of the link, top left etc.</param>
+        /// <param name="linkColour">The CSS colour of the link.</param>
+        /// <param name="editMessage">The text to display in the link</param>
+        /// <param name="margin">The margin around the link</param>
+        /// <param name="zindex">The zindex of the link to make it show above the content on the page</param>
+        /// <param name="umbracoPath">The umbraco path, in case you have changed it</param>
+        /// <param name="fontSize">The font size of the link</param>
+        /// <param name="outerPosition">Position styling for the outer container</param>
+        /// <param name="linkPosition">Position styling for the link inside the container</param>
+        /// <param name="outerClassName">Class name for the outer container</param>
+        /// <param name="linkClassName">Class name for the link</param>
+        /// <returns></returns>
+        public IHtmlString EditLink(int contentId, EditLinkPosition position = EditLinkPosition.TopLeft,
+            string linkColour = "#00aea2", string editMessage = "Edit", int margin = 10, int zindex = 999,
+            string umbracoPath = "/umbraco", int fontSize = 16, string outerPosition = "fixed",
+            string linkPosition = "absolute", string outerClassName = "edit-link-outer", string linkClassName = "edit-link-inner")
         {
             StringBuilder editLinkCode = new StringBuilder();
             var userTicket = new HttpContextWrapper(HttpContext.Current).GetUmbracoAuthTicket();
@@ -1097,28 +1112,28 @@ namespace Umbraco.Web
 
                 string umbracoEditContentUrl = $"{umbracoPath}#/content/content/edit/";
 
-                editLinkCode.Append($"<div");
+                editLinkCode.Append("<div");
                 editLinkCode.Append($" class=\"{outerClassName}\"");
                 if (!string.IsNullOrEmpty(outerStyles))
                 {
                     editLinkCode.Append($" style=\"{outerStyles}\"");
                 }
-                editLinkCode.Append($">");
+                editLinkCode.Append(">");
 
                 string linkStyles = $"color:{linkColour};";
                 linkStyles += $"font-size:{fontSize}px;";
 
-                editLinkCode.Append($"<a ");
+                editLinkCode.Append("<a ");
                 editLinkCode.Append($" class=\"{linkClassName}\"");
                 if (!string.IsNullOrEmpty(linkStyles))
                 {
                     editLinkCode.Append($"style={linkStyles}");
                 }
 
-                editLinkCode.Append($" target=\"_blank\"");
-                editLinkCode.Append($" href =\"{umbracoEditContentUrl}{thisPage.Id}\"");
+                editLinkCode.Append(" target=\"_blank\"");
+                editLinkCode.Append($" href =\"{umbracoEditContentUrl}{contentId}\"");
                 editLinkCode.Append($">{editMessage}</a>");
-                editLinkCode.Append($"</div>");
+                editLinkCode.Append("</div>");
             }
 
             return MvcHtmlString.Create(editLinkCode.ToString());
