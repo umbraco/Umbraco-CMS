@@ -6,6 +6,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    }
 
         $scope.editMode = false;
+        $scope.setFocus = false;
 
 	    $scope.remove = function (item, evt) {
 	        evt.preventDefault();
@@ -17,6 +18,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    $scope.edit = function (item, evt) {
             evt.preventDefault();
             $scope.editMode = true;
+            $scope.setFocus = false;
 
 	        $scope.newItem = item;
 	    };
@@ -24,14 +26,25 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    $scope.cancel = function (evt) {
             evt.preventDefault();
             $scope.editMode = false;
+            $scope.setFocus = true;
 
 	        $scope.newItem = null;
 	    };
+
+        $scope.change = function () {
+            // Listen to the change event and set focus 2 false
+            if($scope.setFocus){
+                $scope.setFocus = false;
+                return;
+            }
+        }
 
 	    $scope.add = function (evt) {
             evt.preventDefault();
 
             $scope.editMode = false;
+
+            $scope.setFocus = true;
 
 	        if ($scope.newItem && $scope.newItem.alias &&
                 angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
@@ -42,15 +55,18 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	            if (!exists) {
 	                $scope.model.value.push($scope.newItem);
 	                $scope.newItem = {};
-	                $scope.hasError = false;
+                    $scope.hasError = false;
+                    $scope.cropAdded = false;
 	                return;
                 }
                 else{
                     $scope.newItem = null;
+                    $scope.hasError = false;
+                    return;
                 }
 	        }
 
 	        //there was an error, do the highlight (will be set back by the directive)
 	        $scope.hasError = true;
-	    };
+        };
 	});

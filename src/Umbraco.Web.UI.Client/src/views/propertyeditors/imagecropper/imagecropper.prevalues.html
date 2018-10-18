@@ -1,62 +1,57 @@
 <div ng-controller="Umbraco.PrevalueEditors.CropSizesController" class="umb-editor umb-prevalues-multivalues umb-cropsizes">
 
-    <div class="form">
-        <!-- <h4><localize key="imagecropper_defineCrop">Define crop</localize></h4> -->
-        <!-- <p>
-            <localize key="imagecropper_defineCropDescription">Give the crop an alias and it's default width and height</localize>.
-        </p> -->
+    <div class="control-group umb-cropsizes__add">
 
-        <div class="control-group umb-cropsizes__add">
-
-            <div class="umb-cropsizes__input-wrap">
-                <label for="addcropalias"><localize key="general_alias">Alias</localize></label>
-                <input
-                    id="addcropalias"
-                    name="newItem.alias"
-                    type="text"
-                    ng-model="newItem.alias"
-                    class="umb-cropsizes__input"
-                    val-highlight="{{hasError}}"
-                    localize="placeholder"
-                    placeholder="@general_alias"
-                />
-            </div>
-
-            <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--icon">
-                <label for="addcropwidth"><localize key="general_width">Width</localize></label>
-                <input
-                    name="newItem.width"
-                    type="number"
-                    localize="placeholder"
-                    placeholder="@general_width"
-                    ng-model="newItem.width"
-                    class="umb-cropsizes__input umb-cropsizes__input--narrow"
-                    val-highlight="{{hasError}}"
-                    id="addcropwidth"
-                />
-            </div>
-
-            <div class="umb-cropsizes__input-wrap">
-                <label for="addcropheight"><localize key="general_height">Height</localize></label>
-                <input
-                    name="newItem.height"
-                    type="number"
-                    localize="placeholder"
-                    placeholder="@general_height"
-                    ng-model="newItem.height"
-                    class="umb-cropsizes__input umb-cropsizes__input--narrow"
-                    val-highlight="{{hasError}}"
-                    id="addcropheight"
-                />
-            </div>
-
-            <div class="umb-cropsizes__controls">
-                <button class="btn btn-info add" ng-hide="editMode" ng-click="add($event)"><localize key="general_add">Add</localize></button>
-                <button class="btn btn-info add" ng-show="editMode" ng-click="add($event)"><localize key="general_update">Update</localize></button>
-                <a href class="btn btn-link" ng-show="editMode" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
-            </div>
-
+        <div class="umb-cropsizes__input-wrap">
+            <label for="addcropalias"><localize key="general_alias">Alias</localize></label>
+            <input
+                id="addcropalias"
+                name="newItem.alias"
+                type="text"
+                ng-model="newItem.alias"
+                class="umb-cropsizes__input"
+                val-highlight="{{hasError}}"
+                localize="placeholder"
+                placeholder="@general_alias"
+                focus-when="{{setFocus}}"
+                ng-change="change()"
+            />
         </div>
+
+        <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow umb-cropsizes__input-wrap--icon">
+            <label for="addcropwidth"><localize key="general_width">Width</localize></label>
+            <input
+                name="newItem.width"
+                type="number"
+                localize="placeholder"
+                placeholder="@general_width"
+                ng-model="newItem.width"
+                class="umb-cropsizes__input umb-cropsizes__input--narrow"
+                val-highlight="{{hasError}}"
+                id="addcropwidth"
+            />
+        </div>
+
+        <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
+            <label for="addcropheight"><localize key="general_height">Height</localize></label>
+            <input
+                name="newItem.height"
+                type="number"
+                localize="placeholder"
+                placeholder="@general_height"
+                ng-model="newItem.height"
+                class="umb-cropsizes__input umb-cropsizes__input--narrow"
+                val-highlight="{{hasError}}"
+                id="addcropheight"
+            />
+        </div>
+
+        <div class="umb-cropsizes__controls">
+            <button class="btn btn-info add" ng-hide="editMode" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+            <button class="btn btn-info add" ng-show="editMode" ng-click="add($event)"><localize key="general_update">Update</localize></button>
+            <a href class="btn btn-link" ng-show="editMode" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
+        </div>
+
     </div>
 
     <div ui-sortable="sortableOptions">
