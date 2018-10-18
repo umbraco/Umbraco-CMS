@@ -2497,6 +2497,8 @@ namespace Umbraco.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
 
+            //TODO: Ensure 'RollingBack' & 'RolledBack' events are wired up
+
             //Get the current copy of the node
             var content = GetById(id);
 
@@ -2524,8 +2526,10 @@ namespace Umbraco.Core.Services.Implement
             else
             {
                 //Logging & Audit message
-                Logger.Error<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-                Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+                Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+
+                //TODO: Audit throws me a 'Cannot run a repository without an ambient scope.'
+                //Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
             }
 
             return rollbackSaveResult;
