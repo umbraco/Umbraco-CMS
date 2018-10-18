@@ -1708,16 +1708,17 @@ namespace Umbraco.Web.Editors
             var rollbackVersions = new List<RollbackVersion>();
 
             //Return a list of all versions of a specific content node
-            var versions = Services.ContentService.GetVersions(contentId);
-            
+            //First item is our current item/state (cant rollback to ourselves)
+            var versions = Services.ContentService.GetVersions(contentId).Skip(1);
+
             //Not all nodes are variants & thus culture can be null
             //Only filter the collection
-            //if(cultureName != null)
-            //{
-            //    versions = versions.Where(x => x.PublishDate == x.GetPublishDate(culture));
-            //}
+            if (culture != null)
+            {
+                versions = versions.Where(x => x.UpdateDate == x.GetUpdateDate(culture));
+            }
 
-            foreach(var version in versions)
+            foreach (var version in versions)
             {
                 var rollbackVersion = new RollbackVersion();
 
@@ -1725,22 +1726,12 @@ namespace Umbraco.Web.Editors
                 rollbackVersion.VersionId = version.VersionId;
 
                 //Date of version
-                var cultureDate = version.GetPublishDate(culture);
-                if (cultureDate.HasValue)
-                {
-                    rollbackVersion.VersionDate = cultureDate.Value;
-                }
-                else
-                {
-                    rollbackVersion.VersionDate = version.UpdateDate;
-                }
-
-                //Name of publisher
-                //TODO: Reviewer would this extra info be expensive?
-                var publisherId = version.PublisherId;
-                var userId = version.PublisherId.HasValue ? version.PublisherId.Value : version.WriterId;
-                var publisher = Services.UserService.GetUserById(userId);
-                rollbackVersion.VersionAuthorName = publisher.Name;
+                rollbackVersion.VersionDate = version.UpdateDate;
+                
+                //Name of writer/publisher/user
+                var writerId = version.WriterId;
+                var user = Services.UserService.GetUserById(writerId);
+                rollbackVersion.VersionAuthorName = user.Name;
 
                 rollbackVersions.Add(rollbackVersion);
             }
@@ -1768,8 +1759,10 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            //TODO: Do we log something - so there is a trail in the logs
-            //Of who performed the rollback of what document, time
+            var userId = Security.GetUserId().ResultOr(0);
+
+            Logger.Info<ContentController>("User ID {UserId} is attempting to rollback content '{ContentId}' to version '{VersionId}'", userId, contentId, versionId);
+            Services.AuditService.Add(AuditType.RollBack, "YO YO YO IM ROLLING BACK", userId, contentId);
 
             //Get the current copy of the node
             var content = Services.ContentService.GetById(contentId);
@@ -1778,16 +1771,38 @@ namespace Umbraco.Web.Editors
             var version = Services.ContentService.GetVersion(versionId);
 
             //Copy the changes from the version
-            content.CopyFrom(version);
-            
-            //Save & Publish the update
-            var publishResult = Services.ContentService.SaveAndPublish(content, culture, Security.GetUserId().ResultOr(0));
-            if (publishResult.Success == false)
+            content.CopyFrom(version, culture);
+
+            //Save the update
+            var saveResult = Services.ContentService.Save(content, userId);
+            if(saveResult.Success == false)
             {
+                Logger.Error<ContentController>("Unable to rollback content '{ContentId}' to version '{VersionId}'", contentId, versionId);
+
                 var notificationModel = new SimpleNotificationModel();
-                AddMessageForPublishStatus(publishResult, notificationModel);
+
+                switch (saveResult.Result)
+                {
+                    case OperationResultType.Failed:
+                    case OperationResultType.FailedCannot:
+                    case OperationResultType.FailedExceptionThrown:
+                    case OperationResultType.NoOperation:
+                    default:
+                        notificationModel.AddErrorNotification(
+                                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                                        null); //TODO: There is no specific failed to save error message AFAIK
+                        break;
+                    case OperationResultType.FailedCancelledByEvent:
+                        notificationModel.AddErrorNotification(
+                                        Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
+                                        Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                        break;
+                }
+                
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
+            
+            Logger.Info<ContentController>("User ID {UserId} rolled back content '{ContentId}' to version '{VersionId}'", userId, contentId, versionId);
 
             //return ok
             return Request.CreateResponse(HttpStatusCode.OK);
