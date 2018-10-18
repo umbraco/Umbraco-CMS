@@ -56,7 +56,11 @@ namespace Umbraco.Core.Models
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, found, found));
             }
             else
-                Add(new CultureName(culture, name, date));    
+                Add(new CultureName(culture)
+                {
+                    Name = name,
+                    Date = date
+                });    
         }
 
         /// <summary>

@@ -14,12 +14,27 @@ namespace Umbraco.Core.Models
         private string _name;
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        public CultureName(string culture, string name, DateTime date)
+        /// <summary>
+        /// Used for cloning without change tracking
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <param name="name"></param>
+        /// <param name="date"></param>
+        private CultureName(string culture, string name, DateTime date)
+            : this(culture)
+        {
+            _name = name;
+            _date = date;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="culture"></param>
+        public CultureName(string culture)
         {
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("message", nameof(culture));
             Culture = culture;
-            _name = name;
-            _date = date;
         }
 
         public string Culture { get; private set; }

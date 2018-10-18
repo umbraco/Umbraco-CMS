@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -88,6 +89,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
+            public readonly PropertyInfo PublishNamesSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyCollection<CultureName>>(x => x.PublishNames);
         }
 
         /// <summary>
@@ -222,7 +224,7 @@ namespace Umbraco.Core.Models
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
-            =>  _publishInfos != null && _publishInfos.Contains(culture); 
+            =>  _publishInfos != null && _publishInfos.Contains(culture);
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
@@ -268,9 +270,10 @@ namespace Umbraco.Core.Models
                 throw new ArgumentNullOrEmptyException(nameof(culture));
 
             if (_publishInfos == null)
+            {
                 _publishInfos = new CultureNameCollection();
-
-            //TODO: Track changes?
+                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+            }
 
             _publishInfos.AddOrUpdate(culture, name, date);
         }
@@ -312,6 +315,16 @@ namespace Umbraco.Core.Models
                 var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
                 _editedCultures = editedCultures.Count > 0 ? editedCultures : null;
             }
+        }
+
+        /// <summary>
+        /// Event handler for when the culture names collection is modified
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(Ps.Value.PublishNamesSelector);
         }
 
         [IgnoreDataMember]
@@ -430,7 +443,8 @@ namespace Umbraco.Core.Models
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
 
-            // take care of publish infos
+            // Make a copy of the _publishInfos, this is purely so that we can detect
+            // if this entity's previous culture publish state (regardless of the rememberDirty flag)
             _publishInfosOrig = _publishInfos == null
                 ? null
                 : new CultureNameCollection(_publishInfos);
