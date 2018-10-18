@@ -176,7 +176,7 @@ div.umb-codeeditor .umb-btn-toolbar {
             margin-bottom: 0;
             vertical-align: middle;
             padding: 6px 10px;
-            background: @grayMed;
+            background: #f7f7f7;
             flex: 0 0 auto;
         }
 
@@ -207,7 +207,7 @@ div.umb-codeeditor .umb-btn-toolbar {
         padding: 6px 10px;
         font-family: monospace;
         border: 1px solid #dfdfe1;
-        background: @grayMed;
+        background: #f7f7f7;
         margin: 0 15px 0 3px;
         border-radius: 3px;
     }
@@ -243,16 +243,27 @@ div.umb-codeeditor .umb-btn-toolbar {
 
    &__input{
        margin: 0 15px 0 0;
+       width: ~"calc(100% - 15px)";
 
        &--narrow{
-           width: 95px;
+           max-width: 95px;
+           width: 100%;
        }
 
        &-wrap{
            position: relative;
+           max-width: 206px;
+           width: 100%;
+
+           &--narrow{
+               margin: 0 15px 0 0;
+               max-width: 95px;
+               width: 100%;
+           }
 
            &--icon{
-            margin: 0 15px 0 0;
+            padding: 0 15px 0 0;
+            width: ~"calc(100% + 15px)"; // Use an escape string in order to make use of CSS native calc function instead of the one built into less
 
                &:after{
                    content:"\00D7";
@@ -260,7 +271,7 @@ div.umb-codeeditor .umb-btn-toolbar {
                    bottom: -9px;
                    top: 0;
                    margin: auto;
-                   right: -1px;
+                   right: 0;
                    width: 5px;
                    height: 5px;
                }
