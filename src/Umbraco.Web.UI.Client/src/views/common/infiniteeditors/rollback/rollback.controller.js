@@ -62,14 +62,21 @@
         }
 
         function changeVersion(version) {
-            console.log("version", version);
-            contentResource.getRollbackVersion(version.versionId)
-                .then(function(data){
-                    vm.previousVersion = data;
-                    vm.previousVersion.versionId = version.versionId;
-                    createDiff(vm.currentVersion, vm.previousVersion);
-                });
 
+            if(version && version.versionId) {
+
+                const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
+
+                contentResource.getRollbackVersion(version.versionId, culture)
+                    .then(function(data){
+                        vm.previousVersion = data;
+                        vm.previousVersion.versionId = version.versionId;
+                        createDiff(vm.currentVersion, vm.previousVersion);
+                    });
+
+            } else {
+                vm.diff = null;
+            }
         }
 
         function getVersions() {
