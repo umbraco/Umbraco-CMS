@@ -438,7 +438,8 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
-            //TODO: Shouldn't we remove this event handler first before re-adding it in case the handler already exists
+
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
 
@@ -456,7 +457,8 @@ namespace Umbraco.Core.Models
                 _contentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
-                //TODO: Shouldn't we remove this event handler first before re-adding it in case the handler already exists
+
+                Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
                 Properties.CollectionChanged += PropertiesChanged;
                 return;
             }

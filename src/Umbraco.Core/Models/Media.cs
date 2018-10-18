@@ -78,6 +78,8 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
+            
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
 
@@ -95,6 +97,8 @@ namespace Umbraco.Core.Models
                 _contentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
+
+                Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
                 Properties.CollectionChanged += PropertiesChanged;
                 return;
             }
@@ -113,5 +117,6 @@ namespace Umbraco.Core.Models
             //The Media Recycle Bin Id is -21 so we correct that here
             ParentId = parentId == -20 ? -21 : parentId;
         }
+
     }
 }

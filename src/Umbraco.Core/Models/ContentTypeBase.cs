@@ -119,7 +119,7 @@ namespace Umbraco.Core.Models
         /// The Alias of the ContentType
         /// </summary>
         [DataMember]
-        public virtual string Alias
+        public string Alias
         {
             get => _alias;
             set => SetPropertyValueAndDetectChanges(
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Models
         /// Description for the ContentType
         /// </summary>
         [DataMember]
-        public virtual string Description
+        public string Description
         {
             get => _description;
             set => SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector);
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Models
         /// Name of the icon (sprite class) used to identify the ContentType
         /// </summary>
         [DataMember]
-        public virtual string Icon
+        public string Icon
         {
             get => _icon;
             set => SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector);
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Models
         /// Name of the thumbnail used to identify the ContentType
         /// </summary>
         [DataMember]
-        public virtual string Thumbnail
+        public string Thumbnail
         {
             get => _thumbnail;
             set => SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector);
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
         /// </summary>
         [DataMember]
-        public virtual bool AllowedAsRoot
+        public bool AllowedAsRoot
         {
             get => _allowedAsRoot;
             set => SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, Ps.Value.AllowedAsRootSelector);
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Models
         /// ContentType Containers doesn't show children in the tree, but rather in grid-type view.
         /// </remarks>
         [DataMember]
-        public virtual bool IsContainer
+        public bool IsContainer
         {
             get => _isContainer;
             set => SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector);
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
         [DataMember]
-        public virtual IEnumerable<ContentTypeSort> AllowedContentTypes
+        public IEnumerable<ContentTypeSort> AllowedContentTypes
         {
             get => _allowedContentTypes;
             set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the content variation of the content type.
         /// </summary>
-        public virtual ContentVariation Variations
+        public ContentVariation Variations
         {
             get => _variations;
             set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
@@ -223,10 +223,12 @@ namespace Umbraco.Core.Models
         /// List of PropertyGroups available on this ContentType
         /// </summary>
         /// <remarks>
-        /// A PropertyGroup corresponds to a Tab in the UI
+        /// <para>A PropertyGroup corresponds to a Tab in the UI</para>
+        /// <para>Marked DoNotClone because we will manually deal with cloning and the event handlers</para>
         /// </remarks>
         [DataMember]
-        public virtual PropertyGroupCollection PropertyGroups
+        [DoNotClone]
+        public PropertyGroupCollection PropertyGroups
         {
             get => _propertyGroups;
             set
@@ -242,7 +244,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         [DoNotClone]
-        public virtual IEnumerable<PropertyType> PropertyTypes
+        public IEnumerable<PropertyType> PropertyTypes
         {
             get
             {
@@ -253,6 +255,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the property types that are not in a group.
         /// </summary>
+        /// <remarks>
+        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// </remarks>
+        [DoNotClone]
         public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
             get => _propertyTypes;
@@ -467,12 +473,25 @@ namespace Umbraco.Core.Models
             var clone = (ContentTypeBase)base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
-            //need to manually wire up the event handlers for the property type collections - we've ensured
-            // its ignored from the auto-clone process because its return values are unions, not raw and
-            // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
-            clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();
-            clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;
+            if (clone._propertyTypes != null)
+            {
+                //need to manually wire up the event handlers for the property type collections - we've ensured
+                // its ignored from the auto-clone process because its return values are unions, not raw and
+                // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
+
+                clone._propertyTypes.CollectionChanged -= this.PropertyTypesChanged;            //clear this event handler if any
+                clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();      //manually deep clone
+                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;           //re-assign correct event handler
+            }
+
+            if (clone._propertyGroups != null)
+            {
+                clone._propertyGroups.CollectionChanged -= this.PropertyGroupsChanged;            //clear this event handler if any
+                clone._propertyGroups = (PropertyGroupCollection)_propertyGroups.DeepClone();     //manually deep clone
+                clone._propertyGroups.CollectionChanged += clone.PropertyGroupsChanged;           //re-assign correct event handler
+            }
+            
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
             //re-enable tracking
