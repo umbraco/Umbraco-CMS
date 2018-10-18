@@ -525,34 +525,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
-          * @name umbraco.resources.contentResource#saveChangeDocType
-          * @methodOf umbraco.resources.contentResource
-          *
-          * @description
-          * Gets the culture and hostnames for a content item with the given Id
-          *
-          * ##usage
-          * <pre>
-          * contentResource.saveChangeDocType(model)
-          *    .then(function(data) {
-          *        alert("change doc type");
-          *    });
-          * </pre>
-          * @param {model} model of type ContentChangeDocType
-          * @returns {Promise} resourcePromise object.
-          *
-          */
-        saveChangeDocType: function (model) {
-            return umbRequestHelper.resourcePromise( 
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "PostSaveChangeDocType"),
-                    model));
-        },
-
-        /**
-          * @ngdoc method
           * @name umbraco.resources.contentResource#getNiceUrl
           * @methodOf umbraco.resources.contentResource
           *

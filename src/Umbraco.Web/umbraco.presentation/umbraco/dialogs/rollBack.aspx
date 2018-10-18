@@ -1,7 +1,7 @@
 <%@ Page Language="c#" CodeBehind="rollBack.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.presentation.dialogs.rollBack" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
@@ -13,7 +13,44 @@
         var submitOnEnter = true;
     </script>
 
-    
+    <style type="text/css">
+        .propertyItemheader {
+            width: 140px !Important;
+        }
+
+        .diff {
+            margin-top: 10px;
+            height: 100%;
+            overflow: auto;
+            border-top: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            padding: 5px;
+        }
+
+            .diff table td {
+                border-bottom: 1px solid #ccc;
+                padding: 3px;
+            }
+
+            .diff del {
+                background: rgb(255, 230, 230) none repeat scroll 0%;
+                -moz-background-clip: -moz-initial;
+                -moz-background-origin: -moz-initial;
+                -moz-background-inline-policy: -moz-initial;
+            }
+
+            .diff ins {
+                background: rgb(230, 255, 230) none repeat scroll 0%;
+                -moz-background-clip: -moz-initial;
+                -moz-background-origin: -moz-initial;
+                -moz-background-inline-policy: -moz-initial;
+            }
+
+            .diff .diffnotice {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+    </style>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -56,7 +93,7 @@
     </div>
 
     <div runat="server" id="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
         <asp:Button ID="Button1" runat="server" Visible="false" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
-    </div>  
+    </div>
 </asp:Content>

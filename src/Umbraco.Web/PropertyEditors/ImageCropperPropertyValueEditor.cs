@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -11,7 +9,6 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;
 
 namespace Umbraco.Web.PropertyEditors
@@ -19,32 +16,42 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// The value editor for the image cropper property editor.
     /// </summary>
-    internal class ImageCropperPropertyValueEditor : PropertyValueEditorWrapper
+    internal class ImageCropperPropertyValueEditor : DataValueEditor // fixme core vs web?
     {
+        private readonly ILogger _logger;
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem)
-            : base(wrapped)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, MediaFileSystem mediaFileSystem)
+            : base(attribute)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
 
         /// <summary>
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
-            var val = base.ConvertDbToEditor(property, propertyType, dataTypeService);
+            var val = property.GetValue(culture, segment);
+            if (val == null) return null;
 
-            var json = val as JObject;
-            if (json != null)
+            ImageCropperValue value;
+            try
             {
-                ImageCropperValueConverter.MergePreValues(json, dataTypeService, propertyType.DataTypeDefinitionId);
-                return json;
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString());
+            }
+            catch
+            {
+                value = new ImageCropperValue { Src = val.ToString() };
             }
 
-            return val;
+            var dataType = dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            if (dataType?.Configuration != null)
+                value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
+
+            return value;
         }
         /// <summary>
         /// Converts the value received from the editor into the value can be stored in the database.
@@ -57,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
         /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
-        public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             // get the current path
             var currentPath = string.Empty;
@@ -71,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 // for some reason the value is invalid so continue as if there was no value there
-                LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not parse current db value to a JObject.", ex);
+                _logger.Warn<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject.");
             }
             if (string.IsNullOrWhiteSpace(currentPath) == false)
                 currentPath = _mediaFileSystem.GetRelativePath(currentPath);
@@ -87,25 +94,18 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             // ensure we have the required guids
-            if (editorValue.AdditionalData.ContainsKey("cuid") == false // for the content item
-                || editorValue.AdditionalData.ContainsKey("puid") == false) // and the property type
-                throw new Exception("Missing cuid/puid additional data.");
-            var cuido = editorValue.AdditionalData["cuid"];
-            var puido = editorValue.AdditionalData["puid"];
-            if ((cuido is Guid) == false || (puido is Guid) == false)
-                throw new Exception("Invalid cuid/puid additional data.");
-            var cuid = (Guid)cuido;
-            var puid = (Guid)puido;
-            if (cuid == Guid.Empty || puid == Guid.Empty)
-                throw new Exception("Invalid cuid/puid additional data.");
+            var cuid = editorValue.ContentKey;
+            if (cuid == Guid.Empty) throw new Exception("Invalid content key.");
+            var puid = editorValue.PropertyTypeKey;
+            if (puid == Guid.Empty) throw new Exception("Invalid property type key.");
 
             // editorFile is empty whenever a new file is being uploaded
             // or when the file is cleared (in which case editorJson is null)
             // else editorFile contains the unchanged value
 
-            var uploads = editorValue.AdditionalData.ContainsKey("files") && editorValue.AdditionalData["files"] is IEnumerable<ContentItemFile>;
-            var files = uploads ? ((IEnumerable<ContentItemFile>)editorValue.AdditionalData["files"]).ToArray() : new ContentItemFile[0];
-            var file = uploads ? files.FirstOrDefault() : null;
+            var uploads = editorValue.Files;
+            if (uploads == null) throw new Exception("Invalid files.");
+            var file = uploads.Length > 0 ? uploads[0] : null;
 
             if (file == null) // not uploading a file
             {
@@ -114,23 +114,23 @@ namespace Umbraco.Web.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    _mediaFileSystem.DeleteFile(currentPath, true);
+                    _mediaFileSystem.DeleteFile(currentPath);
                     return null; // clear
                 }
 
-                return editorJson == null ? null : editorJson.ToString(); // unchanged
+                return editorJson?.ToString(); // unchanged
             }
 
             // process the file
             var filepath = editorJson == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
 
             // remove all temp files
-            foreach (var f in files)
+            foreach (var f in uploads)
                 File.Delete(f.TempFilePath);
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                _mediaFileSystem.DeleteFile(currentPath, true);
+                _mediaFileSystem.DeleteFile(currentPath);
 
             // update json and return
             if (editorJson == null) return null;
@@ -138,7 +138,7 @@ namespace Umbraco.Web.PropertyEditors
             return editorJson.ToString();
         }
 
-        private string ProcessFile(ContentPropertyData editorValue, ContentItemFile file, string currentPath, Guid cuid, Guid puid)
+        private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
@@ -151,47 +151,30 @@ namespace Umbraco.Web.PropertyEditors
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
+                //TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
+                // since we'd need to be able to return values for other properties from these methods
+
                 _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
-
-                var ext = _mediaFileSystem.GetExtension(filepath);
-                if (_mediaFileSystem.IsImageFile(ext) && ext != ".svg")
-                {
-                    var preValues = editorValue.PreValues.FormatAsDictionary();
-                    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                    try
-                    {
-                        using (var image = Image.FromStream(filestream))
-                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        // send any argument errors caused by the thumbnail generation to the log instead of failing miserably 
-                        LogHelper.WarnWithException<ImageCropperPropertyValueEditor>("Could not extract image thumbnails.", ex);
-                    }
-                }
-
-                // all related properties (auto-fill) are managed by ImageCropperPropertyEditor
-                // when the content is saved (through event handlers)
             }
 
             return filepath;
         }
 
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+
+        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
-            if (property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
-               return null;
+            if (value == null || string.IsNullOrEmpty(value.ToString()))
+                return null;
 
             // if we dont have a json structure, we will get it from the property type
-            var val = property.Value.ToString();
+            var val = value.ToString();
             if (val.DetectIsJson())
                 return val;
 
             // more magic here ;-(
-            var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId).FirstOrDefault();
-            var crops = string.IsNullOrEmpty(config) ? "[]" : config;
-            var newVal = "{src: '" + val + "', crops: " + crops + "}";
-            return newVal;
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
+            return "{src: '" + val + "', crops: " + crops + "}";
         }
     }
 }

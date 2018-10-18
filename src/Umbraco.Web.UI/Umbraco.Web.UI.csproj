@@ -11,7 +11,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
@@ -172,6 +172,13 @@
     <Compile Include="Umbraco\Developer\Packages\DirectoryBrowser.aspx.designer.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -327,7 +334,6 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
-    <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -493,11 +499,11 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>8000</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://sandbox.dev.local</IISUrl>
+          <IISUrl>http://localhost:8000</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

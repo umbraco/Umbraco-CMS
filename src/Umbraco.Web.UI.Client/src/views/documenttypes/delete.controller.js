@@ -43,7 +43,7 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
     };
 
     $scope.cancel = function() {
-        navigationService.hideDialog();
+        navigationService.hideDialog(); 
     };
 }
 

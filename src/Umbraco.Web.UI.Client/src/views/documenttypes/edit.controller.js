@@ -261,7 +261,6 @@
             loadDocumentType();
         }
 
-
         function loadDocumentType() {
             vm.page.loading = true;
             contentTypeResource.getById(documentTypeId).then(function (dt) {

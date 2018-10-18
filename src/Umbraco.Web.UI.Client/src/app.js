@@ -43,9 +43,9 @@ var packages = angular.module("umbraco.packages", []);
 //this ensures we can inject our own views into templateCache and clear
 //the entire cache before the app runs, due to the module
 //order, clearing will always happen before umbraco.views and umbraco
-//module is initilized.
+//module is initilized. 
 angular.module("umbraco.views", ["umbraco.viewcache"]);
-angular.module("umbraco.viewcache", [])
+angular.module("umbraco.viewcache", []) 
     .run(function ($rootScope, $templateCache, localStorageService) {
         /** For debug mode, always clear template cache to cut down on
             dev frustration and chrome cache on templates */
