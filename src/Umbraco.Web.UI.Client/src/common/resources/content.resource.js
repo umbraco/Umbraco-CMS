@@ -835,7 +835,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersions", {
-                        contentId: contentId, culture: culture
+                        contentId: contentId,
+                        culture: culture
                     })
                 ),
                 "Failed to get rollback versions for content item with id " + contentId
@@ -853,21 +854,23 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * ##usage
           * <pre>
-          * contentResource.getRollbackVersion(versionId)
+          * contentResource.getRollbackVersion(versionId, culture)
           *    .then(function(version) {
           *        alert('its here!');
           *    });
           * </pre>
           *
           * @param {Int} versionId The version Id
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
           * @returns {Promise} resourcePromise object containing the url.
           *
           */
-        getRollbackVersion: function (versionId) {
+        getRollbackVersion: function (versionId, culture) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersion", {
-                        versionId: versionId
+                        versionId: versionId,
+                        culture: culture
                     })
                 ),
                 "Failed to get version for content item with id " + versionId
