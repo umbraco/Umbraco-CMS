@@ -19,6 +19,7 @@
             vm.variantVersions = [];
             vm.diff = null;
             vm.currentVersion = null;
+            vm.rollbackButtonDisabled = true;
 
             // find the current version for invariant nodes
             if($scope.model.node.variants.length === 1) {
@@ -72,10 +73,12 @@
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
                         createDiff(vm.currentVersion, vm.previousVersion);
+                        vm.rollbackButtonDisabled = false;
                     });
 
             } else {
                 vm.diff = null;
+                vm.rollbackButtonDisabled = true;
             }
         }
 
