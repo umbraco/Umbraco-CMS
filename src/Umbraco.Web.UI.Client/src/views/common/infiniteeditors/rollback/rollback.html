@@ -26,7 +26,6 @@
                             ng-model="vm.selectedLanguage"
                             ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
                             ng-change="vm.changeLanguage(vm.selectedLanguage)">
-                            <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
                     </div>
                     
