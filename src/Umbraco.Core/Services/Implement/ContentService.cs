@@ -2496,9 +2496,7 @@ namespace Umbraco.Core.Services.Implement
         public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-
-            //TODO: Ensure 'RollingBack' & 'RolledBack' events are wired up
-
+            
             //Get the current copy of the node
             var content = GetById(id);
 
@@ -2511,25 +2509,39 @@ namespace Umbraco.Core.Services.Implement
                 return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
             }
 
-            //Copy the changes from the version
-            content.CopyFrom(version, culture);
+            //Store the result of doing the save of content for the rollback
+            OperationResult rollbackSaveResult;
 
-            //Save the content for the rollback
-            var rollbackSaveResult = Save(content, userId);
-
-            //Depending on the save result - is what we log & audit along with what we return
-            if(rollbackSaveResult.Success == false)
+            using (var scope = ScopeProvider.CreateScope())
             {
-                //Log the error/warning
-                Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-            }
-            else
-            {
-                //Logging & Audit message
-                Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
 
-                //TODO: Audit throws me a 'Cannot run a repository without an ambient scope.'
-                //Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+                //Emit RollingBack event aka before
+                scope.Events.Dispatch(RollingBack, this, rollbackEventArgs);
+
+                //Copy the changes from the version
+                content.CopyFrom(version, culture);
+
+                //Save the content for the rollback
+                rollbackSaveResult = Save(content, userId);
+
+                //Depending on the save result - is what we log & audit along with what we return
+                if (rollbackSaveResult.Success == false)
+                {
+                    //Log the error/warning
+                    Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                }
+                else
+                {
+                    //Emit RolledBack event aka after
+                    scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
+
+                    //Logging & Audit message
+                    Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+                }
+                
+                scope.Complete();
             }
 
             return rollbackSaveResult;
