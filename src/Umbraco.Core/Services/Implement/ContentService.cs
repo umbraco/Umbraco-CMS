@@ -328,7 +328,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Content '{content.Name}' was created with Id {content.Id}", content.CreatorId, content.Id);
+            Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
         }
 
         #endregion
@@ -843,7 +843,16 @@ namespace Umbraco.Core.Services.Implement
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                Audit(AuditType.Save, "Saved by user", userId, content.Id);
+
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+                    : null;
+
+                if (culturesChanging != null && culturesChanging.Count > 0)
+                    Audit(AuditType.Save, userId, content.Id, $"Saved culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
+                else
+                    Audit(AuditType.Save, userId, content.Id);
+
                 scope.Complete();
             }
 
@@ -883,7 +892,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(AuditType.Save, "Bulk-saved by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
 
                 scope.Complete();
             }
@@ -988,14 +997,14 @@ namespace Umbraco.Core.Services.Implement
                     UnpublishResultType result;
                     if (culture == "*" || culture == null)
                     {
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         result = UnpublishResultType.Success;
                     }
                     else
                     {
-                        Audit(AuditType.Unpublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id, $"Culture \"{culture}\" unpublished");
                         if (!content.Published)
-                            Audit(AuditType.Unpublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
+                            Audit(AuditType.Unpublish, userId, content.Id, $"Unpublished (culture \"{culture}\" is mandatory)");
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1025,6 +1034,8 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
+            List<string> culturesChanging = null;
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // is the content going to end up published, or unpublished?
@@ -1045,6 +1056,10 @@ namespace Umbraco.Core.Services.Implement
 
                         // we may end up in a state where we won't publish nor unpublish
                         // keep going, though, as we want to save anways
+                    }
+                    else
+                    {
+                        culturesChanging = content.PublishNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList();
                     }
                 }
 
@@ -1085,6 +1100,7 @@ namespace Umbraco.Core.Services.Implement
                         // ensure that the document can be unpublished, and unpublish
                         // handling events, business rules, etc
                         // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                        // note: This unpublishes the entire document (not different variants)
                         unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                         if (unpublishResult.Success)
                             unpublishResult = StrategyUnpublish(scope, content, true, userId, evtMsgs);
@@ -1122,7 +1138,7 @@ namespace Umbraco.Core.Services.Implement
                         // events and audit
                         scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         scope.Complete();
                         return new PublishResult(PublishResultType.Success, evtMsgs, content);
                     }
@@ -1153,7 +1169,11 @@ namespace Umbraco.Core.Services.Implement
                             scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                         }
 
-                        Audit(AuditType.Publish, "Published by user", userId, content.Id);
+                        if (culturesChanging != null && culturesChanging.Count > 0)
+                            Audit(AuditType.Publish, userId, content.Id, $"Published culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
+                        else
+                            Audit(AuditType.Publish, userId, content.Id);
+
                         scope.Complete();
                         return publishResult;
                     }
@@ -1264,6 +1284,8 @@ namespace Umbraco.Core.Services.Implement
                 // deal with descendants
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
+
+                //fixme: should be paged to not overwhelm the database (timeouts)
                 foreach (var d in GetDescendants(document))
                 {
                     // if parent is excluded, exclude document and ignore
@@ -1287,7 +1309,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
-                Audit(AuditType.Publish, "Branch published by user", userId, document.Id);
+                Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 scope.Complete();
             }
@@ -1356,7 +1378,7 @@ namespace Umbraco.Core.Services.Implement
                 DeleteLocked(scope, content);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(AuditType.Delete, "Deleted by user", userId, content.Id);
+                Audit(AuditType.Delete, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1424,7 +1446,7 @@ namespace Umbraco.Core.Services.Implement
 
                 deleteRevisionsEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
-                Audit(AuditType.Delete, "Delete (by version date) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
                 scope.Complete();
             }
@@ -1461,7 +1483,7 @@ namespace Umbraco.Core.Services.Implement
                     _documentRepository.DeleteVersion(versionId);
 
                 scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
-                Audit(AuditType.Delete, "Delete (by version) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
                 scope.Complete();
             }
@@ -1506,7 +1528,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
-                Audit(AuditType.Move, "Moved to Recycle Bin by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
                 scope.Complete();
             }
@@ -1578,7 +1600,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
-                Audit(AuditType.Move, "Moved by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1675,7 +1697,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, "Recycle Bin emptied by user", 0, Constants.System.RecycleBinContent);
+                Audit(AuditType.Delete, 0, Constants.System.RecycleBinContent, "Recycle bin emptied");
 
                 scope.Complete();
             }
@@ -1793,7 +1815,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
                     scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
-                Audit(AuditType.Copy, "Copy Content performed by user", userId, content.Id);
+                Audit(AuditType.Copy, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1824,7 +1846,15 @@ namespace Umbraco.Core.Services.Implement
 
                 sendToPublishEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-                Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+                    : null;
+
+                if (culturesChanging != null && culturesChanging.Count > 0)
+                    Audit(AuditType.SendToPublish, userId, content.Id, $"Send To Publish for culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
+                else
+                    Audit(AuditType.SendToPublish, content.WriterId, content.Id);
             }
 
             return true;
@@ -1930,7 +1960,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents && published.Any())
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
-            Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
+            Audit(AuditType.Sort, userId, 0);
             return true;
         }
 
@@ -1977,9 +2007,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, Constants.ObjectTypes.Strings.Document, message));
         }
 
         #endregion
@@ -2311,7 +2341,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
-                Audit(AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeIdsA)}");
 
                 scope.Complete();
             }

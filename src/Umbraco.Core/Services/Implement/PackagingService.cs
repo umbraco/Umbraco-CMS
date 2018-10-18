@@ -1485,7 +1485,7 @@ namespace Umbraco.Core.Services.Implement
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, "Package", message));
         }
 
         #endregion

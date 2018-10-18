@@ -25,10 +25,20 @@ namespace Umbraco.Core.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_umbracoLog")]
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// This is the entity type associated with the log
+        /// </summary>
+        [Column("entityType")]
+        [Length(50)]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string EntityType { get; set; }
+
+        //TODO: Should we have an index on this since we allow searching on it?
         [Column("Datestamp")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime Datestamp { get; set; }
 
+        //TODO: Should we have an index on this since we allow searching on it?
         [Column("logHeader")]
         [Length(50)]
         public string Header { get; set; }
@@ -37,5 +47,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(4000)]
         public string Comment { get; set; }
+
+        /// <summary>
+        /// Used to store additional data parameters for the log
+        /// </summary>
+        [Column("parameters")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string Parameters { get; set; }
     }
 }
