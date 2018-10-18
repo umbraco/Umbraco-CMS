@@ -1707,9 +1707,8 @@ namespace Umbraco.Web.Editors
         {
             var rollbackVersions = new List<RollbackVersion>();
 
-            //Return a list of all versions of a specific content node
-            //First item is our current item/state (cant rollback to ourselves)
-            var versions = Services.ContentService.GetVersions(contentId).Skip(1);
+            //Return a list of all versions of a specific content node           
+            var versions = Services.ContentService.GetVersions(contentId);
 
             //Not all nodes are variants & thus culture can be null
             //Only filter the collection
@@ -1717,6 +1716,9 @@ namespace Umbraco.Web.Editors
             {
                 versions = versions.Where(x => x.UpdateDate == x.GetUpdateDate(culture));
             }
+
+            //First item is our current item/state (cant rollback to ourselves)
+            versions = versions.Skip(1);
 
             foreach (var version in versions)
             {
@@ -1744,68 +1746,41 @@ namespace Umbraco.Web.Editors
         {
             var version = Services.ContentService.GetVersion(versionId);
             var content = MapToDisplay(version);
-
-
-            //No culture set - so this is an invariant node - so just list me the first item in here
-            //TODO: Tripple check invariant nodes still has one item in the collection but with a language of null
-            if (culture == null)
-            {
-                return content.Variants.FirstOrDefault();
-            }
-
-            return content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
+                       
+			return culture == null
+				? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
+                : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
         [HttpPost]
         public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            var userId = Security.GetUserId().ResultOr(0);
+            var rollbackResult = Services.ContentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
 
-            Logger.Info<ContentController>("User ID {UserId} is attempting to rollback content '{ContentId}' to version '{VersionId}'", userId, contentId, versionId);
-            Services.AuditService.Add(AuditType.RollBack, "YO YO YO IM ROLLING BACK", userId, contentId);
+			if (rollbackResult.Success)
+                return Request.CreateResponse(HttpStatusCode.OK);
 
-            //Get the current copy of the node
-            var content = Services.ContentService.GetById(contentId);
+            var notificationModel = new SimpleNotificationModel();
 
-            //Get the version
-            var version = Services.ContentService.GetVersion(versionId);
-
-            //Copy the changes from the version
-            content.CopyFrom(version, culture);
-
-            //Save the update
-            var saveResult = Services.ContentService.Save(content, userId);
-            if(saveResult.Success == false)
+            switch (rollbackResult.Result)
             {
-                Logger.Error<ContentController>("Unable to rollback content '{ContentId}' to version '{VersionId}'", contentId, versionId);
-
-                var notificationModel = new SimpleNotificationModel();
-
-                switch (saveResult.Result)
-                {
-                    case OperationResultType.Failed:
-                    case OperationResultType.FailedCannot:
-                    case OperationResultType.FailedExceptionThrown:
-                    case OperationResultType.NoOperation:
-                    default:
-                        notificationModel.AddErrorNotification(
-                                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                                        null); //TODO: There is no specific failed to save error message AFAIK
-                        break;
-                    case OperationResultType.FailedCancelledByEvent:
-                        notificationModel.AddErrorNotification(
-                                        Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
-                                        Services.TextService.Localize("speechBubbles/operationCancelledText"));
-                        break;
-                }
-                
-                return Request.CreateValidationErrorResponse(notificationModel);
+                case OperationResultType.Failed:
+                case OperationResultType.FailedCannot:
+                case OperationResultType.FailedExceptionThrown:
+                case OperationResultType.NoOperation:
+                default:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                                    null); //TODO: There is no specific failed to save error message AFAIK
+                    break;
+                case OperationResultType.FailedCancelledByEvent:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
+                                    Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                    break;
             }
-            
-            Logger.Info<ContentController>("User ID {UserId} rolled back content '{ContentId}' to version '{VersionId}'", userId, contentId, versionId);
 
-            //return ok
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateValidationErrorResponse(notificationModel);
         }
     }
 }

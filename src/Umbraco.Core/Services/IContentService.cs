@@ -461,5 +461,18 @@ namespace Umbraco.Core.Services
         IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
 
         #endregion
+
+        #region Rollback
+
+        /// <summary>
+        /// Rolls back the content to a specific version.
+        /// </summary>
+        /// <param name="id">The id of the content node</param>
+        /// <param name="versionId">The version ID to rollback to</param>
+        /// <param name="culture">An optional culture - specifying a culture will only rollback the culture content</param>
+        /// <param name="userId">The user ID who is performing the rollback</param>
+        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
+
+        #endregion
     }
 }
