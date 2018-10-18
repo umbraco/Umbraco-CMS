@@ -252,8 +252,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
             // is empty for many nodes) - see: http://issues.umbraco.org/issue/U4-8831
 
-            var dbfield = GetQuotedFieldName("umbracoNode", "id");
-            (dbfield, _) = SqlContext.Visit<NodeDto>(x => x.NodeId); // fixme?!
+            var (dbfield, _) = SqlContext.VisitDto<NodeDto>(x => x.NodeId);
             if (ordering.IsCustomField || !ordering.OrderBy.InvariantEquals("id"))
             {
                 psql.OrderBy(GetAliasedField(dbfield, sql)); // fixme why aliased?
@@ -262,7 +261,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // create prepared sql
             // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
             psql = Sql(psql.SQL.ToSingleLine(), psql.Arguments);
-
             
             // replace the magic culture parameter (see DocumentRepository.GetBaseQuery())
             if (!ordering.Culture.IsNullOrWhiteSpace())
@@ -353,6 +351,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (ordering.Culture.IsNullOrWhiteSpace())
                     return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
 
+                // "variantName" alias is defined in DocumentRepository.GetBaseQuery
+                // fixme - what if it is NOT a document but a ... media or whatever?
+                // previously, we inserted the join+select *here* so we were sure to have it,
+                // but now that's not the case anymore!
                 return "variantName"; 
             }
 
@@ -432,7 +434,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // sort and filter
             sql = PreparePageSql(sql, filter, ordering);
-
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
