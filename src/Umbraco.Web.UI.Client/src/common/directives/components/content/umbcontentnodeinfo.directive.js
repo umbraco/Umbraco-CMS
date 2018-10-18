@@ -106,6 +106,8 @@
                 var rollback = {
                     node: scope.node,
                     submit: function(model) {
+                        const args = { node: scope.node };
+                        eventsService.emit("editors.content.reload", args);
                         editorService.close();
                     },
                     close: function() {
