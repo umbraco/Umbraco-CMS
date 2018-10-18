@@ -37,8 +37,9 @@ namespace Umbraco.Core.Components
 
             Current.Services.AuditService.Add(
                 AuditType.Copy,
-                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'",
-                e.Copy.WriterId, e.Copy.Id);
+                e.Copy.WriterId,
+                e.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),
+                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'");
         }
     }
 }

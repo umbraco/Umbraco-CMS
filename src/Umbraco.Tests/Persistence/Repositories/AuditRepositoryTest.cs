@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = sp.CreateScope())
             {
                 var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
-                repo.Save(new AuditItem(-1, "This is a System audit trail", AuditType.System, -1));
+                repo.Save(new AuditItem(-1, AuditType.System, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "This is a System audit trail"));
 
                 var dtos = scope.Database.Fetch<LogDto>("WHERE id > -1");
 
@@ -46,8 +46,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, $"Content {i} created", AuditType.New, -1));
-                    repo.Save(new AuditItem(i, $"Content {i} published", AuditType.Publish, -1));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -74,8 +74,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, $"Content {i} created", AuditType.New, -1));
-                    repo.Save(new AuditItem(i, $"Content {i} published", AuditType.Publish, -1));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -117,8 +117,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, $"Content {i} created", AuditType.New, -1));
-                    repo.Save(new AuditItem(i, $"Content {i} published", AuditType.Publish, -1));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), $"Content {i} published"));
                 }
 
                 scope.Complete();
@@ -148,8 +148,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (var i = 0; i < 100; i++)
                 {
-                    repo.Save(new AuditItem(i, "Content created", AuditType.New, -1));
-                    repo.Save(new AuditItem(i, "Content published", AuditType.Publish, -1));
+                    repo.Save(new AuditItem(i, AuditType.New, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "Content created"));
+                    repo.Save(new AuditItem(i, AuditType.Publish, -1, ObjectTypes.GetName(UmbracoObjectTypes.Document), "Content published"));
                 }
 
                 scope.Complete();

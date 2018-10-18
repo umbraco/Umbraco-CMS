@@ -323,8 +323,8 @@ namespace umbraco.cms.businesslogic.packager
                 if (_currentUserId > -1)
                 {
                     Current.Services.AuditService.Add(AuditType.PackagerInstall,
-                                            string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
-                                            _currentUserId, -1);
+                        _currentUserId,
+                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid));
                 }
 
                 insPack.Save();
