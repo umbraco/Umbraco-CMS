@@ -79,7 +79,10 @@
 
             return contentResource.getRollbackVersions(nodeId, culture)
                 .then(function(data){
-                    vm.previousVersions = data;
+                    vm.previousVersions = data.map(version => {
+                        version.displayValue = version.versionDate + " - " + version.versionAuthorName;
+                        return version;
+                    }); 
                 });
         }
 
