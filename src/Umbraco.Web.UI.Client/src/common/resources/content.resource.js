@@ -828,7 +828,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @param {Int} id Id of node
           * @param {Int} culture if provided, the results will be for this specific culture/variant
-          * @returns {Promise} resourcePromise object containing the url.
+          * @returns {Promise} resourcePromise object containing the versions
           *
           */
         getRollbackVersions: function (contentId, culture) {
@@ -842,7 +842,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 "Failed to get rollback versions for content item with id " + contentId
             );
         },
-
 
         /**
           * @ngdoc method
@@ -862,7 +861,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           * @param {Int} versionId The version Id
           * @param {Int} culture if provided, the results will be for this specific culture/variant
-          * @returns {Promise} resourcePromise object containing the url.
+          * @returns {Promise} resourcePromise object containing the version
           *
           */
         getRollbackVersion: function (versionId, culture) {
@@ -875,9 +874,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to get version for content item with id " + versionId
             );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#rollback
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Roll backs a content item to a previous version
+          *
+          * ##usage
+          * <pre>
+          * contentResource.rollback(contentId, versionId, culture)
+          *    .then(function() {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} versionId The version Id
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object
+          *
+          */
+        rollback: function (contentId, versionId, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostRollbackContent", {
+                        contentId: contentId, versionId:versionId, culture:culture
+                    })
+                ),
+                "Failed to roll back content item with id " + contentId
+            );
         }
-
-
 
     };
 }

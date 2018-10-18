@@ -65,8 +65,9 @@
             console.log("version", version);
             contentResource.getRollbackVersion(version.versionId)
                 .then(function(data){
-                    const previousVersion = data;
-                    createDiff(vm.currentVersion, previousVersion);
+                    vm.previousVersion = data;
+                    vm.previousVersion.versionId = version.versionId;
+                    createDiff(vm.currentVersion, vm.previousVersion);
                 });
 
         }
@@ -82,10 +83,6 @@
                 });
         }
 
-        function rollback() {
-            console.log("rollback");
-        }
-
         /**
          * This will load in a new version
          */
@@ -95,10 +92,10 @@
             vm.diff.properties = [];
 
             // find diff in name
-            vm.diff.name = JsDiff.diffWords(vm.currentVersion.name, previousVersion.name);
+            vm.diff.name = JsDiff.diffWords(currentVersion.name, previousVersion.name);
 
             // extract all properties from the tabs and create new object for the diff
-            vm.currentVersion.tabs.forEach((tab, tabIndex) => {
+            currentVersion.tabs.forEach((tab, tabIndex) => {
                 tab.properties.forEach((property, propertyIndex) => {
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
                     var diffProperty = {
@@ -112,9 +109,27 @@
 
         }
 
-        function submit(model) {
+        function rollback() {
+
+            vm.rollbackButtonState = "busy";
+
+            const nodeId = $scope.model.node.id;
+            const versionId = vm.previousVersion.versionId;
+            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;            
+
+            return contentResource.rollback(nodeId, versionId, culture)
+                .then(data => {
+                    vm.rollbackButtonState = "success";
+                    submit();
+                }, error => {
+                    vm.rollbackButtonState = "error";
+                });
+
+        }
+
+        function submit() {
             if($scope.model.submit) {
-                $scope.model.submit(model);
+                $scope.model.submit($scope.model.submit);
             }
         }
 
