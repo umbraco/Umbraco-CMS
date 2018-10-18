@@ -220,9 +220,13 @@ div.umb-codeeditor .umb-btn-toolbar {
 .umb-cropsizes{
     .control-group{
         label{
-            display: inline-block;
-            width: 100%;
+            display: block;
         }
+   }
+
+   &__add{
+       display: flex;
+       align-items: center;
    }
 
    &__times{
@@ -230,12 +234,33 @@ div.umb-codeeditor .umb-btn-toolbar {
        margin: 6px 0 0;
    }
 
+   &__controls{
+       margin: 24px 0 0;
+   }
+
    &__input{
+       margin: 0 15px 0 0;
+
        &--narrow{
            width: 95px;
+       }
 
-           &:last-of-type{
-               margin: 0 11px 0 0;
+       &-wrap{
+           position: relative;
+
+           &--icon{
+            margin: 0 15px 0 0;
+
+               &:after{
+                   content:"\00D7";
+                   position: absolute;
+                   bottom: -9px;
+                   top: 0;
+                   margin: auto;
+                   right: -1px;
+                   width: 5px;
+                   height: 5px;
+               }
            }
        }
    }
