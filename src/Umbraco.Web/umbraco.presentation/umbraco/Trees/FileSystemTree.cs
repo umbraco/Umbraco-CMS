@@ -42,8 +42,7 @@ namespace umbraco.cms.presentation.Trees
             if (!string.IsNullOrEmpty(this.NodeKey))
             {
                 orgPath = this.NodeKey;
-                path = IOHelper.MapPath(FilePath + orgPath);
-                orgPath += "/";
+                path = IOHelper.MapPath(FilePath+ "/" + orgPath + "/");
             }
             else
             {
