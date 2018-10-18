@@ -113,7 +113,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the collection of properties for the entity.
         /// </summary>
+        /// <remarks>
+        /// Marked DoNotClone since we'll manually clone the underlying field to deal with the event handling
+        /// </remarks>
         [DataMember]
+        [DoNotClone]
         public virtual PropertyCollection Properties
         {
             get => _properties;
@@ -477,5 +481,39 @@ namespace Umbraco.Core.Models
         }
 
         #endregion
+
+        /// <summary>
+        /// Override to deal with specific object instances
+        /// </summary>
+        /// <returns></returns>
+        public override object DeepClone()
+        {
+            var clone = (ContentBase)base.DeepClone();
+            //turn off change tracking
+            clone.DisableChangeTracking();
+
+            //if culture infos exist then deal with event bindings
+            if (clone._cultureInfos != null)
+            {
+                clone._cultureInfos.CollectionChanged -= this.CultureNamesCollectionChanged;    //clear this event handler if any
+                clone._cultureInfos = (CultureNameCollection)_cultureInfos.DeepClone();         //manually deep clone
+                clone._cultureInfos.CollectionChanged += clone.CultureNamesCollectionChanged;   //re-assign correct event handler
+            }
+
+            //if properties exist then deal with event bindings
+            if (clone._properties != null)
+            {
+                clone._properties.CollectionChanged -= this.PropertiesChanged;    //clear this event handler if any
+                clone._properties = (PropertyCollection)_properties.DeepClone();  //manually deep clone
+                clone._properties.CollectionChanged += clone.PropertiesChanged;   //re-assign correct event handler
+            }
+
+            //this shouldn't really be needed since we're not tracking
+            clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
+            return clone;
+        }
     }
 }

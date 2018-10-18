@@ -438,6 +438,7 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
+            //TODO: Shouldn't we remove this event handler first before re-adding it in case the handler already exists
             Properties.CollectionChanged += PropertiesChanged;
         }
 
@@ -455,6 +456,7 @@ namespace Umbraco.Core.Models
                 _contentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
+                //TODO: Shouldn't we remove this event handler first before re-adding it in case the handler already exists
                 Properties.CollectionChanged += PropertiesChanged;
                 return;
             }
@@ -500,10 +502,18 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Content) base.DeepClone();
+
             //turn off change tracking
             clone.DisableChangeTracking();
-            //need to manually clone this since it's not settable
-            clone._contentType = (IContentType)ContentType.DeepClone();
+
+            //if culture infos exist then deal with event bindings
+            if (clone._publishInfos != null)
+            {
+                clone._publishInfos.CollectionChanged -= this.PublishNamesCollectionChanged;    //clear this event handler if any
+                clone._publishInfos = (CultureNameCollection)_publishInfos.DeepClone();         //manually deep clone
+                clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;   //re-assign correct event handler
+            }
+
             //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
             //re-enable tracking

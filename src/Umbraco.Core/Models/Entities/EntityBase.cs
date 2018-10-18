@@ -13,6 +13,10 @@ namespace Umbraco.Core.Models.Entities
     [DebuggerDisplay("Id: {" + nameof(Id) + "}")]
     public abstract class EntityBase : BeingDirtyBase, IEntity
     {
+#if DEBUG
+        public Guid InstanceId = Guid.NewGuid();
+#endif
+
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private bool _hasIdentity;
@@ -160,6 +164,11 @@ namespace Umbraco.Core.Models.Entities
             // memberwise-clone (ie shallow clone) the entity
             var unused = Key; // ensure that 'this' has a key, before cloning
             var clone = (EntityBase) MemberwiseClone();
+
+#if DEBUG
+            clone.InstanceId = Guid.NewGuid();
+#endif
+
 
             // clear changes (ensures the clone has its own dictionaries)
             // then disable change tracking
