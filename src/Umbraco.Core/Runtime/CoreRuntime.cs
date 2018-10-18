@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Runtime
 {
@@ -313,21 +314,19 @@ namespace Umbraco.Core.Runtime
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
             // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
-            bool exists;
+            bool noUpgrade;
             try
             {
-                exists = EnsureUmbracoUpgradeState(databaseFactory, logger);
+                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory, logger);
             }
             catch (Exception e)
             {
-                // can connect to the database but cannot access the migration table... need to install
+                // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
-                logger.Debug<CoreRuntime>("Could not check the upgrade state, need to install Umbraco.");
-                _state.Level = RuntimeLevel.Install;
-                return;
+                throw new BootFailedException("Could not check the upgrade state.", e);
             }
 
-            if (exists)
+            if (noUpgrade)
             {
                 // the database version matches the code & files version, all clear, can run
                 _state.Level = RuntimeLevel.Run;
@@ -345,27 +344,19 @@ namespace Umbraco.Core.Runtime
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            // no scope, no key value service - just directly accessing the database
-
             var umbracoPlan = new UmbracoPlan();
             var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
 
-            string state;
+            // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
-                var sql = databaseFactory.SqlContext.Sql()
-                    .Select<KeyValueDto>()
-                    .From<KeyValueDto>()
-                    .Where<KeyValueDto>(x => x.Key == stateValueKey);
-                state = database.FirstOrDefault<KeyValueDto>(sql)?.Value;
+                _state.CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
+                _state.FinalMigrationState = umbracoPlan.FinalState;
             }
 
-            _state.CurrentMigrationState = state;
-            _state.FinalMigrationState = umbracoPlan.FinalState;
+            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");
 
-            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, state ?? "<null>");
-
-            return state == _state.FinalMigrationState;
+            return _state.CurrentMigrationState == _state.FinalMigrationState;
         }
 
         #region Locals

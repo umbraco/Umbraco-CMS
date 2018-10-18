@@ -2197,7 +2197,7 @@ namespace Umbraco.Tests.Services
             var rollback = contentService.GetById(NodeDto.NodeIdSeed + 4);
             var rollto = contentService.GetVersion(version1);
             rollback.CopyFrom(rollto);
-            rollback.Name = rollto.Name; // must do it explicitely
+            rollback.Name = rollto.Name; // must do it explicitly
             contentService.Save(rollback);
 
             Assert.IsNotNull(rollback);
@@ -2245,6 +2245,194 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.Edited);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));
+        }
+
+        [Test]
+        public void Can_Rollback_Version_On_Multilingual()
+        {
+            var langFr = new Language("fr");
+            var langDa = new Language("da");
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langDa);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("multi", "Multi");
+            contentType.Key = new Guid("45FF9A70-9C5F-448D-A476-DCD23566BBF8");
+            contentType.Variations = ContentVariation.Culture;
+            var p1 = contentType.PropertyTypes.First();
+            p1.Variations = ContentVariation.Culture;
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var page = new Content("Page", -1, contentType)
+            {
+                Level = 1,
+                SortOrder = 1,
+                CreatorId = 0,
+                WriterId = 0,
+                Key = new Guid("D7B84CC9-14AE-4D92-A042-023767AD3304")
+            };
+
+            page.SetCultureName("fr1", "fr");
+            page.SetCultureName("da1", "da");
+            ServiceContext.ContentService.Save(page);
+            var versionId0 = page.VersionId;
+
+            page.SetValue(p1.Alias, "v1fr", "fr");
+            page.SetValue(p1.Alias, "v1da", "da");
+            ServiceContext.ContentService.SaveAndPublish(page);
+            var versionId1 = page.VersionId;
+
+            Thread.Sleep(250);
+
+            page.SetCultureName("fr2", "fr");
+            page.SetValue(p1.Alias, "v2fr", "fr");
+            ServiceContext.ContentService.SaveAndPublish(page, "fr");
+            var versionId2 = page.VersionId;
+
+            Thread.Sleep(250);
+
+            page.SetCultureName("da2", "da");
+            page.SetValue(p1.Alias, "v2da", "da");
+            ServiceContext.ContentService.SaveAndPublish(page, "da");
+            var versionId3 = page.VersionId;
+
+            Thread.Sleep(250);
+
+            page.SetCultureName("fr3", "fr");
+            page.SetCultureName("da3", "da");
+            page.SetValue(p1.Alias, "v3fr", "fr");
+            page.SetValue(p1.Alias, "v3da", "da");
+            ServiceContext.ContentService.SaveAndPublish(page);
+            var versionId4 = page.VersionId;
+
+            // now get all versions
+
+            var versions = ServiceContext.ContentService.GetVersions(page.Id).ToArray();
+
+            Assert.AreEqual(5, versions.Length);
+
+            // current version
+            Assert.AreEqual(versionId4, versions[0].VersionId);
+            Assert.AreEqual(versionId3, versions[0].PublishedVersionId);
+            // published version
+            Assert.AreEqual(versionId3, versions[1].VersionId);
+            Assert.AreEqual(versionId3, versions[1].PublishedVersionId);
+            // previous version
+            Assert.AreEqual(versionId2, versions[2].VersionId);
+            Assert.AreEqual(versionId3, versions[2].PublishedVersionId);
+            // previous version
+            Assert.AreEqual(versionId1, versions[3].VersionId);
+            Assert.AreEqual(versionId3, versions[3].PublishedVersionId);
+            // previous version
+            Assert.AreEqual(versionId0, versions[4].VersionId);
+            Assert.AreEqual(versionId3, versions[4].PublishedVersionId);
+
+            Assert.AreEqual("fr3", versions[4].GetPublishName("fr"));
+            Assert.AreEqual("fr3", versions[3].GetPublishName("fr"));
+            Assert.AreEqual("fr3", versions[2].GetPublishName("fr"));
+            Assert.AreEqual("fr3", versions[1].GetPublishName("fr"));
+            Assert.AreEqual("fr3", versions[0].GetPublishName("fr"));
+
+            Assert.AreEqual("fr1", versions[4].GetCultureName("fr"));
+            Assert.AreEqual("fr2", versions[3].GetCultureName("fr"));
+            Assert.AreEqual("fr2", versions[2].GetCultureName("fr"));
+            Assert.AreEqual("fr3", versions[1].GetCultureName("fr"));
+            Assert.AreEqual("fr3", versions[0].GetCultureName("fr"));
+
+            Assert.AreEqual("da3", versions[4].GetPublishName("da"));
+            Assert.AreEqual("da3", versions[3].GetPublishName("da"));
+            Assert.AreEqual("da3", versions[2].GetPublishName("da"));
+            Assert.AreEqual("da3", versions[1].GetPublishName("da"));
+            Assert.AreEqual("da3", versions[0].GetPublishName("da"));
+
+            Assert.AreEqual("da1", versions[4].GetCultureName("da"));
+            Assert.AreEqual("da1", versions[3].GetCultureName("da"));
+            Assert.AreEqual("da2", versions[2].GetCultureName("da"));
+            Assert.AreEqual("da3", versions[1].GetCultureName("da"));
+            Assert.AreEqual("da3", versions[0].GetCultureName("da"));
+
+            // all versions have the same publish infos
+            for (var i = 0; i < 5; i++)
+            {
+                Assert.AreEqual(versions[0].PublishDate, versions[i].PublishDate);
+                Assert.AreEqual(versions[0].GetPublishDate("fr"), versions[i].GetPublishDate("fr"));
+                Assert.AreEqual(versions[0].GetPublishDate("da"), versions[i].GetPublishDate("da"));
+            }
+
+            for (var i = 0; i < 5; i++)
+            {
+                Console.Write("[{0}] ", i);
+                Console.WriteLine(versions[i].UpdateDate.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+            }
+            Console.WriteLine("-");
+
+            // for all previous versions, UpdateDate is the published date
+
+            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate("fr"));
+            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate("da"));
+
+            Assert.AreEqual(versions[3].UpdateDate, versions[3].GetUpdateDate("fr"));
+            Assert.AreEqual(versions[4].UpdateDate, versions[3].GetUpdateDate("da"));
+
+            Assert.AreEqual(versions[3].UpdateDate, versions[2].GetUpdateDate("fr"));
+            Assert.AreEqual(versions[2].UpdateDate, versions[2].GetUpdateDate("da"));
+
+            // for the published version, UpdateDate is the published date
+
+            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate("fr"));
+            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate("da"));
+            Assert.AreEqual(versions[1].PublishDate, versions[1].UpdateDate);
+
+            // for the current version, things are different
+            // UpdateDate is the date it was last saved
+
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("fr"));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("da"));
+
+            // so if we save again...
+
+            page.SetCultureName("fr4", "fr");
+            //page.SetCultureName("da4", "da");
+            page.SetValue(p1.Alias, "v4fr", "fr");
+            page.SetValue(p1.Alias, "v4da", "da");
+            ServiceContext.ContentService.Save(page);
+            var versionId5 = page.VersionId;
+
+            versions = ServiceContext.ContentService.GetVersions(page.Id).ToArray();
+
+            // we just update the current version
+            Assert.AreEqual(5, versions.Length);
+            Assert.AreEqual(versionId4, versionId5);
+
+            for (var i = 0; i < 5; i++)
+            {
+                Console.Write("[{0}] ", i);
+                Console.WriteLine(versions[i].UpdateDate.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+            }
+            Console.WriteLine("-");
+
+            // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
+            // that we cannot synchronize dates the way we do with publish dates - and so this
+            // would fail - the version UpdateDate is greater than the cultures'.
+            //Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("fr"));
+            //Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("da"));
+
+            // now roll french back to its very first version
+            page.CopyFrom(versions[4], "fr"); // only the pure FR values
+            page.CopyFrom(versions[4], null); // so, must explicitly do the INVARIANT values too
+            page.SetCultureName(versions[4].GetPublishName("fr"), "fr");
+            ServiceContext.ContentService.Save(page);
+
+            // and voila, rolled back!
+            Assert.AreEqual(versions[4].GetPublishName("fr"), page.GetCultureName("fr"));
+            Assert.AreEqual(versions[4].GetValue(p1.Alias, "fr"), page.GetValue(p1.Alias, "fr"));
+
+            // note that rolling back invariant values means we also rolled back... DA... at least partially
+            // bah?
         }
 
         [Test]

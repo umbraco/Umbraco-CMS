@@ -232,6 +232,26 @@ namespace Umbraco.Core.Models
             // a non-available culture could not become published anyways
             => _publishInfosOrig != null && _publishInfosOrig.Contains(culture); 
 
+        // adjust dates to sync between version, cultures etc
+        // used by the repo when persisting
+        internal void AdjustDates(DateTime date)
+        {
+            foreach (var culture in PublishedCultures.ToList())
+            {
+                if (_publishInfos == null || !_publishInfos.TryGetValue(culture, out var publishInfos))
+                    continue;
+
+                if (_publishInfosOrig != null && _publishInfosOrig.TryGetValue(culture, out var publishInfosOrig)
+                    && publishInfosOrig.Date == publishInfos.Date)
+                    continue;
+
+                _publishInfos.AddOrUpdate(culture, publishInfos.Name, date);
+
+                if (CultureNames.TryGetValue(culture, out var name))
+                    SetCultureInfo(culture, name.Name, date);
+            }
+        }
+
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
             => IsCultureAvailable(culture) && // is available, and
@@ -358,6 +378,12 @@ namespace Umbraco.Core.Models
                         return false;
                     SetPublishInfo(c, name, DateTime.Now);
                 }
+            }
+            else if (culture == null) // invariant culture
+            {
+                if (string.IsNullOrWhiteSpace(Name))
+                    return false;
+                // PublishName set by repository - nothing to do here
             }
             else // one single culture
             {

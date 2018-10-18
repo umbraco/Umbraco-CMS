@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,7 +9,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,7 +17,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -265,6 +262,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // create prepared sql
             // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
             psql = Sql(psql.SQL.ToSingleLine(), psql.Arguments);
+
+            
+            // replace the magic culture parameter (see DocumentRepository.GetBaseQuery())
+            if (!ordering.Culture.IsNullOrWhiteSpace())
+            {
+                for (var i = 0; i < psql.Arguments.Length; i++)
+                {
+                    if (psql.Arguments[i] is string s && s == "[[[ISOCODE]]]")
+                    {
+                        psql.Arguments[i] = ordering.Culture;
+                        break;
+                    }
+                }
+            }
             return psql;
         }
 
@@ -342,20 +353,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (ordering.Culture.IsNullOrWhiteSpace())
                     return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text), sql);
 
-                // culture = must work on variant name ?? invariant name
-                // insert proper join and return coalesced ordering field
-
-                var joins = Sql()
-                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
-                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
-
-                // see notes in ApplyOrdering: the field MUST be selected + aliased
-                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlContext.Visit<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql + " AS ordering "), sql.Arguments);
-
-                sql = InsertJoins(sql, joins);
-
-                return "ordering";
+                return "variantName"; 
             }
 
             // previously, we'd accept anything and just sanitize it - not anymore
@@ -434,6 +432,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // sort and filter
             sql = PreparePageSql(sql, filter, ordering);
+
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);

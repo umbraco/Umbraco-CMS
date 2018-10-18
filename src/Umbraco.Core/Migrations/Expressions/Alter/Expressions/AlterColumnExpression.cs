@@ -18,7 +18,6 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 
         protected override string GetSql()
         {
-
             return string.Format(SqlSyntax.AlterColumn,
                                 SqlSyntax.GetQuotedTableName(TableName),
                                 SqlSyntax.Format(Column));
