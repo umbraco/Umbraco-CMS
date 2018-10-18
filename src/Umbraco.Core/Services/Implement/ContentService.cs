@@ -2490,5 +2490,47 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
+
+        #region Rollback
+
+        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            //Get the current copy of the node
+            var content = GetById(id);
+
+            //Get the version
+            var version = GetVersion(versionId);
+
+            //Good ole null checks
+            if (content == null || version == null)
+            {
+                return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            }
+
+            //Copy the changes from the version
+            content.CopyFrom(version, culture);
+
+            //Save the content for the rollback
+            var rollbackSaveResult = Save(content, userId);
+
+            //Depending on the save result - is what we log & audit along with what we return
+            if(rollbackSaveResult.Success == false)
+            {
+                //Log the error/warning
+                Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+            }
+            else
+            {
+                //Logging & Audit message
+                Logger.Error<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+            }
+
+            return rollbackSaveResult;
+        }
+
+        #endregion
     }
 }
