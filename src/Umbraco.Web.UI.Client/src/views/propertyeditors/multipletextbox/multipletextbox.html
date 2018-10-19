@@ -11,7 +11,7 @@
         <i class="icon icon-remove"></i>
       </a>
 
-    <div style="position: relative">
+    <div style="position: relative" ng-show="model.value.length > model.config.min">
         <button type="button" prevet-default ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
             <i class="icon-trash"></i>
         </button>

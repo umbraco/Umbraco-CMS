@@ -92,6 +92,9 @@
     };
 
     $scope.remove = function (index) {
+        // Make sure not to trigger other prompts when remove is triggered
+        $scope.hidePrompt();
+
         var remainder = [];
         for (var x = 0; x < $scope.model.value.length; x++) {
             if (x !== index) {
