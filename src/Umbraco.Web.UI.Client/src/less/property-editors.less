@@ -240,6 +240,10 @@ div.umb-codeeditor .umb-btn-toolbar {
    &__sortable{
        max-width: 500px;
        width: 100%;
+
+       @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
+           max-width: none;
+       }
    }
 
    &__controls{
@@ -250,6 +254,11 @@ div.umb-codeeditor .umb-btn-toolbar {
        margin: 0 15px 0 0;
        width: ~"calc(100% - 15px)";
 
+       @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
+           margin: 0;
+           width: 100%;
+       }
+
        &--narrow{
            max-width: 95px;
            width: 100%;
@@ -259,6 +268,12 @@ div.umb-codeeditor .umb-btn-toolbar {
            position: relative;
            max-width: 206px;
            width: 100%;
+
+            @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px){
+                max-width: none;
+                flex: 1 1 100%;
+                margin: 0 0 20px;
+            }
 
            &--narrow{
                margin: 0 15px 0 0;
