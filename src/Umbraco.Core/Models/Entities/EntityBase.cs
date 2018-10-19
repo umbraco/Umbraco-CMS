@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.Entities
     [DebuggerDisplay("Id: {" + nameof(Id) + "}")]
     public abstract class EntityBase : BeingDirtyBase, IEntity
     {
-#if DEBUG
+#if ModelDebug
         public Guid InstanceId = Guid.NewGuid();
 #endif
 
@@ -165,7 +165,7 @@ namespace Umbraco.Core.Models.Entities
             var unused = Key; // ensure that 'this' has a key, before cloning
             var clone = (EntityBase) MemberwiseClone();
 
-#if DEBUG
+#if ModelDebug
             clone.InstanceId = Guid.NewGuid();
 #endif
 

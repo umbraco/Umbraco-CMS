@@ -834,6 +834,15 @@ namespace Umbraco.Core.Services.Implement
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
+                //track the cultures that have changed
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? string.Join(",", content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture))
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 _documentRepository.Save(content);
 
                 if (raiseEvents)
@@ -844,12 +853,8 @@ namespace Umbraco.Core.Services.Implement
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
 
-                var culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                    : null;
-
-                if (culturesChanging != null && culturesChanging.Count > 0)
-                    Audit(AuditType.Save, userId, content.Id, $"Saved culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
+                if (culturesChanging != null)
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved cultures: {culturesChanging}", culturesChanging);
                 else
                     Audit(AuditType.Save, userId, content.Id);
 
@@ -1002,9 +1007,14 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        Audit(AuditType.Unpublish, userId, content.Id, $"Culture \"{culture}\" unpublished");
+                        //unpublishing a specific culture
+                        Audit(AuditType.UnpublishVariant, userId, content.Id, $"Culture \"{culture}\" unpublished", culture);
                         if (!content.Published)
+                        {
+                            //log that the whole content item has been unpublished due to mandatory culture unpublished
                             Audit(AuditType.Unpublish, userId, content.Id, $"Unpublished (culture \"{culture}\" is mandatory)");
+                        }
+                            
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1034,7 +1044,7 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
-            List<string> culturesChanging = null;
+            string culturesChanging = null;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1059,7 +1069,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        culturesChanging = content.PublishNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList();
+                        culturesChanging = string.Join(",", content.PublishNames.Where(x => x.IsDirty()).Select(x => x.Culture));
                     }
                 }
 
@@ -1169,8 +1179,8 @@ namespace Umbraco.Core.Services.Implement
                             scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                         }
 
-                        if (culturesChanging != null && culturesChanging.Count > 0)
-                            Audit(AuditType.Publish, userId, content.Id, $"Published culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
+                        if (culturesChanging != null)
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published cultures: {culturesChanging}", culturesChanging);
                         else
                             Audit(AuditType.Publish, userId, content.Id);
 
@@ -1840,24 +1850,32 @@ namespace Umbraco.Core.Services.Implement
                     return false;
                 }
 
+                //track the cultures changing for auditing
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? string.Join(",", content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture))
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 //Save before raising event
                 // fixme - nesting uow?
-                Save(content, userId);
+                var saveResult = Save(content, userId);
 
-                sendToPublishEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+                if (saveResult.Success)
+                {
+                    sendToPublishEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
 
-                var culturesChanging = content.ContentType.VariesByCulture()
-                    ? content.CultureNames.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                    : null;
+                    if (culturesChanging != null)
+                        Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+                    else
+                        Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                }
 
-                if (culturesChanging != null && culturesChanging.Count > 0)
-                    Audit(AuditType.SendToPublish, userId, content.Id, $"Send To Publish for culture{(culturesChanging.Count > 1 ? "s" : string.Empty)} {string.Join(",", culturesChanging)}");
-                else
-                    Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                return saveResult.Success;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -2007,9 +2025,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, type, userId, Constants.ObjectTypes.Strings.Document, message));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Document), message, parameters));
         }
 
         #endregion

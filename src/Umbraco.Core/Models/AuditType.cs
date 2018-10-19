@@ -14,6 +14,10 @@
         /// </summary>
         Save,
         /// <summary>
+        /// Used when variant(s) are saved
+        /// </summary>
+        SaveVariant,
+        /// <summary>
         /// Used when nodes are opened
         /// </summary>
         Open,
@@ -26,13 +30,25 @@
         /// </summary>
         Publish,
         /// <summary>
-        /// Used when nodes are send to publishing
+        /// Used when variant(s) are published
+        /// </summary>
+        PublishVariant,
+        /// <summary>
+        /// Used when nodes are sent for publishing
         /// </summary>
         SendToPublish,
+        /// <summary>
+        /// Used when variant(s) are sent for publishing
+        /// </summary>
+        SendToPublishVariant,
         /// <summary>
         /// Used when nodes are unpublished
         /// </summary>
         Unpublish,
+        /// <summary>
+        /// Used when variant(s) are unpublished
+        /// </summary>
+        UnpublishVariant,
         /// <summary>
         /// Used when nodes are moved
         /// </summary>
@@ -72,11 +88,7 @@
         /// <summary>
         /// Used when a package is uninstalled
         /// </summary>
-        PackagerUninstall,
-        /// <summary>
-        /// Used when a node is send to translation
-        /// </summary>
-        SendToTranslate,
+        PackagerUninstall,        
         /// <summary>
         /// Use this log action for custom log messages that should be shown in the audit trail
         /// </summary>
