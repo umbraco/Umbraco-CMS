@@ -2517,7 +2517,11 @@ namespace Umbraco.Core.Services.Implement
                 var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
 
                 //Emit RollingBack event aka before
-                scope.Events.Dispatch(RollingBack, this, rollbackEventArgs);
+                if (scope.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
+                {
+                    scope.Complete();
+                    return OperationResult.Cancel(evtMsgs);
+                }
 
                 //Copy the changes from the version
                 content.CopyFrom(version, culture);
@@ -2534,6 +2538,7 @@ namespace Umbraco.Core.Services.Implement
                 else
                 {
                     //Emit RolledBack event aka after
+                    rollbackEventArgs.CanCancel = false;
                     scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
 
                     //Logging & Audit message

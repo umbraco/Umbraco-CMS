@@ -467,10 +467,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Rolls back the content to a specific version.
         /// </summary>
-        /// <param name="id">The id of the content node</param>
-        /// <param name="versionId">The version ID to rollback to</param>
-        /// <param name="culture">An optional culture - specifying a culture will only rollback the culture content</param>
-        /// <param name="userId">The user ID who is performing the rollback</param>
+        /// <param name="id">The id of the content node.</param>
+        /// <param name="versionId">The version id to roll back to.</param>
+        /// <param name="culture">An optional culture to roll back.</param>
+        /// <param name="userId">The identifier of the user who is performing the roll back.</param>
+        /// <remarks>
+        /// <para>When no culture is specified, all cultures are rolled back.</para>
+        /// </remarks>
         OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
 
         #endregion
