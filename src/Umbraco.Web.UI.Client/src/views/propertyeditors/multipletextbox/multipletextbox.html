@@ -10,6 +10,20 @@
          ng-click="remove($index)">
         <i class="icon icon-remove"></i>
       </a>
+
+    <div style="position: relative">
+        <button type="button" prevet-default ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
+            <i class="icon-trash"></i>
+        </button>
+
+        <umb-confirm-action
+            ng-if="promptIsVisible === $index"
+            direction="left"
+            on-confirm="remove($index)"
+            on-cancel="hidePrompt()">
+        </umb-confirm-action>
+    </div>
+
     </div>
   </div>
   <a prevent-default href="" class="add-link" localize="title" title="@content_addTextBox"

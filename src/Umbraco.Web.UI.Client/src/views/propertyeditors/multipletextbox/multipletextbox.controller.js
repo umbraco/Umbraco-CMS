@@ -2,6 +2,9 @@
 
     var backspaceHits = 0;
 
+    // Set the visible prompt to -1 to ensure it will not be visible
+    $scope.promptIsVisible = "-1";
+
     $scope.sortableOptions = {
         axis: 'y',
         containment: 'parent',
@@ -97,6 +100,20 @@
         }
         $scope.model.value = remainder;
     };
+
+    $scope.showPrompt = function (idx, item){
+
+        var i = $scope.model.value.indexOf(item);
+
+        // Make the prompt visible for the clicked tag only
+        if (i === idx) {
+            $scope.promptIsVisible = i;
+        }
+    }
+
+    $scope.hidePrompt = function(){
+        $scope.promptIsVisible = "-1";
+    }
 
 }
 
