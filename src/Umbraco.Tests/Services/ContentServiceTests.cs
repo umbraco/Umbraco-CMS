@@ -1308,7 +1308,7 @@ namespace Umbraco.Tests.Services
             var published = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that french was published
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
-            Assert.AreEqual($"Published culture fr-fr", lastLog.Comment);
+            Assert.AreEqual($"Published cultures: fr-fr", lastLog.Comment);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
@@ -1317,7 +1317,7 @@ namespace Umbraco.Tests.Services
             published = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
-            Assert.AreEqual($"Published culture en-uk", lastLog.Comment);
+            Assert.AreEqual($"Published cultures: en-uk", lastLog.Comment);
         }
 
         [Test]

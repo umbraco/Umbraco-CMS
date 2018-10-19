@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo CultureNamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyCollection<CultureName>>(x => x.CultureNames);
+            public readonly PropertyInfo CultureNamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, CultureName>>(x => x.CultureNames);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -156,11 +156,11 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public bool IsCultureAvailable(string culture)
-            => _cultureInfos != null && _cultureInfos.Contains(culture);
+            => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyKeyedCollection<string, CultureName> CultureNames => _cultureInfos ?? NoNames;
+        public virtual IReadOnlyDictionary<string, CultureName> CultureNames => _cultureInfos ?? NoNames;
         
         /// <inheritdoc />
         public string GetCultureName(string culture)
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Models
             foreach (var (otherCulture, otherName) in other.CultureNames)
             {
                 if (culture == "*" || culture == otherCulture)
-                    SetCultureName(otherName, otherCulture);
+                    SetCultureName(otherName.Name, otherCulture);
             }
         }
 

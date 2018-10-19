@@ -33,9 +33,9 @@ namespace Umbraco.Web.Security
 
         public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings)
         {
-            _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _httpContext = httpContext;
+            _userService = userService;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>

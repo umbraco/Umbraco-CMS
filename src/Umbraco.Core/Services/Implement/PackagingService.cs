@@ -1318,7 +1318,7 @@ namespace Umbraco.Core.Services.Implement
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
-                    if (macro.Properties.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase))) continue;
+                    if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase))) continue;
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
                     sortOrder++;
                 }

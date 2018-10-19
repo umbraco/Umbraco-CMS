@@ -89,7 +89,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-            public readonly PropertyInfo PublishNamesSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyCollection<CultureName>>(x => x.PublishNames);
+            public readonly PropertyInfo PublishNamesSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, CultureName>>(x => x.PublishNames);
         }
 
         /// <summary>
@@ -224,13 +224,13 @@ namespace Umbraco.Core.Models
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
-            =>  _publishInfos != null && _publishInfos.Contains(culture);
+            =>  _publishInfos != null && _publishInfos.ContainsKey(culture);
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.Contains(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -260,7 +260,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyKeyedCollection<string, CultureName> PublishNames => _publishInfos ?? NoNames;
+        public IReadOnlyDictionary<string, CultureName> PublishNames => _publishInfos ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -507,6 +507,9 @@ namespace Umbraco.Core.Models
 
             //turn off change tracking
             clone.DisableChangeTracking();
+
+            //need to manually clone this since it's not settable
+            clone._contentType = (IContentType)ContentType.DeepClone();
 
             //if culture infos exist then deal with event bindings
             if (clone._publishInfos != null)

@@ -22,6 +22,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using System.Linq;
 using Umbraco.Core.Services;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.Web
 {
@@ -49,6 +50,8 @@ namespace Umbraco.Tests.Web
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             Udi.ResetUdiTypes();
+
+            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TearDown]
@@ -90,7 +93,7 @@ namespace Umbraco.Tests.Web
                 .Returns((UmbracoContext umbCtx, IPublishedContent content, UrlProviderMode mode, string culture, Uri url) => "/my-test-url");
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-
+            
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
             Mock.Get(publishedContent).Setup(x => x.Id).Returns(1234);

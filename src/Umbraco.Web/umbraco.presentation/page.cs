@@ -396,7 +396,7 @@ namespace umbraco
                         return _cultureInfos;
 
                     return _cultureInfos = _inner.PublishNames
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, x.Date));
+                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date));
                 }
             }
 

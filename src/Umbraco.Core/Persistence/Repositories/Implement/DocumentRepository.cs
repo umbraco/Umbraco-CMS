@@ -359,7 +359,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
-                    if (name != content.GetPublishName(culture))
+                    if (name.Name != content.GetPublishName(culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
                 // insert content variations
@@ -521,7 +521,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
-                    if (name != content.GetPublishName(culture))
+                    if (name.Name != content.GetPublishName(culture))
                     {
                         edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
@@ -1120,7 +1120,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     VersionId = content.VersionId,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
-                    Name = name,
+                    Name = name.Name,
                     UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
@@ -1135,7 +1135,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     VersionId = content.PublishedVersionId,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
-                    Name = name,
+                    Name = name.Name,
                     UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
@@ -1210,7 +1210,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 content.Name = defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName)
                     ? cultureName.Name
-                    : content.CultureNames[0].Name;
+                    : content.CultureNames.First().Value.Name;
             }
             else
             {
@@ -1265,13 +1265,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name);
+                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name.Name);
 
                 if (uniqueName == content.GetCultureName(culture)) continue;
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishNames.Contains(culture))
+                if (publishing && content.PublishNames.ContainsKey(culture))
                     content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }

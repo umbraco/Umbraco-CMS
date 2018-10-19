@@ -109,7 +109,6 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
-    <Compile Include="Collections\IReadOnlyKeyedCollection.cs" />
     <Compile Include="Components\AuditEventsComponent.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />

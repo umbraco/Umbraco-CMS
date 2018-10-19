@@ -133,7 +133,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyKeyedCollection<string, CultureName> PublishNames { get; }
+        IReadOnlyDictionary<string, CultureName> PublishNames { get; }
 
         /// <summary>
         /// Gets the published cultures.

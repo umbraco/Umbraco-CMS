@@ -94,7 +94,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
         {
             var macroPropertyId = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
 
-            var property = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
+            var property = _macro.Properties.Values.Single(x => x.Id == int.Parse(macroPropertyId.Value));
             _macro.Properties.Remove(property);
 
             Services.MacroService.Save(_macro);
@@ -104,7 +104,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 
         public void MacroPropertyBind()
         {
-            macroProperties.DataSource = _macro.Properties.OrderBy(x => x.SortOrder);
+            macroProperties.DataSource = _macro.Properties.Values.OrderBy(x => x.SortOrder);
             macroProperties.DataBind();
         }
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
                 _macro.Properties.Add(new MacroProperty(
                                           macroPropertyAliasNew.Text.Trim(),
                                           macroPropertyNameNew.Text.Trim(),
-                                          _macro.Properties.Any() ? _macro.Properties.Max(x => x.SortOrder) + 1 : 0,
+                                          _macro.Properties.Values.Any() ? _macro.Properties.Values.Max(x => x.SortOrder) + 1 : 0,
                                           macroPropertyTypeNew.SelectedValue));
 
                 Services.MacroService.Save(_macro);
@@ -246,7 +246,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
                 var macroElementSortOrder = (TextBox)item.FindControl("macroPropertySortOrder");
                 var macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
-                var prop = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
+                var prop = _macro.Properties.Values.Single(x => x.Id == int.Parse(macroPropertyId.Value));
                 var sortOrder = 0;
                 int.TryParse(macroElementSortOrder.Text, out sortOrder);
 

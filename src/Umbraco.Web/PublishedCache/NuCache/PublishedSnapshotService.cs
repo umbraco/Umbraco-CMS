@@ -1199,7 +1199,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var (culture, name) in names)
             {
-                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                cultureData[culture] = new CultureVariation { Name = name.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
             }
 
             //the dictionary that will be serialized

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models
         private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
         private PropertyGroupCollection _propertyGroups;
-        private PropertyTypeCollection _propertyTypes;
+        private PropertyTypeCollection _noGroupPropertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
         private bool _hasPropertyTypeBeenRemoved;
         private ContentVariation _variations;
@@ -43,8 +43,8 @@ namespace Umbraco.Core.Models
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
-            _propertyTypes = new PropertyTypeCollection(IsPublishing);
-            _propertyTypes.CollectionChanged += PropertyTypesChanged;
+            _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing);
+            _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
 
             _variations = ContentVariation.Nothing;
         }
@@ -64,8 +64,8 @@ namespace Umbraco.Core.Models
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
-            _propertyTypes = new PropertyTypeCollection(IsPublishing);
-            _propertyTypes.CollectionChanged += PropertyTypesChanged;
+            _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing);
+            _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
 
             _variations = ContentVariation.Nothing;
         }
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                return _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
+                return _noGroupPropertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
             }
         }
 
@@ -261,12 +261,12 @@ namespace Umbraco.Core.Models
         [DoNotClone]
         public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
-            get => _propertyTypes;
+            get => _noGroupPropertyTypes;
             set
             {
-                _propertyTypes = new PropertyTypeCollection(IsPublishing, value);
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
-                PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                _noGroupPropertyTypes = new PropertyTypeCollection(IsPublishing, value);
+                _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
+                PropertyTypesChanged(_noGroupPropertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
@@ -320,7 +320,7 @@ namespace Umbraco.Core.Models
         {
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
-                _propertyTypes.Add(propertyType);
+                _noGroupPropertyTypes.Add(propertyType);
                 return true;
             }
 
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Models
             }
 
             //check through each local property type collection (not assigned to a tab)
-            if (_propertyTypes.RemoveItem(propertyTypeAlias))
+            if (_noGroupPropertyTypes.RemoveItem(propertyTypeAlias))
             {
                 if (!HasPropertyTypeBeenRemoved)
                 {
@@ -408,7 +408,7 @@ namespace Umbraco.Core.Models
             foreach (var property in group.PropertyTypes)
             {
                 property.PropertyGroupId = null;
-                _propertyTypes.Add(property);
+                _noGroupPropertyTypes.Add(property);
             }
 
             // actually remove the group
@@ -421,7 +421,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         //fixme should we mark this as EditorBrowsable hidden since it really isn't ever used?
-        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes;
+        internal PropertyTypeCollection PropertyTypeCollection => _noGroupPropertyTypes;
 
         /// <summary>
         /// Indicates whether the current entity is dirty.
@@ -474,15 +474,15 @@ namespace Umbraco.Core.Models
             //turn off change tracking
             clone.DisableChangeTracking();
 
-            if (clone._propertyTypes != null)
+            if (clone._noGroupPropertyTypes != null)
             {
                 //need to manually wire up the event handlers for the property type collections - we've ensured
                 // its ignored from the auto-clone process because its return values are unions, not raw and
                 // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
-                clone._propertyTypes.CollectionChanged -= this.PropertyTypesChanged;            //clear this event handler if any
-                clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();      //manually deep clone
-                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;           //re-assign correct event handler
+                clone._noGroupPropertyTypes.CollectionChanged -= this.PropertyTypesChanged;            //clear this event handler if any
+                clone._noGroupPropertyTypes = (PropertyTypeCollection)_noGroupPropertyTypes.DeepClone();      //manually deep clone
+                clone._noGroupPropertyTypes.CollectionChanged += clone.PropertyTypesChanged;           //re-assign correct event handler
             }
 
             if (clone._propertyGroups != null)
