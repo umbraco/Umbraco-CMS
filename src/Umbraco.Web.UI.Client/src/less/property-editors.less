@@ -217,6 +217,11 @@ div.umb-codeeditor .umb-btn-toolbar {
 // Image Cropper
 // --------------------------------------------------
 
+.umb-prevalues-multivalues.umb-cropsizes{
+    max-width: none;
+    width: 100%;
+}
+
 .umb-cropsizes{
     float: left;
 
@@ -229,11 +234,12 @@ div.umb-codeeditor .umb-btn-toolbar {
    &__add{
        display: flex;
        align-items: center;
+       flex-wrap: wrap;
    }
 
-   &__times{
-       display: inline-block;
-       margin: 6px 0 0;
+   &__sortable{
+       max-width: 500px;
+       width: 100%;
    }
 
    &__controls{
