@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
@@ -140,8 +141,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
                 TableName = Expression.TableName,
-                IsUnique = true
+                IsUnique = true,
+                IndexType = IndexTypes.UniqueNonClustered
             });
+
+            
 
             index.Index.Columns.Add(new IndexColumnDefinition
                                         {
