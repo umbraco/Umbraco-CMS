@@ -245,7 +245,6 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionProtect>(item, menu, true, true);
             
             AddActionNode<ActionNotify>(item, menu, true);
-            AddActionNode<ActionSendToTranslate>(item, menu, convert: true);
 
             AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
 
