@@ -5,7 +5,7 @@
 	ng-init="init('https://umbraco.tv/videos/implementor/chapterrss?sort=no')" 
 	ng-controller="Umbraco.Dashboard.StartupVideosController">
 
-    <div ng-if="videos.length">
+    <div ng-show="videos.length">
         <h4>To get you started:</h4>
         <ul class="thumbnails" >
             <li class="span2" ng-repeat="video in videos">
