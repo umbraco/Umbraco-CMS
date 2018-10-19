@@ -1,4 +1,6 @@
 using System;
+using System.Globalization;
+using System.Threading;
 using System.Web;
 using System.Web.Http;
 using Microsoft.Owin;
@@ -26,7 +28,8 @@ namespace Umbraco.Web.WebApi
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             UmbracoContext = umbracoContext;
-            InstanceId = Guid.NewGuid();            
+            InstanceId = Guid.NewGuid();
+            SetRequestCulture();
         }
 
         protected UmbracoApiControllerBase(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
@@ -35,9 +38,31 @@ namespace Umbraco.Web.WebApi
             if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
-            _umbraco = umbracoHelper;            
+            _umbraco = umbracoHelper;
+            SetRequestCulture();
         }
-        
+
+        /// <summary>
+        /// Sets the correct thread culture for the current domain if the request is not a back office request
+        /// </summary>
+        /// <returns>true if the culture was set</returns>
+        private void SetRequestCulture()
+        {
+            var requestUrl = UmbracoContext.OriginalRequestUrl;
+            if (requestUrl == null || requestUrl.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
+            {
+                return;
+            }
+
+            var domainAndUri = Routing.DomainHelper.DomainForUri(Services.DomainService.GetAll(false), requestUrl);
+            if (domainAndUri == null || domainAndUri.UmbracoDomain.LanguageIsoCode.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = new CultureInfo(domainAndUri.UmbracoDomain.LanguageIsoCode);
+        }
+
         private UmbracoHelper _umbraco;
 
         /// <summary>
