@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.ContentApps
             _propertyEditors = propertyEditors;
         }
 
-        public ContentApp GetContentAppFor(object o)
+        public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             string contentTypeAlias, entityType;
 

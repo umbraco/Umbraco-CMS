@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+            var contentTypesWhereCompositionIsUsed = source.GetWhereCompositionIsUsedInContentTypes(allContentTypes);
            return contentTypesWhereCompositionIsUsed
                 .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
                 .Select(x =>

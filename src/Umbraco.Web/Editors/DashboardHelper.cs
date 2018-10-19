@@ -47,51 +47,50 @@ namespace Umbraco.Web.Editors
             var i = 1;
 
             //disable packages section dashboard
-            if (section != "packages")
+            if (section == "packages") return tabs;
 
-                // The dashboard config can contain more than one area inserted by a package.
-                foreach (var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
+            foreach (var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
+            {
+                //we need to validate access to this section
+                if (DashboardSecurity.AuthorizeAccess(dashboardSection, currentUser, _sectionService) == false)
+                    continue;
+
+                //User is authorized
+                foreach (var tab in dashboardSection.Tabs)
                 {
-                    //we need to validate access to this section
-                    if (DashboardSecurity.AuthorizeAccess(dashboardSection, currentUser, _sectionService) == false)
+                    //we need to validate access to this tab
+                    if (DashboardSecurity.AuthorizeAccess(tab, currentUser, _sectionService) == false)
                         continue;
 
-                    //User is authorized
-                    foreach (var tab in dashboardSection.Tabs)
+                    var dashboardControls = new List<DashboardControl>();
+
+                    foreach (var control in tab.Controls)
                     {
-                        //we need to validate access to this tab
-                        if (DashboardSecurity.AuthorizeAccess(tab, currentUser, _sectionService) == false)
+                        if (DashboardSecurity.AuthorizeAccess(control, currentUser, _sectionService) == false)
                             continue;
 
-                        var dashboardControls = new List<DashboardControl>();
+                        var dashboardControl = new DashboardControl();
+                        var controlPath = control.ControlPath.Trim();
+                        dashboardControl.Caption = control.PanelCaption;
+                        dashboardControl.Path = IOHelper.FindFile(controlPath);
+                        if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
+                            dashboardControl.ServerSide = true;
 
-                        foreach (var control in tab.Controls)
-                        {
-                            if (DashboardSecurity.AuthorizeAccess(control, currentUser, _sectionService) == false)
-                                continue;
-
-                            var dashboardControl = new DashboardControl();
-                            var controlPath = control.ControlPath.Trim();
-                            dashboardControl.Caption = control.PanelCaption;
-                            dashboardControl.Path = IOHelper.FindFile(controlPath);
-                            if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
-                                dashboardControl.ServerSide = true;
-
-                            dashboardControls.Add(dashboardControl);
-                        }
-
-                        tabs.Add(new Tab<DashboardControl>
-                        {
-                            Id = i,
-                            Alias = tab.Caption.ToSafeAlias(),
-                            IsActive = i == 1,
-                            Label = tab.Caption,
-                            Properties = dashboardControls
-                        });
-
-                        i++;
+                        dashboardControls.Add(dashboardControl);
                     }
+
+                    tabs.Add(new Tab<DashboardControl>
+                    {
+                        Id = i,
+                        Alias = tab.Caption.ToSafeAlias(),
+                        IsActive = i == 1,
+                        Label = tab.Caption,
+                        Properties = dashboardControls
+                    });
+
+                    i++;
                 }
+            }
 
             //In case there are no tabs or a user doesn't have access the empty tabs list is returned
             return tabs;

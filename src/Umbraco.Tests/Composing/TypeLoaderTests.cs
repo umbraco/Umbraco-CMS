@@ -258,7 +258,7 @@ AnotherContentFinder
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _typeLoader.GetAssignedMapperTypes();
-            Assert.AreEqual(30, foundTypes1.Count());
+            Assert.AreEqual(29, foundTypes1.Count());
         }
 
         [Test]
@@ -273,13 +273,6 @@ AnotherContentFinder
         {
             var actions = _typeLoader.GetActions();
             Assert.AreEqual(34, actions.Count());
-        }
-
-        [Test]
-        public void Resolves_Trees()
-        {
-            var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(3, trees.Count());
         }
 
         [Test]

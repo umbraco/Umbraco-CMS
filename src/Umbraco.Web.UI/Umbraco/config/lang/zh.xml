@@ -60,7 +60,7 @@
         只需要设置语言部分即可。]]></key>
     <key alias="inherit">继承</key>
     <key alias="setLanguage">语言</key>
-    <key alias="setLanguageHelp"><![CDATA[为当前节点及子节点设置语言，<br /> 
+    <key alias="setLanguageHelp"><![CDATA[为当前节点及子节点设置语言，<br />
        也可以从父节点继承。]]></key>
     <key alias="setDomains">域名</key>
   </area>
@@ -543,7 +543,7 @@
      点击<strong>更新</strong>来更新系统到 %0%</p>
       <p>
       不用担心更新会丢失数据！
-      </p>    
+      </p>
     ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[数据库已更新到版本 %0%。<br />点击<strong>下一步</strong>继续。]]></key>
     <key alias="databaseUpToDate"><![CDATA[您的数据库已安装！点击<strong>下一步</strong>继续]]></key>
@@ -615,7 +615,7 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的帮助信息</h3>
 从社区获取帮助]]></key>
     <key alias="theEndHeader">系统 %0% 安装完毕</key>
-    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键 
+    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键
         <strong>UmbracoConfigurationStatus</strong>为 <strong>'%0%'</strong>。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[您想要<strong>立即开始</strong>请点“运行系统”<br />如果您是<strong>新手</strong>, 您可以得到相当丰富的学习资源。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>运行系统</h3>
@@ -638,6 +638,7 @@
     <key alias="renewSession">已更新，继续工作。</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">星期一快乐</key>
     <key alias="greeting1">星期二快乐</key>
     <key alias="greeting2">星期三快乐</key>
     <key alias="greeting3">星期四快乐</key>
@@ -700,7 +701,7 @@
 		  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -712,7 +713,7 @@
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-                                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+                                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
                                 <br />
                   </div>
 
@@ -1073,7 +1074,7 @@
      %0%：
 
      您好！这是一封自动邮件来提醒您注意，%2%的文档'%1%'
-     需要您翻译为'%5%' 
+     需要您翻译为'%5%'
 
      转到 http://%3%/translation/details.aspx?id=%4% 进行编辑
 
