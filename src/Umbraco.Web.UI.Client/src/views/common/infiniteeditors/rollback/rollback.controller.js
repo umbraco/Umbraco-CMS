@@ -111,12 +111,28 @@
             currentVersion.tabs.forEach((tab, tabIndex) => {
                 tab.properties.forEach((property, propertyIndex) => {
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
+
+                    // we have to make properties storing values as object into strings (Grid, nested content, etc.)
+                    if(property.value instanceof Object) {
+                        property.value = JSON.stringify(property.value, null, 1);
+                        property.isObject = true;
+                    }
+
+                    if(oldProperty.value instanceof Object) {
+                        oldProperty.value = JSON.stringify(oldProperty.value, null, 1);
+                        oldProperty.isObject = true;
+                    }
+
+                    // create new property object used in the diff table
                     var diffProperty = {
                         "alias": property.alias,
                         "label": property.label,
-                        "diff": JsDiff.diffWords(property.value, oldProperty.value)
+                        "diff": (property.value || oldProperty.value) ? JsDiff.diffWords(property.value, oldProperty.value) : "",
+                        "isObject": (property.isObject || oldProperty.isObject) ? true : false
                     };
+
                     vm.diff.properties.push(diffProperty);
+
                 });
             });
 
