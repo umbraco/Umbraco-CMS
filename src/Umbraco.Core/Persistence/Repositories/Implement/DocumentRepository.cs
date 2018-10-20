@@ -95,6 +95,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetBaseQuery(queryType, true);
         }
 
+        // gets the COALESCE expression for variant/invariant name
+        private string VariantNameSqlExpression
+            => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql;
+
         protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
         {
             var sql = SqlContext.Sql();
@@ -110,12 +114,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 case QueryType.Single:
                 case QueryType.Many:
                     sql = sql.Select<DocumentDto>(r =>
-                        r.Select(documentDto => documentDto.ContentDto, r1 =>
-                            r1.Select(contentDto => contentDto.NodeDto))
-                         .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
-                            r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
-                         .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                            r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")));
+                       r.Select(documentDto => documentDto.ContentDto, r1 =>
+                           r1.Select(contentDto => contentDto.NodeDto))
+                        .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
+                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
+                        .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
+                           r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
+
+                        // select the variant name, coalesce to the invariant name, as "variantName"
+                       .AndSelect(VariantNameSqlExpression + " AS variantName");
                     break;
             }
 
@@ -125,13 +132,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
 
                 // inner join on mandatory edited version
-                .InnerJoin<ContentVersionDto>().On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
-                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                .InnerJoin<ContentVersionDto>()
+                    .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
 
                 // left join on optional published version
                 .LeftJoin<ContentVersionDto>(nested =>
-                        nested.InnerJoin<DocumentVersionDto>("pdv").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
-                    .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv");
+                    nested.InnerJoin<DocumentVersionDto>("pdv")
+                            .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
+                    .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
+
+                // left join on optional culture variation
+                //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
+                .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv") 
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
 
             sql
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
@@ -417,7 +433,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // whatever we do, we must check that we are saving the current version
             // fixme maybe we can just fetch Current (bool)
             var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == content.VersionId)).FirstOrDefault();
-            if (version == null || !version.Current )
+            if (version == null || !version.Current)
                 throw new InvalidOperationException("Cannot save a non-current version.");
 
             // update
@@ -690,16 +706,33 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         /// <inheritdoc />
         public override IEnumerable<IContent> GetPage(IQuery<IContent> query,
-            long pageIndex, int pageSize, out long totalRecords,            
+            long pageIndex, int pageSize, out long totalRecords,
             IQuery<IContent> filter, Ordering ordering)
         {
             Sql<ISqlContext> filterSql = null;
 
+            // if we have a filter, map its clauses to an Sql statement
             if (filter != null)
             {
+                // if the clause works on "name", we need to swap the field and use the variantName instead,
+                // so that querying also works on variant content (for instance when searching a listview).
+
+                // figure out how the "name" field is going to look like - so we can look for it
+                var nameField = SqlContext.VisitModelField<IContent>(x => x.Name);
+
                 filterSql = Sql();
                 foreach (var filterClause in filter.GetWhereClauses())
-                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
+                {
+                    var clauseSql = filterClause.Item1;
+                    var clauseArgs  = filterClause.Item2;
+
+                    // replace the name field
+                    // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
+                    clauseSql = clauseSql.Replace(nameField, VariantNameSqlExpression);
+
+                    // append the clause
+                    filterSql.Append($"AND ({clauseSql})", clauseArgs);
+                }
             }
 
             return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
@@ -836,7 +869,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .InnerJoin<UserDto>("updaterUser").On<ContentVersionDto, UserDto>((version, user) => version.UserId == user.Id, aliasRight: "updaterUser");
 
                 // see notes in ApplyOrdering: the field MUST be selected + aliased
-                sql = Sql(InsertBefore(sql, "FROM", SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering"), sql.Arguments);
+                sql = Sql(InsertBefore(sql, "FROM", ", " + SqlSyntax.GetFieldName<UserDto>(x => x.UserName, "updaterUser") + " AS ordering "), sql.Arguments);
 
                 sql = InsertJoins(sql, joins);
 
@@ -858,10 +891,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // variant: left join may yield NULL or something, and that determines published
 
                 var joins = Sql()
-                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype")
-                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == ordering.Culture, "ccv", "lang"), "ccv")
-                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((pcv, ccv) => pcv.Id == ccv.VersionId, "pcv", "ccv"); // join on *published* content version
+                    .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
 
                 sql = InsertJoins(sql, joins);
 
@@ -1228,7 +1258,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
-            foreach(var (culture, name) in content.CultureNames)
+            foreach (var (culture, name) in content.CultureNames)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(culture);
                 if (!langId.HasValue) continue;
