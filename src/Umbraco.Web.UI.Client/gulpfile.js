@@ -6,21 +6,22 @@ var wrap = require("gulp-wrap-js");
 var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
-const babel = require("gulp-babel");
+var babel = require("gulp-babel");
 var runSequence = require('run-sequence');
-const imagemin = require('gulp-imagemin');
+var imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 // js
-const eslint = require('gulp-eslint');
+var eslint = require('gulp-eslint');
 
 //Less + css
 var postcss = require('gulp-postcss');
 var less = require('gulp-less');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
+var cleanCss = require("gulp-clean-css");
 
 // Documentation
 var gulpDocs = require('gulp-ngdocs');
@@ -49,7 +50,6 @@ function processJs(files, out) {
 }
 
 function processLess(files, out) {
-
     var processors = [
          autoprefixer,
          cssnano({zindex: false})
@@ -57,6 +57,7 @@ function processLess(files, out) {
 
     return gulp.src(files)
         .pipe(less())
+        .pipe(cleanCss())
         .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(root + targets.css));
