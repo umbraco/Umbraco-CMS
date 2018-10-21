@@ -443,6 +443,8 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="enterAlias">Indtast alias...</key>
+    <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
