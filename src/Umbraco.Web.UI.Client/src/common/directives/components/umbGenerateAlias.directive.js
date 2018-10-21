@@ -70,7 +70,7 @@ angular.module("umbraco.directives")
 
                 scope.labels = {
                     idle: "Enter alias...",
-                    busy: "Generating alias...",
+                    busy: "Generating alias..."
                 };
                 
                 scope.placeholderText = scope.labels.idle;
