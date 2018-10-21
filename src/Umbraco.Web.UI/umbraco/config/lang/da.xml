@@ -267,6 +267,7 @@
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
     <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
