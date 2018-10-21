@@ -243,22 +243,26 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
 
         createContainer: function(parentId, name) {
 
+            var promise = localizationService.localize("media_createFolderFailed", [parentId]);
+
             return umbRequestHelper.resourcePromise(
                  $http.post(
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
                         { parentId: parentId, name: encodeURIComponent(name) })),
-                'Failed to create a folder under parent id ' + parentId);
+                promise);
         },
 
         renameContainer: function (id, name) {
+
+            var promise = localizationService.localize("media_renameFolderFailed", [id]);
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl",
                     "PostRenameContainer",
                     { id: id, name: name })),
-                "Failed to rename the folder with id " + id
+                promise
             );
 
         }
