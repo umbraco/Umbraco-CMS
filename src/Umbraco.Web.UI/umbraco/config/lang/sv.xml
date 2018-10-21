@@ -645,8 +645,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Återställ</key>
-    <key alias="defineCrop">Definiera beskräning</key>
-    <key alias="defineCropDescription">Ge beskärningen ett alias och dess standardbredd och -höjd</key>
     <key alias="saveCrop">spara beskärning</key>
     <key alias="addCrop">Lägg till ny beskärning</key>
   </area>
