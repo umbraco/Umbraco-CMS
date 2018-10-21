@@ -3,7 +3,7 @@
     * @name umbraco.resources.mediaTypeResource
     * @description Loads in data for media types
     **/
-function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
+function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
 
@@ -208,13 +208,15 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("media_moveFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }),
-                'Failed to move content');
+                promise);
         },
 
         copy: function (args) {
