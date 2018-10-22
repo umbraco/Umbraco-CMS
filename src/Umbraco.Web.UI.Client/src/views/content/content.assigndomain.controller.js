@@ -15,6 +15,7 @@
         function activate() {
             languageResource.getAll().then(function (langs) {
                 vm.languages = langs;
+
                 var defLang = langs.filter(function (l) {
                     return l.isDefault;
                 });
@@ -37,9 +38,10 @@
         function getCultureAndDomains () {
             contentResource.getCultureAndDomains($scope.currentNode.id)
                 .then(function (data) {
-                    if (data.Language !== "undefined") {
+
+                    if (data.language !== "undefined") {
                         var lang = vm.languages.filter(function (l) {
-                            return matchLanguageById(l, data.Language.Id);
+                            return matchLanguageById(l, data.language.Id);
 
                         });
                         if (lang.length > 0) {
@@ -47,13 +49,13 @@
                         }
                     }
 
-                    vm.domains = data.Domains.map(function (d) {
+                    vm.domains = data.domains.map(function (d) {
                         var matchedLangs = vm.languages.filter(function (lng) {
-                            return matchLanguageById(lng, d.Lang);
+                            return matchLanguageById(lng, d.lang);
                         });
                         return {
-                            Name: d.Name,
-                            Lang: matchedLangs.length > 0 ? matchedLangs[0] : vm.defaultLanguage
+                            name: d.name,
+                            lang: matchedLangs.length > 0 ? matchedLangs[0] : vm.defaultLanguage
                         }
                     });
                 });
@@ -71,8 +73,8 @@
 
         function addDomain() {
             vm.domains.push({
-                Name: '',
-                Lang: vm.defaultLanguage
+                name: '',
+                lang: vm.defaultLanguage
             });
         }
 
@@ -85,11 +87,11 @@
             if (vm.domains.length > 1) {
 
                 vm.domains.map(function (d, index) {
-                    if (d.Name in duplicateTest) {
+                    if (d.name in duplicateTest) {
                         valid = false;
                     }
                     else {
-                        duplicateTest[d.Name] = index;
+                        duplicateTest[d.name] = index;
                     }
                 });
             }
@@ -102,14 +104,14 @@
 
             if (vm.domainForm.$valid) {
                 var data = {
-                    NodeId: $scope.currentNode.id,
-                    Domains: vm.domains.map(function (d) {
+                    nodeId: $scope.currentNode.id,
+                    domains: vm.domains.map(function (d) {
                         return {
-                            Name: d.Name,
-                            Lang: d.Lang.id
+                            name: d.name,
+                            lang: d.lang.id
                         };
                     }),
-                    Language: vm.language != null ? vm.language.id : 0
+                    language: vm.language != null ? vm.language.id : 0
                 };
                 contentResource.saveLanguageAndDomains(data).then(function () {
                     vm.submitButtonState = "success";
