@@ -417,7 +417,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             var content = Services.ContentService.GetById(pageId);
             var text = content == null ? "" : content.Name;
-            feedback.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { text });
+            feedback_text.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { text });
 
             p_setup.Visible = false;
             p_feedback.Visible = true;

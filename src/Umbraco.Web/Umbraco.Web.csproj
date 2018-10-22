@@ -179,6 +179,7 @@
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
@@ -200,7 +201,6 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
