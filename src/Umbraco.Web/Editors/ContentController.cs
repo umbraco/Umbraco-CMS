@@ -1706,14 +1706,16 @@ namespace Umbraco.Web.Editors
         public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
         {
             var rollbackVersions = new List<RollbackVersion>();
+            var writerIds = new HashSet<int>();
 
-            //Return a list of all versions of a specific content node           
-            var versions = Services.ContentService.GetVersions(contentId);
+            //Return a list of all versions of a specific content node
+            // fixme - cap at 50 versions for now?
+            var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
 
             //Not all nodes are variants & thus culture can be null
-            //Only filter the collection
             if (culture != null)
             {
+                //Get cultures that were published with the version = their update date is equal to the version's
                 versions = versions.Where(x => x.UpdateDate == x.GetUpdateDate(culture));
             }
 
@@ -1722,20 +1724,26 @@ namespace Umbraco.Web.Editors
 
             foreach (var version in versions)
             {
-                var rollbackVersion = new RollbackVersion();
-
-                //Version ID
-                rollbackVersion.VersionId = version.VersionId;
-
-                //Date of version
-                rollbackVersion.VersionDate = version.UpdateDate;
-                
-                //Name of writer/publisher/user
-                var writerId = version.WriterId;
-                var user = Services.UserService.GetUserById(writerId);
-                rollbackVersion.VersionAuthorName = user.Name;
+                var rollbackVersion = new RollbackVersion
+                {
+                    VersionId = version.VersionId,
+                    VersionDate = version.UpdateDate,
+                    VersionAuthorId = version.WriterId
+                };
 
                 rollbackVersions.Add(rollbackVersion);
+
+                writerIds.Add(version.WriterId);
+            }
+
+            var users = Services.UserService
+                .GetUsersById(writerIds.ToArray())
+                .ToDictionary(x => x.Id, x => x.Name);
+
+            foreach (var rollbackVersion in rollbackVersions)
+            {
+                if (users.TryGetValue(rollbackVersion.VersionAuthorId, out var userName))
+                    rollbackVersion.VersionAuthorName = userName;
             }
             
             return rollbackVersions;

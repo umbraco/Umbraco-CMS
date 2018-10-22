@@ -135,6 +135,12 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetVersions(int id);
 
         /// <summary>
+        /// Gets all versions of a document.
+        /// </summary>
+        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+        IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
+
+        /// <summary>
         /// Gets top versions of a document.
         /// </summary>
         /// <remarks>Versions are ordered with current first, then most recent first.</remarks>

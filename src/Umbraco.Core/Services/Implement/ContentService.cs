@@ -475,6 +475,19 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by Id
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetAllVersionsSlim(id, skip, take);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of all version Ids for the given content item ordered so latest is first
         /// </summary>
         /// <param name="id"></param>
