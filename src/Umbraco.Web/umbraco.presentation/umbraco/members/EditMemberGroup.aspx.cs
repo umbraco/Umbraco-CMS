@@ -67,7 +67,7 @@ namespace umbraco.presentation.members
 			_memberGroup.Text = NameTxt.Text;
             memberGroupName.Value = NameTxt.Text;
             _memberGroup.Save();
-            this.ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("buttons", "save", base.getUser()),"");
+            this.ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberGroupSaved", base.getUser()),"");
 
             ClientTools
                 .RefreshTree(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias);
