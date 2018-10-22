@@ -23,22 +23,35 @@
                     <table class="table table-condensed table-bordered domains" style="margin-bottom: 10px;" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
-                                <th><localize key="assignDomain_domain"></localize></th>
-                                <th><localize key="assignDomain_language"></localize></th>
+                                <th>
+                                    <localize key="assignDomain_domain"></localize>                    
+                                    <span class="umb-control-required">*</span>
+                                </th>
+                                <th>
+                                    <localize key="assignDomain_language"></localize>
+                                    <span class="umb-control-required">*</span>
+                                </th>
                                 <th />
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" />
+                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="multi"><localize key="assignDomain_duplicateDomain"></localize></span>
                                         <span class="help-inline" ng-message="pattern"><localize key="assignDomain_invalidDomain"></localize></span>
                                     </span>
                                 </td>
                                 <td>
-                                    <select style="width: 100%; margin-bottom: 0;" name="domain_language_{{$index}}" class="language" ng-model="domain.lang" ng-options="lang.name for lang in vm.languages"></select>
+                                    <select 
+                                        style="width: 100%; margin-bottom: 0;" 
+                                        name="domain_language_{{$index}}" 
+                                        class="language" 
+                                        ng-model="domain.lang" 
+                                        ng-options="lang.name for lang in vm.languages"
+                                        required>
+                                    </select>
                                 </td>
                                 <td>
                                     <umb-button 
