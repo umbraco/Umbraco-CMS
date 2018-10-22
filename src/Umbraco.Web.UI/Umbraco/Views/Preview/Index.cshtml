@@ -32,7 +32,7 @@
         @Html.Partial(Model.PreviewExtendedHeaderView)
     }
 
-    <div id="demo-iframe-wrapper" ng-show="frameLoaded && pageUrl" class="{{previewDevice.css}}">
+    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
         <preview-i-frame src="pageUrl" on-loaded="onFrameLoaded(iframe)"></preview-i-frame>
     </div>
     <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">

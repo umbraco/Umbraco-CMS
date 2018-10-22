@@ -19,5 +19,16 @@ namespace Umbraco.Web.PropertyEditors
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new TrueFalseConfigurationEditor();
+
+            public TrueFalsePreValueEditor()
+            {
+                Fields.Add(new PreValueField()
+                {
+                    Description = "Write a label text",
+                    Key = "labelOn",
+                    Name = "Label",
+                    View = "textstring"
+                });
+            }
     }
 }

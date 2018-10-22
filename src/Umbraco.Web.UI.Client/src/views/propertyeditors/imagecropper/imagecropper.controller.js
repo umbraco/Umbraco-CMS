@@ -171,7 +171,7 @@ angular.module('umbraco')
     })
     .run(function (mediaHelper, umbRequestHelper) {
         if (mediaHelper && mediaHelper.registerFileResolver) {
-
+            
             //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
             // they contain different data structures so if we need to query against it we need to be aware of this.
             mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {

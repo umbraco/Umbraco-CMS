@@ -2,7 +2,6 @@
      ng-controller="Umbraco.PropertyEditors.ImageCropperController">
 
     <ng-form name="imageCropperForm">
-
         <umb-property-file-upload culture="{{model.culture}}"
                                   property-alias="{{model.alias}}"
                                   value="model.value.src"
@@ -17,7 +16,6 @@
                     <div class="umb-cropper__container">
 
                         <i ng-click="done()" class="icon icon-delete btn-round umb-close-cropper"></i>
-
                         <div>
                             <umb-image-crop height="{{currentCrop.height}}"
                                             width="{{currentCrop.width}}"
@@ -42,7 +40,7 @@
                     </umb-image-gravity>
                     <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
-            
+
                 
                 <ul ng-if="!imageSrc.endsWith('.svg')" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">

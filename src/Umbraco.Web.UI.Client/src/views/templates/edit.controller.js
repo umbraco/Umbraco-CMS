@@ -145,15 +145,15 @@
 
 
             }, function (err) {
+                if (suppressNotification) {
+                    vm.page.saveButtonState = "error";
 
-                vm.page.saveButtonState = "error";
-                
-                localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
-                    var header = data[0];
-                    var message = data[1];
-                    notificationsService.error(header, message);
-                });
-
+                    localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function (data) {
+                        var header = data[0];
+                        var message = data[1];
+                        notificationsService.error(header, message);
+                    });
+                }
             });
 
         };

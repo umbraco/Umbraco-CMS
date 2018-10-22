@@ -66,7 +66,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool EnableInheritedMediaTypes { get; }
 
         string LoginBackgroundImage { get; }
-        bool StripUdiAttributes { get; }
-        
     }
 }
