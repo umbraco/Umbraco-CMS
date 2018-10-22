@@ -92,6 +92,7 @@ namespace Umbraco.Web.Trees
                         }
                     }
 
+                    node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
 
