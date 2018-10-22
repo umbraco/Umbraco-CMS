@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
@@ -437,7 +437,7 @@
     <key alias="current">nuvarande</key>
     <key alias="embed">Inbäddning</key>
     <key alias="retrieve">Hämta</key>
-    <key alias="selected">valgt</key>
+    <key alias="selected">valda</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
