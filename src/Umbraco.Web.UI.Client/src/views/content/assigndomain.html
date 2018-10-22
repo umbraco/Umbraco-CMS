@@ -2,20 +2,21 @@
 
     <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
-    <div ng-hide="vm.loading" class="umb-dialog-body">
-        
-        <umb-pane ng-if="!currentNode.metaData.variesByCulture">
-            <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
-            <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
-            <select class="umb-property-editor umb-dropdown" name="language" id="assignDomain_language" ng-model="vm.language" ng-options="lang.name for lang in vm.languages">
-                <option value="">{{vm.inherit}}</option>
-            </select>
-        </umb-pane>
+    <form name="vm.domainForm" ng-submit="vm.save()" novalidate>
 
-        <umb-pane>
+        <div ng-hide="vm.loading" class="umb-dialog-body">
+            
+            <umb-pane ng-if="!currentNode.metaData.variesByCulture">
+                <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
+                <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
+                <select class="umb-property-editor umb-dropdown" name="language" id="assignDomain_language" ng-model="vm.language" ng-options="lang.name for lang in vm.languages">
+                    <option value="">{{vm.inherit}}</option>
+                </select>
+            </umb-pane>
 
-            <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
-            <form name="vm.domainForm" novalidate="" class="control-group umb-control-group">
+            <umb-pane>
+
+                <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
                 <small class="db" style="margin-bottom: 10px;">
                     <localize key="assignDomain_domainHelp"></localize>
                 </small>
@@ -39,8 +40,8 @@
                                 <td>
                                     <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
+                                        <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                         <span class="help-inline" ng-message="multi"><localize key="assignDomain_duplicateDomain"></localize></span>
-                                        <span class="help-inline" ng-message="pattern"><localize key="assignDomain_invalidDomain"></localize></span>
                                     </span>
                                 </td>
                                 <td>
@@ -73,28 +74,28 @@
                     button-style="info">
                 </umb-button>
 
-            </form>
-        </umb-pane>
+            </umb-pane>
 
-    </div>
+        </div>
 
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
 
-        <umb-button 
-            label-key="general_close"
-            action="vm.closeDialog()"
-            type="button"
-            button-style="link">
-        </umb-button>
+            <umb-button 
+                label-key="general_close"
+                action="vm.closeDialog()"
+                type="button"
+                button-style="link">
+            </umb-button>
 
-        <umb-button 
-            label-key="buttons_save"
-            type="button"
-            action="vm.save()"
-            button-style="success"
-            state="vm.submitButtonState">
-        </umb-button>
+            <umb-button 
+                label-key="buttons_save"
+                type="submit"
+                button-style="success"
+                state="vm.submitButtonState">
+            </umb-button>
 
-    </div>
+        </div>
+
+    </form>
     
 </div>
