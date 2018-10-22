@@ -1,5 +1,8 @@
 <div ng-controller="Umbraco.Editors.Content.AssignDomainController as vm" ng-cloak>
-    <div class="umb-dialog-body">
+
+    <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
+
+    <div ng-hide="vm.loading" class="umb-dialog-body">
         
         <umb-pane ng-if="!currentNode.metaData.variesByCulture">
             <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>

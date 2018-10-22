@@ -11,12 +11,15 @@
         vm.languages = [];
         vm.domains = [];
         vm.language = null;
-        //vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
+        vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
         function activate() {
-            languageResource.getAll().then(function (langs) {
+
+            vm.loading = true;
+
+            languageResource.getAll().then(langs => {
                 vm.languages = langs;
 
-                var defLang = langs.filter(function (l) {
+                var defLang = langs.filter(l => {
                     return l.isDefault;
                 });
 
@@ -26,7 +29,9 @@
                 else {
                     vm.defaultLanguage = langs[0];
                 }
-                getCultureAndDomains();
+                getCultureAndDomains().then(() => {
+                    vm.loading = false;
+                });
             });
 
             localizationService.localize("assignDomain_inherit").then(function (value) {
@@ -36,7 +41,7 @@
         }
 
         function getCultureAndDomains () {
-            contentResource.getCultureAndDomains($scope.currentNode.id)
+            return contentResource.getCultureAndDomains($scope.currentNode.id)
                 .then(function (data) {
 
                     if (data.language !== "undefined") {
@@ -121,6 +126,7 @@
             }
             else {
                 console.log('not valid');
+                vm.submitButtonState = "error";
             }
         }
 
