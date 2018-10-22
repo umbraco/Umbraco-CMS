@@ -11,7 +11,7 @@
         vm.languages = [];
         vm.domains = [];
         vm.language = null;
-        vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
+        
         function activate() {
 
             vm.loading = true;
