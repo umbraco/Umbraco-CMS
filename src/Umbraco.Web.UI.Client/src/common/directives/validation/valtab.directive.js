@@ -6,7 +6,7 @@
 * @description Used to show validation warnings for a tab to indicate that the tab content has validations errors in its data.
 * In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
-function valTab($rootScope) {
+function valTab(eventsService) {
     return {
         require: ['^form', '^valFormManager'],
         restrict: "A",
@@ -33,7 +33,8 @@ function valTab($rootScope) {
             });
             var tabShownFunc = function (e) {
                 var tabContent = element.closest(".umb-panel").find("#" + tabId);
-                $rootScope.$emit('valTab.tabShown', e, scope.tab, tabContent);
+                eventsService.emit('valTab.tabShown', { originalEvent: e, tab: scope.tab, content: tabContent });
+
             };
             var anchorElement = element.find("a[data-toggle='tab']");
             anchorElement.on('shown.bs.tab', tabShownFunc);

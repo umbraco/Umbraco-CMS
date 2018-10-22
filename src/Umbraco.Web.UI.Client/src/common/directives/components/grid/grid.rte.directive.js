@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout, $rootScope) {
+    .directive('gridRte', function (tinyMceService, stylesheetResource, angularHelper, assetsService, $q, $timeout, eventsService) {
         return {
             scope: {
                 uniqueId: '=',
@@ -362,7 +362,8 @@ angular.module("umbraco.directives")
                             //    tinyMceEditor.fire('LoadContent', null);
                             //};
 
-                            var tabShownListener = $rootScope.$on('valTab.tabShown', function (e, originalEvent, tab, contentElement) {
+                             
+                            var tabShownListener = eventsService.on("valTab.tabShown", function (e, args) {
                                 //the tab has been shown, trigger the mceAutoResize (as it could have timed out before the tab was shown)
                                 if (tinyMceEditor !== undefined && tinyMceEditor != null) {
                                     tinyMceEditor.execCommand('mceAutoResize', false, null, null);
@@ -381,7 +382,7 @@ angular.module("umbraco.directives")
                             // element might still be there even after the modal has been hidden.
                             scope.$on('$destroy', function () {
                                 formSubmittingListener();
-                                tabShownListener();
+                                eventsService.unsubscribe(tabShownListener);
 								if (tinyMceEditor !== undefined && tinyMceEditor != null) {
 									tinyMceEditor.destroy()
 								}
