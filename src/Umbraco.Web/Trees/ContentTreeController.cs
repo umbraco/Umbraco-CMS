@@ -238,7 +238,10 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionRights>(ui.Text("actions", ActionRights.Instance.Alias), true);
             menu.Items.Add<ActionProtect>(ui.Text("actions", ActionProtect.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
 
-            menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true);
+            if (EmailSender.CanSendRequiredEmail)
+            {
+                menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true);
+            }
             menu.Items.Add<ActionSendToTranslate>(ui.Text("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
