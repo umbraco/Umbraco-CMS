@@ -3,15 +3,15 @@
 
     function AssignDomainController($scope, localizationService, languageResource, contentResource) {
         var vm = this;
+        
         vm.closeDialog = closeDialog;
         vm.addDomain = addDomain;
         vm.removeDomain = removeDomain;
         vm.save = save;
-        vm.validateDomain = validateDomain;
         vm.languages = [];
         vm.domains = [];
         vm.language = null;
-        
+
         function activate() {
 
             vm.loading = true;
@@ -87,22 +87,6 @@
             vm.domains.splice(index, 1);
         }
 
-        function validateDomain() {
-            var valid = true, duplicateTest = {};
-            if (vm.domains.length > 1) {
-
-                vm.domains.map(function (d, index) {
-                    if (d.name in duplicateTest) {
-                        valid = false;
-                    }
-                    else {
-                        duplicateTest[d.name] = index;
-                    }
-                });
-            }
-            return valid;
-        }
-
         function save() {
 
             vm.submitButtonState = "busy";
@@ -125,7 +109,6 @@
                 });
             }
             else {
-                console.log('not valid');
                 vm.submitButtonState = "error";
             }
         }
