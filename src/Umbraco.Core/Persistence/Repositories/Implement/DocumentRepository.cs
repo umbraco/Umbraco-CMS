@@ -966,17 +966,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         if (templateId.HasValue && templateId.Value > 0)
                             templateIds.Add(templateId.Value);
                     }
-
-                    // need properties
-                    var versionId = dto.DocumentVersionDto.Id;
-                    var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-                    var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
-                    {
-                        Template1Id = dto.DocumentVersionDto.TemplateId
-                    };
-                    if (dto.Published) temp.Template2Id = dto.PublishedVersionDto.TemplateId;
-                    temps.Add(temp);
                 }
+
+                // need temps, for properties, templates and variations
+                var versionId = dto.DocumentVersionDto.Id;
+                var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+                var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
+                {
+                    Template1Id = dto.DocumentVersionDto.TemplateId
+                };
+                if (dto.Published) temp.Template2Id = dto.PublishedVersionDto.TemplateId;
+                temps.Add(temp);
             }
 
             if (!slim)
