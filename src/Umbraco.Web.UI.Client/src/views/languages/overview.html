@@ -31,6 +31,7 @@
                 <thead>
                     <tr>
                         <th>Language</th>
+                        <th>ISO</th>
                         <th>Default</th>
                         <th>Mandatory</th>
                         <th>Fallback</th>
@@ -41,6 +42,9 @@
                         <td>
                             <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
                             <span class="bold">{{ language.name }}</span>
+                        </td>
+                        <td>
+                            <span>{{ language.culture }}</span>
                         </td>
                         <td>
                             <umb-checkmark
