@@ -2,12 +2,16 @@
 
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
-    
+
     <div data-element="sortable-thumbnails" class="flex flex-wrap error">
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
-                <span class="label trashed" ng-if="image.trashed"><localize key="mediaPicker_trashed"></localize></span>
+                <p class="label label__trashed" ng-if="image.trashed">
+                    <localize key="mediaPicker_trashed"></localize>
+                    <i class="icon-trash"></i>
+                </p>
+
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
 
@@ -16,13 +20,13 @@
                 <img ng-class="{'trashed': image.trashed}" ng-if="image.extension === 'svg'" ng-src="{{image.file}}" alt="" />
 
                 <!-- FILE -->
-                <span class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
+                <div ng-class="{'trashed': image.trashed}" class="umb-icon-holder" ng-hide="image.thumbnail || image.metaData.umbracoExtension.Value === 'svg' || image.extension === 'svg'">
                     <span class="file-icon">
                         <i class="icon {{image.icon}} large"></i>
                         <span>.{{image.extension}}</span>
                     </span>
                     <small>{{image.name}}</small>
-                </span>
+                </div>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
                     <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="goToItem(image)">

@@ -235,6 +235,18 @@ div.umb-codeeditor .umb-btn-toolbar {
     }
 }
 
+.umb-mediapicker .label{
+    &__trashed{
+        background-color: @orange;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        transform: translate3d(-50%,-50%,0);
+        margin: 0;
+    }
+}
+
 .umb-mediapicker .picked-image {
   position: absolute;
   bottom: 10px;
@@ -333,7 +345,7 @@ div.umb-codeeditor .umb-btn-toolbar {
     background-image: url(../img/checkered-background.png);
 }
 
-.umb-sortable-thumbnails li img.trashed {
+.umb-sortable-thumbnails li .trashed {
     opacity:0.3;
 }
 
