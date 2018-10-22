@@ -1,5 +1,6 @@
 <div ng-controller="Umbraco.Editors.Content.AssignDomainController as vm" ng-cloak>
     <div class="umb-dialog-body">
+        
         <umb-pane ng-if="!currentNode.metaData.variesByCulture">
             <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
             <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
@@ -7,6 +8,7 @@
                 <option value="">{{vm.inherit}}</option>
             </select>
         </umb-pane>
+
         <umb-pane>
 
             <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
@@ -26,7 +28,7 @@
                         <tbody>
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.Name" multi="vm.validateDomain" ng-pattern="vm.domainPattern" name="domain_name_{{$index}}" />
+                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.Name" name="domain_name_{{$index}}" />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="multi"><localize key="assignDomain_duplicateDomain"></localize></span>
                                         <span class="help-inline" ng-message="pattern"><localize key="assignDomain_invalidDomain"></localize></span>
@@ -73,7 +75,8 @@
             label-key="buttons_save"
             type="button"
             action="vm.save()"
-            button-style="success">
+            button-style="success"
+            state="vm.submitButtonState">
         </umb-button>
 
     </div>

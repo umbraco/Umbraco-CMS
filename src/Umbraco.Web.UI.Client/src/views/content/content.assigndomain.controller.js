@@ -11,7 +11,7 @@
         vm.languages = [];
         vm.domains = [];
         vm.language = null;
-        vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
+        //vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
         function activate() {
             languageResource.getAll().then(function (langs) {
                 vm.languages = langs;
@@ -98,6 +98,8 @@
 
         function save() {
 
+            vm.submitButtonState = "busy";
+
             if (vm.domainForm.$valid) {
                 var data = {
                     NodeId: $scope.currentNode.id,
@@ -109,11 +111,10 @@
                     }),
                     Language: vm.language != null ? vm.language.id : 0
                 };
-                console.log(data);
                 contentResource.saveLanguageAndDomains(data).then(function () {
-                    closeDialog();
+                    vm.submitButtonState = "success";
                 }, function (e) {
-                    console.log(e); //TODO: not sure how best to handle this case
+                    vm.submitButtonState = "error";
                 });
             }
             else {
