@@ -158,8 +158,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                                      Name = indexName,
                                      IndexType = attribute.IndexType,
                                      ColumnName = columnName,
-                                     TableName = tableName,
-                                     IsClustered = attribute.IndexType == IndexTypes.Clustered,                                    
+                                     TableName = tableName,                                                                     
                                  };
 
             if (string.IsNullOrEmpty(attribute.ForColumns) == false)
