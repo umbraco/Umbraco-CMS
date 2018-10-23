@@ -150,8 +150,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             img.isFolder = !mediaHelper.hasFilePropertyType(img);
 
             if (!img.isFolder) {
-                img.thumbnail = mediaHelper.resolveFile(img, true);
-                img.image = mediaHelper.resolveFile(img, false);
+                img.thumbnail = mediaHelper.resolveFile(img, true, "umbracoFile");
+                img.image = mediaHelper.resolveFile(img, false, "umbracoFile");
             }
         },
 

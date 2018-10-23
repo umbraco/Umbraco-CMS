@@ -104,7 +104,7 @@ angular.module("umbraco")
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
                     } else if ($scope.showDetails) {
                         $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
+                        $scope.target.url = mediaHelper.resolveFile(image, false, "umbracoFile");
                     } else {
                         $scope.submit(image);
                     }

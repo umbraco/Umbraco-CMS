@@ -88,7 +88,7 @@ angular.module("umbraco")
                                 $scope.target = node;
                                 if (ensureWithinStartNode(node)) {
                                     selectImage(node);
-                                    $scope.target.url = mediaHelper.resolveFile(node);
+                                    $scope.target.url = mediaHelper.resolveFile(node, false, "umbracoFile");
                                     $scope.target.altText = altText;
                                     $scope.openDetailsDialog();
                                 }
@@ -192,7 +192,7 @@ angular.module("umbraco")
                         if (image.image) {
                             $scope.target.url = image.image;
                         } else {
-                            $scope.target.url = mediaHelper.resolveFile(image);
+                            $scope.target.url = mediaHelper.resolveFile(image, false, "umbracoFile");
                         }
 
                         $scope.openDetailsDialog();
@@ -239,7 +239,7 @@ angular.module("umbraco")
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
                         var image = $scope.images[$scope.images.length - 1];
                         $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
+                        $scope.target.url = mediaHelper.resolveFile(image, false, "umbracoFile");
                         selectImage(image);
                     }
                 });

@@ -177,38 +177,39 @@ function mediaHelper(umbRequestHelper) {
          * 
          * @param {object} mediaEntity A media Entity returned from the entityResource
          * @param {boolean} thumbnail Whether to return the thumbnail url or normal url
+         * @param {string} propertyAlias The propertyAlias to look for.
          */
         /*jshint loopfunc: true */
-        resolveFile : function(mediaItem, thumbnail){
-            
-            function iterateProps(props){
+        resolveFile: function (mediaItem, thumbnail, propertyAlias) {
+
+            function iterateProps(props) {
                 var res = null;
-                for(var resolver in _mediaFileResolvers) {
-                    var property = _.find(props, function(prop){ return prop.editor === resolver; });
-                    if(property){
+                for (var resolver in _mediaFileResolvers) {
+                    var property = _.find(props, function (prop) { return prop.editor === resolver && (propertyAlias === undefined || prop.alias === propertyAlias); });
+                    if (property) {
                         res = _mediaFileResolvers[resolver](property, mediaItem, thumbnail);
                         break;
                     }
                 }
 
-                return res;    
+                return res;
             }
 
             //we either have properties raw on the object, or spread out on tabs
             var result = "";
-            if(mediaItem.properties){
+            if (mediaItem.properties) {
                 result = iterateProps(mediaItem.properties);
-            }else if(mediaItem.tabs){
-                for(var tab in mediaItem.tabs) {
-                    if(mediaItem.tabs[tab].properties){
+            } else if (mediaItem.tabs) {
+                for (var tab in mediaItem.tabs) {
+                    if (mediaItem.tabs[tab].properties) {
                         result = iterateProps(mediaItem.tabs[tab].properties);
-                        if(result){
+                        if (result) {
                             break;
                         }
                     }
                 }
             }
-            return result;            
+            return result;
         },
 
         /*jshint loopfunc: true */

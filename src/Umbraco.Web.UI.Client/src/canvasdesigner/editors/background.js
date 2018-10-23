@@ -131,7 +131,7 @@ angular.module("Umbraco.canvasdesigner")
                         angular.forEach(child.properties, function (property) {       
                             if (property.alias == "umbracoFile" && property.value)
                             {
-                                child.thumbnail = mediaHelper.resolveFile(child, true);
+                                child.thumbnail = mediaHelper.resolveFile(child, true, property.alias);
                                 child.image = property.value;
                             }
                         })
