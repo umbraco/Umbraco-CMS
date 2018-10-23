@@ -119,7 +119,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 new ContentPropertyDisplay
                 {
-                    Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
                     Label = _localizedTextService.Localize("general/id"),
                     Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
                     View = "idwithguid"
