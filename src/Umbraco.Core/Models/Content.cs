@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
@@ -22,8 +21,8 @@ namespace Umbraco.Core.Models
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private CultureNameCollection _publishInfos;
-        private CultureNameCollection _publishInfosOrig;
+        private ContentCultureInfosCollection _publishInfos;
+        private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -89,7 +88,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-            public readonly PropertyInfo PublishNamesSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, CultureName>>(x => x.PublishNames);
+            public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
         }
 
         /// <summary>
@@ -214,7 +213,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IEnumerable<string> EditedCultures => CultureNames.Keys.Where(IsCultureEdited);
+        public IEnumerable<string> EditedCultures => CultureInfos.Keys.Where(IsCultureEdited);
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -224,7 +223,7 @@ namespace Umbraco.Core.Models
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
-            =>  _publishInfos != null && _publishInfos.ContainsKey(culture);
+            => _publishInfos != null && _publishInfos.ContainsKey(culture);
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
@@ -247,8 +246,8 @@ namespace Umbraco.Core.Models
 
                 _publishInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
-                if (CultureNames.TryGetValue(culture, out var name))
-                    SetCultureInfo(culture, name.Name, date);
+                if (CultureInfos.TryGetValue(culture, out var infos))
+                    SetCultureInfo(culture, infos.Name, date);
             }
         }
 
@@ -260,7 +259,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, CultureName> PublishNames => _publishInfos ?? NoNames;
+        public IReadOnlyDictionary<string, ContentCultureInfos> PublishCultureInfos => _publishInfos ?? NoInfos;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -291,7 +290,7 @@ namespace Umbraco.Core.Models
 
             if (_publishInfos == null)
             {
-                _publishInfos = new CultureNameCollection();
+                _publishInfos = new ContentCultureInfosCollection();
                 _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
             }
 
@@ -338,13 +337,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Event handler for when the culture names collection is modified
+        /// Handles culture infos collection changes.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PublishNamesSelector);
+            OnPropertyChanged(Ps.Value.PublishCultureInfosSelector);
         }
 
         [IgnoreDataMember]
@@ -477,11 +474,12 @@ namespace Umbraco.Core.Models
             // if this entity's previous culture publish state (regardless of the rememberDirty flag)
             _publishInfosOrig = _publishInfos == null
                 ? null
-                : new CultureNameCollection(_publishInfos);
+                : new ContentCultureInfosCollection(_publishInfos);
 
-            if (_publishInfos != null)
-                foreach (var cultureName in _publishInfos)
-                    cultureName.ResetDirtyProperties(rememberDirty);
+            if (_publishInfos == null) return;
+
+            foreach (var infos in _publishInfos)
+                infos.ResetDirtyProperties(rememberDirty);
         }
 
         /// <summary>
@@ -509,18 +507,16 @@ namespace Umbraco.Core.Models
             clone.DisableChangeTracking();
 
             //need to manually clone this since it's not settable
-            clone._contentType = (IContentType)ContentType.DeepClone();
+            clone._contentType = (IContentType) ContentType.DeepClone();
 
             //if culture infos exist then deal with event bindings
             if (clone._publishInfos != null)
             {
-                clone._publishInfos.CollectionChanged -= this.PublishNamesCollectionChanged;    //clear this event handler if any
-                clone._publishInfos = (CultureNameCollection)_publishInfos.DeepClone();         //manually deep clone
-                clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;   //re-assign correct event handler
+                clone._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
+                clone._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
+                clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
 
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
             //re-enable tracking
             clone.EnableChangeTracking();
 

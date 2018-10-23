@@ -103,18 +103,17 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (PropertyGroup)base.DeepClone();
+
             //turn off change tracking
             clone.DisableChangeTracking();
 
             if (clone._propertyTypes != null)
             {
-                clone._propertyTypes.CollectionChanged -= this.PropertyTypesChanged;            //clear this event handler if any
-                clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();      //manually deep clone
-                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;           //re-assign correct event handler
+                clone._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
+                clone._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
+                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;       //re-assign correct event handler
             }
 
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
             //re-enable tracking
             clone.EnableChangeTracking();
 

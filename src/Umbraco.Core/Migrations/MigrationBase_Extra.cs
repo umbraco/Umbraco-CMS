@@ -18,10 +18,24 @@ namespace Umbraco.Core.Migrations
             AddColumn(table, table.Name, columnName);
         }
 
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            if (columns.Any(x => x.TableName.InvariantEquals(table.Name) && !x.ColumnName.InvariantEquals(columnName)))
+                AddColumn(table, table.Name, columnName);
+        }
+
         protected void AddColumn<T>(string tableName, string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             AddColumn(table, tableName, columnName);
+        }
+
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            if (columns.Any(x => x.TableName.InvariantEquals(tableName) && !x.ColumnName.InvariantEquals(columnName)))
+                AddColumn(table, tableName, columnName);
         }
 
         private void AddColumn(TableDefinition table, string tableName, string columnName)

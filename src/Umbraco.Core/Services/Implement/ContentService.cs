@@ -849,7 +849,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures that have changed
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureNames.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -1082,7 +1082,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        culturesChanging = string.Join(",", content.PublishNames.Where(x => x.Value.IsDirty()).Select(x => x.Key));
+                        culturesChanging = string.Join(",", content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key));
                     }
                 }
 
@@ -1865,7 +1865,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures changing for auditing
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureNames.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -2604,7 +2604,7 @@ namespace Umbraco.Core.Services.Implement
 
                     //Logging & Audit message
                     Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
-                    Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+                    Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
                 
                 scope.Complete();

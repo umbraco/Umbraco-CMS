@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -470,7 +469,8 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = (ContentTypeBase)base.DeepClone();
+            var clone = (ContentTypeBase) base.DeepClone();
+
             //turn off change tracking
             clone.DisableChangeTracking();
 
@@ -480,20 +480,18 @@ namespace Umbraco.Core.Models
                 // its ignored from the auto-clone process because its return values are unions, not raw and
                 // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
-                clone._noGroupPropertyTypes.CollectionChanged -= this.PropertyTypesChanged;            //clear this event handler if any
-                clone._noGroupPropertyTypes = (PropertyTypeCollection)_noGroupPropertyTypes.DeepClone();      //manually deep clone
-                clone._noGroupPropertyTypes.CollectionChanged += clone.PropertyTypesChanged;           //re-assign correct event handler
+                clone._noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;                    //clear this event handler if any
+                clone._noGroupPropertyTypes = (PropertyTypeCollection) _noGroupPropertyTypes.DeepClone(); //manually deep clone
+                clone._noGroupPropertyTypes.CollectionChanged += clone.PropertyTypesChanged;              //re-assign correct event handler
             }
 
             if (clone._propertyGroups != null)
             {
-                clone._propertyGroups.CollectionChanged -= this.PropertyGroupsChanged;            //clear this event handler if any
-                clone._propertyGroups = (PropertyGroupCollection)_propertyGroups.DeepClone();     //manually deep clone
-                clone._propertyGroups.CollectionChanged += clone.PropertyGroupsChanged;           //re-assign correct event handler
+                clone._propertyGroups.CollectionChanged -= PropertyGroupsChanged;              //clear this event handler if any
+                clone._propertyGroups = (PropertyGroupCollection) _propertyGroups.DeepClone(); //manually deep clone
+                clone._propertyGroups.CollectionChanged += clone.PropertyGroupsChanged;        //re-assign correct event handler
             }
             
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
             //re-enable tracking
             clone.EnableChangeTracking();
 

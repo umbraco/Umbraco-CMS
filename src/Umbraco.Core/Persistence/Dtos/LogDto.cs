@@ -5,11 +5,13 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Log)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class LogDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.Log;
+
         private int? _userId;
 
         [Column("id")]

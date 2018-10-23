@@ -53,23 +53,23 @@ namespace Umbraco.Tests.Models
             
             contentType.Variations = ContentVariation.Culture;
 
-            Assert.IsFalse(content.IsPropertyDirty("CultureNames"));    //hasn't been changed
+            Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //hasn't been changed
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.IsPropertyDirty("CultureNames"));     //now it will be changed since the collection has changed
-            var frCultureName = content.CultureNames[langFr];
+            Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //now it will be changed since the collection has changed
+            var frCultureName = content.CultureInfos[langFr];
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
             content.ResetDirtyProperties();
 
-            Assert.IsFalse(content.IsPropertyDirty("CultureNames"));    //it's been reset
-            Assert.IsTrue(content.WasPropertyDirty("CultureNames"));
+            Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //it's been reset
+            Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
-            Assert.IsTrue(content.IsPropertyDirty("CultureNames"));     //it's true now since we've updated a name
+            Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //it's true now since we've updated a name
         }
 
         [Test]
@@ -82,25 +82,25 @@ namespace Umbraco.Tests.Models
 
             contentType.Variations = ContentVariation.Culture;
 
-            Assert.IsFalse(content.IsPropertyDirty("PublishNames"));    //hasn't been changed
+            Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //hasn't been changed
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
             content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
-            Assert.IsTrue(content.IsPropertyDirty("PublishNames"));     //now it will be changed since the collection has changed
-            var frCultureName = content.PublishNames[langFr];
+            Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //now it will be changed since the collection has changed
+            var frCultureName = content.PublishCultureInfos[langFr];
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
             content.ResetDirtyProperties();
 
-            Assert.IsFalse(content.IsPropertyDirty("PublishNames"));    //it's been reset
-            Assert.IsTrue(content.WasPropertyDirty("PublishNames"));
+            Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //it's been reset
+            Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
 
             Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
             content.SetCultureName("name-fr", langFr);
             content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
             Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
-            Assert.IsTrue(content.IsPropertyDirty("PublishNames"));     //it's true now since we've updated a name
+            Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //it's true now since we've updated a name
         }
 
         [Test]

@@ -23,22 +23,22 @@ namespace Umbraco.Core.Collections
         /// Create new ObservableDictionary
         /// </summary>
         /// <param name="keySelector">Selector function to create key from value</param>
+        /// <param name="equalityComparer">The equality comparer to use when comparing keys, or null to use the default comparer.</param>
         public ObservableDictionary(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer = null)
-            : base()
         {
-            if (keySelector == null) throw new ArgumentException("keySelector");
-            KeySelector = keySelector;
+            KeySelector = keySelector ?? throw new ArgumentException("keySelector");
             Indecies = new Dictionary<TKey, int>(equalityComparer);
         }
 
         #region Protected Methods
+
         protected override void InsertItem(int index, TValue item)
         {
             var key = KeySelector(item);
             if (Indecies.ContainsKey(key))
                 throw new DuplicateKeyException(key.ToString());
 
-            if (index != this.Count)
+            if (index != Count)
             {
                 foreach (var k in Indecies.Keys.Where(k => Indecies[k] >= index).ToList())
                 {
@@ -48,7 +48,6 @@ namespace Umbraco.Core.Collections
 
             base.InsertItem(index, item);
             Indecies[key] = index;
-
         }
 
         protected override void ClearItems()
@@ -56,7 +55,6 @@ namespace Umbraco.Core.Collections
             base.ClearItems();
             Indecies.Clear();
         }
-
 
         protected override void RemoveItem(int index)
         {
@@ -72,6 +70,7 @@ namespace Umbraco.Core.Collections
                 Indecies[k]--;
             }
         }
+
         #endregion
 
         public bool ContainsKey(TKey key)
@@ -87,7 +86,7 @@ namespace Umbraco.Core.Collections
         public TValue this[TKey key]
         {
 
-            get { return this[Indecies[key]]; }
+            get => this[Indecies[key]];
             set
             {
                 //confirm key matches
@@ -96,7 +95,7 @@ namespace Umbraco.Core.Collections
 
                 if (!Indecies.ContainsKey(key))
                 {
-                    this.Add(value);
+                    Add(value);
                 }
                 else
                 {
@@ -116,6 +115,7 @@ namespace Umbraco.Core.Collections
         public bool Replace(TKey key, TValue value)
         {
             if (!Indecies.ContainsKey(key)) return false;
+
             //confirm key matches
             if (!KeySelector(value).Equals(key))
                 throw new InvalidOperationException("Key of new value does not match");
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Collections
         {
             if (!Indecies.ContainsKey(key)) return false;
 
-            this.RemoveAt(Indecies[key]);
+            RemoveAt(Indecies[key]);
             return true;
 
         }
@@ -145,6 +145,7 @@ namespace Umbraco.Core.Collections
             {
                 throw new InvalidOperationException("No item with the key " + currentKey + "was found in the collection");
             }
+
             if (ContainsKey(newKey))
             {
                 throw new DuplicateKeyException(newKey.ToString());
@@ -184,10 +185,7 @@ namespace Umbraco.Core.Collections
         //this will never be used
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values.ToList();
 
-        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly
-        {
-            get { return false; }
-        }
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
         {
@@ -227,14 +225,13 @@ namespace Umbraco.Core.Collections
 
         internal class DuplicateKeyException : Exception
         {
-
-            public string Key { get; private set; }
             public DuplicateKeyException(string key)
-                : base("Attempted to insert duplicate key " + key + " in collection")
+                : base("Attempted to insert duplicate key \"" + key + "\" in collection.")
             {
                 Key = key;
             }
-        }
 
+            public string Key { get; }
+        }
     }
 }

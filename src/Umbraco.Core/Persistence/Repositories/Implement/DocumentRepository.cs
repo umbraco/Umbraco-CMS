@@ -372,8 +372,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.CultureNames)
-                    if (name.Name != content.GetPublishName(culture))
+                foreach (var (culture, infos) in content.CultureInfos)
+                    if (infos.Name != content.GetPublishName(culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
                 // insert content variations
@@ -534,8 +534,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.CultureNames)
-                    if (name.Name != content.GetPublishName(culture))
+                foreach (var (culture, infos) in content.CultureInfos)
+                    if (infos.Name != content.GetPublishName(culture))
                     {
                         edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
@@ -1131,7 +1131,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
             // create dtos for the 'current' (non-published) version, all cultures
-            foreach (var (culture, name) in content.CultureNames)
+            foreach (var (culture, name) in content.CultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
@@ -1146,7 +1146,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishNames)
+            foreach (var (culture, name) in content.PublishCultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
@@ -1219,15 +1219,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 // content varies by culture
                 // then it must have at least a variant name, else it makes no sense
-                if (content.CultureNames.Count == 0)
+                if (content.CultureInfos.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
                 // and then, we need to set the invariant name implicitely,
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                content.Name = defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName)
+                content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)
                     ? cultureName.Name
-                    : content.CultureNames.First().Value.Name;
+                    : content.CultureInfos.First().Value.Name;
             }
             else
             {
@@ -1260,7 +1260,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureVariantNamesAreUnique(Content content, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureNames.Count == 0) return;
+            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
 
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
@@ -1274,7 +1274,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
-            foreach (var (culture, name) in content.CultureNames)
+            foreach (var (culture, name) in content.CultureInfos)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(culture);
                 if (!langId.HasValue) continue;
@@ -1288,7 +1288,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishNames.ContainsKey(culture))
+                if (publishing && content.PublishCultureInfos.ContainsKey(culture))
                     content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }

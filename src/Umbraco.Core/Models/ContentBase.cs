@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Web;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
@@ -20,14 +18,14 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-        protected static readonly CultureNameCollection NoNames = new CultureNameCollection();
+        protected static readonly ContentCultureInfosCollection NoInfos = new ContentCultureInfosCollection();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private CultureNameCollection _cultureInfos;
+        private ContentCultureInfosCollection _cultureInfos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -70,7 +68,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo CultureNamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, CultureName>>(x => x.CultureNames);
+            public readonly PropertyInfo CultureInfosSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.CultureInfos);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -160,7 +158,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, CultureName> CultureNames => _cultureInfos ?? NoNames;
+        public virtual IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos => _cultureInfos ?? NoInfos;
         
         /// <inheritdoc />
         public string GetCultureName(string culture)
@@ -207,17 +205,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        //fixme: this isn't used anywhere
-        internal void TouchCulture(string culture)
-        {
-            if (ContentTypeBase.VariesByCulture() && _cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
-                _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
-        }
-
         protected void ClearCultureInfos()
         {
-            if (_cultureInfos != null)
-                _cultureInfos.Clear();
+            _cultureInfos?.Clear();
             _cultureInfos = null;
         }
 
@@ -243,21 +233,19 @@ namespace Umbraco.Core.Models
 
             if (_cultureInfos == null)
             {
-                _cultureInfos = new CultureNameCollection();
-                _cultureInfos.CollectionChanged += CultureNamesCollectionChanged;
+                _cultureInfos = new ContentCultureInfosCollection();
+                _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
             }   
 
             _cultureInfos.AddOrUpdate(culture, name, date);
         }
 
         /// <summary>
-        /// Event handler for when the culture names collection is modified
+        /// Handles culture infos collection changes.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CultureNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void CultureInfosCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.CultureNamesSelector);
+            OnPropertyChanged(Ps.Value.CultureInfosSelector);
         }
 
         #endregion
@@ -370,10 +358,10 @@ namespace Umbraco.Core.Models
             if (culture == null || culture == "*")
                 Name = other.Name;
 
-            foreach (var (otherCulture, otherName) in other.CultureNames)
+            foreach (var (otherCulture, otherInfos) in other.CultureInfos)
             {
                 if (culture == "*" || culture == otherCulture)
-                    SetCultureName(otherName.Name, otherCulture);
+                    SetCultureName(otherInfos.Name, otherCulture);
             }
         }
 
@@ -406,10 +394,11 @@ namespace Umbraco.Core.Models
             foreach (var prop in Properties)
                 prop.ResetDirtyProperties(rememberDirty);
 
-            // take care of culture names
-            if (_cultureInfos != null)
-                foreach (var cultureName in _cultureInfos)
-                    cultureName.ResetDirtyProperties(rememberDirty);
+            // take care of culture infos
+            if (_cultureInfos == null) return;
+
+            foreach (var cultureInfo in _cultureInfos)
+                cultureInfo.ResetDirtyProperties(rememberDirty);
         }
 
         /// <inheritdoc />
@@ -482,34 +471,33 @@ namespace Umbraco.Core.Models
 
         #endregion
 
-        /// <summary>
-        /// Override to deal with specific object instances
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
+        /// <remarks>
+        /// Overriden to deal with specific object instances
+        /// </remarks>
         public override object DeepClone()
         {
-            var clone = (ContentBase)base.DeepClone();
+            var clone = (ContentBase) base.DeepClone();
+
             //turn off change tracking
             clone.DisableChangeTracking();
 
             //if culture infos exist then deal with event bindings
             if (clone._cultureInfos != null)
             {
-                clone._cultureInfos.CollectionChanged -= this.CultureNamesCollectionChanged;    //clear this event handler if any
-                clone._cultureInfos = (CultureNameCollection)_cultureInfos.DeepClone();         //manually deep clone
-                clone._cultureInfos.CollectionChanged += clone.CultureNamesCollectionChanged;   //re-assign correct event handler
+                clone._cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;          //clear this event handler if any
+                clone._cultureInfos = (ContentCultureInfosCollection) _cultureInfos.DeepClone(); //manually deep clone
+                clone._cultureInfos.CollectionChanged += clone.CultureInfosCollectionChanged;    //re-assign correct event handler
             }
 
             //if properties exist then deal with event bindings
             if (clone._properties != null)
             {
-                clone._properties.CollectionChanged -= this.PropertiesChanged;    //clear this event handler if any
-                clone._properties = (PropertyCollection)_properties.DeepClone();  //manually deep clone
+                clone._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
+                clone._properties = (PropertyCollection) _properties.DeepClone(); //manually deep clone
                 clone._properties.CollectionChanged += clone.PropertiesChanged;   //re-assign correct event handler
             }
 
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
             //re-enable tracking
             clone.EnableChangeTracking();
 

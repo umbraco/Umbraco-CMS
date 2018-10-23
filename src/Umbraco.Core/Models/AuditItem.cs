@@ -5,12 +5,8 @@ namespace Umbraco.Core.Models
     public sealed class AuditItem : EntityBase, IAuditItem
     {
         /// <summary>
-        /// Constructor for creating an item to be created
+        /// Initializes a new instance of the <see cref="AuditItem"/> class.
         /// </summary>
-        /// <param name="objectId"></param>
-        /// <param name="comment"></param>
-        /// <param name="type"></param>
-        /// <param name="userId"></param>
         public AuditItem(int objectId, AuditType type, int userId, string entityType, string comment = null, string parameters = null)
         {
             DisableChangeTracking();
@@ -25,14 +21,19 @@ namespace Umbraco.Core.Models
             EnableChangeTracking();
         }
 
-        public string Comment { get; }
+        /// <inheritdoc/>
+        public AuditType AuditType { get; }
 
         /// <inheritdoc/>
         public string EntityType { get; }
+
+        /// <inheritdoc/>
+        public int UserId { get; }
+
+        /// <inheritdoc/>
+        public string Comment { get; }
+
         /// <inheritdoc/>
         public string Parameters { get; }
-
-        public AuditType AuditType { get; }
-        public int UserId { get; }     
     }
 }
