@@ -1838,6 +1838,8 @@ namespace Umbraco.Core.Services.Implement
                 sendToPublishEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
                 Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+
+                scope.Complete();
             }
 
             return true;
