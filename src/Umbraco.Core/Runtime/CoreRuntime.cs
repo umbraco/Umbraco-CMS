@@ -307,9 +307,9 @@ namespace Umbraco.Core.Runtime
                 throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
             }
 
-            // if we already know we want to upgrade, no need to look for migrations...
-            if (_state.Level == RuntimeLevel.Upgrade)
-                return;
+            // if we already know we want to upgrade,
+            // still run EnsureUmbracoUpgradeState to get the states
+            // (v7 will just get a null state, that's ok)
 
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet

@@ -188,7 +188,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
                             alias: "unpublish",
-                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
+                            addEllipsis: "true"
                         };
                     case "SCHEDULE":
                         //schedule publish - schedule doesn't have a permission letter so
