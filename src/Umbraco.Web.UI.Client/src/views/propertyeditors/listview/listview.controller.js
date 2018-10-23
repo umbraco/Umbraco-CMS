@@ -614,10 +614,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
               });
           });
 
-          if (listViewAllowedTypes.length == 1 && blueprints == false) {
+          if (listViewAllowedTypes.length === 1 && blueprints === false) {
               $scope.createAllowedButtonSingle = true;
           }
-          if (listViewAllowedTypes.length == 1 && blueprints == true) {
+          if (listViewAllowedTypes.length === 1 && blueprints === true) {
               $scope.createAllowedButtonSingleWithBlueprints = true;
           }
           if (listViewAllowedTypes.length > 1) {

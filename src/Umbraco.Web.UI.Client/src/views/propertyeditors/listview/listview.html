@@ -12,29 +12,31 @@
 
                <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
 
-                   <div class="btn-group" ng-show="createAllowedButtonSingle == true">
+                   <div class="btn-group" ng-show="createAllowedButtonSingle">
                        <a class="btn" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </a>
                    </div>
 
-                   <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints == true">
+                   <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                            </span>
                            <span class="caret"></span>
                        </a>
+
                        <ul class="dropdown-menu">
                            <li ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints">
-                               <a ng-click="createFromBlueprint(entityType,listViewAllowedTypes[0].alias , key)">
-                                   <localize key="actions_create">Create</localize> {{value}}
+                               <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].blueprints.alias, key)">
+                                   <i class="{{listViewAllowedTypes[0].icon}}"></i>
+                                   {{value}}
                                </a>
                            </li>
                        </ul>
                    </div>
 
-                   <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints == true">
+                   <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
@@ -48,7 +50,7 @@
                                <a ng-repeat="(key, value) in contentType.blueprints" ng-click="createFromBlueprint(entityType,contentType.alias , key)">
                                    &nbsp;&nbsp;<i class="{{contentType.icon}}"></i>
                                    {{value}}
-                               </a>   
+                               </a>
                            </li>
                        </ul>
                    </div>
