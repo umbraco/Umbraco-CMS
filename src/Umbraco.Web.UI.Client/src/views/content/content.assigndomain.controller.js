@@ -92,6 +92,13 @@
             vm.submitButtonState = "busy";
 
             if (vm.domainForm.$valid) {
+
+                // clear validation messages
+                vm.domains.forEach(domain => {
+                    domain.duplicate = null;
+                    domain.other = null;
+                });
+
                 var data = {
                     nodeId: $scope.currentNode.id,
                     domains: vm.domains.map(function (d) {
@@ -102,8 +109,27 @@
                     }),
                     language: vm.language != null ? vm.language.id : 0
                 };
-                contentResource.saveLanguageAndDomains(data).then(function () {
-                    vm.submitButtonState = "success";
+
+                contentResource.saveLanguageAndDomains(data).then(function (response) {
+
+                    // validation is interesting. Check if response is valid
+                    if(response.valid) {
+
+                        vm.submitButtonState = "success";
+
+                    // show validation messages for each domain
+                    } else {
+                        response.domains.forEach(validation => {
+                            vm.domains.forEach(domain => {
+                                if(validation.name === domain.name) {
+                                    domain.duplicate = validation.duplicate;
+                                    domain.other = validation.other;
+                                }
+                            });
+                        });
+                        vm.submitButtonState = "error";
+                    }
+
                 }, function (e) {
                     vm.submitButtonState = "error";
                 });
