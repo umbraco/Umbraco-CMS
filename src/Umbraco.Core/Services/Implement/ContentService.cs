@@ -475,6 +475,19 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by Id
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetAllVersionsSlim(id, skip, take);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of all version Ids for the given content item ordered so latest is first
         /// </summary>
         /// <param name="id"></param>
@@ -1825,6 +1838,8 @@ namespace Umbraco.Core.Services.Implement
                 sendToPublishEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
                 Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+
+                scope.Complete();
             }
 
             return true;
@@ -2487,6 +2502,69 @@ namespace Umbraco.Core.Services.Implement
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
         {
             DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+        }
+
+        #endregion
+
+        #region Rollback
+
+        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            
+            //Get the current copy of the node
+            var content = GetById(id);
+
+            //Get the version
+            var version = GetVersion(versionId);
+
+            //Good ole null checks
+            if (content == null || version == null)
+            {
+                return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            }
+
+            //Store the result of doing the save of content for the rollback
+            OperationResult rollbackSaveResult;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
+
+                //Emit RollingBack event aka before
+                if (scope.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
+                {
+                    scope.Complete();
+                    return OperationResult.Cancel(evtMsgs);
+                }
+
+                //Copy the changes from the version
+                content.CopyFrom(version, culture);
+
+                //Save the content for the rollback
+                rollbackSaveResult = Save(content, userId);
+
+                //Depending on the save result - is what we log & audit along with what we return
+                if (rollbackSaveResult.Success == false)
+                {
+                    //Log the error/warning
+                    Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                }
+                else
+                {
+                    //Emit RolledBack event aka after
+                    rollbackEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
+
+                    //Logging & Audit message
+                    Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Audit(AuditType.RollBack, $"Content '{content.Name}' was rolled back to version '{versionId}'", userId, id);
+                }
+                
+                scope.Complete();
+            }
+
+            return rollbackSaveResult;
         }
 
         #endregion
