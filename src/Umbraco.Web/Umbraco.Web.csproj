@@ -180,6 +180,7 @@
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
@@ -201,7 +202,6 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
@@ -1248,9 +1248,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

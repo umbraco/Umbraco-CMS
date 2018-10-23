@@ -109,11 +109,23 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                    $http.post(umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostMove"),
-                         {
-                             parentId: args.parentId,
-                             id: args.id
+                        {
+                            parentId: args.parentId,
+                            id: args.id
                          }, {responseType: 'text'}),
-                   'Failed to move media');
+                        {
+                        error: function(data){
+                            var errorMsg = 'Failed to move media';
+
+                            if(data.parentId === data.id){
+                                errorMsg = 'Media can\'t be moved into itself';
+                            }
+
+                            return {
+                                errorMsg: errorMsg
+                            };
+                       }
+                   });
         },
 
 

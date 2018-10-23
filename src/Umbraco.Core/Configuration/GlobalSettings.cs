@@ -61,7 +61,8 @@ namespace Umbraco.Core.Configuration
 
             var config = WebConfigurationManager.OpenWebConfiguration(appPath);
             var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            if (settings == null || settings.Smtp == null) return false;
+            // note: "noreply@example.com" is/was the sample SMTP from email - we'll regard that as "not configured"
+            if (settings == null || settings.Smtp == null || "noreply@example.com".Equals(settings.Smtp.From, StringComparison.OrdinalIgnoreCase)) return false;
             if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
                 return true;
             if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)

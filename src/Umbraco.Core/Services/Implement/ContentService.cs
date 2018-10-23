@@ -1887,6 +1887,9 @@ namespace Umbraco.Core.Services.Implement
                         Audit(AuditType.SendToPublish, content.WriterId, content.Id);
                 }
 
+                // fixme here, on only on success?                
+                scope.Complete();
+
                 return saveResult.Success;
             }
         }
@@ -1991,7 +1994,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents && published.Any())
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
-            Audit(AuditType.Sort, userId, 0);
+            Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
             return true;
         }
 
