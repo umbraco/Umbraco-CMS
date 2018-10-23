@@ -648,6 +648,26 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets the total number of Members based on the memberAlias
+        /// </summary>
+        /// <param name="memberAlias">memberAlias to count by</param>
+        /// <returns><see cref="System.int"/> with number of Members for passed in type</returns>
+        public int GetCount(string memberAlias)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
+
+                IQuery<IMember> query;
+                int ret;
+                query = Query<IMember>.Builder.Where(x => ((Member)x).PropertyTypeAlias == Constants.Conventions.MemberTypes.SystemDefaultProtectType);
+                ret = repository.GetCountByQuery(query);
+
+                return ret;
+            }
+        }
+
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords)
