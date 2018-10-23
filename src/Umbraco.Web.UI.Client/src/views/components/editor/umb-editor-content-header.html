@@ -44,7 +44,7 @@
                                 <span class="umb-variant-switcher__name">{{variant.language.name}}</span>
                                 <umb-variant-state variant="variant" class="umb-variant-switcher__state"></umb-variant-state>
                             </a>
-                            <div ng-if="splitViewOpen !== true && !variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
+                            <div ng-if="splitViewOpen !== true && !variant.active" class="umb-variant-switcher__split-view icon icon-split" ng-click="openInSplitView($event, variant)" title="Open in split view"></div>
                         </umb-dropdown-item>
                     </umb-dropdown>
 
@@ -79,4 +79,3 @@
     </div>
 
 </div>
-    
