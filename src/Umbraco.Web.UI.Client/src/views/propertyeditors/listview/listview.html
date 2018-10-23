@@ -42,16 +42,13 @@
                        <ul class="dropdown-menu">
                            <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
                                <a ng-click="createBlank(entityType,contentType.alias)">
-                                   <i class="icon-{{contentType.cssClass}}"></i>
-                                   {{contentType.name}}
+                                   <i class="{{contentType.icon}}"></i>
+                                   {{contentType.name}} <span ng-show="contentType.blueprints && contentType.blueprints.length != 0" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </a>
-                               <ul>
-                                   <li ng-repeat="(key, value) in contentType.blueprints">
-                                       <a ng-click="createFromBlueprint(entityType,contentType.alias , key)">
-                                           <localize key="actions_create">Create</localize> {{value}}
-                                       </a>
-                                   </li>
-                               </ul>
+                               <a ng-repeat="(key, value) in contentType.blueprints" ng-click="createFromBlueprint(entityType,contentType.alias , key)">
+                                   &nbsp;&nbsp;<i class="{{contentType.icon}}"></i>
+                                   {{value}}
+                               </a>   
                            </li>
                        </ul>
                    </div>
