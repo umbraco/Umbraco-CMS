@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }
-        public virtual bool IsUnique { get; set; }
+        
         public bool IsClustered { get; set; }
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
         public IndexTypes IndexType { get; set; }

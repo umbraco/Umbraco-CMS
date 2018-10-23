@@ -115,8 +115,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Column
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
-                TableName = Expression.TableName,
-                IsUnique = true,
+                TableName = Expression.TableName,               
                 IndexType = IndexTypes.UniqueNonClustered
             });
 

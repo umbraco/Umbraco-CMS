@@ -47,8 +47,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Index
         }
 
         ICreateIndexOnColumnSyntax ICreateIndexColumnOptionsSyntax.Unique()
-        {
-            Expression.Index.IsUnique = true;
+        {           
             //if it is Unique then it must be unique nonclustered and set the other flags
             Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
             Expression.Index.IsClustered = false;
@@ -59,26 +58,23 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Index
         {
             Expression.Index.IndexType = IndexTypes.NonClustered;
             Expression.Index.IsClustered = false;
-            Expression.Index.IndexType = IndexTypes.NonClustered;
-            Expression.Index.IsUnique = false;
+           
             return this;
         }
 
         public ICreateIndexOnColumnSyntax Clustered()
-        {
-            Expression.Index.IndexType = IndexTypes.Clustered;
-            Expression.Index.IsClustered = true;
+        {           
             //if it is clustered then we have to change the index type set the other flags
             Expression.Index.IndexType = IndexTypes.Clustered;
             Expression.Index.IsClustered = true;
-            Expression.Index.IsUnique = false;
+           
             return this;
         }
 
         ICreateIndexOnColumnSyntax ICreateIndexOptionsSyntax.Unique()
         {
             Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
-            Expression.Index.IsUnique = true;
+           
             return this;
         }
     }

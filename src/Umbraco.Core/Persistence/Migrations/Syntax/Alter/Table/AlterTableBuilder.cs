@@ -125,8 +125,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
-                TableName = Expression.TableName,
-                IsUnique = true,
+                TableName = Expression.TableName,               
                 IndexType = IndexTypes.UniqueNonClustered
             });
 
