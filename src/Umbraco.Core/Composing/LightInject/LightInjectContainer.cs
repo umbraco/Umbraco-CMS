@@ -286,6 +286,10 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.RegisterInstance(serviceType, instance);
 
         /// <inheritdoc />
+        public void RegisterInstance(Type serviceType, object instance, string name)
+            => Container.RegisterInstance(serviceType, instance, name);
+
+        /// <inheritdoc />
         public void RegisterAuto(Type serviceBaseType)
         {
             Container.RegisterFallback((serviceType, serviceName) =>

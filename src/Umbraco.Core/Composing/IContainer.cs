@@ -120,6 +120,11 @@ namespace Umbraco.Core.Composing
         void RegisterInstance(Type serviceType, object instance);
 
         /// <summary>
+        /// Registers a service with a named implementing instance.
+        /// </summary>
+        void RegisterInstance(Type serviceType, object instance, string name);
+
+        /// <summary>
         /// Registers a base type for auto-registration.
         /// </summary>
         /// <remarks>
