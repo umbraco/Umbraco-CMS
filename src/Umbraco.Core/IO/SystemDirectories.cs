@@ -16,6 +16,7 @@ namespace Umbraco.Core.IO
 
         public static string Install => IOHelper.ReturnPath("umbracoInstallPath", "~/install");
 
+        //TODO: Consider removing this
         public static string Masterpages => IOHelper.ReturnPath("umbracoMasterPagesPath", "~/masterpages");
 
         //NOTE: this is not configurable and shouldn't need to be
@@ -37,6 +38,7 @@ namespace Umbraco.Core.IO
 
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
+        //TODO: Consider removing this
         public static string UserControls => IOHelper.ReturnPath("umbracoUsercontrolsPath", "~/usercontrols");
 
         public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
