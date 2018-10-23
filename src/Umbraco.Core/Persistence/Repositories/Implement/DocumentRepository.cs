@@ -985,7 +985,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (properties.ContainsKey(temp.VersionId))
                     temp.Content.Properties = properties[temp.VersionId];
                 else
-                    throw new InvalidOperationException($"No property data found for version: '{cc.Version}'.");
+                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
 
                 // reset dirty initial properties (U4-1946)
                 temp.Content.ResetDirtyProperties(false);

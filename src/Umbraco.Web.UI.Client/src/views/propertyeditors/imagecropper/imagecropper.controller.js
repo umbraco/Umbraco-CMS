@@ -130,7 +130,8 @@ angular.module('umbraco')
          * @param {any} crop
          */
         function crop(crop) {
-            $scope.currentCrop = crop;
+            // clone the crop so we can discard the changes
+            $scope.currentCrop = angular.copy(crop);
             $scope.currentPoint = null;
 
             //set form to dirty to track changes

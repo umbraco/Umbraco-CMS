@@ -105,7 +105,11 @@ namespace Umbraco.Web.PropertyEditors
 
             // handle useLabel
             if (editorValues.TryGetValue("useLabel", out var useLabelObj))
-                output.UseLabel = useLabelObj.TryConvertTo<bool>();
+            {
+                var convertBool = useLabelObj.TryConvertTo<bool>();
+                if (convertBool.Success)
+                    output.UseLabel = convertBool.Result;
+            }   
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;
@@ -124,7 +128,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var id = item.Property("id")?.Value?.Value<int>() ?? 0;
                 if (id >= nextId) nextId = id + 1;
-                
+
                 var label = item.Property("label")?.Value?.Value<string>();
                 value = JsonConvert.SerializeObject(new { value, label });
 

@@ -108,7 +108,7 @@
                         }
                         else {
                             // From: https://stackoverflow.com/a/51789597/5018
-                            var type = vm.src.substring(vm.src.indexOf("/") + 1, scope.src.indexOf(";base64"));
+                            var type = vm.src.substring(vm.src.indexOf("/") + 1, vm.src.indexOf(";base64"));
                             if (type.startsWith("svg")) {
                                 vm.isCroppable = false;
                                 vm.hasDimensions = false;
