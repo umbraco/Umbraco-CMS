@@ -266,6 +266,10 @@
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
+    <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
