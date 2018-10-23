@@ -9,8 +9,6 @@ namespace Umbraco.Core.IO
         //TODO: Why on earth is this even configurable? You cannot change the /Bin folder in ASP.Net
         public static string Bin => IOHelper.ReturnPath("umbracoBinDirectory", "~/bin");
 
-        public static string Base => IOHelper.ReturnPath("umbracoBaseDirectory", "~/base");
-
         public static string Config => IOHelper.ReturnPath("umbracoConfigDirectory", "~/config");
 
         public static string Css => IOHelper.ReturnPath("umbracoCssDirectory", "~/css");
