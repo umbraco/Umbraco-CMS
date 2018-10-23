@@ -23,7 +23,7 @@ We recommend running the site with the Visual Studio since you'll be able to rem
 
 ### Making code changes
 
-* _[The process for making code changes in v8 is the same as v7](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/docs/CONTRIBUTING.md)_
+* _[The process for making code changes in v8 is the same as v7](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md)_
 * Any .NET changes you make you just need to compile
 * Any Angular/JS changes you make you will need to make sure you are running the Gulp build. Easiest way to do this is from within Visual Studio in the `Task Runner Explorer`. You can find this window by pressing `ctrl + q` and typing in `Task Runner Explorer`. In this window you'll see all Gulp tasks, double click on the `dev` task, this will compile the angular solution and start a file watcher, then any html/js changes you make are automatically built.  
 * When making js changes, you should have the chrome developer tools open to ensure that cache is disabled

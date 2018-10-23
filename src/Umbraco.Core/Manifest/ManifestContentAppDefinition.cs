@@ -20,7 +20,8 @@ namespace Umbraco.Core.Manifest
     //     show: [                  // optional, default is always show
     //       '-content/foo',        // hide for content type 'foo'
     //       '+content/*',          // show for all other content types
-    //       '+media/*'             // show for all media types
+    //       '+media/*',            // show for all media types
+    //       '+role/admin'          // show for admin users. Role based permissions will override others.
     //     ]
     //   },
     //   ...

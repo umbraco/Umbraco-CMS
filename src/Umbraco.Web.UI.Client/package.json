@@ -44,6 +44,7 @@
     "@babel/preset-env": "^7.1.0",
     "autoprefixer": "^6.5.0",
     "bower-installer": "^1.2.0",
+    "gulp-clean-css": "3.10.0",
     "cssnano": "^3.7.6",
     "gulp": "^3.9.1",
     "gulp-babel": "^8.0.0-beta.2",

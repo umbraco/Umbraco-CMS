@@ -2,7 +2,12 @@
 // Container styles
 // --------------------------------------------------
 .umb-property-editor {
-  min-width:66.6%;
+    @media (max-width: 800px) {
+        width: 100%;
+    }
+    @media (min-width: 800px) {
+      min-width:66.6%;
+    }
 
 	&-pull {
 		float:left;

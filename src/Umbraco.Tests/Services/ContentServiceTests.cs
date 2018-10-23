@@ -25,6 +25,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using System.Reflection;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Services
 {
@@ -2415,6 +2416,22 @@ namespace Umbraco.Tests.Services
             }
             Console.WriteLine("-");
 
+            var versionsSlim = ServiceContext.ContentService.GetVersionsSlim(page.Id, 0, 50).ToArray();
+            Assert.AreEqual(5, versionsSlim.Length);
+
+            for (var i = 0; i < 5; i++)
+            {
+                Console.Write("[{0}] ", i);
+                Console.WriteLine(versionsSlim[i].UpdateDate.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versionsSlim[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versionsSlim[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+            }
+            Console.WriteLine("-");
+
+            // what we do in the controller to get rollback versions
+            var versionsSlimFr = versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate("fr")).ToArray();
+            Assert.AreEqual(3, versionsSlimFr.Length);
+
             // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
             // that we cannot synchronize dates the way we do with publish dates - and so this
             // would fail - the version UpdateDate is greater than the cultures'.
@@ -2828,6 +2845,107 @@ namespace Umbraco.Tests.Services
                 contentService.Save(child);
                 Assert.AreEqual("child" + (i == 0 ? "" : " (" + i + ")"), child.GetCultureName(langUk.IsoCode));
             }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children_WithFilterAndOrder()
+        {
+            var languageService = ServiceContext.LocalizationService;
+
+            var langUk = new Language("en-UK") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+            var langDa = new Language("da-DK");
+
+            languageService.Save(langFr);
+            languageService.Save(langUk);
+            languageService.Save(langDa);
+
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = contentTypeService.Get("umbTextpage");
+            contentType.Variations = ContentVariation.Culture;
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            var o = new[] { 2, 1, 3, 0, 4 }; // randomly different
+            for (var i = 0; i < 5; i++)
+            {
+                var contentA = new Content(null, -1, contentType);
+                contentA.SetCultureName("contentA" + i + "uk", langUk.IsoCode);
+                contentA.SetCultureName("contentA" + o[i] + "fr", langFr.IsoCode);
+                contentA.SetCultureName("contentX" + i + "da", langDa.IsoCode);
+                contentService.Save(contentA);
+
+                var contentB = new Content(null, -1, contentType);
+                contentB.SetCultureName("contentB" + i + "uk", langUk.IsoCode);
+                contentB.SetCultureName("contentB" + o[i] + "fr", langFr.IsoCode);
+                contentB.SetCultureName("contentX" + i + "da", langDa.IsoCode);
+                contentService.Save(contentB);
+            }
+
+            // get all
+            var list = contentService.GetPagedChildren(-1, 0, 100, out var total).ToList();
+
+            Console.WriteLine("ALL");
+            WriteList(list);
+
+            // 10 items (there's already a Home content in there...)
+            Assert.AreEqual(11, total);
+            Assert.AreEqual(11, list.Count);
+
+            // filter
+            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+                SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
+                Ordering.By("name", culture: langFr.IsoCode)).ToList();
+
+            Assert.AreEqual(0, total);
+            Assert.AreEqual(0, list.Count);
+
+            // filter
+            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+                SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
+                Ordering.By("name", culture: langDa.IsoCode)).ToList();
+
+            Console.WriteLine("FILTER BY NAME da:'contentX'");
+            WriteList(list);
+
+            Assert.AreEqual(10, total);
+            Assert.AreEqual(10, list.Count);
+
+            // filter
+            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+                SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
+                Ordering.By("name", culture: langFr.IsoCode)).ToList();
+
+            Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER ASC");
+            WriteList(list);
+
+            Assert.AreEqual(5, total);
+            Assert.AreEqual(5, list.Count);
+
+            for (var i = 0; i < 5; i++)
+                Assert.AreEqual("contentA" + i + "fr", list[i].GetCultureName(langFr.IsoCode));
+
+            list = contentService.GetPagedChildren(-1, 0, 100, out total,
+                SqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
+                Ordering.By("name", direction: Direction.Descending, culture: langFr.IsoCode)).ToList();
+
+            Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER DESC");
+            WriteList(list);
+
+            Assert.AreEqual(5, total);
+            Assert.AreEqual(5, list.Count);
+
+            for (var i = 0; i < 5; i++)
+                Assert.AreEqual("contentA" + (4-i) + "fr", list[i].GetCultureName(langFr.IsoCode));
+        }
+
+        private void WriteList(List<IContent> list)
+        {
+            foreach (var content in list)
+                Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-UK"), content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
+            Console.WriteLine("-");
         }
 
         [Test]
