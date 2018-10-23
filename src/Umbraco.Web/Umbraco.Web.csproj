@@ -147,6 +147,7 @@
     <Compile Include="Media\TypeDetector\SvgDetector.cs" />
     <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
     <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
@@ -200,7 +202,6 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
-    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
@@ -1248,9 +1249,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1310,12 +1309,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
-      <DependentUpon>rollBack.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
-      <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
@@ -1401,9 +1394,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
@@ -1457,10 +1447,7 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="umbraco.presentation\umbraco\settings\" />
-    <Folder Include="umbraco.presentation\umbraco\translation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
     copied from Microsoft.CSharp.targets

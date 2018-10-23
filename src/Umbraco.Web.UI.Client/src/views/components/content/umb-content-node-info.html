@@ -2,7 +2,7 @@
 
     <div class="umb-package-details__main-content">
 
-        <umb-box data-element="node-info-urls">
+        <umb-box ng-if="node.urls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
@@ -41,7 +41,19 @@
         </umb-box>
 
         <umb-box data-element="node-info-history">
-            <umb-box-header title-key="general_history"></umb-box-header>
+
+            <umb-box-header
+                title-key="general_history">
+                <umb-button
+                    type="button"
+                    button-style="outline"
+                    action="openRollback()"
+                    label-key="actions_rollback"
+                    size="xs"
+                    add-ellipsis="true">
+                </umb-button>
+            </umb-box-header>
+
             <umb-box-content class="block-form">
 
                 <div style="position: relative;">

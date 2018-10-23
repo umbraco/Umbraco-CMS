@@ -36,7 +36,6 @@ angular.module('umbraco.mocks').
                   "actions_sendtopublish": "Send To Publish",
                   "actions_sendToTranslate": "Send To Translation",
                   "actions_sort": "Sort",
-                  "actions_toPublish": "Send to publication",
                   "actions_translate": "Translate",
                   "actions_update": "Update",
                   "actions_exportContourForm": "Export form",

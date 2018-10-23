@@ -2330,6 +2330,22 @@ namespace Umbraco.Tests.Services
             }
             Console.WriteLine("-");
 
+            var versionsSlim = ServiceContext.ContentService.GetVersionsSlim(page.Id, 0, 50).ToArray();
+            Assert.AreEqual(5, versionsSlim.Length);
+
+            for (var i = 0; i < 5; i++)
+            {
+                Console.Write("[{0}] ", i);
+                Console.WriteLine(versionsSlim[i].UpdateDate.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versionsSlim[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versionsSlim[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+            }
+            Console.WriteLine("-");
+
+            // what we do in the controller to get rollback versions
+            var versionsSlimFr = versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate("fr")).ToArray();
+            Assert.AreEqual(3, versionsSlimFr.Length);
+
             // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
             // that we cannot synchronize dates the way we do with publish dates - and so this
             // would fail - the version UpdateDate is greater than the cultures'.

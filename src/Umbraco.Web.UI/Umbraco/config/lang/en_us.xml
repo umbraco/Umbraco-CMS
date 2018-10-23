@@ -153,6 +153,7 @@
     <key alias="rollback">Content rollback performed by user</key>
     <key alias="sendtopublish">Content Send To Publish performed by user</key>
     <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="sort">Sort child items performed by user</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallMove">Move</key>
@@ -162,6 +163,7 @@
     <key alias="smallRollBack">Rollback</key>
     <key alias="smallSendToPublish">Send To Publish</key>
     <key alias="smallSendToTranslate">Send To Translation</key>
+        <key alias="smallSort">Sort</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -290,6 +292,7 @@
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
+    <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -301,7 +304,7 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
-    <key alias="newJavascriptFile">New javascript file</key>
+        <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
@@ -459,6 +462,8 @@
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
+        <key alias="enterAlias">Enter alias...</key>
+        <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child node types</key>
@@ -576,6 +581,7 @@
     <key alias="hide">Hide</key>
     <key alias="history">History</key>
     <key alias="icon">Icon</key>
+        <key alias="id">Id</key>
     <key alias="import">Import</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -627,7 +633,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+    <key alias="searchNoResult">Sorry, we cannot find what you are looking for</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1121,7 +1127,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
+    <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
     <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
@@ -1184,11 +1190,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-    <key alias="reset">Reset</key>
+        <key alias="reset">Reset crop</key>
     <key alias="defineCrop">Define crop</key>
     <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
+        <key alias="updateEditCrop">Done</key>
+        <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -1277,6 +1285,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editMediaSaved">Media saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
+        <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
     <key alias="editStylesheetSaved">Stylesheet saved</key>
     <key alias="editTemplateSaved">Template saved</key>
