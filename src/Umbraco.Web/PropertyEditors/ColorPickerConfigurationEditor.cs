@@ -124,14 +124,9 @@ namespace Umbraco.Web.PropertyEditors
 
                 var id = item.Property("id")?.Value?.Value<int>() ?? 0;
                 if (id >= nextId) nextId = id + 1;
-
-                // if using a label, replace color by json blob
-                // (a pity we have to serialize here!)
-                if (output.UseLabel)
-                {
-                    var label = item.Property("label")?.Value?.Value<string>();
-                    value = JsonConvert.SerializeObject(new { value, label });
-                }
+                
+                var label = item.Property("label")?.Value?.Value<string>();
+                value = JsonConvert.SerializeObject(new { value, label });
 
                 output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
             }
