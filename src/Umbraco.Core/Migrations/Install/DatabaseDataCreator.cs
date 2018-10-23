@@ -243,7 +243,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateDataTypeData()
         {
-            void InsertDataTypeDto(int id, string dbType, string editorAlias, string configuration = null)
+            void InsertDataTypeDto(int id, string editorAlias, string dbType, string configuration = null)
             {
                 var dataTypeDto = new DataTypeDto
                 {
