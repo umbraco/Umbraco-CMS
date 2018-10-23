@@ -142,8 +142,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore());
         }
     }
 }
