@@ -17,7 +17,7 @@
                            update-placeholder="vm.updateTemplatePlaceholder">
         </umb-grid-selector>
 
-        <button type="button" ng-click="vm.createTemplate()" class="btn btn-info" ng-if="model.allowedTemplates.length == 0">
+        <button type="button" ng-click="vm.createTemplate()" class="btn btn-info" ng-show="model.allowedTemplates.length == 0">
             <i class="icon icon-add"></i>
             <localize key="shortcuts_addTemplate">Add template</localize>
         </button>
