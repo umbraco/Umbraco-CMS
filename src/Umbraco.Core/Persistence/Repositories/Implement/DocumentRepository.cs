@@ -220,6 +220,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
         }
 
+        public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
+        {
+            var sql = GetBaseQuery(QueryType.Many, false)
+                .Where<NodeDto>(x => x.NodeId == nodeId)
+                .OrderByDescending<ContentVersionDto>(x => x.Current)
+                .AndByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true);
+        }
+
         public override IContent GetVersion(int versionId)
         {
             var sql = GetBaseQuery(QueryType.Single, false)
@@ -911,7 +921,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 
-        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false)
+        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false, bool slim = false)
         {
             var temps = new List<TempContent<Content>>();
             var contentTypes = new Dictionary<int, IContentType>();
@@ -944,18 +954,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-                // need templates
-                var templateId = dto.DocumentVersionDto.TemplateId;
-                if (templateId.HasValue && templateId.Value > 0)
-                    templateIds.Add(templateId.Value);
-                if (dto.Published)
+                if (!slim)
                 {
-                    templateId = dto.PublishedVersionDto.TemplateId;
+                    // need templates
+                    var templateId = dto.DocumentVersionDto.TemplateId;
                     if (templateId.HasValue && templateId.Value > 0)
                         templateIds.Add(templateId.Value);
+                    if (dto.Published)
+                    {
+                        templateId = dto.PublishedVersionDto.TemplateId;
+                        if (templateId.HasValue && templateId.Value > 0)
+                            templateIds.Add(templateId.Value);
+                    }
                 }
 
-                // need properties
+                // need temps, for properties, templates and variations
                 var versionId = dto.DocumentVersionDto.Id;
                 var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
                 var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
@@ -966,25 +979,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            // load all required templates in 1 query, and index
-            var templates = _templateRepository.GetMany(templateIds.ToArray())
-                .ToDictionary(x => x.Id, x => x);
-
-            // load all properties for all documents from database in 1 query - indexed by version id
-            var properties = GetPropertyCollections(temps);
-
-            // assign templates and properties
-            foreach (var temp in temps)
+            if (!slim)
             {
-                // complete the item
-                if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
-                    temp.Content.Template = template;
-                if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
-                    temp.Content.PublishTemplate = template;
-                temp.Content.Properties = properties[temp.VersionId];
+                // load all required templates in 1 query, and index
+                var templates = _templateRepository.GetMany(templateIds.ToArray())
+                    .ToDictionary(x => x.Id, x => x);
 
-                // reset dirty initial properties (U4-1946)
-                temp.Content.ResetDirtyProperties(false);
+                // load all properties for all documents from database in 1 query - indexed by version id
+                var properties = GetPropertyCollections(temps);
+
+                // assign templates and properties
+                foreach (var temp in temps)
+                {
+                    // complete the item
+                    if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
+                        temp.Content.Template = template;
+                    if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
+                        temp.Content.PublishTemplate = template;
+                    temp.Content.Properties = properties[temp.VersionId];
+
+                    // reset dirty initial properties (U4-1946)
+                    temp.Content.ResetDirtyProperties(false);
+                }
             }
 
             // set variations, if varying

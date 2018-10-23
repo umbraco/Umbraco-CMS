@@ -135,6 +135,12 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetVersions(int id);
 
         /// <summary>
+        /// Gets all versions of a document.
+        /// </summary>
+        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+        IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
+
+        /// <summary>
         /// Gets top versions of a document.
         /// </summary>
         /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
@@ -459,6 +465,22 @@ namespace Umbraco.Core.Services
         /// Creates and saves a document.
         /// </summary>
         IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
+
+        #endregion
+
+        #region Rollback
+
+        /// <summary>
+        /// Rolls back the content to a specific version.
+        /// </summary>
+        /// <param name="id">The id of the content node.</param>
+        /// <param name="versionId">The version id to roll back to.</param>
+        /// <param name="culture">An optional culture to roll back.</param>
+        /// <param name="userId">The identifier of the user who is performing the roll back.</param>
+        /// <remarks>
+        /// <para>When no culture is specified, all cultures are rolled back.</para>
+        /// </remarks>
+        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
 
         #endregion
     }

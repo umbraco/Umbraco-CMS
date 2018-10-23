@@ -53,6 +53,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets all versions, current first
         public abstract IEnumerable<TEntity> GetAllVersions(int nodeId);
 
+        // gets all versions, current first
+        public virtual IEnumerable<TEntity> GetAllVersionsSlim(int nodeId, int skip, int take)
+            => GetAllVersions(nodeId).Skip(skip).Take(take);
+
         // gets all version ids, current first
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
