@@ -21,7 +21,7 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Templates, null, sortOrder:6)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
         /// <summary>

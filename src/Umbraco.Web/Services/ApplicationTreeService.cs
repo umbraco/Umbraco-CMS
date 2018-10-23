@@ -24,11 +24,13 @@ namespace Umbraco.Web.Services
         internal const string TreeConfigFileName = "trees.config";
         private static string _treeConfig;
         private static readonly object Locker = new object();
+        private readonly Lazy<IReadOnlyCollection<IGrouping<string, string>>> _groupedTrees;
 
         public ApplicationTreeService(ILogger logger, CacheHelper cache)
         {
             _logger = logger;
             _cache = cache;
+            _groupedTrees = new Lazy<IReadOnlyCollection<IGrouping<string, string>>>(InitGroupedTrees);
         }
 
         /// <summary>
@@ -281,6 +283,46 @@ namespace Umbraco.Web.Services
             return list.OrderBy(x => x.SortOrder).ToArray();
         }
 
+        public IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias, bool onlyInitialized)
+        {
+            var result = new Dictionary<string, IEnumerable<ApplicationTree>>();
+            var foundTrees = GetApplicationTrees(applicationAlias, onlyInitialized);
+            foreach(var treeGroup in _groupedTrees.Value)
+            {
+                List<ApplicationTree> resultGroup = null;
+                foreach(var tree in foundTrees)
+                { 
+                    foreach(var treeAliasInGroup in treeGroup)
+                    {
+                        if (tree.Alias == treeAliasInGroup)
+                        {
+                            if (resultGroup == null) resultGroup = new List<ApplicationTree>();
+                            resultGroup.Add(tree);
+                        }
+                    }  
+                }
+                if (resultGroup != null)
+                    result[treeGroup.Key ?? string.Empty] = resultGroup; //key cannot be null so make empty string
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a group of all tree groups and their tree aliases
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Used to initialize the <see cref="_groupedTrees"/> field
+        /// </remarks>
+        private IReadOnlyCollection<IGrouping<string, string>> InitGroupedTrees()
+        {
+            var result = GetAll()
+                .Select(x => (treeAlias: x.Alias, treeGroup: x.GetRuntimeType().GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
+                .GroupBy(x => x.treeGroup, x => x.treeAlias)
+                .ToList();
+            return result;
+        }
+           
         /// <summary>
         /// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the
         /// callback with the xml document and saves the structure back to disk if saveAfterCallback is true.

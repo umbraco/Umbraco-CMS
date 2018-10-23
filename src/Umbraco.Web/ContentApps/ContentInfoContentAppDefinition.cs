@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
@@ -12,7 +14,7 @@ namespace Umbraco.Web.ContentApps
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
 
-        public ContentApp GetContentAppFor(object o)
+        public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             switch (o)
             {

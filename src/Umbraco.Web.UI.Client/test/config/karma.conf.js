@@ -11,19 +11,19 @@ module.exports = function (config) {
         files: [
 
             //libraries
-            'lib-bower/jquery/jquery.min.js',
-            'lib-bower/angular/angular.js',
-            'lib-bower/angular-animate/angular-animate.js',
-            'lib-bower/angular-cookies/angular-cookies.js',
-            'lib-bower/angular-local-storage/angular-local-storage.min.js',
-            'lib-bower/angular-route/angular-route.js',
-            'lib-bower/angular-sanitize/angular-sanitize.js',
-            'bower_components/angular-mocks/angular-mocks.js',
-            'lib-bower/angular-ui-sortable/sortable.js',
-            'lib-bower/underscore/underscore-min.js',
-            'lib-bower/moment/moment-with-locales.js',
+            'node_modules/jquery/dist/jquery.min.js',
+            'node_modules/angular/angular.js',
+            'node_modules/angular-animate/angular-animate.js',
+            'node_modules/angular-cookies/angular-cookies.js',
+            'node_modules/angular-local-storage/dist/angular-local-storage.min.js',
+            'node_modules/angular-route/angular-route.js',
+            'node_modules/angular-sanitize/angular-sanitize.js',
+            'node_modules/angular-mocks/angular-mocks.js',
+            'node_modules/angular-ui-sortable/dist/sortable.js',
+            'node_modules/underscore/underscore-min.js',
+            'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
-            'lib-bower/rgrove-lazyload/lazyload.js',
+            'node_modules/lazyload-js/lazyload.min.js',
 
             //app bootstrap and loader
             'test/config/app.unit.js',

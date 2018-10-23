@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Benchmarks
 
             // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
 
-            _emittedCtor = ReflectionUtilities.EmitCtor<Func<IFoo, Foo>>();
+            _emittedCtor = ReflectionUtilities.EmitConstuctor<Func<IFoo, Foo>>();
         }
 
         public IFoo IlCtor(IFoo foo)

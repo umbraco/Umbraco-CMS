@@ -125,13 +125,19 @@ Use this directive to generate a thumbnail grid of media items.
                         i--;
                     }
 
-                    if (scope.includeSubFolders !== 'true') {
-                        if (item.parentId !== parseInt(scope.currentFolderId)) {
-                            scope.items.splice(i, 1);
-                            i--;
+
+                    // If subfolder search is not enabled remove the media items that's not needed
+                    // Make sure that includeSubFolder is not undefined since the directive is used
+                    // in contexts where it should not be used. Currently only used when we trigger
+                    // a media picker
+                    if(scope.includeSubFolders !== undefined){
+                        if (scope.includeSubFolders !== 'true') {
+                            if (item.parentId !== parseInt(scope.currentFolderId)) {
+                                scope.items.splice(i, 1);
+                                i--;
+                            }
                         }
                     }
-                    
 
                 }
 
@@ -152,7 +158,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
 
                 if (!item.isFolder) {
-                    
+
                     // handle entity
                     if(item.image) {
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
@@ -161,7 +167,7 @@ Use this directive to generate a thumbnail grid of media items.
                     } else {
                         item.thumbnail = mediaHelper.resolveFile(item, true);
                         item.image = mediaHelper.resolveFile(item, false);
-                        
+
                         var fileProp = _.find(item.properties, function (v) {
                             return (v.alias === "umbracoFile");
                         });

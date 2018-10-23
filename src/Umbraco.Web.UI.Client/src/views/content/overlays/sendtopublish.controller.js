@@ -34,7 +34,7 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.sendToPublish = true;
+                    active.save = true;
                 }
 
             } else {
@@ -48,7 +48,7 @@
 
         function changeSelection() {
             var firstSelected = _.find(vm.variants, function (v) {
-                return v.sendToPublish;
+                return v.save;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
@@ -69,10 +69,10 @@
             return (variant.state === "Published" && !variant.isDirty && !variant.active || variant.state === "NotCreated" && !variant.isDirty && !variant.active);
         }
 
-        //when this dialog is closed, reset all 'sendToPublish' flags
+        //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].sendToPublish = false;
+                vm.variants[i].save = false;
             }
         });
 

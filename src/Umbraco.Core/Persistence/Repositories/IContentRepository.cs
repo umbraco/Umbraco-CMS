@@ -20,6 +20,12 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<TEntity> GetAllVersions(int nodeId);
 
         /// <summary>
+        /// Gets versions.
+        /// </summary>
+        /// <remarks>Current version is first, and then versions are ordered with most recent first.</remarks>
+        IEnumerable<TEntity> GetAllVersionsSlim(int nodeId, int skip, int take);
+
+        /// <summary>
         /// Gets version identifiers.
         /// </summary>
         /// <remarks>Current version is first, and then versions are ordered with most recent first.</remarks>

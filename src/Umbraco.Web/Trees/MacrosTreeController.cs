@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -15,9 +16,8 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Macros, "Macros", sortOrder: 4)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
-    public class 
-        MacrosTreeController : TreeController
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    public class MacrosTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {

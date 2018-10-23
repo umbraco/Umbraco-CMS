@@ -120,10 +120,12 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
@@ -392,7 +394,6 @@
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
-    <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DataTypeDefinitionRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DictionaryRepositoryTest.cs" />
