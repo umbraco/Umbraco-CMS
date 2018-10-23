@@ -25,9 +25,10 @@
 
              <p><strong><localize key="grid_chooseLayout" /></strong></p>
 
-            <div class="preview-rows layout"
-                 ng-repeat="template in model.config.items.templates"
-                 ng-click="addTemplate(template)">
+            <button class="preview-rows layout"
+                    type="button"
+                    ng-repeat="template in model.config.items.templates"
+                    ng-click="addTemplate(template)">
 
                 <div class="preview-row">
 
@@ -47,7 +48,7 @@
 
                 <small>{{template.name}}</small>
 
-            </div> <!-- .templates-preview-rows -->
+            </button> <!-- .templates-preview-rows -->
 
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
@@ -68,15 +69,15 @@
                         <!-- ng-mouseenter="setCurrentRow(row)" -->
                         <!-- ng-mouseleave="disableCurrentRow()"  -->
                         <div class="umb-row"
-                             ng-repeat="row in section.rows"
-                             ng-click="clickRow($index, section.rows)"
-                             ng-class="{
-                                     '-has-config': row.hasConfig,
-                                     '-active': row.active,
-                                     '-active-child': row.hasActiveChild}"
-                             on-outside-click="clickOutsideRow($index, section.rows)"
-                             bind-click-on="{{row.active}}"
-                             data-rowid="{{row.$uniqueId}}">
+                                ng-repeat="row in section.rows"
+                                ng-click="clickRow($index, section.rows)"
+                                ng-class="{
+                                        '-has-config': row.hasConfig,
+                                        '-active': row.active,
+                                        '-active-child': row.hasActiveChild}"
+                                on-outside-click="clickOutsideRow($index, section.rows)"
+                                bind-click-on="{{row.active}}"
+                                data-rowid="{{row.$uniqueId}}">
 
                             <div class="umb-row-title-bar">
 
@@ -265,10 +266,11 @@
 
                         <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows" /></strong></p>
 
-                        <div class="preview-rows columns"
-                             ng-repeat="layout in  section.$allowedLayouts"
-                             ng-show="layout.areas.length > 0"
-                             ng-click="addRow(section, layout)">
+                        <button class="preview-rows columns"
+                                type="button"
+                                ng-repeat="layout in  section.$allowedLayouts"
+                                ng-show="layout.areas.length > 0"
+                                ng-click="addRow(section, layout)">
 
                             <div class="preview-row">
 
@@ -286,7 +288,7 @@
 
                             <small>{{layout.label || layout.name}}</small>
 
-                        </div> <!-- .templates-preview-rows -->
+                        </button> <!-- .templates-preview-rows -->
 
                     </div> <!-- .templates-preview -->
                     <!-- column tools end -->
