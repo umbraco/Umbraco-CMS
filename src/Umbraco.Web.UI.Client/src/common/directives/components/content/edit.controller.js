@@ -103,6 +103,17 @@
                     loadContent();
                 }
             }));
+
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {
+                // if this content item uses the updated doc type we need to reload the content item
+                if(args && args.node && args.node.key === $scope.content.key) {
+                    $scope.page.loading = true;
+                    loadContent().then(function() {
+                        $scope.page.loading = false;
+                    });
+                }
+            }));
+            
         }
 
         /**

@@ -1702,5 +1702,93 @@ namespace Umbraco.Web.Editors
             Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
         }
 
+        [HttpGet]
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
+        {
+            var rollbackVersions = new List<RollbackVersion>();
+            var writerIds = new HashSet<int>();
+
+            //Return a list of all versions of a specific content node
+            // fixme - cap at 50 versions for now?
+            var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
+
+            //Not all nodes are variants & thus culture can be null
+            if (culture != null)
+            {
+                //Get cultures that were published with the version = their update date is equal to the version's
+                versions = versions.Where(x => x.UpdateDate == x.GetUpdateDate(culture));
+            }
+
+            //First item is our current item/state (cant rollback to ourselves)
+            versions = versions.Skip(1);
+
+            foreach (var version in versions)
+            {
+                var rollbackVersion = new RollbackVersion
+                {
+                    VersionId = version.VersionId,
+                    VersionDate = version.UpdateDate,
+                    VersionAuthorId = version.WriterId
+                };
+
+                rollbackVersions.Add(rollbackVersion);
+
+                writerIds.Add(version.WriterId);
+            }
+
+            var users = Services.UserService
+                .GetUsersById(writerIds.ToArray())
+                .ToDictionary(x => x.Id, x => x.Name);
+
+            foreach (var rollbackVersion in rollbackVersions)
+            {
+                if (users.TryGetValue(rollbackVersion.VersionAuthorId, out var userName))
+                    rollbackVersion.VersionAuthorName = userName;
+            }
+            
+            return rollbackVersions;
+        }
+
+        [HttpGet]
+        public ContentVariantDisplay GetRollbackVersion(int versionId, string culture = null)
+        {
+            var version = Services.ContentService.GetVersion(versionId);
+            var content = MapToDisplay(version);
+                       
+			return culture == null
+				? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
+                : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
+        }
+
+        [HttpPost]
+        public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
+        {
+            var rollbackResult = Services.ContentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
+
+			if (rollbackResult.Success)
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            var notificationModel = new SimpleNotificationModel();
+
+            switch (rollbackResult.Result)
+            {
+                case OperationResultType.Failed:
+                case OperationResultType.FailedCannot:
+                case OperationResultType.FailedExceptionThrown:
+                case OperationResultType.NoOperation:
+                default:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                                    null); //TODO: There is no specific failed to save error message AFAIK
+                    break;
+                case OperationResultType.FailedCancelledByEvent:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
+                                    Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                    break;
+            }
+
+            return Request.CreateValidationErrorResponse(notificationModel);
+        }
     }
 }
