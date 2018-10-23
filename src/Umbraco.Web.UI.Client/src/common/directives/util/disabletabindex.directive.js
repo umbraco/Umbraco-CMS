@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('disableTabindex', function ($window, $timeout, windowResizeListener) {
+    .directive('disableTabindex', function () {
 
     return {
         restrict: 'A', //Can only be used as an attribute
