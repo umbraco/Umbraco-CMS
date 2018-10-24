@@ -326,9 +326,11 @@ AND umbracoNode.id <> @id",
                 });
             }
 
-            // delete property types
-            // ... by excepting entries from db with entries from collections
-            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
+            // Delete property types ... by excepting entries from db with entries from collections.
+            // We check if the entity's own PropertyTypes has been modified and then also check
+            // any of the property groups PropertyTypes has been modified.
+            // This specifically tells us if any property type collections have changed.
+            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
             {
                 var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
                 var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
@@ -338,10 +340,11 @@ AND umbracoNode.id <> @id",
                     DeletePropertyType(entity.Id, item);
             }
 
-            // delete tabs
-            // ... by excepting entries from db with entries from collections
+            // Delete tabs ... by excepting entries from db with entries from collections.
+            // We check if the entity's own PropertyGroups has been modified.
+            // This specifically tells us if the property group collections have changed.
             List<int> orphanPropertyTypeIds = null;
-            if (entity.IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
+            if (entity.IsPropertyDirty("PropertyGroups"))
             {
                 // todo
                 // we used to try to propagate tabs renaming downstream, relying on ParentId, but
