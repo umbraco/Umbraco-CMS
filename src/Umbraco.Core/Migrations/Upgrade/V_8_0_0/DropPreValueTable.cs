@@ -9,7 +9,8 @@
         public override void Migrate()
         {
             // drop preValues table
-            Delete.Table("cmsDataTypePreValues").Do();
+            if (TableExists("cmsDataTypePreValues"))
+                Delete.Table("cmsDataTypePreValues").Do();
         }
     }
 }

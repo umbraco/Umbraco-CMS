@@ -18,7 +18,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             //need to convert the old drop down data types to use the new one
-            var oldDropDowns = Database.Fetch<DataTypeDto>(Sql().Select<DataTypeDto>().Where<DataTypeDto>(x => x.EditorAlias.Contains(".DropDown")));
+            var oldDropDowns = Database.Fetch<DataTypeDto>(Sql()
+                .Select<DataTypeDto>()
+                .From<DataTypeDto>()
+                .Where<DataTypeDto>(x => x.EditorAlias.Contains(".DropDown")));
             foreach(var dd in oldDropDowns)
             {
                 //nothing to change if there is no config
@@ -37,7 +40,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     continue;
                 }
 
-                var propDataSql = Sql().Select("*").From<PropertyDataDto>()
+                var propDataSql = Sql().Select<PropertyDataDto>().From<PropertyDataDto>()
                     .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>(x => x.Id, x => x.PropertyTypeId)
                     .InnerJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(x => x.NodeId, x => x.DataTypeId)
                     .Where<DataTypeDto>(x => x.EditorAlias == dd.EditorAlias);
