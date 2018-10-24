@@ -49,6 +49,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly ManifestParser _manifestParser;
         private readonly UmbracoFeatures _features;
+        private readonly IRuntimeState _runtimeState;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
@@ -56,10 +57,11 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IRuntimeState runtimeState)
         {
             _manifestParser = manifestParser;
             _features = features;
+            _runtimeState = runtimeState;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -261,7 +263,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState, _features, GlobalSettings);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
