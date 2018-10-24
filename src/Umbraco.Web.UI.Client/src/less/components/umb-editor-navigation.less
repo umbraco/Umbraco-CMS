@@ -19,6 +19,7 @@
   align-items: center;
   justify-content: center;
   height: @editorHeaderHeight;
+  position: relative;
 }
 
 .umb-sub-views-nav-item:focus {
@@ -44,6 +45,21 @@
   display: block;
   text-align: center;
   margin-bottom: 5px;
+}
+
+.umb-sub-views-nav-item .badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  background-color: @turquoise-d1;
+  border-radius: 50%;
+  color: @white;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px;
+  line-height: 16px;
 }
 
 .umb-sub-views-nav-item-text {
