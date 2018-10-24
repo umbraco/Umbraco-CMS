@@ -67,7 +67,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, IsPublishing, this, _templateRepository);
         }
 
-
         protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
         {
             // use the underlying GetAll which will force cache all content types
