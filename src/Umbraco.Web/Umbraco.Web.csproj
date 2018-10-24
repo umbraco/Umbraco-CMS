@@ -1314,19 +1314,6 @@
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Macro.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ContentType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx.cs">
-      <DependentUpon>CheckForUpgrade.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx.cs">
-      <DependentUpon>legacyAjaxCalls.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx.cs">
-      <DependentUpon>nodeSorter.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />
@@ -1338,9 +1325,6 @@
     </Compile>
     <Compile Include="TagsController.cs" />
     <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\UmbracoAuthorizedWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="UmbracoHttpHandler.cs" />
     <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
@@ -1367,10 +1351,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
-    <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
     <Content Include="PublishedCache\NuCache\notes.txt" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx">
       <SubType>ASPXCodeBehind</SubType>

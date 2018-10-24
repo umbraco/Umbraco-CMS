@@ -424,7 +424,6 @@
     </None>
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
     <Content Include="Umbraco\Create\simple.ascx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
@@ -434,10 +433,6 @@
       <SubType>Form</SubType>
     </Content>
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\Webservices\ajax.js" />
-    <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
-    <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
-    <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
     <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
