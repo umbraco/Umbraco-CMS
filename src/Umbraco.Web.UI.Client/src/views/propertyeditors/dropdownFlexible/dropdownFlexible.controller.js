@@ -74,7 +74,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
         // if we run in single mode we'll store the value in a local variable
         // so we can pass an array as the model as our PropertyValueEditor expects that
         $scope.model.singleDropdownValue = "";
-        if ($scope.model.config.multiple === "0") {
+        if (Object.toBoolean($scope.model.config.multiple)) {
             $scope.model.singleDropdownValue = Array.isArray($scope.model.value) ? $scope.model.value[0] : $scope.model.value;
         }
 

@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             _logger = logger;
         }
-        
+
         /// <summary>
         /// Override so that we can return a json array to the editor for multi-select values
         /// </summary>

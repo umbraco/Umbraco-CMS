@@ -22,7 +22,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
                 .Where<DataTypeDto>(x => x.EditorAlias.Contains(".DropDown")));
-            foreach(var dd in oldDropDowns)
+            foreach (var dd in oldDropDowns)
             {
                 //nothing to change if there is no config
                 if (dd.Configuration.IsNullOrWhiteSpace()) continue;
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 ValueListConfiguration config;
                 try
                 {
-                     config = JsonConvert.DeserializeObject<ValueListConfiguration>(dd.Configuration);
+                    config = JsonConvert.DeserializeObject<ValueListConfiguration>(dd.Configuration);
                 }
                 catch (Exception ex)
                 {
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 var propDataSql = Sql().Select<PropertyDataDto>().From<PropertyDataDto>()
                     .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>(x => x.Id, x => x.PropertyTypeId)
                     .InnerJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(x => x.NodeId, x => x.DataTypeId)
-                    .Where<DataTypeDto>(x => x.EditorAlias == dd.EditorAlias);
+                    .Where<PropertyTypeDto>(x => x.DataTypeId == dd.NodeId);
 
                 var propDatas = Database.Query<PropertyDataDto>(propDataSql);
                 var toUpdate = new List<PropertyDataDto>();
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
 
                 //run the property data updates
-                foreach(var propData in toUpdate)
+                foreach (var propData in toUpdate)
                 {
                     Database.Update(propData);
                 }
@@ -97,12 +97,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 items = config.Items
             };
             dataType.Configuration = JsonConvert.SerializeObject(flexConfig);
+            Database.Update(dataType);
         }
 
         private bool UpdatePropertyDataDto(PropertyDataDto propData, ValueListConfiguration config)
         {
             //Get the INT ids stored for this property/drop down
-            IEnumerable<int> ids = null;
+            int[] ids = null;
             if (!propData.VarcharValue.IsNullOrWhiteSpace())
             {
                 ids = ConvertStringValues(propData.VarcharValue);
@@ -117,31 +118,49 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             }
 
             //if there are INT ids, convert them to values based on the configured pre-values
-            if (ids != null)
+            if (ids != null && ids.Length > 0)
             {
                 //map the ids to values
                 var vals = new List<string>();
+                var canConvert = true;
                 foreach (var id in ids)
                 {
                     var val = config.Items.FirstOrDefault(x => x.Id == id);
                     if (val != null)
                         vals.Add(val.Value);
+                    else
+                    {
+                        Logger.Warn<DropDownPropertyEditorsMigration>($"Could not find associated data type configuration for stored Id {id}");
+                        canConvert = false;
+                    }   
                 }
-
-                propData.VarcharValue = string.Join(",", vals);
-                propData.TextValue = null;
-                propData.IntegerValue = null;
-                return true;
+                if (canConvert)
+                {
+                    propData.VarcharValue = string.Join(",", vals);
+                    propData.TextValue = null;
+                    propData.IntegerValue = null;
+                    return true;
+                }
+                
             }
 
             return false;
         }
 
-        private IEnumerable<int> ConvertStringValues(string val)
+        private int[] ConvertStringValues(string val)
         {
-            return val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
-                        .Where(x => x != int.MinValue);
+            var splitVals = val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var intVals = splitVals
+                            .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
+                            .Where(x => x != int.MinValue)
+                            .ToArray();
+
+            //only return if the number of values are the same (i.e. All INTs)
+            if (splitVals.Length == intVals.Length)
+                return intVals;
+
+            return null;
         }
 
     }
