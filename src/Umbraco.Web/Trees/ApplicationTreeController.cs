@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
             var groupedTrees = Services.ApplicationTreeService.GetGroupedApplicationTrees(application, onlyInitialized);
             var allTrees = groupedTrees.Values.SelectMany(x => x).ToList();
 
-            if (string.IsNullOrEmpty(tree) == false || allTrees.Count <= 1)
+            if (string.IsNullOrEmpty(tree) == false)
             {
                 var apptree = !tree.IsNullOrWhiteSpace()
                     ? allTrees.FirstOrDefault(x => x.Alias == tree)
