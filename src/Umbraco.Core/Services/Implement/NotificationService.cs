@@ -313,47 +313,15 @@ namespace Umbraco.Core.Services.Implement
                     ReplaceHtmlSymbols(ref newText);
                 }
 
-
-                // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
-                // TODO: We should probably allow more than just tinymce??
-                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.TinyMce)
-                    && string.CompareOrdinal(oldText, newText) != 0)
-                {
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Note: </th>");
-                    summary.Append(
-                        "<td style='text-align: left; vertical-align: top;'> <span style='background-color:red;'>Red for deleted characters</span>&nbsp;<span style='background-color:yellow;'>Yellow for inserted characters</span></td>");
-                    summary.Append("</tr>");
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> New ");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(ReplaceLinks(CompareText(oldText, newText, true, false, "<span style='background-color:yellow;'>", string.Empty), siteUri));
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Old ");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(ReplaceLinks(CompareText(newText, oldText, true, false, "<span style='background-color:red;'>", string.Empty), siteUri));
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                }
-                else
-                {
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(newText);
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                }
-                summary.Append(
-                    "<tr><td colspan=\"2\" style=\"border-bottom: 1px solid #CCC; font-size: 2px;\">&nbsp;</td></tr>");
+                //show the values
+                summary.Append("<tr>");
+                summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
+                summary.Append(p.PropertyType.Name);
+                summary.Append("</th>");
+                summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
+                summary.Append(newText);
+                summary.Append("</td>");
+                summary.Append("</tr>");
             }
 
             var protocol = _globalSettings.UseHttps ? "https" : "http";
@@ -430,6 +398,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="oldString">The old string.</param>
         private static void ReplaceHtmlSymbols(ref string oldString)
         {
+            if (oldString.IsNullOrWhiteSpace()) return;
             oldString = oldString.Replace("&nbsp;", " ");
             oldString = oldString.Replace("&rsquo;", "'");
             oldString = oldString.Replace("&amp;", "&");
@@ -437,69 +406,7 @@ namespace Umbraco.Core.Services.Implement
             oldString = oldString.Replace("&rdquo;", "”");
             oldString = oldString.Replace("&quot;", "\"");
         }
-
-        /// <summary>
-        /// Compares the text.
-        /// </summary>
-        /// <param name="oldText">The old text.</param>
-        /// <param name="newText">The new text.</param>
-        /// <param name="displayInsertedText">if set to <c>true</c> [display inserted text].</param>
-        /// <param name="displayDeletedText">if set to <c>true</c> [display deleted text].</param>
-        /// <param name="insertedStyle">The inserted style.</param>
-        /// <param name="deletedStyle">The deleted style.</param>
-        /// <returns></returns>
-        private static string CompareText(string oldText, string newText, bool displayInsertedText,
-                                          bool displayDeletedText, string insertedStyle, string deletedStyle)
-        {
-            var sb = new StringBuilder();
-            var diffs = Diff.DiffText1(oldText, newText);
-
-            int pos = 0;
-            for (var n = 0; n < diffs.Length; n++)
-            {
-                var it = diffs[n];
-
-                // write unchanged chars
-                while ((pos < it.StartB) && (pos < newText.Length))
-                {
-                    sb.Append(newText[pos]);
-                    pos++;
-                } // while
-
-                // write deleted chars
-                if (displayDeletedText && it.DeletedA > 0)
-                {
-                    sb.Append(deletedStyle);
-                    for (var m = 0; m < it.DeletedA; m++)
-                    {
-                        sb.Append(oldText[it.StartA + m]);
-                    } // for
-                    sb.Append("</span>");
-                }
-
-                // write inserted chars
-                if (displayInsertedText && pos < it.StartB + it.InsertedB)
-                {
-                    sb.Append(insertedStyle);
-                    while (pos < it.StartB + it.InsertedB)
-                    {
-                        sb.Append(newText[pos]);
-                        pos++;
-                    } // while
-                    sb.Append("</span>");
-                } // if
-            } // while
-
-            // write rest of unchanged chars
-            while (pos < newText.Length)
-            {
-                sb.Append(newText[pos]);
-                pos++;
-            } // while
-
-            return sb.ToString();
-        }
-
+        
         // manage notifications
         // ideally, would need to use IBackgroundTasks - but they are not part of Core!
 
