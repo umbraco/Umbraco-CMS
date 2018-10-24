@@ -6,6 +6,8 @@ angular.module("umbraco.directives")
         scope: { disableTabindex: "<"},
         link: function (scope, element, attrs) {
 
+            var tabIndexesToRollback = [];
+
             function enableTest(){
                 //Add in observer code
 
@@ -34,7 +36,17 @@ angular.module("umbraco.directives")
                                 console.log('item in loop', element);
 
                                 //TODO: Get existing element & it's tabindex (if any set)
+                                //Check if the element has an existing tab index
+                                //If so store in a collection (that when this directive is disabled/toggled)
+                                //The tabindex is returned back to normal
+                                var currentTabIndex = angular.element(element).attr('tabindex');
+                                console.log('currentTabIndex', currentTabIndex);
 
+                                if(currentTabIndex){
+                                    //A value has been set - need to track it
+                                    var itemToRevert = { dom: element, tabindex: currentTabIndex };
+                                    tabIndexesToRollback.push(itemToRevert);
+                                }
 
                                 //TODO: Note we updating way too many times from the DOMSubtreeModified event - is this expensive?
                                 angular.element(element).attr('tabindex', '-1');
@@ -58,6 +70,15 @@ angular.module("umbraco.directives")
                 if(newVal === true){
                     enableTest();
                 }else{
+                    console.log('what do I need to revert', tabIndexesToRollback);
+
+                    //Stop observation?
+                    //TODO: Will it refire the observer?!
+
+                    angular.forEach(tabIndexesToRollback, function(rollbackItem){
+                        console.log('item in rollback', rollbackItem);
+                        angular.element(rollbackItem.dom).attr('tabindex', rollbackItem.tabindex);
+                    });
 
                 }
             });
