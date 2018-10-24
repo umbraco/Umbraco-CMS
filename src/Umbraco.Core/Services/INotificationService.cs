@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, Uri siteUri,
+        void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
                                Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
                                Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody);
 

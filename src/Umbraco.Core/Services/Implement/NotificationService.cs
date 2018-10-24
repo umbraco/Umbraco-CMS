@@ -66,17 +66,11 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        /// <remarks>
-        /// Currently this will only work for Content entities!
-        /// </remarks>
-        public void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, Uri siteUri,
+        public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
             Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
         {
-            if (entities is IEnumerable<IContent> == false)
-                throw new NotSupportedException();
-
-            var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
+            var entitiesL = entities.ToList();
 
             //exit if there are no entities
             if (entitiesL.Count == 0) return;

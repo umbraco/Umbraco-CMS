@@ -122,7 +122,7 @@ namespace Umbraco.Web.Components
                 _logger = logger;
             }
 
-            public void Notify(IAction action, params IUmbracoEntity[] entities)
+            public void Notify(IAction action, params IContent[] entities)
             {
                 IUser user = null;
                 if (_umbracoContextAccessor.UmbracoContext != null)
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Components
                 SendNotification(user, entities, action, _runtimeState.ApplicationUrl);
             }
 
-            private void SendNotification(IUser sender, IEnumerable<IUmbracoEntity> entities, IAction action, Uri siteUri)
+            private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
             {
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null) throw new ArgumentNullException(nameof(siteUri));
