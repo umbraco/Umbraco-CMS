@@ -360,7 +360,6 @@
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownMultipleConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfiguration.cs" />
     <Compile Include="PropertyEditors\GridConfiguration.cs" />
@@ -814,11 +813,9 @@
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
-    <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
@@ -828,9 +825,6 @@
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RelatedLinksValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
