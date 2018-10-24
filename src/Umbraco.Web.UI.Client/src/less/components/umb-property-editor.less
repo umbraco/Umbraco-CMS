@@ -1,3 +1,18 @@
 .umb-property-editor.-not-clickable {
     pointer-events: none;
 }
+
+.umb-property-editor {
+    position:relative;
+}
+
+.umb-property-editor .overlay {
+    background: rgba(255,0,0,0.5);
+    display: block;
+    position: absolute;
+    top:0;
+    left:0;
+    height:100%;
+    width:100%;
+    cursor: not-allowed;
+}
