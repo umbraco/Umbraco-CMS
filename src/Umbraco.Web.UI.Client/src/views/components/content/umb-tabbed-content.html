@@ -9,9 +9,9 @@
 
             <div class="umb-expansion-panel__content" ng-show="group.open">
                 <umb-property data-element="property-{{property.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
-                    
-                    <div ng-if="content.variants.length > 1" style="font-size: 13px; margin-bottom: 5px;">
-                        
+
+                    <!-- <div ng-if="content.variants.length > 1" style="font-size: 13px; margin-bottom: 5px;">
+
                         <div ng-if="!property.culture && !activeVariant.language.isDefault">
                             <div ng-if="!property.unlockInvariantValue" ng-click="unlockInvariantValue(property)" style="margin-right: 3px;"><i class="icon-lock"></i>Unlock to change on all languages</div>
                             <div ng-if="property.unlockInvariantValue" ng-click="unlockInvariantValue(property)" style="margin-right: 3px;"><i class="icon-unlocked"></i>Changes to <strong>{{property.label}}</strong> will be copied to all languages</div>
@@ -20,11 +20,11 @@
                         <div ng-if="!property.culture && activeVariant.language.isDefault">
                             Changes to <strong>{{property.label}}</strong> will be copied to all languages
                         </div>
-                    </div>
+                    </div> -->
 
                     <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
                         <umb-property-editor
-                            model="property" 
+                            model="property"
                             preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
                         </umb-property-editor>
                     </div>
