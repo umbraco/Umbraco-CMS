@@ -30,14 +30,6 @@
             },
             link: function(scope) {
 
-                function onInit() {
-                    angular.forEach(scope.content.tabs, function (group) {
-                        group.open = true;
-                    });
-                }
-
-                onInit();
-
             },
             scope: {
                 content: "="

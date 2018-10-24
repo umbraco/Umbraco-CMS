@@ -285,9 +285,11 @@ angular.module("umbraco")
                     event: event,
                     show: true,
                     submit: function(model) {
+                      if (model.selectedItem) {
                         $scope.addControl(model.selectedItem, area, index);
                         $scope.editorOverlay.show = false;
                         $scope.editorOverlay = null;
+                      }
                     }
                 };
             });

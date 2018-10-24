@@ -145,6 +145,7 @@
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
     <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
     <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="sort">Brugeren har sorteret de underliggende sider</key>
     <key alias="smallCopy">Kopieret</key>
     <key alias="smallPublish">Udgivet</key>
     <key alias="smallMove">Flyttet</key>
@@ -154,6 +155,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+    <key alias="smallSort">Sorteret</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -254,7 +256,7 @@
   <area alias="media">
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
-    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade.</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
@@ -421,6 +423,8 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="enterAlias">Indtast alias...</key>
+    <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Tilladte typer</key>
@@ -530,6 +534,7 @@
     <key alias="hide">Skjul</key>
     <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
+    <key alias="id">Id</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
@@ -918,6 +923,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="updateEditCrop">Acceptér</key>
+    <key alias="undoEditCrop">Fortryd</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>

@@ -555,7 +555,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
@@ -1068,7 +1068,7 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder) == false)
+                if (contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id) == false)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");

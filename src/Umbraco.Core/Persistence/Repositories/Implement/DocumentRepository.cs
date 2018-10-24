@@ -996,7 +996,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         temp.Content.Template = template;
                     if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
                         temp.Content.PublishTemplate = template;
+
+                if (properties.ContainsKey(temp.VersionId))
                     temp.Content.Properties = properties[temp.VersionId];
+                else
+                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
 
                     // reset dirty initial properties (U4-1946)
                     temp.Content.ResetDirtyProperties(false);
