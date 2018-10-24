@@ -337,12 +337,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
 
         #endregion
 

@@ -777,7 +777,6 @@
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
-    <Compile Include="NotificationServiceExtensions.cs" />
     <Compile Include="PropertyEditors\ColorPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
@@ -1295,13 +1294,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.designer.cs">
       <DependentUpon>republish.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.cs">
-      <DependentUpon>SendPublish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.designer.cs">
-      <DependentUpon>SendPublish.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1370,7 +1362,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

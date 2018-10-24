@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -106,6 +107,7 @@ namespace Umbraco.Tests.TestHelpers
             CacheHelper cache,
             ILogger logger,
             IGlobalSettings globalSettings,
+            IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IServiceFactory container = null)
@@ -161,7 +163,7 @@ namespace Umbraco.Tests.TestHelpers
             var userService = GetLazyService<IUserService>(container, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c),globalSettings));
             var dataTypeService = GetLazyService<IDataTypeService>(container, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c)));
             var contentService = GetLazyService<IContentService>(container, c => new ContentService(scopeProvider, logger, eventMessagesFactory, mediaFileSystem, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c), GetRepo<ILanguageRepository>(c)));
-            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, logger, GetRepo<INotificationsRepository>(c),globalSettings));
+            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, logger, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c)));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(container, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
