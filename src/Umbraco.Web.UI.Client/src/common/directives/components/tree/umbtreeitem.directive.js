@@ -72,7 +72,7 @@ angular.module("umbraco.directives")
                 //get the first div element
                 element.children(":first")
                     //set the padding
-                    .css("padding-" + (Umbraco.Sys.ServerVariables.application.isRtl === true ? "right" : "left"), (node.level * 20) + "px");
+                    .css("padding-" + ($rootScope.isRtl === true ? "right" : "left"), (node.level * 20) + "px");
 
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
@@ -118,7 +118,7 @@ angular.module("umbraco.directives")
 
             scope.getInsClass = function (node) {
                 if (!node.expanded || node.metaData.isContainer) {
-                    if (Umbraco.Sys.ServerVariables.application.isRtl) {
+                    if ($rootScope.isRtl) {
                         return "icon-navigation-left";
                     }
                     return "icon-navigation-right";            

@@ -26,6 +26,17 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
             
             assetsService._loadInitAssets().then(function() {
 
+                if (data.user !== undefined) {
+                    if (data.user.isRtl) {
+                        $rootScope.rtlcss = "rtl";
+                        $rootScope.isRtl = true;
+                    }
+                    else {
+                        $rootScope.rtlcss = "css";
+                        $rootScope.isRtl = false;
+                    }
+                }
+
                 // Loads the user's locale settings for Moment.
                 userService.loadMomentLocaleForCurrentUser().then(function() {
 
@@ -91,21 +102,12 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
 
-            if (User !== undefined) {
-                if (Umbraco.Sys.ServerVariables.application.isRtl) {
-                    $rootScope.rtlcss = "rtl";
-                }
-                else {
-                    $rootScope.rtlcss = "css";
-                }
-            }
-
-            //reset the editorState on each successful route chage
+            // reset the editorState on each successful route change
             editorState.reset();
 
-            //reset the file manager on each route change, the file collection is only relavent
+            // reset the file manager on each route change, the file collection is only relavent
             // when working in an editor and submitting data to the server.
-            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
+            // This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
             fileManager.clearFiles();
         });
 

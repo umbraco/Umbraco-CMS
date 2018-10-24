@@ -20,7 +20,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public string Culture { get; set; }
 
-
         [DataMember(Name = "isRtl")]
         public bool IsRtl {
             get {

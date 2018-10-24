@@ -171,9 +171,9 @@
                         vm.page.saveButtonState = "success";
 
                         // If the culture has changed, force Umbraco to completely reload to ensure the new culture is loaded.
-                        if (vm.culture !== vm.user.culture) {
-                            location.reload(true);
-                        }
+                        //if (vm.culture !== vm.user.culture) {
+                        //    location.reload(true);
+                        //}
 
                     }, function (err) {
 
