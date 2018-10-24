@@ -172,23 +172,16 @@ namespace Umbraco.Core.Components
             composition.Container.RegisterSingleton(_ => registrar);
         }
 
-
-        // review since only one is called in the core for now, I remove this
-        // it allows us to wrap the factory to "allow re-registration".
-        ///// <summary>
-        ///// Sets the server messenger.
-        ///// </summary>
-        ///// <typeparam name="T">The type of the server registrar.</typeparam>
-        ///// <param name="composition">The composition.</param>
-        //public static void SetServerMessenger<T>(this Composition composition)
-        //    where T : IServerMessenger
-        //{
-        //    composition.Container.Register<IServerMessenger, T>(Lifetime.Singleton);
-        //}
-
-        private static Func<IContainer, IServerMessenger> serverMessengerFactory = null;
-        private static bool serverMessengerIsRegistered = false;
-        private static Func<IContainer, IServerMessenger> wrappedServerMessengerFactory = c => serverMessengerFactory(c);
+        /// <summary>
+        /// Sets the server messenger.
+        /// </summary>
+        /// <typeparam name="T">The type of the server registrar.</typeparam>
+        /// <param name="composition">The composition.</param>
+        public static void SetServerMessenger<T>(this Composition composition)
+            where T : IServerMessenger
+        {
+            composition.Container.Register<IServerMessenger, T>(Lifetime.Singleton);
+        }
 
         /// <summary>
         /// Sets the server messenger.
@@ -197,13 +190,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A function creating a server messenger.</param>
         public static void SetServerMessenger(this Composition composition, Func<IContainer, IServerMessenger> factory)
         {
-            if (!serverMessengerIsRegistered)
-            {
-                serverMessengerIsRegistered = true;
-                composition.Container.RegisterSingleton(wrappedServerMessengerFactory);
-            }
-
-            serverMessengerFactory = factory;
+            composition.Container.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -213,13 +200,7 @@ namespace Umbraco.Core.Components
         /// <param name="registrar">A server messenger.</param>
         public static void SetServerMessenger(this Composition composition, IServerMessenger registrar)
         {
-            if (!serverMessengerIsRegistered)
-            {
-                serverMessengerIsRegistered = true;
-                composition.Container.RegisterSingleton(wrappedServerMessengerFactory);
-            }
-
-            serverMessengerFactory = c => registrar;
+            composition.Container.RegisterSingleton(_ => registrar);
         }
 
         /// <summary>
