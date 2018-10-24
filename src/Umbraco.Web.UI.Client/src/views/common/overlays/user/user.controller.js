@@ -39,6 +39,7 @@ angular.module("umbraco")
             $location.path("/logout");
 
             if (Umbraco.Sys.ServerVariables.application.defaultLang !== $scope.user.locale) {
+                $scope.user = null;
                 location.reload(true);
             }
         };

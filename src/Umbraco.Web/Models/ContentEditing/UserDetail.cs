@@ -20,6 +20,14 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public string Culture { get; set; }
 
+
+        [DataMember(Name = "isRtl")]
+        public bool IsRtl {
+            get {
+                return System.Globalization.CultureInfo.CreateSpecificCulture(this.Culture).TextInfo.IsRightToLeft;
+            }
+        }
+
         /// <summary>
         /// The MD5 lowercase hash of the email which can be used by gravatar
         /// </summary>

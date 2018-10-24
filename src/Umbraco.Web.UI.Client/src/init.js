@@ -91,7 +91,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
 
-            if (Umbraco.Sys.ServerVariables.application.isRtl !== undefined) {
+            if (User !== undefined) {
                 if (Umbraco.Sys.ServerVariables.application.isRtl) {
                     $rootScope.rtlcss = "rtl";
                 }
