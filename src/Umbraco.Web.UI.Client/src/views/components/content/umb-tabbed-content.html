@@ -22,10 +22,12 @@
                         </div>
                     </div>
 
-                    <umb-property-editor 
-                        model="property" 
-                        preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
-                    </umb-property-editor>
+                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                        <umb-property-editor
+                            model="property" 
+                            preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                        </umb-property-editor>
+                    </div>
 
                 </umb-property>
             </div>
