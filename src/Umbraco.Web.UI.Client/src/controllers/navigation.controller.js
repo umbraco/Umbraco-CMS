@@ -194,7 +194,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 $rootScope.emptySection = false;
             }
         }
-        
+
     }));
 
     //Listen for section state changes
@@ -222,10 +222,21 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         });
     }));
 
-    evts.push(eventsService.on("editors.languages.languageCreated", function (e, args) {
-        loadLanguages().then(function (languages) {
-            $scope.languages = languages;
-        });
+    //Emitted when a language is created or an existing one saved/edited
+    evts.push(eventsService.on("editors.languages.languageSaved", function (e, args) {
+        console.log('lang event listen args', args);
+        if(args.isNew){
+            //A new language has been created - reload languages for tree
+            loadLanguages().then(function (languages) {
+                $scope.languages = languages;
+            });
+        }
+        else if(args.language.isDefault){
+            //A language was saved and was set to be the new default (refresh the tree, so its at the top)
+            loadLanguages().then(function (languages) {
+                $scope.languages = languages;
+            });
+        }
     }));
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs

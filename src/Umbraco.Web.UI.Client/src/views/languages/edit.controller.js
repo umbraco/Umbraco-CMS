@@ -113,11 +113,9 @@
                         notificationsService.success(value);
                     });
 
-                    // emit event when language is created
-                    if($routeParams.create) {
-                        var args = { language: lang };
-                        eventsService.emit("editors.languages.languageCreated", args);
-                    }
+                    // emit event when language is created or updated/saved
+                    var args = { language: lang, isNew: $routeParams.create ? true : false };
+                    eventsService.emit("editors.languages.languageSaved", args);
 
                     back();
 
@@ -129,7 +127,7 @@
                 });
             }
 
-            
+
         }
 
         function back() {
@@ -145,7 +143,7 @@
         }
 
         function toggleDefault() {
-            
+
             // it shouldn't be possible to uncheck the default language
             if(vm.initIsDefault) {
                 return;
