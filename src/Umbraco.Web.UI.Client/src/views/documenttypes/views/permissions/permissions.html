@@ -10,11 +10,10 @@
                     <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
                 </div>
                 <div class="sub-view-column-right">
-                    <umb-toggle
-                        data-element="permissions-allow-as-root"
-                        checked="model.allowAsRoot"
-                        on-click="vm.toggleAllowAsRoot()"
-                        hotkey="alt+shift+r">
+                    <umb-toggle data-element="permissions-allow-as-root"
+                                checked="model.allowAsRoot"
+                                on-click="vm.toggleAllowAsRoot()"
+                                hotkey="alt+shift+r">
                     </umb-toggle>
                 </div>
 
@@ -28,24 +27,29 @@
                 </div>
 
                 <div class="sub-view-column-right">
-                    <umb-child-selector
-                        selected-children="vm.selectedChildren"
-                        available-children="vm.contentTypes"
-                        parent-name="model.name"
-                        parent-icon="model.icon"
-                        parent-id="model.id"
-                        on-add="vm.addChild"
-                        on-remove="vm.removeChild">
+                    <umb-child-selector selected-children="vm.selectedChildren"
+                                        available-children="vm.contentTypes"
+                                        parent-name="model.name"
+                                        parent-icon="model.icon"
+                                        parent-id="model.id"
+                                        on-add="vm.addChild"
+                                        on-remove="vm.removeChild">
                     </umb-child-selector>
                 </div>
+
+            </div>
+
+            <div class="sub-view-column-section">
+
+                <h5>Content Type Variation</h5>
+                <small>Define the rules for how this content type's properties can be varied</small>
 
             </div>
 
             <div class="sub-view-columns">
 
                 <div class="sub-view-column-left">
-                    <h5>Content Type Variation</h5>
-                    <small>Define the rules for how this content type's properties can be varied</small>
+                    <label>Allow varying by Culture</label>
                 </div>
                 <div class="sub-view-column-right">
                     <umb-toggle data-element="permissions-allow-culture-variant"
@@ -53,13 +57,11 @@
                                 on-click="vm.toggleAllowCultureVariants()"
                                 hotkey="alt+shift+v">
                     </umb-toggle>
-                    <label class="checkbox no-indent">                       
-                        Allow varying by Culture
-                    </label>
+
                 </div>
 
             </div>
-            
+
         </umb-box-content>
     </umb-box>
 </div>
