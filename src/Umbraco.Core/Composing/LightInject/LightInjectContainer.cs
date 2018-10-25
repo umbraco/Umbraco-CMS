@@ -20,8 +20,6 @@ namespace Umbraco.Core.Composing.LightInject
         protected LightInjectContainer(ServiceContainer container)
         {
             Container = container;
-
-            container.RegisterSingleton<IContainer>(_ => this);
         }
 
         /// <summary>
@@ -152,6 +150,12 @@ namespace Umbraco.Core.Composing.LightInject
                 ctorArgs[i++] = arg ?? GetInstance(parameter.ParameterType);
             }
             return ctor.Invoke(ctorArgs);
+        }
+
+        /// <inheritdoc />
+        public void Release(object instance)
+        {
+            // nothing to release with LightInject
         }
 
         // notes:
@@ -317,11 +321,6 @@ namespace Umbraco.Core.Composing.LightInject
         //    => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
 
         #endregion
-
-        public void Release(object instance)
-        {
-            // fixme - no idea how to do this with LI
-        }
 
         #region Control
 
