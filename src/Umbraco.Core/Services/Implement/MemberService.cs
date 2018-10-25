@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Member '{member.Name}' was created with Id {member.Id}", member.CreatorId, member.Id);
+            Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }
 
         #endregion
@@ -843,7 +843,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                Audit(AuditType.Save, "Save Member performed by user", 0, member.Id);
+                Audit(AuditType.Save, 0, member.Id);
 
                 scope.Complete();
             }
@@ -884,7 +884,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                Audit(AuditType.Save, "Save Member items performed by user", 0, -1);
+                Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
                 scope.Complete();
             }
@@ -912,7 +912,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 DeleteLocked(scope, member, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete Member performed by user", 0, member.Id);
+                Audit(AuditType.Delete, 0, member.Id);
                 scope.Complete();
             }
         }
@@ -1089,9 +1089,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
         }
 
         #endregion

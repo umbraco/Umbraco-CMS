@@ -236,11 +236,11 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual("name-uk", content.GetCultureName(langUk));
 
             // variant dictionary of names work
-            Assert.AreEqual(2, content.CultureNames.Count);
-            Assert.IsTrue(content.CultureNames.ContainsKey(langFr));
-            Assert.AreEqual("name-fr", content.CultureNames[langFr]);
-            Assert.IsTrue(content.CultureNames.ContainsKey(langUk));
-            Assert.AreEqual("name-uk", content.CultureNames[langUk]);
+            Assert.AreEqual(2, content.CultureInfos.Count);
+            Assert.IsTrue(content.CultureInfos.ContainsKey(langFr));
+            Assert.AreEqual("name-fr", content.CultureInfos[langFr].Name);
+            Assert.IsTrue(content.CultureInfos.ContainsKey(langUk));
+            Assert.AreEqual("name-uk", content.CultureInfos[langUk].Name);
         }
 
         [Test]

@@ -66,7 +66,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets a collection of PropertyTypes for this PropertyGroup
         /// </summary>
+        /// <remarks>
+        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// </remarks>
         [DataMember]
+        [DoNotClone]
         public PropertyTypeCollection PropertyTypes
         {
             get => _propertyTypes;
@@ -94,6 +98,26 @@ namespace Umbraco.Core.Models
             var baseHash = base.GetHashCode();
             var nameHash = Name.ToLowerInvariant().GetHashCode();
             return baseHash ^ nameHash;
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (PropertyGroup)base.DeepClone();
+
+            //turn off change tracking
+            clone.DisableChangeTracking();
+
+            if (clone._propertyTypes != null)
+            {
+                clone._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
+                clone._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
+                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;       //re-assign correct event handler
+            }
+
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
+            return clone;
         }
     }
 }

@@ -404,7 +404,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 OnSaved(scope, saveEventArgs);
 
-                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
+                Audit(AuditType.Save, userId, item.Id);
                 scope.Complete();
             }
         }
@@ -446,7 +446,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 OnSaved(scope, saveEventArgs);
 
-                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1);
                 scope.Complete();
             }
         }
@@ -504,7 +504,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 OnDeleted(scope, deleteEventArgs);
 
-                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
+                Audit(AuditType.Delete, userId, item.Id);
                 scope.Complete();
             }
         }
@@ -557,7 +557,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 OnDeleted(scope, deleteEventArgs);
 
-                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1);
                 scope.Complete();
             }
         }
@@ -944,9 +944,10 @@ namespace Umbraco.Core.Services.Implement
 
         #region Audit
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId,
+                ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
         }
 
         #endregion

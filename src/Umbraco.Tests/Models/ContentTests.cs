@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -40,6 +41,66 @@ namespace Umbraco.Tests.Models
             Container.Register<FileSystems>();
             Container.Register(_ => Mock.Of<IDataTypeService>());
             Container.Register(_ => Mock.Of<IContentSection>());
+        }
+
+        [Test]
+        public void Variant_Culture_Names_Track_Dirty_Changes()
+        {
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            const string langFr = "fr-FR";
+            
+            contentType.Variations = ContentVariation.Culture;
+
+            Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //hasn't been changed
+
+            Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
+            content.SetCultureName("name-fr", langFr);
+            Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //now it will be changed since the collection has changed
+            var frCultureName = content.CultureInfos[langFr];
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
+
+            content.ResetDirtyProperties();
+
+            Assert.IsFalse(content.IsPropertyDirty("CultureInfos"));    //it's been reset
+            Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
+
+            Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
+            content.SetCultureName("name-fr", langFr);
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(content.IsPropertyDirty("CultureInfos"));     //it's true now since we've updated a name
+        }
+
+        [Test]
+        public void Variant_Published_Culture_Names_Track_Dirty_Changes()
+        {
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            const string langFr = "fr-FR";
+
+            contentType.Variations = ContentVariation.Culture;
+
+            Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //hasn't been changed
+
+            Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
+            content.SetCultureName("name-fr", langFr);
+            content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
+            Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //now it will be changed since the collection has changed
+            var frCultureName = content.PublishCultureInfos[langFr];
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
+
+            content.ResetDirtyProperties();
+
+            Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos"));    //it's been reset
+            Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
+
+            Thread.Sleep(500);                                          //The "Date" wont be dirty if the test runs too fast since it will be the same date
+            content.SetCultureName("name-fr", langFr);
+            content.PublishCulture(langFr);                             //we've set the name, now we're publishing it
+            Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));       
+            Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos"));     //it's true now since we've updated a name
         }
 
         [Test]

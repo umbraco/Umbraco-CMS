@@ -138,6 +138,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             Chain<DropTaskTables>("{6A2C7C1B-A9DB-4EA9-B6AB-78E7D5B722A7}");
             Chain<FixLockTablePrimaryKey>("{77874C77-93E5-4488-A404-A630907CEEF0}");
+            Chain<AddLogTableColumns>("{8804D8E8-FE62-4E3A-B8A2-C047C2118C38}");
 
             //FINAL
 
