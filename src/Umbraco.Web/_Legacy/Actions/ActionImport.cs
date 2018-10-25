@@ -72,6 +72,8 @@
             }
         }
 
+        public bool OpensDialog => true;
+
         #endregion
     }
 }

@@ -174,6 +174,7 @@ namespace Umbraco.Web._Legacy.Actions
         public string Alias { get; set; }
         public string JsFunctionName { get; set; }
         public string JsSource { get; set; }
+        public bool OpensDialog { get; set; }
 
         public PlaceboAction() { }
         public PlaceboAction(IAction legacyAction)
@@ -185,6 +186,7 @@ namespace Umbraco.Web._Legacy.Actions
             Alias = legacyAction.Alias;
             JsFunctionName = legacyAction.JsFunctionName;
             JsSource = legacyAction.JsSource;
+            OpensDialog = legacyAction.OpensDialog;
         }
     }
 
