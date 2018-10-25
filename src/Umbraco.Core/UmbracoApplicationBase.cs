@@ -34,8 +34,6 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual IContainer GetContainer()
         {
-            // note: the actual, web UmbracoApplication is overriding this
-            // with a web-supporting container
             return ContainerFactory.Create();
         }
 
@@ -70,7 +68,6 @@ namespace Umbraco.Core
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
             var container = GetContainer();
-            container.RegisterInstance(container);
             Current.Container = container;
 
             // register the essential stuff,
@@ -107,6 +104,8 @@ namespace Umbraco.Core
 
         protected virtual void ConfigureAssemblyResolve(ILogger logger)
         {
+            // TODO - do we still need this?
+
             // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
             // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
