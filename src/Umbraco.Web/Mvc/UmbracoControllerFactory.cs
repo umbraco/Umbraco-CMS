@@ -66,12 +66,10 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <remarks></remarks>
         internal class OverridenDefaultControllerFactory : ContainerControllerFactory
-            // DefaultControllerFactory
         {
             public OverridenDefaultControllerFactory()
                 : base(Current.Container)
-            {
-            }
+            { }
 
             public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)
             {
@@ -80,11 +78,9 @@ namespace Umbraco.Web.Mvc
 
             public new Type GetControllerType(RequestContext requestContext, string controllerName)
             {
-                if (controllerName.IsNullOrWhiteSpace())
-                {
-                    return null;
-                }
-                return base.GetControllerType(requestContext, controllerName);
+                return controllerName.IsNullOrWhiteSpace()
+                    ? null
+                    : base.GetControllerType(requestContext, controllerName);
             }
         }
     }
