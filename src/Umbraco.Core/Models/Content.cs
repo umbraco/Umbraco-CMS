@@ -499,28 +499,23 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Content) base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedContent = (Content)clone;
 
             //need to manually clone this since it's not settable
-            clone._contentType = (IContentType) ContentType.DeepClone();
+            clonedContent._contentType = (IContentType) ContentType.DeepClone();
 
             //if culture infos exist then deal with event bindings
-            if (clone._publishInfos != null)
+            if (clonedContent._publishInfos != null)
             {
-                clone._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
-                clone._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
-                clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;    //re-assign correct event handler
+                clonedContent._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
+                clonedContent._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
+                clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
-
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            
         }
     }
 }

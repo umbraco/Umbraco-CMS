@@ -284,22 +284,18 @@ namespace Umbraco.Core.Models
             get { return _properties; }
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Macro)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            clone._addedProperties = new List<string>();
-            clone._removedProperties = new List<string>();
-            clone._properties = (MacroPropertyCollection)Properties.DeepClone();
-            //re-assign the event handler
-            clone._properties.CollectionChanged += clone.PropertiesChanged;
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedEntity = (Macro)clone;
+            
+            clonedEntity._addedProperties = new List<string>();
+            clonedEntity._removedProperties = new List<string>();
+            clonedEntity._properties = (MacroPropertyCollection)Properties.DeepClone();
+            //re-assign the event handler
+            clonedEntity._properties.CollectionChanged += clonedEntity.PropertiesChanged;
+            
         }
     }
 }
