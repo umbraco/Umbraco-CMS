@@ -31,7 +31,10 @@
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
     "clipboard": "1.7.1",
-    "font-awesome": "~4.2"
+    "font-awesome": "~4.7"
+  },
+  "resolutions": {
+    "font-awesome": "~4.7"
   },
   "install": {
     "path": "lib-bower",
