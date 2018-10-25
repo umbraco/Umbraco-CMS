@@ -681,7 +681,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
     <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
     <key alias="contentPublishedFailedByEvent">%0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.</key>
-    <key alias="contentPublishedFailedByParent">%0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
+    <key alias="contentPublishedFailedByParent">%0% (ID: %1%) kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
     <key alias="includeUnpublished">Unveröffentlichte Unterelemente einschließen</key>
     <key alias="inProgress">Bitte warten, Veröffentlichung läuft...</key>
     <key alias="inProgressCounter">%0% Elemente veröffentlicht, %1% Elemente ausstehend ...</key>
