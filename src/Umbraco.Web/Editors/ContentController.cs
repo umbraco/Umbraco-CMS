@@ -1054,7 +1054,7 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                    new[] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) }).Trim());
+                                    new[] {status.ContentItem.Name, status.ContentItem.Id.ToString() }));
                     break;
                 case PublishStatusType.FailedCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
