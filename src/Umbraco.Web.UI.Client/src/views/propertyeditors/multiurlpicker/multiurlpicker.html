@@ -4,20 +4,18 @@
 
     <ng-form name="multiUrlPickerForm">
         <div ui-sortable="sortableOptions" ng-model="renderModel">
-            <div>
-                <umb-node-preview
-                    ng-repeat="link in renderModel"
-                    icon="link.icon"
-                    name="link.name"
-                    published="link.published"
-                    description="link.url + (link.queryString ? link.queryString : '')"
-                    sortable="!sortableOptions.disabled"
-                    allow-remove="true"
-                    allow-open="true"
-                    on-remove="remove($index)"
-                    on-open="openLinkPicker(link, $index)">
-                </umb-node-preview>
-            </div>
+            <umb-node-preview
+                ng-repeat="link in renderModel"
+                icon="link.icon"
+                name="link.name"
+                published="link.published"
+                description="link.url + (link.queryString ? link.queryString : '')"
+                sortable="!sortableOptions.disabled"
+                allow-remove="true"
+                allow-open="true"
+                on-remove="remove($index)"
+                on-open="openLinkPicker(link, $index)">
+            </umb-node-preview>
         </div>
 
         <a ng-show="!model.config.maxNumber || renderModel.length < model.config.maxNumber"
