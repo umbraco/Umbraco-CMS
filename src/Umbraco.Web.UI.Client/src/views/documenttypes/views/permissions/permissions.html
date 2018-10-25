@@ -13,7 +13,7 @@
                     <umb-toggle
                         data-element="permissions-allow-as-root"
                         checked="model.allowAsRoot"
-                        on-click="vm.toggle()"
+                        on-click="vm.toggleAllowAsRoot()"
                         hotkey="alt+shift+r">
                     </umb-toggle>
                 </div>
@@ -48,8 +48,12 @@
                     <small>Define the rules for how this content type's properties can be varied</small>
                 </div>
                 <div class="sub-view-column-right">
-                    <label class="checkbox no-indent">
-                        <input type="checkbox" ng-model="model.allowCultureVariant" />
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowCultureVariant"
+                                on-click="vm.toggleAllowCultureVariants()"
+                                hotkey="alt+shift+v">
+                    </umb-toggle>
+                    <label class="checkbox no-indent">                       
                         Allow varying by Culture
                     </label>
                 </div>
