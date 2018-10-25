@@ -943,10 +943,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       Go to http://%4%/#/content/content/edit/%5% to edit.
 
+      %6%
+
       Have a nice day!
 
       Cheers from the Umbraco robot
     ]]></key>
+    <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
     <key alias="mailBodyHtml"><![CDATA[
         <html>
 			<head>
@@ -1002,9 +1005,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 														</table>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<h3>Update summary:</h3>
-															<table style="width: 100%;">
-																 %6%
-															</table>
+															%6%
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Have a nice day!<br /><br />
@@ -1025,6 +1026,9 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
 		</html>
 	]]></key>
+    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
+        %0%
+    ]]></key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
   </area>

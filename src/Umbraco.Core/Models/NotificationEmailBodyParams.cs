@@ -21,6 +21,10 @@ namespace Umbraco.Core.Models
         public string ItemName { get; }
         public string ItemId { get; }
         public string ItemUrl { get; }
+
+        /// <summary>
+        /// This will either be an HTML or text based summary depending on the email type being sent
+        /// </summary>
         public string Summary { get; }
         public string EditedUser { get; }
         public string SiteUrl { get; }

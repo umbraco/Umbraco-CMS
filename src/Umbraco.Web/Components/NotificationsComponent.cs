@@ -150,22 +150,42 @@ namespace Umbraco.Web.Components
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null) throw new ArgumentNullException(nameof(siteUri));
 
-                _notificationService.SendNotifications(
-                    sender,
-                    entities,
-                    action.Letter.ToString(CultureInfo.InvariantCulture),
-                    _textService.Localize("actions", action.Alias),
-                    siteUri,
-                    ((IUser user, NotificationEmailSubjectParams subject) x)
-                        => _textService.Localize(
-                                "notifications/mailSubject",
-                                x.user.GetUserCulture(_textService, _globalSettings),
-                                new[] { x.subject.SiteUrl, x.subject.Action, x.subject.ItemName }), 
-                    ((IUser user, NotificationEmailBodyParams body, bool isHtml) x)
-                        => _textService.Localize(
-                                x.isHtml ? "notifications/mailBodyHtml" : "notifications/mailBody",
-                                x.user.GetUserCulture(_textService, _globalSettings),
-                                new[] { x.body.RecipientName, x.body.Action, x.body.ItemName, x.body.EditedUser, x.body.SiteUrl, x.body.ItemId, x.body.Summary, x.body.ItemUrl }));
+                //group by the content type variation since the emails will be different
+                foreach(var contentVariantGroup in entities.GroupBy(x => x.ContentType.Variations))
+                {
+                    if (contentVariantGroup.Key == ContentVariation.CultureAndSegment || contentVariantGroup.Key == ContentVariation.Segment)
+                        throw new NotSupportedException("Segments are not yet supported in Umbraco");
+
+                    _notificationService.SendNotifications(
+                        sender,
+                        contentVariantGroup,
+                        action.Letter.ToString(CultureInfo.InvariantCulture),
+                        _textService.Localize("actions", action.Alias),
+                        siteUri,
+                        ((IUser user, NotificationEmailSubjectParams subject) x)
+                            => _textService.Localize(
+                                    "notifications/mailSubject",
+                                    x.user.GetUserCulture(_textService, _globalSettings),
+                                    new[] { x.subject.SiteUrl, x.subject.Action, x.subject.ItemName }),
+                        ((IUser user, NotificationEmailBodyParams body, bool isHtml) x)
+                            => _textService.Localize(
+                                    x.isHtml ? "notifications/mailBodyHtml" : "notifications/mailBody",
+                                    x.user.GetUserCulture(_textService, _globalSettings),
+                                    new[]
+                                    {
+                                        x.body.RecipientName,
+                                        x.body.Action,
+                                        x.body.ItemName,
+                                        x.body.EditedUser,
+                                        x.body.SiteUrl,
+                                        x.body.ItemId,
+                                        //format the summary depending on if it's variant or not
+                                        contentVariantGroup.Key == ContentVariation.Culture
+                                            ? (x.isHtml ? _textService.Localize("notifications/mailBodyVariantHtmlSummary", new[]{ x.body.Summary }) : _textService.Localize("notifications/mailBodyVariantSummary", new []{ x.body.Summary }))
+                                            : x.body.Summary,
+                                        x.body.ItemUrl
+                                    }));
+                }
             }
 
         }

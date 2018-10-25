@@ -24,12 +24,13 @@ namespace Umbraco.Core.Services.Implement
         private readonly IScopeProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
+        private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSection _contentSection;
         private readonly ILogger _logger;
 
-        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService,
+        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
             ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
         {
             _notificationsRepository = notificationsRepository;
@@ -38,6 +39,7 @@ namespace Umbraco.Core.Services.Implement
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _localizationService = localizationService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -279,7 +281,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="siteUri"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContentBase content, IContentBase oldDoc,
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IContentBase oldDoc,
             string actionName,
             Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
@@ -294,34 +296,88 @@ namespace Umbraco.Core.Services.Implement
 
             // build summary
             var summary = new StringBuilder();
-            var props = content.Properties.ToArray();
-            foreach (var p in props)
+
+            if (content.ContentType.VariesByNothing())
             {
-                //fixme doesn't take into account variants
-
-                var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
-                var oldText = newText;
-
-                // check if something was changed and display the changes otherwise display the fields
-                if (oldDoc.Properties.Contains(p.PropertyType.Alias))
+                if (!_contentSection.DisableHtmlEmail)
                 {
-                    var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                    oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
+                    //create the html summary for invariant content
 
-                    // replace html with char equivalent
-                    ReplaceHtmlSymbols(ref oldText);
-                    ReplaceHtmlSymbols(ref newText);
+                    //list all of the property values like we used to
+                    summary.Append("<table style=\"width: 100 %; \">");
+                    foreach (var p in content.Properties)
+                    {
+                        //fixme doesn't take into account variants
+
+                        var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
+                        var oldText = newText;
+
+                        // check if something was changed and display the changes otherwise display the fields
+                        if (oldDoc.Properties.Contains(p.PropertyType.Alias))
+                        {
+                            var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
+                            oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
+
+                            // replace html with char equivalent
+                            ReplaceHtmlSymbols(ref oldText);
+                            ReplaceHtmlSymbols(ref newText);
+                        }
+
+                        //show the values
+                        summary.Append("<tr>");
+                        summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
+                        summary.Append(p.PropertyType.Name);
+                        summary.Append("</th>");
+                        summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
+                        summary.Append(newText);
+                        summary.Append("</td>");
+                        summary.Append("</tr>");
+                    }
+                    summary.Append("</table>");
                 }
+                
+            }
+            else if (content.ContentType.VariesByCulture())
+            {
+                //it's variant, so detect what cultures have changed
 
-                //show the values
-                summary.Append("<tr>");
-                summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
-                summary.Append(p.PropertyType.Name);
-                summary.Append("</th>");
-                summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
-                summary.Append(newText);
-                summary.Append("</td>");
-                summary.Append("</tr>");
+                if (!_contentSection.DisableHtmlEmail)
+                {
+                    //Create the html based summary (ul of culture names)
+
+                    var culturesChanged = content.CultureInfos.Where(x => x.Value.WasDirty())
+                        .Select(x => x.Key)
+                        .Select(_localizationService.GetLanguageByIsoCode)
+                        .WhereNotNull()
+                        .Select(x => x.CultureName);
+                    summary.Append("<ul>");
+                    foreach (var culture in culturesChanged)
+                    {
+                        summary.Append("<li>");
+                        summary.Append(culture);
+                        summary.Append("</li>");
+                    }
+                    summary.Append("</ul>");
+                }
+                else
+                {
+                    //Create the text based summary (csv of culture names)
+
+                    var culturesChanged = string.Join(", ", content.CultureInfos.Where(x => x.Value.WasDirty())
+                        .Select(x => x.Key)
+                        .Select(_localizationService.GetLanguageByIsoCode)
+                        .WhereNotNull()
+                        .Select(x => x.CultureName));
+
+                    summary.Append("'");
+                    summary.Append(culturesChanged);
+                    summary.Append("'");
+                }
+            }
+            else
+            {
+                //not supported yet...
+                throw new NotSupportedException();
             }
 
             var protocol = _globalSettings.UseHttps ? "https" : "http";

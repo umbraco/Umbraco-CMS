@@ -467,8 +467,10 @@ namespace Umbraco.Core.Models
         {
             base.ResetDirtyProperties(rememberDirty);
 
-            Template.ResetDirtyProperties(rememberDirty);
-            ContentType.ResetDirtyProperties(rememberDirty);
+            if (Template != null)
+                Template.ResetDirtyProperties(rememberDirty);
+            if (ContentType != null)
+                ContentType.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
