@@ -463,7 +463,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     //if it is not two parts long then this most likely means that it's a legacy action
                     var js = action.metaData["jsAction"].replace("javascript:", "");
-                    //there's not really a different way to acheive this except for eval
+                    //there's not really a different way to achieve this except for eval
                     eval(js);
                 }
                 else {
