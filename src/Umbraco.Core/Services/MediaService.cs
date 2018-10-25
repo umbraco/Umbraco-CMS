@@ -1104,6 +1104,13 @@ namespace Umbraco.Core.Services
                     var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
                     if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs, "Trashing"))
                     {
+                        if (moveEventArgs.Messages.Count > 0)
+                        {
+                            foreach (var message in moveEventArgs.Messages.GetAll())
+                            {
+                                evtMsgs.Add(message);
+                            }
+                        }
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs);
                     }
