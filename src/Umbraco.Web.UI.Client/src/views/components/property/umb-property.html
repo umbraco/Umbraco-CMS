@@ -8,7 +8,9 @@
 
                 <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
                     
-                    <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">Inherits from {{inheritsFrom}}</small>
+                    <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
+                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{inheritsFrom}}
+                    </small>
 
                     {{property.label}}
 
