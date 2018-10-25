@@ -89,10 +89,6 @@ namespace Umbraco.Web.Runtime
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.Container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
-            // review - Let's just keep the one, eh? (Line 104)
-            //// register the 'current' umbraco context - transient - for eg controllers
-            //composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, "TransientUmbracoContext");
-
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
             composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
@@ -100,11 +96,11 @@ namespace Umbraco.Web.Runtime
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.Container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
-            // review - making the umbraco context and actual per request thing. See 9a4eecab0177a67b8e7670edadb4547f5c3271b9
-             // register a per-request UmbracoContext object
-             // no real need to be per request but assuming it is faster
-             // fixme - this second registration really bugs me. re-purposing a (nameless) service? can't we force everything to use the accessor now?
-                composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
+            // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
+            // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
+            // a way to inject the UmbracoContext - and register it per-request to be more efficient
+            //TODO: stop doing this
+            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
             // register the umbraco helper
             composition.Container.RegisterSingleton<UmbracoHelper>();
