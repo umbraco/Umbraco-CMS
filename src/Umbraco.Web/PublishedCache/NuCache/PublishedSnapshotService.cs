@@ -198,6 +198,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void InitializeRepositoryEvents()
         {
+            //fixme: The reason these events are in the repository is for legacy, the events should exist at the service
+            // level now since we can fire these events within the transaction... so move the events to service level
+
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
@@ -212,9 +215,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
-            ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
         }
 
         private void TearDownRepositoryEvents()
@@ -229,9 +232,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //MemberRepository.RemovedVersion -= OnMemberRemovedVersion;
             MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
-            ContentTypeService.UowRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.UowRefreshedEntity -= OnMemberTypeRefreshedEntity;
+            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
+            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
+            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
         }
 
         public override void Dispose()
@@ -1190,13 +1193,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var names = content is IContent document
                     ? (published
-                        ? document.PublishNames
-                        : document.CultureNames)
-                    : content.CultureNames;
+                        ? document.PublishCultureInfos
+                        : document.CultureInfos)
+                    : content.CultureInfos;
 
             foreach (var (culture, name) in names)
             {
-                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                cultureData[culture] = new CultureVariation { Name = name.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
             }
 
             //the dictionary that will be serialized

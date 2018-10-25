@@ -26,8 +26,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.showCreateDocTypeCollection = function () {
         $scope.model.creatingDoctypeCollection = true;
-        $scope.model.collectionCreateTemplate = true;
-        $scope.model.collectionItemCreateTemplate = true;
+        $scope.model.collectionCreateTemplate = !$scope.model.disableTemplates;
+        $scope.model.collectionItemCreateTemplate = !$scope.model.disableTemplates;
     };
 
     $scope.createContainer = function () {

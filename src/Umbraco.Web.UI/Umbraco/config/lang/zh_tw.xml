@@ -299,7 +299,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言      
+      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言
    ]]></key>
     <key alias="displayName">語言名稱</key>
   </area>
@@ -625,6 +625,7 @@
     <key alias="renewSession">已更新，繼續工作。</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">超級星期天快樂</key>
     <key alias="greeting1">瘋狂星期一快樂</key>
     <key alias="greeting2">熱鬧星期二快樂</key>
     <key alias="greeting3">美妙星期三快樂</key>
@@ -671,7 +672,7 @@
 
       這是一封自動產生的信件來通知您 %1% 工作
       已經在頁面 %2% 上由使用者 %3% 執行完成
-      
+
 
       請移至下列網址編輯： http://%4%/#/content/content/edit/%5%
 
@@ -1056,7 +1057,7 @@
       哈嘍 %0%
 
       這是一封自動產生的郵件通知您文檔 %1%
-      已經被 %2 要求翻譯成 %5% 
+      已經被 %2 要求翻譯成 %5%
 
       請移至此網址來編輯： http://%3%/translation/details.aspx?id=%4%
 

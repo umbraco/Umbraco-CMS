@@ -33,7 +33,7 @@ namespace dashboardUtilities
                     return;
 
                 var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                if (feedProxyXml?.SelectSingleNode($"//allow[@host = '{requestUri.Host}']") != null && requestUri.Port == 80)
+                if (feedProxyXml?.SelectSingleNode($"//allow[@host = '{requestUri.Host}']") != null && (requestUri.Port == 80 || requestUri.Port == 443))
                 {
                     if (_httpClient == null)
                         _httpClient = new HttpClient();

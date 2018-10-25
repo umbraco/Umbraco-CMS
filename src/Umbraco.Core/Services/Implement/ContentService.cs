@@ -328,7 +328,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Content '{content.Name}' was created with Id {content.Id}", content.CreatorId, content.Id);
+            Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
         }
 
         #endregion
@@ -471,6 +471,19 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetAllVersions(id);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by Id
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetAllVersionsSlim(id, skip, take);
             }
         }
 
@@ -834,6 +847,15 @@ namespace Umbraco.Core.Services.Implement
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
+                //track the cultures that have changed
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 _documentRepository.Save(content);
 
                 if (raiseEvents)
@@ -843,7 +865,12 @@ namespace Umbraco.Core.Services.Implement
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                Audit(AuditType.Save, "Saved by user", userId, content.Id);
+
+                if (culturesChanging != null)
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved cultures: {culturesChanging}", culturesChanging);
+                else
+                    Audit(AuditType.Save, userId, content.Id);
+
                 scope.Complete();
             }
 
@@ -883,7 +910,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(AuditType.Save, "Bulk-saved by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
 
                 scope.Complete();
             }
@@ -988,14 +1015,19 @@ namespace Umbraco.Core.Services.Implement
                     UnpublishResultType result;
                     if (culture == "*" || culture == null)
                     {
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         result = UnpublishResultType.Success;
                     }
                     else
                     {
-                        Audit(AuditType.Unpublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
+                        //unpublishing a specific culture
+                        Audit(AuditType.UnpublishVariant, userId, content.Id, $"Culture \"{culture}\" unpublished", culture);
                         if (!content.Published)
-                            Audit(AuditType.Unpublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
+                        {
+                            //log that the whole content item has been unpublished due to mandatory culture unpublished
+                            Audit(AuditType.Unpublish, userId, content.Id, $"Unpublished (culture \"{culture}\" is mandatory)");
+                        }
+                            
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1025,6 +1057,8 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
+            string culturesChanging = null;
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // is the content going to end up published, or unpublished?
@@ -1045,6 +1079,10 @@ namespace Umbraco.Core.Services.Implement
 
                         // we may end up in a state where we won't publish nor unpublish
                         // keep going, though, as we want to save anways
+                    }
+                    else
+                    {
+                        culturesChanging = string.Join(",", content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key));
                     }
                 }
 
@@ -1085,6 +1123,7 @@ namespace Umbraco.Core.Services.Implement
                         // ensure that the document can be unpublished, and unpublish
                         // handling events, business rules, etc
                         // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                        // note: This unpublishes the entire document (not different variants)
                         unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                         if (unpublishResult.Success)
                             unpublishResult = StrategyUnpublish(scope, content, true, userId, evtMsgs);
@@ -1122,7 +1161,7 @@ namespace Umbraco.Core.Services.Implement
                         // events and audit
                         scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         scope.Complete();
                         return new PublishResult(PublishResultType.Success, evtMsgs, content);
                     }
@@ -1153,7 +1192,11 @@ namespace Umbraco.Core.Services.Implement
                             scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                         }
 
-                        Audit(AuditType.Publish, "Published by user", userId, content.Id);
+                        if (culturesChanging != null)
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published cultures: {culturesChanging}", culturesChanging);
+                        else
+                            Audit(AuditType.Publish, userId, content.Id);
+
                         scope.Complete();
                         return publishResult;
                     }
@@ -1264,6 +1307,8 @@ namespace Umbraco.Core.Services.Implement
                 // deal with descendants
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
+
+                //fixme: should be paged to not overwhelm the database (timeouts)
                 foreach (var d in GetDescendants(document))
                 {
                     // if parent is excluded, exclude document and ignore
@@ -1287,7 +1332,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
-                Audit(AuditType.Publish, "Branch published by user", userId, document.Id);
+                Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 scope.Complete();
             }
@@ -1356,7 +1401,7 @@ namespace Umbraco.Core.Services.Implement
                 DeleteLocked(scope, content);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(AuditType.Delete, "Deleted by user", userId, content.Id);
+                Audit(AuditType.Delete, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1424,7 +1469,7 @@ namespace Umbraco.Core.Services.Implement
 
                 deleteRevisionsEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
-                Audit(AuditType.Delete, "Delete (by version date) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
                 scope.Complete();
             }
@@ -1461,7 +1506,7 @@ namespace Umbraco.Core.Services.Implement
                     _documentRepository.DeleteVersion(versionId);
 
                 scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
-                Audit(AuditType.Delete, "Delete (by version) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
                 scope.Complete();
             }
@@ -1506,7 +1551,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
-                Audit(AuditType.Move, "Moved to Recycle Bin by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
                 scope.Complete();
             }
@@ -1578,7 +1623,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
-                Audit(AuditType.Move, "Moved by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1675,7 +1720,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, "Recycle Bin emptied by user", 0, Constants.System.RecycleBinContent);
+                Audit(AuditType.Delete, 0, Constants.System.RecycleBinContent, "Recycle bin emptied");
 
                 scope.Complete();
             }
@@ -1793,7 +1838,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
                     scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
-                Audit(AuditType.Copy, "Copy Content performed by user", userId, content.Id);
+                Audit(AuditType.Copy, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1818,16 +1863,35 @@ namespace Umbraco.Core.Services.Implement
                     return false;
                 }
 
+                //track the cultures changing for auditing
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 //Save before raising event
                 // fixme - nesting uow?
-                Save(content, userId);
+                var saveResult = Save(content, userId);
 
-                sendToPublishEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-                Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+                if (saveResult.Success)
+                {
+                    sendToPublishEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+
+                    if (culturesChanging != null)
+                        Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+                    else
+                        Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                }
+
+                // fixme here, on only on success?                
+                scope.Complete();
+
+                return saveResult.Success;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -1930,7 +1994,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents && published.Any())
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
-            Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
+            Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
             return true;
         }
 
@@ -1977,9 +2041,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Document), message, parameters));
         }
 
         #endregion
@@ -2311,7 +2375,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
-                Audit(AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeIdsA)}");
 
                 scope.Complete();
             }
@@ -2487,6 +2551,69 @@ namespace Umbraco.Core.Services.Implement
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
         {
             DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+        }
+
+        #endregion
+
+        #region Rollback
+
+        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            
+            //Get the current copy of the node
+            var content = GetById(id);
+
+            //Get the version
+            var version = GetVersion(versionId);
+
+            //Good ole null checks
+            if (content == null || version == null)
+            {
+                return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            }
+
+            //Store the result of doing the save of content for the rollback
+            OperationResult rollbackSaveResult;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
+
+                //Emit RollingBack event aka before
+                if (scope.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
+                {
+                    scope.Complete();
+                    return OperationResult.Cancel(evtMsgs);
+                }
+
+                //Copy the changes from the version
+                content.CopyFrom(version, culture);
+
+                //Save the content for the rollback
+                rollbackSaveResult = Save(content, userId);
+
+                //Depending on the save result - is what we log & audit along with what we return
+                if (rollbackSaveResult.Success == false)
+                {
+                    //Log the error/warning
+                    Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                }
+                else
+                {
+                    //Emit RolledBack event aka after
+                    rollbackEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
+
+                    //Logging & Audit message
+                    Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
+                }
+                
+                scope.Complete();
+            }
+
+            return rollbackSaveResult;
         }
 
         #endregion

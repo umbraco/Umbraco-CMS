@@ -524,38 +524,6 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        /// <summary>
-        /// Returns the JavaScript blocks for any legacy trees declared
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [MinifyJavaScriptResult(Order = 1)]
-        public JavaScriptResult LegacyTreeJs()
-        {
-            Func<string> getResult = () =>
-            {
-                var javascript = new StringBuilder();
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyTreeJavascript());
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyIActionJavascript());
-                //add all of the menu blocks
-                foreach (var file in GetLegacyActionJs(LegacyJsActionType.JsBlock))
-                {
-                    javascript.AppendLine(file);
-                }
-                return javascript.ToString();
-            };
-
-            //cache the result if debugging is disabled
-            var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationCache.RuntimeCache.GetCacheItem<string>(
-                    typeof(BackOfficeController) + "LegacyTreeJs",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
-
-            return JavaScript(result);
-        }
-
         internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
         {
             var blockList = new List<string>();
@@ -586,7 +554,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Renders out all JavaScript references that have bee declared in IActions
+        /// Renders out all JavaScript references that have been declared in IActions
         /// </summary>
         private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
         {

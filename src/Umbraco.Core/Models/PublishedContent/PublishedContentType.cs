@@ -94,10 +94,10 @@ namespace Umbraco.Core.Models.PublishedContent
             { "Comments", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
             { "IsApproved", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
             { "IsLockedOut", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
-            { "LastLockoutDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
-            { "CreateDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
-            { "LastLoginDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
-            { "LastPasswordChangeDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "LastLockoutDate", (Constants.DataTypes.DateTime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "CreateDate", (Constants.DataTypes.DateTime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "LastLoginDate", (Constants.DataTypes.DateTime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "LastPasswordChangeDate", (Constants.DataTypes.DateTime, Constants.PropertyEditors.Aliases.DateTime) },
         };
 
         #region Content type

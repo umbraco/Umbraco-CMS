@@ -14,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
-            var asString = value.ToString();
+            var asString = value == null ? "" : value.ToString();
 
             var emailVal = new EmailAddressAttribute();
 

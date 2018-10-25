@@ -97,10 +97,32 @@
             //listen for the image DOM element loading
             htmlImage.on("load", function () {
                 $timeout(function () {
+
+                    vm.isCroppable = true;
+                    vm.hasDimensions = true;
+                    
+                    if (vm.src) {
+                        if (vm.src.endsWith(".svg")) {
+                            vm.isCroppable = false;
+                            vm.hasDimensions = false;
+                        }
+                        else {
+                            // From: https://stackoverflow.com/a/51789597/5018
+                            var type = vm.src.substring(vm.src.indexOf("/") + 1, vm.src.indexOf(";base64"));
+                            if (type.startsWith("svg")) {
+                                vm.isCroppable = false;
+                                vm.hasDimensions = false;
+                            }
+                        }
+                    }
+
                     setDimensions();
                     vm.loaded = true;
                     if (vm.onImageLoaded) {
-                        vm.onImageLoaded();
+                        vm.onImageLoaded({
+                            "isCroppable": vm.isCroppable,
+                            "hasDimensions": vm.hasDimensions
+                        });
                     }
                 }, 100);
             });
@@ -147,19 +169,7 @@
         /** Sets the width/height/left/top dimentions based on the image size and the "center" value */
         function setDimensions() {
 
-            if (vm.src.endsWith(".svg")) {
-                // svg files don't automatically get a size by
-                // loading them set a default size for now
-                vm.dimensions.width = 200;
-                vm.dimensions.height = 200;
-                vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;
-                vm.dimensions.top = vm.center.top * vm.dimensions.height - 10;
-                // can't crop an svg file, don't show the focal point
-                if (htmlOverlay) {
-                    htmlOverlay.remove();
-                }
-            }
-            else if (htmlImage && vm.center) {
+            if (vm.isCroppable && htmlImage && vm.center) {
                 vm.dimensions.width = htmlImage.width();
                 vm.dimensions.height = htmlImage.height();
                 vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;

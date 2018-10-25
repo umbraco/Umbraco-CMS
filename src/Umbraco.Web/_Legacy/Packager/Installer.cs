@@ -323,8 +323,8 @@ namespace umbraco.cms.businesslogic.packager
                 if (_currentUserId > -1)
                 {
                     Current.Services.AuditService.Add(AuditType.PackagerInstall,
-                                            string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid),
-                                            _currentUserId, -1);
+                        _currentUserId,
+                        -1, "Package", string.Format("Package '{0}' installed. Package guid: {1}", insPack.Data.Name, insPack.Data.PackageGuid));
                 }
 
                 insPack.Save();
@@ -717,7 +717,6 @@ namespace umbraco.cms.businesslogic.packager
             {
                 //this is experimental and undocumented...
                 path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
-                path = path.Replace("[$UMBRACOCLIENT]", SystemDirectories.UmbracoClient);
                 path = path.Replace("[$CONFIG]", SystemDirectories.Config);
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }

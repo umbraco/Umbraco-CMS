@@ -152,5 +152,24 @@ namespace Umbraco.Core.Models
                 publicAccessRule.ResetDirtyProperties(rememberDirty);
             }
         }
+
+        public override object DeepClone()
+        {
+            var clone = (PublicAccessEntry) base.DeepClone();
+
+            //turn off change tracking
+            clone.DisableChangeTracking();
+
+            if (clone._ruleCollection != null)
+            {
+                clone._ruleCollection.CollectionChanged -= _ruleCollection_CollectionChanged;       //clear this event handler if any
+                clone._ruleCollection.CollectionChanged += clone._ruleCollection_CollectionChanged; //re-assign correct event handler
+            }
+
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
+            return clone;
+        }
     }
 }

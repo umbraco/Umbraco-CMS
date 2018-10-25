@@ -1,67 +1,19 @@
 .umb-user-cards {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: -10px;
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .umb-user-card {
-    padding: 10px;
     box-sizing: border-box;
-    flex: 0 0 100%;
     max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
 }
 
 .umb-user-card:hover,
 .umb-user-card:focus {
     outline: none;
     text-decoration: none !important;
-}
-
-@media (min-width: 768px) {
-    .umb-user-card {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-}
-
-@media (min-width: 1200px) {
-    .umb-user-card {
-        flex: 0 0 33.33%;
-        max-width: 33.33%;
-    }
-}
-
-@media (min-width: 1400px) {
-    .umb-user-card {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
-
-@media (min-width: 1700px) {
-    .umb-user-card {
-        flex: 0 0 20%;
-        max-width: 20%;
-    }
-}
-
-
-@media (min-width: 1900px) {
-    .umb-user-card {
-        flex: 0 0 16.66%;
-        max-width: 16.66%;
-    }
-}
-
-@media (min-width: 2200px) {
-    .umb-user-card {
-        flex: 0 0 14.28%;
-        max-width: 14.28%;
-    }
 }
 
 .umb-user-card__content {

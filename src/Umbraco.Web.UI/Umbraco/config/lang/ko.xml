@@ -408,7 +408,7 @@
     <key alias="permissionsText">Umbraco 는 특정 디렉토리에 쓰기/수정 권한이 필요합니다. 이것은 PDF나 그림과 같은 파일을 저장하고 cache같은 임시데이터을 위해 사용됩니다.</key>
     <key alias="runwayFromScratch">scratch를 시작하기 원합니다.</key>
     <key alias="runwayFromScratchText"><![CDATA[
-      사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다. 
+      사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다.
       (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
       Runway설치를 나중에 실행하실 수 있습니다. 개발도구 부분에서 패키지를 선택하세요.
     ]]></key>
@@ -445,7 +445,7 @@
      우수 커뮤니티에서 도음을 받으세요. 간단한 사이트제작이나 패키지 사용법, Umbraco기술의 퀵가이드를 제공하는 문서를 보시거나 무료 비디오를 시청하세요.]]></key>
     <key alias="theEndHeader">Umbraco %0% 가 설치되어 사용준비가 되었습니다.</key>
     <key alias="theEndInstallFailed"><![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>UmbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다. 
+    <key alias="theEndInstallSuccess"><![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다.
     시작페이지에서 풍부한 리소소를 제공받을 수 있습니다.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbraco 실행</h3>
 사이트 관리를 위해서 Umbraco 관리자를 여시고 컨텐츠를 추가하시거나 템플릿과 스타일시트 업데이트 또는 새기능을 추가하세요]]></key>
@@ -492,21 +492,21 @@
 
       사용자 '%3%' 가  작업 '%1%' 를 페이지 '%2%' 에서
       진행했음을 알리는 자동 발송 메일입니다.
-      
+
       편집하시려면 http://%4%/#/content/content/edit/%5% 로 이동하세요
 
       좋은 하루 되세요!
-      
+
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>안녕하세요 %0%</p>
 
-	  <p>사용자 <strong>'%3%'</strong> 가  작업 <strong>'%1%'</strong> 를 
+	  <p>사용자 <strong>'%3%'</strong> 가  작업 <strong>'%1%'</strong> 를
        페이지 <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 에서
        진행했음을 알리는 자동 발송 메일입니다.
   </p>
 	  <div style="margin: 8px 0; padding: 8px; display: block;">
 			<br />
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 			<br />
 	  </div>
 	  <p>
@@ -518,11 +518,11 @@
 
 	  <div style="margin: 8px 0; padding: 8px; display: block;">
 			<br />
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 			<br />
 	  </div>
 
-	  <p>좋은 하루 되세요!<br /><br />		  
+	  <p>좋은 하루 되세요!<br /><br />
 	  </p>]]></key>
     <key alias="mailSubject">%1%에 대한 [%0]알림이 %2%에 생성되었습니다</key>
     <key alias="notifications">알림</key>
@@ -779,8 +779,8 @@
       %2% 에 의해 문서 '%1%' 가 '%5%' 로 번역요청되었음을
       알리는 자동 발송 메일입니다.
 
-      편집하시려면 http://%3%/translation/details.aspx?id=%4% 로 
-      
+      편집하시려면 http://%3%/translation/details.aspx?id=%4% 로
+
       번역작업을 전반적으로 보시려면 Umbraco에 로그인 하세요
       http://%3%
 

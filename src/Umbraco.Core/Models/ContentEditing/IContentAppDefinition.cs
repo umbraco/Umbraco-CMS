@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Core.Models.ContentEditing
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.Membership;
+
+namespace Umbraco.Core.Models.ContentEditing
 {
     /// <summary>
     /// Represents a content app definition.
@@ -15,6 +18,6 @@
         /// the content app should be displayed or not, and return either a <see cref="ContentApp"/>
         /// instance, or null.</para>
         /// </remarks>
-        ContentApp GetContentAppFor(object source);
+        ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups);
     }
 }

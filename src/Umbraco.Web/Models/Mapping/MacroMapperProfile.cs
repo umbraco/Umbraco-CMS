@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(dto => dto.AdditionalData, expression => expression.Ignore());
 
             CreateMap<IMacro, IEnumerable<MacroParameter>>()
-                    .ConvertUsing(macro => macro.Properties.Select(Mapper.Map<MacroParameter>).ToList());
+                    .ConvertUsing(macro => macro.Properties.Values.Select(Mapper.Map<MacroParameter>).ToList());
 
             CreateMap<IMacroProperty, MacroParameter>()
                 .ForMember(x => x.View, expression => expression.Ignore())

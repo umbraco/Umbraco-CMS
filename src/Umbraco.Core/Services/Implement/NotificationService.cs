@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services.Implement
             //  users being (dis)approved = not an issue, filtered in memory not in SQL
             //  users being modified or created = not an issue, ordering by ID, as long as we don't *insert* low IDs
             //  users being deleted = not an issue for GetNextUsers
-            var id = 0;
+            var id = Constants.Security.SuperUserId;
             var nodeIds = content.Path.Split(',').Select(int.Parse).ToArray();
             const int pagesz = 400; // load batches of 400 users
             do

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -22,9 +23,10 @@ namespace Umbraco.Web.ContentApps
             _propertyEditors = propertyEditors;
         }
 
-        public ContentApp GetContentAppFor(object o)
+        public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             string contentTypeAlias, entityType;
+            int dtdId;
 
             switch (o)
             {
@@ -33,22 +35,33 @@ namespace Umbraco.Web.ContentApps
                 case IContent content:
                     contentTypeAlias = content.ContentType.Alias;
                     entityType = "content";
+                    dtdId = Core.Constants.DataTypes.DefaultContentListView;
                     break;
                 case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
                     return null;
                 case IMedia media:
                     contentTypeAlias = media.ContentType.Alias;
                     entityType = "media";
+                    dtdId = Core.Constants.DataTypes.DefaultMediaListView;
                     break;
                 default:
                     throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");
             }
 
-            return CreateContentApp(_dataTypeService, _propertyEditors, entityType, contentTypeAlias);
+            return CreateContentApp(_dataTypeService, _propertyEditors, entityType, contentTypeAlias, dtdId);
         }
 
-        public static ContentApp CreateContentApp(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditors, string entityType, string contentTypeAlias)
+        public static ContentApp CreateContentApp(IDataTypeService dataTypeService,
+            PropertyEditorCollection propertyEditors,
+            string entityType, string contentTypeAlias,
+            int defaultListViewDataType)
         {
+            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
+            if (propertyEditors == null) throw new ArgumentNullException(nameof(propertyEditors));
+            if (string.IsNullOrWhiteSpace(entityType)) throw new ArgumentException("message", nameof(entityType));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("message", nameof(contentTypeAlias));
+            if (defaultListViewDataType == default) throw new ArgumentException("defaultListViewDataType", nameof(defaultListViewDataType));
+
             var contentApp = new ContentApp
             {
                 Alias = "umbListView",
@@ -59,10 +72,10 @@ namespace Umbraco.Web.ContentApps
             };
 
             var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
-            var dtdId = Core.Constants.DataTypes.DefaultContentListView;
+            
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataType(customDtdName)
-                     ?? dataTypeService.GetDataType(dtdId);
+                     ?? dataTypeService.GetDataType(defaultListViewDataType);
 
             if (dt == null)
             {

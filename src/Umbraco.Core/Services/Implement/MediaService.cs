@@ -295,7 +295,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Media '{media.Name}' was created with Id {media.Id}", media.CreatorId, media.Id);
+            Audit(AuditType.New, media.CreatorId, media.Id, $"Media '{media.Name}' was created with Id {media.Id}");
         }
 
         #endregion
@@ -778,7 +778,7 @@ namespace Umbraco.Core.Services.Implement
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, changeType).ToEventArgs());
 
-                Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
+                Audit(AuditType.Save, userId, media.Id);
                 scope.Complete();
             }
 
@@ -821,7 +821,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(AuditType.Save, "Bulk Save media performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Bulk save media");
 
                 scope.Complete();
             }
@@ -855,7 +855,7 @@ namespace Umbraco.Core.Services.Implement
                 DeleteLocked(scope, media);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
+                Audit(AuditType.Delete, userId, media.Id);
 
                 scope.Complete();
             }
@@ -924,7 +924,7 @@ namespace Umbraco.Core.Services.Implement
                 //repository.DeleteVersions(id, versionDate);
 
                 //uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate));
-                //Audit(uow, AuditType.Delete, "Delete Media by version date performed by user", userId, Constants.System.Root);
+                //Audit(uow, AuditType.Delete, "Delete Media by version date, userId, Constants.System.Root);
 
                 //uow.Complete();
             }
@@ -942,7 +942,7 @@ namespace Umbraco.Core.Services.Implement
 
             args.CanCancel = false;
             scope.Events.Dispatch(DeletedVersions, this, args);
-            Audit(AuditType.Delete, "Delete Media by version date performed by user", userId, Constants.System.Root);
+            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version date");
         }
 
         /// <summary>
@@ -978,7 +978,7 @@ namespace Umbraco.Core.Services.Implement
 
                 args.CanCancel = false;
                 scope.Events.Dispatch(DeletedVersions, this, args);
-                Audit(AuditType.Delete, "Delete Media by version performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
 
                 scope.Complete();
             }
@@ -1020,7 +1020,7 @@ namespace Umbraco.Core.Services.Implement
                     .ToArray();
 
                 scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo), nameof(Trashed));
-                Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
+                Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
 
                 scope.Complete();
             }
@@ -1080,7 +1080,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
-                Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
+                Audit(AuditType.Move, userId, media.Id);
                 scope.Complete();
             }
         }
@@ -1173,7 +1173,7 @@ namespace Umbraco.Core.Services.Implement
                 args.CanCancel = false;
                 scope.Events.Dispatch(EmptiedRecycleBin, this, args);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, Constants.System.RecycleBinMedia);
+                Audit(AuditType.Delete, 0, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
             }
 
@@ -1238,7 +1238,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, args);
                 }
                 scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
-                Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);
+                Audit(AuditType.Sort, userId, 0);
 
                 scope.Complete();
             }
@@ -1250,9 +1250,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Media), message));
         }
 
         #endregion
@@ -1434,7 +1434,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
-                Audit(AuditType.Delete, $"Delete Media of types {string.Join(",", mediaTypeIdsA)} performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete Media of types {string.Join(",", mediaTypeIdsA)}");
 
                 scope.Complete();
             }
