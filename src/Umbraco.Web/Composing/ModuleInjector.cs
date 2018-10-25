@@ -2,6 +2,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Composing
 {
@@ -21,16 +22,28 @@ namespace Umbraco.Web.Composing
             {
                 // using the service locator here - no other way, really
                 Module = Current.Container.GetInstance<TModule>();
-                Module.Init(context);
             }
             catch
             {
-                var runtimeState = Current.Container.GetInstance<IRuntimeState>();
-                if (runtimeState.BootFailedException != null)
+                // if GetInstance fails, it may be because of a boot error, in
+                // which case that is the error we actually want to report
+                IRuntimeState runtimeState = null;
+
+                try
                 {
-                    throw new Exception("Failed to boot", runtimeState.BootFailedException);
+                    runtimeState = Current.Container.GetInstance<IRuntimeState>();
                 }
+                catch { /* don't make it worse */ }
+
+                if (runtimeState?.BootFailedException != null)
+                    BootFailedException.Rethrow(runtimeState.BootFailedException);
+
+                // else... throw what we have
+                throw;
             }
+
+            // initialize
+            Module.Init(context);
         }
 
         /// <inheritdoc />
