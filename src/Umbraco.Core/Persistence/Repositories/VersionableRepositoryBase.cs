@@ -382,11 +382,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (orderDirection == Direction.Descending)
                 {
                     sortedSql.OrderByDescending("CustomPropData.CustomPropVal");
+                    // need to ensure ordering unique by using id as CustomPropVal may not be unique
+                    // see: https://github.com/umbraco/Umbraco-CMS/issues/3296
                     sortedSql.OrderByDescending("umbracoNode.id");
                 }
                 else
                 {
                     sortedSql.OrderBy("CustomPropData.CustomPropVal");
+                    // need to ensure ordering unique by using id as CustomPropVal may not be unique
+                    // see: https://github.com/umbraco/Umbraco-CMS/issues/3296
                     sortedSql.OrderBy("umbracoNode.id");
                 }
             }
