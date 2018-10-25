@@ -680,6 +680,7 @@
     <key alias="moveLineDown">Move Lines Down</key>
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
+    <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background colour</key>
