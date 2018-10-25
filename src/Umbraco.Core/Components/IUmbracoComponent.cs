@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Components
 {
@@ -15,19 +14,8 @@ namespace Umbraco.Core.Components
         void Compose(Composition composition);
 
         /// <summary>
-        /// An optional <see cref="IComponentInitializer"/> that will be executed after composition is done.
-        /// The initializer will be registered with the DI container and can have constructor dependencies.
-        /// </summary>
-        Type InitializerType { get; }
-
-        /// <summary>
         /// Terminates the component.
         /// </summary>
         void Terminate();
-    }
-
-    public interface IComponentInitializer
-    {
-        void Initialize();
     }
 }

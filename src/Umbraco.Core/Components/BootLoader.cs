@@ -48,7 +48,6 @@ namespace Umbraco.Core.Components
 
             InstantiateComponents(orderedComponentTypes);
             ComposeComponents(level);
-            RegisterInitializers();
 
             using (var scope = _container.GetInstance<IScopeProvider>().CreateScope())
             {
@@ -82,10 +81,6 @@ namespace Umbraco.Core.Components
                 })
                 .ToList();
 
-            // cannot remove that one - ever
-            if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
-                componentTypeList.Add(typeof(UmbracoCoreComponent));
-
             // enable or disable components
             EnableDisableComponents(componentTypeList);
 
@@ -113,7 +108,7 @@ namespace Umbraco.Core.Components
             {
                 // in case of an error, force-dump everything to log
                 _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
-                _logger.Error<BootLoader>(e, "Failed to sort compontents.");
+                _logger.Error<BootLoader>(e, "Failed to sort components.");
                 throw;
             }
 
@@ -189,7 +184,6 @@ namespace Umbraco.Core.Components
                 foreach (var attr in componentType.GetCustomAttributes<DisableComponentAttribute>())
                 {
                     var type = attr.DisabledType ?? componentType;
-                    if (type == typeof(UmbracoCoreComponent)) throw new InvalidOperationException("Cannot disable UmbracoCoreComponent.");
                     if (enabled.TryGetValue(type, out var enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
                     var weight = type == componentType ? 1 : 2;
                     if (enableInfo.Weight > weight) continue;
@@ -303,17 +297,6 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private void RegisterInitializers()
-        {
-            foreach (var component in _components)
-            {
-                if (component.InitializerType != null)
-                {
-                    _container.Register(component.InitializerType);
-                }
-            }
-        }
-
         private void InitializeComponents()
         {
             // use a container scope to ensure that PerScope instances are disposed
@@ -334,12 +317,6 @@ namespace Umbraco.Core.Components
                                 .Select(x => GetParameter(componentType, x.ParameterType))
                                 .ToArray();
                             initializer.Invoke(component, parameters);
-                        }
-
-                        if (component.InitializerType != null)
-                        {
-                            var initializer = (IComponentInitializer) _container.GetInstance(component.InitializerType);
-                            initializer.Initialize();
                         }
                     }
                 }

@@ -111,34 +111,22 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
         }
 
-        public override Type InitializerType => typeof(Initializer);
-
-        internal class Initializer : IComponentInitializer
+        internal void Initialize(IEnumerable<Profile> mapperProfiles)
         {
-            private readonly IEnumerable<Profile> mapperProfiles;
-
-            public Initializer(IEnumerable<Profile> mapperProfiles)
+            // mapper profiles have been registered & are created by the container
+            Mapper.Initialize(configuration =>
             {
-                this.mapperProfiles = mapperProfiles;
-            }
+                foreach (var profile in mapperProfiles)
+                    configuration.AddProfile(profile);
+            });
 
-            public void Initialize()
-            {
-                // mapper profiles have been registered & are created by the container
-                Mapper.Initialize(configuration =>
-                {
-                    foreach (var profile in mapperProfiles)
-                        configuration.AddProfile(profile);
-                });
-
-                // ensure we have some essential directories
-                // every other component can then initialize safely
-                IOHelper.EnsurePathExists("~/App_Data");
-                IOHelper.EnsurePathExists(SystemDirectories.Media);
-                IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
-                IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
-                IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
-            }
+            // ensure we have some essential directories
+            // every other component can then initialize safely
+            IOHelper.EnsurePathExists("~/App_Data");
+            IOHelper.EnsurePathExists(SystemDirectories.Media);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
     }
 }

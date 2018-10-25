@@ -169,7 +169,8 @@
     <Compile Include="Components\RequiredComponentAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\UmbracoComponentBase.cs" />
-    <Compile Include="Components\UmbracoCoreComponent.cs" />
+    <Compile Include="Components\UmbracoCoreComponentBase.cs" />
+    <Compile Include="Components\UmbracoUserComponentBase.cs" />
     <Compile Include="Composing\BuilderCollectionBase.cs" />
     <Compile Include="Composing\CollectionBuilderBase.cs" />
     <Compile Include="Composing\Composers\ConfigurationComposer.cs" />

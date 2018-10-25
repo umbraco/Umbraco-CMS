@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Components
 {
-    [RequireComponent(typeof(UmbracoCoreComponent))]
+    [RequireComponent(typeof(IUmbracoCoreComponent))]
     public interface IUmbracoUserComponent : IUmbracoComponent
     { }
 }
