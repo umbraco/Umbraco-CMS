@@ -171,12 +171,17 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
+                var treeAttribute = configTree.GetTreeAttribute();
+
                 var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
                     rootId,
                     rootNode.Result.ChildNodesUrl,
                     rootNode.Result.MenuUrl,
                     rootNode.Result.Name,
-                    byControllerAttempt.Result);
+                    byControllerAttempt.Result,
+                    treeAttribute.AlwaysShowRootItem);
+
+               
 
                 //assign the route path based on the root node, this means it will route there when the section is navigated to
                 //and no dashboards will be available for this section
