@@ -17,6 +17,10 @@
                     return variant.active;
                 });
 
+                $scope.defaultVariant = _.find(this.content.variants, variant => {
+                    return variant.language.isDefault;
+                });
+
                 $scope.unlockInvariantValue = function(property) {
                     property.unlockInvariantValue = !property.unlockInvariantValue;
                 };
