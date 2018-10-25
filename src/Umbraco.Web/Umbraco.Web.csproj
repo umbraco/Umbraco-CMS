@@ -560,7 +560,6 @@
     <Compile Include="_Legacy\Actions\ActionRestore.cs" />
     <Compile Include="_Legacy\Actions\ActionRights.cs" />
     <Compile Include="_Legacy\Actions\ActionRollback.cs" />
-    <Compile Include="_Legacy\Actions\ActionSendToTranslate.cs" />
     <Compile Include="_Legacy\Actions\ActionSort.cs" />
     <Compile Include="_Legacy\Actions\ActionToPublish.cs" />
     <Compile Include="_Legacy\Actions\ActionTranslate.cs" />

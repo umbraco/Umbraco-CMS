@@ -67,7 +67,7 @@ namespace umbraco.cms.businesslogic.packager {
 
         public void Delete(int userId)
         {
-            Current.Services.AuditService.Add(AuditType.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);
+            Current.Services.AuditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid));
             Delete();
         }
 

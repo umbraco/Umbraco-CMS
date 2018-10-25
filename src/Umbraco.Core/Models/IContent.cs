@@ -126,13 +126,13 @@ namespace Umbraco.Core.Models
         string GetPublishName(string culture);
 
         /// <summary>
-        /// Gets the published names of the content.
+        /// Gets the published culture infos of the content.
         /// </summary>
         /// <remarks>
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> PublishNames { get; }
+        IReadOnlyDictionary<string, ContentCultureInfos> PublishCultureInfos { get; }
 
         /// <summary>
         /// Gets the published cultures.

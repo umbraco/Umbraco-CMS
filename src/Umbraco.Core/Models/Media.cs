@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -21,8 +20,7 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">MediaType for the current Media object</param>
         public Media(string name, IMedia parent, IMediaType contentType)
             : this(name, parent, contentType, new PropertyCollection())
-        {
-        }
+        { }
 
         /// <summary>
         /// Constructor for creating a Media object
@@ -45,8 +43,7 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">MediaType for the current Media object</param>
         public Media(string name, int parentId, IMediaType contentType)
             : this(name, parentId, contentType, new PropertyCollection())
-        {
-        }
+        { }
 
         /// <summary>
         /// Constructor for creating a Media object
@@ -78,6 +75,8 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
+            
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
         }
 
@@ -95,6 +94,8 @@ namespace Umbraco.Core.Models
                 _contentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
+
+                Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
                 Properties.CollectionChanged += PropertiesChanged;
                 return;
             }

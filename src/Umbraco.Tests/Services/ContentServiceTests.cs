@@ -1233,6 +1233,92 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Unpublish_Content_Variation()
+        {
+            // Arrange
+            
+            var langUk = new Language("en-UK") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langUk);
+
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            IContent content = new Content("content", -1, contentType);
+            content.SetCultureName("content-fr", langFr.IsoCode);
+            content.SetCultureName("content-en", langUk.IsoCode);
+            content.PublishCulture(langFr.IsoCode);
+            content.PublishCulture(langUk.IsoCode);
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));    //not persisted yet, will be false
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+            Assert.IsFalse(content.WasCulturePublished(langUk.IsoCode));    //not persisted yet, will be false
+
+            var published = ServiceContext.ContentService.SavePublishing(content);
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsTrue(published.Success);
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.WasCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
+
+            var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
+            Assert.IsTrue(unpublished.Success);
+
+            Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+            //this is slightly confusing but this will be false because this method is used for checking the state of the current model,
+            //but the state on the model has changed with the above Unpublish call
+            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+            //this is slightly confusing but this will be false because this method is used for checking the state of a current model,
+            //but we've re-fetched from the database
+            Assert.IsFalse(content.WasCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+            Assert.IsTrue(content.WasCulturePublished(langUk.IsoCode));
+
+        }
+
+        [Test]
+        public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
+        {
+            // Arrange
+
+            var langUk = new Language("en-UK") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langUk);
+
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            IContent content = new Content("content", -1, contentType);
+            content.SetCultureName("content-fr", langFr.IsoCode);
+            content.PublishCulture(langFr.IsoCode);
+            var published = ServiceContext.ContentService.SavePublishing(content);
+            //audit log will only show that french was published
+            var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            Assert.AreEqual($"Published cultures: fr-fr", lastLog.Comment);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetCultureName("content-en", langUk.IsoCode);
+            content.PublishCulture(langUk.IsoCode);
+            published = ServiceContext.ContentService.SavePublishing(content);
+            //audit log will only show that english was published
+            lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            Assert.AreEqual($"Published cultures: en-uk", lastLog.Comment);
+        }
+
+        [Test]
         public void Can_Publish_Content_1()
         {
             // Arrange
