@@ -46,6 +46,8 @@
             get { return false; }
         }
 
+        public bool OpensDialog => false;
+
         #endregion
     }
 }

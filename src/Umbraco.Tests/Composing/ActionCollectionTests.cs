@@ -49,6 +49,8 @@ namespace Umbraco.Tests.Composing
             public bool ShowInNotifier => false;
 
             public bool CanBePermissionAssigned => true;
+
+            public bool OpensDialog => true;
         }
 
         public class NonSingletonAction : IAction
@@ -66,6 +68,8 @@ namespace Umbraco.Tests.Composing
             public bool ShowInNotifier => false;
 
             public bool CanBePermissionAssigned => true;
+
+            public bool OpensDialog => true;
         }
 
         #endregion
