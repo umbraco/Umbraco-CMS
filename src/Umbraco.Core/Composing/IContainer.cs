@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -76,19 +77,6 @@ namespace Umbraco.Core.Composing
         /// <param name="serviceType">The type of the service.</param>
         /// <returns>The registrations for the service.</returns>
         IEnumerable<Registration> GetRegistered(Type serviceType);
-
-        /// <summary>
-        /// Creates an instance of a service, with arguments.
-        /// </summary>
-        /// <param name="type">The type of the instance.</param>
-        /// <param name="args">Named arguments.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>
-        /// <para>The instance type does not need to be registered into the container.</para>
-        /// <para>The arguments are used as dependencies by the container. Other dependencies
-        /// are retrieved from the container.</para>
-        /// </remarks>
-        object CreateInstance(Type type, IDictionary<string, object> args);
 
         /// <summary>
         /// Releases an instance.

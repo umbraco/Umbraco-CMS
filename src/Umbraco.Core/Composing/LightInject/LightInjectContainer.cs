@@ -126,33 +126,6 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.AvailableServices.Where(x => x.ServiceType == type).Select(x => new Registration(x.ServiceType, x.ServiceName));
 
         /// <inheritdoc />
-        public object CreateInstance(Type type, IDictionary<string, object> args)
-        {
-            // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
-            // including the most annoying one, which is that it does not work on singletons (hard to fix)
-            //return Container.GetInstance(type, args);
-
-            // this method is essentially used to build singleton instances, so it is assumed that it would be
-            // more expensive to build and cache a dynamic method ctor than to simply invoke the ctor, as we do
-            // here - this can be discussed
-
-            var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
-            if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
-
-            var ctorParameters = ctor.GetParameters();
-            var ctorArgs = new object[ctorParameters.Length];
-            var i = 0;
-            foreach (var parameter in ctorParameters)
-            {
-                // no! IsInstanceOfType is not ok here
-                // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.Values.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
-                ctorArgs[i++] = arg ?? GetInstance(parameter.ParameterType);
-            }
-            return ctor.Invoke(ctorArgs);
-        }
-
-        /// <inheritdoc />
         public void Release(object instance)
         {
             // nothing to release with LightInject
