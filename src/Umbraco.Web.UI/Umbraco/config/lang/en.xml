@@ -66,6 +66,7 @@
     <key alias="move">Allow access to move a node</key>
     <key alias="protect">Allow access to set and change public access for a node</key>
     <key alias="publish">Allow access to publish a node</key>
+    <key alias="unpublish">Allow access to unpublish a node</key>
     <key alias="rights">Allow access to change permissions for a node</key>
     <key alias="rollback">Allow access to roll back a node to a previous state</key>
     <key alias="sendtopublish">Allow access to send a node for approval before publishing</key>

@@ -1127,7 +1127,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("model.Id", 'U')]
+        [EnsureUserPermissionForContent("model.Id", 'Z')]
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
