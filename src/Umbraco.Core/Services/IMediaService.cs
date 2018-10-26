@@ -27,6 +27,14 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus> MoveToRecycleBin(IMedia media, int userId = 0);
 
         /// <summary>
+        /// Moves an <see cref="IMedia"/> object to a new location
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to move</param>
+        /// <param name="parentId">Id of the Media's new Parent</param>
+        /// <param name="userId">Id of the User moving the Media</param>
+        Attempt<OperationStatus> MoveOp(IMedia media, int parentId, int userId = 0);
+
+        /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
         /// <remarks>

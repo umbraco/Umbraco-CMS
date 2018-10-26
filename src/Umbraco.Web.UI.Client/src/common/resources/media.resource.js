@@ -115,10 +115,22 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         }),
                         {
                         error: function(data){
-                            var errorMsg = 'Failed to move media';
 
-                            if(data.parentId === data.id){
-                                errorMsg = 'Media can\'t be moved into itself';
+                            var errorMsg = 'Failed to move media';
+                            if (data.id != undefined && data.parentid != undefined) {
+                                if (data.parentId === data.id) {
+                                    errorMsg = 'Media can\'t be moved into itself';
+                                }
+                            }
+                            else if (data != undefined) {
+                                if (data.notifications.length > 0) {
+                                    if (data.notifications[0].header.length > 0) {
+                                        errorMsg = data.notifications[0].header;
+                                    }
+                                    if (data.notifications[0].message.length > 0) {
+                                        errorMsg = errorMsg + ": " + data.notifications[0].message;
+                                    }
+                                }
                             }
 
                             return {

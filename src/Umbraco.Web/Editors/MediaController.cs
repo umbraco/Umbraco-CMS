@@ -447,12 +447,31 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
+            var destinationParentID = move.ParentId;
+            var sourceParentID = toMove.ParentId;
 
-            Services.MediaService.Move(toMove, move.ParentId);
-
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            return response;
+            //Services.MediaService.Move(toMove, move.ParentId);
+            var moveResult = Services.MediaService.WithResult().MoveOp(toMove, move.ParentId);
+            //var response = Request.CreateResponse(HttpStatusCode.OK);
+            //response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+            //return response;
+            if (sourceParentID == destinationParentID)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("Error: ","Parent and destination folders cannot be the same",SpeechBubbleIcon.Error)));
+                //var response = Request.CreateResponse(HttpStatusCode.OK);
+                //response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                //return response;
+            }
+            if (moveResult == false)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
         }
 
         /// <summary>
