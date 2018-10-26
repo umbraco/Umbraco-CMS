@@ -1,4 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7)
+[![Issues](http://img.shields.io/github/issues/umbraco/Umbraco-CMS.svg)](https://github.com/umbraco/Umbraco-CMS/issues)
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 _Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 branch_
 
