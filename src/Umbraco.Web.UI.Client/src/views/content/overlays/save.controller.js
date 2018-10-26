@@ -22,12 +22,8 @@
             //determine a variant is 'dirty' (meaning it will show up as save-able) if it's
             // * the active one
             // * it's editor is in a $dirty state
-            // * it's umbContent app viewModel (if any) is in a $dirty state
             // * it is in NotCreated state
-            var contentApp = _.find(variant.apps, function(app) {
-                return app.alias === "umbContent";
-            });
-            return (variant.active || variant.isDirty || (contentApp && contentApp.viewModel && contentApp.viewModel.isDirty));
+            return (variant.active || variant.isDirty);
         }
 
         function pristineVariantFilter(variant) {
