@@ -78,6 +78,8 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
             get { return "javascript:actionDeleteRelationType(UmbClientMgr.mainTree().getActionNode().nodeId,UmbClientMgr.mainTree().getActionNode().nodeName);"; }
         }
 
+        public bool OpensDialog => true;
+
         #endregion
     }
 }

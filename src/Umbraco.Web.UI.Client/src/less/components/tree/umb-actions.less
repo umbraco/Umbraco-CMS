@@ -51,6 +51,15 @@
     text-decoration: none;
 }
 
+.umb-action {
+    &.-opens-dialog {
+        .menu-label:after {
+            // adds an ellipsis (...) after the menu label for actions that open a dialog
+            content: '\2026';
+        }
+    }
+}
+
 .umb-actions-child {
 
     .umb-action {
