@@ -15,11 +15,11 @@ namespace Umbraco.Web.Media
     /// </summary>
     internal class UploadAutoFillProperties
     {
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
         private readonly IContentSection _contentSection;
 
-        public UploadAutoFillProperties(MediaFileSystem mediaFileSystem, ILogger logger, IContentSection contentSection)
+        public UploadAutoFillProperties(IMediaFileSystem mediaFileSystem, ILogger logger, IContentSection contentSection)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -240,7 +240,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
             }
 
-            fileSystems = fileSystems ?? new FileSystems(logger);
+            fileSystems = fileSystems ?? new FileSystems(Current.Container, logger);
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             return scopeProvider;
         }

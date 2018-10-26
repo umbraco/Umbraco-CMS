@@ -15,11 +15,14 @@ namespace Umbraco.Core.IO
     /// <summary>
     /// A custom file system provider for media
     /// </summary>
-    [FileSystemProvider("media")]
-    public class MediaFileSystem : FileSystemWrapper
+    [FileSystem("media")]
+    public class MediaFileSystem : FileSystemWrapper, IMediaFileSystem
     {
-        public MediaFileSystem(IFileSystem wrapped)
-            : base(wrapped)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
+        /// </summary>
+        public MediaFileSystem(IFileSystem innerFileSystem)
+            : base(innerFileSystem)
         {
             ContentConfig = Current.Container.GetInstance<IContentSection>();
             Logger = Current.Container.GetInstance<ILogger>();
@@ -32,58 +35,16 @@ namespace Umbraco.Core.IO
         private IContentSection ContentConfig { get; }
 
         private ILogger Logger { get; }
-        
-        /// <summary>
-        /// Deletes all files passed in.
-        /// </summary>
-        /// <param name="files"></param>
-        /// <param name="onError"></param>
-        /// <returns></returns>
-        internal bool DeleteFiles(IEnumerable<string> files, Action<string, Exception> onError = null)
-        {
-            //ensure duplicates are removed
-            files = files.Distinct();
 
-            var allsuccess = true;
-            var rootRelativePath = GetRelativePath("/");
-
-            Parallel.ForEach(files, file =>
-            {
-                try
-                {
-                    if (file.IsNullOrWhiteSpace()) return;
-
-                    var relativeFilePath = GetRelativePath(file);
-                    if (FileExists(relativeFilePath) == false) return;
-
-                    var parentDirectory = Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (ContentConfig.UploadAllowDirectories && parentDirectory != rootRelativePath)
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        DeleteDirectory(parentDirectory, string.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        DeleteFile(file);
-                    }
-                }
-                catch (Exception e)
-                {
-                    onError?.Invoke(file, e);
-                    allsuccess = false;
-                }
-            });
-
-            return allsuccess;
-        }
-
+        /// <inheritoc />
         public void DeleteMediaFiles(IEnumerable<string> files)
         {
             files = files.Distinct();
 
-            Parallel.ForEach(files, file =>
+            // kinda try to keep things under control
+            var options = new ParallelOptions { MaxDegreeOfParallelism = 20 };
+
+            Parallel.ForEach(files, options, file =>
             {
                 try
                 {
@@ -97,21 +58,14 @@ namespace Umbraco.Core.IO
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<MediaFileSystem>(e, "Failed to delete attached file '{File}'", file);
+                    Logger.Error<MediaFileSystem>(e, "Failed to delete media file '{File}'.", file);
                 }
             });
         }
 
         #region Media Path
 
-        /// <summary>
-        /// Gets the file path of a media file.
-        /// </summary>
-        /// <param name="filename">The file name.</param>
-        /// <param name="cuid">The unique identifier of the content/media owning the file.</param>
-        /// <param name="puid">The unique identifier of the property type owning the file.</param>
-        /// <returns>The filesystem-relative path to the media file.</returns>
-        /// <remarks>With the old media path scheme, this CREATES a new media path each time it is invoked.</remarks>
+        /// <inheritoc />
         public string GetMediaPath(string filename, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
@@ -121,16 +75,7 @@ namespace Umbraco.Core.IO
             return MediaPathScheme.GetFilePath(cuid, puid, filename);
         }
 
-        /// <summary>
-        /// Gets the file path of a media file.
-        /// </summary>
-        /// <param name="filename">The file name.</param>
-        /// <param name="prevpath">A previous file path.</param>
-        /// <param name="cuid">The unique identifier of the content/media owning the file.</param>
-        /// <param name="puid">The unique identifier of the property type owning the file.</param>
-        /// <returns>The filesystem-relative path to the media file.</returns>
-        /// <remarks>In the old, legacy, number-based scheme, we try to re-use the media folder
-        /// specified by <paramref name="prevpath"/>. Else, we CREATE a new one. Each time we are invoked.</remarks>
+        /// <inheritoc />
         public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
@@ -144,20 +89,7 @@ namespace Umbraco.Core.IO
 
         #region Associated Media Files
 
-        /// <summary>
-        /// Stores a media file associated to a property of a content item.
-        /// </summary>
-        /// <param name="content">The content item owning the media file.</param>
-        /// <param name="propertyType">The property type owning the media file.</param>
-        /// <param name="filename">The media file name.</param>
-        /// <param name="filestream">A stream containing the media bytes.</param>
-        /// <param name="oldpath">An optional filesystem-relative filepath to the previous media file.</param>
-        /// <returns>The filesystem-relative filepath to the media file.</returns>
-        /// <remarks>
-        /// <para>The file is considered "owned" by the content/propertyType.</para>
-        /// <para>If an <paramref name="oldpath"/> is provided then that file (and associated thumbnails if any) is deleted
-        /// before the new file is saved, and depending on the media path scheme, the folder may be reused for the new file.</para>
-        /// </remarks>
+        /// <inheritoc />
         public string StoreFile(IContentBase content, PropertyType propertyType, string filename, Stream filestream, string oldpath)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -176,13 +108,7 @@ namespace Umbraco.Core.IO
             return filepath;
         }
 
-        /// <summary>
-        /// Copies a media file as a new media file, associated to a property of a content item.
-        /// </summary>
-        /// <param name="content">The content item owning the copy of the media file.</param>
-        /// <param name="propertyType">The property type owning the copy of the media file.</param>
-        /// <param name="sourcepath">The filesystem-relative path to the source media file.</param>
-        /// <returns>The filesystem-relative path to the copy of the media file.</returns>
+        /// <inheritoc />
         public string CopyFile(IContentBase content, PropertyType propertyType, string sourcepath)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -199,9 +125,6 @@ namespace Umbraco.Core.IO
             return filepath;
         }
 
-        
-
-        #endregion
-        
+        #endregion       
     }
 }

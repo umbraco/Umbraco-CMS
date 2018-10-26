@@ -19,9 +19,9 @@ namespace Umbraco.Web.PropertyEditors
     internal class ImageCropperPropertyValueEditor : DataValueEditor // fixme core vs web?
     {
         private readonly ILogger _logger;
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, MediaFileSystem mediaFileSystem)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem)
             : base(attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
