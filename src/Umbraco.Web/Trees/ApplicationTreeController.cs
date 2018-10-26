@@ -179,9 +179,7 @@ namespace Umbraco.Web.Trees
                     rootNode.Result.MenuUrl,
                     rootNode.Result.Name,
                     byControllerAttempt.Result,
-                    treeAttribute.AlwaysShowRootItem);
-
-               
+                    treeAttribute.IsSingleNodeTree);
 
                 //assign the route path based on the root node, this means it will route there when the section is navigated to
                 //and no dashboards will be available for this section

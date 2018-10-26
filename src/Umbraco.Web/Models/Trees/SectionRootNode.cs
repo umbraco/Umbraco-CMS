@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Trees
     {
         private static readonly string RootId = Core.Constants.System.Root.ToString(CultureInfo.InvariantCulture);
         private bool _isGroup;
-        private bool _alwaysShow;
+        private bool _isSingleNodeTree;
 
         /// <summary>
         /// Creates a group node for grouped multiple trees
@@ -88,15 +88,15 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="menuUrl"></param>
         /// <param name="title"></param>
         /// <param name="children"></param>
-        /// <param name="alwaysShowRootNode"></param>
+        /// <param name="isSingleNodeTree"></param>
         /// <returns></returns>
-        public static TreeRootNode CreateSingleTreeRoot(string nodeId, string getChildNodesUrl, string menuUrl, string title, TreeNodeCollection children, bool alwaysShowRootNode = false)
+        public static TreeRootNode CreateSingleTreeRoot(string nodeId, string getChildNodesUrl, string menuUrl, string title, TreeNodeCollection children, bool isSingleNodeTree = false)
         {
             return new TreeRootNode(nodeId, getChildNodesUrl, menuUrl)
             {
                 Children = children,
                 Name = title,               
-                _alwaysShow = alwaysShowRootNode
+                _isSingleNodeTree = isSingleNodeTree
             };
         }
 
@@ -153,6 +153,6 @@ namespace Umbraco.Web.Models.Trees
         /// This is used in the UI to configure a full screen section/app
         /// </remarks>
         [DataMember(Name = "containsTrees")]
-        public bool ContainsTrees => Children.Count > 0 || _alwaysShow;
+        public bool ContainsTrees => Children.Count > 0 || !_isSingleNodeTree;
     }
 }

@@ -108,6 +108,7 @@ namespace Umbraco.Tests.TestHelpers
             IGlobalSettings globalSettings,
             IEventMessagesFactory eventMessagesFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            TypeLoader typeLoader,
             IServiceFactory container = null)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
@@ -181,7 +182,7 @@ namespace Umbraco.Tests.TestHelpers
             var macroService = GetLazyService<IMacroService>(container, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(container, c => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, scopeProvider, urlSegmentProviders, GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()))));
             var relationService = GetLazyService<IRelationService>(container, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
-            var treeService = GetLazyService<IApplicationTreeService>(container, c => new ApplicationTreeService(logger, cache));
+            var treeService = GetLazyService<IApplicationTreeService>(container, c => new ApplicationTreeService(logger, cache, typeLoader));
             var tagService = GetLazyService<ITagService>(container, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var sectionService = GetLazyService<ISectionService>(container, c => new SectionService(userService.Value, treeService.Value, scopeProvider, cache));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(container, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));

@@ -19,8 +19,10 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
     vm.page.menu.currentSection = appState.getSectionState("currentSection");
     vm.page.menu.currentNode = null;
     vm.description = "";
+    vm.showBackButton = true;
     
     vm.save = saveDictionary;
+    vm.back = back;
   
     function loadDictionary() {
 
@@ -101,6 +103,10 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
         }
     }
     
+    function back() {
+        $location.path(vm.page.menu.currentSection + "/dictionary/list");
+    }
+
     $scope.$watch("vm.content.name", function (newVal, oldVal) {
         //when the value changes, we need to set the name dirty
         if (newVal && (newVal !== oldVal) && typeof(oldVal) !== "undefined") {
