@@ -28,11 +28,11 @@ namespace Umbraco.Core.Models
         /// Initializes a new instance of the <see cref="ContentCultureInfos"/> class.
         /// </summary>
         /// <remarks>Used for cloning, without change tracking.</remarks>
-        private ContentCultureInfos(string culture, string name, DateTime date)
-            : this(culture)
+        internal ContentCultureInfos(ContentCultureInfos other)
+            : this(other.Culture)
         {
-            _name = name;
-            _date = date;
+            _name = other.Name;
+            _date = other.Date;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public object DeepClone()
         {
-            return new ContentCultureInfos(Culture, Name, Date);
+            return new ContentCultureInfos(this);
         }
 
         /// <inheritdoc />
