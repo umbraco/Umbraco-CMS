@@ -115,7 +115,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether a variation varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this ContentVariation variation) => (variation & ContentVariation.CultureAndSegment) > 0;
+        public static bool VariesByCultureAndSegment(this ContentVariation variation) => (variation & ContentVariation.CultureAndSegment) == ContentVariation.CultureAndSegment;
 
         /// <summary>
         /// Validates that a combination of culture and segment is valid for the variation.

@@ -119,66 +119,74 @@ namespace Umbraco.Web.Editors
         /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
         /// <param name="contentTypeId">Id of composition content type</param>
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
-            UmbracoObjectTypes type)
+        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId, UmbracoObjectTypes type)
         {
-            IContentTypeComposition source = null;
+            var id = 0;
 
-            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
+            if (contentTypeId > 0)
+            {
+                IContentTypeComposition source;
 
-            IContentTypeComposition[] allContentTypes;
+                switch (type)
+                {
+                    case UmbracoObjectTypes.DocumentType:
+                        source = Services.ContentTypeService.Get(contentTypeId);
+                        break;
+
+                    case UmbracoObjectTypes.MediaType:
+                        source = Services.ContentTypeService.Get(contentTypeId);
+                        break;
+
+                    case UmbracoObjectTypes.MemberType:
+                        source = Services.MemberTypeService.Get(contentTypeId);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type));
+                }
+
+                if (source == null)
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+                id = source.Id;
+            }
+
+            IEnumerable<IContentTypeComposition> composedOf;
 
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
-                    if (contentTypeId > 0)
-                    {
-                        source = Services.ContentTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-                    }
-                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    composedOf = Services.ContentTypeService.GetComposedOf(id);
                     break;
 
                 case UmbracoObjectTypes.MediaType:
-                    if (contentTypeId > 0)
-                    {
-                        source = Services.ContentTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-                    }
-                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    composedOf = Services.MediaTypeService.GetComposedOf(id);
                     break;
 
                 case UmbracoObjectTypes.MemberType:
-                    if (contentTypeId > 0)
-                    {
-                        source = Services.MemberTypeService.Get(contentTypeId);
-                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-                    }
-                    allContentTypes = Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    composedOf = Services.MemberTypeService.GetComposedOf(id);
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException("The entity type was not a content type");
+                    throw new ArgumentOutOfRangeException(nameof(type));
             }
 
-            var contentTypesWhereCompositionIsUsed = source.GetWhereCompositionIsUsedInContentTypes(allContentTypes);
-           return contentTypesWhereCompositionIsUsed
-                .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
-                .Select(x =>
-                {
-                    //translate the name
-                    x.Name = TranslateItem(x.Name);               
+            EntityBasic TranslateName(EntityBasic e)
+            {
+                e.Name = TranslateItem(e.Name);
+                return e;
+            }
 
-                    return x;
-                })
+            return composedOf
+                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+                .Select(TranslateName)
                 .ToList();
         }
+
         protected string TranslateItem(string text)
         {
             if (text == null)
-            {
                 return null;
-            }
 
             if (text.StartsWith("#") == false)
                 return text;
