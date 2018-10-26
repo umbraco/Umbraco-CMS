@@ -1485,9 +1485,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
-    <key alias="variantsHeading">Content Type Variation</key>
-    <key alias="variantsDescription">Define the rules for how this content type's properties can be varied</key>
-    <key alias="allowVaryByCulture">Allow varying by Culture</key>
+    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="allowVaryByCulture">Allow varying by culture</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
