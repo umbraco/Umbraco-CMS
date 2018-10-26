@@ -13,6 +13,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -458,19 +459,7 @@ namespace Umbraco.Web
                     // also, if something goes wrong with our DI setup, the logging subsystem may
                     // not even kick in, so here we try to give as much detail as possible
 
-                    Exception e = Core.Composing.Current.RuntimeState.BootFailedException;
-                    if (e == null)
-                        throw new BootFailedException(BootFailedException.DefaultMessage);
-                    var m = new StringBuilder();
-                    m.Append(BootFailedException.DefaultMessage);
-                    while (e != null)
-                    {
-                        m.Append($"\n\n-> {e.GetType().FullName}: {e.Message}");
-                        if (string.IsNullOrWhiteSpace(e.StackTrace) == false)
-                            m.Append($"\n{e.StackTrace}");
-                        e = e.InnerException;
-                    }
-                    throw new BootFailedException(m.ToString());
+                    BootFailedException.Rethrow(Core.Composing.Current.RuntimeState.BootFailedException);
                 };
                 return;
             }

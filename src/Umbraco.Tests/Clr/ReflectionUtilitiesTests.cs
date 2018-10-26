@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -552,6 +553,22 @@ namespace Umbraco.Tests.Clr
         }
 
         // fixme - missing tests specifying 'returned' on method, property
+
+        [Test]
+        public void DeconstructAnonymousType()
+        {
+            var o = new { a = 1, b = "hello" };
+
+            var getters = new Dictionary<string, Func<object, object>>();
+            foreach (var prop in o.GetType().GetProperties())
+                getters[prop.Name] = ReflectionUtilities.EmitMethodUnsafe<Func<object, object>>(prop.GetMethod);
+
+            Assert.AreEqual(2, getters.Count);
+            Assert.IsTrue(getters.ContainsKey("a"));
+            Assert.IsTrue(getters.ContainsKey("b"));
+            Assert.AreEqual(1, getters["a"](o));
+            Assert.AreEqual("hello", getters["b"](o));
+        }
 
         #region IL Code
 

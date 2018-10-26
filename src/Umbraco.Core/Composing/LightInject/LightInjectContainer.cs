@@ -126,30 +126,9 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.AvailableServices.Where(x => x.ServiceType == type).Select(x => new Registration(x.ServiceType, x.ServiceName));
 
         /// <inheritdoc />
-        public object CreateInstance(Type type, params object[] args)
+        public void Release(object instance)
         {
-            // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
-            // including the most annoying one, which is that it does not work on singletons (hard to fix)
-            //return Container.GetInstance(type, args);
-
-            // this method is essentially used to build singleton instances, so it is assumed that it would be
-            // more expensive to build and cache a dynamic method ctor than to simply invoke the ctor, as we do
-            // here - this can be discussed
-
-            var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
-            if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
-
-            var ctorParameters = ctor.GetParameters();
-            var ctorArgs = new object[ctorParameters.Length];
-            var i = 0;
-            foreach (var parameter in ctorParameters)
-            {
-                // no! IsInstanceOfType is not ok here
-                // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
-                ctorArgs[i++] = arg ?? GetInstance(parameter.ParameterType);
-            }
-            return ctor.Invoke(ctorArgs);
+            // nothing to release with LightInject
         }
 
         // notes:
@@ -168,6 +147,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, GetLifetime(lifetime));
@@ -186,6 +167,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType, implementingType, implementingType.Name);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, implementingType, GetLifetime(lifetime));
@@ -204,6 +187,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType, implementingType, name);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, implementingType, name, GetLifetime(lifetime));
@@ -222,12 +207,34 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(f => factory(this));
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(f => factory(this), GetLifetime(lifetime));
                     break;
                 case Lifetime.Singleton:
                     Container.RegisterSingleton(f => factory(this));
+                    break;
+                default:
+                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void Register<TService>(Func<IContainer, TService> factory, string name, Lifetime lifetime = Lifetime.Transient)
+        {
+            switch (lifetime)
+            {
+                case Lifetime.Transient:
+                    Container.Register(f => factory(this), name);
+                    break;
+                case Lifetime.Request:
+                case Lifetime.Scope:
+                    Container.Register(f => factory(this), name, GetLifetime(lifetime));
+                    break;
+                case Lifetime.Singleton:
+                    Container.RegisterSingleton(f => factory(this), name);
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
@@ -254,6 +261,10 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public void RegisterInstance(Type serviceType, object instance)
             => Container.RegisterInstance(serviceType, instance);
+
+        /// <inheritdoc />
+        public void RegisterInstance(Type serviceType, object instance, string name)
+            => Container.RegisterInstance(serviceType, instance, name);
 
         /// <inheritdoc />
         public void RegisterAuto(Type serviceBaseType)

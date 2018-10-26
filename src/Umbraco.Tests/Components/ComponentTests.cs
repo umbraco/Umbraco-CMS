@@ -25,18 +25,20 @@ namespace Umbraco.Tests.Components
         {
             // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
+            var mock = new Mock<IContainer>();
+
             var testObjects = new TestObjects(null);
             var logger = Mock.Of<ILogger>();
             var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
             var f = new UmbracoDatabaseFactory(s, logger, new MapperCollection(Enumerable.Empty<BaseMapper>()));
-            var fs = new FileSystems(logger);
+            var fs = new FileSystems(mock.Object, logger);
             var p = new ScopeProvider(f, fs, logger);
 
-            var mock = new Mock<IContainer>();
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+
             setup?.Invoke(mock);
             return mock.Object;
         }
@@ -143,6 +145,7 @@ namespace Umbraco.Tests.Components
 
             var thing = new BootLoader(container);
             Composed.Clear();
+            Initialized.Clear();
             thing.Boot(new[] { typeof(Component1), typeof(Component5) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component1), Composed[0]);

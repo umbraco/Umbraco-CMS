@@ -33,8 +33,7 @@ namespace Umbraco.Tests.Scoping
 
             _testObjects = new TestObjects(container);
 
-            Current.Container.RegisterSingleton(f => Current.Container);
-            Current.Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
+            Current.Container.RegisterSingleton(factory => new FileSystems(container, factory.TryGetInstance<ILogger>()));
             Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();
 
             SettingsForTests.Reset(); // ensure we have configuration

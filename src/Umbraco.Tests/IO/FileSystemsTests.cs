@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
@@ -29,10 +30,11 @@ namespace Umbraco.Tests.IO
             _container = Current.Container = ContainerFactory.Create();
 
             _container.Register(_ => Mock.Of<ILogger>());
-            _container.Register<FileSystems>();
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
             _container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+
+            _container.ComposeFileSystems();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
@@ -52,25 +54,39 @@ namespace Umbraco.Tests.IO
         private FileSystems FileSystems => _container.GetInstance<FileSystems>();
 
         [Test]
-        public void Can_Get_Base_File_System()
+        public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = FileSystems.GetUnderlyingFileSystemProvider("media");
-
+            var fileSystem = FileSystems.GetFileSystem<MediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
-        public void Can_Get_Typed_File_System()
+        public void Can_Get_IMediaFileSystem()
         {
-            var fileSystem = FileSystems.GetFileSystemProvider<MediaFileSystem>();
-
+            var fileSystem = _container.GetInstance<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
-        public void Media_Fs_Safe_Delete()
+        public void MediaFileSystem_Is_Singleton()
         {
-            var fs = FileSystems.GetFileSystemProvider<MediaFileSystem>();
+            var fileSystem1 = FileSystems.GetFileSystem<MediaFileSystem>();
+            var fileSystem2 = FileSystems.GetFileSystem<MediaFileSystem>();
+            Assert.AreSame(fileSystem1, fileSystem2);
+        }
+
+        [Test]
+        public void IMediaFileSystem_Is_Singleton()
+        {
+            var fileSystem1 = _container.GetInstance<IMediaFileSystem>();
+            var fileSystem2 = _container.GetInstance<IMediaFileSystem>();
+            Assert.AreSame(fileSystem1, fileSystem2);
+        }
+
+        [Test]
+        public void Can_Delete_MediaFiles()
+        {
+            var fs = FileSystems.GetFileSystem<MediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
             var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);
@@ -92,51 +108,37 @@ namespace Umbraco.Tests.IO
             Assert.IsTrue(Directory.Exists(physPath));
         }
 
-        public void Singleton_Typed_File_System()
+        [Test]
+        public void Cannot_Get_InvalidFileSystem()
         {
-            var fs1 = FileSystems.GetFileSystemProvider<MediaFileSystem>();
-            var fs2 = FileSystems.GetFileSystemProvider<MediaFileSystem>();
-
-            Assert.AreSame(fs1, fs2);
+            // throws because InvalidTypedFileSystem does not have the proper attribute with an alias
+            Assert.Throws<InvalidOperationException>(() => FileSystems.GetFileSystem<InvalidFileSystem>());
         }
 
         [Test]
-        public void Exception_Thrown_On_Invalid_Typed_File_System()
-        {
-            Assert.Throws<InvalidOperationException>(() => FileSystems.GetFileSystemProvider<InvalidTypedFileSystem>());
-        }
-
-        [Test]
-        public void Exception_Thrown_On_NonConfigured_Typed_File_System()
+        public void Cannot_Get_NonConfiguredFileSystem()
         {
             // note: we need to reset the manager between tests else the Accept_Fallback test would corrupt that one
-            Assert.Throws<ArgumentException>(() => FileSystems.GetFileSystemProvider<NonConfiguredTypeFileSystem>());
+            // throws because NonConfiguredFileSystem has the proper attribute with an alias,
+            // but then the container cannot find an IFileSystem implementation for that alias
+            Assert.Throws<InvalidOperationException>(() => FileSystems.GetFileSystem<NonConfiguredFileSystem>());
+
+            // all we'd need to pass is to register something like:
+            //_container.Register<IFileSystem>("noconfig", factory => new PhysicalFileSystem("~/foo"));
         }
 
-        [Test]
-        public void Accept_Fallback_On_NonConfigured_Typed_File_System()
+        internal class InvalidFileSystem : FileSystemWrapper
         {
-            var fs = FileSystems.GetFileSystemProvider<NonConfiguredTypeFileSystem>(() => new PhysicalFileSystem("~/App_Data/foo"));
-
-            Assert.NotNull(fs);
-        }
-
-        /// <summary>
-        /// Used in unit tests, for a typed file system we need to inherit from FileSystemWrapper and they MUST have a ctor
-        /// that only accepts a base IFileSystem object
-        /// </summary>
-        internal class InvalidTypedFileSystem : FileSystemWrapper
-        {
-            public InvalidTypedFileSystem(IFileSystem wrapped, string invalidParam)
-                : base(wrapped)
+            public InvalidFileSystem(IFileSystem innerFileSystem)
+                : base(innerFileSystem)
             { }
         }
 
-        [FileSystemProvider("noconfig")]
-        internal class NonConfiguredTypeFileSystem : FileSystemWrapper
+        [FileSystem("noconfig")]
+        internal class NonConfiguredFileSystem : FileSystemWrapper
         {
-            public NonConfiguredTypeFileSystem(IFileSystem wrapped)
-                : base(wrapped)
+            public NonConfiguredFileSystem(IFileSystem innerFileSystem)
+                : base(innerFileSystem)
             { }
         }
     }

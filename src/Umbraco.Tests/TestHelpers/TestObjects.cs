@@ -116,7 +116,7 @@ namespace Umbraco.Tests.TestHelpers
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger>());
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
             var externalLoginService = GetLazyService<IExternalLoginService>(container, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(container, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
             }
 
-            fileSystems = fileSystems ?? new FileSystems(logger);
+            fileSystems = fileSystems ?? new FileSystems(Current.Container, logger);
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             return scopeProvider;
         }

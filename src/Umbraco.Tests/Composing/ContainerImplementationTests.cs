@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Composing
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Composing
         public void CanRegisterSingletonWithCreate()
         {
             var container = CreateContainer();
-            container.RegisterSingleton(c => c.CreateInstance<TestClass3>(new TestClass1()));
+            container.RegisterSingleton(c => c.CreateInstance<TestClass3>(new Dictionary<string, object>{{"c", new TestClass1()}}));
             var s1 = container.GetInstance<TestClass3>();
             var s2 = container.GetInstance<TestClass3>();
             Assert.AreSame(s1, s2);

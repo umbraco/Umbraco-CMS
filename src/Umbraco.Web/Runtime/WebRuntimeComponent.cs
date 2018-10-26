@@ -89,9 +89,6 @@ namespace Umbraco.Web.Runtime
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             composition.Container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
-            // register the 'current' umbraco context - transient - for eg controllers
-            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
-
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
             composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
@@ -99,9 +96,11 @@ namespace Umbraco.Web.Runtime
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.Container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
-            // register a per-request UmbracoContext object
-            // no real need to be per request but assuming it is faster
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
+            // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
+            // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
+            // a way to inject the UmbracoContext - and register it per-request to be more efficient
+            //TODO: stop doing this
+            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
             // register the umbraco helper
             composition.Container.RegisterSingleton<UmbracoHelper>();

@@ -72,7 +72,8 @@ namespace Umbraco.Tests.PropertyEditors
 
                 Current.Container.RegisterSingleton<ILogger>(f => Mock.Of<ILogger>());
                 Current.Container.RegisterSingleton<IContentSection>(f => Mock.Of<IContentSection>());
-                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger>());
+                Current.Container.RegisterSingleton<IMediaPathScheme>(f => Mock.Of<IMediaPathScheme>());
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
                     new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1 });
