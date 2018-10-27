@@ -359,7 +359,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         internal IEnumerable<IUmbracoEntity> GetByQueryInternal(IQuery<IUmbracoEntity> query, Guid objectTypeId, bool includePropertyData)
         {
-	        var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
             var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
