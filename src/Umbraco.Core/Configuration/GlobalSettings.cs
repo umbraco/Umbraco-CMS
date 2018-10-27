@@ -856,7 +856,18 @@ namespace Umbraco.Core.Configuration
             return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
         }
 
-      
+        /// <summary>
+        /// Gets a value indicating whether the profiler should always be shown in [debug mode]
+        /// </summary>
+        /// <value><c>true</c> if the profiler should always be shown; otherwise, <c>false</c></value>
+        /// <remarks>If this returns <c>false</c>, the profiler can still be trigged explicitly in [debug mode] (by using umbDebug=true in the query string)</remarks>
+        public static bool ProfilerAlwaysActive
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoProfilerAlwaysActive") && ConfigurationManager.AppSettings["umbracoProfilerAlwaysActive"] == "true";
+            }
+        }
 
     }
 

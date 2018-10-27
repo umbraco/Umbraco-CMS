@@ -99,6 +99,10 @@ namespace Umbraco.Web.Profiling
             if (request.Success == false || request.Result.Url.IsClientSideRequest())
                 return false;
 
+            //is the profiler is set to always active by configuration?
+            if (GlobalSettings.ProfilerAlwaysActive)
+                return true;
+
             //if there is an umbDebug query string than profile it
             bool umbDebug;
             if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"]) == false && bool.TryParse(request.Result.QueryString["umbDebug"], out umbDebug))

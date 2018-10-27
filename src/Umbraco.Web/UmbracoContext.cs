@@ -411,7 +411,7 @@ namespace Umbraco.Web
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
                 return GlobalSettings.DebugMode && request != null
-                    && (!string.IsNullOrEmpty(request["umbdebugshowtrace"]) || !string.IsNullOrEmpty(request["umbdebug"]));
+                    && (GlobalSettings.ProfilerAlwaysActive || !string.IsNullOrEmpty(request["umbdebugshowtrace"]) || !string.IsNullOrEmpty(request["umbdebug"]));
             }
         }
 
