@@ -17,6 +17,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
+using Stylesheet = Umbraco.Core.Models.Stylesheet;
 
 namespace Umbraco.Web.Editors
 {
@@ -168,6 +169,18 @@ namespace Umbraco.Web.Editors
                         return display;
                     }
                     throw new HttpResponseException(HttpStatusCode.NotFound);
+
+                case Core.Constants.Trees.Stylesheets:
+                    var stylesheet = Services.FileService.GetStylesheetByName(virtualPath);
+                    if (stylesheet != null)
+                    {
+                        var display = Mapper.Map<Stylesheet, CodeFileDisplay>(stylesheet);
+                        display.FileType = Core.Constants.Trees.Stylesheets;
+                        display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
+                        return display;
+                    }
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -234,6 +247,10 @@ namespace Umbraco.Web.Editors
                 case Core.Constants.Trees.Scripts:
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.Scripts;
+                    break;
+                case Core.Constants.Trees.Stylesheets:
+                    codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
+                    codeFileDisplay.VirtualPath = SystemDirectories.StyleSheets;
                     break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
@@ -369,13 +386,17 @@ namespace Umbraco.Web.Editors
                     display.Id = System.Web.HttpUtility.UrlEncode(scriptResult.Path);
                     return display;
 
-                    //display.AddErrorNotification(
-                    //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                    //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+                //display.AddErrorNotification(
+                //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
+                //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
 
+                case Core.Constants.Trees.Stylesheets:
 
-
-
+                    var stylesheetResult = CreateOrUpdateStylesheet(display);
+                    display = Mapper.Map(stylesheetResult, display);
+                    display.Path = Url.GetTreePathFromFilePath(stylesheetResult.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(stylesheetResult.Path);
+                    return display;
 
                 default:
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -429,6 +450,54 @@ namespace Umbraco.Web.Editors
             }
 
             return script;
+        }
+
+        private Stylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
+        {
+            return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
+                name => Services.FileService.GetStylesheetByName(name), 
+                (stylesheet, userId) => Services.FileService.SaveStylesheet(stylesheet, userId),
+                name => new Stylesheet(name)
+            );
+        }
+
+        private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem fileSystem,
+            Func<string, T> getFileByName, Action<T, int> saveFile, Func<string, T> createFile) where T : Core.Models.File
+        {
+            //must always end with the correct extension
+            display.Name = EnsureCorrectFileExtension(display.Name, extension);
+
+            var virtualPath = display.VirtualPath ?? string.Empty;
+            // this is all weird, should be using relative paths everywhere!
+            var relPath = fileSystem.GetRelativePath(virtualPath);
+
+            if (relPath.EndsWith(extension) == false)
+            {
+                //this would typically mean it's new
+                relPath = relPath.IsNullOrWhiteSpace()
+                    ? relPath + display.Name
+                    : relPath.EnsureEndsWith('/') + display.Name;
+            }
+
+            var file = getFileByName(relPath);
+            if (file != null)
+            {
+                // might need to find the path
+                var orgPath = file.OriginalPath.Substring(0, file.OriginalPath.IndexOf(file.Name));
+                file.Path = orgPath + display.Name;
+
+                file.Content = display.Content;
+                //try/catch? since this doesn't return an Attempt?
+                saveFile(file, Security.CurrentUser.Id);
+            }
+            else
+            {
+                file = createFile(relPath);
+                file.Content = display.Content;
+                saveFile(file, Security.CurrentUser.Id);
+            }
+
+            return file;
         }
 
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
