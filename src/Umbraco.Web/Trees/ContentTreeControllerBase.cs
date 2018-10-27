@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,12 +10,12 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using System.Globalization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -203,7 +202,11 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
+            // Not pretty having to cast the service, but it is the only way to get to use an internal method that we
+            // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
+            // See this issue for details on why we need this:
+            // https://github.com/umbraco/Umbraco-CMS/issues/3457
+            return ((EntityService)Services.EntityService).GetChildrenWithoutPropertyData(entityId, UmbracoObjectType).ToList();
         }
 
         /// <summary>
