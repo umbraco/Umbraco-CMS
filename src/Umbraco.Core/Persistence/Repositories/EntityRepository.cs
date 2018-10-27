@@ -331,24 +331,49 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
+        /// <summary>
+        /// Gets entities by query.
+        /// Note that this will also fetch all property data for media items, which can cause performance problems
+        /// when used without paging, in sites with large amounts of data in cmsPropertyData.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="objectTypeId"></param>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
+            return GetByQueryInternal(query, objectTypeId, true);
+        }
 
-            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
-            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
+        /// <summary>
+        /// Gets entities by query without fetching property data.
+        /// This is supposed to be internal and can be used when getting all entities without paging, without causing
+        /// performance issues.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="objectTypeId"></param>
+        /// <returns></returns>
+        internal IEnumerable<IUmbracoEntity> GetByQueryWithoutPropertyData(IQuery<IUmbracoEntity> query, Guid objectTypeId)
+        {
+            return GetByQueryInternal(query, objectTypeId, false);
+        }
+
+        internal IEnumerable<IUmbracoEntity> GetByQueryInternal(IQuery<IUmbracoEntity> query, Guid objectTypeId, bool includePropertyData)
+        {
+	        var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
-            
+
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
 
             var factory = new UmbracoEntityFactory();
 
-            if (isMedia)
+            if (isMedia && includePropertyData)
             {
                 var wheres = query.GetWhereClauses().ToArray();
 
-                var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), sql =>
+                var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, isMedia, false)), sql =>
                 {
                     //adds the additional filters
                     foreach (var whereClause in wheres)
@@ -365,21 +390,21 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
-                var finalSql = entitySql.Append(GetGroupBy(isContent, false));
+                var finalSql = entitySql.Append(GetGroupBy(isContent, isMedia));
 
                 //query = read forward data reader, do not load everything into mem
                 var dtos = _work.Database.Query<dynamic>(finalSql);
                 var collection = new EntityDefinitionCollection();
                 foreach (var dto in dtos)
                 {
-                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
+                    collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, isMedia));
                 }
                 return collection.Select(x => x.BuildFromDynamic()).ToList();
             }
         }
 
         #endregion
-        
+
 
         #region Sql Statements
 
