@@ -1,0 +1,104 @@
+<div>
+    <umb-load-indicator ng-if="false"></umb-load-indicator>
+
+    <form name="relationTypeForm" novalidate val-form-manager>
+        <umb-editor-view ng-if="true">
+            <umb-editor-header
+                name="Relation type name"
+                alias="relationTypeAlias"
+                key="relationTypeKey"
+                description="something here"
+                description-locked="true"
+                hide-icon="false">
+            </umb-editor-header>
+
+            <umb-editor-container class="form-horizontal">
+                <umb-box>
+                    <umb-box-content>
+                        <!-- ID -->
+                        <umb-control-group label="Id">
+                            <div>1234</div>
+                            <small>0123-4567-8910-abcd</small>
+                        </umb-control-group>
+
+                        <!-- Direction -->
+                        <umb-control-group label="Direction">
+                            <ul class="unstyled">
+                                <li>
+                                    <label class="radio">
+                                        <input type="radio" name="direction" value="0"> Parent to child
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="radio">
+                                        <input type="radio" name="direction" value="1"> Bidirectional
+                                    </label>
+                                </li>
+                            </ul>
+                        </umb-control-group>
+
+                        <!-- Parent-->
+                        <umb-control-group label="Parent">
+                            <div>Document</div>
+                        </umb-control-group>
+
+                        <!-- Child -->
+                        <umb-control-group label="Child">
+                            <div>Document</div>
+                        </umb-control-group>
+
+                        <!-- Relation count -->
+                        <umb-control-group label="Count">
+                            <div>12</div>
+                        </umb-control-group>
+
+                        <!-- Relations -->
+                        <umb-control-group label="Relations">
+                            <div>
+                                <!-- TODO: Replace with umb-table directive -->
+                                <table class="table">
+                                    <thead>
+                                        <th>Parent</th>
+                                        <th>Child</th>
+                                        <th>Created</th>
+                                        <th>Comment</th>
+                                    </thead>
+                                    <tr>
+                                        <td>Something</td>
+                                        <td>Something else</td>
+                                        <td>2018-10-27 18:58</td>
+                                        <td>A comment here</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Something</td>
+                                        <td>Something else</td>
+                                        <td>2018-10-27 18:58</td>
+                                        <td>A comment here</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Something</td>
+                                        <td>Something else</td>
+                                        <td>2018-10-27 18:58</td>
+                                        <td>A comment here</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </umb-control-group>
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="submit"
+                        button-style="success"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
+</div>
