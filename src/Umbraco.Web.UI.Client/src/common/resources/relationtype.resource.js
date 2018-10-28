@@ -17,7 +17,7 @@ function relationTypeResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
-                        "relationTypeBaseUrl",
+                        "relationTypeApiBaseUrl",
                         "GetById",
                         [{ id: id }]
                     )

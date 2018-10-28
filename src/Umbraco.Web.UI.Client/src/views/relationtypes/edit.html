@@ -1,15 +1,13 @@
-<div>
-    <umb-load-indicator ng-if="false"></umb-load-indicator>
+<div data-element="editor-relation-types" ng-controller="Umbraco.Editors.RelationTypes.EditController as vm">
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
     <form name="relationTypeForm" novalidate val-form-manager>
-        <umb-editor-view ng-if="true">
+        <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
-                name="Relation type name"
-                alias="relationTypeAlias"
-                key="relationTypeKey"
-                description="something here"
-                description-locked="true"
-                hide-icon="false">
+                name="vm.relation.name"
+                alias="vm.relation.alias"
+                hide-description="true"
+                hide-icon="true">
             </umb-editor-header>
 
             <umb-editor-container class="form-horizontal">
@@ -17,8 +15,8 @@
                     <umb-box-content>
                         <!-- ID -->
                         <umb-control-group label="Id">
-                            <div>1234</div>
-                            <small>0123-4567-8910-abcd</small>
+                            <div>{{vm.relation.id}}</div>
+                            <small>{{vm.relation.key}}</small>
                         </umb-control-group>
 
                         <!-- Direction -->
@@ -26,12 +24,12 @@
                             <ul class="unstyled">
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="direction" value="0"> Parent to child
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relation.isBidirectional" ng-value="false"> Parent to child
                                     </label>
                                 </li>
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="direction" value="1"> Bidirectional
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relation.isBidirectional" ng-value="true"> Bidirectional
                                     </label>
                                 </li>
                             </ul>
@@ -39,12 +37,12 @@
 
                         <!-- Parent-->
                         <umb-control-group label="Parent">
-                            <div>Document</div>
+                            <div>{{vm.relation.parentObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Child -->
                         <umb-control-group label="Child">
-                            <div>Document</div>
+                            <div>{{vm.relation.childObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Relation count -->

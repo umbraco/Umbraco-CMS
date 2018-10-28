@@ -1,25 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    [Obsolete("Use Umbraco.Web.Models.ContentEditing.RelationTypeDisplay instead")]
     [DataContract(Name = "relationType", Namespace = "")]
-    public class RelationType
+    public class RelationTypeDisplay : EntityBasic
     {
-
-        /// <summary>
-        /// Gets or sets the Name of the RelationType
-        /// </summary>
-        [DataMember(Name = "name", IsRequired = true)]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Alias of the RelationType
-        /// </summary>
-        [DataMember(Name = "alias", IsRequired = true)]
-        public string Alias { get; set; }
-
         /// <summary>
         /// Gets or sets a boolean indicating whether the RelationType is Bidirectional (true) or Parent to Child (false)
         /// </summary>
@@ -34,10 +21,24 @@ namespace Umbraco.Web.Models.ContentEditing
         public Guid ParentObjectType { get; set; }
 
         /// <summary>
+        /// Gets or sets the Parent's object type name.
+        /// </summary>
+        [DataMember(Name = "parentObjectTypeName")]
+        [ReadOnly(true)]
+        public string ParentObjectTypeName { get; set; }
+
+        /// <summary>
         /// Gets or sets the Childs object type id
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "childObjectType", IsRequired = true)]
         public Guid ChildObjectType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Child's object type name.
+        /// </summary>
+        [DataMember(Name = "childObjectTypeName")]
+        [ReadOnly(true)]
+        public string ChildObjectTypeName { get; set; }
     }
 }

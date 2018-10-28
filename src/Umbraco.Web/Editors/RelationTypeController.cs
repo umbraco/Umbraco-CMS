@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using RelationType = Umbraco.Web.Models.ContentEditing.RelationType;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,8 +26,8 @@ namespace Umbraco.Web.Editors
         /// Gets a relation type by ID.
         /// </summary>
         /// <param name="id">The relation type ID.</param>
-        /// <returns>Returns the <see cref="RelationType"/>.</returns>
-        public RelationType GetById(int id)
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        public RelationTypeDisplay GetById(int id)
         {
             var relationType = Services.RelationService.GetRelationTypeById(id);
 
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return Mapper.Map<IRelationType, RelationType>(relationType);
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
         public void PostSave()

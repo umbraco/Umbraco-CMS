@@ -65,10 +65,7 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     rt.Name,
                     "icon-trafic",
-                    false,
-                    //TODO: Rebuild the macro editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
-                    "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                    Uri.EscapeDataString("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + rt.Id)
+                    false
                     )));
             }
             return nodes;
