@@ -2,11 +2,16 @@
 
     <ul class="unstyled">
         <li ng-repeat="item in selectedItems">
-            <label class="checkbox">
+            <label class="checkbox umb-checkboxlist__label">
                 <input type="checkbox" name="checkboxlist"
                        value="{{item.key}}"
-                       ng-model="item.checked" />
-                {{item.val}}
+                       ng-model="item.checked"
+                       class="umb-checkboxlist__input" />
+
+                <div class="umb-checkboxlist__state">
+                    <i class="umb-checkboxlist__icon icon-check" aria-hidden="true"></i>
+                    <span class="umb-checkboxlist__label-text">{{item.val}}</span>
+                </div>
             </label>
         </li>
     </ul>
