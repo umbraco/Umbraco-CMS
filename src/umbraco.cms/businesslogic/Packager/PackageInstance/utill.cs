@@ -283,7 +283,7 @@ namespace umbraco.cms.businesslogic.packager
             // find number of chars to remove from orginal file path
 
             using (var memoryStream = new MemoryStream())
-            {   
+            {
                 using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
                     foreach (string file in ar)
@@ -301,7 +301,37 @@ namespace umbraco.cms.businesslogic.packager
                     memoryStream.CopyTo(fileStream);
                 }
             }
+        }
 
+        /// <summary>
+        /// Zips the package.
+        /// </summary>
+        /// <returns>The package in a byte array.</returns>
+        /// <param name="Path">The path.</param>
+        public static byte[] ZipPackage(string Path)
+        {
+            ArrayList ar = GenerateFileList(Path);
+            // generate file list
+            // find number of chars to remove from orginal file path
+
+            byte[] package;
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (string file in ar)
+                    {
+                        if (file.EndsWith(@"/") != true) // it's not a directory
+                        {
+                            archive.CreateEntryFromFile(file, System.IO.Path.GetFileName(file));
+                        }
+                    }
+                }
+
+                package = memoryStream.ToArray();
+            }
+
+            return package;
         }
 
         private static ArrayList GenerateFileList(string Dir)

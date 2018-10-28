@@ -347,21 +347,12 @@ namespace umbraco.cms.businesslogic.packager
                 _packageManifest.Save(manifestFileName);
                 _packageManifest = null;
 
-
-                //string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
-
-                // check if there's a packages directory below media
-                var packagesDirectory = SystemDirectories.Media + "/created-packages";
-                if (Directory.Exists(IOHelper.MapPath(packagesDirectory)) == false)
-                {
-                    Directory.CreateDirectory(IOHelper.MapPath(packagesDirectory));
-                }
-
-
+                var packagesDirectory = "created-packages";
                 var packPath = packagesDirectory + "/" + (pack.Name + "_" + pack.Version).Replace(' ', '_') + "." + Settings.PackageFileExtension;
-                utill.ZipPackage(localPath, IOHelper.MapPath(packPath));
+                var packContents = utill.ZipPackage(localPath);
+                UmbracoMediaFile.Save(packContents, packPath);
 
-                pack.PackagePath = packPath;
+                pack.PackagePath = SystemDirectories.Media + "/" + packPath;
 
                 if (pack.PackageGuid.Trim() == "")
                     pack.PackageGuid = Guid.NewGuid().ToString();
@@ -374,9 +365,8 @@ namespace umbraco.cms.businesslogic.packager
 
                 package.FireAfterPublish(e);
             }
-
         }
-        
+
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
         {
             if (dt.MasterContentType != 0 && dt.Parent.nodeObjectType == Constants.ObjectTypes.DocumentTypeGuid)
