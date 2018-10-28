@@ -15,6 +15,8 @@ using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.PropertyEditors;
 using Content = Umbraco.Core.Models.Content;
+using System.Reflection;
+
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -61,10 +63,17 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         TabsAndPropertiesResolver<IContent>.AddListView(display, "content", applicationContext.Services.DataTypeService, applicationContext.Services.TextService);
                     }
-                    //if there aren't any allowed templates for this content item, default 'AllowPreview' to be false
-                    //this can still be overriden by a developer (SendingContentModel event) if they have route hijacked
-                    //and do have a valid preview to show.
-                    if (display.AllowedTemplates == null || !display.AllowedTemplates.Any())
+
+                    // Don't show preview button by default if pressing it will cause an error
+                    // determine whether we are route hijacking by using reflection to find a list of all RenderMvcControllers, and see if the current documenttype alias matches one
+                    string hijackedControllerName = content.ContentType.Alias + "Controller";
+                    List<string> renderMvcControllerNames = (List<string>)ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem("umb-CustomRenderMvcControllerNames", () => GetCustomRenderMvcControllerNames());
+                    bool hasHijackedRoute = renderMvcControllerNames != null && renderMvcControllerNames.Any(f => f.InvariantEquals(hijackedControllerName));
+
+                    // if we are not hijacking and there aren't any allowed templates for this content item,
+                    // set default 'AllowPreview' to be false
+                    // this can still be overriden by a developer (SendingContentModel event)
+                    if (!hasHijackedRoute && (display.AllowedTemplates == null || !display.AllowedTemplates.Any()))
                     {
                         display.AllowPreview = false;
                     }
@@ -91,12 +100,19 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Alias, expression => expression.Ignore());
         }
 
+        private List<string> GetCustomRenderMvcControllerNames()
+        {
+            List<string> renderMvcControllers = new List<string>();
+            renderMvcControllers = TypeFinder.FindClassesOfType<Umbraco.Web.Mvc.RenderMvcController>().Select(f => f.Name).ToList();
+            return renderMvcControllers;
+        }
+
         private static DateTime? GetPublishedDate(IContent content)
         {
             var date = ((Content)content).PublishedDate;
             return date == default(DateTime) ? (DateTime?)null : date;
         }
-        
+
         internal class ContentUrlResolver : IValueResolver
         {
             public ResolutionResult Resolve(ResolutionResult source)
@@ -106,7 +122,7 @@ namespace Umbraco.Web.Models.Mapping
                 var umbCtx = source.Context.GetUmbracoContext();
 
                 var urls = umbCtx == null
-                    ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                    ? new[] { "Cannot generate urls without a current Umbraco Context" }
                     : content.GetContentUrls(umbCtx);
 
                 return source.New(urls, typeof(string[]));
