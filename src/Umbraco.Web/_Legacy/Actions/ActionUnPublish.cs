@@ -25,6 +25,8 @@ namespace Umbraco.Web._Legacy.Actions
         public string Icon => "circle-dotted";
         public bool ShowInNotifier => false;
         public bool CanBePermissionAssigned => true;
+        public bool OpensDialog => false;
+
     }
 
 }

@@ -83,6 +83,9 @@ namespace Umbraco.Web._Legacy.Actions
                 return true;
             }
         }
+
+        public bool OpensDialog => true;
+
         #endregion
     }
 }
