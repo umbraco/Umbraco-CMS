@@ -23,7 +23,7 @@
   * </pre>
   **/
 
-function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files, restApiUrl, showNotifications) {
@@ -607,7 +607,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-
+            if (!options.cultureName) {
+                // must send a culture to the content API to handle variant data correctly
+                options.cultureName = $routeParams.mculture;
+            }
             //converts the value to a js bool
             function toBool(v) {
                 if (angular.isNumber(v)) {
