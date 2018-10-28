@@ -274,6 +274,10 @@
         <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
         <key alias="maxFileSize">Max file size is</key>
         <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     </area>
     <area alias="member">
         <key alias="createNewMember">Create a new member</key>
@@ -464,6 +468,8 @@
         <key alias="enterMessage">Enter a message...</key>
         <key alias="usernameHint">Your username is usually your email</key>
         <key alias="anchor">#value or ?key=value</key>
+        <key alias="enterAlias">Enter alias...</key>
+        <key alias="generatingAlias">Generating alias...</key>
     </area>
     <area alias="editcontenttype">
         <key alias="allowAtRoot" version="7.2">Allow at root</key>
@@ -597,6 +603,7 @@
         <key alias="hide">Hide</key>
         <key alias="history">History</key>
         <key alias="icon">Icon</key>
+        <key alias="id">Id</key>
         <key alias="import">Import</key>
         <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
@@ -1297,8 +1304,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="imagecropper">
         <key alias="reset">Reset crop</key>
-        <key alias="defineCrop">Define crop</key>
-        <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
         <key alias="saveCrop">Save crop</key>
         <key alias="addCrop">Add new crop</key>
         <key alias="updateEditCrop">Done</key>
@@ -1397,6 +1402,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="editContentSendToPublish">Sent For Approval</key>
         <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
         <key alias="editMediaSaved">Media saved</key>
+        <key alias="editMemberGroupSaved">Member group saved</key>
         <key alias="editMediaSavedText">Media saved without any errors</key>
         <key alias="editMemberSaved">Member saved</key>
         <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>

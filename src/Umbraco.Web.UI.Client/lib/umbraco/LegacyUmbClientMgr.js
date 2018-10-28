@@ -150,7 +150,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             sourceUrl: currentMenuNode.childNodesUrl,
                             updateDefinition: function() {
                                 throw "'updateDefinition' method is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
-                            }
+                            },
+                            expanded: currentMenuNode.expanded === true
                         };
                         //defined getters that will throw a not implemented/supported exception
                         Object.defineProperty(legacyNode, "menu", {

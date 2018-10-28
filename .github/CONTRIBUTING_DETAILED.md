@@ -69,9 +69,7 @@ Some additional hints that may be helpful:
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` and issues](http://issues.umbraco.org/issues/U4?q=%28project%3A+%7BU4%7D+Difficulty%3A+%7BVery+Easy%7D+%23Easy+%23Unresolved+Priority%3A+Normal+%23Major+%23Show-stopper+State%3A+-%7BIn+Progress%7D+sort+by%3A+votes+Affected+versions%3A+-6.*+Affected+versions%3A+-4.*%29+OR+%28tag%3A+%7BUp+For+Grabs%7D+%23Unresolved+%29).
-
-The issue list is sorted by total number of upvotes. While not perfect, number of upvotes is a reasonable proxy for impact a given change will have.
+Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` and issues](https://issues.umbraco.org/issues?q=&project=U4&tagValue=upforgrabs&release=&issueType=&search=search) or on the [new issue tracker](https://github.com/umbraco/Umbraco-CMS/issues?q=is%3Aopen+is%3Aissue+label%3Acommunity%2Fup-for-grabs).
 
 ### Pull Requests
 

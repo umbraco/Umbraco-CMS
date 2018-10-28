@@ -110,7 +110,7 @@ angular.module("umbraco.directives")
                         scope.isCroppable = true;
                         scope.hasDimensions = true;
 
-                        if (scope.src !== "undefined") {
+                        if (scope.src) {
                             if (scope.src.endsWith(".svg")) {
                                 scope.isCroppable = false;
                                 scope.hasDimensions = false;

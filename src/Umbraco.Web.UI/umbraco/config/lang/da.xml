@@ -266,6 +266,10 @@
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
+    <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -443,6 +447,8 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="enterAlias">Indtast alias...</key>
+    <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>
@@ -564,6 +570,7 @@
     <key alias="hide">Skjul</key>
     <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
+    <key alias="id">Id</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
