@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
@@ -96,6 +97,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 multiple = isMultiple,
                 items = config.Items
             };
+            dataType.DbType = ValueStorageType.Nvarchar.ToString();
             dataType.Configuration = JsonConvert.SerializeObject(flexConfig);
             Database.Update(dataType);
         }
