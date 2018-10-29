@@ -240,8 +240,12 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu);
             AddActionNode<ActionProtect>(item, menu, true, true);
-            
-            AddActionNode<ActionNotify>(item, menu, true);
+
+            menu.Items.Add(new MenuItem("notify", Services.TextService)
+            {
+                Icon = "megaphone",
+                SeperatorBefore = true
+            });
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 

@@ -185,12 +185,7 @@ namespace Umbraco.Web.Trees
 
             if (Security.CurrentUser.HasAccessToSensitiveData())
             {
-                menu.Items.Add(new ExportMember
-                {
-                    Name = Services.TextService.Localize("actions/export"),
-                    Icon = "download-alt",
-                    Alias = "export"
-                });
+                menu.Items.Add(new ExportMember(Services.TextService));
             }
 
 

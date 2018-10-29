@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -28,9 +29,17 @@ namespace Umbraco.Web.Models.Trees
         /// </summary>
         public virtual string AngularServiceMethodName { get; } = null;
 
-        [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-        protected ActionMenuItem()
-            : base()
+        protected ActionMenuItem(string alias, string name) : base(alias, name)
+        {
+            Initialize();
+        }
+
+        protected ActionMenuItem(string alias, ILocalizedTextService textService) : base(alias, textService)
+        {
+            Initialize();
+        }
+
+        private void Initialize()
         {
             //add the current type to the metadata
             if (AngularServiceMethodName.IsNullOrWhiteSpace())

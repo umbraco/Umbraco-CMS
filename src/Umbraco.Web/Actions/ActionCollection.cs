@@ -17,7 +17,7 @@ namespace Umbraco.Web.Actions
         internal T GetAction<T>()
             where T : IAction
         {
-            return this.OfType<T>().SingleOrDefault();
+            return this.OfType<T>().FirstOrDefault();
         }
 
         internal IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)

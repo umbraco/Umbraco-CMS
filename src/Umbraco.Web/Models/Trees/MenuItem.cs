@@ -31,6 +31,14 @@ namespace Umbraco.Web.Models.Trees
             Name = name;
         }
 
+
+        public MenuItem(string alias, ILocalizedTextService textService)
+            : this()
+        {
+            Alias = alias;
+            Name = textService.Localize($"actions/{Alias}");
+        }
+
         /// <summary>
         /// Create a menu item based on an <see cref="IAction"/> definition
         /// </summary>

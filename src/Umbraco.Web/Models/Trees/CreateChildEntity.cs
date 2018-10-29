@@ -11,17 +11,16 @@ namespace Umbraco.Web.Models.Trees
         public override string AngularServiceName => "umbracoMenuActions";
 
         public CreateChildEntity(string name, bool seperatorBefore = false)
+            : base(ActionNew.ActionAlias, name)
         {
-            Alias = ActionNew.ActionAlias;
             Icon = "add"; Name = name;
             SeperatorBefore = seperatorBefore;
         }
 
         public CreateChildEntity(ILocalizedTextService textService, bool seperatorBefore = false)
+            : base(ActionNew.ActionAlias, textService)
         {
-            Alias = ActionNew.ActionAlias;
             Icon = "add";
-            Name = textService.Localize($"actions/{Alias}");
             SeperatorBefore = seperatorBefore;
         }
     }

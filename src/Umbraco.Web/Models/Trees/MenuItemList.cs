@@ -39,28 +39,6 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Adds a menu item based on an <see cref="IAction"/>
-        /// </summary>
-        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
-        /// <typeparam name="T"></typeparam>
-        public MenuItem Add<T>(string name)
-            where T : IAction
-        {
-            return Add<T>(name, false);
-        }
-
-        /// <summary>
-        /// Adds a menu item based on an <see cref="IAction"/>
-        /// </summary>
-        /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on it's alias</param>
-        /// <typeparam name="T"></typeparam>
-        public MenuItem Add<T>(ILocalizedTextService textService)
-            where T : IAction
-        {
-            return Add<T>(textService, false);
-        }
-
-        /// <summary>
         /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
         /// </summary>
         /// <typeparam name="T"></typeparam>

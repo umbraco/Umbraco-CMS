@@ -349,7 +349,10 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
+                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+                {
+                    Icon = "trash"                    
+                });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }

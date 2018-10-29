@@ -82,7 +82,11 @@ namespace Umbraco.Web.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService);
-                menu.Items.Add<ActionImport>(Services.TextService, true);
+                menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
+                {
+                    Icon = "page-up",
+                    SeperatorBefore = true
+                });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
@@ -123,7 +127,11 @@ namespace Umbraco.Web.Trees
                     menu.Items.Add<ActionMove>(Services.TextService, true);
                 }
                 menu.Items.Add<ActionCopy>(Services.TextService);
-                menu.Items.Add<ActionExport>(Services.TextService, true);
+                menu.Items.Add(new MenuItem("export", Services.TextService)
+                {
+                    Icon = "download-alt",
+                    SeperatorBefore = true
+                });
                 menu.Items.Add<ActionDelete>(Services.TextService, true);
                 if (enableInheritedDocumentTypes)
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
