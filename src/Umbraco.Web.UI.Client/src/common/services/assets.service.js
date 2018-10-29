@@ -141,10 +141,6 @@ angular.module('umbraco.services')
                     var self = this;
                     return self.loadJs(umbRequestHelper.getApiUrl("serverVarsJs", "", ""), $rootScope).then(function () {
                         initAssetsLoaded = true;
-
-                        //now we need to go get the legacyTreeJs - but this can be done async without waiting.
-                        self.loadJs(umbRequestHelper.getApiUrl("legacyTreeJs", "", ""), $rootScope);
-
                         return loadMomentLocaleForCurrentUser();
                     });
                 }

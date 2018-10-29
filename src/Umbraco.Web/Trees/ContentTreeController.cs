@@ -92,6 +92,7 @@ namespace Umbraco.Web.Trees
                         }
                     }
 
+                    node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
 
@@ -238,14 +239,12 @@ namespace Umbraco.Web.Trees
 
             AddActionNode<ActionSort>(item, menu, true);
 
-            AddActionNode<ActionRollback>(item, menu);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
             AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);
             AddActionNode<ActionProtect>(item, menu, true, true);
             
             AddActionNode<ActionNotify>(item, menu, true);
-            AddActionNode<ActionSendToTranslate>(item, menu, convert: true);
 
             AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
 

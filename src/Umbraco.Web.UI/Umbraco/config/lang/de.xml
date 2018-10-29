@@ -483,7 +483,7 @@
     <key alias="permissionsText">Umbraco benötigt Schreibrechte auf verschiedene Verzeichnisse, um Dateien wie Bilder oder PDF-Dokumente speichern zu können. Außerdem werden temporäre Daten zur Leistungssteigerung der Website angelegt.</key>
     <key alias="runwayFromScratch">Ich möchte mit einem leeren System ohne Inhalte und Vorgaben starten</key>
     <key alias="runwayFromScratchText">
-	Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit. 
+	Die Website ist zur Zeit komplett leer und ohne Inhalte und Vorgaben zu Erstellung eigener Dokumenttypen und Vorlagen bereit.
 	(&lt;a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types"&gt;So geht's&lt;/a&gt;)
 	Sie können "Runway" auch jederzeit später installieren. Verwenden Sie hierzu den Punkt "Pakete" im Entwickler-Bereich.
   </key>
@@ -497,8 +497,8 @@ Dies sind unsere empfohlenen Module. Schauen Sie sich die an, die Sie installier
     <key alias="runwaySimpleSite">Ich möchte mit einer einfache Website starten</key>
     <key alias="runwaySimpleSiteText">
 &lt;p&gt;
-"Runway" ist eine einfache Website mit einfachen Dokumententypen und Vorlagen. Der Installer kann Runway automatisch einrichten, 
-aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und Umbraco kann auch ohne Runway verwendet werden. 
+"Runway" ist eine einfache Website mit einfachen Dokumententypen und Vorlagen. Der Installer kann Runway automatisch einrichten,
+aber es kann einfach verändert, erweitert oder entfernt werden. Es ist nicht zwingend notwendig und Umbraco kann auch ohne Runway verwendet werden.
 Runway bietet eine einfache Basis zum schnellen Start mit Umbraco.
 Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die "Runway Modules" und Ihre Runway-Seite erweitern.
 &lt;/p&gt;
@@ -535,6 +535,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Einen wunderbaren Sonntag</key>
     <key alias="greeting1">Schönen Montag</key>
     <key alias="greeting2">Einen großartigen Dienstag</key>
     <key alias="greeting3">Wunderbaren Mittwoch</key>
@@ -578,13 +579,13 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
       Ihr freundlicher Umbraco-Robot
     </key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hallo %0%</p>
-		  <p>Dies ist eine automatisch E-Mail, welche Sie informiert, dass die Aufgabe <strong>'%1%'</strong> 
+		  <p>Dies ist eine automatisch E-Mail, welche Sie informiert, dass die Aufgabe <strong>'%1%'</strong>
 		  an der Seite <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  vom Benutzer <strong>'%3%'</strong> ausgeführt wurde.
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -596,7 +597,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

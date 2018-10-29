@@ -12,13 +12,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<MoveEventInfo<TItem>> Move(TItem moving, EntityContainer container);
 
         /// <summary>
-        /// Returns the content types that are direct compositions of the content type
-        /// </summary>
-        /// <param name="id">The content type id</param>
-        /// <returns></returns>
-        IEnumerable<TItem> GetTypesDirectlyComposedOf(int id);
-
-        /// <summary>
         /// Derives a unique alias from an existing alias.
         /// </summary>
         /// <param name="alias">The original alias.</param>

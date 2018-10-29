@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogController : UmbracoAuthorizedJsonController
     {
+        [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
             int pageSize = 0,

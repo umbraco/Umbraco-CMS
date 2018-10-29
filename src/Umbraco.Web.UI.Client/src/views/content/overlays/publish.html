@@ -25,7 +25,7 @@
                             <span>{{ variant.language.name }}</span>
                         </label>
 
-                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                        <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state variant="variant"></umb-variant-state>
                             <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                         </div>

@@ -1,12 +1,13 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
+    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
 
-        function link(scope, element, attrs, ctrl) {
+        function link(scope, element, attrs, umbVariantContentCtrl) {
 
             var evts = [];
             var isInfoTab = false;
+            var auditTrailLoaded = false;
             var labels = {};
             scope.publishStatus = [];
 
@@ -63,10 +64,22 @@
                 if (scope.documentType !== null) {
                     scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
                 }
+
+                //load in the audit trail if we are currently looking at the INFO tab
+                if (umbVariantContentCtrl) {
+                    var activeApp = _.find(umbVariantContentCtrl.editor.content.apps, a => a.active);
+                    if (activeApp.alias === "umbInfo") {
+                        isInfoTab = true;
+                        loadAuditTrail();
+                        loadRedirectUrls();
+                    }
+                }
+
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
                 scope.auditTrailOptions.pageNumber = pageNumber;
+                auditTrailLoaded = false;
                 loadAuditTrail();
             };
 
@@ -101,7 +114,26 @@
                 scope.node.template = templateAlias;
             };
 
+            scope.openRollback = function() {
+                
+                var rollback = {
+                    node: scope.node,
+                    submit: function(model) {
+                        const args = { node: scope.node };
+                        eventsService.emit("editors.content.reload", args);
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.rollback(rollback);
+            };
+
             function loadAuditTrail() {
+
+                //don't load this if it's already done
+                if (auditTrailLoaded) { return; };
 
                 scope.loadingAuditTrail = true;
 
@@ -124,6 +156,8 @@
                         setAuditTrailLogTypeColor(scope.auditTrail);
 
                         scope.loadingAuditTrail = false;
+
+                        auditTrailLoaded = true;
                     });
 
             }
@@ -230,7 +264,8 @@
                 if (!newValue) { return; }
                 if (newValue === oldValue) { return; }
 
-                if(isInfoTab) {
+                if (isInfoTab) {
+                    auditTrailLoaded = false;
                     loadAuditTrail();
                     loadRedirectUrls();
                     setNodePublishStatus(scope.node);
@@ -249,6 +284,7 @@
         }
 
         var directive = {
+            require: '^^umbVariantContent',
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/content/umb-content-node-info.html',

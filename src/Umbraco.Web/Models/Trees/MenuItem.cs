@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Trees
             SeperatorBefore = false;
             Icon = legacyMenu.Icon;
             Action = legacyMenu;
+            OpensDialog = legacyMenu.OpensDialog;
         }
         #endregion
 
@@ -71,6 +72,10 @@ namespace Umbraco.Web.Models.Trees
 
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }
+
+        [DataMember(Name = "opensDialog")]
+        public bool OpensDialog { get; set; }
+
         #endregion
 
         #region Constants
@@ -201,32 +206,7 @@ namespace Umbraco.Web.Models.Trees
                 }
             }
         }
-
-        internal void ConvertLegacyFileSystemMenuItem(string path, string nodeType, string currentSection)
-        {
-            // try to get a URL/title from the legacy action,
-            // in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
-            var attempt = LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
-                path,
-                nodeType,
-                path, currentSection);
-            if (attempt)
-            {
-                var action = attempt.Result;
-                LaunchDialogUrl(action.Url, action.DialogTitle);
-            }
-            else
-            {
-                // if that doesn't work, try to get the legacy confirm view
-                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
-                if (attempt2)
-                {
-                    var view = attempt2.Result;
-                    var textService = Current.Services.TextService;
-                    LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + path + "' ?");
-                }
-            }
-        }
+        
         #endregion
 
     }

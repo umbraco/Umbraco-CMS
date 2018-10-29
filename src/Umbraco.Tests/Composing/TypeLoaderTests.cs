@@ -272,14 +272,7 @@ AnotherContentFinder
         public void Resolves_Actions()
         {
             var actions = _typeLoader.GetActions();
-            Assert.AreEqual(34, actions.Count());
-        }
-
-        [Test]
-        public void Resolves_Trees()
-        {
-            var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(1, trees.Count());
+            Assert.AreEqual(33, actions.Count());
         }
 
         [Test]

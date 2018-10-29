@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Globalization;
+using System.Linq;
 using System.Web;
 using LightInject;
-using HtmlAgilityPack;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -12,16 +11,15 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
-using System.Linq;
-using Umbraco.Core.Services;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.Web
 {
@@ -49,6 +47,8 @@ namespace Umbraco.Tests.Web
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             Udi.ResetUdiTypes();
+
+            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TearDown]
@@ -63,14 +63,6 @@ namespace Umbraco.Tests.Web
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
         //this one has an invalid char so won't match
         [TestCase("hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
-        // with a-tag with data-udi attribute, that needs to be stripped
-        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a  href=\"/my-test-url\"> world</a> ")]
-        // with a-tag with data-udi attribute spelled wrong, so don't need stripping
-        [TestCase("hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ")]
-        // with a img-tag with data-udi id, that needs to be strippde
-        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img  src=\"imageofcats.jpg\"> world ")]
-        // with a img-tag with data-udi id spelled wrong, so don't need stripping
-        [TestCase("hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ")]
         public void ParseLocalLinks(string input, string result)
         {
             var serviceCtxMock = new TestObjects(null).GetServiceContextMock();
@@ -90,7 +82,7 @@ namespace Umbraco.Tests.Web
                 .Returns((UmbracoContext umbCtx, IPublishedContent content, UrlProviderMode mode, string culture, Uri url) => "/my-test-url");
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-
+            
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
             Mock.Get(publishedContent).Setup(x => x.Id).Returns(1234);
@@ -111,7 +103,7 @@ namespace Umbraco.Tests.Web
                 //setup a quick mock of the WebRouting section
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 //pass in the custom url provider
-                new[] { testUrlProvider.Object },
+                new[]{ testUrlProvider.Object },
                 globalSettings,
                 new TestVariationContextAccessor(),
                 true))
@@ -120,28 +112,6 @@ namespace Umbraco.Tests.Web
 
                 Assert.AreEqual(result, output);
             }
-        }
-        
-        [Test]
-        public void StripDataUdiAttributesUsingSrtringOnLinks()
-        {
-            var input = "hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ";
-            var expected = "hello <a  href=\"/my-test-url\"> world</a> ";
-           
-            var result = TemplateUtilities.StripUdiDataAttributes(input);
-
-            Assert.AreEqual(expected, result);
-        }
-
-        [Test]
-        public void StripDataUdiAttributesUsingStringOnImages()
-        {
-            var input = "hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ";
-            var expected = "hello <img  src=\"imageofcats.jpg\"> world ";
-
-            var result = TemplateUtilities.StripUdiDataAttributes(input);
-
-            Assert.AreEqual(expected, result);
         }
     }
 }

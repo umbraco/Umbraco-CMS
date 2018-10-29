@@ -135,6 +135,12 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetVersions(int id);
 
         /// <summary>
+        /// Gets all versions of a document.
+        /// </summary>
+        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+        IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
+
+        /// <summary>
         /// Gets top versions of a document.
         /// </summary>
         /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
@@ -362,6 +368,11 @@ namespace Umbraco.Core.Services
         /// <para>A publishing document is a document with values that are being published, i.e.
         /// that have been published or cleared via <see cref="IContent.PublishCulture"/> and
         /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>When one needs to publish or unpublish a single culture, or all cultures, using <see cref="SaveAndPublish"/>
+        /// and <see cref="Unpublish"/> is the way to go. But if one needs to, say, publish two cultures and unpublish a third
+        /// one, in one go, then one needs to invoke <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
+        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
+        /// <see cref="SavePublishing"/> to actually commit the changes to the database.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// </remarks>
         PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
@@ -369,11 +380,30 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <remarks>
+        /// <para>Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
+        /// that one culture, see the other overload of this method.</para>
+        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
+        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
+        /// published.</para>
+        /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <remarks>
+        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
+        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
+        /// published.</para>
+        /// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
+        /// values to publish (else there is no need to publish it). If one wants to publish only a selection of
+        /// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
+        /// cultures may trigger an unwanted republish.</para>
+        /// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
+        /// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
+        /// whether the cultures could be published.</para>
+        /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0);
 
         /// <summary>
@@ -459,6 +489,22 @@ namespace Umbraco.Core.Services
         /// Creates and saves a document.
         /// </summary>
         IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
+
+        #endregion
+
+        #region Rollback
+
+        /// <summary>
+        /// Rolls back the content to a specific version.
+        /// </summary>
+        /// <param name="id">The id of the content node.</param>
+        /// <param name="versionId">The version id to roll back to.</param>
+        /// <param name="culture">An optional culture to roll back.</param>
+        /// <param name="userId">The identifier of the user who is performing the roll back.</param>
+        /// <remarks>
+        /// <para>When no culture is specified, all cultures are rolled back.</para>
+        /// </remarks>
+        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
 
         #endregion
     }

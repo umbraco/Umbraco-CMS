@@ -12,8 +12,8 @@ namespace Umbraco.Web.Trees
     
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree]
-    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null, sortOrder: 0)]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

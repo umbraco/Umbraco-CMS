@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
         {
-            var (s, a) = sql.SqlContext.Visit(predicate, alias);
+            var (s, a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
         }
         
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto1, TDto2>(this Sql<ISqlContext> sql, Expression<Func<TDto1, TDto2, bool>> predicate, string alias1 = null, string alias2 = null)
         {
-            var (s, a) = sql.SqlContext.Visit(predicate, alias1, alias2);
+            var (s, a) = sql.SqlContext.VisitDto(predicate, alias1, alias2);
             return sql.Where(s, a);
         }
 
@@ -321,9 +321,9 @@ namespace Umbraco.Core.Persistence
         /// Appends an ORDER BY DESC clause to the Sql statement.
         /// </summary>
         /// <param name="sql">The Sql statement.</param>
-        /// <param name="fields">Expression specifying the fields.</param>
+        /// <param name="fields">Fields.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> OrderByDescending(this Sql<ISqlContext> sql, params object[] fields)
+        public static Sql<ISqlContext> OrderByDescending(this Sql<ISqlContext> sql, params string[] fields)
         {
             return sql.Append("ORDER BY " + string.Join(", ", fields.Select(x => x + " DESC")));
         }
@@ -663,6 +663,18 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Adds columns to a SELECT Sql statement.
         /// </summary>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="fields">Columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> AndSelect(this Sql<ISqlContext> sql, params string[] fields)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            return sql.Append(", " + string.Join(", ", fields));
+        }
+
+        /// <summary>
+        /// Adds columns to a SELECT Sql statement.
+        /// </summary>
         /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
         /// <param name="sql">The origin sql.</param>
         /// <param name="fields">Expressions indicating the columns to select.</param>
@@ -675,7 +687,6 @@ namespace Umbraco.Core.Persistence
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields)));
         }
-
 
         /// <summary>
         /// Adds columns to a SELECT Sql statement.

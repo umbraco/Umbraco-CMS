@@ -19,5 +19,6 @@ namespace Umbraco.Web.PropertyEditors
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new TrueFalseConfigurationEditor();
+
     }
 }

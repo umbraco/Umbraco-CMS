@@ -13,12 +13,10 @@ using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Current = Umbraco.Web.Composing.Current;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
-using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees
 {
@@ -48,28 +46,6 @@ namespace Umbraco.Web.Trees
         internal static TreeAttribute GetTreeAttribute(this ApplicationTree tree)
         {
             return tree.GetRuntimeType().GetTreeAttribute();
-        }
-
-        internal static string GetRootNodeDisplayName(this TreeAttribute attribute, ILocalizedTextService textService)
-        {
-            var label = $"[{attribute.Alias}]";
-
-            // try to look up a the localized tree header matching the tree alias
-            var localizedLabel = textService.Localize("treeHeaders/" + attribute.Alias);
-            
-            // if the localizedLabel returns [alias] then return the title attribute from the trees.config file, if it's defined
-            if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (string.IsNullOrEmpty(attribute.Title) == false)
-                    label = attribute.Title;
-            }
-            else
-            {
-                // the localizedLabel translated into something that's not just [alias], so use the translation
-                label = localizedLabel;
-            }
-
-            return label;
         }
 
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
@@ -189,125 +165,6 @@ namespace Umbraco.Web.Trees
 
             // return its data
             return Attempt.Succeed(instance.GetNodes(id, formCollection));
-        }
-
-        internal static Attempt<TreeNode> TryGetRootNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper, string currentSection)
-        {
-            var xmlTreeNodeAttempt = TryGetRootXmlNodeFromLegacyTree(appTree, formCollection, urlHelper);
-            if (xmlTreeNodeAttempt.Success == false)
-            {
-                return Attempt<TreeNode>.Fail(xmlTreeNodeAttempt.Exception);
-            }
-
-            //the root can potentially be null, in that case we'll just return a null success which means it won't be included
-            if (xmlTreeNodeAttempt.Result == null)
-            {
-                return Attempt<TreeNode>.Succeed(null);
-            }
-
-            //var temp = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
-            var temp = new TreeControllerBaseStuffForLegacy(appTree.Alias, xmlTreeNodeAttempt.Result.Text, urlHelper);
-            var newRoot = temp.GetRootNode(formCollection);
-
-            return Attempt.Succeed(newRoot);
-
-        }
-
-        internal static Attempt<XmlTreeNode> TryGetRootXmlNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
-        {
-            var treeDefAttempt = appTree.TryGetLegacyTreeDef();
-            if (treeDefAttempt.Success == false)
-            {
-                return Attempt<XmlTreeNode>.Fail(treeDefAttempt.Exception);
-            }
-            var treeDef = treeDefAttempt.Result;
-            var bTree = treeDef.CreateInstance();
-            var treeParams = new LegacyTreeParams(formCollection);
-            bTree.SetTreeParameters(treeParams);
-
-            var xmlRoot = bTree.RootNode;
-
-            return Attempt.Succeed(xmlRoot);
-        }
-
-        internal static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
-        {
-            //This is how the legacy trees worked....
-            var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
-            return treeDef == null
-                ? Attempt<TreeDefinition>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias))
-                : Attempt<TreeDefinition>.Succeed(treeDef);
-        }
-
-        internal static Attempt<TreeNodeCollection> TryLoadFromLegacyTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, UrlHelper urlHelper, string currentSection)
-        {
-            var xTreeAttempt = appTree.TryGetXmlTree(id, formCollection);
-            if (xTreeAttempt.Success == false)
-            {
-                return Attempt<TreeNodeCollection>.Fail(xTreeAttempt.Exception);
-            }
-            return Attempt.Succeed(LegacyTreeDataConverter.ConvertFromLegacy(id, xTreeAttempt.Result, urlHelper, currentSection, formCollection));
-        }
-
-        internal static Attempt<MenuItemCollection> TryGetMenuFromLegacyTreeRootNode(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
-        {
-            var rootAttempt = appTree.TryGetRootXmlNodeFromLegacyTree(formCollection, urlHelper);
-            if (rootAttempt.Success == false)
-            {
-                return Attempt<MenuItemCollection>.Fail(rootAttempt.Exception);
-            }
-
-            var currentSection = formCollection.GetRequiredString("section");
-
-            var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(rootAttempt.Result, currentSection);
-            return Attempt.Succeed(result);
-        }
-
-        internal static Attempt<MenuItemCollection> TryGetMenuFromLegacyTreeNode(this ApplicationTree appTree, string parentId, string nodeId, FormDataCollection formCollection, UrlHelper urlHelper)
-        {
-            var xTreeAttempt = appTree.TryGetXmlTree(parentId, formCollection);
-            if (xTreeAttempt.Success == false)
-            {
-                return Attempt<MenuItemCollection>.Fail(xTreeAttempt.Exception);
-            }
-
-            var currentSection = formCollection.GetRequiredString("section");
-
-            var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(nodeId, xTreeAttempt.Result, currentSection);
-            if (result == null)
-            {
-                return Attempt<MenuItemCollection>.Fail(new ApplicationException("Could not find the node with id " + nodeId + " in the collection of nodes contained with parent id " + parentId));
-            }
-            return Attempt.Succeed(result);
-        }
-
-        private static Attempt<XmlTree> TryGetXmlTree(this ApplicationTree appTree, string id, FormDataCollection formCollection)
-        {
-            var treeDefAttempt = appTree.TryGetLegacyTreeDef();
-            if (treeDefAttempt.Success == false)
-            {
-                return Attempt<XmlTree>.Fail(treeDefAttempt.Exception);
-            }
-            var treeDef = treeDefAttempt.Result;
-            //This is how the legacy trees worked....
-            var bTree = treeDef.CreateInstance();
-            var treeParams = new LegacyTreeParams(formCollection);
-
-            //we currently only support an integer id or a string id, we'll refactor how this works
-            //later but we'll get this working first
-            int startId;
-            if (int.TryParse(id, out startId))
-            {
-                treeParams.StartNodeID = startId;
-            }
-            else
-            {
-                treeParams.NodeKey = id;
-            }
-            var xTree = new XmlTree();
-            bTree.SetTreeParameters(treeParams);
-            bTree.Render(ref xTree);
-            return Attempt.Succeed(xTree);
         }
 
     }

@@ -411,8 +411,8 @@
     <key alias="runwaySimpleSite">Vorrei iniziare da un sito semplice</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" è un semplice sito web contenente alcuni tipi di documento e alcuni templates di base. L'installer configurerà Runway per te automaticamente, 
-        ma tu potrai facilmente modificarlo, estenderlo o eliminarlo. Non è necessario installarlo e potrai usare Umbraco anche senza di esso, ma 
+      "Runway" è un semplice sito web contenente alcuni tipi di documento e alcuni templates di base. L'installer configurerà Runway per te automaticamente,
+        ma tu potrai facilmente modificarlo, estenderlo o eliminarlo. Non è necessario installarlo e potrai usare Umbraco anche senza di esso, ma
         Runway ti offre le basi e le best practices per cominciare velocemente.
         Se sceglierai di installare Runway, volendo potrai anche selezionare i moduli di Runway per migliorare le pagine.
         </p>
@@ -491,13 +491,13 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Salve %0%</p>
 
-		  <p>Questa è un'email automatica per informare che l'azione <strong>'%1%'</strong> 
+		  <p>Questa è un'email automatica per informare che l'azione <strong>'%1%'</strong>
 		  è stata eseguita sulla pagina <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  dall'utente <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFICA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFICA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -509,7 +509,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

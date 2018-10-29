@@ -1160,6 +1160,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var pdatas = new List<PropertyData>();
                 foreach (var pvalue in prop.Values)
                 {
+                    // sanitize - properties should be ok but ... never knows
+                    if (!prop.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment))
+                        continue;
+
                     // note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                     if (value != null)
@@ -1191,15 +1195,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var cultureData = new Dictionary<string, CultureVariation>();
 
-            var names = content is IContent document
-                    ? (published
-                        ? document.PublishNames
-                        : document.CultureNames)
-                    : content.CultureNames;
-
-            foreach (var (culture, name) in names)
+            // sanitize - names should be ok but ... never knows
+            if (content.GetContentType().VariesByCulture())
             {
-                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                var infos = content is IContent document
+                    ? (published
+                        ? document.PublishCultureInfos
+                        : document.CultureInfos)
+                    : content.CultureInfos;
+
+                foreach (var (culture, info) in infos)
+                {
+                    cultureData[culture] = new CultureVariation { Name = info.Name, Date = content.GetUpdateDate(culture) ?? DateTime.MinValue };
+                }
             }
 
             //the dictionary that will be serialized

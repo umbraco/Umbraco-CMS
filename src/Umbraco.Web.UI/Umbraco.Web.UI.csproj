@@ -198,13 +198,6 @@
     <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\TreeInit.aspx.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
-    </Compile>
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
@@ -326,7 +319,6 @@
     <Content Include="Umbraco\Config\Lang\pt.xml" />
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
-    <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
@@ -341,7 +333,6 @@
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\endPreview.aspx" />
-    <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml">
       <SubType>Designer</SubType>
@@ -353,16 +344,11 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Dialogs\create.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
-    <Content Include="Umbraco\Dialogs\rollBack.aspx" />
-    <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
-    <Content Include="Umbraco\Dialogs\treePicker.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
@@ -446,7 +432,6 @@
     <Content Include="Umbraco\ping.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />

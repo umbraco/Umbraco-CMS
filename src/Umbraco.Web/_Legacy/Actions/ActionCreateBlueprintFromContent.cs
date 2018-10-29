@@ -20,6 +20,7 @@ namespace Umbraco.Web._Legacy.Actions
         public string Alias { get; private set; }
         public string JsFunctionName { get; private set; }
         public string JsSource { get; private set; }
+        public bool OpensDialog => true;
 
         public ActionCreateBlueprintFromContent()
         {

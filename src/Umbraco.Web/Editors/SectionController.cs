@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,6 +31,7 @@ namespace Umbraco.Web.Editors
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data - and then we have to
             // remember to inject properties - nasty indeed
+            // fixme - this controller could/should be able to be created from the container and/or from webapi's IHttpControllerTypeResolver
             var appTreeController = new ApplicationTreeController();
             Current.Container.InjectProperties(appTreeController);
             appTreeController.ControllerContext = ControllerContext;
@@ -49,14 +51,33 @@ namespace Umbraco.Web.Editors
                 if (hasDashboards == false)
                 {
                     //get the first tree in the section and get it's root node route path
-                    var sectionTrees = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                    section.RoutePath = sectionTrees.IsContainer == false || sectionTrees.Children.Count == 0
-                        ? sectionTrees.RoutePath
-                        : sectionTrees.Children[0].RoutePath;
+                    var sectionRoot = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
+                    section.RoutePath = GetRoutePathForFirstTree(sectionRoot);
                 }
             }
 
             return sectionModels;
+        }
+
+        /// <summary>
+        /// Returns the first non root/group node's route path
+        /// </summary>
+        /// <param name="rootNode"></param>
+        /// <returns></returns>
+        private string GetRoutePathForFirstTree(TreeRootNode rootNode)
+        {
+            if (!rootNode.IsContainer || !rootNode.ContainsTrees)
+                return rootNode.RoutePath;
+
+            foreach(var node in rootNode.Children)
+            {
+                if (node is TreeRootNode groupRoot)
+                    return GetRoutePathForFirstTree(groupRoot);//recurse to get the first tree in the group
+                else
+                    return node.RoutePath;
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
