@@ -40,7 +40,7 @@ Our friendly community is available 24/7 at the community hub we call ["Our Umbr
 
 ## Contribute to Umbraco
 
-Umbraco is contribution focused and community driven. If you want to contribute back to Umbraco please check out our [guide to contributing](CONTRIBUTING.md).
+Umbraco is contribution focused and community driven. If you want to contribute back to Umbraco please check out our [guide to contributing](1_CONTENTS.md).
 
 ## Found a bug?
 
