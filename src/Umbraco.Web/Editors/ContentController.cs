@@ -944,13 +944,13 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         ///
         [EnsureUserPermissionForContent("id", 'U')]
-        public HttpResponseMessage PostPublishById(ContentPublish model)
+        public HttpResponseMessage PostPublishById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
 
             if (foundContent == null)
             {
-                return HandleContentNotFound(model.Id, false);
+                return HandleContentNotFound(id, false);
             }
 
             var publishResult = Services.ContentService.SavePublishing(foundContent, Security.GetUserId().ResultOr(0));
