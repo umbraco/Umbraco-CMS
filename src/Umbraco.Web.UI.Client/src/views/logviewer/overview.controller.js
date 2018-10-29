@@ -88,7 +88,7 @@
         }
 
         function searchLogQuery(logQuery){
-            $location.path("/developer/logViewer/search").search({lq: logQuery});
+            $location.path("/settings/logViewer/search").search({lq: logQuery});
         }
 
         function findMessageTemplate(template){

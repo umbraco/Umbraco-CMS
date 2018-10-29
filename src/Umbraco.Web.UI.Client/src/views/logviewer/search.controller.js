@@ -310,7 +310,7 @@
         }
 
         function back() {
-            $location.path("developer/logViewer/overview").search('lq', null);
+            $location.path("settings/logViewer/overview").search('lq', null);
         }
 
         init();
