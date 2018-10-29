@@ -1,3 +1,5 @@
+[Back to Contents](1_CONTENTS.md)
+
 # Code Of Conduct
  
 Our informal code of conduct concentrates on the values we, as Umbraco HQ, have set for ourselves and for our community. We expect you to be a friend. 
@@ -30,3 +32,5 @@ Don't rest on your laurels and never accept the status quo. Contribute and give 
 ## Friendly
 
 Don’t judge upon mistakes made but rather upon the speed and quality with which mistakes are corrected. Friendly posts and contributions generate smiles and builds long lasting relationships.
+
+[<< Prev ](2_INTRODUCTION.md)[ Next >>](4_QUICK_START.md)
