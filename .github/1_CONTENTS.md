@@ -17,14 +17,12 @@ _Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-
 * [Merging Your Code Into Umbraco](8_PULL_REQUESTS.md)
 * [Credits](9_CREDITS.md)
 
-## Appendix
+## Issue Templates
 
-### Issue Templates
-
-* [Bugs](ISSUE_TEMPLATE/1_Bug.md)
-* [Feature Requests](/ISSUE_TEMPLATE/2_feature-request.md)
-* [Support Questions](/ISSUE_TEMPLATE/3_support-question.md)
-* [Documentation Issues](/ISSUE_TEMPLATE/4_documentation-issue.md)
-* [Security Issues](/ISSUE_TEMPLATE/5_security-issue.md)
+* [Bugs](https://github.com/tiffy74/Umbraco-CMS/blob/Restructure_Docs/.github/ISSUE_TEMPLATE/1_Bug.md)
+* [Feature Requests](https://github.com/tiffy74/Umbraco-CMS/blob/Restructure_Docs/.github/ISSUE_TEMPLATE/2_feature-request.md)
+* [Support Questions](https://github.com/tiffy74/Umbraco-CMS/blob/Restructure_Docs/.github/ISSUE_TEMPLATE/3_support-question.md)
+* [Documentation Issues](https://github.com/tiffy74/Umbraco-CMS/blob/Restructure_Docs/.github/ISSUE_TEMPLATE/4_documentation-issue.md)
+* [Security Issues](https://github.com/tiffy74/Umbraco-CMS/blob/Restructure_Docs/.github/ISSUE_TEMPLATE/5_security-issue.md)
 
 [ Next >>](2_INTRODUCTION.md)
