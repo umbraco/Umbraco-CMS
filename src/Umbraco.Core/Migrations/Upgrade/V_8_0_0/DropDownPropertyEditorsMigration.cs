@@ -73,7 +73,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         requiresCacheRebuild = true;
                         break;
                     case string ea when ea.InvariantEquals("Umbraco.DropDownMultiple"):
-                        UpdateDataType(dd, config, false);
+                        UpdateDataType(dd, config, true);
                         break;
                     case string ea when ea.InvariantEquals("Umbraco.DropdownlistMultiplePublishKeys"):
                         UpdateDataType(dd, config, true);
