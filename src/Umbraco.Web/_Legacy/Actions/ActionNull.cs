@@ -51,6 +51,8 @@
             get { return string.Empty; }
         }
 
+        public bool OpensDialog => false;
+
         #endregion
     }
 }

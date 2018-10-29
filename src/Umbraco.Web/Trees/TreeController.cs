@@ -10,6 +10,7 @@ namespace Umbraco.Web.Trees
     public abstract class TreeController : TreeControllerBase
     {
         private TreeAttribute _attribute;
+        private string _rootNodeDisplayName;
 
         protected TreeController()
         {
@@ -20,9 +21,9 @@ namespace Umbraco.Web.Trees
         /// The name to display on the root node
         /// </summary>
         public override string RootNodeDisplayName
-        {
-            get { return _attribute.GetRootNodeDisplayName(Services.TextService); }
-        }
+            => _rootNodeDisplayName
+                    ?? (_rootNodeDisplayName = Services.ApplicationTreeService.GetByAlias(_attribute.Alias)
+                            ?.GetRootNodeDisplayName(Services.TextService));
 
         /// <summary>
         /// Gets the current tree alias from the attribute assigned to it.

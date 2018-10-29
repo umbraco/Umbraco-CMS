@@ -78,6 +78,8 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
             get { return "javascript:actionNewRelationType();"; }
         }
 
+        public bool OpensDialog => true;
+
         #endregion
     }
 }

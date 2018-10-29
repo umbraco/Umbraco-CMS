@@ -20,7 +20,7 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
     vm.page.menu.currentNode = null;
     vm.description = "";
     vm.showBackButton = true;
-
+    
     vm.save = saveDictionary;
     vm.back = back;
   
@@ -102,9 +102,9 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
                     });
         }
     }
-
+    
     function back() {
-        $location.path("settings/dictionary/list");
+        $location.path(vm.page.menu.currentSection + "/dictionary/list");
     }
 
     $scope.$watch("vm.content.name", function (newVal, oldVal) {
