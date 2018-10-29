@@ -59,7 +59,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService)
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
                     //Since we haven't implemented anything for macros in angular, this needs to be converted to
                     //use the legacy format
                     .ConvertLegacyMenuItem(null, "initmacros", queryStrings.GetValue<string>("application"));
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
             if (macro == null) return new MenuItemCollection();
 
             //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService)
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true)
                 //Since we haven't implemented anything for macros in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new EntitySlim

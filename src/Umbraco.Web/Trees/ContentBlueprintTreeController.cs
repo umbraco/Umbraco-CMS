@@ -93,7 +93,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.ActionAlias}"));
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Trees
             if (cte != null)
             {
                 var ct = Services.ContentTypeService.Get(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService, opensDialog: true);
                 createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
 
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(Services.TextService);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;
         }

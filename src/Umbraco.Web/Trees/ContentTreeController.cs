@@ -128,9 +128,8 @@ namespace Umbraco.Web.Trees
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                //fixme: inject
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.ActionAlias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", Current.Actions.GetAction<ActionSort>().Alias), true);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionSort>(Services.TextService, true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -226,25 +225,22 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
-            AddActionNode<ActionNew>(item, menu);
-            AddActionNode<ActionDelete>(item, menu);
-
-            AddActionNode<ActionCreateBlueprintFromContent>(item, menu);
-
-            //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
-            AddActionNode<ActionMove>(item, menu, true);
-            AddActionNode<ActionCopy>(item, menu);
-
+            AddActionNode<ActionNew>(item, menu, opensDialog: true);
+            AddActionNode<ActionDelete>(item, menu, opensDialog: true);
+            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
+            AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
+            AddActionNode<ActionCopy>(item, menu, opensDialog: true);
             AddActionNode<ActionSort>(item, menu, true);
-
-            AddActionNode<ActionAssignDomain>(item, menu);
-            AddActionNode<ActionRights>(item, menu);
-            AddActionNode<ActionProtect>(item, menu, true, true);
+            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
+            AddActionNode<ActionRights>(item, menu, opensDialog: true);
+            //fixme - conver this editor to angular
+            AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
 
             menu.Items.Add(new MenuItem("notify", Services.TextService)
             {
                 Icon = "megaphone",
-                SeperatorBefore = true
+                SeperatorBefore = true,
+                OpensDialog = true
             });
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -260,8 +256,8 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
-            menu.Items.Add<ActionRestore>(Services.TextService.Localize("actions", ActionRestore.ActionAlias));
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.ActionAlias));
+            menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 
@@ -308,12 +304,13 @@ namespace Umbraco.Web.Trees
         }
 
         //fixme: Remove the need for converting to legacy
-        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)
+        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {
             //fixme: Inject
             var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
             if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
+            menuItem.OpensDialog = opensDialog;
         }
 
         ////fixme: Remove the need for converting to legacy

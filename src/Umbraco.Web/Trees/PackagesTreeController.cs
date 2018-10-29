@@ -84,12 +84,12 @@ namespace Umbraco.Web.Trees
             // Root actions
             if (id == "-1")
             {
-                menu.Items.Add<ActionNew>(Services.TextService)
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
             }
             else if (id == "created")
             {
-                menu.Items.Add<ActionNew>(Services.TextService)
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
 
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 //it's a package node
-                menu.Items.Add<ActionDelete>(Services.TextService);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             }
 
             return menu;

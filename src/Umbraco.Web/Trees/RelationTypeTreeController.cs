@@ -25,7 +25,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                var addMenuItem = menu.Items.Add<ActionNew>(Services.TextService);
+                var addMenuItem = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 addMenuItem.LaunchDialogUrl("developer/RelationTypes/NewRelationType.aspx", "Create New RelationType");
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Trees
             if (relationType == null) return new MenuItemCollection();
 
             //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService)
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true)
                 //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new EntitySlim

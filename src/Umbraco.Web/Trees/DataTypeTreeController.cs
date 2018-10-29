@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
                 menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
                 {
@@ -125,7 +125,7 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 { 
                     //can delete data type
-                    menu.Items.Add<ActionDelete>(Services.TextService);
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
                 }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
@@ -134,9 +134,9 @@ namespace Umbraco.Web.Trees
                 var nonDeletableSystemDataTypeIds = GetNonDeletableSystemDataTypeIds();
 
                 if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id)) == false)
-                    menu.Items.Add<ActionDelete>(Services.TextService);
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
-                menu.Items.Add<ActionMove>(Services.TextService, hasSeparator: true);
+                menu.Items.Add<ActionMove>(Services.TextService, hasSeparator: true, opensDialog: true);
             }
 
             return menu;

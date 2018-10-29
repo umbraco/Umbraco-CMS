@@ -1761,6 +1761,7 @@ namespace Umbraco.Web.Editors
                 : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
+        [EnsureUserPermissionForContent("contentId", ActionRollback.ActionLetter)]
         [HttpPost]
         public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
         {

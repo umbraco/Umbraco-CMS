@@ -351,7 +351,8 @@ namespace Umbraco.Web.Trees
                 var menu = new MenuItemCollection();
                 menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
                 {
-                    Icon = "trash"                    
+                    Icon = "trash",
+                    OpensDialog = true
                 });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;

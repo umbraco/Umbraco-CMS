@@ -74,7 +74,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new RefreshNode(Services.TextService));
                 return menu;
             }
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
                 menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
                 {
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService);
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
                 }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
@@ -106,26 +106,26 @@ namespace Umbraco.Web.Trees
 
                 if (enableInheritedMediaTypes)
                 {
-                    menu.Items.Add<ActionNew>(Services.TextService);
+                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
                     //no move action if this is a child doc type
                     if (parent == null)
                     {
-                        menu.Items.Add<ActionMove>(Services.TextService, true);
+                        menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
                     }
                 }
                 else
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService);
+                    menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
                     //no move action if this is a child doc type
                     if (parent == null)
                     {
-                        menu.Items.Add<ActionMove>(Services.TextService, true);
+                        menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
                     }
                 }
 
-                menu.Items.Add<ActionCopy>(Services.TextService);
-                menu.Items.Add<ActionDelete>(Services.TextService);
+                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
                 if (enableInheritedMediaTypes)
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
             }

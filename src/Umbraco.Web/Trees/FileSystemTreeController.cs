@@ -82,7 +82,7 @@ namespace Umbraco.Web.Trees
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService);
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             //refresh action
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Trees
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService);
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
             var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
             if (hasChildren == false)
             {
                 //delete action
-                menu.Items.Add<ActionDelete>(Services.TextService, true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
             }
 
             //refresh action
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(Services.TextService);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;
         }

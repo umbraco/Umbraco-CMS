@@ -10,7 +10,9 @@ namespace Umbraco.Web.Actions
     /// </summary>
     public class ActionRollback : IAction
     {
-        public char Letter => 'K';
+        public const char ActionLetter = 'K';
+
+        public char Letter => ActionLetter;
         public string Alias => "rollback";
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
         public string Icon => "undo";

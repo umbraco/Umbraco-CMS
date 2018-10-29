@@ -159,17 +159,16 @@ namespace Umbraco.Web.Trees
                     menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                     //Create the normal create action
-                    menu.Items.Add<ActionNew>(Services.TextService);
+                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 }
                 else
                 {
                     //Create a custom create action - this does not launch a dialog, it just navigates to the create screen
                     // we'll create it based on the ActionNew so it maintains the same icon properties, name, etc...
-                    var createMenuItem = new MenuItem
+                    var createMenuItem = new MenuItem(ActionNew.ActionAlias, Services.TextService)
                     {
-                        Name = Services.TextService.Localize($"actions/{ActionNew.ActionAlias}"),
-                        Alias = ActionNew.ActionAlias,
-                        Icon = "add"
+                        Icon = "add",
+                        OpensDialog = true
                     };
                     //we want to go to this route: /member/member/edit/-1?create=true
                     createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
@@ -181,7 +180,7 @@ namespace Umbraco.Web.Trees
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(Services.TextService);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             if (Security.CurrentUser.HasAccessToSensitiveData())
             {

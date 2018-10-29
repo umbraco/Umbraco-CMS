@@ -70,7 +70,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //Create the normal create action
-            var item = menu.Items.Add<ActionNew>(Services.TextService);
+            var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Trees
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(Services.TextService, true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
             }
 
             //add refresh

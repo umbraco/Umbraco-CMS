@@ -52,7 +52,6 @@ namespace Umbraco.Web.Models.Trees
             SeperatorBefore = false;
             Icon = action.Icon;
             Action = action;
-            OpensDialog = legacyMenu.OpensDialog;
         }
         #endregion
 
@@ -87,6 +86,9 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
+        /// </summary>
         [DataMember(Name = "opensDialog")]
         public bool OpensDialog { get; set; }
 

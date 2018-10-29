@@ -95,7 +95,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionSort>(Services.TextService, true);
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
@@ -119,9 +119,9 @@ namespace Umbraco.Web.Trees
             }
 
             //return a normal node menu:
-            menu.Items.Add<ActionNew>(Services.TextService);
-            menu.Items.Add<ActionMove>(Services.TextService);
-            menu.Items.Add<ActionDelete>(Services.TextService);
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             menu.Items.Add<ActionSort>(Services.TextService);
             menu.Items.Add(new RefreshNode(Services.TextService, true));
 
@@ -129,7 +129,10 @@ namespace Umbraco.Web.Trees
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 menu.DefaultMenuAlias = null;
-                menu.Items.Insert(2, new MenuItem(Current.Actions.GetAction<ActionRestore>(), Services.TextService.Localize("actions", ActionRestore.ActionAlias)));
+                menu.Items.Insert(2, new MenuItem(ActionRestore.ActionAlias, Services.TextService)
+                {
+                    OpensDialog = true
+                });
             }
             else
             {

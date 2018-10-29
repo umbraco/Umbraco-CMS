@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 //delete member type/group
-                menu.Items.Add<ActionDelete>(Services.TextService);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             }
 
             return menu;

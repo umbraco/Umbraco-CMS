@@ -81,11 +81,12 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
                 {
                     Icon = "page-up",
-                    SeperatorBefore = true
+                    SeperatorBefore = true,
+                    OpensDialog = true
                 });
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
@@ -98,9 +99,9 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", Services.TextService)
                 {
                     Icon = "icon icon-edit"
                 });
@@ -108,7 +109,7 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService, true);
+                    menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
                 }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
@@ -119,20 +120,21 @@ namespace Umbraco.Web.Trees
 
                 if (enableInheritedDocumentTypes)
                 {
-                    menu.Items.Add<ActionNew>(Services.TextService);
+                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 }
                 //no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService, true);
+                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
                 }
-                menu.Items.Add<ActionCopy>(Services.TextService);
+                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new MenuItem("export", Services.TextService)
                 {
                     Icon = "download-alt",
-                    SeperatorBefore = true
+                    SeperatorBefore = true,
+                    OpensDialog = true
                 });
-                menu.Items.Add<ActionDelete>(Services.TextService, true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
                 if (enableInheritedDocumentTypes)
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
