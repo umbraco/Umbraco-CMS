@@ -35,7 +35,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<DropDownPropertyEditorsMigration>(ex, $"Invalid drop down configuration detected: \"{dd.Configuration}\", cannot convert editor, values will be cleared");
+                    Logger.Error<DropDownPropertyEditorsMigration>(
+                        ex, "Invalid drop down configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
+                        dd.Configuration);
                     dd.Configuration = null;
                     Database.Update(dd);
                     continue;
@@ -132,7 +134,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         vals.Add(val.Value);
                     else
                     {
-                        Logger.Warn<DropDownPropertyEditorsMigration>($"Could not find associated data type configuration for stored Id {id}");
+                        Logger.Warn<DropDownPropertyEditorsMigration>(
+                            "Could not find associated data type configuration for stored Id {DataTypeId}", id);
                         canConvert = false;
                     }   
                 }
