@@ -269,13 +269,6 @@ AnotherContentFinder
         }
 
         [Test]
-        public void Resolves_Actions()
-        {
-            var actions = _typeLoader.GetActions();
-            Assert.AreEqual(33, actions.Count());
-        }
-
-        [Test]
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();

@@ -7,8 +7,9 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -79,11 +80,11 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            menu.Items.Add<ActionNew>(Services.TextService);
             //refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -93,9 +94,9 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            menu.Items.Add<ActionNew>(Services.TextService);
 
             var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
@@ -103,11 +104,11 @@ namespace Umbraco.Web.Trees
             if (hasChildren == false)
             {
                 //delete action
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true);
             }
 
             //refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -117,7 +118,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            menu.Items.Add<ActionDelete>(Services.TextService);
 
             return menu;
         }

@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
@@ -27,7 +28,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
-using Umbraco.Web._Legacy.Actions;
+
 using CoreCurrent = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Web.Composing
