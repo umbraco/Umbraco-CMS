@@ -210,6 +210,11 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/angular-animate"
         },
         {
+            "name": "angular-chart.js",
+            "src": ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
+            "base": "./node_modules/angular-chart.js/dist"
+        },
+        {
             "name": "angular-i18n",
             "src":  [
                 "./node_modules/angular-i18n/angular-i18n.js",
@@ -244,6 +249,11 @@ gulp.task('dependencies', function () {
             "name": "bootstrap-social",
             "src":  ["./node_modules/bootstrap-social/bootstrap-social.css"],
             "base": "./node_modules/bootstrap-social"
+        },
+        {
+            "name": "chart.js",
+            "src": ["./node_modules/chart.js/dist/Chart.min.js"],
+            "base": "./node_modules/chart.js/dist"
         },
         {
             "name": "clipboard",
