@@ -17,4 +17,14 @@ _Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-
 * [Merging Your Code Into Umbraco](8_PULL_REQUESTS.md)
 * [Credits](9_CREDITS.md)
 
+## Appendix
+
+### Issue Templates
+
+* [Bugs](1_Bug.md)
+* [Feature Requests](2_Feature_request.md)
+* [Support Questions](3_Support_question.md)
+* [Documentation Issues](4_Documentation_issue.md)
+* [Security Issues](5_Security_issue.md)
+
 [ Next >>](2_INTRODUCTION.md)
