@@ -23,7 +23,8 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
-        vm.toggle = toggle;
+        vm.toggleAllowAsRoot = toggleAllowAsRoot;
+        vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
 
         /* ---------- INIT ---------- */
 
@@ -86,13 +87,22 @@
         /**
          * Toggle the $scope.model.allowAsRoot value to either true or false
          */
-        function toggle(){
+        function toggleAllowAsRoot(){
             if($scope.model.allowAsRoot){
                 $scope.model.allowAsRoot = false;
                 return;
             }
 
             $scope.model.allowAsRoot = true;
+        }
+
+        function toggleAllowCultureVariants() {
+            if ($scope.model.allowCultureVariant) {
+                $scope.model.allowCultureVariant = false;
+                return;
+            }
+
+            $scope.model.allowCultureVariant = true;
         }
 
     }

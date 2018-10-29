@@ -701,6 +701,7 @@
     <key alias="moveLineDown">Move Lines Down</key>
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
+    <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -1506,6 +1507,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="allowVaryByCulture">Allow varying by culture</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

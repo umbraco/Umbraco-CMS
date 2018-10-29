@@ -48,7 +48,8 @@
             "shortcuts_toggleListView",
             "shortcuts_toggleAllowAsRoot",
             "shortcuts_addChildNode",
-            "shortcuts_addTemplate"
+            "shortcuts_addTemplate",
+            "shortcuts_toggleAllowCultureVariants"
         ];
 
         onInit();
@@ -81,6 +82,7 @@
             vm.labels.allowAsRoot = values[11];
             vm.labels.addChildNode = values[12];
             vm.labels.addTemplate = values[13];
+            vm.labels.allowCultureVariants = values[14];
 
             var buttons = [
                 {
@@ -161,6 +163,10 @@
                         {
                             "description": vm.labels.addChildNode,
                             "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+                        },
+                        {
+                            "description": vm.labels.allowCultureVariants,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                         }
                     ]
                 },
