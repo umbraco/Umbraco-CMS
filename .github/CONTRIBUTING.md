@@ -1,4 +1,4 @@
-_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/temp8/docs/CONTRIBUTING.md) to go to the v8 branch_
+_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/temp8/.github/V8_GETTING_STARTED.md) to go to the v8 branch_
 # Contributing to Umbraco CMS
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
@@ -72,7 +72,6 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Anders Bjerner](https://github.com/abjerner)
 - [Dave Woestenborghs](https://github.com/dawoe)
 - [Emma Burstow](https://github.com/emmaburstow)
-- [Kyle Weems](https://github.com/cssquirrel)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
 These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 

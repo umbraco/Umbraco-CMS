@@ -49,8 +49,10 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 	    $scope.move = function () {
+	        $scope.busy = true;
 	        mediaResource.move({ parentId: $scope.target.id, id: node.id })
                 .then(function (path) {
+	                $scope.busy = false;
                     $scope.error = false;
                     $scope.success = true;
 
