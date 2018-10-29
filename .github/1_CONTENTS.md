@@ -21,10 +21,10 @@ _Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-
 
 ### Issue Templates
 
-* [Bugs](ISSUE_TEMPLATE/1_Bug.md)
-* [Feature Requests](ISSUE_TEMPLATE/2_feature-request.md)
-* [Support Questions](ISSUE_TEMPLATE/3_support-question.md)
-* [Documentation Issues](ISSUE_TEMPLATE/4_documentation-issue.md)
-* [Security Issues](ISSUE_TEMPLATE/5_security-issue.md)
+* [Bugs](/ISSUE_TEMPLATE/1_Bug.md)
+* [Feature Requests](/ISSUE_TEMPLATE/2_feature-request.md)
+* [Support Questions](/ISSUE_TEMPLATE/3_support-question.md)
+* [Documentation Issues](/ISSUE_TEMPLATE/4_documentation-issue.md)
+* [Security Issues](/ISSUE_TEMPLATE/5_security-issue.md)
 
 [ Next >>](2_INTRODUCTION.md)
