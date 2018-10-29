@@ -29,6 +29,8 @@
         vm.submit = submit;
         vm.close = close;
 
+        vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+
         function onInit() {
 
             userService.getCurrentUser().then(function(user) {
@@ -230,6 +232,15 @@
                 vm.showValidationPattern = false;
             }
 
+        }
+
+        function toggleAllowCultureVariants() {
+            if ($scope.model.property.allowCultureVariant) {
+                $scope.model.property.allowCultureVariant = false;
+                return;
+            }
+
+            $scope.model.property.allowCultureVariant = true;
         }
 
         onInit();

@@ -106,14 +106,23 @@
                     
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
-                    
-                            <h5>Property Type Variation</h5>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.allowCultureVariant" />
-                                Allow varying by Culture
-                            </label>
-                    
+                            <div class="sub-view-columns">
+
+                                <div class="sub-view-column-left">
+                                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                                    
+                                </div>
+
+                                <div class="sub-view-column-right">
+                                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                                checked="model.property.allowCultureVariant"
+                                                on-click="vm.toggleAllowCultureVariants()"
+                                    >
+                                    </umb-toggle>
+                                </div>
+    
+                            </div>
+                            
                         </div>
                     
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
