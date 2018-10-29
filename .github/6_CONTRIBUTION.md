@@ -2,6 +2,15 @@
 
 # Developing a contribution
 
+In this chapter:
+
+* [What should I know before I get started?](#what-should-i-know-before-i-get-started?)
+  * [Working with the source code](#what-should-i-know-before-i-get-started?)
+  * [What branch should I target for my contributions?](#what-branch-should-i-target-for-my-contributions)
+  * [Building Umbraco from source code](#building-umbraco-from-source-code)
+  * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
+  * [Styleguides](#styleguides)
+
 ## What should I know before I get started?
 
 ### Working with the source code
