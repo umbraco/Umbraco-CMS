@@ -79,9 +79,15 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Gets documents of a given document type.
+        /// Gets paged documents of a content content
         /// </summary>
-        IEnumerable<IContent> GetByType(int documentTypeId);
+        /// <param name="contentType">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfType(int contentType, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets documents at a given level.

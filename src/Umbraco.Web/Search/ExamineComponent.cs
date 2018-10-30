@@ -102,12 +102,9 @@ namespace Umbraco.Web.Search
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
             ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated; ;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-
-            // fixme - content type?
-            // events handling removed in ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
-            // because, could not make sense of it?
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
@@ -317,6 +314,88 @@ namespace Umbraco.Web.Search
             }
         }
 
+        private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
+        {
+
+            //before content type changes just caused full blown re-indexing:
+            // https://github.com/umbraco/Umbraco-CMS/commit/ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
+
+
+            if (Suspendable.ExamineEvents.CanIndex == false)
+                return;
+
+            if (args.MessageType != MessageType.RefreshByPayload)
+                throw new NotSupportedException();
+
+            var contentService = _services.ContentService;
+
+            var removedIds = new List<int>();
+            var refreshedIds = new List<int>();
+
+            //TODO: What do we do about these?
+            var otherIds = new List<int>();
+
+            foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
+            {
+                if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+                    removedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                    refreshedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
+                    otherIds.Add(payload.Id);
+            }
+
+            const int pageSize = 500;
+
+            //Re-index all content of these types
+            foreach(var id in refreshedIds)
+            {
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
+                {
+                    var contentToRefresh = _services.ContentService.GetPagedOfType(id, page++, pageSize, out total);
+                    foreach(var c in contentToRefresh)
+                    {
+                        //TODO: We might have to order by Path ascending or something since we're going to need to check
+                        // contentService.IsPathPublished(content) but we don't want to make that check for every content item
+                        IContent published = null;
+                        if (c.Published && contentService.IsPathPublished(c))
+                            published = c;
+
+                        ReIndexForContent(c, published);
+                    }
+                }
+            }
+
+            //Delete all content of this content type that is in any content indexer by looking up matched examine docs
+            foreach(var id in removedIds)
+            {
+                foreach(var index in _examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>())
+                {
+                    var searcher = index.GetSearcher();
+
+                    var page = 0;
+                    var total = long.MaxValue;
+                    while (page * pageSize < total)
+                    {
+                        //paging with examine, see https://shazwazza.com/post/paging-with-examine/
+                        var results = searcher.Search(
+                                searcher.CreateCriteria().Field("nodeType", id).Compile(),
+                                maxResults: pageSize * (page + 1));
+                        total = results.TotalItemCount;
+                        var paged = results.Skip(page * pageSize);
+
+                        foreach(var item in paged)
+                            if (int.TryParse(item.Id, out var contentId))
+                                DeleteIndexForEntity(contentId, false);
+                    }
+                }
+                
+                
+            }
+        }
+
         private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -340,6 +419,8 @@ namespace Umbraco.Web.Search
                     // ExamineEvents does not support RefreshAll
                     // just ignore that payload
                     // so what?!
+
+                    //fixme: Rebuild the index at this point?
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
@@ -355,7 +436,7 @@ namespace Umbraco.Web.Search
                     }
 
                     IContent published = null;
-                    if (content.Published && ((ContentService)contentService).IsPathPublished(content))
+                    if (content.Published && contentService.IsPathPublished(content))
                         published = content;
 
                     // just that content
