@@ -849,7 +849,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures that have changed
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -867,7 +867,12 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
 
                 if (culturesChanging != null)
-                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved cultures: {culturesChanging}", culturesChanging);
+                {
+                    var langs = string.Join(", ", _languageRepository.GetMany()
+                        .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                        .Select(x => x.CultureName));
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languagues: {langs}", langs);
+                }   
                 else
                     Audit(AuditType.Save, userId, content.Id);
 
@@ -1057,7 +1062,7 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
-            string culturesChanging = null;
+            IEnumerable<string> culturesChanging = null;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1082,7 +1087,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        culturesChanging = string.Join(",", content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key));
+                        culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
                     }
                 }
 
@@ -1193,7 +1198,12 @@ namespace Umbraco.Core.Services.Implement
                         }
 
                         if (culturesChanging != null)
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published cultures: {culturesChanging}", culturesChanging);
+                        {
+                            var langs = string.Join(", ", _languageRepository.GetMany()
+                                .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                                .Select(x => x.CultureName));
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languagues: {langs}", langs);
+                        }
                         else
                             Audit(AuditType.Publish, userId, content.Id);
 
