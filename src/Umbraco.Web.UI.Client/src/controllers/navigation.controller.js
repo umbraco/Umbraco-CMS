@@ -40,7 +40,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         navigationService.showSearch();
     });
 
-    //trigger dialods with a hotkey:
+    //trigger dialogs with a hotkey:
     keyboardService.bind("esc", function () {
         eventsService.emit("app.closeDialogs");
     });
@@ -112,7 +112,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         $scope.authenticated = false;
     }));
 
-    //when the application is ready and the user is authorized setup the data
+    //when the application is ready and the user is authorized, setup the data
     evts.push(eventsService.on("app.ready", function(evt, data) {
         $scope.authenticated = true;
     }));
