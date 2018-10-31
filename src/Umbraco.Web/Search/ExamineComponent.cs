@@ -314,14 +314,13 @@ namespace Umbraco.Web.Search
             }
         }
 
+        /// <summary>
+        /// Updates indexes based on content type changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
         {
-
-            //before content type changes just didn't do anything for indexing, simply just updated the
-            //definitions to index:
-            // https://github.com/umbraco/Umbraco-CMS/commit/ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
-
-
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
 
@@ -395,6 +394,11 @@ namespace Umbraco.Web.Search
             }
         }
 
+        /// <summary>
+        /// Updates indexes based on content changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -445,19 +449,25 @@ namespace Umbraco.Web.Search
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         var masked = published == null ? null : new List<int>();
-                        var descendants = contentService.GetDescendants(content);
-                        foreach (var descendant in descendants)
+                        const int pageSize = 500;
+                        var page = 0;
+                        var total = long.MaxValue;
+                        while(page * pageSize < total)
                         {
-                            published = null;
-                            if (masked != null) // else everything is masked
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total);
+                            foreach (var descendant in descendants)
                             {
-                                if (masked.Contains(descendant.ParentId) || !descendant.Published)
-                                    masked.Add(descendant.Id);
-                                else
-                                    published = descendant;
-                            }
+                                published = null;
+                                if (masked != null) // else everything is masked
+                                {
+                                    if (masked.Contains(descendant.ParentId) || !descendant.Published)
+                                        masked.Add(descendant.Id);
+                                    else
+                                        published = descendant;
+                                }
 
-                            ReIndexForContent(descendant, published);
+                                ReIndexForContent(descendant, published);
+                            }
                         }
                     }
                 }
