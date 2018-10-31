@@ -12,7 +12,7 @@ function valEmail(valEmailExpression) {
         link: function (scope, elm, attrs, ctrl) {
             
             var patternValidator = function (viewValue) {
-                //NOTE: we don't validate on empty values, use required validator for that
+                //NOTE: We validate only if the viewValue has a value. If it is empty (null or undefined), we'll consider it OK and the let the "Required" validator handle it.
                 if (!viewValue || valEmailExpression.EMAIL_REGEXP.test(viewValue)) {
                     // it is valid
                     ctrl.$setValidity('valEmail', true);
@@ -47,7 +47,9 @@ function valEmail(valEmailExpression) {
 angular.module('umbraco.directives.validation')
     .directive("valEmail", valEmail)
     .factory('valEmailExpression', function () {
-        var emailRegex = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
+        // This syntax should correspond to the Core validation in EmailValidator.cs and the default backend Email Validation in propertysettings.controller.js (validationTypes)
+        var emailSyntax = "^[a-z][a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@([a-z0-9]([a-z0-9-]*[a-z0-9])\.)+([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
+        var emailRegex = new RegExp(emailSyntax, "i");
         return {
             EMAIL_REGEXP: emailRegex
         };

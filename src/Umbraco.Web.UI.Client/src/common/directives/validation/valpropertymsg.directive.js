@@ -56,8 +56,9 @@ function valPropertyMsg(serverValidationManager) {
                 //if there's not already a watch
                 if (!watcher) {
                     watcher = scope.$watch("property.value", function (newValue, oldValue) {
-                        
-                        if (!newValue || angular.equals(newValue, oldValue)) {
+                        // Uncommented the !newValue, because otherwise it would not allow for the field to be emptied in order to evaluate. This was illogical.
+                        // We'll just check that there is a value and if it's unchanged then do nothing.
+                        if ((typeof newValue !== "undefined" && newValue !== null) && angular.equals(newValue, oldValue)) {
                             return;
                         }
 

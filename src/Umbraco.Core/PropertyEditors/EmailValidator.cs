@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
@@ -14,9 +15,10 @@ namespace Umbraco.Core.PropertyEditors
         {
             var asString = value.ToString();
 
-            var emailVal = new EmailAddressAttribute();
+            // This is not the ffficial RFC 5322 regular expression, but it's a version which comes pretty close to. (Inspired by: https://www.regular-expressions.info/email.html)
+            var emailSyntax = @"^[a-z][a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@([a-z0-9]([a-z0-9-]*[a-z0-9])\.)+([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
 
-            if (asString != string.Empty && emailVal.IsValid(asString) == false)
+            if (!string.IsNullOrEmpty(asString) && !Regex.IsMatch(asString, emailSyntax, RegexOptions.IgnoreCase))
             {
                 // TODO: localize these!
                 yield return new ValidationResult("Email is invalid", new[] { "value" });
