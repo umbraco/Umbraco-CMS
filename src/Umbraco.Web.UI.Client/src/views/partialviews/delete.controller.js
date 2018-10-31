@@ -12,6 +12,9 @@ function PartialViewsDeleteController($scope, codefileResource, treeService, nav
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
+
+        // Reset the error message
+        $scope.error = null;
         
         codefileResource.deleteByPath('partialViews', $scope.currentNode.id)
             .then(function() {
@@ -21,6 +24,9 @@ function PartialViewsDeleteController($scope, codefileResource, treeService, nav
                 //TODO: Need to sync tree, etc...
                 treeService.removeNode($scope.currentNode);
                 navigationService.hideMenu();
+            }, function (err) {
+                $scope.currentNode.loading = false;
+                $scope.error = err;
             });
     };
 
