@@ -116,12 +116,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 mediaServiceMock
                     .Setup(x => x.GetPagedDescendants(
-                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>())
+                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Ordering>())
                     ).Returns(() => allRecs);
 
                 mediaServiceMock
                     .Setup(x => x.GetPagedDescendants(
-                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IMedia>>())
+                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<IQuery<IMedia>>(), It.IsAny<Ordering>())
                     ).Returns(() => allRecs);
 
                 //mediaServiceMock.Setup(service => service.GetPagedXmlEntries(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs))

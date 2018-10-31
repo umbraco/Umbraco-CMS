@@ -209,7 +209,10 @@ namespace Umbraco.Web.Editors
             }
 
             long total;
-            var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total, "Name", Direction.Ascending, true, null, folderTypes.ToArray());
+            var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total,
+                //lookup these content types
+                SqlContext.Query<IMedia>().Where(x => folderTypes.Contains(x.ContentTypeId)),
+                Ordering.By("Name", Direction.Ascending));
 
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(total, pageNumber, pageSize)
             {
@@ -286,8 +289,8 @@ namespace Umbraco.Web.Editors
                     .GetPagedChildren(
                         id, (pageNumber - 1), pageSize,
                         out totalChildren,
-                        orderBy, orderDirection, orderBySystemField,
-                        queryFilter).ToList();
+                        queryFilter,
+                        Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField)).ToList();
             }
             else
             {
@@ -762,12 +765,10 @@ namespace Umbraco.Web.Editors
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total);
+                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                    SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
                 foreach (var c in children)
-                {
-                    if (c.Name == nameToFind && c.ContentType.Alias == contentTypeAlias)
-                        return c;
-                }
+                    return c; //return first one if any are found
             }
             return null;
         }

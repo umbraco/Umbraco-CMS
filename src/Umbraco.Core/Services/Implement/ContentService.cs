@@ -595,7 +595,6 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
             string filter = null, Ordering ordering = null)
-            //string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             var filterQuery = filter.IsNullOrWhiteSpace()
                 ? null
@@ -636,7 +635,6 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
-
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             var query = Query<IContent>();
