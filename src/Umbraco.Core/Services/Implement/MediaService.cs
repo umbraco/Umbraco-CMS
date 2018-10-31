@@ -595,7 +595,6 @@ namespace Umbraco.Core.Services.Implement
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
-            if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             var query = Query<IMedia>();
