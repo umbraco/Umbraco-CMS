@@ -74,6 +74,14 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+            //check if there are any children
+            root.HasChildren = GetTreeNodes(Constants.System.Root.ToInvariantString(), queryStrings).Any();
+            return root;
+        }
+
         protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();

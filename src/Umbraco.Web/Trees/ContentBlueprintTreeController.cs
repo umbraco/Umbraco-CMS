@@ -32,6 +32,9 @@ namespace Umbraco.Web.Trees
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
 
+            //check if there are any content blueprints
+            root.HasChildren = Services.ContentService.GetBlueprintsForContentTypes().Any();
+
             return root;
         }
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
