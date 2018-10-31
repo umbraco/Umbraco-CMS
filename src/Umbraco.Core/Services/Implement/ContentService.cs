@@ -593,8 +593,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
 
-                var query = Query<IContent>();
-
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
@@ -604,8 +602,24 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith($"{contentPath[0].Path},", TextColumnType.NVarchar));
+                    return GetPagedDescendants(contentPath[0].Path, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
                 }
+                return GetPagedDescendants(null, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+            }
+        }
+
+        private IEnumerable<IContent> GetPagedDescendants(string contentPath, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+
+                var query = Query<IContent>();
+                if (!contentPath.IsNullOrWhiteSpace())
+                    query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
             }
@@ -794,7 +808,7 @@ namespace Umbraco.Core.Services.Implement
                     var langs = string.Join(", ", _languageRepository.GetMany()
                         .Where(x => culturesChanging.InvariantContains(x.IsoCode))
                         .Select(x => x.CultureName));
-                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languagues: {langs}", langs);
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
                 }   
                 else
                     Audit(AuditType.Save, userId, content.Id);
@@ -1125,7 +1139,7 @@ namespace Umbraco.Core.Services.Implement
                             var langs = string.Join(", ", _languageRepository.GetMany()
                                 .Where(x => culturesChanging.InvariantContains(x.IsoCode))
                                 .Select(x => x.CultureName));
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languagues: {langs}", langs);
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
                         }
                         else
                             Audit(AuditType.Publish, userId, content.Id);
@@ -1650,6 +1664,9 @@ namespace Umbraco.Core.Services.Implement
 
             moves.Add(Tuple.Create(content, content.Path)); // capture original path
 
+            //need to store the original path to lookup descendants based on it below
+            var originalPath = content.Path;
+
             // these will be updated by the repo because we changed parentId
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
             //content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
@@ -1666,7 +1683,7 @@ namespace Umbraco.Core.Services.Implement
             var total = long.MaxValue;
             while(page * pageSize < total)
             {
-                var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
+                var descendants = GetPagedDescendants(originalPath, page++, pageSize, out total, "Path", Direction.Ascending, true, null);
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
@@ -1685,6 +1702,7 @@ namespace Umbraco.Core.Services.Implement
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
+            //fixme no casting
             if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
             _documentRepository.Save(content);

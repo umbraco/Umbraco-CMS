@@ -193,7 +193,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">The ordering direction.</param>
         /// <param name="filter">Search text filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets descendant documents of a given parent.

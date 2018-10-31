@@ -35,7 +35,10 @@ namespace Umbraco.Tests.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+        PublishedRepositoryEvents = true,
+        WithApplication = true,
+        Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
         //TODO Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
@@ -1209,7 +1212,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
@@ -1262,7 +1265,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
@@ -1278,7 +1281,7 @@ namespace Umbraco.Tests.Services
             var published = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that french was published
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
-            Assert.AreEqual($"Published cultures: fr-fr", lastLog.Comment);
+            Assert.AreEqual($"Published languages: French (France)", lastLog.Comment);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
@@ -1287,7 +1290,7 @@ namespace Umbraco.Tests.Services
             published = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
-            Assert.AreEqual($"Published cultures: en-uk", lastLog.Comment);
+            Assert.AreEqual($"Published languages: English (United Kingdom)", lastLog.Comment);
         }
 
         [Test]
@@ -2775,7 +2778,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2810,7 +2813,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2847,7 +2850,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
             var langDa = new Language("da-DK");
 
@@ -2939,7 +2942,7 @@ namespace Umbraco.Tests.Services
         private void WriteList(List<IContent> list)
         {
             foreach (var content in list)
-                Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-UK"), content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
+                Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-GB"), content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
             Console.WriteLine("-");
         }
 
@@ -2951,7 +2954,7 @@ namespace Umbraco.Tests.Services
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
             var langXx = new Language("pt-PT") { IsDefault = true };
             var langFr = new Language("fr-FR");
-            var langUk = new Language("en-UK");
+            var langUk = new Language("en-GB");
             var langDe = new Language("de-DE");
 
             languageService.Save(langFr);
