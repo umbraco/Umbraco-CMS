@@ -26,5 +26,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "cssClass")]
         public string CssClass { get; set; }
+
+        [DataMember(Name = "tooltip")]
+        public string Tooltip { get; set; }
     }
 }
