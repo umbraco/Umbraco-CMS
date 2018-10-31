@@ -313,16 +313,6 @@ namespace Umbraco.Web.Trees
             menuItem.OpensDialog = opensDialog;
         }
 
-        ////fixme: Remove the need for converting to legacy
-        //private void AddActionNode<TItem, TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)
-        //    where TItem : MenuItem, new()
-        //    where TAction : IAction
-        //{
-        //    //fixme: Inject
-        //    var menuItem = menu.Items.Add<TItem, TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
-        //    if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
-        //}
-
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
             return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
