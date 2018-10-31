@@ -106,13 +106,16 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper, localiz
          *
          */
         deleteByPath: function (type, virtualpath) {
+
+            var promise = localizationService.localize("codefile_deleteItemFailed", [virtualpath]);
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "codeFileApiBaseUrl",
                         "Delete",
                         [{ type: type }, { virtualPath: virtualpath}])),
-                "Failed to delete item: " + virtualpath);
+                promise);
         },
 
         /**

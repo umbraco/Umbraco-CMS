@@ -188,6 +188,7 @@
     <area alias="codefile">
         <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
         <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
+        <key alias="deleteItemFailed">Failed to delete item: %0%</key>
     </area>
     <area alias="content">
         <key alias="isPublished" version="7.2">Is Published</key>
