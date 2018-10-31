@@ -643,17 +643,18 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of an <see cref="IMedia"/> objects, which resides in the Recycle Bin
-        /// </summary>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetMediaInRecycleBin()
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMedia> filter = null, Ordering ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
+                if (ordering == null)
+                    ordering = Ordering.By("Path");
+
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
-                return _mediaRepository.Get(query);
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 

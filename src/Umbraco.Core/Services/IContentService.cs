@@ -141,11 +141,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         IEnumerable<IContent> GetContentForRelease();
 
-        //fixme: should be paged
         /// <summary>
         /// Gets documents in the recycle bin.
         /// </summary>
-        IEnumerable<IContent> GetContentInRecycleBin();
+        IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets child documents of a parent.

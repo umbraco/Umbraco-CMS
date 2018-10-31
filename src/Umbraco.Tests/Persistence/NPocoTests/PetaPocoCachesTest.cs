@@ -133,8 +133,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetContentForRelease();
 
-            contentService.GetContentInRecycleBin();
-
             ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(-1))
             {
                 Id = id1,

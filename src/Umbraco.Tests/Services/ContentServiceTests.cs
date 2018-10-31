@@ -1172,7 +1172,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetContentInRecycleBin().ToList();
+            var contents = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -1792,7 +1792,7 @@ namespace Umbraco.Tests.Services
             Assert.True(descendants.All(x => x.Trashed));
 
             contentService.EmptyRecycleBin();
-            var trashed = contentService.GetContentInRecycleBin();
+            var trashed = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
             Assert.IsEmpty(trashed);
         }
 
@@ -1804,7 +1804,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             contentService.EmptyRecycleBin();
-            var contents = contentService.GetContentInRecycleBin();
+            var contents = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents.Any(), Is.False);
@@ -1982,7 +1982,7 @@ namespace Umbraco.Tests.Services
             // Act
             ServiceContext.ContentService.MoveToRecycleBin(content1);
             ServiceContext.ContentService.EmptyRecycleBin();
-            var contents = ServiceContext.ContentService.GetContentInRecycleBin();
+            var contents = ServiceContext.ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents.Any(), Is.False);

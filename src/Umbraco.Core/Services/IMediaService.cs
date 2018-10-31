@@ -170,7 +170,8 @@ namespace Umbraco.Core.Services
         /// Gets a collection of an <see cref="IMedia"/> objects, which resides in the Recycle Bin
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetMediaInRecycleBin();
+        IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Moves an <see cref="IMedia"/> object to a new location
