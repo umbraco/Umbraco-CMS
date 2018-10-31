@@ -2,11 +2,12 @@
     &__label{
         position: relative;
         padding: 0;
+        margin: 0 0 15px 0;
 
         &-text{
-            margin: 0 0 0 32px;
+            margin: 0 0 0 10px;
             position: relative;
-            top: 1px;
+            top: 3px;
         }
     }
 
@@ -16,18 +17,18 @@
         left: 0;
         opacity: 0;
 
-        &:focus ~ .umb-radiobuttons__state{
+        &:focus ~ .umb-radiobuttons__state .umb-radiobuttons__check{
             box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
         }
 
-        &:focus:checked ~ .umb-radiobuttons__state{
+        &:focus:checked ~ .umb-radiobuttons__state .umb-radiobuttons__check{
             box-shadow: none;
         }
 
-        &:checked ~ .umb-radiobuttons__state{
+        &:checked ~ .umb-radiobuttons__state .umb-radiobuttons__check{
             &:before{
-                width: 100%;
-                height: 100%;
+                width: 22px;
+                height: 22px;
             }
         }
 
@@ -39,6 +40,11 @@
     &__state{
         display: flex;
         flex-wrap: wrap;
+        height: 22px;
+        position: relative;
+    }
+
+    &__check{
         border: 1px solid @gray-8;
         border-radius: 100%;
         width: 22px;
