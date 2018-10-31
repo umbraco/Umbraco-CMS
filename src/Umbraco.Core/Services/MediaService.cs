@@ -465,7 +465,7 @@ namespace Umbraco.Core.Services
                 return repository.GetByQuery(query);
             }
         }
-
+        
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
@@ -758,7 +758,8 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public Attempt<OperationStatus> MoveOp(IMedia media, int parentId, int userId = 0)
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        public Attempt<OperationStatus> Move(IMedia media, int parentId, int userId = 0)
         {
             //TODO: This all needs to be on the repo layer in one transaction!
 
@@ -1486,7 +1487,7 @@ namespace Umbraco.Core.Services
 
         void IMediaService.Move(IMedia media, int parentId, int userId)
         {
-            MoveOp(media, parentId, userId);
+            Move(media, parentId, userId);
         }
 
 

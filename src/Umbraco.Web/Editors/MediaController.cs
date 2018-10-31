@@ -449,18 +449,12 @@ namespace Umbraco.Web.Editors
             var toMove = ValidateMoveOrCopy(move);
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
+            
+            var moveResult = Services.MediaService.WithResult().Move(toMove, move.ParentId);
 
-            //Services.MediaService.Move(toMove, move.ParentId);
-            var moveResult = Services.MediaService.WithResult().MoveOp(toMove, move.ParentId);
-            //var response = Request.CreateResponse(HttpStatusCode.OK);
-            //response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            //return response;
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("Error: ","Parent and destination folders cannot be the same",SpeechBubbleIcon.Error)));
-                //var response = Request.CreateResponse(HttpStatusCode.OK);
-                //response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-                //return response;
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),SpeechBubbleIcon.Error)));
             }
             if (moveResult == false)
             {

@@ -32,7 +32,8 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        Attempt<OperationStatus> MoveOp(IMedia media, int parentId, int userId = 0);
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        Attempt<OperationStatus> Move(IMedia media, int parentId, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -276,6 +277,7 @@ namespace Umbraco.Core.Services
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
         void Move(IMedia media, int parentId, int userId = 0);
+
 
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
