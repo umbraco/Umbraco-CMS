@@ -33,8 +33,8 @@ function valServer(serverValidationManager) {
                     watcher = scope.$watch(function () {
                         return modelCtrl.$modelValue;
                     }, function (newValue, oldValue) {
-                        /* Is newValue is undefined then the field could is empty and the status is reset to Validity = true */
-                        if ((typeof newValue !== "undefined" && newValue !== null) && angular.equals(newValue, oldValue)) {
+                        /* If the newValue has a value which is the same as oldValue, then we ignore - otherwise we set Validity = true */
+                        if (newValue && angular.equals(newValue, oldValue)) {
                             return;
                         }
 
