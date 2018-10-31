@@ -19,7 +19,7 @@ Umbraco is a free open source Content Management System built on the ASP.NET pla
 
 For the first time on the Microsoft platform, there is a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports ASP.NET MVC or Web Forms, including User and Custom Controls, out of the box.
 
-Umbraco is not only loved by developers, but is a content editors dream. Enjoy intuitive editing tools, media management, responsive views and approval workflows to send your content live.
+Umbraco is not only loved by developers, but is a content editor's dream. Enjoy intuitive editing tools, media management, responsive views and approval workflows to send your content live.
 
 Used by more than 443,000 active websites including Carlsberg, Segway, Amazon and Heinz and **The Official ASP.NET and IIS.NET website from Microsoft** ([https://asp.net](https://asp.net) / [https://iis.net](https://iis.net)), you can be sure that the technology is proven, stable and scales. Backed by the team at Umbraco HQ, and supported by a dedicated community of over 220,000 craftspeople globally, you can trust that Umbraco is a safe choice and is here to stay.
 
@@ -30,7 +30,7 @@ As an Open Source platform, Umbraco is more than just a CMS. We are transparent 
 
 ## Trying out Umbraco CMS
 
-[Umbraco Cloud](https://umbraco.com/cloud) is the easiest and fastest way to use Umbraco yet with full support for all your custom .NET code and intergrations. You're up and running in less than a minute and your life will be made easier with automated upgrades and a built-in deployment engine. We offer a free 14 day trial, no credit card needed.
+[Umbraco Cloud](https://umbraco.com/cloud) is the easiest and fastest way to use Umbraco yet with full support for all your custom .NET code and integrations. You're up and running in less than a minute and your life will be made easier with automated upgrades and a built-in deployment engine. We offer a free 14-day trial, no credit card needed.
 
 If you want to DIY you can [download Umbraco](https://our.umbraco.com/download) either as a ZIP file or via NuGet. It's the same version of Umbraco CMS that powers Umbraco Cloud, but you'll need to find a place to host yourself and handling deployments and upgrades is all down to you.
 
@@ -47,4 +47,4 @@ Umbraco is contribution focused and community driven. If you want to contribute 
 Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md).
 
 You can comment and report issues on the [github issue tracker](https://github.com/umbraco/Umbraco-CMS/issues).
-Since [September 2018](https://umbraco.com/blog/a-second-take-on-umbraco-issue-tracker-hello-github-issues/) the old issue tracker is in read only mode, but can still be found at [http://issues.umbraco.org](http://issues.umbraco.org).
+Since [September 2018](https://umbraco.com/blog/a-second-take-on-umbraco-issue-tracker-hello-github-issues/) the old issue tracker is in read-only mode, but can still be found at [http://issues.umbraco.org](http://issues.umbraco.org).
