@@ -3,7 +3,7 @@
     * @name umbraco.resources.templateResource
     * @description Loads in data for templates
     **/
-function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function templateResource($q, $http, umbDataFormatter, umbRequestHelper, localizationService) {
 
     return {
 
@@ -152,13 +152,16 @@ function templateResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
         deleteById: function(id) {
+
+            var promise = localizationService.localize("template_deleteByIdFailed", [id]);
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "templateApiBaseUrl",
                         "DeleteById",
                         [{ id: id }])),
-                "Failed to delete item " + id);
+                promise);
         },
 
         /**

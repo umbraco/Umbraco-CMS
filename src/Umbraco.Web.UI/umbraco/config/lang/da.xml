@@ -1157,6 +1157,7 @@ Mange hilsner fra Umbraco robotten
   </area>
 
   <area alias="template">
+    <key alias="deleteByIdFailed">Sletning af skabelonen med ID %0% fejlede</key>
     <key alias="edittemplate">Rediger skabelon</key>
 
     <key alias="insertSections">Sektioner</key>
