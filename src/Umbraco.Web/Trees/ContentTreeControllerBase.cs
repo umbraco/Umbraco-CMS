@@ -14,7 +14,9 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using System.Globalization;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
+
 
 namespace Umbraco.Web.Trees
 {
@@ -347,8 +349,12 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
-                menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+                {
+                    Icon = "trash",
+                    OpensDialog = true
+                });
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
 
@@ -381,13 +387,16 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            var actions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
+            //fixme: inject
+            var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
+
+            var actionDelete = Current.Actions.GetAction<ActionDelete>();
 
             // A user is allowed to delete their own stuff
             var tryGetCurrentUserId = Security.GetUserId();
-            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(ActionDelete.Instance) == false)
-                actions.Add(ActionDelete.Instance);
+            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(actionDelete) == false)
+                actions.Add(actionDelete);
 
             return actions.Select(x => new MenuItem(x));
         }

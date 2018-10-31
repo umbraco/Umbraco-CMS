@@ -8,7 +8,8 @@ using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Web.WebApi.Filters
         public FilterAllowedOutgoingContentAttribute(Type outgoingType)
             : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
         {
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
@@ -37,7 +38,7 @@ namespace Umbraco.Web.WebApi.Filters
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
             : this(outgoingType, propertyName, Current.Services.UserService, Current.Services.EntityService)
         {
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService)
@@ -45,7 +46,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck, IUserService userService, IEntityService entityService)
@@ -65,7 +66,7 @@ namespace Umbraco.Web.WebApi.Filters
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _userService = userService;
             _entityService = entityService;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         protected override void FilterItems(IUser user, IList items)

@@ -5,23 +5,24 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+
 
 namespace Umbraco.Web.Components
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class NotificationsComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public void Initialize(INotificationService notificationService)
+        public void Initialize(INotificationService notificationService, ActionCollection actions)
         {
             ContentService.SentToPublish += (sender, args) =>
-                notificationService.SendNotification(args.Entity, ActionToPublish.Instance);
+                notificationService.SendNotification(args.Entity, actions.GetAction<ActionToPublish>());
 
             //Send notifications for the published action
             ContentService.Published += (sender, args) =>
             {
                 foreach (var content in args.PublishedEntities)
-                    notificationService.SendNotification(content, ActionPublish.Instance);
+                    notificationService.SendNotification(content, actions.GetAction<ActionToPublish>());
             };
 
             //Send notifications for the update and created actions
@@ -45,22 +46,22 @@ namespace Umbraco.Web.Components
                         updatedEntities.Add(entity);
                     }
                 }
-                notificationService.SendNotification(newEntities, ActionNew.Instance);
-                notificationService.SendNotification(updatedEntities, ActionUpdate.Instance);
+                notificationService.SendNotification(newEntities, actions.GetAction<ActionNew>());
+                notificationService.SendNotification(updatedEntities, actions.GetAction<ActionUpdate>());
             };
 
             //Send notifications for the delete action
             ContentService.Deleted += (sender, args) =>
             {
                 foreach (var content in args.DeletedEntities)
-                    notificationService.SendNotification(content, ActionDelete.Instance);
+                    notificationService.SendNotification(content, actions.GetAction<ActionDelete>());
             };
 
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) =>
             {
                 foreach (var content in args.PublishedEntities)
-                    notificationService.SendNotification(content, ActionUnpublish.Instance);
+                    notificationService.SendNotification(content, actions.GetAction<ActionUnpublish>());
             };
         }
     }
