@@ -5,9 +5,10 @@ using System.Web.Http.Filters;
 using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)

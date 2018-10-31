@@ -10,10 +10,11 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Security;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -155,36 +156,35 @@ namespace Umbraco.Web.Trees
                 if (_provider.IsUmbracoMembershipProvider())
                 {
                     //set default
-                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                    menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                     //Create the normal create action
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 }
                 else
                 {
                     //Create a custom create action - this does not launch a dialog, it just navigates to the create screen
                     // we'll create it based on the ActionNew so it maintains the same icon properties, name, etc...
-                    var createMenuItem = new MenuItem(ActionNew.Instance);
+                    var createMenuItem = new MenuItem(ActionNew.ActionAlias, Services.TextService)
+                    {
+                        Icon = "add",
+                        OpensDialog = true
+                    };
                     //we want to go to this route: /member/member/edit/-1?create=true
                     createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
                     menu.Items.Add(createMenuItem);
                 }
 
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             if (Security.CurrentUser.HasAccessToSensitiveData())
             {
-                menu.Items.Add(new ExportMember
-                {
-                    Name = Services.TextService.Localize("actions/export"),
-                    Icon = "download-alt",
-                    Alias = "export"
-                });
+                menu.Items.Add(new ExportMember(Services.TextService));
             }
 
 

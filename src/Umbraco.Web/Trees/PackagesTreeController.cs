@@ -8,7 +8,8 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.cms.businesslogic.packager;
 using Umbraco.Core.Services;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -83,21 +84,20 @@ namespace Umbraco.Web.Trees
             // Root actions
             if (id == "-1")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
             }
             else if (id == "created")
             {
-                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"))
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true)
                     .ConvertLegacyMenuItem(null, Constants.Trees.Packages, queryStrings.GetValue<string>("application"));
 
-                menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
             else
             {
                 //it's a package node
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             }
 
             return menu;

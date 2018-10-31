@@ -47,26 +47,6 @@ namespace Umbraco.Core
                 /// <summary>
                 /// DropDown List.
                 /// </summary>
-                public const string DropDownList = "Umbraco.DropDown";
-
-                /// <summary>
-                /// DropDown List, Publish Keys.
-                /// </summary>
-                public const string DropdownlistPublishKeys = "Umbraco.DropdownlistPublishingKeys";
-
-                /// <summary>
-                /// DropDown List Multiple.
-                /// </summary>
-                public const string DropDownListMultiple = "Umbraco.DropDownMultiple";
-
-                /// <summary>
-                /// DropDown List Multiple, Publish Keys.
-                /// </summary>
-                public const string DropdownlistMultiplePublishKeys = "Umbraco.DropdownlistMultiplePublishKeys";
-            
-                /// <summary>
-                /// DropDown List.
-                /// </summary>
                 public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
                 
                 /// <summary>

@@ -406,7 +406,6 @@
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
-    <Compile Include="Composing\ActionCollectionTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Stubs\TestProfiler.cs" />

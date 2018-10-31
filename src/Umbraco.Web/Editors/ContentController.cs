@@ -30,10 +30,11 @@ using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
@@ -932,14 +933,14 @@ namespace Umbraco.Web.Editors
             var errMsg = Services.TextService.Localize(localizationKey, new[] { _allLangs.Value[culture].CultureName });
             ModelState.AddModelError(key, errMsg);
         }
-        
+
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <remarks>
-        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// The EnsureUserPermissionForContent attribute will deny access to this method if the current user
         /// does not have Publish access to this node.
         /// </remarks>
         ///
@@ -1077,7 +1078,7 @@ namespace Umbraco.Web.Editors
 
                 if (sorted.ParentId > 0)
                 {
-                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
+                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), Current.Actions.GetAction<ActionSort>(), UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -1224,7 +1225,7 @@ namespace Umbraco.Web.Editors
 
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
+            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1761,6 +1762,7 @@ namespace Umbraco.Web.Editors
                 : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
+        [EnsureUserPermissionForContent("contentId", ActionRollback.ActionLetter)]
         [HttpPost]
         public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
         {

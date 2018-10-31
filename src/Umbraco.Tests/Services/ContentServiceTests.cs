@@ -1265,11 +1265,11 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langUk = new Language("en-GB") { IsDefault = true };
+            var langGB = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langUk);
+            ServiceContext.LocalizationService.Save(langGB);
 
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -1285,8 +1285,8 @@ namespace Umbraco.Tests.Services
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
-            content.SetCultureName("content-en", langUk.IsoCode);
-            content.PublishCulture(langUk.IsoCode);
+            content.SetCultureName("content-en", langGB.IsoCode);
+            content.PublishCulture(langGB.IsoCode);
             published = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();

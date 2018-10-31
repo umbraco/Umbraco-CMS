@@ -9,8 +9,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
-using Umbraco.Web._Legacy.Actions;
+
 
 namespace umbraco.presentation.webservices
 {
@@ -186,7 +187,7 @@ namespace umbraco.presentation.webservices
                 //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
                 if (parentId > 0)
                 {
-                    Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
+                    Services.NotificationService.SendNotification(contentService.GetById(parentId), Current.Actions.GetAction<ActionSort>(), UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
             }

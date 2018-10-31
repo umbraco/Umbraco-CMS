@@ -8,12 +8,13 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -69,13 +70,13 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //Create the normal create action
-            var item = menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
+            var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             item.NavigateToRoute($"{queryStrings.GetValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
@@ -88,11 +89,11 @@ namespace Umbraco.Web.Trees
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
             }
 
             //add refresh
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
 
             return menu;
