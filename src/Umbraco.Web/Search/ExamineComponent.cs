@@ -317,7 +317,8 @@ namespace Umbraco.Web.Search
         private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
         {
 
-            //before content type changes just caused full blown re-indexing:
+            //before content type changes just didn't do anything for indexing, simply just updated the
+            //definitions to index:
             // https://github.com/umbraco/Umbraco-CMS/commit/ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
 
 
@@ -331,8 +332,6 @@ namespace Umbraco.Web.Search
 
             var removedIds = new List<int>();
             var refreshedIds = new List<int>();
-
-            //TODO: What do we do about these?
             var otherIds = new List<int>();
 
             foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
@@ -348,7 +347,7 @@ namespace Umbraco.Web.Search
             const int pageSize = 500;
 
             //Re-index all content of these types
-            foreach(var id in refreshedIds)
+            foreach(var id in refreshedIds.Concat(otherIds).Distinct())
             {
                 var page = 0;
                 var total = long.MaxValue;
