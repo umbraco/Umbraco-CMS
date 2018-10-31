@@ -115,14 +115,13 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         }),
                         {
                         error: function(data){
-
                             var errorMsg = 'Failed to move media';
-                            if (data.id != undefined && data.parentid != undefined) {
-                                if (data.parentId === data.id) {
+                            if (data.id !== undefined && data.parentId !== undefined) {
+                                if (data.id === data.parentId) {
                                     errorMsg = 'Media can\'t be moved into itself';
                                 }
                             }
-                            else if (data != undefined) {
+                            else if (data.notifications !== undefined) {
                                 if (data.notifications.length > 0) {
                                     if (data.notifications[0].header.length > 0) {
                                         errorMsg = data.notifications[0].header;
