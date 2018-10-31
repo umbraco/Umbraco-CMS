@@ -162,6 +162,7 @@ gulp.task('dependencies', function () {
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
                 "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
             ],
             "base": "./node_modules/ace-builds"

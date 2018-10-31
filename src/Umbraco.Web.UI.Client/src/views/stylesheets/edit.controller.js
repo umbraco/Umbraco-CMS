@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function StyleSheetsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper) {
+    function StyleSheetsEditController($scope, $routeParams, $timeout, $http, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper, umbRequestHelper) {
 
         var vm = this;
         var currentPosition = null;
@@ -12,6 +12,22 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
+        // TODO: localization
+        vm.page.navigation = [
+            {
+                "name": "Code",
+                "alias": "code",
+                "icon": "icon-brackets",
+                "view": "views/stylesheets/views/code/code.html",
+                "active": true
+            },
+            {
+                "name": "Styles",
+                "alias": "rules",
+                "icon": "icon-font",
+                "view": "views/stylesheets/views/rules/rules.html"
+            }
+        ];
 
          //Used to toggle the keyboard shortcut modal
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
@@ -125,7 +141,7 @@
             }
 
             vm.aceOption = {
-                mode: "stylesheet",
+                mode: "css",
                 theme: "chrome",
                 showPrintMargin: false,
                 advanced: {
@@ -193,8 +209,49 @@
                     currentForm.$setPristine();
                 }
             }
+        }
 
+        $scope.selectApp = function (app) {
+            vm.page.loading = true;
+            var payload = {
+                content: vm.stylesheet.content,
+                rules: vm.stylesheet.rules
+            };
 
+            if (app.alias === "code") {
+                umbRequestHelper.resourcePromise(
+                        $http.post(
+                            umbRequestHelper.getApiUrl(
+                                "stylesheetApiBaseUrl",
+                                "PostInterpolateStylesheetRules"),
+                            payload),
+                        "Failed to interpolate sheet rules")
+                    .then(
+                        function(content) {
+                            vm.page.loading = false;
+                            vm.stylesheet.content = content;
+                        },
+                        function(err) {
+                        }
+                    );
+            }
+            else {
+                umbRequestHelper.resourcePromise(
+                        $http.post(
+                            umbRequestHelper.getApiUrl(
+                                "stylesheetApiBaseUrl",
+                                "PostExtractStylesheetRules"),
+                            payload),
+                        "Failed to extract style sheet rules")
+                    .then(
+                        function (rules) {
+                            vm.page.loading = false;
+                            vm.stylesheet.rules = rules;
+                        },
+                        function(err) {
+                        }
+                    );
+            }
         }
 
         init();

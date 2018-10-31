@@ -13,19 +13,17 @@
                                hide-alias="true"
                                description="vm.stylesheet.virtualPath"
                                description-locked="true"
+                               navigation="vm.page.navigation"
+                               on-select-navigation-item="selectApp(item)"
                                hide-icon="true">
             </umb-editor-header>
 
             <umb-editor-container>
-                <umb-box>
-                    <umb-box-content>
-                        <div data-element="code-editor"
-                             auto-scale="85"
-                             umb-ace-editor="vm.aceOption"
-                             model="vm.stylesheet.content">
-                        </div>
-                    </umb-box-content>
-                </umb-box>
+                <umb-editor-sub-views
+                    ng-if="!vm.page.loading"
+                    sub-views="vm.page.navigation"
+                    model="vm">
+                </umb-editor-sub-views>
             </umb-editor-container>
 
             <umb-editor-footer>
