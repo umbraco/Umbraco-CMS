@@ -154,35 +154,10 @@ namespace Umbraco.Core.Services
         /// <param name="pageIndex">The page number.</param>
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets child documents of a parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets descendant documents of a given parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
-        /// <param name="filter">Search text filter.</param>
-        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -196,7 +171,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
         /// <param name="filter">Query filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets paged documents of a content content

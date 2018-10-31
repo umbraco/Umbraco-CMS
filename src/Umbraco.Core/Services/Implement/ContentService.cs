@@ -406,7 +406,8 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering ordering = null)
+        public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords
+            , IQuery<IContent> filter = null, Ordering ordering = null)
         {
             if(pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -564,18 +565,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            string filter = null, Ordering ordering = null)
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, filterQuery, ordering);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IContent> filter, Ordering ordering = null)
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -594,18 +584,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
-            string filter = null, Ordering ordering = null)
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, filterQuery, ordering);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IContent> filter, Ordering ordering = null)
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             if (ordering == null)
                 ordering = Ordering.By("Path");

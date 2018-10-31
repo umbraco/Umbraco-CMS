@@ -87,39 +87,11 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
         /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
+            IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -134,7 +106,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter, Ordering ordering = null);
+            IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets paged documents of a content content
@@ -146,7 +118,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter, Ordering ordering = null);
+            IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets paged documents for specified content types
@@ -158,7 +130,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter, Ordering ordering = null);
+            IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root

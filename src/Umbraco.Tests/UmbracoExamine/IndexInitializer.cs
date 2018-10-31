@@ -71,10 +71,6 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 contentService = Mock.Of<IContentService>(
                     x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<string>(), It.IsAny<Ordering>())
-                        ==
-                        allRecs
-                        && x.GetPagedDescendants(
                         It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
                         ==
                         allRecs);
@@ -113,11 +109,6 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 // MOCK!
                 var mediaServiceMock = new Mock<IMediaService>();
-
-                mediaServiceMock
-                    .Setup(x => x.GetPagedDescendants(
-                            It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Ordering>())
-                    ).Returns(() => allRecs);
 
                 mediaServiceMock
                     .Setup(x => x.GetPagedDescendants(
