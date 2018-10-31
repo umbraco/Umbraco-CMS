@@ -125,10 +125,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetByLevel(2);
 
-            contentService.GetChildren(id1);
-
-            contentService.GetDescendants(id2);
-
             contentService.GetVersions(id3);
 
             contentService.GetRootContent();

@@ -529,21 +529,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == id);
-                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
-            }
-        }
-
-        /// <summary>
         /// Gets a collection of published <see cref="IContent"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
@@ -623,60 +608,6 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
-        /// </summary>
-        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
-        /// <param name="name">Full or partial name of the children</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int parentId, string name)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
-                return _documentRepository.Get(query);
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var content = GetById(id);
-                if (content == null)
-                {
-                    scope.Complete(); // else causes rollback
-                    return Enumerable.Empty<IContent>();
-                }
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(IContent content)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
             }
         }
 
@@ -1347,27 +1278,35 @@ namespace Umbraco.Core.Services.Implement
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
 
-                //fixme: should be paged to not overwhelm the database (timeouts)
-                foreach (var d in GetDescendants(document))
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
                 {
-                    // if parent is excluded, exclude document and ignore
-                    // if not forcing, and not publishing, exclude document and ignore
-                    if (exclude.Contains(d.ParentId)  ||  !force && !d.Published)
+                    var descendants = GetPagedDescendants(document.Id, page++, pageSize, out total);
+
+                    foreach (var d in descendants)
                     {
+                        // if parent is excluded, exclude document and ignore
+                        // if not forcing, and not publishing, exclude document and ignore
+                        if (exclude.Contains(d.ParentId) || !force && !d.Published)
+                        {
+                            exclude.Add(d.Id);
+                            continue;
+                        }
+
+                        // no need to check path here,
+                        // 1. because we know the parent is path-published (we just published it)
+                        // 2. because it would not work as nothing's been written out to the db until the uow completes
+                        result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        results.Add(result);
+                        if (result.Success) continue;
+
+                        // abort branch
                         exclude.Add(d.Id);
-                        continue;
                     }
-
-                    // no need to check path here,
-                    // 1. because we know the parent is path-published (we just published it)
-                    // 2. because it would not work as nothing's been written out to the db until the uow completes
-                    result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
-                    results.Add(result);
-                    if (result.Success) continue;
-
-                    // abort branch
-                    exclude.Add(d.Id);
                 }
+                
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
@@ -1450,6 +1389,8 @@ namespace Umbraco.Core.Services.Implement
 
         private void DeleteLocked(IScope scope, IContent content)
         {
+            //TODO: Test this
+
             // then recursively delete descendants, bottom-up
             // just repository.Delete + an event
             var stack = new Stack<IContent>();
@@ -1458,14 +1399,37 @@ namespace Umbraco.Core.Services.Implement
             while (stack.Count > 0)
             {
                 var c = stack.Peek();
-                IContent[] cc;
                 if (c.Level == level)
-                    while ((cc = c.Children(this).ToArray()).Length > 0)
+                {
+                    var hasChildren = true;
+                    while (hasChildren)
                     {
-                        foreach (var ci in cc)
-                            stack.Push(ci);
-                        c = cc[cc.Length - 1];
+                        IContent last = null;
+                        const int pageSize = 500;
+                        var page = 0;
+                        var total = long.MaxValue;
+                        var countChildren = 0;
+
+                        //get all children of c in pages
+                        while (page * pageSize < total)
+                        {
+                            var children = GetPagedChildren(c.Id, page++, pageSize, out total);
+                            
+                            foreach (var ci in children)
+                            {
+                                countChildren++;
+                                stack.Push(ci);
+                                last = ci;
+                            }
+
+                            if (countChildren == 0)
+                                hasChildren = false; //exit, there are no children left to load
+                            else
+                                c = last; //recurse with the last child
+                        }
                     }
+                }
+                    
                 c = stack.Pop();
                 level = c.Level;
 
@@ -1686,9 +1650,6 @@ namespace Umbraco.Core.Services.Implement
 
             moves.Add(Tuple.Create(content, content.Path)); // capture original path
 
-            // get before moving, in case uow is immediate
-            var descendants = GetDescendants(content);
-
             // these will be updated by the repo because we changed parentId
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
             //content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
@@ -1700,18 +1661,26 @@ namespace Umbraco.Core.Services.Implement
             //paths[content.Id] = content.Path;
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
 
-            foreach (var descendant in descendants)
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
             {
-                moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
+                foreach (var descendant in descendants)
+                {
+                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                if (paths.ContainsKey(descendant.ParentId) == false)
-                    Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                    // update path and level since we do not update parentId
+                    if (paths.ContainsKey(descendant.ParentId) == false)
+                        Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
+                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                    Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
+                    descendant.Level += levelDelta;
+                    PerformMoveContentLocked(descendant, userId, trash);
+                }
             }
+            
         }
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -1844,29 +1813,36 @@ namespace Umbraco.Core.Services.Implement
 
                 if (recursive) // process descendants
                 {
-                    foreach (var descendant in GetDescendants(content))
+                    const int pageSize = 500;
+                    var page = 0;
+                    var total = long.MaxValue;
+                    while(page * pageSize < total)
                     {
-                        // if parent has not been copied, skip, else gets its copy id
-                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
+                        var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        foreach (var descendant in descendants)
+                        {
+                            // if parent has not been copied, skip, else gets its copy id
+                            if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
 
-                        var descendantCopy = descendant.DeepCloneWithResetIdentities();
-                        descendantCopy.ParentId = parentId;
+                            var descendantCopy = descendant.DeepCloneWithResetIdentities();
+                            descendantCopy.ParentId = parentId;
 
-                        if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
-                            continue;
+                            if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
+                                continue;
 
-                        // a copy is not published (but not really unpublishing either)
-                        // update the create author and last edit author
-                        if (descendantCopy.Published)
-                            ((Content) descendantCopy).Published = false;
-                        descendantCopy.CreatorId = userId;
-                        descendantCopy.WriterId = userId;
+                            // a copy is not published (but not really unpublishing either)
+                            // update the create author and last edit author
+                            if (descendantCopy.Published)
+                                ((Content)descendantCopy).Published = false;
+                            descendantCopy.CreatorId = userId;
+                            descendantCopy.WriterId = userId;
 
-                        // save and flush (see above)
-                        _documentRepository.Save(descendantCopy);
+                            // save and flush (see above)
+                            _documentRepository.Save(descendantCopy);
 
-                        copies.Add(Tuple.Create(descendant, descendantCopy));
-                        idmap[descendant.Id] = descendantCopy.Id;
+                            copies.Add(Tuple.Create(descendant, descendantCopy));
+                            idmap[descendant.Id] = descendantCopy.Id;
+                        }
                     }
                 }
 

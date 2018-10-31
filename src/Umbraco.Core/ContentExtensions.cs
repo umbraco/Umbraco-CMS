@@ -49,28 +49,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Returns a list of the current contents children.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
-        public static IEnumerable<IContent> Children(this IContent content, IContentService contentService)
-        {
-            return contentService.GetChildren(content.Id);
-        }
-
-        /// <summary>
-        /// Returns a list of the current contents descendants, not including the content itself.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
-        public static IEnumerable<IContent> Descendants(this IContent content, IContentService contentService)
-        {
-            return contentService.GetDescendants(content);
-        }
-
-        /// <summary>
         /// Returns the parent of the current content.
         /// </summary>
         /// <param name="content">Current content</param>
@@ -179,29 +157,7 @@ namespace Umbraco.Core
             }
             return false;
         }
-
-        /// <summary>
-        /// Returns the children for the content base item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is a bit of a hack because we need to type check!
-        /// </remarks>
-        internal static IEnumerable<IContentBase> Children(IContentBase content, ServiceContext services)
-        {
-            if (content is IContent)
-            {
-                return services.ContentService.GetChildren(content.Id);
-            }
-            if (content is IMedia)
-            {
-                return services.MediaService.GetChildren(content.Id);
-            }
-            return null;
-        }
-
+        
         /// <summary>
         /// Returns properties that do not belong to a group
         /// </summary>

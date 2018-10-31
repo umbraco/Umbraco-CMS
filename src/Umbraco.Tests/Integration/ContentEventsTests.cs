@@ -459,7 +459,7 @@ namespace Umbraco.Tests.Integration
         #region Utils
 
         private IEnumerable<IContent> Children(IContent content)
-            => ServiceContext.ContentService.GetChildren(content.Id);
+            => ServiceContext.ContentService.GetPagedChildren(content.Id, 0, int.MaxValue, out var total);
 
         #endregion
 

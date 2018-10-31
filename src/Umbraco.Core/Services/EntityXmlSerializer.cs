@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IContent content,
             bool published,
-            bool withDescendants = false) // fixme take care of usage!
+            bool withDescendants = false) //fixme take care of usage! only used for the packager
         {
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
@@ -58,9 +58,15 @@ namespace Umbraco.Core.Services
 
             if (withDescendants)
             {
-                var descendants = contentService.GetDescendants(content).ToArray();
-                var currentChildren = descendants.Where(x => x.ParentId == content.Id);
-                SerializeDescendants(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, descendants, currentChildren, xml, published);
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while(page * pageSize < total)
+                {
+                    var children = contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
+                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml, published);
+                }
+                
             }
 
             return xml;
@@ -451,7 +457,7 @@ namespace Umbraco.Core.Services
         }
 
         // exports an IContent item descendants.
-        private static void SerializeDescendants(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IContent[] originalDescendants, IEnumerable<IContent> children, XElement xml, bool published)
+        private static void SerializeChildren(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IContent> children, XElement xml, bool published)
         {
             foreach (var child in children)
             {
@@ -459,12 +465,15 @@ namespace Umbraco.Core.Services
                 var childXml = Serialize(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, child, published);
                 xml.Add(childXml);
 
-                // capture id (out of closure) and get the grandChildren (children of the child)
-                var parentId = child.Id;
-                var grandChildren = originalDescendants.Where(x => x.ParentId == parentId);
-
-                // recurse
-                SerializeDescendants(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, originalDescendants, grandChildren, childXml, published);
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while(page * pageSize < total)
+                {
+                    var grandChildren = contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
+                    // recurse
+                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml, published);
+                }
             }
         }
 

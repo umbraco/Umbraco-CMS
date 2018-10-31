@@ -95,16 +95,6 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetByLevel(int level);
 
         /// <summary>
-        /// Gets child documents of a given parent.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId);
-
-        /// <summary>
-        /// Gets child documents of a document, (partially) matching a name.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId, string name);
-
-        /// <summary>
         /// Gets the parent of a document.
         /// </summary>
         IContent GetParent(int id);
@@ -123,16 +113,6 @@ namespace Umbraco.Core.Services
         /// Gets ancestor documents of a document.
         /// </summary>
         IEnumerable<IContent> GetAncestors(IContent content);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(int id);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(IContent content);
 
         /// <summary>
         /// Gets all versions of a document.
@@ -172,6 +152,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         IEnumerable<IContent> GetContentForRelease();
 
+        //fixme: should be paged
         /// <summary>
         /// Gets documents in the recycle bin.
         /// </summary>
