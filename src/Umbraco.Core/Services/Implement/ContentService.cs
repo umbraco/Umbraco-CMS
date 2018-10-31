@@ -1202,7 +1202,7 @@ namespace Umbraco.Core.Services.Implement
                             var langs = string.Join(", ", _languageRepository.GetMany()
                                 .Where(x => culturesChanging.InvariantContains(x.IsoCode))
                                 .Select(x => x.CultureName));
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languagues: {langs}", langs);
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
                         }
                         else
                             Audit(AuditType.Publish, userId, content.Id);
