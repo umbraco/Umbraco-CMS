@@ -26,6 +26,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Web.Search
 {
@@ -351,21 +352,42 @@ namespace Umbraco.Web.Search
 
             const int pageSize = 500;
 
-            //Re-index all content of these types
-            foreach(var id in refreshedIds.Concat(otherIds).Distinct())
-            {
+            if (refreshedIds.Count > 0 || otherIds.Count > 0)
+            {   
                 var page = 0;
                 var total = long.MaxValue;
                 while (page * pageSize < total)
                 {
-                    var contentToRefresh = _services.ContentService.GetPagedOfType(id, page++, pageSize, out total);
-                    foreach(var c in contentToRefresh)
+                    var contentToRefresh = _services.ContentService.GetPagedOfTypes(
+                        //Re-index all content of these types
+                        refreshedIds.Concat(otherIds).Distinct().ToArray(),
+                        page++, pageSize, out total, null,
+                        //order by shallowest to deepest, this allows us to check it's published state without checking every item
+                        Ordering.By("Path", Direction.Ascending));
+
+                    //track which Ids have their paths are published
+                    var publishChecked = new Dictionary<int, bool>();
+
+                    foreach (var c in contentToRefresh)
                     {
-                        //TODO: We might have to order by Path ascending or something since we're going to need to check
-                        // contentService.IsPathPublished(content) but we don't want to make that check for every content item
                         IContent published = null;
-                        if (c.Published && contentService.IsPathPublished(c))
-                            published = c;
+                        if (c.Published)
+                        {
+                            if (publishChecked.TryGetValue(c.ParentId, out var isPublished))
+                            {
+                                //if the parent's published path has already been verified then this is published
+                                if (isPublished)
+                                    published = c;
+                            }   
+                            else
+                            {
+                                //nothing by parent id, so query the service and cache the result for the next child to check against
+                                isPublished = contentService.IsPathPublished(c);
+                                publishChecked[c.Id] = isPublished;
+                                if (isPublished)
+                                    published = c;
+                            }
+                        }
 
                         ReIndexForContent(c, published);
                     }
@@ -460,7 +482,10 @@ namespace Umbraco.Web.Search
                         var total = long.MaxValue;
                         while(page * pageSize < total)
                         {
-                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total);
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, 
+                                //order by shallowest to deepest, this allows us to check it's published state without checking every item
+                                ordering: Ordering.By("Path", Direction.Ascending));
+
                             foreach (var descendant in descendants)
                             {
                                 published = null;

@@ -1718,7 +1718,7 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.DeleteOfType(contentType.Id);
             var rootContent = contentService.GetRootContent();
-            var contents = contentService.GetPagedOfType(contentType.Id, 0, int.MaxValue, out var _);
+            var contents = contentService.GetPagedOfType(contentType.Id, 0, int.MaxValue, out var _, null);
 
             // Assert
             Assert.That(rootContent.Any(), Is.False);

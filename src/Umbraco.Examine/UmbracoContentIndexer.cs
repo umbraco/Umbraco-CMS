@@ -258,7 +258,8 @@ namespace Umbraco.Examine
                         else
                         {
                             //add the published filter
-                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total, "Path", Direction.Ascending, true, _publishedQuery);
+                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total,
+                                _publishedQuery, Ordering.By("Path", Direction.Ascending));
                         }
 
                         //if specific types are declared we need to post filter them

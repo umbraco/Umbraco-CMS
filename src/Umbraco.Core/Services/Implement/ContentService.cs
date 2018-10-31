@@ -405,6 +405,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering ordering = null)
         {
             if(pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
@@ -418,6 +419,24 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetPage(
                     Query<IContent>().Where(x => x.ContentTypeId == contentTypeId),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering ordering = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetPage(
+                    Query<IContent>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
                     pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
@@ -574,18 +593,24 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
+            string filter = null, Ordering ordering = null)
+            //string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
             var filterQuery = filter.IsNullOrWhiteSpace()
                 ? null
                 : Query<IContent>().Where(x => x.Name.Contains(filter));
 
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
+            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, filterQuery, ordering);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter, Ordering ordering = null)
         {
+            if (ordering == null)
+                ordering = Ordering.By("Path");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
@@ -599,22 +624,26 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
+        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter, Ordering ordering)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
+
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             var query = Query<IContent>();
             if (!contentPath.IsNullOrWhiteSpace())
                 query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
         /// <summary>
@@ -1412,7 +1441,7 @@ namespace Umbraco.Core.Services.Implement
             while (page * pageSize < total)
             {
                 //get descendants - ordered from deepest to shallowest
-                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, "Path", Direction.Descending);
+                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
                 foreach (var c in descendants)
                     DoDelete(c);
             }
@@ -1645,7 +1674,7 @@ namespace Umbraco.Core.Services.Implement
             var total = long.MaxValue;
             while(page * pageSize < total)
             {
-                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, "Path", Direction.Ascending, true, null);
+                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path

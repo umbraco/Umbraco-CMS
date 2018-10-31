@@ -79,17 +79,6 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Gets paged documents of a content content
-        /// </summary>
-        /// <param name="contentType">The page number.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedOfType(int contentType, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter = null, Ordering ordering = null);
-
-        /// <summary>
         /// Gets documents at a given level.
         /// </summary>
         IEnumerable<IContent> GetByLevel(int level);
@@ -193,7 +182,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">The ordering direction.</param>
         /// <param name="filter">Search text filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -207,7 +196,31 @@ namespace Umbraco.Core.Services
         /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
         /// <param name="filter">Query filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+            IQuery<IContent> filter, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents of a content content
+        /// </summary>
+        /// <param name="contentTypeId">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents for specified content types
+        /// </summary>
+        /// <param name="contentTypeIds">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.
