@@ -1318,7 +1318,7 @@ namespace Umbraco.Web.Editors
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent(Services.ContentService);
+                            xcontent = Services.ContentService.GetParent(xcontent);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);

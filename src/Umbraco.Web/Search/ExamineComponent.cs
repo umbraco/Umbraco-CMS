@@ -304,10 +304,16 @@ namespace Umbraco.Web.Search
                     // branch
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
-                        var descendants = mediaService.GetDescendants(media);
-                        foreach (var descendant in descendants)
+                        const int pageSize = 500;
+                        var page = 0;
+                        var total = long.MaxValue;
+                        while (page * pageSize < total)
                         {
-                            ReIndexForMedia(descendant, descendant.Trashed == false);
+                            var descendants = mediaService.GetPagedDescendants(media.Id, page++, pageSize, out total);
+                            foreach (var descendant in descendants)
+                            {
+                                ReIndexForMedia(descendant, descendant.Trashed == false);
+                            }
                         }
                     }
                 }

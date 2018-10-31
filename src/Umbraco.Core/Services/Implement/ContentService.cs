@@ -586,9 +586,6 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
@@ -602,27 +599,22 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    return GetPagedDescendants(contentPath[0].Path, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
                 }
-                return GetPagedDescendants(null, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
         }
 
-        private IEnumerable<IContent> GetPagedDescendants(string contentPath, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
+        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
+            var query = Query<IContent>();
+            if (!contentPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
-                var query = Query<IContent>();
-                if (!contentPath.IsNullOrWhiteSpace())
-                    query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
-
-                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
-            }
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
         /// <summary>
@@ -1403,50 +1395,8 @@ namespace Umbraco.Core.Services.Implement
 
         private void DeleteLocked(IScope scope, IContent content)
         {
-            //TODO: Test this
-
-            // then recursively delete descendants, bottom-up
-            // just repository.Delete + an event
-            var stack = new Stack<IContent>();
-            stack.Push(content);
-            var level = 1;
-            while (stack.Count > 0)
+            void DoDelete(IContent c)
             {
-                var c = stack.Peek();
-                if (c.Level == level)
-                {
-                    var hasChildren = true;
-                    while (hasChildren)
-                    {
-                        IContent last = null;
-                        const int pageSize = 500;
-                        var page = 0;
-                        var total = long.MaxValue;
-                        var countChildren = 0;
-
-                        //get all children of c in pages
-                        while (page * pageSize < total)
-                        {
-                            var children = GetPagedChildren(c.Id, page++, pageSize, out total);
-                            
-                            foreach (var ci in children)
-                            {
-                                countChildren++;
-                                stack.Push(ci);
-                                last = ci;
-                            }
-
-                            if (countChildren == 0)
-                                hasChildren = false; //exit, there are no children left to load
-                            else
-                                c = last; //recurse with the last child
-                        }
-                    }
-                }
-                    
-                c = stack.Pop();
-                level = c.Level;
-
                 _documentRepository.Delete(c);
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
@@ -1455,6 +1405,18 @@ namespace Umbraco.Core.Services.Implement
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<ContentService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
+
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                //get descendants - ordered from deepest to shallowest
+                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, "Path", Direction.Descending);
+                foreach (var c in descendants)
+                    DoDelete(c);
+            }
+            DoDelete(content);
         }
 
         //TODO:
@@ -1683,16 +1645,13 @@ namespace Umbraco.Core.Services.Implement
             var total = long.MaxValue;
             while(page * pageSize < total)
             {
-                var descendants = GetPagedDescendants(originalPath, page++, pageSize, out total, "Path", Direction.Ascending, true, null);
+                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, "Path", Direction.Ascending, true, null);
                 foreach (var descendant in descendants)
                 {
                     moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
                     // update path and level since we do not update parentId
-                    if (paths.ContainsKey(descendant.ParentId) == false)
-                        Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                    Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
                     descendant.Level += levelDelta;
                     PerformMoveContentLocked(descendant, userId, trash);
                 }

@@ -109,9 +109,14 @@ namespace Umbraco.Core.Services
 
             if (withDescendants)
             {
-                var descendants = mediaService.GetDescendants(media).ToArray();
-                var currentChildren = descendants.Where(x => x.ParentId == media.Id);
-                SerializeDescendants(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, descendants, currentChildren, xml);
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
+                {
+                    var children = mediaService.GetPagedChildren(media.Id, page++, pageSize, out total);
+                    SerializeChildren(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml);
+                }
             }
 
             return xml;
@@ -478,7 +483,7 @@ namespace Umbraco.Core.Services
         }
 
         // exports an IMedia item descendants.
-        private static void SerializeDescendants(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IMedia[] originalDescendants, IEnumerable<IMedia> children, XElement xml)
+        private static void SerializeChildren(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IMedia> children, XElement xml)
         {
             foreach (var child in children)
             {
@@ -486,12 +491,15 @@ namespace Umbraco.Core.Services
                 var childXml = Serialize(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, child);
                 xml.Add(childXml);
 
-                // capture id (out of closure) and get the grandChildren (children of the child)
-                var parentId = child.Id;
-                var grandChildren = originalDescendants.Where(x => x.ParentId == parentId);
-
-                // recurse
-                SerializeDescendants(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, originalDescendants, grandChildren, childXml);
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
+                {
+                    var grandChildren = mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
+                    // recurse
+                    SerializeChildren(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml);
+                }
             }
         }
     }

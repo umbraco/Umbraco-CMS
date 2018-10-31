@@ -129,7 +129,7 @@ namespace Umbraco.Web.Routing
             var parent = content;
             do
             {
-                parent = parent.ParentId > 0 ? parent.Parent(contentService) : null;
+                parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
             }
             while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 

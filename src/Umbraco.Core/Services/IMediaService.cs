@@ -82,13 +82,6 @@ namespace Umbraco.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetChildren(int id);
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
         /// <param name="pageIndex">Page number</param>
         /// <param name="pageSize">Page size</param>
         /// <param name="totalRecords">Total records query would return without paging</param>
@@ -158,14 +151,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter);
-
-        /// <summary>
-        /// Gets descendants of a <see cref="IMedia"/> object by its Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve descendants from</param>
-        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetDescendants(int id);
-
+        
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by the Id of the <see cref="IContentType"/>
         /// </summary>
@@ -320,13 +306,6 @@ namespace Umbraco.Core.Services
         /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetAncestors(IMedia media);
-
-        /// <summary>
-        /// Gets descendants of a <see cref="IMedia"/> object by its Id
-        /// </summary>
-        /// <param name="media">The Parent <see cref="IMedia"/> object to retrieve descendants from</param>
-        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia> GetDescendants(IMedia media);
 
         /// <summary>
         /// Gets the parent of the current media as an <see cref="IMedia"/> item.
