@@ -281,6 +281,7 @@
     <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
+    <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
