@@ -21,18 +21,15 @@ namespace Umbraco.Web.Editors
             _logViewer = logViewer;
         }
 
-        [HttpGet]
-        public IHttpActionResult GetCanViewLogs()
+        private bool CanViewLogs()
         {
-            //Returns 200 OK if the logs can be viewed
-
             //Check if the ILogViewer is our JSON file 
             var isJsonLogViewer = _logViewer is JsonLogViewer;
 
             //Don't WARN or check if it's not our JSON disk file approach
             if (isJsonLogViewer == false)
-            {                
-                return Ok();
+            {
+                return true;
             }
 
             //Go & fetch the number of log entries OR 
@@ -43,7 +40,21 @@ namespace Umbraco.Web.Editors
             //TODO: Convert the bytes to Megabytes and check less than 200Mb
             if (logSize >= 10)
             {
-                return Ok(logSize);
+                return true;
+            }
+
+            //TODO: It may need to be an Umbraco request with errow/warning notification?!
+            //Depends how best to bubble up to UI - with some custom JS promise error that is caught
+            return false;
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetCanViewLogs()
+        {
+            //Returns 200 OK if the logs can be viewed
+            if (CanViewLogs() == true)
+            {                
+                return Ok();
             }
 
             //TODO: It may need to be an Umbraco request with errow/warning notification?!
@@ -56,6 +67,10 @@ namespace Umbraco.Web.Editors
         public int GetNumberOfErrors()
         {
             //TODO: We will need to stop the request if trying to do this on a 1GB file
+            if(CanViewLogs() == false)
+            {
+                //Throw err
+            }
 
             return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
@@ -64,6 +79,10 @@ namespace Umbraco.Web.Editors
         public LogLevelCounts GetLogLevelCounts()
         {
             //TODO: We will need to stop the request if trying to do this on a 1GB file
+            if (CanViewLogs() == false)
+            {
+                //Throw err
+            }
 
             return _logViewer.GetLogLevelCounts(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
@@ -72,6 +91,10 @@ namespace Umbraco.Web.Editors
         public IEnumerable<LogTemplate> GetMessageTemplates()
         {
             //TODO: We will need to stop the request if trying to do this on a 1GB file
+            if (CanViewLogs() == false)
+            {
+                //Throw err
+            }
 
             return _logViewer.GetMessageTemplates(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
@@ -80,6 +103,10 @@ namespace Umbraco.Web.Editors
         public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromUri]string[] logLevels = null)
         {
             //TODO: We will need to stop the request if trying to do this on a 1GB file
+            if (CanViewLogs() == false)
+            {
+                //Throw err
+            }
 
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
             return _logViewer.GetLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
