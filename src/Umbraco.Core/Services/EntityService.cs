@@ -285,39 +285,36 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType)
         {
-            return GetChildrenInternal(parentId, umbracoObjectType, true);
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
+                return repository.GetByQuery(query, objectTypeId);
+            }
         }
 
         /// <summary>
         /// Gets a collection of children by the parent's Id and UmbracoObjectType without adding property data
         /// </summary>
         /// <param name="parentId">Id of the parent to retrieve children for</param>
-        /// <param name="umbracoObjectType">UmbracoObjectType of the children to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        internal IEnumerable<IUmbracoEntity> GetChildrenWithoutPropertyData(int parentId, UmbracoObjectTypes umbracoObjectType)
+        internal IEnumerable<IUmbracoEntity> GetMediaChildrenWithoutPropertyData(int parentId)
         {
-            return GetChildrenInternal(parentId, umbracoObjectType, false);
-        }
-
-        internal IEnumerable<IUmbracoEntity> GetChildrenInternal(int parentId, UmbracoObjectTypes umbracoObjectType, bool includePropertyData)
-        {
-            var objectTypeId = umbracoObjectType.GetGuid();
+            var objectTypeId = UmbracoObjectTypes.Media.GetGuid();
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
                 var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
 
-                if (includePropertyData)
-                    return repository.GetByQuery(query, objectTypeId);
-
                 // Not pretty having to cast the repository, but it is the only way to get to use an internal method that we
                 // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
                 // See this issue for details on why we need this:
                 // https://github.com/umbraco/Umbraco-CMS/issues/3457
-                return ((EntityRepository)repository).GetByQueryWithoutPropertyData(query, objectTypeId);
+                return ((EntityRepository)repository).GetMediaByQueryWithoutPropertyData(query);
             }
         }
-
+        
         /// <summary>
         /// Returns a paged collection of children
         /// </summary>

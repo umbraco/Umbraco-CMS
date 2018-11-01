@@ -202,12 +202,15 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            // Not pretty having to cast the service, but it is the only way to get to use an internal method that we
-            // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
-            // See this issue for details on why we need this:
-            // https://github.com/umbraco/Umbraco-CMS/issues/3457
-            return ((EntityService)Services.EntityService).GetChildrenWithoutPropertyData(entityId, UmbracoObjectType).ToList();
+            return GetChildrenFromEntityService(entityId);
         }
+
+        /// <summary>
+        /// Abstract method to fetch the entities from the entity service
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        internal abstract IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
