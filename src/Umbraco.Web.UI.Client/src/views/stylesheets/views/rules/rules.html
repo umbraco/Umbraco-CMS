@@ -1,5 +1,4 @@
 <!-- TODO: localize -->
-<!-- TODO: more styles to less -->
 <umb-box>
     <umb-box-content>
         <div class="sub-view-columns">
@@ -8,37 +7,37 @@
                 <small>Some explanatory text about rich text editor styles goes here</small>
             </div>
             <div class="sub-view-column-right">
-                <div class="umb-property-editor form-horizontal" style="max-width: 600px" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
+                <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
                     <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
-                        <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="rule in model.stylesheet.rules">
+                        <div class="control-group umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules">
                             <i class="icon icon-navigation handle"></i>
-                            <div class="umb-prevalues-multivalues__left" style="display: block;">
-                                <div class="umb-el-wrap" style="margin: 5px auto;">
-                                    <label class="control-label" style="text-align: left">
+                            <div class="umb-stylesheet-rules__left">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label">
                                         Style name
                                     </label>
                                     <div class="controls">
                                         <input type="text" ng-model="rule.name" required />
                                     </div>
                                 </div>
-                                <div class="umb-el-wrap" style="margin: 5px auto;">
-                                    <label class="control-label" style="text-align: left">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label">
                                         CSS selector
                                     </label>
                                     <div class="controls">
                                         <input type="text" ng-model="rule.selector" required />
                                     </div>
                                 </div>
-                                <div class="umb-el-wrap" style="margin: 5px auto;">
-                                    <label class="control-label" style="text-align: left">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label">
                                         CSS styles
                                     </label>
                                     <div class="controls">
-                                        <textarea ng-model="rule.styles" required style="width: 295px; height: 80px; resize: none"></textarea>
+                                        <textarea ng-model="rule.styles" required></textarea>
                                     </div>
                                 </div>
                             </div>
-                            <div class="umb-prevalues-multivalues__right">
+                            <div class="umb-stylesheet-rules__right">
                                 <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(rule, $event)"><localize key="general_remove">Remove</localize></a>
                             </div>
                         </div>

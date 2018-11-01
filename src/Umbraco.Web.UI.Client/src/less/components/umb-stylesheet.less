@@ -25,13 +25,29 @@
     width: 295px;
 }
 
-.umb-styleheet-rules__left {
+.umb-stylesheet-rules__left {
     display: block;
     flex: 1 1 auto;
     overflow: hidden;
+
+    .umb-el-wrap {
+        margin: 5px auto;
+
+        .control-label {
+            text-align: left
+        }
+
+        .controls {
+            textarea {
+                width: 295px;
+                height: 80px;
+                resize: none;
+            }
+        }
+    }
 }
 
-.umb-styleheet-rules__right {
+.umb-stylesheet-rules__right {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
