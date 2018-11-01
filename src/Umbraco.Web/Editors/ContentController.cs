@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
-                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageNumber = 0,  
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -484,7 +484,8 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                children = Services.ContentService.GetChildren(id).ToList();
+                //better to not use this without paging where possible, currently only the sort dialog does
+                children = Services.ContentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -1318,7 +1319,7 @@ namespace Umbraco.Web.Editors
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent(Services.ContentService);
+                            xcontent = Services.ContentService.GetParent(xcontent);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);
