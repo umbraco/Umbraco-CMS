@@ -130,8 +130,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
             $scope.currentNode = newNode;
             $scope.setDirty();
-
-            $scope.closeNodeTypePicker();
         };
 
         $scope.openNodeTypePicker = function ($event) {
