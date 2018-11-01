@@ -12,22 +12,24 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
-        // TODO: localization
-        vm.page.navigation = [
-            {
-                "name": "Code",
-                "alias": "code",
-                "icon": "icon-brackets",
-                "view": "views/stylesheets/views/code/code.html",
-                "active": true
-            },
-            {
-                "name": "Styles",
-                "alias": "rules",
-                "icon": "icon-font",
-                "view": "views/stylesheets/views/rules/rules.html"
-            }
-        ];
+
+        localizationService.localizeMany(["stylesheet_tabCode", "stylesheet_tabRules"]).then(function (data) {
+            vm.page.navigation = [
+                {
+                    "name": data[0],
+                    "alias": "code",
+                    "icon": "icon-brackets",
+                    "view": "views/stylesheets/views/code/code.html",
+                    "active": true
+                },
+                {
+                    "name": data[1],
+                    "alias": "rules",
+                    "icon": "icon-font",
+                    "view": "views/stylesheets/views/rules/rules.html"
+                }
+            ];
+        });
 
          //Used to toggle the keyboard shortcut modal
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog

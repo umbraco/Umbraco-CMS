@@ -1037,12 +1037,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
+    <key alias="editorRules">Teksteditor-styles</key>
+    <key alias="editorRulesHelp">Definér de styles, der skal være tilgængelige i teksteditoren for dette stylesheet</key>
     <key alias="selector">Selector</key>
     <key alias="selectorHelp">Bruger CSS-syntaks f.eks. h1, .redheader, .blueTex</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
-    <key alias="nameHelp">Navn der identificerer CSS-egenskaben i tekstredigeringsværktøjet</key>
+    <key alias="nameHelp">Det navn der vises i teksteditoren</key>
     <key alias="styles">Styles</key>
+    <key alias="tabCode">Kode</key>
+    <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>
