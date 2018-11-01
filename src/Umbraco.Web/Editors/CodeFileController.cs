@@ -276,7 +276,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Used to delete a specific file from disk via the FileService
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="virtualPath">The filename or urlencoded path of the file to delete</param>
         /// <returns>Will return a simple 200 if file deletion succeeds</returns>
         [HttpDelete]
@@ -326,6 +326,14 @@ namespace Umbraco.Web.Editors
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
+
+                case Core.Constants.Trees.Stylesheets:
+                    if (Services.FileService.GetStylesheetByName(virtualPath) != null)
+                    {
+                        Services.FileService.DeleteStylesheet(virtualPath, Security.CurrentUser.Id);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Stylesheet found with the specified path");
 
                 default:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
