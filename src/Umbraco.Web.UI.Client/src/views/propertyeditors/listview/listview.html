@@ -89,57 +89,65 @@
 
                    <umb-button
                        ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Publish"
+                       button-style="outline"
                        label-key="actions_publish"
                        icon="icon-globe"
                        action="publish()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Unpublish"
+                       button-style="outline"
                        label-key="actions_unpublish"
                        icon="icon-block"
                        action="unpublish()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Copy"
+                       button-style="outline"
                        label-key="actions_copy"
                        icon="icon-documents"
                        action="copy()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Move"
+                       button-style="outline"
                        label-key="actions_move"
                        icon="icon-enter"
                        action="move()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
-                       button-style="link"
-                       label="Delete"
+                       button-style="outline"
                        label-key="actions_delete"
                        icon="icon-trash"
                        action="delete()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                </umb-editor-sub-header-section>
