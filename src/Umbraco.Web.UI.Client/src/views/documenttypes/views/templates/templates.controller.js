@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor templates sub view
  */
-(function() {
+(function () {
     'use strict';
 
     function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, $routeParams) {
@@ -16,6 +16,7 @@
         var vm = this;
 
         vm.availableTemplates = [];
+        vm.canCreateTemplate = false;
         vm.updateTemplatePlaceholder = false;
 
 
@@ -31,15 +32,9 @@
         });
 
         function init(callback) {
+            checkIfTemplateExists();
 
-            entityResource.getAll("Template").then(function(templates){
-
-                vm.availableTemplates = templates;
-
-                callback();
-
-            });
-
+            callback();
         }
 
         vm.createTemplate = function () {
@@ -50,20 +45,30 @@
 
                 templateResource.save(template).then(function (savedTemplate) {
 
-                    init(function () {
+                    vm.availableTemplates.push(savedTemplate);
+                    vm.canCreateTemplate = false;
 
-                        var newTemplate = vm.availableTemplates.filter(function (t) { return t.id === savedTemplate.id });
-                        if (newTemplate.length > 0) {
-                            $scope.model.allowedTemplates.push(newTemplate[0]);
+                    $scope.model.allowedTemplates.push(savedTemplate);
 
-                            if ($scope.model.defaultTemplate === null) {
-                                $scope.model.defaultTemplate = newTemplate[0];
-                            }
-                        }
-
-                    });
+                    if ($scope.model.defaultTemplate === null) {
+                        $scope.model.defaultTemplate = savedTemplate;
+                    }
 
                 });
+
+            });
+        };
+
+        function checkIfTemplateExists() {
+            entityResource.getAll("Template").then(function (templates) {
+
+                vm.availableTemplates = templates;
+
+                var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
+                    return availableTemplate.name === $scope.model.name;
+                });
+
+                vm.canCreateTemplate = existingTemplate ? false : true;
 
             });
         }
