@@ -47,16 +47,37 @@
         vm.stylesheet = {};
 
         // bind functions to view model
-        vm.save = save;
+        vm.save = interpolateAndSave;
 
         /* Function bound to view model */
 
-        function save() {
-
+        function interpolateAndSave() {
             vm.page.saveButtonState = "busy";
-            
-            vm.stylesheet.content = vm.editor.getValue();
 
+            var activeApp = _.find(vm.page.navigation, function(item) {
+                return item.active;
+            });
+
+            if (activeApp.alias === "rules") {
+                // we're on the rules tab: interpolate the rules into the editor value and save the output as stylesheet content
+                interpolateRules().then(
+                    function (content) {
+                        vm.stylesheet.content = content;
+                        save(activeApp);
+                    },
+                    function(err) {
+                    }
+                );
+            } else {
+                // we're on the code tab: just save the editor value as stylesheet content
+                vm.stylesheet.content = vm.editor.getValue();
+                save(activeApp);
+            }
+        }
+
+        /* Local functions */
+
+        function save(activeApp) {            
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: codefileResource.save,
                 scope: $scope,
@@ -89,6 +110,10 @@
                     navigationService.syncTree({ tree: "stylesheets", path: vm.stylesheet.path, forceReload: true }).then(function (syncArgs) {
                         vm.page.menu.currentNode = syncArgs.node;
                     });
+
+                    if (activeApp.alias === "rules") {
+                        $scope.selectApp(activeApp);
+                    }
                 }
 
             }, function (err) {
@@ -105,8 +130,6 @@
 
 
         }
-
-        /* Local functions */
 
         function init() {
 
@@ -211,46 +234,59 @@
             }
         }
 
-        $scope.selectApp = function (app) {
-            vm.page.loading = true;
+        function interpolateRules() {
             var payload = {
                 content: vm.stylesheet.content,
                 rules: vm.stylesheet.rules
             };
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "stylesheetApiBaseUrl",
+                        "PostInterpolateStylesheetRules"),
+                    payload),
+                "Failed to interpolate sheet rules");
+        }
 
+        function extractRules() {
+            var payload = {
+                content: vm.stylesheet.content,
+                rules: null
+            };
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "stylesheetApiBaseUrl",
+                        "PostExtractStylesheetRules"),
+                    payload),
+                "Failed to extract style sheet rules");
+        }
+
+        $scope.selectApp = function (app) {
+            vm.page.loading = true;
+
+            // are we going to the code tab?
             if (app.alias === "code") {
-                umbRequestHelper.resourcePromise(
-                        $http.post(
-                            umbRequestHelper.getApiUrl(
-                                "stylesheetApiBaseUrl",
-                                "PostInterpolateStylesheetRules"),
-                            payload),
-                        "Failed to interpolate sheet rules")
-                    .then(
-                        function(content) {
-                            vm.page.loading = false;
-                            vm.stylesheet.content = content;
-                        },
-                        function(err) {
-                        }
-                    );
+                // yes - interpolate the rules into the current editor value before displaying the editor
+                interpolateRules().then(
+                    function(content) {
+                        vm.stylesheet.content = content;
+                        vm.page.loading = false;
+                    },
+                    function(err) {
+                    }
+                );
             }
             else {
-                umbRequestHelper.resourcePromise(
-                        $http.post(
-                            umbRequestHelper.getApiUrl(
-                                "stylesheetApiBaseUrl",
-                                "PostExtractStylesheetRules"),
-                            payload),
-                        "Failed to extract style sheet rules")
-                    .then(
-                        function (rules) {
-                            vm.page.loading = false;
-                            vm.stylesheet.rules = rules;
-                        },
-                        function(err) {
-                        }
-                    );
+                // no - extract the rules from the current editor value before displaying the rules tab
+                extractRules().then(
+                    function(rules) {
+                        vm.stylesheet.rules = rules;
+                        vm.page.loading = false;
+                    },
+                    function(err) {
+                    }
+                );
             }
         }
 
