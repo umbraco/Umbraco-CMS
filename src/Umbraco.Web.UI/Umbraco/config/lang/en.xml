@@ -1317,12 +1317,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
-    <key alias="editstylesheet">Edit stylesheet</key>
-    <key alias="editstylesheetproperty">Edit stylesheet property</key>
-    <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="preview">Preview</key>
-    <key alias="styles">Styles</key>
+      <key alias="selector">Selector</key>
+      <key alias="selectorHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
+      <key alias="editstylesheet">Edit stylesheet</key>
+      <key alias="editstylesheetproperty">Edit stylesheet property</key>
+      <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
+      <key alias="styles">Styles</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>

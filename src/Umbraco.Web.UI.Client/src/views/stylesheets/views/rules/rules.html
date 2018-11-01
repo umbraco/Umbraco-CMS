@@ -1,4 +1,3 @@
-<!-- TODO: localize -->
 <umb-box>
     <umb-box-content>
         <div class="sub-view-columns">
@@ -13,27 +12,29 @@
                             <i class="icon icon-navigation handle"></i>
                             <div class="umb-stylesheet-rules__left">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label">
-                                        Style name
+                                    <label class="control-label" for="name_{{$index}}">
+                                        <localize key="general_name">Name</localize>
+                                        <small><localize key="stylesheet_nameHelp">Name to identify the style property in the rich text editor</localize></small>
                                     </label>
                                     <div class="controls">
-                                        <input type="text" ng-model="rule.name" required />
+                                        <input type="text" ng-model="rule.name" id="name_{{$index}}" required />
                                     </div>
                                 </div>
                                 <div class="umb-el-wrap">
-                                    <label class="control-label">
-                                        CSS selector
+                                    <label class="control-label" for="selector_{{$index}}">
+                                        <localize key="stylesheet_selector">Selector</localize>
+                                        <small><localize key="stylesheet_selectorHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</localize></small>
                                     </label>
                                     <div class="controls">
-                                        <input type="text" ng-model="rule.selector" required />
+                                        <input type="text" ng-model="rule.selector" id="selector_{{$index}}" required />
                                     </div>
                                 </div>
                                 <div class="umb-el-wrap">
-                                    <label class="control-label">
-                                        CSS styles
+                                    <label class="control-label" for="styles_{{$index}}">
+                                        <localize key="stylesheet_styles">Styles</localize>
                                     </label>
                                     <div class="controls">
-                                        <textarea ng-model="rule.styles" required></textarea>
+                                        <textarea ng-model="rule.styles" id="styles_{{$index}}" required></textarea>
                                     </div>
                                 </div>
                             </div>

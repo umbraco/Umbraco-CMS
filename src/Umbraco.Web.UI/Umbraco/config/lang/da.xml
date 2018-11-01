@@ -1037,11 +1037,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Bruger CSS-syntaks f.eks. h1, .redheader, .blueTex</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Bruger CSS-syntaks f.eks. h1, .redheader, .blueTex</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
     <key alias="nameHelp">Navn der identificerer CSS-egenskaben i tekstredigeringsværktøjet</key>
-    <key alias="preview">Forhåndsvisning</key>
     <key alias="styles">Styles</key>
   </area>
   <area alias="template">
