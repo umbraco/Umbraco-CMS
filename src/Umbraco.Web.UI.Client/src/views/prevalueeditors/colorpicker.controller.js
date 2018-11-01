@@ -56,8 +56,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
         }
 
         function isValidHex(str) {
-            console.log("str", str);
-            console.log("test", /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(str));
             return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(str);
         }
 
