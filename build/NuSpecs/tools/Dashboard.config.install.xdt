@@ -92,4 +92,15 @@
       </control>
     </tab>
   </section>
+
+  <section alias="UmbracoProfiler" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
+    <areas>
+      <area>developer</area>
+    </areas>
+    <tab caption="Profiler">
+      <control>
+        views/dashboard/developer/profiler.html
+      </control>
+    </tab>
+  </section>
 </dashBoard>

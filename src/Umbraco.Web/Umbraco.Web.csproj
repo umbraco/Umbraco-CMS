@@ -348,6 +348,7 @@
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
+    <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />
     <Compile Include="TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />

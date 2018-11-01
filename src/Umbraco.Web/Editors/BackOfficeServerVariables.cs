@@ -17,6 +17,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebServices;
@@ -279,8 +280,11 @@ namespace Umbraco.Web.Editors
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
+                        },
+                        {
+                            "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                                controller => controller.GetStatus())
                         }
-
                     }
                 },
                 {
