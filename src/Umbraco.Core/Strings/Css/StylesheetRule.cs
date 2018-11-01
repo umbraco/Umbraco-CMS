@@ -30,7 +30,7 @@ namespace Umbraco.Core.Strings.Css
                 // instead of using string interpolation (for increased performance)
                 foreach (var style in Styles.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    sb.Append("\t").Append(style).Append(";").Append(Environment.NewLine);
+                    sb.Append("\t").Append(style.StripNewLines().Trim()).Append(";").Append(Environment.NewLine);
                 }
             }
             sb.Append("}");
