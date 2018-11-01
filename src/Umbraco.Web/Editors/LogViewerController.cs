@@ -22,6 +22,35 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
+        public IHttpActionResult GetLogSize()
+        {
+            //Returns 200 OK if the logs can be viewed
+
+            //Check if the ILogViewer is our JSON file 
+            var isJsonLogViewer = _logViewer is JsonLogViewer;
+
+            //Don't WARN or check if it's not our JSON disk file approach
+            if (isJsonLogViewer == false)
+            {                
+                return Ok();
+            }
+
+            //Go & fetch the number of log entries OR 
+            var logSize = _logViewer.GetLogSize(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+
+            //If the number of items is less than 
+            if (logSize >= 10)
+            {
+                return Ok(logSize);
+            }
+
+            //TODO: It may need to be an Umbraco request with errow/warning notification?!
+            //Depends how best to bubble up to UI - with some custom JS promise error that is caught
+            return BadRequest();
+
+        }
+
+        [HttpGet]
         public int GetNumberOfErrors()
         {
             return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
