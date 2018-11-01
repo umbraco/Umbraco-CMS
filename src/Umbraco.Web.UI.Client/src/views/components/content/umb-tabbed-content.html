@@ -8,8 +8,20 @@
             </div>
 
             <div class="umb-expansion-panel__content" ng-show="group.open">
-                <umb-property data-element="property-{{property.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
-                    <umb-property-editor model="property"></umb-property-editor>
+                <umb-property 
+                    data-element="property-{{property.alias}}" 
+                    ng-repeat="property in group.properties track by property.alias" 
+                    property="property"
+                    show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                    inherits-from="defaultVariant.language.name">
+
+                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                        <umb-property-editor
+                            model="property"
+                            preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                        </umb-property-editor>
+                    </div>
+
                 </umb-property>
             </div>
 

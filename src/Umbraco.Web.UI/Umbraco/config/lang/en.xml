@@ -143,14 +143,14 @@
     <key alias="delete">Content deleted</key>
     <key alias="unpublish">Content unpublished</key>
     <key alias="publish">Content saved and Published</key>
-    <key alias="publishvariant">Content cultures %0% saved and published</key>
+    <key alias="publishvariant">Content saved and published for languages: %0% </key>
     <key alias="save">Content saved</key>
-    <key alias="savevariant">Content cultures %0% saved</key>
+    <key alias="savevariant">Content saved for languages: %0%</key>
     <key alias="move">Content moved</key>
     <key alias="copy">Content copied</key>
     <key alias="rollback">Content rolled back</key>
     <key alias="sendtopublish">Content sent for publishing</key>
-    <key alias="sendtopublishvariant">Content cultures %0% sent for publishing</key>
+    <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>

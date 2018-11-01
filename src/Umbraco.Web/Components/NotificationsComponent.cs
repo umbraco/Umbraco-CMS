@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -26,28 +26,28 @@ namespace Umbraco.Web.Components
             composition.Container.RegisterSingleton<Notifier>();
         }
 
-        public void Initialize(INotificationService notificationService, Notifier notifier)
+        public void Initialize(INotificationService notificationService, Notifier notifier, ActionCollection actions)
         {
             //Send notifications for the send to publish action
-            ContentService.SentToPublish += (sender, args) => notifier.Notify(ActionToPublish.Instance, args.Entity);
+            ContentService.SentToPublish += (sender, args) => notifier.Notify(actions.GetAction<ActionToPublish>(), args.Entity);
 
             //Send notifications for the published action
-            ContentService.Published += (sender, args) => notifier.Notify(ActionPublish.Instance, args.PublishedEntities.ToArray());
+            ContentService.Published += (sender, args) => notifier.Notify(actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
 
             //Send notifications for the saved action
-            ContentService.Sorted += (sender, args) => ContentServiceSorted(notifier, sender, args);
+            ContentService.Sorted += (sender, args) => ContentServiceSorted(notifier, sender, args, actions);
 
             //Send notifications for the update and created actions
-            ContentService.Saved += (sender, args) => ContentServiceSaved(notifier, sender, args);
+            ContentService.Saved += (sender, args) => ContentServiceSaved(notifier, sender, args, actions);
 
             //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) => notifier.Notify(ActionDelete.Instance, args.DeletedEntities.ToArray());
+            ContentService.Deleted += (sender, args) => notifier.Notify(actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
             
             //Send notifications for the unpublish action
-            ContentService.Unpublished += (sender, args) => notifier.Notify(ActionUnpublish.Instance, args.PublishedEntities.ToArray());
+            ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
 
-        private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
         {
             var parentId = args.SavedEntities.Select(x => x.ParentId).Distinct().ToList();
             if (parentId.Count != 1) return; // this shouldn't happen, for sorting all entities will have the same parent id
@@ -59,10 +59,10 @@ namespace Umbraco.Web.Components
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
 
-            notifier.Notify(ActionSort.Instance, new[] { parent });
+            notifier.Notify(actions.GetAction<ActionSort>(), new[] { parent });
         }
 
-        private void ContentServiceSaved(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSaved(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
         {
             var newEntities = new List<IContent>();
             var updatedEntities = new List<IContent>();
@@ -82,8 +82,8 @@ namespace Umbraco.Web.Components
                     updatedEntities.Add(entity);
                 }
             }
-            notifier.Notify(ActionNew.Instance, newEntities.ToArray());
-            notifier.Notify(ActionUpdate.Instance, updatedEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
 
         /// <summary>

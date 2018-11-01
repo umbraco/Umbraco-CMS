@@ -360,7 +360,6 @@
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownMultipleConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfiguration.cs" />
     <Compile Include="PropertyEditors\GridConfiguration.cs" />
@@ -428,7 +427,6 @@
     <Compile Include="PublishedCache\NuCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\PublishedElement.cs" />
     <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
-    <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
     <Compile Include="PublishedCache\IDomainCache.cs" />
@@ -531,39 +529,26 @@
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
     <Compile Include="Editors\NuCacheStatusController.cs" />
-    <Compile Include="_Legacy\Actions\Action.cs" />
-    <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
-    <Compile Include="_Legacy\Actions\ActionBrowse.cs" />
-    <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
-    <Compile Include="_Legacy\Actions\ActionCollection.cs" />
-    <Compile Include="_Legacy\Actions\ActionCollectionBuilder.cs" />
-    <Compile Include="_Legacy\Actions\ActionCopy.cs" />
-    <Compile Include="_Legacy\Actions\ActionCreateBlueprintFromContent.cs" />
-    <Compile Include="_Legacy\Actions\ActionDelete.cs" />
-    <Compile Include="_Legacy\Actions\ActionEmptyTranscan.cs" />
-    <Compile Include="_Legacy\Actions\ActionExport.cs" />
-    <Compile Include="_Legacy\Actions\ActionImport.cs" />
-    <Compile Include="_Legacy\Actions\ActionMove.cs" />
-    <Compile Include="_Legacy\Actions\ActionNew.cs" />
-    <Compile Include="_Legacy\Actions\ActionNotify.cs" />
-    <Compile Include="_Legacy\Actions\ActionNull.cs" />
-    <Compile Include="_Legacy\Actions\ActionPackage.cs" />
-    <Compile Include="_Legacy\Actions\ActionPackageCreate.cs" />
-    <Compile Include="_Legacy\Actions\ActionProtect.cs" />
-    <Compile Include="_Legacy\Actions\ActionPublish.cs" />
-    <Compile Include="_Legacy\Actions\ActionRefresh.cs" />
-    <Compile Include="_Legacy\Actions\ActionRePublish.cs" />
-    <Compile Include="_Legacy\Actions\ActionRestore.cs" />
-    <Compile Include="_Legacy\Actions\ActionRights.cs" />
-    <Compile Include="_Legacy\Actions\ActionRollback.cs" />
-    <Compile Include="_Legacy\Actions\ActionSort.cs" />
-    <Compile Include="_Legacy\Actions\ActionToPublish.cs" />
-    <Compile Include="_Legacy\Actions\ActionTranslate.cs" />
-    <Compile Include="_Legacy\Actions\ActionUnpublish.cs" />
-    <Compile Include="_Legacy\Actions\ActionUpdate.cs" />
-    <Compile Include="_Legacy\Actions\ContextMenuSeperator.cs" />
-    <Compile Include="_Legacy\Actions\IAction.cs" />
-    <Compile Include="_Legacy\Actions\LegacyActionMenuItemAttribute.cs" />
+    <Compile Include="Actions\ActionAssignDomain.cs" />
+    <Compile Include="Actions\ActionBrowse.cs" />
+    <Compile Include="Actions\ActionChangeDocType.cs" />
+    <Compile Include="Actions\ActionCollection.cs" />
+    <Compile Include="Actions\ActionCollectionBuilder.cs" />
+    <Compile Include="Actions\ActionCopy.cs" />
+    <Compile Include="Actions\ActionCreateBlueprintFromContent.cs" />
+    <Compile Include="Actions\ActionDelete.cs" />
+    <Compile Include="Actions\ActionMove.cs" />
+    <Compile Include="Actions\ActionNew.cs" />
+    <Compile Include="Actions\ActionProtect.cs" />
+    <Compile Include="Actions\ActionPublish.cs" />
+    <Compile Include="Actions\ActionRestore.cs" />
+    <Compile Include="Actions\ActionRights.cs" />
+    <Compile Include="Actions\ActionRollback.cs" />
+    <Compile Include="Actions\ActionSort.cs" />
+    <Compile Include="Actions\ActionToPublish.cs" />
+    <Compile Include="Actions\ActionUnpublish.cs" />
+    <Compile Include="Actions\ActionUpdate.cs" />
+    <Compile Include="Actions\IAction.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\Trees\ApplicationAttribute.cs" />
     <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
@@ -812,11 +797,9 @@
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
-    <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
@@ -826,9 +809,6 @@
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RelatedLinksValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -952,7 +932,6 @@
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Models\Trees\ActionMenuItem.cs" />
-    <Compile Include="Models\Trees\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
@@ -1268,12 +1247,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs">
-      <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1351,7 +1324,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
       <SubType>ASPXCodeBehind</SubType>
