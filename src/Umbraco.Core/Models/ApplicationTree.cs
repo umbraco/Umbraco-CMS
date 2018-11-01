@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -35,6 +36,7 @@ namespace Umbraco.Core.Models
             IconClosed = iconClosed;
             IconOpened = iconOpened;
             Type = type;
+            
         }
 
         /// <summary>
@@ -84,6 +86,33 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <value>The type.</value>
         public string Type { get; set; }
+
+        /// <summary>
+        /// Returns the localized root node display name
+        /// </summary>
+        /// <param name="textService"></param>
+        /// <returns></returns>
+        public string GetRootNodeDisplayName(ILocalizedTextService textService)
+        {
+            var label = $"[{Alias}]";
+
+            // try to look up a the localized tree header matching the tree alias
+            var localizedLabel = textService.Localize("treeHeaders/" + Alias);
+
+            // if the localizedLabel returns [alias] then return the title attribute from the trees.config file, if it's defined
+            if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(Title) == false)
+                    label = Title;
+            }
+            else
+            {
+                // the localizedLabel translated into something that's not just [alias], so use the translation
+                label = localizedLabel;
+            }
+
+            return label;
+        }
 
         private Type _runtimeType;
 

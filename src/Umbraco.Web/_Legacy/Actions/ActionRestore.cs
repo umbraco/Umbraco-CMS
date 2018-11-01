@@ -27,6 +27,8 @@
 
         public bool CanBePermissionAssigned => false;
 
+        public bool OpensDialog => true;
+
         #endregion
     }
 }

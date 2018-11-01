@@ -1272,10 +1272,47 @@ namespace Umbraco.Core.Services.Implement
 
             bool IsEditing(IContent c, string l)
                 => c.PublishName != c.Name ||
-                   c.PublishedCultures.Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
-                   c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture == l).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                   c.PublishedCultures.Where(x => x.InvariantEquals(l)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                   c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture.InvariantEquals(l)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
 
             return SaveAndPublishBranch(content, force, document => IsEditing(document, culture), document => document.PublishCulture(culture), userId);
+        }
+
+        // fixme - make this public once we know it works + document
+        private IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0)
+        {
+            // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
+            // and not to == them, else we would be comparing references, and that is a bad thing
+
+            cultures = cultures ?? Array.Empty<string>();
+
+            // determines whether the document is edited, and thus needs to be published,
+            // for the specified cultures (it may be edited for other cultures and that
+            // should not trigger a publish).
+            bool IsEdited(IContent c)
+            {
+                if (cultures.Length == 0)
+                {
+                    // nothing = everything
+                    return c.PublishName != c.Name ||
+                           c.PublishedCultures.Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                           c.Properties.Any(x => x.Values.Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                }
+
+                return c.PublishName != c.Name ||
+                       c.PublishedCultures.Where(x => cultures.Contains(x, StringComparer.InvariantCultureIgnoreCase)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                       c.Properties.Any(x => x.Values.Where(y => cultures.Contains(y.Culture, StringComparer.InvariantCultureIgnoreCase)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+            }
+
+            // publish the specified cultures
+            bool PublishCultures(IContent c)
+            {
+                return cultures.Length == 0
+                    ? c.PublishCulture() // nothing = everything
+                    : cultures.All(c.PublishCulture);
+            }
+
+            return SaveAndPublishBranch(content, force, IsEdited, PublishCultures, userId);
         }
 
         /// <inheritdoc />

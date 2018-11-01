@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Trees
             SeperatorBefore = false;
             Icon = legacyMenu.Icon;
             Action = legacyMenu;
+            OpensDialog = legacyMenu.OpensDialog;
         }
         #endregion
 
@@ -71,6 +72,10 @@ namespace Umbraco.Web.Models.Trees
 
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }
+
+        [DataMember(Name = "opensDialog")]
+        public bool OpensDialog { get; set; }
+
         #endregion
 
         #region Constants

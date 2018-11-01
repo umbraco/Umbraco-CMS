@@ -115,6 +115,27 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets the property types obtained via composition.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets them raw, ie with their original variation.</para>
+        /// </remarks>
+        [IgnoreDataMember]
+        internal IEnumerable<PropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
+
+        private IEnumerable<PropertyType> GetRawComposedPropertyTypes(bool start = true)
+        {
+            var propertyTypes = ContentTypeComposition
+                .Cast<ContentTypeCompositionBase>()
+                .SelectMany(x => start ? x.GetRawComposedPropertyTypes(false) : x.CompositionPropertyTypes);
+
+            if (!start)
+                propertyTypes = propertyTypes.Union(PropertyTypes);
+
+            return propertyTypes;
+        }
+
+        /// <summary>
         /// Adds a content type to the composition.
         /// </summary>
         /// <param name="contentType">The content type to add.</param>
