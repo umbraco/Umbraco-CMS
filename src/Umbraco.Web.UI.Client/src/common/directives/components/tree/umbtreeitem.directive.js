@@ -135,11 +135,19 @@ angular.module("umbraco.directives")
 				}
 				
 				//is this the current action node (this is not the same as the current selected node!)
-				var actionNode = appState.getMenuState("currentNode");
+                var actionNode = appState.getMenuState("currentNode");
 				if(actionNode) {
-					if(actionNode.id === node.id) {
+
+					if(actionNode.id === node.id && actionNode.id !== "-1") {
 						css.push("active");
-					}
+                    }
+                    
+                    // special handling of root nodes with id -1 
+                    // as there can be many nodes with id -1 in a tree we need to check the treeAlias instead
+                    if(actionNode.id === "-1" && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
+                        css.push("active");
+                    }
+
 				}
                 
                 return css.join(" ");

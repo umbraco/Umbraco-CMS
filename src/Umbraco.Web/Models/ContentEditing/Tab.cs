@@ -23,5 +23,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "properties")]
         public IEnumerable<T> Properties { get; set; }
+
+        [DataMember(Name = "cssClass")]
+        public string CssClass { get; set; }
+
+        [DataMember(Name = "tooltip")]
+        public string Tooltip { get; set; }
     }
 }
