@@ -22,7 +22,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public IHttpActionResult GetLogSize()
+        public IHttpActionResult GetCanViewLogs()
         {
             //Returns 200 OK if the logs can be viewed
 
@@ -38,7 +38,9 @@ namespace Umbraco.Web.Editors
             //Go & fetch the number of log entries OR 
             var logSize = _logViewer.GetLogSize(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
 
-            //If the number of items is less than 
+            //The GetLogSize call on JsonLogViewer returns the total filesize in bytes
+            //Check if the logsize is not greater than 200Mb
+            //TODO: Convert the bytes to Megabytes and check less than 200Mb
             if (logSize >= 10)
             {
                 return Ok(logSize);
@@ -53,24 +55,32 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public int GetNumberOfErrors()
         {
+            //TODO: We will need to stop the request if trying to do this on a 1GB file
+
             return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]
         public LogLevelCounts GetLogLevelCounts()
         {
+            //TODO: We will need to stop the request if trying to do this on a 1GB file
+
             return _logViewer.GetLogLevelCounts(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]
         public IEnumerable<LogTemplate> GetMessageTemplates()
         {
+            //TODO: We will need to stop the request if trying to do this on a 1GB file
+
             return _logViewer.GetMessageTemplates(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]
         public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromUri]string[] logLevels = null)
         {
+            //TODO: We will need to stop the request if trying to do this on a 1GB file
+
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
             return _logViewer.GetLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
         }
