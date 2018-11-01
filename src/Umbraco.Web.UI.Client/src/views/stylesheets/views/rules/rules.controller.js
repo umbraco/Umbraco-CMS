@@ -4,7 +4,7 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             axis: 'y',
             containment: 'parent',
             cursor: 'move',
-            items: '> div.control-group',
+            items: 'div.umb-stylesheet-rules__listitem',
             tolerance: 'pointer',
             update: function (e, ui) {
                 // TODO
