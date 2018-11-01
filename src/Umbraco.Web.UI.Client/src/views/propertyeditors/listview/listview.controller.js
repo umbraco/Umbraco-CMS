@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, mediaResource, listViewHelper, navigationService, editorService) {
+function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, mediaResource, listViewHelper, navigationService, editorService, overlayService, languageResource) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -397,6 +397,50 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     };
 
     $scope.publish = function () {
+
+        let variesByCulture = false;
+
+        const dialog = {
+            view: "views/propertyeditors/listview/overlays/listviewpublish.html",
+            submitButtonLabel: "Publish",
+            submit: function (model) {
+                console.log(model);
+                //console.log(model.languages);
+                performPublish();
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
+
+        // check if any of the selected nodes has variants
+        $scope.selection.forEach(selectedItem => {
+            $scope.listViewResultSet.items.forEach(resultItem => {
+                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
+                    variesByCulture = true;
+                }
+            })
+        });
+        
+        // if any of the selected nodes has variants we want to 
+        // show a dialog where the languages can be chosen
+        if(variesByCulture) {
+            languageResource.getAll()
+                .then(languages => {                    
+                    dialog.languages = languages;
+                    overlayService.open(dialog);
+                }, error => {
+                    console.log(error);
+                });
+        } else {
+            overlayService.open(dialog);
+        }
+
+    };
+
+    function performPublish() {
+        console.log("perform publish");
         applySelected(
             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
             function (count, total) {
@@ -407,7 +451,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
                 return localizationService.localize(key, [total]);
             });
-    };
+    }
 
     $scope.unpublish = function () {
         applySelected(
