@@ -8,10 +8,10 @@
             <div class="sub-view-column-right">
                 <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
                     <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
-                        <div class="control-group umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules">
+                        <div class="umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules">
                             <i class="icon icon-navigation handle"></i>
                             <div class="umb-stylesheet-rules__left">
-                                <div class="umb-el-wrap">
+                                <div class="control-group">
                                     <label class="control-label" for="name_{{$index}}">
                                         <localize key="general_name">Name</localize>
                                         <small><localize key="stylesheet_nameHelp">Name to identify the style property in the rich text editor</localize></small>
@@ -20,7 +20,7 @@
                                         <input type="text" ng-model="rule.name" id="name_{{$index}}" required />
                                     </div>
                                 </div>
-                                <div class="umb-el-wrap">
+                                <div class="control-group">
                                     <label class="control-label" for="selector_{{$index}}">
                                         <localize key="stylesheet_selector">Selector</localize>
                                         <small><localize key="stylesheet_selectorHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</localize></small>
@@ -29,7 +29,7 @@
                                         <input type="text" ng-model="rule.selector" id="selector_{{$index}}" required />
                                     </div>
                                 </div>
-                                <div class="umb-el-wrap">
+                                <div class="control-group">
                                     <label class="control-label" for="styles_{{$index}}">
                                         <localize key="stylesheet_styles">Styles</localize>
                                     </label>
