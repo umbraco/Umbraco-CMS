@@ -244,7 +244,7 @@
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "stylesheetApiBaseUrl",
+                        "codeFileApiBaseUrl",
                         "PostInterpolateStylesheetRules"),
                     payload),
                 "Failed to interpolate sheet rules");
@@ -258,7 +258,7 @@
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
-                        "stylesheetApiBaseUrl",
+                        "codeFileApiBaseUrl",
                         "PostExtractStylesheetRules"),
                     payload),
                 "Failed to extract style sheet rules");

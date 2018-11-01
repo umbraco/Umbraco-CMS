@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings.Css;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -18,6 +19,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
+using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 
 namespace Umbraco.Web.Editors
 {
@@ -122,7 +124,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Used to get a specific file from disk via the FileService
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="virtualPath">The filename or urlencoded path of the file to open</param>
         /// <returns>The file and its contents from the virtualPath</returns>
         public CodeFileDisplay GetByPath(string type, string virtualPath)
@@ -217,9 +219,9 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to scaffold the json object for the editors for 'scripts', 'partialViews', 'partialViewMacros'
+        /// Used to scaffold the json object for the editors for 'scripts', 'partialViews', 'partialViewMacros' and 'stylesheets'
         /// </summary>
-        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros'</param>
+        /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="id"></param>
         /// <param name="snippetName"></param>
         /// <returns></returns>
@@ -333,7 +335,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Used to create or update a 'partialview', 'partialviewmacro' or 'script' file
+        /// Used to create or update a 'partialview', 'partialviewmacro', 'script' or 'stylesheets' file
         /// </summary>
         /// <param name="display"></param>
         /// <returns>The updated CodeFileDisplay model</returns>
@@ -403,6 +405,66 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+        /// <summary>
+        /// Extracts "umbraco style rules" from a style sheet
+        /// </summary>
+        /// <param name="data">The style sheet data</param>
+        /// <returns>The style rules</returns>
+        public StylesheetRule[] PostExtractStylesheetRules(StylesheetData data)
+        {
+            if (data.Content.IsNullOrWhiteSpace())
+            {
+                return new StylesheetRule[0];
+            }
+
+            return StylesheetHelper.ParseRules(data.Content)?.Select(rule => new StylesheetRule
+            {
+                Name = rule.Name,
+                Selector = rule.Selector,
+                Styles = rule.Styles
+            }).ToArray();
+        }
+
+        /// <summary>
+        /// Creates a style sheet from CSS and style rules
+        /// </summary>
+        /// <param name="data">The style sheet data</param>
+        /// <returns>The style sheet combined from the CSS and the rules</returns>
+        /// <remarks>
+        /// Any "umbraco style rules" in the CSS will be removed and replaced with the rules passed in <see cref="data"/>
+        /// </remarks>
+        public string PostInterpolateStylesheetRules(StylesheetData data)
+        {
+            // first remove all existing rules
+            var existingRules = data.Content.IsNullOrWhiteSpace()
+                ? new Core.Strings.Css.StylesheetRule[0]
+                : StylesheetHelper.ParseRules(data.Content).ToArray();
+            foreach (var rule in existingRules)
+            {
+                data.Content = StylesheetHelper.ReplaceRule(data.Content, rule.Name, null);
+            }
+
+            data.Content = data.Content.TrimEnd('\n', '\r');
+
+            // now add all the posted rules
+            if (data.Rules != null && data.Rules.Any())
+            {
+                foreach (var rule in data.Rules)
+                {
+                    data.Content = StylesheetHelper.AppendRule(data.Content, new Core.Strings.Css.StylesheetRule
+                    {
+                        Name = rule.Name,
+                        Selector = rule.Selector,
+                        Styles = rule.Styles
+                    });
+                }
+
+                data.Content += Environment.NewLine;
+            }
+
+            return data.Content;
         }
 
         /// <summary>
@@ -579,6 +641,14 @@ namespace Umbraco.Web.Editors
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
+        }
+
+        // this is an internal class for passing stylesheet data from the client to the controller while editing
+        public class StylesheetData
+        {
+            public string Content { get; set; }
+
+            public StylesheetRule[] Rules { get; set; }
         }
     }
 }
