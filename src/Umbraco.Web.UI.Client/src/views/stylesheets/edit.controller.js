@@ -156,6 +156,10 @@
 
             vm.stylesheet = stylesheet;
 
+            vm.setDirty = function () {
+                setFormState("dirty");
+            }
+
             //sync state
             editorState.set(vm.stylesheet);
 
@@ -215,7 +219,7 @@
 
                     vm.editor.on("change", changeAceEditor);
 
-            	}
+                }
             }
 
             function changeAceEditor() {
@@ -263,7 +267,7 @@
                     payload),
                 "Failed to extract style sheet rules");
         }
-
+        
         $scope.selectApp = function (app) {
             vm.page.loading = true;
 

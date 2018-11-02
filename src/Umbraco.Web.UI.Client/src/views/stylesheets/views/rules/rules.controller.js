@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesController",
-    function ($scope) {       
+    function ($scope, angularHelper) {       
         $scope.sortableOptions = {
             axis: 'y',
             containment: 'parent',
@@ -7,8 +7,7 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             items: 'div.umb-stylesheet-rules__listitem',
             tolerance: 'pointer',
             update: function (e, ui) {
-                // TODO
-                console.log("TODO: set dirty")
+                setDirty();
             }
         };
 
@@ -16,11 +15,17 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             evt.preventDefault();
 
             $scope.model.stylesheet.rules.push({});
+            setDirty();
         }
 
         $scope.remove = function (rule, evt) {
             evt.preventDefault();
 
             $scope.model.stylesheet.rules = _.without($scope.model.stylesheet.rules, rule);
+            setDirty();
+        }
+
+        function setDirty() {
+            $scope.model.setDirty();
         }
     });
