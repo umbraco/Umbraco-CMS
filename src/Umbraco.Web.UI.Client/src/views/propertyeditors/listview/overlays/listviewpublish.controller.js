@@ -9,6 +9,14 @@
         vm.changeSelection = changeSelection;
         
         function changeSelection(language) {
+
+            // disable submit button if nothing is selected
+            var firstSelected = _.find(vm.languages, function (language) {
+                return language.publish;
+            });
+
+            $scope.model.disableSubmitButton = !firstSelected;
+
             //need to set the Save state to true if publish is true
             language.save = language.publish;
         }
