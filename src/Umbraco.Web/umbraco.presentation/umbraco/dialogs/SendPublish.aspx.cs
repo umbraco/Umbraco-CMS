@@ -1,7 +1,9 @@
 ﻿using System;
 using Umbraco.Web;
 using Umbraco.Core;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
+
 
 namespace umbraco.dialogs
 {
@@ -25,7 +27,7 @@ namespace umbraco.dialogs
                 {
                     //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
                     Services.NotificationService.SendNotification(
-                        Services.ContentService.GetById(docId), ActionToPublish.Instance);
+                        Services.ContentService.GetById(docId), Current.Actions.GetAction<ActionToPublish>());
                 }
 
             }

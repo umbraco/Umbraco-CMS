@@ -209,7 +209,10 @@ namespace Umbraco.Web.Editors
             }
 
             long total;
-            var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total, "Name", Direction.Ascending, true, null, folderTypes.ToArray());
+            var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total,
+                //lookup these content types
+                SqlContext.Query<IMedia>().Where(x => folderTypes.Contains(x.ContentTypeId)),
+                Ordering.By("Name", Direction.Ascending));
 
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(total, pageNumber, pageSize)
             {
@@ -271,7 +274,7 @@ namespace Umbraco.Web.Editors
             // else proceed as usual
 
             long totalChildren;
-            IMedia[] children;
+            List<IMedia> children;
             if (pageNumber > 0 && pageSize > 0)
             {
                 IQuery<IMedia> queryFilter = null;
@@ -286,13 +289,14 @@ namespace Umbraco.Web.Editors
                     .GetPagedChildren(
                         id, (pageNumber - 1), pageSize,
                         out totalChildren,
-                        orderBy, orderDirection, orderBySystemField,
-                        queryFilter).ToArray();
+                        queryFilter,
+                        Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField)).ToList();
             }
             else
             {
-                children = Services.MediaService.GetChildren(id).ToArray();
-                totalChildren = children.Length;
+                //better to not use this without paging where possible, currently only the sort dialog does
+                children = Services.MediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
+                totalChildren = children.Count;
             }
 
             if (totalChildren == 0)
@@ -663,7 +667,8 @@ namespace Umbraco.Web.Editors
                                 " returned null");
 
                         //look for matching folder
-                        folderMediaItem = mediaRoot.Children(Services.MediaService).FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                        folderMediaItem = FindInChildren(mediaRoot.Id, folderName, Constants.Conventions.MediaTypes.Folder);
+
                         if (folderMediaItem == null)
                         {
                             //if null, create a folder
@@ -751,6 +756,21 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+        }
+
+        private IMedia FindInChildren(int mediaId, string nameToFind, string contentTypeAlias)
+        {
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                    SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
+                foreach (var c in children)
+                    return c; //return first one if any are found
+            }
+            return null;
         }
 
         /// <summary>

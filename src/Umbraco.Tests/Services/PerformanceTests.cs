@@ -108,40 +108,6 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test]
-        public void Get_All_Published_Content_Of_Type()
-        {
-            var result = PrimeDbWithLotsOfContent();
-            var contentSvc = (ContentService)ServiceContext.ContentService;
-
-            var countOfPublished = result.Count(x => x.Published);
-            var contentTypeId = result.First().ContentTypeId;
-
-            var proflog = GetTestProfilingLogger();
-            using (proflog.DebugDuration<PerformanceTests>("Getting published content of type normally"))
-            {
-                //do this 10x!
-                for (var i = 0; i < 10; i++)
-                {
-
-                    //get all content items that are published of this type
-                    var published = contentSvc.GetByType(contentTypeId).Where(content => content.Published);
-                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
-                }
-            }
-
-            using (proflog.DebugDuration<PerformanceTests>("Getting published content of type optimized"))
-            {
-
-                //do this 10x!
-                for (var i = 0; i < 10; i++)
-                {
-                    //get all content items that are published of this type
-                    var published = contentSvc.GetPublishedContentOfContentType(contentTypeId);
-                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
-                }
-            }
-        }
 
         [Test]
         public void Truncate_Insert_Vs_Update_Insert()

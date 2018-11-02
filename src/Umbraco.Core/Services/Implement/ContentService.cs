@@ -405,28 +405,40 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContentType"/></param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetByType(int id)
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords
+            , IQuery<IContent> filter = null, Ordering ordering = null)
         {
+            if(pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(
+                    Query<IContent>().Where(x => x.ContentTypeId == contentTypeId),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
-        internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering ordering = null)
         {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(
+                    Query<IContent>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -537,21 +549,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == id);
-                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
-            }
-        }
-
-        /// <summary>
         /// Gets a collection of published <see cref="IContent"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
@@ -568,18 +565,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            string filter = null, Ordering ordering = null)
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, filterQuery, ordering);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IContent> filter, Ordering ordering = null)
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -597,26 +583,15 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
-        {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null)
+                ordering = Ordering.By("Path");
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-
-                var query = Query<IContent>();
 
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
@@ -627,65 +602,24 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith($"{contentPath[0].Path},", TextColumnType.NVarchar));
+                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-
-                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
-        /// </summary>
-        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
-        /// <param name="name">Full or partial name of the children</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int parentId, string name)
+        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter, Ordering ordering)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
-                return _documentRepository.Get(query);
-            }
-        }
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var content = GetById(id);
-                if (content == null)
-                {
-                    scope.Complete(); // else causes rollback
-                    return Enumerable.Empty<IContent>();
-                }
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
-            }
-        }
+            var query = Query<IContent>();
+            if (!contentPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(IContent content)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
-            }
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
         /// <summary>
@@ -772,13 +706,17 @@ namespace Umbraco.Core.Services.Implement
         /// Gets a collection of an <see cref="IContent"/> objects, which resides in the Recycle Bin
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetContentInRecycleBin()
+        public IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
+                if (ordering == null)
+                    ordering = Ordering.By("Path");
+
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -849,7 +787,7 @@ namespace Umbraco.Core.Services.Implement
 
                 //track the cultures that have changed
                 var culturesChanging = content.ContentType.VariesByCulture()
-                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
@@ -867,7 +805,12 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
 
                 if (culturesChanging != null)
-                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved cultures: {culturesChanging}", culturesChanging);
+                {
+                    var langs = string.Join(", ", _languageRepository.GetMany()
+                        .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                        .Select(x => x.CultureName));
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                }   
                 else
                     Audit(AuditType.Save, userId, content.Id);
 
@@ -1057,7 +1000,7 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
-            string culturesChanging = null;
+            IEnumerable<string> culturesChanging = null;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1082,7 +1025,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        culturesChanging = string.Join(",", content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key));
+                        culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
                     }
                 }
 
@@ -1193,7 +1136,12 @@ namespace Umbraco.Core.Services.Implement
                         }
 
                         if (culturesChanging != null)
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published cultures: {culturesChanging}", culturesChanging);
+                        {
+                            var langs = string.Join(", ", _languageRepository.GetMany()
+                                .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                                .Select(x => x.CultureName));
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
+                        }
                         else
                             Audit(AuditType.Publish, userId, content.Id);
 
@@ -1345,27 +1293,35 @@ namespace Umbraco.Core.Services.Implement
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
 
-                //fixme: should be paged to not overwhelm the database (timeouts)
-                foreach (var d in GetDescendants(document))
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
                 {
-                    // if parent is excluded, exclude document and ignore
-                    // if not forcing, and not publishing, exclude document and ignore
-                    if (exclude.Contains(d.ParentId)  ||  !force && !d.Published)
+                    var descendants = GetPagedDescendants(document.Id, page++, pageSize, out total);
+
+                    foreach (var d in descendants)
                     {
+                        // if parent is excluded, exclude document and ignore
+                        // if not forcing, and not publishing, exclude document and ignore
+                        if (exclude.Contains(d.ParentId) || !force && !d.Published)
+                        {
+                            exclude.Add(d.Id);
+                            continue;
+                        }
+
+                        // no need to check path here,
+                        // 1. because we know the parent is path-published (we just published it)
+                        // 2. because it would not work as nothing's been written out to the db until the uow completes
+                        result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        results.Add(result);
+                        if (result.Success) continue;
+
+                        // abort branch
                         exclude.Add(d.Id);
-                        continue;
                     }
-
-                    // no need to check path here,
-                    // 1. because we know the parent is path-published (we just published it)
-                    // 2. because it would not work as nothing's been written out to the db until the uow completes
-                    result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
-                    results.Add(result);
-                    if (result.Success) continue;
-
-                    // abort branch
-                    exclude.Add(d.Id);
                 }
+                
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
@@ -1448,25 +1404,8 @@ namespace Umbraco.Core.Services.Implement
 
         private void DeleteLocked(IScope scope, IContent content)
         {
-            // then recursively delete descendants, bottom-up
-            // just repository.Delete + an event
-            var stack = new Stack<IContent>();
-            stack.Push(content);
-            var level = 1;
-            while (stack.Count > 0)
+            void DoDelete(IContent c)
             {
-                var c = stack.Peek();
-                IContent[] cc;
-                if (c.Level == level)
-                    while ((cc = c.Children(this).ToArray()).Length > 0)
-                    {
-                        foreach (var ci in cc)
-                            stack.Push(ci);
-                        c = cc[cc.Length - 1];
-                    }
-                c = stack.Pop();
-                level = c.Level;
-
                 _documentRepository.Delete(c);
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
@@ -1475,6 +1414,18 @@ namespace Umbraco.Core.Services.Implement
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<ContentService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
+
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                //get descendants - ordered from deepest to shallowest
+                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                foreach (var c in descendants)
+                    DoDelete(c);
+            }
+            DoDelete(content);
         }
 
         //TODO:
@@ -1684,8 +1635,8 @@ namespace Umbraco.Core.Services.Implement
 
             moves.Add(Tuple.Create(content, content.Path)); // capture original path
 
-            // get before moving, in case uow is immediate
-            var descendants = GetDescendants(content);
+            //need to store the original path to lookup descendants based on it below
+            var originalPath = content.Path;
 
             // these will be updated by the repo because we changed parentId
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
@@ -1698,22 +1649,28 @@ namespace Umbraco.Core.Services.Implement
             //paths[content.Id] = content.Path;
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
 
-            foreach (var descendant in descendants)
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
             {
-                moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                foreach (var descendant in descendants)
+                {
+                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                if (paths.ContainsKey(descendant.ParentId) == false)
-                    Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                    // update path and level since we do not update parentId
+                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                    descendant.Level += levelDelta;
+                    PerformMoveContentLocked(descendant, userId, trash);
+                }
             }
+            
         }
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
+            //fixme no casting
             if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
             _documentRepository.Save(content);
@@ -1842,29 +1799,36 @@ namespace Umbraco.Core.Services.Implement
 
                 if (recursive) // process descendants
                 {
-                    foreach (var descendant in GetDescendants(content))
+                    const int pageSize = 500;
+                    var page = 0;
+                    var total = long.MaxValue;
+                    while(page * pageSize < total)
                     {
-                        // if parent has not been copied, skip, else gets its copy id
-                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
+                        var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        foreach (var descendant in descendants)
+                        {
+                            // if parent has not been copied, skip, else gets its copy id
+                            if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
 
-                        var descendantCopy = descendant.DeepCloneWithResetIdentities();
-                        descendantCopy.ParentId = parentId;
+                            var descendantCopy = descendant.DeepCloneWithResetIdentities();
+                            descendantCopy.ParentId = parentId;
 
-                        if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
-                            continue;
+                            if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
+                                continue;
 
-                        // a copy is not published (but not really unpublishing either)
-                        // update the create author and last edit author
-                        if (descendantCopy.Published)
-                            ((Content) descendantCopy).Published = false;
-                        descendantCopy.CreatorId = userId;
-                        descendantCopy.WriterId = userId;
+                            // a copy is not published (but not really unpublishing either)
+                            // update the create author and last edit author
+                            if (descendantCopy.Published)
+                                ((Content)descendantCopy).Published = false;
+                            descendantCopy.CreatorId = userId;
+                            descendantCopy.WriterId = userId;
 
-                        // save and flush (see above)
-                        _documentRepository.Save(descendantCopy);
+                            // save and flush (see above)
+                            _documentRepository.Save(descendantCopy);
 
-                        copies.Add(Tuple.Create(descendant, descendantCopy));
-                        idmap[descendant.Id] = descendantCopy.Id;
+                            copies.Add(Tuple.Create(descendant, descendantCopy));
+                            idmap[descendant.Id] = descendantCopy.Id;
+                        }
                     }
                 }
 
