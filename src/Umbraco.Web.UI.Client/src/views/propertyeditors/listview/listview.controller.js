@@ -461,9 +461,18 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
             submit: function (model) {
-                console.log(model);
-                //console.log(model.languages);
-                performUnpublish();
+                
+                // create a comma seperated array of selected cultures
+                let selectedCultures = [];
+                if(model.languages && model.languages.length > 0) {
+                    model.languages.forEach(language => {
+                        if(language.unpublish) {
+                            selectedCultures.push(language.culture);
+                        }
+                    });
+                }
+
+                performUnpublish(selectedCultures);
                 overlayService.close();
             },
             close: function () {
@@ -496,9 +505,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     };
 
-    function performUnpublish() {
+    function performUnpublish(cultures) {
         applySelected(
-            function (selected, index) { return contentResource.unpublish(getIdCallback(selected[index])); },
+            function (selected, index) { return contentResource.unpublish(getIdCallback(selected[index]), cultures); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
                 return localizationService.localize(key, [count, total]);
