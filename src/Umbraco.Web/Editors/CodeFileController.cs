@@ -486,40 +486,10 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private Script CreateOrUpdateScript(CodeFileDisplay display)
         {
-            //must always end with the correct extension
-            display.Name = EnsureCorrectFileExtension(display.Name, ".js");
-
-            var virtualPath = display.VirtualPath ?? string.Empty;
-            // this is all weird, should be using relative paths everywhere!
-            var relPath = Current.FileSystems.ScriptsFileSystem.GetRelativePath(virtualPath);
-
-            if (relPath.EndsWith(".js") == false)
-            {
-                //this would typically mean it's new
-                relPath = relPath.IsNullOrWhiteSpace()
-                    ? relPath + display.Name
-                    : relPath.EnsureEndsWith('/') + display.Name;
-            }
-
-            var script = Services.FileService.GetScriptByName(relPath);
-            if (script != null)
-            {
-                // might need to find the path
-                var orgPath = script.OriginalPath.Substring(0, script.OriginalPath.IndexOf(script.Name));
-                script.Path = orgPath + display.Name;
-
-                script.Content = display.Content;
-                //try/catch? since this doesn't return an Attempt?
-                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
-            }
-            else
-            {
-                script = new Script(relPath);
-                script.Content = display.Content;
-                Services.FileService.SaveScript(script, Security.CurrentUser.Id);
-            }
-
-            return script;
+            return CreateOrUpdateFile(display, ".js", Current.FileSystems.ScriptsFileSystem,
+                name => Services.FileService.GetScriptByName(name),
+                (script, userId) => Services.FileService.SaveScript(script, userId),
+                name => new Script(name));
         }
 
         private Stylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
