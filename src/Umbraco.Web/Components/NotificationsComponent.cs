@@ -137,7 +137,7 @@ namespace Umbraco.Web.Components
                     user = _userService.GetUserById(Constants.Security.SuperUserId);
                     if (user == null)
                     {
-                        _logger.Warn(typeof(Notifier), "Noticiations can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
+                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                         return;
                     }
                 }
