@@ -208,7 +208,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, layout, $scope.model.config.layouts);
     };
 
-    function showNotificationsAndReset(err, reload, successMsg) {
+    function showNotificationsAndReset(err, reload, successMsgPromise) {
 
         //check if response is ysod
         if (err.status && err.status >= 500) {
@@ -227,10 +227,12 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         },
             500);
 
-        if (successMsg) {
+        if (successMsgPromise) {
             localizationService.localize("bulk_done")
                 .then(function (v) {
-                    notificationsService.success(v, successMsg);
+                    successMsgPromise.then(function(successMsg) {
+                        notificationsService.success(v, successMsg);
+                    })
                 });
         }
     }
@@ -338,7 +340,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     function serial(selected, fn, getStatusMsg, index) {
         return fn(selected, index).then(function (content) {
             index++;
-            $scope.bulkStatus = getStatusMsg(index, selected.length);
+            getStatusMsg(index, selected.length).then(function(value) {
+                $scope.bulkStatus = value;
+            });
             return index < selected.length ? serial(selected, fn, getStatusMsg, index) : content;
         }, function (err) {
             var reload = index > 0;
@@ -355,7 +359,10 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             return;
 
         $scope.actionInProgress = true;
-        $scope.bulkStatus = getStatusMsg(0, selected.length);
+
+        getStatusMsg(0, selected.length).then(function(value){
+            $scope.bulkStatus = value;
+        });
 
         return serial(selected, fn, getStatusMsg, 0).then(function (result) {
             // executes once the whole selection has been processed
