@@ -417,8 +417,6 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/listviewpublish.html",
             submitButtonLabelKey: "actions_publish",
             submit: function (model) {
-                console.log(model);
-                //console.log(model.languages);
                 performPublish();
                 overlayService.close();
             },
@@ -444,7 +442,6 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     };
 
     function performPublish() {
-        console.log("perform publish");
         applySelected(
             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
             function (count, total) {
