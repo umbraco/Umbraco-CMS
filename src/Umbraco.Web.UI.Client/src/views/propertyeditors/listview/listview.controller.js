@@ -417,7 +417,16 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             view: "views/propertyeditors/listview/overlays/listviewpublish.html",
             submitButtonLabelKey: "actions_publish",
             submit: function (model) {
-                performPublish();
+                // create a comma seperated array of selected cultures
+                let selectedCultures = [];
+                if(model.languages && model.languages.length > 0) {
+                    model.languages.forEach(language => {
+                        if(language.publish) {
+                            selectedCultures.push(language.culture);
+                        }
+                    });
+                }
+                performPublish(selectedCultures);
                 overlayService.close();
             },
             close: function () {
@@ -441,9 +450,9 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
     };
 
-    function performPublish() {
+    function performPublish(cultures) {
         applySelected(
-            function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
+            function (selected, index) { return contentResource.publishById(getIdCallback(selected[index]), cultures); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
                 return localizationService.localize(key, [count, total]);
