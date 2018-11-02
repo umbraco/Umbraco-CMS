@@ -35,7 +35,10 @@ namespace Umbraco.Tests.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+        PublishedRepositoryEvents = true,
+        WithApplication = true,
+        Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
         //TODO Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
@@ -1038,37 +1041,6 @@ namespace Umbraco.Tests.Services
             Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(2));
         }
 
-        [Test]
-        public void Can_Get_Children_Of_Content_Id()
-        {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
-
-            // Act
-            var contents = contentService.GetChildren(NodeDto.NodeIdSeed + 2).ToList();
-
-            // Assert
-            Assert.That(contents, Is.Not.Null);
-            Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(2));
-        }
-
-        [Test]
-        public void Can_Get_Descendents_Of_Content()
-        {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
-            var hierarchy = CreateContentHierarchy();
-            contentService.Save(hierarchy, 0);
-
-            // Act
-            var contents = contentService.GetDescendants(NodeDto.NodeIdSeed + 2).ToList();
-
-            // Assert
-            Assert.That(contents, Is.Not.Null);
-            Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.EqualTo(52));
-        }
 
         [Test]
         public void Can_Get_All_Versions_Of_Content()
@@ -1200,7 +1172,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetContentInRecycleBin().ToList();
+            var contents = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -1240,7 +1212,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
@@ -1476,8 +1448,16 @@ namespace Umbraco.Tests.Services
             var parent = contentService.GetById(parentId);
 
             Console.WriteLine(" " + parent.Id);
-            foreach (var x in contentService.GetDescendants(parent))
-                Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
+            {
+                var descendants = contentService.GetPagedDescendants(parent.Id, page++, pageSize, out total);
+                foreach (var x in descendants)
+                    Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
+            }
+            
             Console.WriteLine();
 
             // publish parent & its branch
@@ -1492,7 +1472,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parentPublished.All(x => x.Success));
             Assert.IsTrue(parent.Published);
 
-            var children = contentService.GetChildren(parentId);
+            var children = contentService.GetPagedChildren(parentId, 0, 500, out var totalChildren); //we only want the first so page size, etc.. is abitrary
 
             // children are published including ... that was released 5 mins ago
             Assert.IsTrue(children.First(x => x.Id == NodeDto.NodeIdSeed + 4).Published);
@@ -1738,7 +1718,7 @@ namespace Umbraco.Tests.Services
             // Act
             contentService.DeleteOfType(contentType.Id);
             var rootContent = contentService.GetRootContent();
-            var contents = contentService.GetByType(contentType.Id);
+            var contents = contentService.GetPagedOfType(contentType.Id, 0, int.MaxValue, out var _, null);
 
             // Assert
             Assert.That(rootContent.Any(), Is.False);
@@ -1785,7 +1765,13 @@ namespace Umbraco.Tests.Services
             contentService.Save(subsubpage, 0);
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            var descendants = contentService.GetDescendants(content).ToList();
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            var descendants = new List<IContent>();
+            while(page * pageSize < total)
+                descendants.AddRange(contentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
             Assert.AreEqual(3, descendants.Count);
@@ -1793,7 +1779,11 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(descendants.Any(x => x.Trashed));
 
             contentService.MoveToRecycleBin(content, 0);
-            descendants = contentService.GetDescendants(content).ToList();
+
+            descendants.Clear();
+            page = 0;
+            while (page * pageSize < total)
+                descendants.AddRange(contentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
 
             Assert.AreEqual(-20, content.ParentId);
             Assert.IsTrue(content.Trashed);
@@ -1802,7 +1792,7 @@ namespace Umbraco.Tests.Services
             Assert.True(descendants.All(x => x.Trashed));
 
             contentService.EmptyRecycleBin();
-            var trashed = contentService.GetContentInRecycleBin();
+            var trashed = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
             Assert.IsEmpty(trashed);
         }
 
@@ -1814,7 +1804,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             contentService.EmptyRecycleBin();
-            var contents = contentService.GetContentInRecycleBin();
+            var contents = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents.Any(), Is.False);
@@ -1883,8 +1873,13 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(childPage3);
 
             //Verify that the children have the inherited permissions
-            var descendants = ServiceContext.ContentService.GetDescendants(parentPage).ToArray();
-            Assert.AreEqual(3, descendants.Length);
+            var descendants = new List<IContent>();
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
+                descendants.AddRange(ServiceContext.ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total));
+            Assert.AreEqual(3, descendants.Count);
 
             foreach (var descendant in descendants)
             {
@@ -1902,8 +1897,11 @@ namespace Umbraco.Tests.Services
             //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
             var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
 
-            descendants = ServiceContext.ContentService.GetDescendants(parentPage2).ToArray();
-            Assert.AreEqual(3, descendants.Length);
+            descendants.Clear();
+            page = 0;
+            while (page * pageSize < total)
+                descendants.AddRange(ServiceContext.ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total));
+            Assert.AreEqual(3, descendants.Count);
 
             foreach (var descendant in descendants)
             {
@@ -1984,7 +1982,7 @@ namespace Umbraco.Tests.Services
             // Act
             ServiceContext.ContentService.MoveToRecycleBin(content1);
             ServiceContext.ContentService.EmptyRecycleBin();
-            var contents = ServiceContext.ContentService.GetContentInRecycleBin();
+            var contents = ServiceContext.ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
             Assert.That(contents.Any(), Is.False);
@@ -2035,7 +2033,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, temp.Children(contentService).Count());
+            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, true, 0);
@@ -2045,10 +2043,10 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, copy.Children(contentService).Count());
+            Assert.AreEqual(2, contentService.CountChildren(copy.Id));
 
             var child = contentService.GetById(NodeDto.NodeIdSeed + 3);
-            var childCopy = copy.Children(contentService).First();
+            var childCopy = contentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
             Assert.AreEqual(childCopy.Name, child.Name);
             Assert.AreNotEqual(childCopy.Id, child.Id);
             Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -2061,7 +2059,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, temp.Children(contentService).Count());
+            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, false, 0);
@@ -2071,7 +2069,7 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(0, copy.Children(contentService).Count());
+            Assert.AreEqual(0, contentService.CountChildren(copy.Id));
         }
 
         [Test]
@@ -2780,7 +2778,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2815,7 +2813,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
@@ -2852,7 +2850,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language("en-UK") { IsDefault = true };
+            var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
             var langDa = new Language("da-DK");
 
@@ -2944,7 +2942,7 @@ namespace Umbraco.Tests.Services
         private void WriteList(List<IContent> list)
         {
             foreach (var content in list)
-                Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-UK"), content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
+                Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-GB"), content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
             Console.WriteLine("-");
         }
 
@@ -2956,7 +2954,7 @@ namespace Umbraco.Tests.Services
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
             var langXx = new Language("pt-PT") { IsDefault = true };
             var langFr = new Language("fr-FR");
-            var langUk = new Language("en-UK");
+            var langUk = new Language("en-GB");
             var langDe = new Language("de-DE");
 
             languageService.Save(langFr);
