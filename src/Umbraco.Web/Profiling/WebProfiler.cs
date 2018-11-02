@@ -108,6 +108,10 @@ namespace Umbraco.Web.Profiling
             if (string.IsNullOrEmpty(request.Result.Headers["X-UMB-DEBUG"]) == false && bool.TryParse(request.Result.Headers["X-UMB-DEBUG"], out umbDebug))
                 return true;
 
+            //if there is an umbDebug cookie then profile it
+            if (string.IsNullOrEmpty(request.Result.Cookies["UMB-DEBUG"]?.Value) == false && bool.TryParse(request.Result.Cookies["UMB-DEBUG"].Value, out umbDebug))
+                return true;
+
             //everything else is ok to profile
             return false;
         }
