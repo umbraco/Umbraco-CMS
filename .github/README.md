@@ -9,7 +9,7 @@ The friendliest, most flexible and fastest growing ASP.NET CMS, and used by more
 [![ScreenShot](img/vimeo.png)](https://vimeo.com/172382998/)
 
 ## Umbraco CMS
-Umbraco is a free open source Content Management System built on the ASP.NET platform. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simple and social.
+Umbraco is a free open source Content Management System built on the ASP.NET platform. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
 
 ## Watch an introduction video
 
