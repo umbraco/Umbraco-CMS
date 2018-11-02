@@ -396,9 +396,22 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             });
     };
 
-    $scope.publish = function () {
-
+    function selectionHasVariants() {
         let variesByCulture = false;
+
+        // check if any of the selected nodes has variants
+        $scope.selection.forEach(selectedItem => {
+            $scope.listViewResultSet.items.forEach(resultItem => {
+                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
+                    variesByCulture = true;
+                }
+            })
+        });
+
+        return variesByCulture;
+    }
+
+    $scope.publish = function () {
 
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewpublish.html",
@@ -413,25 +426,16 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 overlayService.close();
             }
         };
-
-        // check if any of the selected nodes has variants
-        $scope.selection.forEach(selectedItem => {
-            $scope.listViewResultSet.items.forEach(resultItem => {
-                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
-                    variesByCulture = true;
-                }
-            })
-        });
         
         // if any of the selected nodes has variants we want to 
         // show a dialog where the languages can be chosen
-        if(variesByCulture) {
+        if(selectionHasVariants()) {
             languageResource.getAll()
                 .then(languages => {                    
                     dialog.languages = languages;
                     overlayService.open(dialog);
                 }, error => {
-                    console.log(error);
+                    notificationsService.error(error);
                 });
         } else {
             overlayService.open(dialog);
@@ -454,8 +458,6 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     $scope.unpublish = function () {
-
-        let variesByCulture = false;
 
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
@@ -480,24 +482,15 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             }
         };
 
-        // check if any of the selected nodes has variants
-        $scope.selection.forEach(selectedItem => {
-            $scope.listViewResultSet.items.forEach(resultItem => {
-                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
-                    variesByCulture = true;
-                }
-            })
-        });
-
         // if any of the selected nodes has variants we want to 
         // show a dialog where the languages can be chosen
-        if(variesByCulture) {
+        if(selectionHasVariants()) {
             languageResource.getAll()
                 .then(languages => {                    
                     dialog.languages = languages;
                     overlayService.open(dialog);
                 }, error => {
-                    console.log(error);
+                    notificationsService.error(error);
                 });
         } else {
             overlayService.open(dialog);
