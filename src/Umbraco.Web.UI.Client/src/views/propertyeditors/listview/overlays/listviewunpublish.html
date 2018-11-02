@@ -15,17 +15,17 @@
             <div class="umb-list umb-list--condensed">
         
                 <div class="umb-list-item" ng-repeat="language in vm.languages">
-                    <ng-form name="unpublishVariantSelectorForm">
+                    <ng-form name="unpublishLanguageSelectorForm">
                         <div class="flex">
-                            <input id="{{variant.htmlId}}"
-                                    name="unpublishVariantSelector"
+                            <input id="{{language.culture}}"
+                                    name="unpublishLanguageSelector"
                                     type="checkbox"
                                     ng-model="language.unpublish"
                                     ng-change="vm.changeSelection(language)"
                                     ng-disabled="language.disabled"
                                     style="margin-right: 8px;" />
                             <div>
-                                <label style="margin-bottom: 2px;">
+                                <label for="{{language.culture}}" style="margin-bottom: 2px;">
                                     <span ng-class="{'bold': language.isDefault}">{{ language.name }}</span>
                                 </label>
         
