@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ListViewPublishController($scope, localizationService) {
+    function ListViewPublishController($scope, $routeParams, localizationService) {
 
         var vm = this;
         vm.loading = true;
@@ -21,6 +21,30 @@
                 localizationService.localize("content_readyToPublish").then(function (value) {
                     $scope.model.title = value;
                 });
+            }
+
+            // node has variants
+            if (vm.languages && vm.languages.length > 0) {
+
+                var culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+
+                if(culture) {
+                    
+                    // sort languages so the active on is on top
+                    vm.languages = _.sortBy(vm.languages, function (language) {
+                        return language.culture === culture ? 0 : 1;
+                    });
+                    
+                    var active = _.find(vm.languages, function (language) {
+                        return language.culture === culture;
+                    });
+
+                    if (active) {
+                        //ensure that the current one is selected
+                        active.publish = true;
+                    }
+
+                }
             }
 
             vm.loading = false;
