@@ -42,6 +42,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
             $scope.model.value = [$scope.model.singleDropdownValue];
         }
 
+        $scope.updateMultipleDropdownValue = function () {
+            $scope.model.value = $scope.model.multipleDropdownValue;
+        }
+
         if (angular.isArray($scope.model.config.items)) {
             //PP: I dont think this will happen, but we have tests that expect it to happen..
             //if array is simple values, convert to array of objects
@@ -74,8 +78,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
         // if we run in single mode we'll store the value in a local variable
         // so we can pass an array as the model as our PropertyValueEditor expects that
         $scope.model.singleDropdownValue = "";
-        if ($scope.model.config.multiple === "0") {
+        if ($scope.model.config.multiple === "0" && $scope.model.value) {
             $scope.model.singleDropdownValue = Array.isArray($scope.model.value) ? $scope.model.value[0] : $scope.model.value;
         }
 
+        // if we run in multiple mode, make sure the model is an array (in case the property was previously saved in single mode)
+        // also explicitly set the model to null if it's an empty array, so mandatory validation works on the client
+        if ($scope.model.config.multiple === "1" && $scope.model.value) {
+            $scope.model.value = !Array.isArray($scope.model.value) ? [$scope.model.value] : $scope.model.value;
+            if ($scope.model.value.length === 0) {
+                $scope.model.value = null;
+            }
+        }
     });
