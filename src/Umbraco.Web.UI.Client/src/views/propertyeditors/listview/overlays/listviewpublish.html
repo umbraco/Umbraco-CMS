@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.Overlays.ListViewPublishController as vm">
 
         <div ng-if="!vm.languages">
-            Some content here
+            <p><localize key="prompt_confirmListViewPublish"></localize></p>
         </div>
     
         <div ng-if="vm.languages.length > 1">
