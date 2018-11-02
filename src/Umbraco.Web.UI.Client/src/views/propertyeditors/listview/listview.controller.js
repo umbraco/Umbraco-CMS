@@ -402,7 +402,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
         const dialog = {
             view: "views/propertyeditors/listview/overlays/listviewpublish.html",
-            submitButtonLabel: "Publish",
+            submitButtonLabelKey: "actions_publish",
             submit: function (model) {
                 console.log(model);
                 //console.log(model.languages);
@@ -454,6 +454,49 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     $scope.unpublish = function () {
+
+        let variesByCulture = false;
+
+        const dialog = {
+            view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
+            submitButtonLabelKey: "actions_unpublish",
+            submit: function (model) {
+                console.log(model);
+                //console.log(model.languages);
+                performUnpublish();
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
+
+        // check if any of the selected nodes has variants
+        $scope.selection.forEach(selectedItem => {
+            $scope.listViewResultSet.items.forEach(resultItem => {
+                if((selectedItem.id === resultItem.id || selectedItem.key === resultItem.key) && resultItem.variesByCulture) {
+                    variesByCulture = true;
+                }
+            })
+        });
+
+        // if any of the selected nodes has variants we want to 
+        // show a dialog where the languages can be chosen
+        if(variesByCulture) {
+            languageResource.getAll()
+                .then(languages => {                    
+                    dialog.languages = languages;
+                    overlayService.open(dialog);
+                }, error => {
+                    console.log(error);
+                });
+        } else {
+            overlayService.open(dialog);
+        }
+
+    };
+
+    function performUnpublish() {
         applySelected(
             function (selected, index) { return contentResource.unpublish(getIdCallback(selected[index])); },
             function (count, total) {
@@ -464,7 +507,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
             });
-    };
+    }
 
     $scope.move = function () {
         var move = {
