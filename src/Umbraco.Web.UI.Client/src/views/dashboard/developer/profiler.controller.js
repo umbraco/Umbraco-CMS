@@ -2,7 +2,7 @@
     "use strict";
 
     function ProfilerController($scope, $cookieStore, $http, umbRequestHelper) {
-        var COOKIE = "UMB-PROFILER-ALWAYS-ON";
+        var COOKIE = "UMB-DEBUG";
 
         var vm = this;
 
