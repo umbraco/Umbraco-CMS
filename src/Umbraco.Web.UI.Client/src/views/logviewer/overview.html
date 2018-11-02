@@ -13,7 +13,18 @@
         <umb-editor-container>
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-            <div class="umb-package-details" ng-if="!vm.loading">
+            <!-- Warning message (if unable to view log files) -->
+            <div ng-show="!vm.loading && !vm.canLoadLogs">
+                <umb-box>
+                    <umb-box-header title="Unable to view logs"/>
+                    <umb-box-content>
+                        <p>Today's log file is too large to be viewed and would cause performance problems.</p>
+                        <p>If you need to view the log files, try opening them manually</p>
+                    </umb-box-content>
+                </umb-box>
+            </div>
+
+            <div class="umb-package-details" ng-show="!vm.loading && vm.canLoadLogs">
                 <div class="umb-package-details__main-content">
                     <!-- Saved Searches -->
                     <umb-box>

@@ -44,7 +44,9 @@ namespace Umbraco.Core.Logging.Viewer
         /// </summary>
         IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate);
 
-        long GetLogSize(DateTimeOffset startDate, DateTimeOffset endDate);
+        bool CanHandleLargeLogs { get; }
+
+        bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
         /// Returns the collection of logs

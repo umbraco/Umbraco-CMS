@@ -14,9 +14,11 @@ namespace Umbraco.Core.Logging.Viewer
         
         private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
+        public abstract bool CanHandleLargeLogs { get; }
+        
         public abstract IEnumerable<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take);
-
-        public abstract long GetLogSize(DateTimeOffset startDate, DateTimeOffset endDate);
+        
+        public abstract bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
         public virtual IEnumerable<SavedLogSearch> GetSavedSearches()
         {
@@ -139,5 +141,7 @@ namespace Umbraco.Core.Logging.Viewer
                 Items = logMessages
             };
         }
+
+        
     }
 }

@@ -5,6 +5,7 @@
 
         var vm = this;
         vm.loading = false;
+        vm.canLoadLogs = false;
         vm.searches = [];
         vm.numberOfErrors = 0;
         vm.commonLogMessages = [];
@@ -24,6 +25,22 @@
         //functions
         vm.searchLogQuery = searchLogQuery;
         vm.findMessageTemplate = findMessageTemplate;
+
+        function preFlightCheck(){
+            vm.loading = true;
+
+            //Do our pre-flight check (to see if we can view logs)
+            //IE the log file is NOT too big such as 1GB & crash the site
+            logViewerResource.canViewLogs().then(function(result){
+                vm.loading = false;
+                vm.canLoadLogs = result;
+
+                if(result){
+                    //Can view logs - so initalise
+                    init();
+                }
+            });
+        }
 
 
         function init() {
@@ -96,7 +113,7 @@
             searchLogQuery(logQuery);
         }
 
-        init();
+        preFlightCheck();
 
     }
 

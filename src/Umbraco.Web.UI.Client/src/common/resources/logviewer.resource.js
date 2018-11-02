@@ -91,6 +91,15 @@
                         "GetLogs",
                         options)),
                 'Failed to retrieve common log messages');
+        },
+
+        canViewLogs: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logViewerApiBaseUrl",
+                        "GetCanViewLogs")),
+                'Failed to retrieve state if logs can be viewed');
         }
 
     };

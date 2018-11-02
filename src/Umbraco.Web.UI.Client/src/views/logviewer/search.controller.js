@@ -159,6 +159,8 @@
                 vm.logsLoading = false;
 
                 setLogTypeColor(vm.logItems.items);
+            }, function(err){
+                vm.logsLoading = false;
             });
         }
 
