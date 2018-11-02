@@ -5,7 +5,8 @@
             <label class="checkbox">
                 <input type="checkbox" name="checkboxlist"
                        value="{{item.key}}"
-                       ng-model="item.checked" />
+                       ng-model="item.checked"
+                       ng-required="model.validation.mandatory && !model.value.length" />
                 {{item.val}}
             </label>
         </li>
