@@ -17,6 +17,7 @@ namespace Umbraco.Core.Models
     {
         private IContentType _contentType;
         private ITemplate _template;
+        private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
@@ -86,9 +87,15 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
-            public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
+            public readonly PropertyInfo ContentScheduleSelector = ExpressionHelper.GetPropertyInfo<Content, ContentScheduleCollection>(x => x.ContentSchedule);
             public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
+        }
+
+        /// <inheritdoc />
+        public ContentScheduleCollection ContentSchedule
+        {
+            get => _schedule ?? (_schedule = new ContentScheduleCollection());
+            set => SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
         }
 
         /// <summary>
@@ -100,7 +107,7 @@ namespace Umbraco.Core.Models
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
-        public virtual ITemplate Template
+        public ITemplate Template
         {
             get => _template ?? _contentType.DefaultTemplate;
             set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
@@ -117,10 +124,14 @@ namespace Umbraco.Core.Models
                 if(Trashed)
                     return ContentStatus.Trashed;
 
-                if(ExpireDate.HasValue && ExpireDate.Value > DateTime.MinValue && DateTime.Now > ExpireDate.Value)
+                //fixme - deal with variants
+                var expires = ContentSchedule.GetSchedule(ContentScheduleChange.End).FirstOrDefault();
+                if (expires != null && expires.Date > DateTime.MinValue && DateTime.Now > expires.Date)
                     return ContentStatus.Expired;
 
-                if(ReleaseDate.HasValue && ReleaseDate.Value > DateTime.MinValue && ReleaseDate.Value > DateTime.Now)
+                //fixme - deal with variants
+                var release = ContentSchedule.GetSchedule(ContentScheduleChange.Start).FirstOrDefault();
+                if (release != null && release.Date > DateTime.MinValue && release.Date > DateTime.Now)
                     return ContentStatus.AwaitingRelease;
 
                 if(Published)
@@ -168,26 +179,6 @@ namespace Umbraco.Core.Models
 
         [IgnoreDataMember]
         public bool Edited { get; internal set; }
-
-        /// <summary>
-        /// The date this Content should be released and thus be published
-        /// </summary>
-        [DataMember]
-        public DateTime? ReleaseDate
-        {
-            get => _releaseDate;
-            set => SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector);
-        }
-
-        /// <summary>
-        /// The date this Content should expire and thus be unpublished
-        /// </summary>
-        [DataMember]
-        public DateTime? ExpireDate
-        {
-            get => _expireDate;
-            set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
-        }
 
         /// <summary>
         /// Gets the ContentType used by this content object

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -12,7 +14,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
-        public static Content BuildEntity(DocumentDto dto, IContentType contentType)
+        public static Content BuildEntity(DocumentDto dto, IContentType contentType, ILanguageRepository languageRepository )
         {
             var contentDto = dto.ContentDto;
             var nodeDto = contentDto.NodeDto;
@@ -45,8 +47,18 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Published = dto.Published;
                 content.Edited = dto.Edited;
-                content.ExpireDate = dto.ExpiresDate;
-                content.ReleaseDate = dto.ReleaseDate;
+
+                var schedule = new ContentScheduleCollection();
+                foreach(var entry in dto.ContentSchedule)
+                {
+                    schedule.Add(new ContentSchedule(entry.Id,
+                                languageRepository.GetIsoCodeById(entry.LanguageId),
+                                entry.Date,
+                                entry.Action == ContentScheduleChange.Start.ToString()
+                                    ? ContentScheduleChange.Start
+                                    : ContentScheduleChange.End));
+                }
+                content.ContentSchedule = schedule;
 
                 // fixme - shall we get published infos or not?
                 //if (dto.Published)
@@ -142,7 +154,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
-                content.ProviderUserKey = content.Key; // fixme explain
+                content.ProviderUserKey = content.Key; // The `ProviderUserKey` is a membership provider thing
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -155,9 +167,9 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         /// <summary>
-        /// Buils a dto from an IContent item.
+        /// Builds a dto from an IContent item.
         /// </summary>
-        public static DocumentDto BuildDto(IContent entity, Guid objectType)
+        public static DocumentDto BuildDto(IContent entity, Guid objectType, ILanguageRepository languageRepository)
         {
             var contentDto = BuildContentDto(entity, objectType);
 
@@ -165,12 +177,26 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 Published = entity.Published,
-                ReleaseDate = entity.ReleaseDate,
-                ExpiresDate = entity.ExpireDate,
-
                 ContentDto = contentDto,
                 DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto)
             };
+
+            var schedule = new List<ContentScheduleDto>();
+            foreach(var schedByCulture in entity.ContentSchedule.GetFullSchedule())
+            {
+                foreach(var cultureSched in schedByCulture.Value)
+                {
+                    schedule.Add(new ContentScheduleDto
+                    {
+                        Action = cultureSched.Change.ToString(),
+                        Date = cultureSched.Date,
+                        NodeId = entity.Id,
+                        LanguageId = languageRepository.GetIdByIsoCode(schedByCulture.Key),
+                        Id = cultureSched.Id
+                    });
+                }
+            }
+            dto.ContentSchedule = schedule;
 
             return dto;
         }

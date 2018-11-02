@@ -749,8 +749,11 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-                return _documentRepository.Get(query);
+
+                //fixme - need to get the DB updated to query for this
+                //var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
+                //return _documentRepository.Get(query);
+                throw new NotImplementedException("Implement GetContentForExpiration");
             }
         }
 
@@ -763,8 +766,11 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-                return _documentRepository.Get(query);
+
+                //fixme - need to get the DB updated to query for this
+                //var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+                //return _documentRepository.Get(query);
+                throw new NotImplementedException("Implement GetContentForRelease");
             }
         }
 
@@ -1241,7 +1247,10 @@ namespace Umbraco.Core.Services.Implement
                     PublishResult result;
                     try
                     {
-                        d.ReleaseDate = null;
+                        //d.ReleaseDate = null;
+                        //fixme - need to clear this particular schedule for this item
+                        throw new NotImplementedException("Implement PerformScheduledPublish");
+
                         d.PublishCulture(); // fixme variants?
                         result = SaveAndPublish(d, userId: d.WriterId);
                         if (result.Success == false)
@@ -1258,7 +1267,10 @@ namespace Umbraco.Core.Services.Implement
                 {
                     try
                     {
-                        d.ExpireDate = null;
+                        //d.ExpireDate = null;
+                        //fixme - need to clear this particular schedule for this item
+                        throw new NotImplementedException("Implement PerformScheduledPublish");
+
                         var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -2328,14 +2340,17 @@ namespace Umbraco.Core.Services.Implement
             if (attempt.Success == false)
                 return attempt;
 
-            // if the document has a release date set to before now,
-            // it should be removed so it doesn't interrupt an unpublish
+            // if the document has any release dates set to before now,
+            // they should be removed so they don't interrupt an unpublish
             // otherwise it would remain released == published
-            if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
-            {
-                content.ReleaseDate = null;
+
+            var pastReleases = content.ContentSchedule.GetFullSchedule().SelectMany(x => x.Value)
+                .Where(x => x.Change == ContentScheduleChange.End && x.Date <= DateTime.Now)
+                .ToList();
+            foreach (var p in pastReleases)
+                content.ContentSchedule.Remove(p);                
+            if(pastReleases.Count > 0)
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
-            }
 
             // change state to unpublishing
             ((Content) content).PublishedState = PublishedState.Unpublishing;

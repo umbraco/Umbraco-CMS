@@ -260,11 +260,11 @@ namespace Umbraco.Tests.Services
             // Act
             var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
 
-            content.ReleaseDate = DateTime.Now.AddHours(2);
+            content.ContentSchedule.Add(null, DateTime.Now.AddHours(2));
             contentService.Save(content, 0);
 
             content = contentService.GetById(content.Id);
-            content.ReleaseDate = null;
+            content.ContentSchedule.Clear(ContentScheduleChange.End);
             contentService.Save(content, 0);
 
 
@@ -1164,7 +1164,7 @@ namespace Umbraco.Tests.Services
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
             contentService.SaveAndPublish(root);
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
-            content.ExpireDate = DateTime.Now.AddSeconds(1);
+            content.ContentSchedule.Add(null, DateTime.Now.AddSeconds(1));
             contentService.SaveAndPublish(content);
 
             // Act
@@ -1504,7 +1504,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4); //This Content expired 5min ago
-            content.ExpireDate = DateTime.Now.AddMinutes(-5);
+            content.ContentSchedule.Add(null, DateTime.Now.AddMinutes(-5));
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
@@ -1527,7 +1527,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 3);
-            content.ReleaseDate = DateTime.Now.AddHours(2);
+            content.ContentSchedule.Add(null, DateTime.Now.AddHours(2));
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);

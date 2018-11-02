@@ -277,7 +277,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId, LanguageRepository);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -363,6 +363,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             dto.NodeId = nodeDto.NodeId;
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
+
+            //insert the schedule
+            foreach(var c in dto.ContentSchedule)
+            {
+                Database.Insert(c);
+            }
 
             // persist the variations
             if (content.ContentType.VariesByCulture())
@@ -474,7 +480,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId, LanguageRepository);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -581,6 +587,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 dto.Published = false;
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Update(dto);
+
+            //update the schedule, get the existing one so we know what to update
+            var existingSched = Database.Fetch<int>(Sql()
+                .Select<ContentScheduleDto>(x => x.Id)
+                .Where<ContentScheduleDto>(x => x.NodeId == content.Id));
+            //remove any that no longer exist
+            var schedToRemove = existingSched.Except(dto.ContentSchedule.Select(x => x.Id));
+            foreach(var c in schedToRemove)
+                Database.DeleteWhere<ContentScheduleDto>("id = @id", new { id = c });
+            //add/update the rest
+            foreach (var c in dto.ContentSchedule)
+            {
+                if (c.Id == 0)
+                    Database.Insert(c);
+                else
+                    Database.Update(c);
+            }
 
             // if entity is publishing, update tags, else leave tags there
             // means that implicitely unpublished, or trashed, entities *still* have tags in db
@@ -952,7 +975,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
                     contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
 
-                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType, LanguageRepository);
 
                 if (!slim)
                 {
@@ -1024,7 +1047,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IContent MapDtoToContent(DocumentDto dto)
         {
             var contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            var content = ContentBaseFactory.BuildEntity(dto, contentType);
+            var content = ContentBaseFactory.BuildEntity(dto, contentType, LanguageRepository);
 
             // get template
             if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)

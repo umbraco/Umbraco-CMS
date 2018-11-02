@@ -40,7 +40,10 @@ namespace Umbraco.Core.Publishing
             {
                 try
                 {
-                    d.ReleaseDate = null;
+                    throw new NotImplementedException("implement scheduled publishing");
+                    //d.ReleaseDate = null;
+                    //fixme - need to clear this particular schedule for this item
+
                     d.PublishCulture(); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
                     _logger.Debug<ContentService>("Result of publish attempt: {PublishResult}", result.Result);
@@ -67,7 +70,10 @@ namespace Umbraco.Core.Publishing
             {
                 try
                 {
-                    d.ExpireDate = null;
+                    throw new NotImplementedException("implement scheduled publishing");
+                    //d.ExpireDate = null;
+                    //fixme - need to clear this particular schedule for this item
+
                     var result = _contentService.Unpublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
                     if (result.Success)
                     {

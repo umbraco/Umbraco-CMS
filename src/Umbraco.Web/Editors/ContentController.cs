@@ -1425,8 +1425,8 @@ namespace Umbraco.Web.Editors
 
             //TODO: We need to support 'send to publish'
 
-            contentSave.PersistedContent.ExpireDate = contentSave.ExpireDate;
-            contentSave.PersistedContent.ReleaseDate = contentSave.ReleaseDate;
+            //fixme - deal with variants too
+            contentSave.PersistedContent.ContentSchedule.Add(contentSave.ExpireDate, contentSave.ReleaseDate);
 
             //only set the template if it didn't change
             var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)

@@ -366,6 +366,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\TablesForScheduledPublishing.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
@@ -376,6 +377,9 @@
     <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
+    <Compile Include="Models\ContentSchedule.cs" />
+    <Compile Include="Models\ContentScheduleChange.cs" />
+    <Compile Include="Models\ContentScheduleCollection.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\ContentCultureInfos.cs" />
@@ -409,6 +413,7 @@
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
+    <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\DocumentCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\MediaDto.cs" />

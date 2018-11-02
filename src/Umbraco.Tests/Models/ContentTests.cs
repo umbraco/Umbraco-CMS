@@ -228,11 +228,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
@@ -287,11 +286,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
@@ -326,11 +324,11 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.ContentTypeId, content.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, content.CreateDate);
             Assert.AreEqual(clone.CreatorId, content.CreatorId);
-            Assert.AreEqual(clone.ExpireDate, content.ExpireDate);
             Assert.AreEqual(clone.Key, content.Key);
             Assert.AreEqual(clone.Level, content.Level);
             Assert.AreEqual(clone.Path, content.Path);
-            Assert.AreEqual(clone.ReleaseDate, content.ReleaseDate);
+            //fixme: Need to maybe override equals or determine another way of comparing these
+            Assert.AreEqual(clone.ContentSchedule, content.ContentSchedule);
             Assert.AreEqual(clone.Published, content.Published);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
@@ -386,11 +384,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")

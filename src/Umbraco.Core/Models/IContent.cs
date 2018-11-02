@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Represents a document.
     /// </summary>
@@ -11,6 +12,11 @@ namespace Umbraco.Core.Models
     /// </remarks>
     public interface IContent : IContentBase
     {
+        /// <summary>
+        /// Gets or sets the content schedule
+        /// </summary>
+        ContentScheduleCollection ContentSchedule { get; set; }
+
         /// <summary>
         /// Gets or sets the template used to render the content.
         /// </summary>
@@ -59,16 +65,6 @@ namespace Umbraco.Core.Models
         /// Gets the date and time the content was published.
         /// </summary>
         DateTime? PublishDate { get; }
-
-        /// <summary>
-        /// Gets or sets the date and time the content item should be published.
-        /// </summary>
-        DateTime? ReleaseDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time the content should be unpublished.
-        /// </summary>
-        DateTime? ExpireDate { get; set; }
 
         /// <summary>
         /// Gets the content type of this content.
