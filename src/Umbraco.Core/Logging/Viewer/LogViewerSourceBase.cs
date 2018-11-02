@@ -74,21 +74,21 @@ namespace Umbraco.Core.Logging.Viewer
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var errorCounter = new ErrorCounterFilter();
-            GetLogs(DateTime.Now, DateTime.Now, errorCounter, 0, int.MaxValue);
+            GetLogs(startDate, endDate, errorCounter, 0, int.MaxValue);
             return errorCounter.count;
         }
 
         public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var counter = new CountingFilter();
-            GetLogs(DateTime.Now, DateTime.Now, counter, 0, int.MaxValue);
+            GetLogs(startDate, endDate, counter, 0, int.MaxValue);
             return counter.Counts;
         }
 
         public IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var messageTemplates = new MessageTemplateFilter();
-            GetLogs(DateTime.Now, DateTime.Now, messageTemplates, 0, int.MaxValue);
+            GetLogs(startDate, endDate, messageTemplates, 0, int.MaxValue);
 
             var templates = messageTemplates.counts.
                 Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Logging.Viewer
             string[] logLevels = null)
         {
             var expression = new ExpressionFilter(filterExpression);
-            var filteredLogs = GetLogs(DateTime.Now, DateTime.Now, expression, 0, int.MaxValue);
+            var filteredLogs = GetLogs(startDate, endDate, expression, 0, int.MaxValue);
             
             //This is user used the checkbox UI to toggle which log levels they wish to see
             //If an empty array - its implied all levels to be viewed
