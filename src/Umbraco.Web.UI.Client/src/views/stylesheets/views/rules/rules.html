@@ -1,50 +1,46 @@
 <umb-box>
     <umb-box-content>
-        <div class="sub-view-columns">
-            <div class="sub-view-column-left">
-                <h5><localize key="stylesheet_editorRules">Rich text editor styles</localize></h5>
-                <small><localize key="stylesheet_editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</localize></small>
-            </div>
-            <div class="sub-view-column-right">
-                <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
-                    <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
-                        <div class="umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules">
-                            <i class="icon icon-navigation handle"></i>
-                            <div class="umb-stylesheet-rules__left">
-                                <div class="control-group">
-                                    <label class="control-label" for="name_{{$index}}">
-                                        <localize key="general_name">Name</localize>
-                                        <small><localize key="stylesheet_nameHelp">Name to identify the style property in the rich text editor</localize></small>
-                                    </label>
-                                    <div class="controls">
-                                        <input type="text" ng-model="rule.name" id="name_{{$index}}" required />
-                                    </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label" for="selector_{{$index}}">
-                                        <localize key="stylesheet_selector">Selector</localize>
-                                        <small><localize key="stylesheet_selectorHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</localize></small>
-                                    </label>
-                                    <div class="controls">
-                                        <input type="text" ng-model="rule.selector" id="selector_{{$index}}" required />
-                                    </div>
-                                </div>
-                                <div class="control-group">
-                                    <label class="control-label" for="styles_{{$index}}">
-                                        <localize key="stylesheet_styles">Styles</localize>
-                                    </label>
-                                    <div class="controls">
-                                        <textarea ng-model="rule.styles" id="styles_{{$index}}" required></textarea>
-                                    </div>
-                                </div>
+        <h5><localize key="stylesheet_editorRules">Rich text editor styles</localize></h5>
+        <small><localize key="stylesheet_editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</localize></small>
+        <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
+            <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
+                <div class="umb-stylesheet-rules__listitem" ng-repeat="rule in model.stylesheet.rules">
+                    <i class="icon icon-navigation handle"></i>
+                    <div class="umb-stylesheet-rules__left">
+                        <div class="control-group">
+                            <label class="control-label" for="name_{{$index}}">
+                                <localize key="general_name">Name</localize>
+                                <small><localize key="stylesheet_nameHelp">Name to identify the style property in the rich text editor</localize></small>
+                            </label>
+                            <div class="controls">
+                                <input type="text" ng-model="rule.name" id="name_{{$index}}" required />
                             </div>
-                            <div class="umb-stylesheet-rules__right">
-                                <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(rule, $event)"><localize key="general_remove">Remove</localize></a>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="selector_{{$index}}">
+                                <localize key="stylesheet_selector">Selector</localize>
+                                <small><localize key="stylesheet_selectorHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</localize></small>
+                            </label>
+                            <div class="controls">
+                                <input type="text" ng-model="rule.selector" id="selector_{{$index}}" required />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="styles_{{$index}}">
+                                <localize key="stylesheet_styles">Styles</localize>
+                            </label>
+                            <div class="controls">
+                                <textarea ng-model="rule.styles" id="styles_{{$index}}" required></textarea>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-info" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+                    <div class="umb-stylesheet-rules__right">
+                        <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(rule, $event)"><localize key="general_remove">Remove</localize></a>
+                    </div>
                 </div>
+            </div>
+            <div class="text-right">
+                <button class="btn btn-info" ng-click="add($event)"><localize key="general_add">Add</localize></button>
             </div>
         </div>
     </umb-box-content>
