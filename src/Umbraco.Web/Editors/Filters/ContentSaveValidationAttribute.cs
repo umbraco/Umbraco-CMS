@@ -9,11 +9,12 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
-using Umbraco.Web._Legacy.Actions;
+
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -94,24 +95,24 @@ namespace Umbraco.Web.Editors.Filters
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.Publish:
-                    permissionToCheck.Add(ActionPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SendPublish:
-                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SaveNew:
                     //Save new requires ActionNew
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {
@@ -126,8 +127,8 @@ namespace Umbraco.Web.Editors.Filters
                 case ContentSaveAction.SendPublishNew:
                     //Send new requires both ActionToPublish AND ActionNew
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
@@ -142,8 +143,8 @@ namespace Umbraco.Web.Editors.Filters
                     //Publish new requires both ActionNew AND ActionPublish
                     //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {

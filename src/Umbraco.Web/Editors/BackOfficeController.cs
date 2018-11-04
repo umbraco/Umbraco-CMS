@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using LightInject;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -22,18 +19,13 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-
-using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
-using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
 
@@ -197,11 +189,8 @@ namespace Umbraco.Web.Editors
         {
             var initJs = new JsInitialization(_manifestParser);
             var initCss = new CssInitialization(_manifestParser);
-
-            //get the legacy ActionJs file references to append as well
-            var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
-
-            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
             var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
@@ -519,50 +508,7 @@ namespace Umbraco.Web.Editors
             }
             return true;
         }
-
-        internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
-        {
-            var blockList = new List<string>();
-            var urlList = new List<string>();
-            foreach (var jsFile in values)
-            {
-                var isJsPath = jsFile.DetectIsJavaScriptPath();
-                if (isJsPath.Success)
-
-                {
-                    urlList.Add(isJsPath.Result);
-                }
-                else
-                {
-                    blockList.Add(isJsPath.Result);
-                }
-            }
-
-            switch (type)
-            {
-                case LegacyJsActionType.JsBlock:
-                    return blockList;
-                case LegacyJsActionType.JsUrl:
-                    return urlList;
-            }
-
-            return blockList;
-        }
-
-        /// <summary>
-        /// Renders out all JavaScript references that have been declared in IActions
-        /// </summary>
-        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
-        {
-            return GetLegacyActionJsForActions(type, Action.GetJavaScriptFileReferences());
-        }
-
-        internal enum LegacyJsActionType
-        {
-            JsBlock,
-            JsUrl
-        }
-
+        
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

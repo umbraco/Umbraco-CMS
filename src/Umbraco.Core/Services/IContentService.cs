@@ -79,24 +79,9 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Gets documents of a given document type.
-        /// </summary>
-        IEnumerable<IContent> GetByType(int documentTypeId);
-
-        /// <summary>
         /// Gets documents at a given level.
         /// </summary>
         IEnumerable<IContent> GetByLevel(int level);
-
-        /// <summary>
-        /// Gets child documents of a given parent.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId);
-
-        /// <summary>
-        /// Gets child documents of a document, (partially) matching a name.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId, string name);
 
         /// <summary>
         /// Gets the parent of a document.
@@ -117,16 +102,6 @@ namespace Umbraco.Core.Services
         /// Gets ancestor documents of a document.
         /// </summary>
         IEnumerable<IContent> GetAncestors(IContent content);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(int id);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(IContent content);
 
         /// <summary>
         /// Gets all versions of a document.
@@ -169,19 +144,8 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets documents in the recycle bin.
         /// </summary>
-        IEnumerable<IContent> GetContentInRecycleBin();
-
-        /// <summary>
-        /// Gets child documents of a parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
+        IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets child documents of a parent.
@@ -193,20 +157,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets descendant documents of a given parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
-        /// <param name="filter">Search text filter.</param>
-        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -220,7 +171,31 @@ namespace Umbraco.Core.Services
         /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
         /// <param name="filter">Query filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+            IQuery<IContent> filter = null, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents of a content content
+        /// </summary>
+        /// <param name="contentTypeId">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents for specified content types
+        /// </summary>
+        /// <param name="contentTypeIds">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.

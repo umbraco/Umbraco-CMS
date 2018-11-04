@@ -69,11 +69,15 @@ namespace Umbraco.Tests.Services
             }
 
             long total;
-            var result = ServiceContext.MediaService.GetPagedChildren(-1, 0, 11, out total, "SortOrder", Direction.Ascending, true, null, new[] { mediaType1.Id, mediaType2.Id });
+            var result = ServiceContext.MediaService.GetPagedChildren(-1, 0, 11, out total,
+                SqlContext.Query<IMedia>().Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                Ordering.By("SortOrder", Direction.Ascending));
             Assert.AreEqual(11, result.Count());
             Assert.AreEqual(20, total);
 
-            result = ServiceContext.MediaService.GetPagedChildren(-1, 1, 11, out total, "SortOrder", Direction.Ascending, true, null, new[] { mediaType1.Id, mediaType2.Id });
+            result = ServiceContext.MediaService.GetPagedChildren(-1, 1, 11, out total,
+                SqlContext.Query<IMedia>().Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                Ordering.By("SortOrder", Direction.Ascending));
             Assert.AreEqual(9, result.Count());
             Assert.AreEqual(20, total);
         }
