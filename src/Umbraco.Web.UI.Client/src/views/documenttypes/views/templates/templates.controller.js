@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor templates sub view
  */
-(function() {
+(function () {
     'use strict';
 
     function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, $routeParams) {
@@ -16,33 +16,35 @@
         var vm = this;
 
         vm.availableTemplates = [];
+        vm.canCreateTemplate = false;
         vm.updateTemplatePlaceholder = false;
 
+        vm.createTemplate = createTemplate;
 
         /* ---------- INIT ---------- */
 
-        init(function () {
+        function onInit() {
 
-            // update placeholder template information on new doc types
-            if (!$routeParams.notemplate && $scope.model.id === 0) {
-                vm.updateTemplatePlaceholder = true;
-                vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
-            }
-        });
-
-        function init(callback) {
-
-            entityResource.getAll("Template").then(function(templates){
+            entityResource.getAll("Template").then(function (templates) {
 
                 vm.availableTemplates = templates;
 
-                callback();
+                // update placeholder template information on new doc types
+                if (!$routeParams.notemplate && $scope.model.id === 0) {
+                    vm.updateTemplatePlaceholder = true;
+                    vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
+                }
+
+                checkIfTemplateExists();
 
             });
 
         }
 
-        vm.createTemplate = function () {
+        function createTemplate() {
+
+            vm.createTemplateButtonState = "busy";
+
             templateResource.getScaffold(-1).then(function (template) {
 
                 template.alias = $scope.model.alias;
@@ -50,23 +52,38 @@
 
                 templateResource.save(template).then(function (savedTemplate) {
 
-                    init(function () {
+                    // add icon
+                    savedTemplate.icon = "icon-layout";
+                    
+                    vm.availableTemplates.push(savedTemplate);
+                    vm.canCreateTemplate = false;
 
-                        var newTemplate = vm.availableTemplates.filter(function (t) { return t.id === savedTemplate.id });
-                        if (newTemplate.length > 0) {
-                            $scope.model.allowedTemplates.push(newTemplate[0]);
+                    $scope.model.allowedTemplates.push(savedTemplate);
 
-                            if ($scope.model.defaultTemplate === null) {
-                                $scope.model.defaultTemplate = newTemplate[0];
-                            }
-                        }
+                    if ($scope.model.defaultTemplate === null) {
+                        $scope.model.defaultTemplate = savedTemplate;
+                    }
 
-                    });
+                    vm.createTemplateButtonState = "success";
 
+                }, function() {
+                    vm.createTemplateButtonState = "error";
                 });
 
+            }, function() {
+                vm.createTemplateButtonState = "error";
             });
+        };
+
+        function checkIfTemplateExists() {
+            var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
+                return (availableTemplate.name === $scope.model.name || availableTemplate.placeholder);
+            });
+
+            vm.canCreateTemplate = existingTemplate ? false : true;
         }
+
+        onInit();
 
     }
 
