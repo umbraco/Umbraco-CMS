@@ -77,7 +77,7 @@
 
         function checkIfTemplateExists() {
             var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
-                return availableTemplate.name === $scope.model.name;
+                return (availableTemplate.name === $scope.model.name || availableTemplate.placeholder);
             });
 
             vm.canCreateTemplate = existingTemplate ? false : true;
