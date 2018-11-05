@@ -29,7 +29,7 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any templates
-            root.HasChildren = Services.MacroService.GetAll().Any();
+            root.HasChildren = Services.FileService.GetTemplates(-1).Any();
             return root;
         }
 
