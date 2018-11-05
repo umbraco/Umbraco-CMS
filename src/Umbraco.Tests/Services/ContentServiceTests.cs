@@ -260,11 +260,17 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, Constants.Security.SuperUserId);
 
             content = contentService.GetById(content.Id);
+            var sched = content.ContentSchedule.GetFullSchedule();
+            Assert.AreEqual(1, sched.Count());
+            Assert.AreEqual(1, sched[string.Empty].Count());
             content.ContentSchedule.Clear(ContentScheduleChange.End);
             contentService.Save(content, Constants.Security.SuperUserId);
 
 
             // Assert
+            content = contentService.GetById(content.Id);
+            sched = content.ContentSchedule.GetFullSchedule();
+            Assert.AreEqual(0, sched.Count());
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
 

@@ -22,6 +22,7 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
+
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {

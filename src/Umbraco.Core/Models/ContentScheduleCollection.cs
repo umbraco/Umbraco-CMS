@@ -2,13 +2,21 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Umbraco.Core.Models
 {
-    public class ContentScheduleCollection
+    public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable
     {
         //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date
         private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule = new Dictionary<string, SortedList<DateTime, ContentSchedule>>();
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+        {
+            CollectionChanged?.Invoke(this, args);
+        }
 
         /// <summary>
         /// Add an existing schedule
@@ -24,6 +32,8 @@ namespace Umbraco.Core.Models
 
             //TODO: Below will throw if there are duplicate dates added, validate/return bool?
             changes.Add(schedule.Date, schedule);
+
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, schedule));
         }
 
         /// <summary>
@@ -62,9 +72,20 @@ namespace Umbraco.Core.Models
             // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
 
             if (releaseDate.HasValue)
-                changes.Add(releaseDate.Value, new ContentSchedule(0, culture, releaseDate.Value, ContentScheduleChange.Start));
+            {
+                var entry = new ContentSchedule(0, culture, releaseDate.Value, ContentScheduleChange.Start);
+                changes.Add(releaseDate.Value, entry);
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
+            }
+                
             if (expireDate.HasValue)
-                changes.Add(expireDate.Value, new ContentSchedule(0, culture, expireDate.Value, ContentScheduleChange.End));
+            {
+                var entry = new ContentSchedule(0, culture, expireDate.Value, ContentScheduleChange.End);
+                changes.Add(expireDate.Value, entry);
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
+            }
+                
+
             
         }
 
@@ -76,7 +97,14 @@ namespace Umbraco.Core.Models
         {
             if (_schedule.TryGetValue(change.Culture, out var s))
             {
-                s.Remove(change.Date);
+                var removed = s.Remove(change.Date);
+                if (removed)
+                {
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, change));
+                    if (s.Count == 0)
+                        _schedule.Remove(change.Culture);
+                }
+                    
             }
         }
 
@@ -99,7 +127,16 @@ namespace Umbraco.Core.Models
             if (_schedule.TryGetValue(culture, out var s))
             {
                 foreach (var ofChange in s.Where(x => x.Value.Change == changeType).ToList())
-                    s.Remove(ofChange.Value.Date);
+                {
+                    var removed = s.Remove(ofChange.Value.Date);
+                    if (removed)
+                    {
+                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ofChange.Value));
+                        if (s.Count == 0)
+                            _schedule.Remove(culture);
+                    }   
+                }
+                    
             }
         }
 
@@ -131,6 +168,19 @@ namespace Umbraco.Core.Models
         public IReadOnlyDictionary<string, IEnumerable<ContentSchedule>> GetFullSchedule()
         {
             return _schedule.ToDictionary(x => x.Key, x => (IEnumerable<ContentSchedule>)x.Value.Values);
+        }
+
+        public object DeepClone()
+        {
+            var clone = new ContentScheduleCollection();
+            foreach(var cultureSched in _schedule)
+            {
+                var list = new SortedList<DateTime, ContentSchedule>();
+                foreach (var schedEntry in cultureSched.Value)
+                    list.Add(schedEntry.Key, (ContentSchedule)schedEntry.Value.DeepClone());
+                clone._schedule[cultureSched.Key] = list;
+            }
+            return clone;
         }
     }
 }

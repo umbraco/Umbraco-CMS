@@ -92,10 +92,36 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        [DoNotClone]
         public ContentScheduleCollection ContentSchedule
         {
-            get => _schedule ?? (_schedule = new ContentScheduleCollection());
-            set => SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
+            get
+            {
+                if (_schedule == null)
+                {
+                    _schedule = new ContentScheduleCollection();
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+                }
+                return _schedule ?? (_schedule = new ContentScheduleCollection());
+            }
+            set
+            {
+                if(_schedule != null)
+                    _schedule.CollectionChanged -= ScheduleCollectionChanged;
+                SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
+                if (_schedule != null)
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Collection changed event handler to ensure the schedule field is set to dirty when the schedule changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(Ps.Value.ContentScheduleSelector);
         }
 
         /// <summary>
@@ -125,13 +151,13 @@ namespace Umbraco.Core.Models
                     return ContentStatus.Trashed;
 
                 //fixme - deal with variants
-                var expires = ContentSchedule.GetSchedule(ContentScheduleChange.End).FirstOrDefault();
-                if (expires != null && expires.Date > DateTime.MinValue && DateTime.Now > expires.Date)
+                var expires = ContentSchedule.GetSchedule(ContentScheduleChange.End);
+                if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
                     return ContentStatus.Expired;
 
                 //fixme - deal with variants
-                var release = ContentSchedule.GetSchedule(ContentScheduleChange.Start).FirstOrDefault();
-                if (release != null && release.Date > DateTime.MinValue && release.Date > DateTime.Now)
+                var release = ContentSchedule.GetSchedule(ContentScheduleChange.Start);
+                if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
                     return ContentStatus.AwaitingRelease;
 
                 if(Published)
@@ -506,6 +532,14 @@ namespace Umbraco.Core.Models
                 clone._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
                 clone._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
                 clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;    //re-assign correct event handler
+            }
+
+            //if properties exist then deal with event bindings
+            if (clone._schedule != null)
+            {
+                clone._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
+                clone._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
+                clone._schedule.CollectionChanged += clone.ScheduleCollectionChanged;   //re-assign correct event handler
             }
 
             //re-enable tracking

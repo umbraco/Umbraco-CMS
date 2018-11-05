@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class ContentSchedule
+    public class ContentSchedule : IDeepCloneable
     {
         public ContentSchedule(int id, string culture, DateTime date, ContentScheduleChange change)
         {
@@ -45,5 +45,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         public ContentScheduleChange Change { get; }
+
+        public object DeepClone()
+        {
+            return new ContentSchedule(Id, Culture, Date, Change);
+        }
     }
 }

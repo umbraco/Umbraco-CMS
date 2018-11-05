@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
-        public static Content BuildEntity(DocumentDto dto, IContentType contentType, ILanguageRepository languageRepository )
+        public static Content BuildEntity(DocumentDto dto, IContentType contentType)
         {
             var contentDto = dto.ContentDto;
             var nodeDto = contentDto.NodeDto;
@@ -48,18 +48,6 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Published = dto.Published;
                 content.Edited = dto.Edited;
-
-                var schedule = new ContentScheduleCollection();
-                foreach(var entry in dto.ContentSchedule ?? Enumerable.Empty<ContentScheduleDto>())
-                {
-                    schedule.Add(new ContentSchedule(entry.Id,
-                                languageRepository.GetIsoCodeById(entry.LanguageId),
-                                entry.Date,
-                                entry.Action == ContentScheduleChange.Start.ToString()
-                                    ? ContentScheduleChange.Start
-                                    : ContentScheduleChange.End));
-                }
-                content.ContentSchedule = schedule;
 
                 // fixme - shall we get published infos or not?
                 //if (dto.Published)
@@ -170,7 +158,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds a dto from an IContent item.
         /// </summary>
-        public static DocumentDto BuildDto(IContent entity, Guid objectType, ILanguageRepository languageRepository)
+        public static DocumentDto BuildDto(IContent entity, Guid objectType)
         {
             var contentDto = BuildContentDto(entity, objectType);
 
@@ -182,10 +170,15 @@ namespace Umbraco.Core.Persistence.Factories
                 DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto)
             };
 
+            return dto;
+        }
+
+        public static IEnumerable<ContentScheduleDto> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
+        {
             var schedule = new List<ContentScheduleDto>();
-            foreach(var schedByCulture in entity.ContentSchedule.GetFullSchedule())
+            foreach (var schedByCulture in entity.ContentSchedule.GetFullSchedule())
             {
-                foreach(var cultureSched in schedByCulture.Value)
+                foreach (var cultureSched in schedByCulture.Value)
                 {
                     schedule.Add(new ContentScheduleDto
                     {
@@ -197,9 +190,7 @@ namespace Umbraco.Core.Persistence.Factories
                     });
                 }
             }
-            dto.ContentSchedule = schedule;
-
-            return dto;
+            return schedule;
         }
 
         /// <summary>

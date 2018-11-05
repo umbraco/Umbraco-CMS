@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
                            r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
 
-                        // select the variant name, coalesce to the invariant name, as "variantName"
+                       // select the variant name, coalesce to the invariant name, as "variantName"
                        .AndSelect(VariantNameSqlExpression + " AS variantName");
                     break;
             }
@@ -143,11 +143,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
                     .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
 
+                //fixme - should we be joining this when the query type is not single/many?
                 // left join on optional culture variation
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
                 .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv") 
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
+                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
+                    .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
 
             sql
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
@@ -261,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // however, it's not just so we have access to AddingEntity
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
-            var content = (Content) entity;
+            var content = (Content)entity;
 
             content.AddingEntity();
             var publishing = content.PublishedState == PublishedState.Publishing;
@@ -278,7 +279,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId, LanguageRepository);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -366,7 +367,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             //insert the schedule
-            foreach(var c in dto.ContentSchedule)
+            var scheduleDto = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
+            foreach (var c in scheduleDto)
             {
                 c.NodeId = nodeDto.NodeId;
                 Database.Insert(c);
@@ -442,10 +444,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // however, it's not just so we have access to AddingEntity
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
-            var content = (Content) entity;
+            var content = (Content)entity;
 
             // check if we need to make any database changes at all
-            if ((content.PublishedState == PublishedState.Published || content.PublishedState == PublishedState.Unpublished) && !content.IsEntityDirty() && !content.IsAnyUserPropertyDirty())
+            if ((content.PublishedState == PublishedState.Published || content.PublishedState == PublishedState.Unpublished)
+                    && !content.IsEntityDirty() && !content.IsAnyUserPropertyDirty())
                 return; // no change to save, do nothing, don't even update dates
 
             // whatever we do, we must check that we are saving the current version
@@ -482,7 +485,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId, LanguageRepository);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -590,22 +593,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Update(dto);
 
-            //update the schedule, get the existing one so we know what to update
-            var existingSched = Database.Fetch<int>(Sql()
-                .Select<ContentScheduleDto>(x => x.Id)
-                .From<ContentScheduleDto>()
-                .Where<ContentScheduleDto>(x => x.NodeId == content.Id));
-            //remove any that no longer exist
-            var schedToRemove = existingSched.Except(dto.ContentSchedule.Select(x => x.Id));
-            foreach(var c in schedToRemove)
-                Database.DeleteWhere<ContentScheduleDto>("id = @id", new { id = c });
-            //add/update the rest
-            foreach (var c in dto.ContentSchedule)
+            if (content.IsPropertyDirty("ContentSchedule"))
             {
-                if (c.Id == 0)
-                    Database.Insert(c);
-                else
-                    Database.Update(c);
+                //update the schedule, get the existing one so we know what to update
+                var dtoSchedule = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
+                var existingSched = Database.Fetch<int>(Sql()
+                    .Select<ContentScheduleDto>(x => x.Id)
+                    .From<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id));
+                //remove any that no longer exist
+                var schedToRemove = existingSched.Except(dtoSchedule.Select(x => x.Id));
+                foreach (var c in schedToRemove)
+                    Database.DeleteWhere<ContentScheduleDto>("id = @id", new { id = c });
+                //add/update the rest
+                foreach (var c in dtoSchedule)
+                {
+                    if (c.Id == 0)
+                        Database.Insert(c);
+                    else
+                        Database.Update(c);
+                }
             }
 
             // if entity is publishing, update tags, else leave tags there
@@ -760,7 +767,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var filterClause in filter.GetWhereClauses())
                 {
                     var clauseSql = filterClause.Item1;
-                    var clauseArgs  = filterClause.Item2;
+                    var clauseArgs = filterClause.Item2;
 
                     // replace the name field
                     // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
@@ -1011,7 +1018,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
-                        content[i] = (Content) cached;
+                        content[i] = (Content)cached;
                         continue;
                     }
                 }
@@ -1024,7 +1031,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
                     contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
 
-                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType, LanguageRepository);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
                 if (!slim)
                 {
@@ -1059,6 +1066,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // load all properties for all documents from database in 1 query - indexed by version id
                 var properties = GetPropertyCollections(temps);
+                var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
 
                 // assign templates and properties
                 foreach (var temp in temps)
@@ -1069,10 +1077,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
                         temp.Content.PublishTemplate = template;
 
-                if (properties.ContainsKey(temp.VersionId))
-                    temp.Content.Properties = properties[temp.VersionId];
-                else
-                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                    if (properties.ContainsKey(temp.VersionId))
+                        temp.Content.Properties = properties[temp.VersionId];
+                    else
+                        throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+
+                    //load in the schedule
+                    if (schedule.TryGetValue(temp.Content.Id, out var s))
+                        temp.Content.ContentSchedule = s;
 
                     // reset dirty initial properties (U4-1946)
                     temp.Content.ResetDirtyProperties(false);
@@ -1096,35 +1108,72 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IContent MapDtoToContent(DocumentDto dto)
         {
             var contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            var content = ContentBaseFactory.BuildEntity(dto, contentType, LanguageRepository);
+            var content = ContentBaseFactory.BuildEntity(dto, contentType);
 
-            // get template
-            if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                content.Template = _templateRepository.Get(dto.DocumentVersionDto.TemplateId.Value);
-
-            // get properties - indexed by version id
-            var versionId = dto.DocumentVersionDto.Id;
-
-            // fixme - shall we get published properties or not?
-            //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
-
-            var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
-            var ltemp = new List<TempContent<Content>> { temp };
-            var properties = GetPropertyCollections(ltemp);
-            content.Properties = properties[dto.DocumentVersionDto.Id];
-
-            // set variations, if varying
-            if (contentType.VariesByCulture())
+            try
             {
-                var contentVariations = GetContentVariations(ltemp);
-                var documentVariations = GetDocumentVariations(ltemp);
-                SetVariations(content, contentVariations, documentVariations);
-            }
+                content.DisableChangeTracking();
 
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
+                // get template
+                if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
+                    content.Template = _templateRepository.Get(dto.DocumentVersionDto.TemplateId.Value);
+
+                // get properties - indexed by version id
+                var versionId = dto.DocumentVersionDto.Id;
+
+                // fixme - shall we get published properties or not?
+                //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+                var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
+
+                var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
+                var ltemp = new List<TempContent<Content>> { temp };
+                var properties = GetPropertyCollections(ltemp);
+                content.Properties = properties[dto.DocumentVersionDto.Id];
+
+                // set variations, if varying
+                if (contentType.VariesByCulture())
+                {
+                    var contentVariations = GetContentVariations(ltemp);
+                    var documentVariations = GetDocumentVariations(ltemp);
+                    SetVariations(content, contentVariations, documentVariations);
+                }
+
+                //load in the schedule
+                var schedule = GetContentSchedule(dto.NodeId);
+                if (schedule.TryGetValue(dto.NodeId, out var s))
+                    content.ContentSchedule = s;
+
+                // reset dirty initial properties (U4-1946)
+                content.ResetDirtyProperties(false);
+                return content;
+            }
+            finally
+            {
+                content.EnableChangeTracking();
+            }
+        }
+
+        private IDictionary<int, ContentScheduleCollection> GetContentSchedule(params int[] contentIds)
+        {
+            var result = new Dictionary<int, ContentScheduleCollection>();
+            foreach(var ids in contentIds.InGroupsOf(2000))
+            {
+                var sql = Sql().Select<ContentScheduleDto>().From<ContentScheduleDto>().Where<ContentScheduleDto>(x => ids.Contains(x.NodeId));
+                var scheduleDto = Database.Fetch<ContentScheduleDto>(sql);
+
+                foreach (var dto in scheduleDto)
+                {
+                    var schedule = new ContentScheduleCollection();
+                    schedule.Add(new ContentSchedule(dto.Id,
+                                LanguageRepository.GetIsoCodeById(dto.LanguageId) ?? string.Empty,
+                                dto.Date,
+                                dto.Action == ContentScheduleChange.Start.ToString()
+                                    ? ContentScheduleChange.Start
+                                    : ContentScheduleChange.End));
+                    result[dto.NodeId] = schedule;
+                }
+            }
+            return result;
         }
 
         private void SetVariations(Content content, IDictionary<int, List<ContentVariation>> contentVariations, IDictionary<int, List<DocumentVariation>> documentVariations)

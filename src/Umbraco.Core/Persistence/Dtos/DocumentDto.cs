@@ -55,9 +55,6 @@ namespace Umbraco.Core.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
         public DocumentVersionDto PublishedVersionDto { get; set; }
-
-        [ResultColumn]
-        [Reference(ReferenceType.Many, ReferenceMemberName = "NodeId")]
-        public IEnumerable<ContentScheduleDto> ContentSchedule { get; set; }
+        
     }
 }
