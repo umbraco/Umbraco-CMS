@@ -19,25 +19,32 @@
         vm.canCreateTemplate = false;
         vm.updateTemplatePlaceholder = false;
 
+        vm.createTemplate = createTemplate;
 
         /* ---------- INIT ---------- */
 
-        init(function () {
+        function onInit() {
 
-            // update placeholder template information on new doc types
-            if (!$routeParams.notemplate && $scope.model.id === 0) {
-                vm.updateTemplatePlaceholder = true;
-                vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
-            }
-        });
+            entityResource.getAll("Template").then(function (templates) {
 
-        function init(callback) {
-            checkIfTemplateExists();
+                vm.availableTemplates = templates;
 
-            callback();
+                // update placeholder template information on new doc types
+                if (!$routeParams.notemplate && $scope.model.id === 0) {
+                    vm.updateTemplatePlaceholder = true;
+                    vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
+                }
+
+                checkIfTemplateExists();
+
+            });
+
         }
 
-        vm.createTemplate = function () {
+        function createTemplate() {
+
+            vm.createTemplateButtonState = "busy";
+
             templateResource.getScaffold(-1).then(function (template) {
 
                 template.alias = $scope.model.alias;
@@ -45,6 +52,9 @@
 
                 templateResource.save(template).then(function (savedTemplate) {
 
+                    // add icon
+                    savedTemplate.icon = "icon-layout";
+                    
                     vm.availableTemplates.push(savedTemplate);
                     vm.canCreateTemplate = false;
 
@@ -54,24 +64,26 @@
                         $scope.model.defaultTemplate = savedTemplate;
                     }
 
+                    vm.createTemplateButtonState = "success";
+
+                }, function() {
+                    vm.createTemplateButtonState = "error";
                 });
 
+            }, function() {
+                vm.createTemplateButtonState = "error";
             });
         };
 
         function checkIfTemplateExists() {
-            entityResource.getAll("Template").then(function (templates) {
-
-                vm.availableTemplates = templates;
-
-                var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
-                    return availableTemplate.name === $scope.model.name;
-                });
-
-                vm.canCreateTemplate = existingTemplate ? false : true;
-
+            var existingTemplate = vm.availableTemplates.find(function (availableTemplate) {
+                return availableTemplate.name === $scope.model.name;
             });
+
+            vm.canCreateTemplate = existingTemplate ? false : true;
         }
+
+        onInit();
 
     }
 
