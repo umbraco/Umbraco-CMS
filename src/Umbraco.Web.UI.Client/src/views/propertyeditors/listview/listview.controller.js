@@ -467,6 +467,8 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             function (total) {
                 var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
                 return localizationService.localize(key, [total]);
+            }).then(function(){
+                $scope.reloadView($scope.contentId);
             });
     }
 
@@ -521,6 +523,8 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             function (total) {
                 var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
                 return localizationService.localize(key, [total]);
+            }).then(function(){
+                $scope.reloadView($scope.contentId);
             });
     }
 
