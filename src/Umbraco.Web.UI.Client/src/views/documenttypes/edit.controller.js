@@ -302,8 +302,8 @@
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
         function saveInternal() {
 
-            // only save if there is no overlays open
-            if (overlayHelper.getNumberOfOverlays() === 0 && editorService.getNumberOfEditors() === 0) {
+            // only save if there are no dialogs open
+            if (overlayHelper.getNumberOfOverlays() === 0 && (editorService.getNumberOfEditors() === 0 || infiniteMode)) {
 
                 vm.page.saveButtonState = "busy";
 
