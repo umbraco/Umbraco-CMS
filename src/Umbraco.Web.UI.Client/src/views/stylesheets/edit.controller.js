@@ -4,7 +4,6 @@
     function StyleSheetsEditController($scope, $routeParams, $timeout, $http, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper, umbRequestHelper) {
 
         var vm = this;
-        var currentPosition = null;
 
         vm.page = {};
         vm.page.loading = true;
