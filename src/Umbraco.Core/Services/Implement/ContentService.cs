@@ -749,11 +749,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-
-                //fixme - need to get the DB updated to query for this
-                //var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-                //return _documentRepository.Get(query);
-                throw new NotImplementedException("Implement GetContentForExpiration");
+                return _documentRepository.GetContentForExpiration();
             }
         }
 
@@ -766,11 +762,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-
-                //fixme - need to get the DB updated to query for this
-                //var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-                //return _documentRepository.Get(query);
-                throw new NotImplementedException("Implement GetContentForRelease");
+                return _documentRepository.GetContentForRelease();
             }
         }
 

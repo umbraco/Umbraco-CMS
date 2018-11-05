@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate();
 
-            sql // fixme why?
+            sql // fixme why - this should be Path
                 .OrderBy<NodeDto>(x => x.Level)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
@@ -182,6 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var list = new List<string>
             {
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
@@ -319,7 +320,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
-            contentVersionDto.Text = content.Name;
+            contentVersionDto.Text = content.Name; //fixme is this requried? isn't this mapped in the ContentBaseFactory?
             Database.Insert(contentVersionDto);
             content.VersionId = contentVersionDto.Id;
 
@@ -367,6 +368,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //insert the schedule
             foreach(var c in dto.ContentSchedule)
             {
+                c.NodeId = nodeDto.NodeId;
                 Database.Insert(c);
             }
 
@@ -591,6 +593,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //update the schedule, get the existing one so we know what to update
             var existingSched = Database.Fetch<int>(Sql()
                 .Select<ContentScheduleDto>(x => x.Id)
+                .From<ContentScheduleDto>()
                 .Where<ContentScheduleDto>(x => x.NodeId == content.Id));
             //remove any that no longer exist
             var schedToRemove = existingSched.Except(dto.ContentSchedule.Select(x => x.Id));
@@ -888,6 +891,52 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 throw new WontImplementException();
             }
+        }
+
+        #endregion
+
+        #region Schedule
+
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetContentForRelease()
+        {
+            var sqlSchedule = Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x =>
+                    x.Action == ContentScheduleChange.Start.ToString()
+                    && x.LanguageId == null
+                    && x.Date <= DateTime.Now);
+
+            //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
+            // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
+            // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
+            // no time to investigate right now.
+            var scheduledIds = (IEnumerable<int>)Database.Fetch<int>(sqlSchedule);
+
+            var query = Query<IContent>().Where(x => x.Published == false && scheduledIds.Contains(x.Id));
+            return Get(query);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetContentForExpiration()
+        {
+            var sqlSchedule = Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x =>
+                    x.Action == ContentScheduleChange.End.ToString()
+                    && x.LanguageId == null
+                    && x.Date <= DateTime.Now);
+
+            //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
+            // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
+            // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
+            // no time to investigate right now.
+            var scheduledIds = (IEnumerable<int>)Database.Fetch<int>(sqlSchedule);
+
+            var query = Query<IContent>().Where(x => x.Published && scheduledIds.Contains(x.Id));
+            return Get(query);
         }
 
         #endregion

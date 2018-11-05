@@ -7,6 +7,20 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
+        //fixme support variants
+        /// <summary>
+        /// Gets a collection of <see cref="TEntity"/> objects, which has an expiration date less than or equal to today.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<IContent> GetContentForExpiration();
+
+        //fixme support variants
+        /// <summary>
+        /// Gets a collection of <see cref="TEntity"/> objects, which has a release date less than or equal to today.
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="TEntity"/> objects</returns>
+        IEnumerable<IContent> GetContentForRelease();
+
         /// <summary>
         /// Get the count of published items
         /// </summary>

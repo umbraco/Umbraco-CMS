@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Services
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1062
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-            subpage.ContentSchedule.Add(null, DateTime.Now.AddMinutes(-5));
+            subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
             ServiceContext.ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1063

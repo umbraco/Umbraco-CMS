@@ -121,7 +121,7 @@ namespace Umbraco.Core.Models
         {
             if (_schedule.TryGetValue(culture, out var changes))
                 return changeType == null ? changes.Values : changes.Values.Where(x => x.Change == changeType.Value);
-            return null;
+            return Enumerable.Empty<ContentSchedule>();
         }
 
         /// <summary>

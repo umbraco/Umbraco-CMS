@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Edited = dto.Edited;
 
                 var schedule = new ContentScheduleCollection();
-                foreach(var entry in dto.ContentSchedule)
+                foreach(var entry in dto.ContentSchedule ?? Enumerable.Empty<ContentScheduleDto>())
                 {
                     schedule.Add(new ContentSchedule(entry.Id,
                                 languageRepository.GetIsoCodeById(entry.LanguageId),
@@ -191,7 +192,7 @@ namespace Umbraco.Core.Persistence.Factories
                         Action = cultureSched.Change.ToString(),
                         Date = cultureSched.Date,
                         NodeId = entity.Id,
-                        LanguageId = languageRepository.GetIdByIsoCode(schedByCulture.Key),
+                        LanguageId = languageRepository.GetIdByIsoCode(schedByCulture.Key, false),
                         Id = cultureSched.Id
                     });
                 }
