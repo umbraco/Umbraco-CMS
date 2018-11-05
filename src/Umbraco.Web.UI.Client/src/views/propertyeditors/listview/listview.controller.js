@@ -373,35 +373,41 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     }
 
     $scope.delete = function () {
-        var confirmDeleteText = "";
 
-        localizationService.localize("defaultdialogs_confirmdelete")
-            .then(function (value) {
-                confirmDeleteText = value;
+        const dialog = {
+            view: "views/propertyeditors/listview/overlays/delete.html",
+            deletesVariants: selectionHasVariants(),
+            submitButtonLabelKey: "contentTypeEditor_yesDelete",
+            submit: function (model) {
+                performDelete();
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
 
-                var attempt =
-                    applySelected(
-                        function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-                        function (count, total) {
-                            var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
-                            return localizationService.localize(key, [count, total]);
-                        },
-                        function (total) {
-                            var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
-                            return localizationService.localize(key, [total]);
-                        },
-                        confirmDeleteText + "?");
-                if (attempt) {
-                    attempt.then(function () {
-                        //executes if all is successful, let's sync the tree
-                        var activeNode = appState.getTreeState("selectedNode");
-                        if (activeNode) {
-                            navigationService.reloadNode(activeNode);
-                        }
-                    });
-                }
-            });
+        localizationService.localize("general_delete").then(value => {
+            dialog.title = value;
+            overlayService.open(dialog);
+        });
+
     };
+
+    function performDelete() {
+        applySelected(
+            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+            function (count, total) {
+                var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
+                return localizationService.localize(key, [count, total]);
+            },
+            function (total) {
+                var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
+                return localizationService.localize(key, [total]);
+            }).then(function() {
+                $scope.reloadView($scope.contentId);
+            });
+    }
 
     function selectionHasVariants() {
         let variesByCulture = false;
