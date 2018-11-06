@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Models
             schedule.Add(now, null);
             var invariantSched = schedule.GetSchedule(string.Empty);
             schedule.Remove(invariantSched.First());
-            Assert.AreEqual(0, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(0, schedule.FullSchedule.Count());
         }
 
         [Test]
@@ -57,11 +57,11 @@ namespace Umbraco.Tests.Models
             var invariantSched = schedule.GetSchedule(string.Empty);
             schedule.Remove(invariantSched.First());
             Assert.AreEqual(0, schedule.GetSchedule(string.Empty).Count());
-            Assert.AreEqual(1, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(1, schedule.FullSchedule.Count());
             var variantSched = schedule.GetSchedule("en-US");
             schedule.Remove(variantSched.First());
             Assert.AreEqual(0, schedule.GetSchedule("en-US").Count());
-            Assert.AreEqual(0, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(0, schedule.FullSchedule.Count());
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Models
 
             Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleChange.Start).Count());
             Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.End).Count());
-            Assert.AreEqual(1, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(1, schedule.FullSchedule.Count());
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.Start).Count());
             Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.End).Count());
             Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.Start).Count());
-            Assert.AreEqual(2, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(2, schedule.FullSchedule.Count());
 
             schedule.Clear("en-US", ContentScheduleChange.End);
 
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.Start).Count());
             Assert.AreEqual(0, schedule.GetSchedule("en-US", ContentScheduleChange.End).Count());
             Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.Start).Count());
-            Assert.AreEqual(2, schedule.GetFullSchedule().Count());
+            Assert.AreEqual(2, schedule.FullSchedule.Count());
         }
 
     }

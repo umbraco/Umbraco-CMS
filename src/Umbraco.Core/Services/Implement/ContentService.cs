@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -1064,30 +1065,6 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                // is the content going to end up published, or unpublished?
-                if (publishing && content.ContentType.VariesByCulture())
-                {
-                    var publishedCultures = content.PublishedCultures.ToList();
-                    var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
-                    if (!cannotBePublished)
-                    {
-                        var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
-                        cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
-                    }
-
-                    if (cannotBePublished)
-                    {
-                        publishing = false;
-                        unpublishing = content.Published; // if not published yet, nothing to do
-
-                        // we may end up in a state where we won't publish nor unpublish
-                        // keep going, though, as we want to save anways
-                    }
-                    else
-                    {
-                        culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
-                    }
-                }
 
                 var isNew = !content.HasIdentity;
                 var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1107,12 +1084,30 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // ensure that the document can be published, and publish
                     // handling events, business rules, etc
-                    // note: StrategyPublish flips the PublishedState to Publishing!
                     publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, evtMsgs);
                     if (publishResult.Success)
-                        publishResult = StrategyPublish(scope, content, /*canPublish:*/ true, userId, evtMsgs);
-                    if (!publishResult.Success)
-                        ((Content) content).Published = content.Published; // reset published state = save unchanged
+                    {
+                        culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
+                        // note: StrategyPublish flips the PublishedState to Publishing!
+                        publishResult = StrategyPublish(scope, content, userId, evtMsgs);
+                    }   
+                    else
+                    {
+                        //check for mandatory culture missing, if this is the case we'll switch the
+                        //unpublishing flag
+                        //SD: this is the logic that was happening above but is now moved into the StrategyCanPublish
+                        if (publishResult.Result == PublishResultType.FailedMandatoryCultureMissing)
+                        {
+                            unpublishing = content.Published; // if not published yet, nothing to do
+
+                            // we may end up in a state where we won't publish nor unpublish
+                            // keep going, though, as we want to save anways
+                        }
+
+                        //fixme - casting
+                        ((Content)content).Published = content.Published; // reset published state = save unchanged
+                    }
+                        
                 }
 
                 if (unpublishing)
@@ -1129,9 +1124,12 @@ namespace Umbraco.Core.Services.Implement
                         // note: This unpublishes the entire document (not different variants)
                         unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                         if (unpublishResult.Success)
-                            unpublishResult = StrategyUnpublish(scope, content, true, userId, evtMsgs);
-                        if (!unpublishResult.Success)
-                            ((Content) content).Published = content.Published; // reset published state = save unchanged
+                            unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
+                        else 
+                        {
+                            //fixme - casting
+                            ((Content)content).Published = content.Published; // reset published state = save unchanged
+                        }   
                     }
                     else
                     {
@@ -1209,21 +1207,13 @@ namespace Umbraco.Core.Services.Implement
                         return publishResult;
                     }
 
-                    // or, failed
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                    scope.Complete(); // compete the save
-                    return publishResult;
                 }
 
-                // both publishing and unpublishing are false
-                // this means that we wanted to publish, in a variant scenario, a document that
-                // was not published yet, and we could not, due to cultures issues
-                //
-                // raise event (we saved), report
 
+                // or, failed
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                 scope.Complete(); // compete the save
-                return new PublishResult(PublishResultType.FailedByCulture, evtMsgs, content);
+                return publishResult;
             }
         }
 
@@ -1412,7 +1402,7 @@ namespace Umbraco.Core.Services.Implement
                 return result;
 
             // publish - should be successful
-            var publishResult = StrategyPublish(scope, document, /*canPublish:*/ true, userId, evtMsgs);
+            var publishResult = StrategyPublish(scope, document, userId, evtMsgs);
             if (!publishResult.Success)
                 throw new Exception("oops: failed to publish.");
 
@@ -2239,9 +2229,17 @@ namespace Umbraco.Core.Services.Implement
 
         #region Publishing Strategies
 
-        // ensures that a document can be published
-        internal PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
-        {
+        /// <summary>
+        /// Ensures that a document can be published
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="userId"></param>
+        /// <param name="checkPath"></param>
+        /// <param name="evtMsgs"></param>
+        /// <returns></returns>
+        private PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
+        {   
             // raise Publishing event
             if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
@@ -2249,28 +2247,63 @@ namespace Umbraco.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
             }
 
+            var variesByCulture = content.ContentType.VariesByCulture();
+            var culturesChanging = variesByCulture ? new List<string>() : null;
+
+            //First check if mandatory languages fails, we are checking this first because this logic used to occur
+            //before the call to this method so I'm ensuring the order remains the same since we check the response
+            //specifically for FailedMandatoryCultureMissing
+            if (variesByCulture)
+            {
+                var publishedCultures = content.PublishedCultures.ToList();
+                var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
+                if (!cannotBePublished)
+                {
+                    var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
+                    cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
+                }
+
+                if (cannotBePublished)
+                    return new PublishResult(PublishResultType.FailedMandatoryCultureMissing, evtMsgs, content);
+
+                //track which cultures are being published
+                culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
+            }
+
             // ensure that the document has published values
             // either because it is 'publishing' or because it already has a published version
+            //fixme - casting
             if (((Content) content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
                 return new PublishResult(PublishResultType.FailedNoPublishedValues, evtMsgs, content);
             }
 
-            // ensure that the document status is correct
-            switch (content.Status)
+            //loop over each culture changing - or string.Empty for invariant
+            foreach(var culture in culturesChanging == null ? new[] { string.Empty } : (IEnumerable<string>)culturesChanging)
             {
-                case ContentStatus.Expired:
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
-                    return new PublishResult(PublishResultType.FailedHasExpired, evtMsgs, content);
+                // ensure that the document status is correct
+                // note: culture will be string.Empty for invariant
+                switch (content.GetStatus(culture))
+                {
+                    case ContentStatus.Expired:
+                        if (!variesByCulture)
+                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
+                        else
+                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
+                        return new PublishResult(!variesByCulture ? PublishResultType.FailedHasExpired : PublishResultType.FailedCultureHasExpired, evtMsgs, content);
 
-                case ContentStatus.AwaitingRelease:
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is awaiting release");
-                    return new PublishResult(PublishResultType.FailedAwaitingRelease, evtMsgs, content);
+                    case ContentStatus.AwaitingRelease:
+                        if (!variesByCulture)
+                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is awaiting release");
+                        else
+                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document is culture awaiting release");
+                        return new PublishResult(!variesByCulture ? PublishResultType.FailedAwaitingRelease : PublishResultType.FailedCultureAwaitingRelease, evtMsgs, content);
 
-                case ContentStatus.Trashed:
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is trashed");
-                    return new PublishResult(PublishResultType.FailedIsTrashed, evtMsgs, content);
+                    case ContentStatus.Trashed:
+                        Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is trashed");
+                        return new PublishResult(PublishResultType.FailedIsTrashed, evtMsgs, content);
+                }
             }
 
             if (!checkPath) return new PublishResult(evtMsgs, content);
@@ -2288,29 +2321,41 @@ namespace Umbraco.Core.Services.Implement
             return new PublishResult(evtMsgs, content);
         }
 
-        // publishes a document
-        internal PublishResult StrategyPublish(IScope scope, IContent content, bool canPublish, int userId, EventMessages evtMsgs)
+        /// <summary>
+        /// Publishes a document
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="userId"></param>
+        /// <param name="evtMsgs"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// It is assumed that all publishing checks have passed before calling this method like <see cref="StrategyCanPublish"/>
+        /// </remarks>
+        private PublishResult StrategyPublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
-            // note: when used at top-level, StrategyCanPublish with checkPath=true should have run already
-            // and alreadyCheckedCanPublish should be true, so not checking again. when used at nested level,
-            // there is no need to check the path again. so, checkPath=false in StrategyCanPublish below
-
-            var result = canPublish
-                ? new PublishResult(evtMsgs, content) // already know we can
-                : StrategyCanPublish(scope, content, userId, /*checkPath:*/ false, evtMsgs); // else check
+            var result = new PublishResult(evtMsgs, content);
 
             if (result.Success == false)
                 return result;
 
             // change state to publishing
+            // fixme - casting
             ((Content) content).PublishedState = PublishedState.Publishing;
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
             return result;
         }
 
-        // ensures that a document can be unpublished
-        internal UnpublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        /// <summary>
+        /// Ensures that a document can be unpublished
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="userId"></param>
+        /// <param name="evtMsgs"></param>
+        /// <returns></returns>
+        private UnpublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
             // raise Unpublishing event
             if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
@@ -2322,12 +2367,20 @@ namespace Umbraco.Core.Services.Implement
             return new UnpublishResult(evtMsgs, content);
         }
 
-        // unpublishes a document
-        internal UnpublishResult StrategyUnpublish(IScope scope, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
+        /// <summary>
+        /// Unpublishes a document 
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="userId"></param>
+        /// <param name="evtMsgs"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// It is assumed that all unpublishing checks have passed before calling this method like <see cref="StrategyCanUnpublish"/>
+        /// </remarks>
+        internal UnpublishResult StrategyUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
-            var attempt = canUnpublish
-                ? new UnpublishResult(evtMsgs, content) // already know we can
-                : StrategyCanUnpublish(scope, content, userId, evtMsgs); // else check
+            var attempt = new UnpublishResult(evtMsgs, content);
 
             if (attempt.Success == false)
                 return attempt;
@@ -2336,7 +2389,7 @@ namespace Umbraco.Core.Services.Implement
             // they should be removed so they don't interrupt an unpublish
             // otherwise it would remain released == published
 
-            var pastReleases = content.ContentSchedule.GetFullSchedule().SelectMany(x => x.Value)
+            var pastReleases = content.ContentSchedule.FullSchedule.SelectMany(x => x.Value)
                 .Where(x => x.Change == ContentScheduleChange.End && x.Date <= DateTime.Now)
                 .ToList();
             foreach (var p in pastReleases)
@@ -2345,6 +2398,7 @@ namespace Umbraco.Core.Services.Implement
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
             // change state to unpublishing
+            // fixme - casting
             ((Content) content).PublishedState = PublishedState.Unpublishing;
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);

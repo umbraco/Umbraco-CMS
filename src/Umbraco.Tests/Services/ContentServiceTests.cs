@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, Constants.Security.SuperUserId);
 
             content = contentService.GetById(content.Id);
-            var sched = content.ContentSchedule.GetFullSchedule();
+            var sched = content.ContentSchedule.FullSchedule;
             Assert.AreEqual(1, sched.Count());
             Assert.AreEqual(1, sched[string.Empty].Count());
             content.ContentSchedule.Clear(ContentScheduleChange.End);
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             content = contentService.GetById(content.Id);
-            sched = content.ContentSchedule.GetFullSchedule();
+            sched = content.ContentSchedule.FullSchedule;
             Assert.AreEqual(0, sched.Count());
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
@@ -1521,6 +1521,26 @@ namespace Umbraco.Tests.Services
             Assert.That(parentPublished.Success, Is.True);
             Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
+            Assert.AreEqual(PublishResultType.FailedHasExpired, published.Result);
+        }
+
+        [Test]
+        public void Cannot_Publish_Expired_Culture()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var content = MockedContent.CreateBasicContent(contentType);
+            content.SetCultureName("Hello", "en-US");
+            content.ContentSchedule.Add("en-US", null, DateTime.Now.AddMinutes(-5));
+            ServiceContext.ContentService.Save(content);
+
+            var published = ServiceContext.ContentService.SaveAndPublish(content, "en-US", Constants.Security.SuperUserId);
+
+            Assert.IsFalse(published.Success);
+            Assert.AreEqual(PublishResultType.FailedCultureHasExpired, published.Result);
+            Assert.That(content.Published, Is.False);
         }
 
         [Test]
@@ -1543,6 +1563,26 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(parentPublished.Success, Is.True);
             Assert.That(published.Success, Is.False);
+            Assert.That(content.Published, Is.False);
+            Assert.AreEqual(PublishResultType.FailedAwaitingRelease, published.Result);
+        }
+
+        [Test]
+        public void Cannot_Publish_Culture_Awaiting_Release()
+        {
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var content = MockedContent.CreateBasicContent(contentType);
+            content.SetCultureName("Hello", "en-US");
+            content.ContentSchedule.Add("en-US", DateTime.Now.AddHours(2), null);
+            ServiceContext.ContentService.Save(content);
+
+            var published = ServiceContext.ContentService.SaveAndPublish(content, "en-US", Constants.Security.SuperUserId);
+
+            Assert.IsFalse(published.Success);
+            Assert.AreEqual(PublishResultType.FailedCultureAwaitingRelease, published.Result);
             Assert.That(content.Published, Is.False);
         }
 

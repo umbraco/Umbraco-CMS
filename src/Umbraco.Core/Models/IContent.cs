@@ -72,11 +72,6 @@ namespace Umbraco.Core.Models
         IContentType ContentType { get; }
 
         /// <summary>
-        /// Gets the current status of the content.
-        /// </summary>
-        ContentStatus Status { get; }
-
-        /// <summary>
         /// Gets a value indicating whether a culture is published.
         /// </summary>
         /// <remarks>
@@ -168,7 +163,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>A value indicating whether the culture can be published.</returns>
         /// <remarks>
-        /// <para>Fails if properties don't pass variant validtion rules.</para>
+        /// <para>Fails if properties don't pass variant validation rules.</para>
         /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
         bool PublishCulture(string culture = "*");

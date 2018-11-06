@@ -176,7 +176,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static IEnumerable<ContentScheduleDto> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
         {
             var schedule = new List<ContentScheduleDto>();
-            foreach (var schedByCulture in entity.ContentSchedule.GetFullSchedule())
+            foreach (var schedByCulture in entity.ContentSchedule.FullSchedule)
             {
                 foreach (var cultureSched in schedByCulture.Value)
                 {

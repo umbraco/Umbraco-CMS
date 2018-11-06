@@ -43,38 +43,47 @@
         FailedAwaitingRelease = Failed | 3,
 
         /// <summary>
+        /// A culture on the content item was scheduled to be un-published and it has expired so we cannot force it to be
+        /// published again as part of a bulk publish operation.
+        /// </summary>
+        FailedCultureHasExpired = Failed | 4,
+
+        /// <summary>
+        /// A culture on the content item is scheduled to be released in the future and therefore we cannot force it to
+        /// be published during a bulk publish operation.
+        /// </summary>
+        FailedCultureAwaitingRelease = Failed | 5,
+
+        /// <summary>
         /// The content item could not be published because it is in the trash.
         /// </summary>
-        FailedIsTrashed = Failed | 4,
+        FailedIsTrashed = Failed | 6,
 
         /// <summary>
         /// The publish action has been cancelled by an event handler.
         /// </summary>
-        FailedCancelledByEvent = Failed | 5,
+        FailedCancelledByEvent = Failed | 7,
 
         /// <summary>
         /// The content item could not be published because it contains invalid data (has not passed validation requirements).
         /// </summary>
-        FailedContentInvalid = Failed | 6,
+        FailedContentInvalid = Failed | 8,
 
         /// <summary>
         /// Cannot republish a document that hasn't been published.
         /// </summary>
-        FailedNoPublishedValues = Failed | 7, // in ContentService.StrategyCanPublish - fixme weird
-
-        /// <summary>
-        /// Some mandatory cultures are missing, or are not valid.
-        /// </summary>
-        FailedCannotPublish = Failed | 8, // in ContentController.PublishInternal - fixme // FailedByCulture?
+        FailedNoPublishedValues = Failed | 9, // in ContentService.StrategyCanPublish - fixme weird
 
         /// <summary>
         /// Publishing changes triggered an unpublishing, due to missing mandatory cultures, and unpublishing failed.
         /// </summary>
-        FailedToUnpublish = Failed | 9, // in ContentService.SavePublishing
+        FailedToUnpublish = Failed | 10, // in ContentService.SavePublishing
 
         /// <summary>
         /// Some mandatory cultures are missing.
         /// </summary>
-        FailedByCulture = Failed | 10, // in ContentService.SavePublishing
+        FailedMandatoryCultureMissing = Failed | 11, // in ContentService.SavePublishing
+
+
     }
 }

@@ -24,6 +24,33 @@ namespace Umbraco.Core
         #region IContent
 
         /// <summary>
+        /// Gets the current status of the Content
+        /// </summary>
+        public static ContentStatus GetStatus(this IContent content, string culture = null)
+        {
+            if (content.Trashed)
+                return ContentStatus.Trashed;
+
+            if (!content.ContentType.VariesByCulture())
+                culture = string.Empty;
+            else if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
+
+            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleChange.End);
+            if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+                return ContentStatus.Expired;
+
+            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleChange.Start);
+            if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+                return ContentStatus.AwaitingRelease;
+
+            if (content.Published)
+                return ContentStatus.Published;
+
+            return ContentStatus.Unpublished;
+        }
+
+        /// <summary>
         /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
         /// </summary>
         /// <param name="entity"></param>

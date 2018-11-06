@@ -9,7 +9,8 @@ namespace Umbraco.Core.Models
     public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable
     {
         //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date
-        private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule = new Dictionary<string, SortedList<DateTime, ContentSchedule>>();
+        private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule
+            = new Dictionary<string, SortedList<DateTime, ContentSchedule>>(StringComparer.InvariantCultureIgnoreCase);
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -161,14 +162,12 @@ namespace Umbraco.Core.Models
             return Enumerable.Empty<ContentSchedule>();
         }
 
+        //fixme - should this just return IEnumerable<ContentSchedule> since the culture is part of the ContentSchedule object already?
         /// <summary>
         /// Returns all schedules for both invariant and variant cultures
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, IEnumerable<ContentSchedule>> GetFullSchedule()
-        {
-            return _schedule.ToDictionary(x => x.Key, x => (IEnumerable<ContentSchedule>)x.Value.Values);
-        }
+        public IReadOnlyDictionary<string, IEnumerable<ContentSchedule>> FullSchedule => _schedule.ToDictionary(x => x.Key, x => (IEnumerable<ContentSchedule>)x.Value.Values);
 
         public object DeepClone()
         {

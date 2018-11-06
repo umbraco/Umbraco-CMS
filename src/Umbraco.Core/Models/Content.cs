@@ -139,33 +139,6 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
         }
 
-        /// <summary>
-        /// Gets the current status of the Content
-        /// </summary>
-        [IgnoreDataMember]
-        public ContentStatus Status
-        {
-            get
-            {
-                if(Trashed)
-                    return ContentStatus.Trashed;
-
-                //fixme - deal with variants
-                var expires = ContentSchedule.GetSchedule(ContentScheduleChange.End);
-                if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
-                    return ContentStatus.Expired;
-
-                //fixme - deal with variants
-                var release = ContentSchedule.GetSchedule(ContentScheduleChange.Start);
-                if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
-                    return ContentStatus.AwaitingRelease;
-
-                if(Published)
-                    return ContentStatus.Published;
-
-                return ContentStatus.Unpublished;
-            }
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this content item is published or not.

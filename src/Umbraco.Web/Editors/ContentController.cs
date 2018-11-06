@@ -845,7 +845,8 @@ namespace Umbraco.Web.Editors
 
                 if (canPublish)
                 {
-                    //try to publish all the values on the model
+                    //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
+                    //since there's no reason variant rules would be violated in normal cases.
                     canPublish = PublishCulture(contentItem.PersistedContent, cultureVariants);
                 }
 
@@ -860,7 +861,7 @@ namespace Umbraco.Web.Editors
                 {
                     //can only save
                     var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    publishStatus = new PublishResult(PublishResultType.FailedCannotPublish, null, contentItem.PersistedContent);
+                    publishStatus = new PublishResult(PublishResultType.FailedMandatoryCultureMissing, null, contentItem.PersistedContent);
                     wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                     successfulCultures = Array.Empty<string>();
                 }
@@ -904,6 +905,9 @@ namespace Umbraco.Web.Editors
         /// <param name="persistentContent"></param>
         /// <param name="cultureVariants"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// This would generally never fail unless someone is tampering with the request
+        /// </remarks>
         private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants)
         {
             foreach(var variant in cultureVariants.Where(x => x.Publish))
@@ -1573,7 +1577,7 @@ namespace Umbraco.Web.Editors
                                     string.Join(",", status.InvalidProperties.Select(x => x.Alias))
                                 }).Trim());
                     break;
-                case PublishResultType.FailedByCulture:
+                case PublishResultType.FailedMandatoryCultureMissing:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
                         "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
