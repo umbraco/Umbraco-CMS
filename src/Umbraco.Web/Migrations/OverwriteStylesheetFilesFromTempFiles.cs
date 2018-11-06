@@ -38,7 +38,7 @@ namespace Umbraco.Web.Migrations
                         {
                             //backup
                             var targetPath = Path.Combine(tempCssFolder, relativePath.EnsureEndsWith(".bak"));
-                            logger.Info<OverwriteStylesheetFilesFromTempFiles>($"CSS file is being backed up from {cssFilePath}, to {targetPath} before being migrated to new format");
+                            logger.Info<OverwriteStylesheetFilesFromTempFiles>("CSS file is being backed up from {CssFilePath}, to {TargetPath} before being migrated to new format", cssFilePath, targetPath);
                             File.Copy(cssFilePath, targetPath, true);
                         }
 

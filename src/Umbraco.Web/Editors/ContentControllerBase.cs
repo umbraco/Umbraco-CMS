@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)
                 {
-                    Logger.Warn<ContentController>("No property editor found for property " + propertyDto.Alias);
+                    Logger.Warn<ContentController>("No property editor found for property {PropertyAlias}", propertyDto.Alias);
                     continue;
                 }
 
