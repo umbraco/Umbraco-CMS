@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         { }
 
         internal Stylesheet(string path, Func<File, string> getFileContent)
-            : base(path.EnsureEndsWith(".css"), getFileContent)
+            : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
         }

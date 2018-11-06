@@ -1,0 +1,41 @@
+<umb-box>
+    <umb-box-content>
+        <div class="sub-view-columns">
+            <div class="sub-view-column-left">
+                <h5><localize key="stylesheet_editorRules">Rich text editor styles</localize></h5>
+                <small><localize key="stylesheet_editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</localize></small>
+            </div>
+            <div class="sub-view-column-right">
+                <div class="umb-property-editor umb-stylesheet-rules form-horizontal" ng-controller="Umbraco.Editors.StyleSheets.RulesController">
+                    <div ui-sortable="sortableOptions" ng-model="model.stylesheet.rules">
+                        <div class="umb-stylesheet-rules__listitem" ng-click="edit(rule, $event)" ng-repeat="rule in model.stylesheet.rules">
+                            <i class="icon icon-navigation handle"></i>
+                            <div class="umb-stylesheet-rules__left">
+                                {{rule.name}}
+                            </div>
+                            <div class="umb-stylesheet-rules__right">
+                                <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(rule, $event)"><localize key="general_remove">Remove</localize></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <button class="btn btn-info" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <umb-overlay ng-if="model.overlay" model="model.overlay" position="right" class="umb-stylesheet-rule-overlay">
+            <umb-control-group label="@general_name" description="@stylesheet_nameHelp">
+                <input type="text" ng-model="model.overlay.rule.name" required />
+            </umb-control-group>
+            <umb-control-group label="@stylesheet_selector" description="@stylesheet_selectorHelp">
+                <input type="text" ng-model="model.overlay.rule.selector" required />
+            </umb-control-group>
+            <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
+                <textarea ng-model="model.overlay.rule.styles" required></textarea>
+            </umb-control-group>
+        </umb-overlay>
+
+    </umb-box-content>
+</umb-box>

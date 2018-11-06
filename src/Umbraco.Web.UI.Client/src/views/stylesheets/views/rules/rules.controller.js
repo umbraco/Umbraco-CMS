@@ -1,0 +1,70 @@
+angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesController",
+    function ($scope, localizationService) {       
+        $scope.sortableOptions = {
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            items: 'div.umb-stylesheet-rules__listitem',
+            handle: '.handle',
+            tolerance: 'pointer',
+            update: function (e, ui) {
+                setDirty();
+            }
+        };
+
+        $scope.add = function (evt) {
+            evt.preventDefault();
+
+            openOverlay({}, $scope.labels.addRule, (newRule) => {
+                $scope.model.stylesheet.rules.push(newRule);
+                setDirty();
+            });
+        }
+
+        $scope.edit = function(rule, evt) {
+            evt.preventDefault();
+
+            openOverlay(rule, $scope.labels.editRule, (newRule) => {
+                rule.name = newRule.name;
+                rule.selector = newRule.selector;
+                rule.styles = newRule.styles;
+                setDirty();
+            });
+        }
+
+        $scope.remove = function (rule, evt) {
+            evt.preventDefault();
+
+            $scope.model.stylesheet.rules = _.without($scope.model.stylesheet.rules, rule);
+            setDirty();
+        }
+
+        function openOverlay(rule, title, onSubmit) {
+            $scope.model.overlay = {
+                title: title,
+                submit: function (model) {
+                    onSubmit(model.rule);
+                    $scope.model.overlay = null;
+                },
+                close: function (oldModel) {
+                    $scope.model.overlay = null;
+                },
+                rule: _.clone(rule)
+            };
+        }
+
+        function setDirty() {
+            $scope.model.setDirty();
+        }
+
+        function init() {
+            localizationService.localizeMany(["stylesheet_overlayTitleAddRule", "stylesheet_overlayTitleEditRule"]).then(function (data) {
+                $scope.labels = {
+                    addRule: data[0],
+                    editRule: data[1]
+                }
+            });
+        }
+
+        init();
+    });

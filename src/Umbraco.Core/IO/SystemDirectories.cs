@@ -36,6 +36,8 @@ namespace Umbraco.Core.IO
 
         public static string Scripts => IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
 
+        public static string StyleSheets => IOHelper.ReturnPath("umbracoStylesheetsPath", "~/css");
+
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
         //TODO: Consider removing this
