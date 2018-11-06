@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
+    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];
@@ -296,14 +296,14 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            saveInternal();
+            saveInternal().then(angular.noop, angular.noop);
         }
 
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
         function saveInternal() {
 
-            // only save if there is no overlays open
-            if (overlayHelper.getNumberOfOverlays() === 0) {
+            // only save if there are no dialogs open
+            if (overlayHelper.getNumberOfOverlays() === 0 && (editorService.getNumberOfEditors() === 0 || infiniteMode)) {
 
                 vm.page.saveButtonState = "busy";
 

@@ -60,7 +60,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
                 .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
 
-            //FROM IMember TO MediaItemDisplay
+            //FROM IMember TO MemberDisplay
             CreateMap<IMember, MemberDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
@@ -80,7 +80,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
-                .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(memberTreeNodeUrlResolver));
+                .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(memberTreeNodeUrlResolver))
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM IMember TO MemberBasic
             CreateMap<IMember, MemberBasic>()
@@ -97,7 +98,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(memberBasicPropertiesResolver));
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(memberBasicPropertiesResolver))
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             CreateMap<MembershipUser, MemberBasic>()
@@ -122,7 +124,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
+                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore())
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             CreateMap<IMember, ContentPropertyCollectionDto>()

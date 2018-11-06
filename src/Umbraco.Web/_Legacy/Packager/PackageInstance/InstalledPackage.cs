@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic.packager {
         {
 #if DEBUG
             _saveHitCount++;
-            Current.Logger.Info<InstalledPackage>("The InstalledPackage class save method has been hit " + _saveHitCount + " times.");
+            Current.Logger.Info<InstalledPackage>("The InstalledPackage class save method has been hit {Total} times.", _saveHitCount);
 #endif
             this.FireBeforeSave(EventArgs.Empty);
             data.Save(this.Data, IOHelper.MapPath(Settings.InstalledPackagesSettings));

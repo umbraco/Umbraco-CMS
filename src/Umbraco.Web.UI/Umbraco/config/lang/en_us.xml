@@ -330,6 +330,8 @@
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="confirmListViewPublish">Publishing will make the selected items visible on the site.</key>
+    <key alias="confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</key>
     <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
   </area>
   <area alias="bulk">

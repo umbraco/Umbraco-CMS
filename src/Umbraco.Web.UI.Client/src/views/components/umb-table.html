@@ -32,15 +32,10 @@
         <div class="umb-table-body">
             <div class="umb-table-row"
                  ng-repeat="item in vm.items track by $index"
-                 ng-class="{
-                    '-selected':item.selected,
-                    '-published':item.published,
-                    '-unpublished':!item.published,
-                    'with-unpublished-version':!item.published && item.hasPublishedVersion
-                }"
+                 ng-class="{'umb-table-row--selected':item.selected}"
                  ng-click="vm.selectItem(item, $index, $event)">
 
-                <div class="umb-table-cell" ng-class="{'has-unpublished-version':!item.published && item.hasPublishedVersion}">
+                <div class="umb-table-cell">
                     <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" ng-class="vm.getIcon(item)"></i>
                     <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
                 </div>

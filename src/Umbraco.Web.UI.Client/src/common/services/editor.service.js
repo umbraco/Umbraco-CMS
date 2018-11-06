@@ -26,6 +26,18 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#getNumberOfEditors
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Method to return the number of open editors
+         */
+        function getNumberOfEditors() {
+            return editors.length;
+        };
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#open
          * @methodOf umbraco.services.editorService
          *
@@ -491,6 +503,7 @@
 
         var service = {
             getEditors: getEditors,
+            getNumberOfEditors: getNumberOfEditors,
             open: open,
             close: close,
             closeAll: closeAll,
