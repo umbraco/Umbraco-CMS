@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -41,7 +40,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(1, stylesheet.Properties.Count());
             Assert.AreEqual("Test", stylesheet.Properties.Single().Name);
             Assert.AreEqual("p", stylesheet.Properties.Single().Alias);
-            Assert.AreEqual("font-weight:bold; font-family:Arial;", stylesheet.Properties.Single().Value);
+            Assert.AreEqual("font-weight:bold;\r\nfont-family:Arial;", stylesheet.Properties.Single().Value);
         }
 
         [Test]
@@ -76,7 +75,7 @@ namespace Umbraco.Tests.Models
             prop = stylesheet.Properties.Single();
             Assert.AreEqual("li", prop.Alias);
             Assert.AreEqual("font-size:5em;", prop.Value);
-            Assert.AreEqual("body { color:#000; } /**umb_name:Hello*/\r\nli{font-size:5em;} .bold {font-weight:bold;}", stylesheet.Content);
+            Assert.AreEqual("body { color:#000; } /**umb_name:Hello*/\r\nli {\r\n\tfont-size:5em;\r\n} .bold {font-weight:bold;}", stylesheet.Content);
         }
 
         [Test]

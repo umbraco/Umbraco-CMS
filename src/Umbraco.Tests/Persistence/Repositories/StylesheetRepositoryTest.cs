@@ -1,17 +1,11 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -118,10 +112,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 stylesheet = repository.Get(stylesheet.Name);
 
                 //Assert
-                Assert.That(stylesheet.Content, Is.EqualTo(@"body { color:#000; } .bold {font-weight:bold;}
-
-/**umb_name:Test*/
-p{font-size:2em;}"));
+                Assert.That(stylesheet.Content, Is.EqualTo("body { color:#000; } .bold {font-weight:bold;}\r\n\r\n/**umb_name:Test*/\r\np {\r\n\tfont-size:2em;\r\n}"));
                 Assert.AreEqual(1, stylesheet.Properties.Count());
             }
         }

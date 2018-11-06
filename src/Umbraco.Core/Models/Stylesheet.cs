@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.IO;
 using Umbraco.Core.Strings.Css;
 
 namespace Umbraco.Core.Models
