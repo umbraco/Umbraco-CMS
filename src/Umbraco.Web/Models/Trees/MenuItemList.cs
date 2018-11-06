@@ -44,10 +44,11 @@ namespace Umbraco.Web.Models.Trees
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
         /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
-        public MenuItem Add<T>(string name, bool hasSeparator = false)
+        /// <param name="opensDialog">Whether or not this action opens a dialog</param>
+        public MenuItem Add<T>(string name, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
-            var item = CreateMenuItem<T>(name, hasSeparator);
+            var item = CreateMenuItem<T>(name, hasSeparator, opensDialog);
             if (item != null)
             {
                 Add(item);
@@ -62,11 +63,11 @@ namespace Umbraco.Web.Models.Trees
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
         /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on it's alias</param>
-        /// <param name="opensDialog"></param>
+        /// <param name="opensDialog">Whether or not this action opens a dialog</param>
         public MenuItem Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
-            var item = CreateMenuItem<T>(textService, hasSeparator);
+            var item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
             if (item != null)
             {
                 Add(item);
@@ -75,14 +76,15 @@ namespace Umbraco.Web.Models.Trees
             return null;
         }
         
-        internal MenuItem CreateMenuItem<T>(string name, bool hasSeparator = false)
+        internal MenuItem CreateMenuItem<T>(string name, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
         {
             var item = Current.Actions.GetAction<T>();
             if (item == null) return null;
             var menuItem = new MenuItem(item, name)
             {
-                SeperatorBefore = hasSeparator
+                SeperatorBefore = hasSeparator,
+                OpensDialog = opensDialog
             };
 
             return menuItem;
