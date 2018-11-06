@@ -48,7 +48,7 @@ angular.module('umbraco.directives.validation')
     .directive("valEmail", valEmail)
     .factory('valEmailExpression', function () {
         // This syntax should correspond to the Core validation in EmailValidator.cs and the default backend Email Validation in propertysettings.controller.js (validationTypes)
-        var emailSyntax = "^[a-z][a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@([a-z0-9]([a-z0-9-]*[a-z0-9])\.)+([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
+        var emailSyntax = "^[a-z0-9][a-z0-9!#$%&'*+\/=?^_`{|}~.-]*@([a-z0-9]([a-z0-9-]*)\.)+([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
         var emailRegex = new RegExp(emailSyntax, "i");
         return {
             EMAIL_REGEXP: emailRegex
