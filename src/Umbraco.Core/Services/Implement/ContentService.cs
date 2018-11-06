@@ -1952,7 +1952,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="items"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
         public OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -1981,7 +1981,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="ids"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
         public OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
