@@ -18,9 +18,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <button class="btn btn-info" ng-click="add($event)"><localize key="general_add">Add</localize></button>
-                    </div>
+                    <umb-button
+                        type="button"
+                        button-style="info"
+                        action="add($event)"
+                        label-key="general_add">
+                    </umb-button>
                 </div>
             </div>
         </div>
