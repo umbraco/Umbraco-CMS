@@ -1070,15 +1070,12 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id) == false)
+                var sortResult = contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id);
+                if (!sortResult.Success)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    //TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
-                }
-
-                if (sorted.ParentId > 0)
-                {
-                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), Current.Actions.GetAction<ActionSort>(), UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);

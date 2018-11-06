@@ -395,6 +395,8 @@
     <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
+    <Compile Include="Models\NotificationEmailBodyParams.cs" />
+    <Compile Include="Models\NotificationEmailSubjectParams.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />

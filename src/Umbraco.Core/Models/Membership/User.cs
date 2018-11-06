@@ -448,18 +448,19 @@ namespace Umbraco.Core.Models.Membership
         [DoNotClone]
         internal object AdditionalDataLock { get { return _additionalDataLock; } }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (User)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (User)clone;
+            
             //manually clone the start node props
-            clone._startContentIds = _startContentIds.ToArray();
-            clone._startMediaIds = _startMediaIds.ToArray();
+            clonedEntity._startContentIds = _startContentIds.ToArray();
+            clonedEntity._startMediaIds = _startMediaIds.ToArray();
 
             // this value has been cloned and points to the same object
             // which obviously is bad - needs to point to a new object
-            clone._additionalDataLock = new object();
+            clonedEntity._additionalDataLock = new object();
 
             if (_additionalData != null)
             {
@@ -467,7 +468,7 @@ namespace Umbraco.Core.Models.Membership
                 // changing one clone impacts all of them - so we need to reset it with a fresh
                 // dictionary that will contain the same values - and, if some values are deep
                 // cloneable, they should be deep-cloned too
-                var cloneAdditionalData = clone._additionalData = new Dictionary<string, object>();
+                var cloneAdditionalData = clonedEntity._additionalData = new Dictionary<string, object>();
 
                 lock (_additionalDataLock)
                 {
@@ -480,15 +481,9 @@ namespace Umbraco.Core.Models.Membership
             }
 
             //need to create new collections otherwise they'll get copied by ref
-            clone._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
-            clone._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
-            //re-create the event handler
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
+            clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
+            
         }
 
         /// <summary>
