@@ -243,6 +243,77 @@ function codefileResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     "PostCreateContainer", 
                     { type: type, parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#interpolateStylesheetRules
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Takes all rich text editor styling rules and turns them into css
+         * 
+         * ##usage
+         * <pre>
+         * codefileResource.interpolateStylesheetRules(".box{background:purple;}", "[{name: "heading", selector: "h1", styles: "color: red"}]")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} content The style sheet content.
+         * @param {string} rules The rich text editor rules
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        interpolateStylesheetRules: function (content, rules) {
+            var payload = {
+                content: content,
+                rules: rules
+            };
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "codeFileApiBaseUrl",
+                        "PostInterpolateStylesheetRules"),
+                    payload),
+                "Failed to interpolate sheet rules");
+        },
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.codefileResource#extractStylesheetRules
+         * @methodOf umbraco.resources.codefileResource
+         *
+         * @description
+         * Find all rich text editor styles in the style sheets and turns them into "rules"
+         * 
+         * ##usage
+         * <pre>
+         * 
+         * var conntent
+         * codefileResource.extractStylesheetRules(".box{background:purple;}")
+         *    .then(function(data) {
+         *        alert('its here!');
+         *    });
+         * </pre>
+         *
+         * @param {string} content The style sheet content.
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        extractStylesheetRules: function(content) {
+            var payload = {
+                content: content,
+                rules: null
+            };
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "codeFileApiBaseUrl",
+                        "PostExtractStylesheetRules"),
+                    payload),
+                "Failed to extract style sheet rules");
         }
 
     };

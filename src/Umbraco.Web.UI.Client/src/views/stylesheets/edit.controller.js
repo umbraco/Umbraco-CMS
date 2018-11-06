@@ -240,31 +240,11 @@
         }
 
         function interpolateRules() {
-            var payload = {
-                content: vm.stylesheet.content,
-                rules: vm.stylesheet.rules
-            };
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "codeFileApiBaseUrl",
-                        "PostInterpolateStylesheetRules"),
-                    payload),
-                "Failed to interpolate sheet rules");
+            return codefileResource.interpolateStylesheetRules(vm.stylesheet.content, vm.stylesheet.rules);
         }
 
         function extractRules() {
-            var payload = {
-                content: vm.stylesheet.content,
-                rules: null
-            };
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "codeFileApiBaseUrl",
-                        "PostExtractStylesheetRules"),
-                    payload),
-                "Failed to extract style sheet rules");
+            return codefileResource.extractStylesheetRules(vm.stylesheet.content, null);
         }
         
         $scope.selectApp = function (app) {
