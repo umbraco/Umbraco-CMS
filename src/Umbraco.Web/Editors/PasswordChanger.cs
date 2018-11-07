@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
         public async Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
             IUser currentUser,
             IUser savingUser,
-            ChangingPasswordModel passwordModel, 
+            ChangingPasswordModel passwordModel,
             BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
                     _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, errors: " + errors, new[] { "resetPassword" }) });
                 }
-                
+
                 return Attempt.Succeed(new PasswordChangedModel());
             }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Editors
             if (passwordModel.NewPassword.IsNullOrWhiteSpace())
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
-            }            
+            }
 
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             //TODO: What if the current user is admin? We should allow manually changing then?
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Editors
                     _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
                 }
-                return Attempt.Succeed(new PasswordChangedModel());                
+                return Attempt.Succeed(new PasswordChangedModel());
             }
 
             //We shouldn't really get here
@@ -143,10 +143,10 @@ namespace Umbraco.Web.Editors
         /// <param name="username">The username of the user having their password changed</param>
         /// <param name="passwordModel"></param>
         /// <param name="membershipProvider"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
+            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null) throw new ArgumentNullException("passwordModel");
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
@@ -181,9 +181,17 @@ namespace Umbraco.Web.Editors
                 //ok, we should be able to reset it
                 try
                 {
-                    var newPass = membershipProvider.ResetPassword(
-                        username,
-                        membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+                    string newPass = passwordModel.NewPassword;
+                    if (newPass.IsNullOrWhiteSpace())
+                    {
+                        newPass = membershipProvider.ResetPassword(
+                            username,
+                            membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+                    }
+                    else
+                    {
+                        membershipProvider.ChangePassword(username, string.Empty, newPass);
+                    }
 
                     if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
                         backofficeUserManager.RaisePasswordResetEvent(userId);
