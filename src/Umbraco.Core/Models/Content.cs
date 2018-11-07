@@ -517,11 +517,11 @@ namespace Umbraco.Core.Models
             }
 
             //if properties exist then deal with event bindings
-            if (clone._schedule != null)
+            if (clonedContent._schedule != null)
             {
-                clone._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
-                clone._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
-                clone._schedule.CollectionChanged += clone.ScheduleCollectionChanged;   //re-assign correct event handler
+                clonedContent._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
+                clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
+                clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
             
         }
