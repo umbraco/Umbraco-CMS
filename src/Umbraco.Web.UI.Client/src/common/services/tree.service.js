@@ -343,7 +343,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);
+            var parent = treeNode.parent();
+            parent.children.splice(parent.children.indexOf(treeNode), 1);
+
+            parent.hasChildren = parent.children.length !== 0;
         },
 
         /**
@@ -736,7 +739,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
             return reversePath.reverse();
         },
-        
+
         syncTree: function(args) {
 
             if (!args) {
