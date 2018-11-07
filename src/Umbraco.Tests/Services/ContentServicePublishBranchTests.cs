@@ -43,9 +43,9 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "ii2");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready);
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready);
 
             // prepare
 
@@ -83,13 +83,13 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "ii11", "ii12", "ii2", "ii21", "ii22");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready);
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready);
 
             // prepare
 
@@ -113,13 +113,13 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "ii11", "ii12", "ii2", "ii21", "ii22");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.Success,
-                PublishResultType.SuccessAlready,
-                PublishResultType.Success,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready);
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready);
 
             // force = publishes everything that has changes
             // here: ii12, ii2, ii22 - ii21 was published already but masked
@@ -128,13 +128,13 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "ii11", "ii12", "ii2", "ii21", "ii22");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.Success,
-                PublishResultType.Success,
-                PublishResultType.SuccessAlready, // was masked
-                PublishResultType.Success);
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishAlready, // was masked
+                PublishResultType.SuccessPublish);
 
             ii21 = ServiceContext.ContentService.GetById(ii21.Id);
             Assert.IsTrue(ii21.Published);
@@ -186,9 +186,9 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "vroot.de", "iv1.de", "iv2.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready,
-                PublishResultType.SuccessAlready);
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishAlready);
 
             // prepare
             ServiceContext.ContentService.SaveAndPublish(vRoot, "de");
@@ -220,9 +220,9 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "vroot.de", "iv1.de", "iv2.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.Success,
-                PublishResultType.Success,
-                PublishResultType.SuccessAlready);
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishAlready);
 
             // reload - SaveAndPublishBranch has modified other instances
             Reload(ref iv1);
@@ -289,9 +289,9 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "iv11.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessAlready,
-                PublishResultType.Success,
-                PublishResultType.Success);
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublish);
 
             // reload - SaveAndPublishBranch has modified other instances
             Reload(ref ii1);

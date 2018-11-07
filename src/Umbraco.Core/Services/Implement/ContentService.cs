@@ -410,7 +410,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords
             , IQuery<IContent> filter = null, Ordering ordering = null)
         {
-            if(pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
             if (ordering == null)
@@ -803,7 +803,7 @@ namespace Umbraco.Core.Services.Implement
                         .Where(x => culturesChanging.InvariantContains(x.IsoCode))
                         .Select(x => x.CultureName));
                     Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
-                }   
+                }
                 else
                     Audit(AuditType.Save, userId, content.Id);
 
@@ -929,7 +929,7 @@ namespace Umbraco.Core.Services.Implement
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
-                ((Content) content).PublishedState = PublishedState.Unpublishing;
+                ((Content)content).PublishedState = PublishedState.Unpublishing;
             }
             else
             {
@@ -986,9 +986,6 @@ namespace Umbraco.Core.Services.Implement
                 ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                 : null;
 
-            using (var scope = ScopeProvider.CreateScope())
-            {
-
             var isNew = !content.HasIdentity;
             var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
             var previouslyPublished = content.HasIdentity && content.Published;
@@ -996,40 +993,41 @@ namespace Umbraco.Core.Services.Implement
             // always save
             var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
             if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
 
             if (publishing)
             {
-                    culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = variesByCulture
+                        ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                        : null;
 
-                    // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, evtMsgs);
+                // ensure that the document can be published, and publish handling events, business rules, etc
+                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, culturesPublishing, culturesUnpublishing, evtMsgs);
                 if (publishResult.Success)
-                    {
-                        culturesPublishing = variesByCulture
-                            ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
-                            : null;
+                {
+                    
 
-                        // note: StrategyPublish flips the PublishedState to Publishing!
-                        publishResult = StrategyPublish(scope, content, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
+                    // note: StrategyPublish flips the PublishedState to Publishing!
+                    publishResult = StrategyPublish(scope, content, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
 
-                    }   
-                    else
-                    {
-                        //check for mandatory culture missing, if this is the case we'll switch the unpublishing flag
-                        if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
-                        {
-                            publishing = false;
-                            unpublishing = content.Published; // if not published yet, nothing to do
-
-                            // we may end up in a state where we won't publish nor unpublish
-                            // keep going, though, as we want to save anways
-                        }
-
-                        //fixme - casting
-                        ((Content)content).Published = content.Published; // reset published state = save unchanged
-                    }   
                 }
+                else
+                {
+                    //check for mandatory culture missing, if this is the case we'll switch the unpublishing flag
+                    if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
+                    {
+                        publishing = false;
+                        unpublishing = content.Published; // if not published yet, nothing to do
+
+                        // we may end up in a state where we won't publish nor unpublish
+                        // keep going, though, as we want to save anways
+                    }
+
+                    //fixme - casting
+                    ((Content)content).Published = content.Published; // reset published state = save unchanged
+                }
+            }
 
             if (unpublishing)
             {
@@ -1045,13 +1043,13 @@ namespace Umbraco.Core.Services.Implement
                     // note: This unpublishes the entire document (not different variants)
                     unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                     if (unpublishResult.Success)
-                            unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
-                        else 
-                        {
-                            //fixme - casting
-                            ((Content)content).Published = content.Published; // reset published state = save unchanged
-                        }   
+                        unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
+                    else
+                    {
+                        //fixme - casting
+                        ((Content)content).Published = content.Published; // reset published state = save unchanged
                     }
+                }
                 else
                 {
                     // already unpublished - optimistic concurrency collision, really,
@@ -1084,25 +1082,25 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
-                        if (culturesUnpublishing != null)
-                        {
-                            //If we are here, it means we tried unpublishing a culture but it was mandatory so now everything is unpublished
-                            var langs = string.Join(", ", _languageRepository.GetMany()
-                                        .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                                        .Select(x => x.CultureName));
-                            Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
-                            //log that the whole content item has been unpublished due to mandatory culture unpublished
-                            Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
-                        }
-                        else
-                            Audit(AuditType.Unpublish, userId, content.Id);
+                    if (culturesUnpublishing != null)
+                    {
+                        //If we are here, it means we tried unpublishing a culture but it was mandatory so now everything is unpublished
+                        var langs = string.Join(", ", _languageRepository.GetMany()
+                                    .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
+                                    .Select(x => x.CultureName));
+                        Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+                        //log that the whole content item has been unpublished due to mandatory culture unpublished
+                        Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
+                    }
+                    else
+                        Audit(AuditType.Unpublish, userId, content.Id);
 
-                        return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
+                    return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
                 }
 
                 // or, failed
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                    return new PublishResult(PublishResultType.FailedUnpublish, evtMsgs, content); // bah
+                return new PublishResult(PublishResultType.FailedUnpublish, evtMsgs, content); // bah
             }
 
             if (publishing) // we have tried to publish
@@ -1125,53 +1123,53 @@ namespace Umbraco.Core.Services.Implement
                         scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                     }
 
-                        switch(publishResult.Result)
-                        {
-                            case PublishResultType.SuccessPublish:
-                                Audit(AuditType.Publish, userId, content.Id);
-                                break;
-                            case PublishResultType.SuccessPublishCulture:
-                                if (culturesPublishing != null)
-                                {
-                                    var langs = string.Join(", ", _languageRepository.GetMany()
-                                        .Where(x => culturesPublishing.InvariantContains(x.IsoCode))
-                                        .Select(x => x.CultureName));
-                                    Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
-                                }
-                                break;
-                            case PublishResultType.SuccessUnpublishCulture:
-                                if (culturesUnpublishing != null)
-                                {
-                                    var langs = string.Join(", ", _languageRepository.GetMany()
-                                       .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                                       .Select(x => x.CultureName));
-                                    Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
-                                }
-                                break;
-                        }   
+                    switch (publishResult.Result)
+                    {
+                        case PublishResultType.SuccessPublish:
+                            Audit(AuditType.Publish, userId, content.Id);
+                            break;
+                        case PublishResultType.SuccessPublishCulture:
+                            if (culturesPublishing != null)
+                            {
+                                var langs = string.Join(", ", _languageRepository.GetMany()
+                                    .Where(x => culturesPublishing.InvariantContains(x.IsoCode))
+                                    .Select(x => x.CultureName));
+                                Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
+                            }
+                            break;
+                        case PublishResultType.SuccessUnpublishCulture:
+                            if (culturesUnpublishing != null)
+                            {
+                                var langs = string.Join(", ", _languageRepository.GetMany()
+                                   .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
+                                   .Select(x => x.CultureName));
+                                Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
+                            }
+                            break;
+                    }
 
                     return publishResult;
                 }
 
-                }
+            }
 
-                //if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-                if (publishResult == null || !publishResult.Success)
-                {   
-                    if (culturesChanging != null)
-                    {
-                        var langs = string.Join(", ", _languageRepository.GetMany()
-                            .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                            .Select(x => x.CultureName));
-                        Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
-                    }
-                    else
-                        Audit(AuditType.Save, userId, content.Id);
+            //if publishing didn't happen or if it has failed, we still need to log which cultures were saved
+            if (publishResult == null || !publishResult.Success)
+            {
+                if (culturesChanging != null)
+                {
+                    var langs = string.Join(", ", _languageRepository.GetMany()
+                        .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                        .Select(x => x.CultureName));
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
                 }
+                else
+                    Audit(AuditType.Save, userId, content.Id);
+            }
 
-                // or, failed
+            // or, failed
             scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                return publishResult;
+            return publishResult;
         }
 
         /// <inheritdoc />
@@ -1195,7 +1193,7 @@ namespace Umbraco.Core.Services.Implement
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
-                        
+
                         foreach (var c in pendingCultures)
                         {
                             //Clear this schedule for this culture
@@ -1260,7 +1258,7 @@ namespace Umbraco.Core.Services.Implement
                         yield return result;
                     }
 
-                    
+
                 }
 
                 scope.Complete();
@@ -1375,7 +1373,7 @@ namespace Umbraco.Core.Services.Implement
                 if (!document.HasIdentity)
                     throw new InvalidOperationException("Cannot not branch-publish a new document.");
 
-                var publishedState = ((Content) document).PublishedState;
+                var publishedState = ((Content)document).PublishedState;
                 if (publishedState == PublishedState.Publishing)
                     throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
@@ -1453,30 +1451,6 @@ namespace Umbraco.Core.Services.Implement
 
             return SavePublishingInternal(scope, document, userId);
 
-            // fixme deal with the rest of this code!
-            // check if we can publish
-            var result = StrategyCanPublish(scope, document, userId, checkPath, evtMsgs);
-            if (!result.Success)
-                return result;
-;
-            IReadOnlyList<string> culturesPublishing = null;
-            IReadOnlyList<string> culturesUnpublishing = null;
-            if (document.ContentType.VariesByCulture())
-            {
-                culturesPublishing = document.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
-                culturesUnpublishing = document.GetCulturesUnpublishing();
-            }
-            
-            // publish - should be successful
-            var publishResult = StrategyPublish(scope, document, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
-            if (!publishResult.Success)
-                throw new Exception("oops: failed to publish.");
-
-            // save
-            document.WriterId = userId;
-            _documentRepository.Save(document);
-            publishedDocuments.Add(document);
-            return publishResult;
         }
 
         #endregion
@@ -1711,7 +1685,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // however, it had been masked when being trashed, so there's no need for
                     // any special event here - just change its state
-                    ((Content) content).PublishedState = PublishedState.Unpublishing;
+                    ((Content)content).PublishedState = PublishedState.Unpublishing;
                 }
 
                 PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
@@ -1766,7 +1740,7 @@ namespace Umbraco.Core.Services.Implement
             const int pageSize = 500;
             var page = 0;
             var total = long.MaxValue;
-            while(page * pageSize < total)
+            while (page * pageSize < total)
             {
                 var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
                 foreach (var descendant in descendants)
@@ -1779,13 +1753,13 @@ namespace Umbraco.Core.Services.Implement
                     PerformMoveContentLocked(descendant, userId, trash);
                 }
             }
-            
+
         }
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
             //fixme no casting
-            if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
+            if (trash.HasValue) ((ContentBase)content).Trashed = trash.Value;
             content.WriterId = userId;
             _documentRepository.Save(content);
         }
@@ -1889,7 +1863,7 @@ namespace Umbraco.Core.Services.Implement
                 // a copy is not published (but not really unpublishing either)
                 // update the create author and last edit author
                 if (copy.Published)
-                    ((Content) copy).Published = false;
+                    ((Content)copy).Published = false;
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
@@ -1916,7 +1890,7 @@ namespace Umbraco.Core.Services.Implement
                     const int pageSize = 500;
                     var page = 0;
                     var total = long.MaxValue;
-                    while(page * pageSize < total)
+                    while (page * pageSize < total)
                     {
                         var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
                         foreach (var descendant in descendants)
@@ -2335,8 +2309,8 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="checkPath"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
-        private PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
-        {   
+        private PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing, EventMessages evtMsgs)
+        {
             // raise Publishing event
             if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
@@ -2345,38 +2319,35 @@ namespace Umbraco.Core.Services.Implement
             }
 
             var variesByCulture = content.ContentType.VariesByCulture();
-            IList<string> culturesPublishing = null;
-
+            
             //First check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
-                var publishedCultures = content.PublishedCultures.ToList();
-
-                if (publishedCultures.Count == 0) // no published cultures = cannot be published
+                if (culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
 
+                // missing mandatory culture = cannot be published
                 var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
-                var mandatoryMissing = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
-                
+                var mandatoryMissing = mandatoryCultures.Any(x => !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); 
                 if (mandatoryMissing)
                     return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, evtMsgs, content);
 
-                //track which cultures are being published
-                culturesPublishing = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
+                if (culturesPublishing.Count == 0 && culturesUnpublishing.Count > 0)
+                    return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
             }
 
             // ensure that the document has published values
             // either because it is 'publishing' or because it already has a published version
             //fixme - casting
-            if (((Content) content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
+            if (((Content)content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
             //loop over each culture publishing - or string.Empty for invariant
-            foreach(var culture in culturesPublishing ?? (new[] { string.Empty }))
+            foreach (var culture in culturesPublishing ?? (new[] { string.Empty }))
             {
                 // ensure that the document status is correct
                 // note: culture will be string.Empty for invariant
@@ -2415,6 +2386,8 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
+            //TODO: If we are both publishing and unpublishing cultures, then there should be a status for that (mixed?)
+
             return new PublishResult(evtMsgs, content);
         }
 
@@ -2435,7 +2408,7 @@ namespace Umbraco.Core.Services.Implement
         {
             // change state to publishing
             // fixme - casting
-            ((Content) content).PublishedState = PublishedState.Publishing;
+            ((Content)content).PublishedState = PublishedState.Publishing;
 
             //if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
             if (content.ContentType.VariesByCulture())
@@ -2503,13 +2476,13 @@ namespace Umbraco.Core.Services.Implement
                 .Where(x => x.Change == ContentScheduleChange.End && x.Date <= DateTime.Now)
                 .ToList();
             foreach (var p in pastReleases)
-                content.ContentSchedule.Remove(p);                
-            if(pastReleases.Count > 0)
+                content.ContentSchedule.Remove(p);
+            if (pastReleases.Count > 0)
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
             // change state to unpublishing
             // fixme - casting
-            ((Content) content).PublishedState = PublishedState.Unpublishing;
+            ((Content)content).PublishedState = PublishedState.Unpublishing;
 
             Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
             return attempt;
@@ -2646,7 +2619,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).Blueprint = true;
+                    ((Content)blueprint).Blueprint = true;
                 return blueprint;
             }
         }
@@ -2658,7 +2631,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).Blueprint = true;
+                    ((Content)blueprint).Blueprint = true;
                 return blueprint;
             }
         }
@@ -2669,7 +2642,7 @@ namespace Umbraco.Core.Services.Implement
             if (content.ParentId != -1)
                 content.ParentId = -1;
 
-            ((Content) content).Blueprint = true;
+            ((Content)content).Blueprint = true;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2733,7 +2706,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 return _documentBlueprintRepository.Get(query).Select(x =>
                 {
-                    ((Content) x).Blueprint = true;
+                    ((Content)x).Blueprint = true;
                     return x;
                 });
             }
@@ -2752,7 +2725,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var blueprints = _documentBlueprintRepository.Get(query).Select(x =>
                 {
-                    ((Content) x).Blueprint = true;
+                    ((Content)x).Blueprint = true;
                     return x;
                 }).ToArray();
 
@@ -2778,7 +2751,7 @@ namespace Umbraco.Core.Services.Implement
         public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            
+
             //Get the current copy of the node
             var content = GetById(id);
 
@@ -2827,7 +2800,7 @@ namespace Umbraco.Core.Services.Implement
                     Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
-                
+
                 scope.Complete();
             }
 
