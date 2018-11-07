@@ -362,12 +362,34 @@ namespace Umbraco.Core.Services
         /// </remarks>
         PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
 
+        /*
+         fixme - document this better + test
+         If the item being published is Invariant and it has Variant descendants and
+          we are NOT forcing publishing of anything not published - the result will be that the Variant cultures that are
+          already published (but may contain a draft) are published. Any cultures that don't have a published version are not published
+          fixme: now, if publishing '*' then all cultures
+         If the item being published is Invariant and it has Variant descendants and
+           we ARE forcing publishing of anything not published - the result will be that all Variant cultures are
+           published regardless of whether they don't have any current published versions
+
+         If the item being published is Variant and it has Invariant descendants and
+           we are NOT forcing publishing of anything not published - the result will be that all Invariant documents are
+           published that already have a published versions, regardless of what cultures are selected to be published
+         If the item being published is Variant and it has Invariant descendants and
+           we ARE forcing publishing of anything not published - the result will be that all Invariant documents are
+           published regardless of whether they have a published version or not and regardless of what cultures are selected to be published
+         */
+
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="culture">A culture, or "*" for all cultures.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
         /// <remarks>
         /// <para>Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
-        /// that one culture, see the other overload of this method.</para>
+        /// than one culture, see the other overloads of this method.</para>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
         /// published.</para>
@@ -377,19 +399,38 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="cultures">The cultures to publish.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
+        /// <remarks>
+        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
+        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
+        /// published.</para>
+        /// </remarks>
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0);
+
+        /// <summary>
+        /// Saves and publishes a document branch.
+        /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="editing">A function determining whether a document has changes to publish.</param>
+        /// <param name="publishCultures">A function publishing cultures.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
         /// <remarks>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
         /// published.</para>
         /// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
-        /// values to publish (else there is no need to publish it). If one wants to publish only a selection of
+        /// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
         /// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
         /// cultures may trigger an unwanted republish.</para>
         /// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
         /// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
         /// whether the cultures could be published.</para>
         /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, HashSet<string>> shouldPublish, Func<IContent, HashSet<string>, bool> publishCultures, int userId = 0);
 
         /// <summary>
         /// Unpublishes a document.

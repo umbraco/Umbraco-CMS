@@ -954,13 +954,24 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true)
         {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+                var result = SavePublishingInternal(scope, content, userId, raiseEvents);
+                scope.Complete();
+                return result;
+            }
+        }
+
+        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true)
+        {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
             PublishResult unpublishResult = null;
 
             // nothing set = republish it all
             if (content.PublishedState != PublishedState.Publishing && content.PublishedState != PublishedState.Unpublishing)
-                ((Content) content).PublishedState = PublishedState.Publishing;
+                ((Content)content).PublishedState = PublishedState.Publishing;
 
             // state here is either Publishing or Unpublishing
             var publishing = content.PublishedState == PublishedState.Publishing;
@@ -978,27 +989,22 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
 
-                var isNew = !content.HasIdentity;
-                var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
-                var previouslyPublished = content.HasIdentity && content.Published;
+            var isNew = !content.HasIdentity;
+            var changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
+            var previouslyPublished = content.HasIdentity && content.Published;
 
-                scope.WriteLock(Constants.Locks.ContentTree);
-
-                // always save
-                var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                {
-                    scope.Complete();
+            // always save
+            var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+            if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-                }
 
-                if (publishing)
-                {
+            if (publishing)
+            {
                     culturesUnpublishing = content.GetCulturesUnpublishing();
 
                     // ensure that the document can be published, and publish handling events, business rules, etc
-                    publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, evtMsgs);
-                    if (publishResult.Success)
+                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, evtMsgs);
+                if (publishResult.Success)
                     {
                         culturesPublishing = variesByCulture
                             ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
@@ -1025,20 +1031,20 @@ namespace Umbraco.Core.Services.Implement
                     }   
                 }
 
-                if (unpublishing)
-                {
-                    var newest = GetById(content.Id); // ensure we have the newest version - in scope
-                    if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
-                        content = newest;
+            if (unpublishing)
+            {
+                var newest = GetById(content.Id); // ensure we have the newest version - in scope
+                if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
+                    content = newest;
 
-                    if (content.Published)
-                    {
-                        // ensure that the document can be unpublished, and unpublish
-                        // handling events, business rules, etc
-                        // note: StrategyUnpublish flips the PublishedState to Unpublishing!
-                        // note: This unpublishes the entire document (not different variants)
-                        unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
-                        if (unpublishResult.Success)
+                if (content.Published)
+                {
+                    // ensure that the document can be unpublished, and unpublish
+                    // handling events, business rules, etc
+                    // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                    // note: This unpublishes the entire document (not different variants)
+                    unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
+                    if (unpublishResult.Success)
                             unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
                         else 
                         {
@@ -1046,37 +1052,37 @@ namespace Umbraco.Core.Services.Implement
                             ((Content)content).Published = content.Published; // reset published state = save unchanged
                         }   
                     }
-                    else
-                    {
-                        // already unpublished - optimistic concurrency collision, really,
-                        // and I am not sure at all what we should do, better die fast, else
-                        // we may end up corrupting the db
-                        throw new InvalidOperationException("Concurrency collision.");
-                    }
-                }
-
-                // save, always
-                if (content.HasIdentity == false)
-                    content.CreatorId = userId;
-                content.WriterId = userId;
-
-                // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-                _documentRepository.Save(content);
-
-                // raise the Saved event, always
-                if (raiseEvents)
+                else
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    // already unpublished - optimistic concurrency collision, really,
+                    // and I am not sure at all what we should do, better die fast, else
+                    // we may end up corrupting the db
+                    throw new InvalidOperationException("Concurrency collision.");
                 }
+            }
 
-                if (unpublishing) // we have tried to unpublish
+            // save, always
+            if (content.HasIdentity == false)
+                content.CreatorId = userId;
+            content.WriterId = userId;
+
+            // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
+            _documentRepository.Save(content);
+
+            // raise the Saved event, always
+            if (raiseEvents)
+            {
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+            }
+
+            if (unpublishing) // we have tried to unpublish
+            {
+                if (unpublishResult.Success) // and succeeded, trigger events
                 {
-                    if (unpublishResult.Success) // and succeeded, trigger events
-                    {
-                        // events and audit
-                        scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
-                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                    // events and audit
+                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                         if (culturesUnpublishing != null)
                         {
@@ -1091,35 +1097,33 @@ namespace Umbraco.Core.Services.Implement
                         else
                             Audit(AuditType.Unpublish, userId, content.Id);
 
-                        scope.Complete();
                         return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
-                    }
-
-                    // or, failed
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                    scope.Complete(); // compete the save
-                    return new PublishResult(PublishResultType.FailedUnpublish, evtMsgs, content); // bah
                 }
 
-                if (publishing) // we have tried to publish
+                // or, failed
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    return new PublishResult(PublishResultType.FailedUnpublish, evtMsgs, content); // bah
+            }
+
+            if (publishing) // we have tried to publish
+            {
+                if (publishResult.Success) // and succeeded, trigger events
                 {
-                    if (publishResult.Success) // and succeeded, trigger events
+                    if (isNew == false && previouslyPublished == false)
+                        changeType = TreeChangeTypes.RefreshBranch; // whole branch
+
+                    // invalidate the node/branch
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+
+                    // if was not published and now is... descendants that were 'published' (but
+                    // had an unpublished ancestor) are 're-published' ie not explicitely published
+                    // but back as 'published' nevertheless
+                    if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
-                        if (isNew == false && previouslyPublished == false)
-                            changeType = TreeChangeTypes.RefreshBranch; // whole branch
-
-                        // invalidate the node/branch
-                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
-
-                        // if was not published and now is... descendants that were 'published' (but
-                        // had an unpublished ancestor) are 're-published' ie not explicitely published
-                        // but back as 'published' nevertheless
-                        if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
-                        {
-                            var descendants = GetPublishedDescendantsLocked(content).ToArray();
-                            scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
-                        }
+                        var descendants = GetPublishedDescendantsLocked(content).ToArray();
+                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
+                    }
 
                         switch(publishResult.Result)
                         {
@@ -1146,9 +1150,8 @@ namespace Umbraco.Core.Services.Implement
                                 break;
                         }   
 
-                        scope.Complete();
-                        return publishResult;
-                    }
+                    return publishResult;
+                }
 
                 }
 
@@ -1167,10 +1170,8 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // or, failed
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                scope.Complete(); // compete the save
+            scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                 return publishResult;
-            }
         }
 
         /// <inheritdoc />
@@ -1272,16 +1273,44 @@ namespace Umbraco.Core.Services.Implement
             // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
             // and not to == them, else we would be comparing references, and that is a bad thing
 
-            bool IsEditing(IContent c, string l)
-                => c.PublishName != c.Name ||
-                   c.PublishedCultures.Where(x => x.InvariantEquals(l)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
-                   c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture.InvariantEquals(l)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+            // determines whether the document is edited, and thus needs to be published,
+            // for the specified culture (it may be edited for other cultures and that
+            // should not trigger a publish).
+            HashSet<string> ShouldPublish(IContent c)
+            {
+                if (c.ContentType.VariesByCulture())
+                {
+                    // variant content type
+                    // add culture if edited, and already published or forced
+                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force))
+                        return new HashSet<string> { culture.ToLowerInvariant() };
+                }
+                else
+                {
+                    // invariant content type
+                    // add "*" if edited, and already published or forced
+                    if (c.Edited && (c.Published || force))
+                        return new HashSet<string> { "*" };
+                }
 
-            return SaveAndPublishBranch(content, force, document => IsEditing(document, culture), document => document.PublishCulture(culture), userId);
+                return new HashSet<string>();
+            }
+
+            // publish the specified cultures
+            bool PublishCultures(IContent c, HashSet<string> culturesToPublish)
+            {
+                // variant content type - publish specified cultures
+                // invariant content type - publish only the invariant culture
+                return c.ContentType.VariesByCulture()
+                    ? culturesToPublish.All(c.PublishCulture)
+                    : c.PublishCulture();
+            }
+
+            return SaveAndPublishBranch(content, force, ShouldPublish, PublishCultures, userId);
         }
 
-        // fixme - make this public once we know it works + document
-        private IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0)
+        /// <inheritdoc />
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0)
         {
             // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
             // and not to == them, else we would be comparing references, and that is a bad thing
@@ -1291,35 +1320,47 @@ namespace Umbraco.Core.Services.Implement
             // determines whether the document is edited, and thus needs to be published,
             // for the specified cultures (it may be edited for other cultures and that
             // should not trigger a publish).
-            bool IsEdited(IContent c)
+            HashSet<string> ShouldPublish(IContent c)
             {
-                if (cultures.Length == 0)
+                var culturesToPublish = new HashSet<string>();
+
+                if (c.ContentType.VariesByCulture())
                 {
-                    // nothing = everything
-                    return c.PublishName != c.Name ||
-                           c.PublishedCultures.Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
-                           c.Properties.Any(x => x.Values.Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                    // variant content type
+                    // add cultures which are edited, and already published or forced
+                    foreach (var culture in cultures)
+                    {
+                        if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force))
+                            culturesToPublish.Add(culture.ToLowerInvariant());
+                    }
+                }
+                else
+                {
+                    // invariant content type
+                    // add "*" if edited, and already published or forced
+                    if (c.Edited && (c.Published || force))
+                        culturesToPublish.Add("*");
                 }
 
-                return c.PublishName != c.Name ||
-                       c.PublishedCultures.Where(x => cultures.Contains(x, StringComparer.InvariantCultureIgnoreCase)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
-                       c.Properties.Any(x => x.Values.Where(y => cultures.Contains(y.Culture, StringComparer.InvariantCultureIgnoreCase)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                return culturesToPublish;
             }
 
             // publish the specified cultures
-            bool PublishCultures(IContent c)
+            bool PublishCultures(IContent c, HashSet<string> culturesToPublish)
             {
-                return cultures.Length == 0
-                    ? c.PublishCulture() // nothing = everything
-                    : cultures.All(c.PublishCulture);
+                // variant content type - publish specified cultures
+                // invariant content type - publish only the invariant culture
+                return c.ContentType.VariesByCulture()
+                    ? culturesToPublish.All(c.PublishCulture)
+                    : c.PublishCulture();
             }
 
-            return SaveAndPublishBranch(content, force, IsEdited, PublishCultures, userId);
+            return SaveAndPublishBranch(content, force, ShouldPublish, PublishCultures, userId);
         }
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
-            Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0)
+            Func<IContent, HashSet<string>> shouldPublish, Func<IContent, HashSet<string>, bool> publishCultures, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var results = new List<PublishResult>();
@@ -1332,14 +1373,14 @@ namespace Umbraco.Core.Services.Implement
                 // fixme events?!
 
                 if (!document.HasIdentity)
-                    throw new InvalidOperationException("Do not branch-publish a new document.");
+                    throw new InvalidOperationException("Cannot not branch-publish a new document.");
 
                 var publishedState = ((Content) document).PublishedState;
                 if (publishedState == PublishedState.Publishing)
-                    throw new InvalidOperationException("Do not publish values when publishing branches.");
+                    throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
                 // deal with the branch root - if it fails, abort
-                var result = SaveAndPublishBranchOne(scope, document, editing, publishCultures, true, publishedDocuments, evtMsgs, userId);
+                var result = SaveAndPublishBranchOne(scope, document, shouldPublish, publishCultures, true, publishedDocuments, evtMsgs, userId);
                 results.Add(result);
                 if (!result.Success) return results;
 
@@ -1347,35 +1388,36 @@ namespace Umbraco.Core.Services.Implement
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
 
-                const int pageSize = 500;
+                int count;
                 var page = 0;
-                var total = long.MaxValue;
-                while (page * pageSize < total)
+                const int pageSize = 100;
+                do
                 {
-                    var descendants = GetPagedDescendants(document.Id, page++, pageSize, out total);
-
-                    foreach (var d in descendants)
+                    count = 0;
+                    // important to order by Path ASC so make it explicit in case defaults change
+                    // ReSharper disable once RedundantArgumentDefaultValue
+                    foreach (var d in GetPagedDescendants(document.Id, page, pageSize, out _, ordering: Ordering.By("Path", Direction.Ascending)))
                     {
-                        // if parent is excluded, exclude document and ignore
-                        // if not forcing, and not publishing, exclude document and ignore
-                        if (exclude.Contains(d.ParentId) || !force && !d.Published)
+                        count++;
+
+                        // if parent is excluded, exclude child too
+                        if (exclude.Contains(d.ParentId))
                         {
                             exclude.Add(d.Id);
                             continue;
                         }
 
-                        // no need to check path here,
-                        // 1. because we know the parent is path-published (we just published it)
-                        // 2. because it would not work as nothing's been written out to the db until the uow completes
-                        result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        // no need to check path here, parent has to be published here
+                        result = SaveAndPublishBranchOne(scope, d, shouldPublish, publishCultures, false, publishedDocuments, evtMsgs, userId);
                         results.Add(result);
                         if (result.Success) continue;
 
-                        // abort branch
+                        // if we could not publish the document, cut its branch
                         exclude.Add(d.Id);
                     }
-                }
-                
+
+                    page++;
+                } while (count > 0);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
@@ -1387,21 +1429,31 @@ namespace Umbraco.Core.Services.Implement
             return results;
         }
 
+        // shouldPublish: a function determining whether the document has changes that need to be published
+        //  note - 'force' is handled by 'editing'
+        // publishValues: a function publishing values (using the appropriate PublishCulture calls)
         private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
-            Func<IContent, bool> editing, Func<IContent, bool> publishValues,
+            Func<IContent, HashSet<string>> shouldPublish, Func<IContent, HashSet<string>, bool> publishCultures,
             bool checkPath,
-            List<IContent> publishedDocuments,
+            ICollection<IContent> publishedDocuments,
             EventMessages evtMsgs, int userId)
         {
-            // if already published, and values haven't changed - i.e. not changing anything
-            // nothing to do - fixme - unless we *want* to bump dates?
-            if (document.Published && (editing == null || !editing(document)))
+            // use 'shouldPublish' to determine whether there are changes to be published
+            // if the document has no changes to be published - nothing to
+            // for an invariant content, shouldPublish may contain "*" to indicate changes
+            var culturesToPublish = shouldPublish?.Invoke(document);
+            if (culturesToPublish == null || culturesToPublish.Count == 0)
                 return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
 
+            // there are changes to be published - publish them with 'publishCultures'
+
             // publish & check if values are valid
-            if (publishValues != null && !publishValues(document))
+            if (publishCultures != null && !publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
+            return SavePublishingInternal(scope, document, userId);
+
+            // fixme deal with the rest of this code!
             // check if we can publish
             var result = StrategyCanPublish(scope, document, userId, checkPath, evtMsgs);
             if (!result.Success)
