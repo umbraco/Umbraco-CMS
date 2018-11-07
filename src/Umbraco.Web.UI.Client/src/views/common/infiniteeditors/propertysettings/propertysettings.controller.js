@@ -30,6 +30,7 @@
         vm.close = close;
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleValidation = toggleValidation;
 
         function onInit() {
 
@@ -241,6 +242,15 @@
             }
 
             $scope.model.property.allowCultureVariant = true;
+        }
+
+        function toggleValidation() {
+            if ($scope.model.property.validation.mandatory) {
+                $scope.model.property.validation.mandatory = false;
+                return;
+            }
+
+            $scope.model.property.validation.mandatory = true;
         }
 
         onInit();
