@@ -251,6 +251,90 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Perform_Scheduled_Publishing()
+        {
+            var langUk = new Language("en-GB") { IsDefault = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langUk);
+
+            var ctInvariant = MockedContentTypes.CreateBasicContentType("invariantPage");
+            ServiceContext.ContentTypeService.Save(ctInvariant);
+
+            var ctVariant = MockedContentTypes.CreateBasicContentType("variantPage");
+            ctVariant.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(ctVariant);
+
+            var now = DateTime.Now;
+
+            //10x invariant content, half is scheduled to be published in 5 seconds, the other half is scheduled to be unpublished in 5 seconds
+            var invariant = new List<IContent>();
+            for (var i = 0; i < 10; i++)
+            {
+                var c = MockedContent.CreateBasicContent(ctInvariant);
+                c.Name = "name" + i;
+                if (i % 2 == 0)
+                {
+                    c.ContentSchedule.Add(now.AddSeconds(5), null); //release in 5 seconds
+                    var r = ServiceContext.ContentService.Save(c);
+                    Assert.IsTrue(r.Success, r.Result.ToString());
+                }   
+                else
+                {
+                    c.ContentSchedule.Add(null, now.AddSeconds(5)); //expire in 5 seconds
+                    var r = ServiceContext.ContentService.SaveAndPublish(c);
+                    Assert.IsTrue(r.Success, r.Result.ToString());
+                }
+                invariant.Add(c);
+            }
+
+            //10x variant content, half is scheduled to be published in 5 seconds, the other half is scheduled to be unpublished in 5 seconds
+            var variant = new List<IContent>();
+            var alternatingCulture = langFr.IsoCode;
+            for (var i = 0; i < 10; i++)
+            {
+                var c = MockedContent.CreateBasicContent(ctVariant);
+                c.SetCultureName("name-uk" + i, langUk.IsoCode);
+                c.SetCultureName("name-fr" + i, langFr.IsoCode);
+
+                if (i % 2 == 0)
+                {
+                    c.ContentSchedule.Add(alternatingCulture, now.AddSeconds(5), null); //release in 5 seconds
+                    var r = ServiceContext.ContentService.Save(c);
+                    Assert.IsTrue(r.Success, r.Result.ToString());
+
+                    alternatingCulture = alternatingCulture == langFr.IsoCode ? langUk.IsoCode : langFr.IsoCode;
+                }
+                else
+                {
+                    c.ContentSchedule.Add(alternatingCulture, null, now.AddSeconds(5)); //expire in 5 seconds
+                    var r = ServiceContext.ContentService.SaveAndPublish(c);
+                    Assert.IsTrue(r.Success, r.Result.ToString());
+                }
+                variant.Add(c);
+            }
+
+            
+            var runSched = ServiceContext.ContentService.PerformScheduledPublish(
+                now.AddMinutes(1)).ToList(); //lets go way later just to be safe, NOTE: This is NOT based on actual timer so it's safe
+
+            //this is 21 because the test data installed before this test runs has a scheduled item!
+            Assert.AreEqual(21, runSched.Count);
+            Assert.AreEqual(20, runSched.Count(x => x.Success),
+                string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+
+            Assert.AreEqual(5, runSched.Count(x => x.Result == PublishResultType.SuccessPublish),
+                string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+            Assert.AreEqual(5, runSched.Count(x => x.Result == PublishResultType.SuccessUnpublish),
+                string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+            Assert.AreEqual(5, runSched.Count(x => x.Result == PublishResultType.SuccessPublishCulture),
+                string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+            Assert.AreEqual(5, runSched.Count(x => x.Result == PublishResultType.SuccessUnpublishCulture),
+                string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+        }
+
+        [Test]
         public void Remove_Scheduled_Publishing_Date()
         {
             // Arrange

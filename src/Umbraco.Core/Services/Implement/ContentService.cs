@@ -1174,7 +1174,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> PerformScheduledPublish()
+        public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1182,7 +1182,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var now = DateTime.Now;
+                var now = date;
 
                 foreach (var d in GetContentForRelease(now))
                 {
@@ -1192,7 +1192,8 @@ namespace Umbraco.Core.Services.Implement
                         //find which cultures have pending schedules
                         var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, now)
                             .Select(x => x.Culture)
-                            .Distinct();
+                            .Distinct()
+                            .ToList();
                         
                         foreach (var c in pendingCultures)
                         {
@@ -1202,10 +1203,13 @@ namespace Umbraco.Core.Services.Implement
                             d.PublishCulture(c);
                         }
 
-                        result = SavePublishing(d, d.WriterId); 
-                        if (result.Success == false)
-                            Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-
+                        if (pendingCultures.Count > 0)
+                        {
+                            result = SavePublishing(d, d.WriterId);
+                            if (result.Success == false)
+                                Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            yield return result;
+                        }
                     }
                     else
                     {
@@ -1214,9 +1218,8 @@ namespace Umbraco.Core.Services.Implement
                         result = SaveAndPublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        yield return result;
                     }
-                                        
-                    yield return result;
                 }
 
                 foreach (var d in GetContentForExpiration(now))
@@ -1227,7 +1230,8 @@ namespace Umbraco.Core.Services.Implement
                         //find which cultures have pending schedules
                         var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, now)
                             .Select(x => x.Culture)
-                            .Distinct();
+                            .Distinct()
+                            .ToList();
 
                         foreach (var c in pendingCultures)
                         {
@@ -1237,10 +1241,13 @@ namespace Umbraco.Core.Services.Implement
                             d.UnpublishCulture(c);
                         }
 
-                        result = SavePublishing(d, d.WriterId);
-                        if (result.Success == false)
-                            Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-
+                        if (pendingCultures.Count > 0)
+                        {
+                            result = SavePublishing(d, d.WriterId);
+                            if (result.Success == false)
+                                Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            yield return result;
+                        }
                     }
                     else
                     {
@@ -1249,9 +1256,10 @@ namespace Umbraco.Core.Services.Implement
                         result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        yield return result;
                     }
 
-                    yield return result;
+                    
                 }
 
                 scope.Complete();
@@ -2292,14 +2300,14 @@ namespace Umbraco.Core.Services.Implement
             if (variesByCulture)
             {
                 var publishedCultures = content.PublishedCultures.ToList();
-                var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
-                if (!cannotBePublished)
-                {
-                    var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
-                    cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
-                }
 
-                if (cannotBePublished)
+                if (publishedCultures.Count == 0) // no published cultures = cannot be published
+                    return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+
+                var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
+                var mandatoryMissing = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
+                
+                if (mandatoryMissing)
                     return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, evtMsgs, content);
 
                 //track which cultures are being published
@@ -2312,7 +2320,7 @@ namespace Umbraco.Core.Services.Implement
             if (((Content) content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
-                return new PublishResult(PublishResultType.FailedPublishNoPublishedValues, evtMsgs, content);
+                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
             //loop over each culture publishing - or string.Empty for invariant

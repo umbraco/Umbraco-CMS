@@ -57,7 +57,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
         {
-            if (!content.ContentType.VariesByCulture() && !content.IsPropertyDirty("PublishCultureInfos"))
+            if (!content.ContentType.VariesByCulture() && !content.IsPropertyDirty("PublishCultureInfos") && !content.Published)
                 return Array.Empty<string>();
 
             var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);

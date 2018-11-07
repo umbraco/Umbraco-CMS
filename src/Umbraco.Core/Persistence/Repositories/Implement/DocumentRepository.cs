@@ -1083,9 +1083,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     //load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
-
-                    // reset dirty initial properties (U4-1946)
-                    temp.Content.ResetDirtyProperties(false);
                 }
             }
 
@@ -1099,6 +1096,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var temp in temps)
                     SetVariations(temp.Content, contentVariations, documentVariations);
             }
+
+            foreach(var c in content)
+                c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
 
             return content;
         }

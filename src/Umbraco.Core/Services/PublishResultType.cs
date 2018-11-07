@@ -97,9 +97,9 @@
         FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
-        /// Cannot republish a document that hasn't been published.
+        /// Cannot publish a document that has no publishing flags or values
         /// </summary>
-        FailedPublishNoPublishedValues = FailedPublish | 9, // in ContentService.StrategyCanPublish - fixme weird
+        FailedPublishNothingToPublish = FailedPublish | 9, // in ContentService.StrategyCanPublish - fixme weird
 
         /// <summary>
         /// Some mandatory cultures are missing.

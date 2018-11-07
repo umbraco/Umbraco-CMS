@@ -147,11 +147,9 @@ namespace Umbraco.Core.Models
         /// <param name="changeType"></param>
         /// <param name="date"></param>
         /// <returns></returns>
-        public IEnumerable<ContentSchedule> GetPending(ContentScheduleChange changeType, DateTime date)
+        public IReadOnlyList<ContentSchedule> GetPending(ContentScheduleChange changeType, DateTime date)
         {
-            if (_schedule.TryGetValue(string.Empty, out var changes))
-                return changes.Values.Where(x => x.Date <= date);
-            return Enumerable.Empty<ContentSchedule>();
+            return _schedule.Values.SelectMany(x => x.Values).Where(x => x.Date <= date).ToList();
         }
 
         /// <summary>

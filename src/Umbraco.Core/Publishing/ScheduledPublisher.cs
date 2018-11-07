@@ -31,7 +31,7 @@ namespace Umbraco.Core.Publishing
         /// </returns>
         public int CheckPendingAndProcess()
         {
-            var results = _contentService.PerformScheduledPublish();
+            var results = _contentService.PerformScheduledPublish(DateTime.Now);
             return results.Count(x => x.Success);
             
         }

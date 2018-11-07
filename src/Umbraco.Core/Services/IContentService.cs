@@ -423,7 +423,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Publishes and unpublishes scheduled documents.
         /// </summary>
-        IEnumerable<PublishResult> PerformScheduledPublish();
+        IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 
         #endregion
 
