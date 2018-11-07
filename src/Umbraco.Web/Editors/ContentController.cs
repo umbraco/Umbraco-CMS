@@ -821,7 +821,7 @@ namespace Umbraco.Web.Editors
             {
                 //its invariant, proceed normally
                 publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
-                wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
+                wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
             }
             else
@@ -854,14 +854,14 @@ namespace Umbraco.Web.Editors
                 {
                     //proceed to publish if all validation still succeeds
                     publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
+                    wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                     successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
                 }
                 else
                 {
                     //can only save
                     var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    publishStatus = new PublishResult(PublishResultType.FailedMandatoryCultureMissing, null, contentItem.PersistedContent);
+                    publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
                     wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                     successfulCultures = Array.Empty<string>();
                 }
@@ -1165,12 +1165,12 @@ namespace Umbraco.Web.Editors
             else
             {
                 //we only want to unpublish some of the variants
-                var results = new Dictionary<string, UnpublishResult>();
+                var results = new Dictionary<string, PublishResult>();
                 foreach(var c in model.Cultures)
                 {
                     var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
                     results[c] = result;
-                    if (result.Result == UnpublishResultType.SuccessMandatoryCulture)
+                    if (result.Result == PublishResultType.SuccessUnpublishMandatoryCulture)
                     {
                         //if this happens, it means they are all unpublished, we don't need to continue
                         break;
@@ -1180,7 +1180,7 @@ namespace Umbraco.Web.Editors
                 var content = MapToDisplay(foundContent);
 
                 //check for this status and return the correct message
-                if (results.Any(x => x.Value.Result == UnpublishResultType.SuccessMandatoryCulture))
+                if (results.Any(x => x.Value.Result == PublishResultType.SuccessUnpublishMandatoryCulture))
                 {
                     content.AddSuccessNotification(
                            Services.TextService.Localize("content/unpublish"),
@@ -1521,8 +1521,9 @@ namespace Umbraco.Web.Editors
         {
             switch (status.Result)
             {
-                case PublishResultType.Success:
-                case PublishResultType.SuccessAlready:
+                case PublishResultType.SuccessPublish:
+                case PublishResultType.SuccessPublishAlready:
+                case PublishResultType.SuccessPublishCulture:
                     if (successfulCultures == null)
                     {
                         display.AddSuccessNotification(
@@ -1539,35 +1540,37 @@ namespace Umbraco.Web.Editors
                         }
                     }
                     break;
-                case PublishResultType.FailedPathNotPublished:
+                case PublishResultType.FailedPublishPathNotPublished:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedByParent",
                                 new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
-                case PublishResultType.FailedCancelledByEvent:
+                case PublishResultType.FailedPublishCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
                     break;
-                case PublishResultType.FailedAwaitingRelease:
+                case PublishResultType.FailedPublishAwaitingRelease:
+                case PublishResultType.FailedPublishCultureAwaitingRelease:
                     //TODO: We'll need to deal with variants here eventually
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
                                 new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
-                case PublishResultType.FailedHasExpired:
+                case PublishResultType.FailedPublishHasExpired:
+                case PublishResultType.FailedPublishCultureHasExpired:
                     //TODO: We'll need to deal with variants here eventually
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedExpired",
                                 new[] { $"{status.Content.Name} ({status.Content.Id})", }).Trim());
                     break;
-                case PublishResultType.FailedIsTrashed:
+                case PublishResultType.FailedPublishIsTrashed:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
                         "publish/contentPublishedFailedIsTrashed"); // fixme properly localize, these keys are missing from lang files!
                     break;
-                case PublishResultType.FailedContentInvalid:
+                case PublishResultType.FailedPublishContentInvalid:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedInvalid",
@@ -1577,7 +1580,7 @@ namespace Umbraco.Web.Editors
                                     string.Join(",", status.InvalidProperties.Select(x => x.Alias))
                                 }).Trim());
                     break;
-                case PublishResultType.FailedMandatoryCultureMissing:
+                case PublishResultType.FailedPublishMandatoryCultureMissing:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
                         "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!

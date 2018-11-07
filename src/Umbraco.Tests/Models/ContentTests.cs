@@ -328,8 +328,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Key, content.Key);
             Assert.AreEqual(clone.Level, content.Level);
             Assert.AreEqual(clone.Path, content.Path);
-            //fixme: Need to maybe override equals or determine another way of comparing these
-            Assert.AreEqual(clone.ContentSchedule, content.ContentSchedule);
+            Assert.IsTrue(clone.ContentSchedule.Equals(content.ContentSchedule));
             Assert.AreEqual(clone.Published, content.Published);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);

@@ -905,15 +905,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Schedule
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetContentForRelease()
+        public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
             var sqlSchedule = Sql()
                 .Select<ContentScheduleDto>(x => x.NodeId)
                 .From<ContentScheduleDto>()
                 .Where<ContentScheduleDto>(x =>
                     x.Action == ContentScheduleChange.Start.ToString()
-                    && x.LanguageId == null
-                    && x.Date <= DateTime.Now);
+                    && x.Date <= date);
 
             //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
             // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
@@ -926,15 +925,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetContentForExpiration()
+        public IEnumerable<IContent> GetContentForExpiration(DateTime date)
         {
             var sqlSchedule = Sql()
                 .Select<ContentScheduleDto>(x => x.NodeId)
                 .From<ContentScheduleDto>()
                 .Where<ContentScheduleDto>(x =>
                     x.Action == ContentScheduleChange.End.ToString()
-                    && x.LanguageId == null
-                    && x.Date <= DateTime.Now);
+                    && x.Date <= date);
 
             //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
             // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason

@@ -299,6 +299,11 @@ namespace Umbraco.Core.Models
 
             if (_publishInfos == null) return;
             _publishInfos.Remove(culture);
+
+            //we need to set the culture name to be dirty so we know it's being modified
+            //fixme is there a better way to do this, not as far as i know. 
+            SetCultureName(GetCultureName(culture), culture);
+
             if (_publishInfos.Count == 0) _publishInfos = null;
         }
 
@@ -341,7 +346,7 @@ namespace Umbraco.Core.Models
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        public virtual bool PublishCulture(string culture = "*")
+        public bool PublishCulture(string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
@@ -394,7 +399,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void UnpublishCulture(string culture = "*")
+        public void UnpublishCulture(string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 

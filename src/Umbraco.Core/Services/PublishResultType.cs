@@ -9,81 +9,117 @@
         // all "ResultType" enums must be byte-based, and declare Failed = 128, and declare
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
+        #region Success - Publish
         /// <summary>
         /// The publishing was successful.
         /// </summary>
-        Success = 0,
+        SuccessPublish = 0,
+
+        SuccessPublishCulture = 1,
 
         /// <summary>
         /// The item was already published.
         /// </summary>
-        SuccessAlready = 1,
+        SuccessPublishAlready = 2, 
+        #endregion
 
+        #region Success - Unpublish
+        /// <summary>
+        /// The unpublishing was successful.
+        /// </summary>
+        SuccessUnpublish = 3,
+
+        /// <summary>
+        /// The item was already unpublished.
+        /// </summary>
+        SuccessUnpublishAlready = 4,
+
+        /// <summary>
+        /// The specified variant was unpublished, the content item itself remains published.
+        /// </summary>
+        SuccessUnpublishCulture = 5,
+
+        /// <summary>
+        /// The specified variant was a mandatory culture therefore it was unpublished and the content item itself is unpublished
+        /// </summary>
+        SuccessUnpublishMandatoryCulture = 6,
+        #endregion
+
+        #region Failed - Publish
         /// <summary>
         /// The operation failed.
         /// </summary>
         /// <remarks>All values above this value indicate a failure.</remarks>
-        Failed = 128,
+        FailedPublish = 128,
 
         /// <summary>
         /// The content could not be published because it's ancestor path isn't published.
         /// </summary>
-        FailedPathNotPublished = Failed | 1,
+        FailedPublishPathNotPublished = FailedPublish | 1,
 
         /// <summary>
         /// The content item was scheduled to be un-published and it has expired so we cannot force it to be
         /// published again as part of a bulk publish operation.
         /// </summary>
-        FailedHasExpired = Failed | 2,
+        FailedPublishHasExpired = FailedPublish | 2,
 
         /// <summary>
         /// The content item is scheduled to be released in the future and therefore we cannot force it to
         /// be published during a bulk publish operation.
         /// </summary>
-        FailedAwaitingRelease = Failed | 3,
+        FailedPublishAwaitingRelease = FailedPublish | 3,
 
         /// <summary>
         /// A culture on the content item was scheduled to be un-published and it has expired so we cannot force it to be
         /// published again as part of a bulk publish operation.
         /// </summary>
-        FailedCultureHasExpired = Failed | 4,
+        FailedPublishCultureHasExpired = FailedPublish | 4,
 
         /// <summary>
         /// A culture on the content item is scheduled to be released in the future and therefore we cannot force it to
         /// be published during a bulk publish operation.
         /// </summary>
-        FailedCultureAwaitingRelease = Failed | 5,
+        FailedPublishCultureAwaitingRelease = FailedPublish | 5,
 
         /// <summary>
         /// The content item could not be published because it is in the trash.
         /// </summary>
-        FailedIsTrashed = Failed | 6,
+        FailedPublishIsTrashed = FailedPublish | 6,
 
         /// <summary>
         /// The publish action has been cancelled by an event handler.
         /// </summary>
-        FailedCancelledByEvent = Failed | 7,
+        FailedPublishCancelledByEvent = FailedPublish | 7,
 
         /// <summary>
         /// The content item could not be published because it contains invalid data (has not passed validation requirements).
         /// </summary>
-        FailedContentInvalid = Failed | 8,
+        FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
         /// Cannot republish a document that hasn't been published.
         /// </summary>
-        FailedNoPublishedValues = Failed | 9, // in ContentService.StrategyCanPublish - fixme weird
-
-        /// <summary>
-        /// Publishing changes triggered an unpublishing, due to missing mandatory cultures, and unpublishing failed.
-        /// </summary>
-        FailedToUnpublish = Failed | 10, // in ContentService.SavePublishing
+        FailedPublishNoPublishedValues = FailedPublish | 9, // in ContentService.StrategyCanPublish - fixme weird
 
         /// <summary>
         /// Some mandatory cultures are missing.
         /// </summary>
-        FailedMandatoryCultureMissing = Failed | 11, // in ContentService.SavePublishing
+        FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing 
+        #endregion
 
+        #region Failed - Unpublish
+
+        /// <summary>
+        /// Unpublish failed
+        /// </summary>
+        FailedUnpublish = FailedPublish | 11, // in ContentService.SavePublishing
+
+        /// <summary>
+        /// The unpublish action has been cancelled by an event handler.
+        /// </summary>
+        FailedUnpublishCancelledByEvent = FailedPublish | 12,
+
+        #endregion
 
     }
 }

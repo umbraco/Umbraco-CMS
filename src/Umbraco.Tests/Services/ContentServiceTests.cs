@@ -1171,7 +1171,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-            var contents = contentService.GetContentForExpiration().ToList();
+            var contents = contentService.GetContentForExpiration(DateTime.Now).ToList();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -1186,7 +1186,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var contents = contentService.GetContentForRelease().ToList();
+            var contents = contentService.GetContentForRelease(DateTime.Now).ToList();
 
             // Assert
             Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
@@ -1230,6 +1230,7 @@ namespace Umbraco.Tests.Services
             Assert.That(published.Success, Is.True);
             Assert.That(unpublished.Success, Is.True);
             Assert.That(content.Published, Is.False);
+            Assert.AreEqual(PublishResultType.SuccessUnpublish, unpublished.Result);
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1273,6 +1274,7 @@ namespace Umbraco.Tests.Services
 
             var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             Assert.IsTrue(unpublished.Success);
+            Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
 
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
             //this is slightly confusing but this will be false because this method is used for checking the state of the current model,
@@ -1321,6 +1323,48 @@ namespace Umbraco.Tests.Services
             //audit log will only show that english was published
             lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: English (United Kingdom)", lastLog.Comment);
+        }
+
+        [Test]
+        public void Can_Unpublish_Content_Variation_And_Detect_Changed_Cultures()
+        {
+            // Arrange
+
+            var langGB = new Language("en-GB") { IsDefault = true, IsMandatory = true };
+            var langFr = new Language("fr-FR");
+
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langGB);
+
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            IContent content = new Content("content", -1, contentType);
+            content.SetCultureName("content-fr", langFr.IsoCode);
+            content.SetCultureName("content-gb", langGB.IsoCode);
+            content.PublishCulture(langGB.IsoCode);
+            content.PublishCulture(langFr.IsoCode);
+            var published = ServiceContext.ContentService.SavePublishing(content);
+            Assert.IsTrue(published.Success);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.UnpublishCulture(langFr.IsoCode); //unpublish non-mandatory lang
+            var unpublished = ServiceContext.ContentService.SavePublishing(content);
+            //audit log will only show that french was unpublished
+            var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            Assert.AreEqual($"Unpublished languages: French (France)", lastLog.Comment);
+
+            //re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetCultureName("content-en", langGB.IsoCode);
+            content.UnpublishCulture(langGB.IsoCode); //unpublish mandatory lang
+            unpublished = ServiceContext.ContentService.SavePublishing(content);
+            //audit log will only show that english was published
+            var logs = ServiceContext.AuditService.GetLogs(content.Id).ToList();
+            Assert.AreEqual($"Unpublished languages: English (United Kingdom)", logs[logs.Count - 2].Comment);
+            Assert.AreEqual($"Unpublished (mandatory language unpublished)", logs[logs.Count - 1].Comment);
         }
 
         [Test]
@@ -1444,7 +1488,7 @@ namespace Umbraco.Tests.Services
             // because it did not have a published version at all
             var contentPublished = contentService.SaveAndPublish(content);
             Assert.IsFalse(contentPublished.Success);
-            Assert.AreEqual(PublishResultType.FailedContentInvalid, contentPublished.Result);
+            Assert.AreEqual(PublishResultType.FailedPublishContentInvalid, contentPublished.Result);
             Assert.IsFalse(content.Published);
         }
 
@@ -1521,7 +1565,7 @@ namespace Umbraco.Tests.Services
             Assert.That(parentPublished.Success, Is.True);
             Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
-            Assert.AreEqual(PublishResultType.FailedHasExpired, published.Result);
+            Assert.AreEqual(PublishResultType.FailedPublishHasExpired, published.Result);
         }
 
         [Test]
@@ -1539,7 +1583,7 @@ namespace Umbraco.Tests.Services
             var published = ServiceContext.ContentService.SaveAndPublish(content, "en-US", Constants.Security.SuperUserId);
 
             Assert.IsFalse(published.Success);
-            Assert.AreEqual(PublishResultType.FailedCultureHasExpired, published.Result);
+            Assert.AreEqual(PublishResultType.FailedPublishCultureHasExpired, published.Result);
             Assert.That(content.Published, Is.False);
         }
 
@@ -1564,7 +1608,7 @@ namespace Umbraco.Tests.Services
             Assert.That(parentPublished.Success, Is.True);
             Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
-            Assert.AreEqual(PublishResultType.FailedAwaitingRelease, published.Result);
+            Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, published.Result);
         }
 
         [Test]
@@ -1582,7 +1626,7 @@ namespace Umbraco.Tests.Services
             var published = ServiceContext.ContentService.SaveAndPublish(content, "en-US", Constants.Security.SuperUserId);
 
             Assert.IsFalse(published.Success);
-            Assert.AreEqual(PublishResultType.FailedCultureAwaitingRelease, published.Result);
+            Assert.AreEqual(PublishResultType.FailedPublishCultureAwaitingRelease, published.Result);
             Assert.That(content.Published, Is.False);
         }
 

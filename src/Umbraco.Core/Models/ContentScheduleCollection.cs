@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 
 namespace Umbraco.Core.Models
 {
-    public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable
+    public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable, IEquatable<ContentScheduleCollection>
     {
         //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date
         private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule
@@ -85,9 +85,6 @@ namespace Umbraco.Core.Models
                 changes.Add(expireDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
-                
-
-            
         }
 
         /// <summary>
@@ -113,9 +110,10 @@ namespace Umbraco.Core.Models
         /// Clear all of the scheduled change type for invariant content
         /// </summary>
         /// <param name="changeType"></param>
-        public void Clear(ContentScheduleChange changeType)
+        /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
+        public void Clear(ContentScheduleChange changeType, DateTime? changeDate = null)
         {
-            Clear(string.Empty, changeType);
+            Clear(string.Empty, changeType, changeDate);
         }
 
         /// <summary>
@@ -123,11 +121,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="culture"></param>
         /// <param name="changeType"></param>
-        public void Clear(string culture, ContentScheduleChange changeType)
+        /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
+        public void Clear(string culture, ContentScheduleChange changeType, DateTime? changeDate = null)
         {
             if (_schedule.TryGetValue(culture, out var s))
             {
-                foreach (var ofChange in s.Where(x => x.Value.Change == changeType).ToList())
+                foreach (var ofChange in s.Where(x => x.Value.Change == changeType
+                    && (changeDate.HasValue ? x.Value.Date <= changeDate.Value : true)).ToList())
                 {
                     var removed = s.Remove(ofChange.Value.Date);
                     if (removed)
@@ -139,6 +139,19 @@ namespace Umbraco.Core.Models
                 }
                     
             }
+        }
+
+        /// <summary>
+        /// Returns all pending schedules based on the date and type provided
+        /// </summary>
+        /// <param name="changeType"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public IEnumerable<ContentSchedule> GetPending(ContentScheduleChange changeType, DateTime date)
+        {
+            if (_schedule.TryGetValue(string.Empty, out var changes))
+                return changes.Values.Where(x => x.Date <= date);
+            return Enumerable.Empty<ContentSchedule>();
         }
 
         /// <summary>
@@ -168,6 +181,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         public IReadOnlyDictionary<string, IEnumerable<ContentSchedule>> FullSchedule => _schedule.ToDictionary(x => x.Key, x => (IEnumerable<ContentSchedule>)x.Value.Values);
+        //public IEnumerable<ContentSchedule> FullSchedule => _schedule.SelectMany(x => x.Value.Values);
 
         public object DeepClone()
         {
@@ -181,5 +195,43 @@ namespace Umbraco.Core.Models
             }
             return clone;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ContentScheduleCollection c))
+                return false;
+            return Equals(c);
+        }
+
+        public bool Equals(ContentScheduleCollection other)
+        {
+            var thisSched = this.FullSchedule;
+            var thatSched = other.FullSchedule;
+
+            var equal = false;
+            if (thisSched.Count == thatSched.Count)
+            {
+                equal = true;
+                foreach (var pair in thisSched)
+                {
+                    if (thatSched.TryGetValue(pair.Key, out var val))
+                    {
+                        if (val.SequenceEqual(pair.Value))
+                        {
+                            equal = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // Require key be present.
+                        equal = false;
+                        break;
+                    }
+                }
+            }
+            return equal;
+        }
+        
     }
 }

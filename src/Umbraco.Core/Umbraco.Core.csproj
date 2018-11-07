@@ -1408,8 +1408,6 @@
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
-    <Compile Include="Services\UnpublishResult.cs" />
-    <Compile Include="Services\UnpublishResultType.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Settable.cs" />
     <Compile Include="Components\ManifestWatcherComponent.cs" />

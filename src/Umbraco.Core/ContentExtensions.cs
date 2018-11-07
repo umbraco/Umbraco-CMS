@@ -51,6 +51,26 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Method to return the cultures that have been flagged for unpublishing
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        {
+            if (!content.ContentType.VariesByCulture() && !content.IsPropertyDirty("PublishCultureInfos"))
+                return Array.Empty<string>();
+
+            var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
+
+            var result = new List<string>();
+            foreach (var culture in culturesChanging)
+                if (!content.IsCulturePublished(culture) && content.WasCulturePublished(culture))
+                    result.Add(culture);
+
+            return result;
+        }
+
+        /// <summary>
         /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
         /// </summary>
         /// <param name="entity"></param>

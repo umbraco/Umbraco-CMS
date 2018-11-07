@@ -159,12 +159,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets documents with an expiration date greater then today.
         /// </summary>
-        IEnumerable<IContent> GetContentForExpiration();
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForExpiration(DateTime date);
 
         /// <summary>
         /// Gets documents with a release date greater then today.
         /// </summary>
-        IEnumerable<IContent> GetContentForRelease();
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForRelease(DateTime date);
 
         /// <summary>
         /// Gets documents in the recycle bin.
@@ -416,7 +426,7 @@ namespace Umbraco.Core.Services
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
         /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
-        UnpublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
+        PublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.

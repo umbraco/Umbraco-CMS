@@ -133,9 +133,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetRootContent();
 
-            contentService.GetContentForExpiration();
+            contentService.GetContentForExpiration(DateTime.Now);
 
-            contentService.GetContentForRelease();
+            contentService.GetContentForRelease(DateTime.Now);
 
             contentService.GetContentInRecycleBin();
 
