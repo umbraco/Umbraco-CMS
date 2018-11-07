@@ -28,17 +28,5 @@
             </div>
         </div>
 
-        <umb-overlay ng-if="model.overlay" model="model.overlay" position="right" class="umb-stylesheet-rule-overlay">
-            <umb-control-group label="@general_name" description="@stylesheet_nameHelp">
-                <input type="text" ng-model="model.overlay.rule.name" required />
-            </umb-control-group>
-            <umb-control-group label="@stylesheet_selector" description="@stylesheet_selectorHelp">
-                <input type="text" ng-model="model.overlay.rule.selector" required />
-            </umb-control-group>
-            <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
-                <textarea ng-model="model.overlay.rule.styles" required></textarea>
-            </umb-control-group>
-        </umb-overlay>
-
     </umb-box-content>
 </umb-box>
