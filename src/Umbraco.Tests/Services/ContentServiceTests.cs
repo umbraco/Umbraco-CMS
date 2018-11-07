@@ -317,7 +317,7 @@ namespace Umbraco.Tests.Services
 
             
             var runSched = ServiceContext.ContentService.PerformScheduledPublish(
-                now.AddMinutes(1)).ToList(); //lets go way later just to be safe, NOTE: This is NOT based on actual timer so it's safe
+                now.AddMinutes(1)).ToList(); //process anything scheduled before a minute from now
 
             //this is 21 because the test data installed before this test runs has a scheduled item!
             Assert.AreEqual(21, runSched.Count);
@@ -332,6 +332,12 @@ namespace Umbraco.Tests.Services
                 string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
             Assert.AreEqual(5, runSched.Count(x => x.Result == PublishResultType.SuccessUnpublishCulture),
                 string.Join(Environment.NewLine, runSched.Select(x => $"{x.Entity.Name} - {x.Result}")));
+
+            //re-run the scheduled publishing, there should be no results
+            runSched = ServiceContext.ContentService.PerformScheduledPublish(
+               now.AddMinutes(1)).ToList();
+
+            Assert.AreEqual(0, runSched.Count);
         }
 
         [Test]

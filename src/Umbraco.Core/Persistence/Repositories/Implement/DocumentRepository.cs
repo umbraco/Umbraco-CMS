@@ -918,9 +918,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
             // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
             // no time to investigate right now.
-            var scheduledIds = (IEnumerable<int>)Database.Fetch<int>(sqlSchedule);
+            // fixed here: https://github.com/umbraco/Umbraco-CMS/pull/3516/files so when that's merged we don't need the AsEnumerable() thing
+            var scheduledIds = Database.Fetch<int>(sqlSchedule);
+            if (scheduledIds.Count == 0) return Enumerable.Empty<IContent>();
+            var e = scheduledIds.AsEnumerable();
 
-            var query = Query<IContent>().Where(x => x.Published == false && scheduledIds.Contains(x.Id));
+            var query = Query<IContent>().Where(x => x.Published == false && e.Contains(x.Id));
             return Get(query);
         }
 
@@ -938,9 +941,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
             // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
             // no time to investigate right now.
-            var scheduledIds = (IEnumerable<int>)Database.Fetch<int>(sqlSchedule);
+            // fixed here: https://github.com/umbraco/Umbraco-CMS/pull/3516/files so when that's merged we don't need the AsEnumerable() thing
+            var scheduledIds = Database.Fetch<int>(sqlSchedule);
+            if (scheduledIds.Count == 0) return Enumerable.Empty<IContent>();
+            var e = scheduledIds.AsEnumerable();
 
-            var query = Query<IContent>().Where(x => x.Published && scheduledIds.Contains(x.Id));
+            var query = Query<IContent>().Where(x => x.Published && e.Contains(x.Id));
             return Get(query);
         }
 
