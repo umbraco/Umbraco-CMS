@@ -17,7 +17,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Creates the built in list view data types
     /// </summary>
-    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHander
+    public class EnsureDefaultListViewDataTypesCreated : MigrationStartupHandler
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {

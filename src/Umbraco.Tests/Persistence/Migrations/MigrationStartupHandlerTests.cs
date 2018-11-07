@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Migrations
             public int CountExecuted { get; set; }
         }
 
-        public class TestMigrationHandler : MigrationStartupHander
+        public class TestMigrationHandler : MigrationStartupHandler
         {
             private readonly string _prodName;
             private readonly Args _changed;

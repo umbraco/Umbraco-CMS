@@ -19,7 +19,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// files during the migration since other parts of the migration might fail. So once the migration is complete, we'll then copy over the temp
     /// files that this migration created over top of the developer's files. We'll also create a backup of their files.
     /// </summary>
-    public sealed class OverwriteStylesheetFilesFromTempFiles : MigrationStartupHander
+    public sealed class OverwriteStylesheetFilesFromTempFiles : MigrationStartupHandler
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {

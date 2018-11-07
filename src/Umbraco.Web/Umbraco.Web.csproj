@@ -784,7 +784,7 @@
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Strategies\Migrations\MigrationStartupHander.cs" />
+    <Compile Include="Strategies\Migrations\MigrationStartupHandler.cs" />
     <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Strategies\NotificationsHandler.cs" />
     <Compile Include="Strategies\RelateOnCopyHandler.cs" />

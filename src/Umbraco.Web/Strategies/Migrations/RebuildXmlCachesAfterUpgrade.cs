@@ -19,7 +19,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// - Media & Content Xml : if current is less than, or equal to, 7.3.0 - because 7.3.0 adds .Key to cached items
     /// </para>
     /// </remarks>
-    public class RebuildXmlCachesAfterUpgrade : MigrationStartupHander
+    public class RebuildXmlCachesAfterUpgrade : MigrationStartupHandler
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {

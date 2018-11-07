@@ -7,7 +7,7 @@ namespace Umbraco.Web.Strategies.Migrations
     /// <summary>
     /// Base class that can be used to run code after the migration runner has executed
     /// </summary>
-    public abstract class MigrationStartupHander : ApplicationEventHandler
+    public abstract class MigrationStartupHandler : ApplicationEventHandler
     {
         /// <summary>
         /// Ensure this is run when not configured
