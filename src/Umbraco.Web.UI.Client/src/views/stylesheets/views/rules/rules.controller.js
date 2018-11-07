@@ -16,6 +16,9 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             evt.preventDefault();
 
             openOverlay({}, $scope.labels.addRule, (newRule) => {
+                if(!$scope.model.stylesheet.rules) {
+                    $scope.model.stylesheet.rules = [];
+                } 
                 $scope.model.stylesheet.rules.push(newRule);
                 setDirty();
             });
