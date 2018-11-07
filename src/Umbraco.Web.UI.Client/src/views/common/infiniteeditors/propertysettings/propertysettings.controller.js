@@ -31,6 +31,9 @@
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
         vm.toggleValidation = toggleValidation;
+        vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
+        vm.toggleMemberCanEdit = toggleMemberCanEdit;
+        vm.toggleIsSensitiveData = toggleIsSensitiveData;
 
         function onInit() {
 
@@ -251,6 +254,33 @@
             }
 
             $scope.model.property.validation.mandatory = true;
+        }
+
+        function toggleShowOnMemberProfile() {
+            if ($scope.model.property.showOnMemberProfile) {
+                $scope.model.property.showOnMemberProfile = false;
+                return;
+            }
+
+            $scope.model.property.showOnMemberProfile = true;
+        }
+
+        function toggleMemberCanEdit() {
+            if ($scope.model.property.memberCanEdit) {
+                $scope.model.property.memberCanEdit = false;
+                return;
+            }
+
+            $scope.model.property.memberCanEdit = true;
+        }
+
+        function toggleIsSensitiveData() {
+            if ($scope.model.property.isSensitiveData) {
+                $scope.model.property.isSensitiveData = false;
+                return;
+            }
+
+            $scope.model.property.isSensitiveData = true;
         }
 
         onInit();

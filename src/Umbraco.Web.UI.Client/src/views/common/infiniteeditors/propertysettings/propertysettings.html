@@ -127,27 +127,40 @@
                         </div>
                     
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
-                    
+
                             <h5><localize key="general_options"></localize></h5>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+
+                            <label class="mt3">
                                 <localize key="contentTypeEditor_showOnMemberProfile"></localize>
                                 <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
                             </label>
-                    
-                            <label class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.memberCanEdit">
+
+                            <umb-toggle data-element="settings_show_member_on_profile"
+                                        checked="model.property.showOnMemberProfile"
+                                        on-click="vm.toggleShowOnMemberProfile()">
+                            </umb-toggle>
+
+                            <label class="mt3">
                                 <localize key="contentTypeEditor_memberCanEdit"></localize>
                                 <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
                             </label>
-                    
-                            <label ng-if="vm.showSensitiveData" class="checkbox no-indent">
-                                <input type="checkbox" ng-model="model.property.isSensitiveData">
-                                <localize key="contentTypeEditor_isSensitiveData"></localize>
-                                <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
+
+                            <umb-toggle data-element="settings_member_can_edit"
+                                        checked="model.property.memberCanEdit"
+                                        on-click="vm.toggleMemberCanEdit()">
+                            </umb-toggle>
+
+                            <label class="mt3" ng-if="vm.showSensitiveData">
+                                <localize key="contentTypeEditor_memberCanEdit"></localize>
+                                <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
                             </label>
-                    
+
+                            <umb-toggle ng-if="vm.showSensitiveData" data-element="settings_is_sensitive_data"
+                                        checked="model.property.isSensitiveData"
+                                        on-click="vm.toggleIsSensitiveData()">
+                            </umb-toggle>
+                                                      
+
                         </div>
                     </div>
 
