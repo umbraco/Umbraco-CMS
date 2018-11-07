@@ -238,49 +238,28 @@
 
         }
 
-        function toggleAllowCultureVariants() {
-            if ($scope.model.property.allowCultureVariant) {
-                $scope.model.property.allowCultureVariant = false;
-                return;
-            }
+        function toggleValue(settingValue) {
+            return !settingValue;
+        }
 
-            $scope.model.property.allowCultureVariant = true;
+        function toggleAllowCultureVariants() {            
+            $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
         }
 
         function toggleValidation() {
-            if ($scope.model.property.validation.mandatory) {
-                $scope.model.property.validation.mandatory = false;
-                return;
-            }
-
-            $scope.model.property.validation.mandatory = true;
+            $scope.model.property.validation.mandatory = toggleValue($scope.model.property.validation.mandatory);            
         }
 
         function toggleShowOnMemberProfile() {
-            if ($scope.model.property.showOnMemberProfile) {
-                $scope.model.property.showOnMemberProfile = false;
-                return;
-            }
-
-            $scope.model.property.showOnMemberProfile = true;
+            $scope.model.property.showOnMemberProfile = toggleValue($scope.model.property.showOnMemberProfile);           
         }
 
         function toggleMemberCanEdit() {
-            if ($scope.model.property.memberCanEdit) {
-                $scope.model.property.memberCanEdit = false;
-                return;
-            }
-
-            $scope.model.property.memberCanEdit = true;
+            $scope.model.property.memberCanEdit = toggleValue($scope.model.property.memberCanEdit);            
         }
 
         function toggleIsSensitiveData() {
-            if ($scope.model.property.isSensitiveData) {
-                $scope.model.property.isSensitiveData = false;
-                return;
-            }
-
-            $scope.model.property.isSensitiveData = true;
+            $scope.model.property.isSensitiveData = toggleValue($scope.model.property.isSensitiveData);             
         }
 
         onInit();
