@@ -29,7 +29,7 @@ describe('tree service tests', function () {
             menuUrl: menuUrl,
             metaData: { treeAlias: "content" }
         };
-        
+
         treeService._formatNodeDataForUseInUI(t, t.children, "content", 0);
         treeService._formatNodeDataForUseInUI(t.children[0], t.children[0].children, "content", 1);
 
@@ -42,7 +42,7 @@ describe('tree service tests', function () {
     beforeEach(module('ngRoute'));
 
     beforeEach(inject(function ($injector, mocksUtils) {
-        
+
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
 
@@ -59,53 +59,53 @@ describe('tree service tests', function () {
 
             var cache;
             treeService.getTree().then(function (data) {
-                cache = treeService._getTreeCache();                
+                cache = treeService._getTreeCache();
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
 
             expect(_.keys(cache).length).toBe(0);
         });
-        
+
         it('does not cache with no cacheKey', function () {
             var cache;
             treeService.getTree({section: "content"}).then(function (data) {
                 cache = treeService._getTreeCache();
-                
+
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
 
             expect(_.keys(cache).length).toBe(0);
         });
-        
+
         it('caches by section with cache key', function () {
             var cache;
             treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
-                cache = treeService._getTreeCache();                
+                cache = treeService._getTreeCache();
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
 
             expect(cache["__media"]).toBeDefined();
         });
-        
+
         it('caches by default content section with cache key', function () {
             var cache;
             treeService.getTree({ cacheKey: "_" }).then(function (data) {
-                cache = treeService._getTreeCache();                
+                cache = treeService._getTreeCache();
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
-            
+
             expect(cache).toBeDefined();
             expect(cache["__content"]).toBeDefined();
         });
-        
+
         it('removes by section with cache key', function () {
             var cache;
             treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
@@ -122,15 +122,15 @@ describe('tree service tests', function () {
 
             treeService.clearCache({ section: "media", cacheKey: "_" });
             cache = treeService._getTreeCache();
-            
+
             expect(cache["__media"]).not.toBeDefined();
             expect(_.keys(cache).length).toBe(1);
 
         });
-        
+
         it('removes cache by key regardless of section', function () {
             var cache;
-            
+
             treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
                 treeService.getTree({ section: "content", cacheKey: "_" }).then(function (d) {
                     treeService.getTree({ section: "content", cacheKey: "anotherkey" }).then(function (dd) {
@@ -138,7 +138,7 @@ describe('tree service tests', function () {
                     });
                 });
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
 
@@ -153,11 +153,11 @@ describe('tree service tests', function () {
             expect(cache["__content"]).not.toBeDefined();
             expect(_.keys(cache).length).toBe(1);
         });
-        
+
         it('removes all section cache regardless of key', function () {
-            
+
             var cache;
-            
+
             treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
                 treeService.getTree({ section: "media", cacheKey: "anotherkey" }).then(function (d) {
                     treeService.getTree({ section: "content", cacheKey: "anotherkey" }).then(function (dd) {
@@ -165,7 +165,7 @@ describe('tree service tests', function () {
                     });
                 });
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
 
@@ -180,7 +180,7 @@ describe('tree service tests', function () {
             expect(cache["__media"]).not.toBeDefined();
             expect(_.keys(cache).length).toBe(1);
         });
-        
+
         it('removes all cache', function () {
 
             var cache;
@@ -206,20 +206,20 @@ describe('tree service tests', function () {
             cache = treeService._getTreeCache();
             expect(_.keys(cache).length).toBe(0);
         });
-        
+
         it('clears cache by key using a filter that returns null', function () {
 
             var cache;
-            
+
             treeService.getTree({ section: "media", cacheKey: "_" }).then(function (d) {
                 treeService.getTree({ section: "content", cacheKey: "_" }).then(function (dd) {
                     cache = treeService._getTreeCache();
                 });
             });
-            
+
             $rootScope.$digest();
             $httpBackend.flush();
-            
+
             expect(_.keys(cache).length).toBe(2);
 
             treeService.clearCache({
@@ -230,10 +230,10 @@ describe('tree service tests', function () {
             });
 
             cache = treeService._getTreeCache();
-            
+
             expect(_.keys(cache).length).toBe(1);
         });
-        
+
         it('removes cache by key using a filter', function () {
 
             var cache;
@@ -252,7 +252,7 @@ describe('tree service tests', function () {
 
             treeService.clearCache({
                 cacheKey: "__content",
-                filter: function (currentCache) {                    
+                filter: function (currentCache) {
                     var toRemove = treeService.getDescendantNode(currentCache.root, 1235);
                     toRemove.parent().children = _.without(toRemove.parent().children, toRemove);
                     return currentCache;
@@ -263,15 +263,15 @@ describe('tree service tests', function () {
 
             expect(cache.__content.root.children.length).toBe(3);
         });
-        
+
         it('removes cache children for a parent id specified', function () {
 
             var cache;
 
             treeService.getTree({ section: "content", cacheKey: "_" }).then(function (dd) {
                 treeService.loadNodeChildren({ node: dd.root.children[0] }).then(function () {
-                    cache = treeService._getTreeCache();    
-                });                
+                    cache = treeService._getTreeCache();
+                });
             });
 
             $rootScope.$digest();
@@ -279,7 +279,7 @@ describe('tree service tests', function () {
 
             expect(cache.__content.root.children.length).toBe(4);
             expect(cache.__content.root.children[0].children.length).toBe(4);
-            
+
             treeService.clearCache({
                 cacheKey: "__content",
                 childrenOf: "1234"
@@ -301,11 +301,25 @@ describe('tree service tests', function () {
             var found = treeService.getTreePackageFolder("myTree");
             expect(found).toBe("MyPackage");
         });
-        
+
         it('returns undefined for a not found tree', function () {
             //we know this exists in the mock umbraco server vars
             var found = treeService.getTreePackageFolder("asdfasdf");
             expect(found).not.toBeDefined();
+        });
+
+    });
+
+    describe('Remove existing nodes', function() {
+
+        it('hasChildren has to be updated on parent', function () {
+            var tree = getContentTree();
+
+            while (tree.children.length > 0){
+                treeService.removeNode(tree.children[0])
+            }
+
+            expect(tree.hasChildren).toBe(false);
         });
 
     });
@@ -333,15 +347,15 @@ describe('tree service tests', function () {
             expect(found.id).toBe(13);
             expect(found.name).toBe("random-name-3");
         });
-        
+
         it('returns null for a descendant node that doesnt exist', function () {
 
             var tree = getContentTree();
             var found = treeService.getDescendantNode(tree, 123456);
-            
-            expect(found).toBeNull();            
+
+            expect(found).toBeNull();
         });
-        
+
         it('can get a child node', function () {
 
             var tree = getContentTree();
@@ -370,17 +384,17 @@ describe('tree service tests', function () {
         });
 
         it('can get the root node from a child node', function () {
-            
+
             var tree = getContentTree();
             var testNode = tree.children[0].children[3];
             var root = treeService.getTreeRoot(testNode);
-            
+
             expect(root).toBeDefined();
             expect(root).not.toBeNull();
             expect(root.id).toBe(-1);
             expect(root.name).toBe("content");
         });
-        
+
         it('can get the root node from the root node', function () {
 
             var tree = getContentTree();
@@ -391,6 +405,6 @@ describe('tree service tests', function () {
             expect(root.id).toBe(-1);
             expect(root.name).toBe("content");
         });
-        
+
     });
 });

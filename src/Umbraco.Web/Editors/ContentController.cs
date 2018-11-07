@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
-                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageNumber = 0,  
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -484,7 +484,8 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                children = Services.ContentService.GetChildren(id).ToList();
+                //better to not use this without paging where possible, currently only the sort dialog does
+                children = Services.ContentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -1073,15 +1074,12 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id) == false)
+                var sortResult = contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id);
+                if (!sortResult.Success)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    //TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
-                }
-
-                if (sorted.ParentId > 0)
-                {
-                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), Current.Actions.GetAction<ActionSort>(), UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -1322,7 +1320,7 @@ namespace Umbraco.Web.Editors
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent(Services.ContentService);
+                            xcontent = Services.ContentService.GetParent(xcontent);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);
@@ -1442,7 +1440,7 @@ namespace Umbraco.Web.Editors
                 if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: " + contentSave.TemplateAlias);
+                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else
                 {

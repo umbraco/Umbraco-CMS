@@ -48,6 +48,7 @@ namespace Umbraco.Web.Trees
         internal static Attempt<LegacyUrlAction> GetUrlAndTitleFromLegacyAction(IAction action, string nodeId, string nodeType, string nodeName, string currentSection)
         {
             switch (action)
+
             {
                 case ActionNew actionNew:
                     return Attempt.Succeed(

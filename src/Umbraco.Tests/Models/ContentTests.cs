@@ -271,7 +271,12 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
             contentType.Id = 99;
+            contentType.Variations = ContentVariation.Culture;
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.SetCultureName("Hello", "en-US");
+            content.SetCultureName("World", "es-ES");
+            content.PublishCulture("en-US");
 
             // should not try to clone something that's not Published or Unpublished
             // (and in fact it will not work)
@@ -299,6 +304,8 @@ namespace Umbraco.Tests.Models
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
+
+            
 
             // Act
             var clone = (Content)content.DeepClone();
@@ -347,6 +354,22 @@ namespace Umbraco.Tests.Models
                 Assert.AreEqual(clone.Properties[index], content.Properties[index]);
             }
 
+            Assert.AreNotSame(clone.PublishCultureInfos, content.PublishCultureInfos);
+            Assert.AreEqual(clone.PublishCultureInfos.Count, content.PublishCultureInfos.Count);
+            foreach (var key in content.PublishCultureInfos.Keys)
+            {
+                Assert.AreNotSame(clone.PublishCultureInfos[key], content.PublishCultureInfos[key]);
+                Assert.AreEqual(clone.PublishCultureInfos[key], content.PublishCultureInfos[key]);
+            }
+
+            Assert.AreNotSame(clone.CultureInfos, content.CultureInfos);
+            Assert.AreEqual(clone.CultureInfos.Count, content.CultureInfos.Count);
+            foreach (var key in content.CultureInfos.Keys)
+            {
+                Assert.AreNotSame(clone.CultureInfos[key], content.CultureInfos[key]);
+                Assert.AreEqual(clone.CultureInfos[key], content.CultureInfos[key]);
+            }
+
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
@@ -365,6 +388,87 @@ namespace Umbraco.Tests.Models
             clone.Properties.Add(newProperty);
 
             Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
+        }
+
+        [Test]
+        public void Remember_Dirty_Properties()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.Id = 99;
+            contentType.Variations = ContentVariation.Culture;
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.SetCultureName("Hello", "en-US");
+            content.SetCultureName("World", "es-ES");
+            content.PublishCulture("en-US");
+            
+            var i = 200;
+            foreach (var property in content.Properties)
+            {
+                property.Id = ++i;
+            }
+            content.Id = 10;
+            content.CreateDate = DateTime.Now;
+            content.CreatorId = 22;
+            content.ExpireDate = DateTime.Now;
+            content.Key = Guid.NewGuid();
+            content.Level = 3;
+            content.Path = "-1,4,10";
+            content.ReleaseDate = DateTime.Now;
+            content.SortOrder = 5;
+            content.Template = new Template((string)"Test Template", (string)"testTemplate")
+            {
+                Id = 88
+            };
+            
+            content.Trashed = true;
+            content.UpdateDate = DateTime.Now;
+            content.WriterId = 23;
+
+            content.Template.UpdateDate = DateTime.Now; //update a child object
+            content.ContentType.UpdateDate = DateTime.Now;  //update a child object
+
+            // Act
+            content.ResetDirtyProperties();
+
+            // Assert
+            Assert.IsTrue(content.WasDirty());
+            Assert.IsTrue(content.WasPropertyDirty("Id"));
+            Assert.IsTrue(content.WasPropertyDirty("CreateDate"));
+            Assert.IsTrue(content.WasPropertyDirty("CreatorId"));
+            Assert.IsTrue(content.WasPropertyDirty("ExpireDate"));
+            Assert.IsTrue(content.WasPropertyDirty("Key"));
+            Assert.IsTrue(content.WasPropertyDirty("Level"));
+            Assert.IsTrue(content.WasPropertyDirty("Path"));
+            Assert.IsTrue(content.WasPropertyDirty("ReleaseDate"));
+            Assert.IsTrue(content.WasPropertyDirty("SortOrder"));
+            Assert.IsTrue(content.WasPropertyDirty("Template"));
+            Assert.IsTrue(content.WasPropertyDirty("Trashed"));
+            Assert.IsTrue(content.WasPropertyDirty("UpdateDate"));
+            Assert.IsTrue(content.WasPropertyDirty("WriterId"));
+            foreach (var prop in content.Properties)
+            {
+                Assert.IsTrue(prop.WasDirty());
+                Assert.IsTrue(prop.WasPropertyDirty("Id"));
+            }
+            Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
+            foreach(var culture in content.CultureInfos)
+            {
+                Assert.IsTrue(culture.Value.WasDirty());
+                Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
+                Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
+            }
+            Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
+            foreach (var culture in content.PublishCultureInfos)
+            {
+                Assert.IsTrue(culture.Value.WasDirty());
+                Assert.IsTrue(culture.Value.WasPropertyDirty("Name"));
+                Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
+            }
+            //verify child objects were reset too
+            Assert.IsTrue(content.Template.WasPropertyDirty("UpdateDate"));
+            Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
         [Test]

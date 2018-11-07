@@ -311,20 +311,15 @@ namespace Umbraco.Core.Models
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (ContentTypeCompositionBase)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //need to manually assign since this is an internal field and will not be automatically mapped
-            clone.RemovedContentTypeKeyTracker = new List<int>();
-            clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedEntity = (ContentTypeCompositionBase)clone;
+            
+            //need to manually assign since this is an internal field and will not be automatically mapped
+            clonedEntity.RemovedContentTypeKeyTracker = new List<int>();
+            clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
         }
     }
 }

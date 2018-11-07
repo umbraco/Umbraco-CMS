@@ -59,7 +59,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     var taskResult = await GetTaskByHttpAync(t.Url, token);
                     if (t.Log)
-                        _logger.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
+                        _logger.Info<ScheduledTasks>("{TaskAlias} has been called with response: {TaskResult}", t.Alias, taskResult);
                 }
             }
         }

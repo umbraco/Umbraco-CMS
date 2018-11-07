@@ -25,6 +25,14 @@ namespace Umbraco.Web.Trees
     [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class TemplatesTreeController : TreeController, ISearchableTree
     {
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+            //check if there are any templates
+            root.HasChildren = Services.FileService.GetTemplates(-1).Any();
+            return root;
+        }
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>

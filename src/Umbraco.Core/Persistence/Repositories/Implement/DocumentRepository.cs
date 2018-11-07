@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private string VariantNameSqlExpression
             => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql;
 
-        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
+        protected Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
         {
             var sql = SqlContext.Sql();
 

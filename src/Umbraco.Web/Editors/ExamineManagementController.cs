@@ -149,7 +149,7 @@ namespace Umbraco.Web.Editors
             var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
             if (msg.IsSuccessStatusCode)
             {
-                _logger.Info<ExamineManagementController>($"Rebuilding index '{indexerName}'");
+                _logger.Info<ExamineManagementController>("Rebuilding index '{IndexerName}'", indexerName);
 
                 //remove it in case there's a handler there alraedy
                 indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

@@ -49,7 +49,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 .ToArray();
             var contentService = Mock.Of<IContentService>(
                 x => x.GetPagedDescendants(
-                    It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<bool>(), It.IsAny<IQuery<IContent>>())
+                    It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
                     ==
                     allRecs);
 

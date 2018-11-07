@@ -125,10 +125,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetByLevel(2);
 
-            contentService.GetChildren(id1);
-
-            contentService.GetDescendants(id2);
-
             contentService.GetVersions(id3);
 
             contentService.GetRootContent();
@@ -136,8 +132,6 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             contentService.GetContentForExpiration(DateTime.Now);
 
             contentService.GetContentForRelease(DateTime.Now);
-
-            contentService.GetContentInRecycleBin();
 
             ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(-1))
             {
