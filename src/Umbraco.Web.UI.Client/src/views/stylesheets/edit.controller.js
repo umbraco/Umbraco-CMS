@@ -12,24 +12,6 @@
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
 
-        localizationService.localizeMany(["stylesheet_tabCode", "stylesheet_tabRules"]).then(function (data) {
-            vm.page.navigation = [
-                {
-                    "name": data[0],
-                    "alias": "code",
-                    "icon": "icon-brackets",
-                    "view": "views/stylesheets/views/code/code.html",
-                    "active": true
-                },
-                {
-                    "name": data[1],
-                    "alias": "rules",
-                    "icon": "icon-font",
-                    "view": "views/stylesheets/views/rules/rules.html"
-                }
-            ];
-        });
-
          //Used to toggle the keyboard shortcut modal
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
         vm.showKeyboardShortcut = false;
@@ -45,7 +27,10 @@
             vm.page.keyboardShortcutsOverview.push(shortcuts);
         });
 
-        vm.stylesheet = {};
+        vm.stylesheet = {
+            content: "",
+            rules: []
+        };
 
         // bind functions to view model
         vm.save = interpolateAndSave;
@@ -139,14 +124,45 @@
 
             if ($routeParams.create) {
                 codefileResource.getScaffold("stylesheets", $routeParams.id).then(function (stylesheet) {
+                    const mode = $routeParams.rtestyle ? "RTE" : null;
                     ready(stylesheet, false);
+                    generateNavigation(mode);
                 });
             } else {
                 codefileResource.getByPath('stylesheets', $routeParams.id).then(function (stylesheet) {
                     ready(stylesheet, true);
+                    extractRules().then(rules => {
+                        vm.stylesheet.rules = rules;
+                        const mode = rules && rules.length > 0 ? "RTE" : null;
+                        generateNavigation(mode);
+                    });
                 });
             }
 
+        }
+
+        function generateNavigation(mode) {
+            localizationService.localizeMany(["stylesheet_tabRules", "stylesheet_tabCode"]).then(function (data) {
+                vm.page.navigation = [
+                    {
+                        "name": data[0],
+                        "alias": "rules",
+                        "icon": "icon-font",
+                        "view": "views/stylesheets/views/rules/rules.html"
+                    },
+                    {
+                        "name": data[1],
+                        "alias": "code",
+                        "icon": "icon-brackets",
+                        "view": "views/stylesheets/views/code/code.html"
+                    }
+                ];
+                if(mode === "RTE") {
+                    vm.page.navigation[0].active = true;
+                } else {
+                    vm.page.navigation[1].active = true;
+                }
+            });
         }
 
         function ready(stylesheet, syncTree) {
@@ -240,31 +256,11 @@
         }
 
         function interpolateRules() {
-            var payload = {
-                content: vm.stylesheet.content,
-                rules: vm.stylesheet.rules
-            };
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "codeFileApiBaseUrl",
-                        "PostInterpolateStylesheetRules"),
-                    payload),
-                "Failed to interpolate sheet rules");
+            return codefileResource.interpolateStylesheetRules(vm.stylesheet.content, vm.stylesheet.rules);
         }
 
         function extractRules() {
-            var payload = {
-                content: vm.stylesheet.content,
-                rules: null
-            };
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "codeFileApiBaseUrl",
-                        "PostExtractStylesheetRules"),
-                    payload),
-                "Failed to extract style sheet rules");
+            return codefileResource.extractStylesheetRules(vm.stylesheet.content);
         }
         
         $scope.selectApp = function (app) {
