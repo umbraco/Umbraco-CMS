@@ -106,23 +106,15 @@
                     
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
-                            <div class="sub-view-columns">
-
-                                <div class="sub-view-column-left">
+                           
                                     <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
-                                    
-                                </div>
-
-                                <div class="sub-view-column-right">
+                             
                                     <umb-toggle data-element="permissions-allow-culture-variant"
                                                 checked="model.property.allowCultureVariant"
                                                 on-click="vm.toggleAllowCultureVariants()"
                                     >
                                     </umb-toggle>
-                                </div>
-    
-                            </div>
-                            
+
                         </div>
                     
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
