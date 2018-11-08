@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesController",
-    function ($scope, localizationService) {       
+    function ($scope, localizationService, editorService) {       
         $scope.sortableOptions = {
             axis: 'y',
             containment: 'parent',
@@ -16,6 +16,9 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             evt.preventDefault();
 
             openOverlay({}, $scope.labels.addRule, (newRule) => {
+                if(!$scope.model.stylesheet.rules) {
+                    $scope.model.stylesheet.rules = [];
+                } 
                 $scope.model.stylesheet.rules.push(newRule);
                 setDirty();
             });
@@ -40,17 +43,23 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
         }
 
         function openOverlay(rule, title, onSubmit) {
-            $scope.model.overlay = {
+
+            const ruleDialog = {
                 title: title,
-                submit: function (model) {
+                rule: _.clone(rule),
+                view: "views/stylesheets/infiniteeditors/richtextrule/richtextrule.html",
+                size: "small",
+                submit: function(model) {
                     onSubmit(model.rule);
-                    $scope.model.overlay = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    $scope.model.overlay = null;
-                },
-                rule: _.clone(rule)
+                close: function() {
+                    editorService.close();
+                }
             };
+
+            editorService.open(ruleDialog);
+
         }
 
         function setDirty() {
