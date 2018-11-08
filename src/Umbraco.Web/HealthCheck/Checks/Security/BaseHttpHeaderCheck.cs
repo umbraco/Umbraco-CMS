@@ -13,24 +13,24 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        protected readonly ILocalizedTextService _textService;
+        protected readonly ILocalizedTextService TextService;
 
         protected const string SetHeaderInConfigAction = "setHeaderInConfig";
 
-        protected readonly string _header;
-        protected readonly string _value;
-        protected readonly string _localizedTextPrefix;
-        protected readonly bool _metaTagOptionAvailable;
+        protected readonly string Header;
+        protected readonly string Value;
+        protected readonly string LocalizedTextPrefix;
+        protected readonly bool MetaTagOptionAvailable;
 
         public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext, 
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            TextService = healthCheckContext.ApplicationContext.Services.TextService;
 
-            _header = header;
-            _value = value;
-            _localizedTextPrefix = localizedTextPrefix;
-            _metaTagOptionAvailable = metaTagOptionAvailable;
+            Header = header;
+            Value = value;
+            LocalizedTextPrefix = localizedTextPrefix;
+            MetaTagOptionAvailable = metaTagOptionAvailable;
         }
 
         /// <summary>
@@ -76,18 +76,18 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 success = DoHttpHeadersContainHeader(response);
 
                 // If not found, and available, check for meta-tag
-                if (success == false && _metaTagOptionAvailable)
+                if (success == false && MetaTagOptionAvailable)
                 {
                     success = DoMetaTagsContainKeyForHeader(response);
                 }
 
                 message = success
-                    ? _textService.Localize(string.Format("healthcheck/{0}CheckHeaderFound", _localizedTextPrefix))
-                    : _textService.Localize(string.Format("healthcheck/{0}CheckHeaderNotFound", _localizedTextPrefix));
+                    ? TextService.Localize(string.Format("healthcheck/{0}CheckHeaderFound", LocalizedTextPrefix))
+                    : TextService.Localize(string.Format("healthcheck/{0}CheckHeaderNotFound", LocalizedTextPrefix));
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, ex.Message });
+                message = TextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
@@ -95,8 +95,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
                 {
-                    Name = _textService.Localize("healthcheck/setHeaderInConfig"),
-                    Description = _textService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigDescription", _localizedTextPrefix))
+                    Name = TextService.Localize("healthcheck/setHeaderInConfig"),
+                    Description = TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigDescription", LocalizedTextPrefix))
                 });
             }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private bool DoHttpHeadersContainHeader(WebResponse response)
         {
-            return response.Headers.AllKeys.Contains(_header);
+            return response.Headers.AllKeys.Contains(Header);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -122,7 +122,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     var html = reader.ReadToEnd();
                     var metaTags = ParseMetaTags(html);
-                    return metaTags.ContainsKey(_header);
+                    return metaTags.ContainsKey(Header);
                 }
             }
         }
@@ -144,14 +144,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             if (success)
             {
                 return
-                    new HealthCheckStatus(_textService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
+                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", LocalizedTextPrefix)))
                     {
                         ResultType = StatusResultType.Success
                     };
             }
 
             return
-                new HealthCheckStatus(_textService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };
@@ -182,22 +182,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
                 var removeHeaderElement = customHeadersElement.Elements("remove")
                     .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name")?.Value == _value);
+                                          x.Attribute("name")?.Value == Value);
                 if (removeHeaderElement == null)
                 {
                     removeHeaderElement = new XElement("remove");
-                    removeHeaderElement.Add(new XAttribute("name", _header));
+                    removeHeaderElement.Add(new XAttribute("name", Header));
                     customHeadersElement.Add(removeHeaderElement);
                 }
 
                 var addHeaderElement = customHeadersElement.Elements("add")
                     .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name").Value == _header);
+                                          x.Attribute("name").Value == Header);
                 if (addHeaderElement == null)
                 {
                     addHeaderElement = new XElement("add");
-                    addHeaderElement.Add(new XAttribute("name", _header));
-                    addHeaderElement.Add(new XAttribute("value", _value));
+                    addHeaderElement.Add(new XAttribute("name", Header));
+                    addHeaderElement.Add(new XAttribute("value", Value));
                     customHeadersElement.Add(addHeaderElement);
                 }
 
