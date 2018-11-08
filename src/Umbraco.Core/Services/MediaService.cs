@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -1166,24 +1167,51 @@ namespace Umbraco.Core.Services
 
         private void ObfuscateTrashedMedia(IMedia media)
         {
-            // TODO This will have to work, if it part fails we've made a mess on the FS
-            var currentFilename = media.GetValue<string>("umbracoFile");
-            var newFilename = Guid.NewGuid() + "$" + currentFilename;
-            _mediaFileSystem.CopyFile(currentFilename, newFilename);
-            _mediaFileSystem.DeleteFile(currentFilename);
-            media.SetValue("umbracoFile", newFilename);
+            // TODO This *has* to work, if it part fails we've made a mess on the FS
+
+            var umbracoFile = media.GetValue<string>("umbracoFile");
+            var filename = Path.GetFileName(umbracoFile);
+            var newUmbracoFile = MediaPath(umbracoFile) + ObfuscateFilename(filename);
+            MoveFile(umbracoFile, newUmbracoFile);
+            media.SetValue("umbracoFile", newUmbracoFile);
         }
 
         private void UnobfuscateTrashedMedia(IMedia media)
         {
-            var currentFilename = media.GetValue<string>("umbracoFile");
-            if (currentFilename.Contains("$")) // TODO : Not good enough, files could contain $ already
+            var umbracoFile = media.GetValue<string>("umbracoFile");
+            var filename = Path.GetFileName(umbracoFile);
+            if (HasBeenObfuscated(filename)) 
             {
-                var newFilename = currentFilename.Split('$')[1];
-                _mediaFileSystem.CopyFile(currentFilename, newFilename);
-                _mediaFileSystem.DeleteFile(currentFilename);
-                media.SetValue("umbracoFile", newFilename);
+                var newUmbracoFile = MediaPath(umbracoFile) + UnobfuscateFilename(filename);
+                MoveFile(umbracoFile, newUmbracoFile);
+                media.SetValue("umbracoFile", newUmbracoFile);
             }
+        }
+
+        private string MediaPath(string umbracoFile)
+        {
+            return Path.GetDirectoryName(umbracoFile).Replace("\\", "/") + "/";
+        }
+
+        private void MoveFile(string from, string to)
+        {
+            _mediaFileSystem.CopyFile(from, to);
+            _mediaFileSystem.DeleteFile(from);
+        }
+
+        private string ObfuscateFilename(string filename)
+        {
+            return Guid.NewGuid() + "$" + filename;
+        }
+
+        private string UnobfuscateFilename(string filename)
+        {
+            return filename.Split(new[] {'$'}, 2)[1];
+        }
+
+        private bool HasBeenObfuscated(string filename)
+        {
+            return Regex.IsMatch(filename, @"^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?\\$");
         }
 
 
