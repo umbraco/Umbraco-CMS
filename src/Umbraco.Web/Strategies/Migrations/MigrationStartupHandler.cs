@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Migrations;
 
@@ -57,5 +58,11 @@ namespace Umbraco.Web.Strategies.Migrations
         /// Leaving empty will run for all migration products
         /// </remarks>
         public virtual string[] TargetProductNames { get { return new string[] {}; } }
+    }
+
+    [Obsolete("Name has changed, use MigrationStartupHandler instead")]
+    public abstract class MigrationStartupHander : MigrationStartupHandler
+    {
+
     }
 }
