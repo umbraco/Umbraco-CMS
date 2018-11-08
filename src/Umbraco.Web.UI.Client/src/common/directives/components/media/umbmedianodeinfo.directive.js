@@ -16,7 +16,7 @@
                 // get document type details
                 scope.mediaType = scope.node.contentType;
 
-                // set the media link initially
+               
                 setMediaLink();
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
@@ -45,14 +45,14 @@
                 if(!newValue) { return; }
                 if(newValue === oldValue) { return; }
 
-                // Update the media link
+  
                 setMediaLink();
 
                 // Update the create and update dates
                 formatDatesToLocal();
             });
 
-            //ensure to unregister from all events!
+        
             scope.$on('$destroy', function () {
                 for (var e in evts) {
                     eventsService.unsubscribe(evts[e]);

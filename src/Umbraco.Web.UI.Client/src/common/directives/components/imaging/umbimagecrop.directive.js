@@ -80,8 +80,7 @@ angular.module("umbraco.directives")
 						scope.dimensions.image = image;
 
 						//unscaled editor size
-						//var viewPortW =  $viewport.width();
-						//var viewPortH =  $viewport.height();
+				
 						var _viewPortW =  parseInt(scope.width, 10);
 						var _viewPortH =  parseInt(scope.height, 10);
 
@@ -114,7 +113,7 @@ angular.module("umbraco.directives")
 								scope.dimensions.cropper.height,
 								true);
 
-						//sets the image size and updates the scope
+					
 						scope.dimensions.image.width = size.width;
 						scope.dimensions.image.height = size.height;
 
@@ -133,7 +132,7 @@ angular.module("umbraco.directives")
 
 					//resize to a given ratio
 					var resizeImageToScale = function(ratio){
-						//do stuff
+				
 						var size = cropperHelper.calculateSizeToRatio(scope.dimensions.image.originalWidth, scope.dimensions.image.originalHeight, ratio);
 						scope.dimensions.image.width = size.width;
 						scope.dimensions.image.height = size.height;
@@ -210,7 +209,7 @@ angular.module("umbraco.directives")
 						},
 						stop: function(event, ui){
 							scope.$apply(function(){
-								//make sure that every validates one more time...
+						
 								validatePosition(ui.position.left, ui.position.top);
 
 								calculateCropBox();
@@ -224,17 +223,17 @@ angular.module("umbraco.directives")
 					var init = function(image){
 						scope.loaded = false;
 
-						//set dimensions on image, viewport, cropper etc
+					
 						setDimensions(image);
 
-						//if we have a crop already position the image
+					
 						if(scope.crop){
 							resizeImageToCrop();
 						}else{
 							resizeImageToEditor();
 						}
 
-						//sets constaints for the cropper
+		
 						setConstraints();
 						scope.loaded = true;
 					};
@@ -256,7 +255,7 @@ angular.module("umbraco.directives")
 					}, 100);
 
 
-					//happens when we change the scale
+				
 					scope.$watch("dimensions.scale.current", function(){
 						if(scope.loaded){
 							throttledResizing();

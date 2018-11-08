@@ -352,15 +352,7 @@ angular.module("umbraco.directives")
 
                             loadTinyMce();
 
-                            //here we declare a special method which will be called whenever the value has changed from the server
-                            //this is instead of doing a watch on the model.value = faster
-                            //scope.model.onValueChanged = function (newVal, oldVal) {
-                            //    //update the display val again if it has changed from the server;
-                            //    tinyMceEditor.setContent(newVal, { format: 'raw' });
-                            //    //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
-                            //    // is required for our plugins listening to this event to execute
-                            //    tinyMceEditor.fire('LoadContent', null);
-                            //};
+
 
                              
                             var tabShownListener = eventsService.on("valTab.tabShown", function (e, args) {

@@ -9,8 +9,7 @@
    function NotificationDirective(notificationsService) {
 
       function link(scope, el, attr, ctrl) {
-
-         //subscribes to notifications in the notification service
+          
          scope.notifications = notificationsService.current;
          scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
              if (newVal) {

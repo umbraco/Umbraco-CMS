@@ -56,7 +56,7 @@ angular.module("umbraco.directives")
 
                     if(attr){
                         if(attr[0] === '@'){
-                            //If the translation key starts with @ then remove it
+                           
                             attr = attr.substring(1);
                         }
 
