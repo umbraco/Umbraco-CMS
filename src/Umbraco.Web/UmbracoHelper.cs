@@ -916,7 +916,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Will take the first non-null value in the collection and return the value of it.
+        /// Joins any number of int/string/objects into one string
         /// </summary>
         public string Concatenate(params object[] args)
         {

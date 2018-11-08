@@ -143,7 +143,6 @@
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
-    <Compile Include="CodeAnnotations\ActionMetadataAttribute.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
@@ -352,10 +351,13 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddLogTableColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddTypedLabels.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables2.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DropDownPropertyEditorsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DropPreValueTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTaskTables.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
@@ -375,6 +377,8 @@
     <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
+    <Compile Include="Models\ContentCultureInfos.cs" />
+    <Compile Include="Models\ContentCultureInfosCollection.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
     <Compile Include="Models\Editors\ContentPropertyFile.cs" />
     <Compile Include="Models\Entities\BeingDirty.cs" />
@@ -391,6 +395,8 @@
     <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
+    <Compile Include="Models\NotificationEmailBodyParams.cs" />
+    <Compile Include="Models\NotificationEmailSubjectParams.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
@@ -1239,10 +1245,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\DropdownListMultipleValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\DropdownListMultipleWithKeysValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\DropdownListValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\DropdownListWithKeysValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\EmailAddressValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />

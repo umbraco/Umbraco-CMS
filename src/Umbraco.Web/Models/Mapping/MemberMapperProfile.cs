@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             CreateMap<MembershipUser, IMember>()
                 .ConstructUsing(src => MemberService.CreateGenericMembershipProviderMember(src.UserName, src.Email, src.UserName, ""))
-                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of int.MaxValue - TODO: SD: I can't remember why this mapping is here?
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
                 .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comment))
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreationDate))
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.CultureNames, opt => opt.Ignore())
+                .ForMember(dest => dest.CultureInfos, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentId, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
                 .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
 
-            //FROM IMember TO MediaItemDisplay
+            //FROM IMember TO MemberDisplay
             CreateMap<IMember, MemberDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
@@ -80,10 +80,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
-                .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(memberTreeNodeUrlResolver));
+                .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(memberTreeNodeUrlResolver))
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM IMember TO MemberBasic
             CreateMap<IMember, MemberBasic>()
+                //we're giving this entity an ID of int.MaxValue - this is kind of a hack to force angular to use the Key instead of the Id in list views
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
@@ -95,11 +98,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(memberBasicPropertiesResolver));
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(memberBasicPropertiesResolver))
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             CreateMap<MembershipUser, MemberBasic>()
-                //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
+                //we're giving this entity an ID of int.MaxValue - TODO: SD: I can't remember why this mapping is here?
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => int.MaxValue))
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreationDate))
@@ -120,7 +124,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
+                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore())
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             CreateMap<IMember, ContentPropertyCollectionDto>()
@@ -142,8 +147,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentId, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.Path, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore());
         }
     }
 }

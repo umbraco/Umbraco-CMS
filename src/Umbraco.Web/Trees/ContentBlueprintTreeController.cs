@@ -4,10 +4,11 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -31,6 +32,9 @@ namespace Umbraco.Web.Trees
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
+
+            //check if there are any content blueprints
+            root.HasChildren = Services.ContentService.GetBlueprintsForContentTypes().Any();
 
             return root;
         }
@@ -92,9 +96,8 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions
-                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
-                    $"actions/{ActionRefresh.Instance.Alias}"), true);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
             var cte = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
@@ -102,15 +105,15 @@ namespace Umbraco.Web.Trees
             if (cte != null)
             {
                 var ct = Services.ContentTypeService.Get(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService.Localize($"actions/{ActionCreateBlueprintFromContent.Instance.Alias}"));
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService, opensDialog: true);
                 createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
 
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;
         }

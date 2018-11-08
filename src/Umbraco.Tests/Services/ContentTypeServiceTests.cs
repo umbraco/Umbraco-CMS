@@ -1,10 +1,8 @@
-﻿using System.Runtime.Remoting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -12,10 +10,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.Components;
+using Umbraco.Tests.Scoping;
 
 namespace Umbraco.Tests.Services
 {

@@ -23,7 +23,7 @@
   * </pre>
   **/
 
-function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files, restApiUrl, showNotifications) {
@@ -607,7 +607,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-
+            if (!options.cultureName) {
+                // must send a culture to the content API to handle variant data correctly
+                options.cultureName = $routeParams.mculture;
+            }
             //converts the value to a js bool
             function toBool(v) {
                 if (angular.isNumber(v)) {
@@ -756,11 +759,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the saved content item.
           *
           */
-        sendToPublish: function (content, isNew, files) {
+        sendToPublish: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
-            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
+            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
         /**
@@ -808,8 +811,106 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to create blueprint from content with id " + contentId
             );
-        }
+        },
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getRollbackVersions
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns an array of previous version id's, given a node id and a culture
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getRollbackVersions(id, culture)
+          *    .then(function(versions) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object containing the versions
+          *
+          */
+        getRollbackVersions: function (contentId, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersions", {
+                        contentId: contentId,
+                        culture: culture
+                    })
+                ),
+                "Failed to get rollback versions for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getRollbackVersion
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a previous version of a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getRollbackVersion(versionId, culture)
+          *    .then(function(version) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} versionId The version Id
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object containing the version
+          *
+          */
+        getRollbackVersion: function (versionId, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetRollbackVersion", {
+                        versionId: versionId,
+                        culture: culture
+                    })
+                ),
+                "Failed to get version for content item with id " + versionId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#rollback
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Roll backs a content item to a previous version
+          *
+          * ##usage
+          * <pre>
+          * contentResource.rollback(contentId, versionId, culture)
+          *    .then(function() {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} versionId The version Id
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object
+          *
+          */
+        rollback: function (contentId, versionId, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostRollbackContent", {
+                        contentId: contentId, versionId:versionId, culture:culture
+                    })
+                ),
+                "Failed to roll back content item with id " + contentId
+            );
+        }
 
     };
 }

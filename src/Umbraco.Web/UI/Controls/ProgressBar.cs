@@ -9,7 +9,7 @@ namespace Umbraco.Web.UI.Controls
         protected override void Render(System.Web.UI.HtmlTextWriter writer)
         {
             // fixme - image is gone!
-            base.ImageUrl = SystemDirectories.UmbracoClient + "/images/progressBar.gif";
+            base.ImageUrl = "/images/progressBar.gif";
             base.AlternateText = Title;
 
             base.Render(writer);

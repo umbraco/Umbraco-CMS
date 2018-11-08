@@ -1,15 +1,18 @@
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
+    function ($scope, fileManager) {
 
         var config = angular.copy($scope.model.config);
 
         $scope.filesSelected = onFileSelected;
         $scope.filesChanged = onFilesChanged;
         $scope.fileUploaderInit = onFileUploaderInit;
+        $scope.imageLoaded = imageLoaded;
         $scope.crop = crop;
         $scope.done = done;
         $scope.clear = clear;
+        $scope.reset = reset;
+        $scope.close = close;
         $scope.focalPointChanged = focalPointChanged;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
@@ -64,6 +67,11 @@ angular.module('umbraco')
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         }
+
+        function imageLoaded (isCroppable, hasDimensions) {
+            $scope.isCroppable = isCroppable;
+            $scope.hasDimensions = hasDimensions;
+        };
 
         /**
          * Called when the file collection changes
@@ -122,7 +130,8 @@ angular.module('umbraco')
          * @param {any} crop
          */
         function crop(crop) {
-            $scope.currentCrop = crop;
+            // clone the crop so we can discard the changes
+            $scope.currentCrop = angular.copy(crop);
             $scope.currentPoint = null;
 
             //set form to dirty to track changes
@@ -131,12 +140,27 @@ angular.module('umbraco')
 
         /** done cropping */
         function done() {
-            $scope.currentCrop = null;
-            $scope.currentPoint = null;
+            if (!$scope.currentCrop) {
+                return;
+            }
+            // find the original crop by crop alias and update its coordinates
+            var editedCrop = _.find($scope.model.value.crops, crop => crop.alias === $scope.currentCrop.alias);
+            editedCrop.coordinates = $scope.currentCrop.coordinates;
+            $scope.close();
 
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         };
+
+        function reset() {
+            $scope.currentCrop.coordinates = undefined;
+            $scope.done();
+        }
+
+        function close() {
+            $scope.currentCrop = undefined;
+            $scope.currentPoint = undefined;
+        }
 
         /**
          * crop a specific crop
@@ -171,7 +195,7 @@ angular.module('umbraco')
     })
     .run(function (mediaHelper, umbRequestHelper) {
         if (mediaHelper && mediaHelper.registerFileResolver) {
-
+            
             //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
             // they contain different data structures so if we need to query against it we need to be aware of this.
             mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {

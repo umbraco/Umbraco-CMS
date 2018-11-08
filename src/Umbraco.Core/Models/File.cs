@@ -156,26 +156,17 @@ namespace Umbraco.Core.Models
             clone._alias = Alias;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (File) base.DeepClone();
+            base.PerformDeepClone(clone);
+
+            var clonedFile = (File)clone;
 
             // clear fields that were memberwise-cloned and that we don't want to clone
-            clone._content = null;
-
-            // turn off change tracking
-            clone.DisableChangeTracking();
+            clonedFile._content = null;
 
             // ...
-            DeepCloneNameAndAlias(clone);
-
-            // this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-
-            // re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            DeepCloneNameAndAlias(clonedFile);
         }
     }
 }

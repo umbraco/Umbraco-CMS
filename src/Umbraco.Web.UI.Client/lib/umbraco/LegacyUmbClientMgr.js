@@ -33,7 +33,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
          * Returns the root angular scope
          */
         function getRootScope() {
-            return angular.element(document.getElementById("umbracoMainPageBody")).scope();
+            return top.$("#umbracoMainPageBody").scope();
         }
         
         /**
@@ -46,7 +46,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
          * Returns the root angular injector
          */
         function getRootInjector() {
-            return angular.element(document.getElementById("umbracoMainPageBody")).injector();
+            return top.$("#umbracoMainPageBody").injector();
         }
 
 
@@ -146,7 +146,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             sourceUrl: currentMenuNode.childNodesUrl,
                             updateDefinition: function() {
                                 throw "'updateDefinition' method is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
-                            }
+                            },
+                            expanded: currentMenuNode.expanded === true
                         };
                         //defined getters that will throw a not implemented/supported exception
                         Object.defineProperty(legacyNode, "menu", {
@@ -326,7 +327,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
                 dialog.element.data("modalCb", onCloseCallback);
                 //add the close triggers
-                if (angular.isArray(closeTriggers)) {
+                if (top.angular.isArray(closeTriggers)) {
                     for (var i = 0; i < closeTriggers.length; i++) {
                         var e = dialog.find(closeTriggers[i]);
                         if (e.length > 0) {

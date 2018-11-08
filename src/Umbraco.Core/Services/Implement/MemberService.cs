@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Member '{member.Name}' was created with Id {member.Id}", member.CreatorId, member.Id);
+            Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }
 
         #endregion
@@ -393,12 +393,14 @@ namespace Umbraco.Core.Services.Implement
 
         // fixme get rid of string filter?
 
-        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
         {
             return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
         }
 
-        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter)
+        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -843,7 +845,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                Audit(AuditType.Save, "Save Member performed by user", 0, member.Id);
+                Audit(AuditType.Save, 0, member.Id);
 
                 scope.Complete();
             }
@@ -884,7 +886,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                Audit(AuditType.Save, "Save Member items performed by user", 0, -1);
+                Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
                 scope.Complete();
             }
@@ -912,7 +914,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 DeleteLocked(scope, member, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete Member performed by user", 0, member.Id);
+                Audit(AuditType.Delete, 0, member.Id);
                 scope.Complete();
             }
         }
@@ -1089,9 +1091,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
         }
 
         #endregion

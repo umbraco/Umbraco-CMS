@@ -82,7 +82,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<UpdateDateResolver>())
                 .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>());
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>())
+                .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
@@ -132,7 +133,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if we don't have a name for a culture, it means the culture is not available, and
                 // hey we should probably not be mapping it, but it's too late, return a fallback name
-                return source.CultureNames.TryGetValue(culture, out var name) && !name.IsNullOrWhiteSpace() ? name : $"(({source.Name}))";
+                return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"(({source.Name}))";
             }
         }
     }    

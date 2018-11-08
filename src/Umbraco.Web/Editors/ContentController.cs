@@ -30,10 +30,11 @@ using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
@@ -456,7 +457,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
-                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageNumber = 0,  
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -483,7 +484,8 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                children = Services.ContentService.GetChildren(id).ToList();
+                //better to not use this without paging where possible, currently only the sort dialog does
+                children = Services.ContentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -555,7 +557,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
@@ -931,14 +933,14 @@ namespace Umbraco.Web.Editors
             var errMsg = Services.TextService.Localize(localizationKey, new[] { _allLangs.Value[culture].CultureName });
             ModelState.AddModelError(key, errMsg);
         }
-        
+
         /// <summary>
         /// Publishes a document with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <remarks>
-        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// The EnsureUserPermissionForContent attribute will deny access to this method if the current user
         /// does not have Publish access to this node.
         /// </remarks>
         ///
@@ -1068,15 +1070,12 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder) == false)
+                var sortResult = contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id);
+                if (!sortResult.Success)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    //TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
-                }
-
-                if (sorted.ParentId > 0)
-                {
-                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -1127,7 +1126,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("model.Id", 'U')]
+        [EnsureUserPermissionForContent("model.Id", 'Z')]
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
@@ -1223,7 +1222,7 @@ namespace Umbraco.Web.Editors
 
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
+            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1317,7 +1316,7 @@ namespace Umbraco.Web.Editors
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent(Services.ContentService);
+                            xcontent = Services.ContentService.GetParent(xcontent);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);
@@ -1437,7 +1436,7 @@ namespace Umbraco.Web.Editors
                 if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: " + contentSave.TemplateAlias);
+                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else
                 {
@@ -1702,5 +1701,94 @@ namespace Umbraco.Web.Editors
             Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
         }
 
+        [HttpGet]
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
+        {
+            var rollbackVersions = new List<RollbackVersion>();
+            var writerIds = new HashSet<int>();
+
+            //Return a list of all versions of a specific content node
+            // fixme - cap at 50 versions for now?
+            var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
+
+            //Not all nodes are variants & thus culture can be null
+            if (culture != null)
+            {
+                //Get cultures that were published with the version = their update date is equal to the version's
+                versions = versions.Where(x => x.UpdateDate == x.GetUpdateDate(culture));
+            }
+
+            //First item is our current item/state (cant rollback to ourselves)
+            versions = versions.Skip(1);
+
+            foreach (var version in versions)
+            {
+                var rollbackVersion = new RollbackVersion
+                {
+                    VersionId = version.VersionId,
+                    VersionDate = version.UpdateDate,
+                    VersionAuthorId = version.WriterId
+                };
+
+                rollbackVersions.Add(rollbackVersion);
+
+                writerIds.Add(version.WriterId);
+            }
+
+            var users = Services.UserService
+                .GetUsersById(writerIds.ToArray())
+                .ToDictionary(x => x.Id, x => x.Name);
+
+            foreach (var rollbackVersion in rollbackVersions)
+            {
+                if (users.TryGetValue(rollbackVersion.VersionAuthorId, out var userName))
+                    rollbackVersion.VersionAuthorName = userName;
+            }
+            
+            return rollbackVersions;
+        }
+
+        [HttpGet]
+        public ContentVariantDisplay GetRollbackVersion(int versionId, string culture = null)
+        {
+            var version = Services.ContentService.GetVersion(versionId);
+            var content = MapToDisplay(version);
+                       
+			return culture == null
+				? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
+                : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
+        }
+
+        [EnsureUserPermissionForContent("contentId", ActionRollback.ActionLetter)]
+        [HttpPost]
+        public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
+        {
+            var rollbackResult = Services.ContentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
+
+			if (rollbackResult.Success)
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            var notificationModel = new SimpleNotificationModel();
+
+            switch (rollbackResult.Result)
+            {
+                case OperationResultType.Failed:
+                case OperationResultType.FailedCannot:
+                case OperationResultType.FailedExceptionThrown:
+                case OperationResultType.NoOperation:
+                default:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                                    null); //TODO: There is no specific failed to save error message AFAIK
+                    break;
+                case OperationResultType.FailedCancelledByEvent:
+                    notificationModel.AddErrorNotification(
+                                    Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
+                                    Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                    break;
+            }
+
+            return Request.CreateValidationErrorResponse(notificationModel);
+        }
     }
 }

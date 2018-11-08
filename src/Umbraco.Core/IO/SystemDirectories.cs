@@ -6,10 +6,7 @@ namespace Umbraco.Core.IO
     //all paths has a starting but no trailing /
     public class SystemDirectories
     {
-        //TODO: Why on earth is this even configurable? You cannot change the /Bin folder in ASP.Net
-        public static string Bin => IOHelper.ReturnPath("umbracoBinDirectory", "~/bin");
-
-        public static string Base => IOHelper.ReturnPath("umbracoBaseDirectory", "~/base");
+        public static string Bin => "~/bin";
 
         public static string Config => IOHelper.ReturnPath("umbracoConfigDirectory", "~/config");
 
@@ -19,6 +16,7 @@ namespace Umbraco.Core.IO
 
         public static string Install => IOHelper.ReturnPath("umbracoInstallPath", "~/install");
 
+        //TODO: Consider removing this
         public static string Masterpages => IOHelper.ReturnPath("umbracoMasterPagesPath", "~/masterpages");
 
         //NOTE: this is not configurable and shouldn't need to be
@@ -38,11 +36,11 @@ namespace Umbraco.Core.IO
 
         public static string Scripts => IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
 
+        public static string StyleSheets => IOHelper.ReturnPath("umbracoStylesheetsPath", "~/css");
+
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
-        [Obsolete("This will be removed, there is no more umbraco_client folder")]
-        public static string UmbracoClient => IOHelper.ReturnPath("umbracoClientPath", "~/umbraco_client");
-
+        //TODO: Consider removing this
         public static string UserControls => IOHelper.ReturnPath("umbracoUsercontrolsPath", "~/usercontrols");
 
         public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");

@@ -328,7 +328,7 @@ namespace Umbraco.Core.Services.Implement
             if (withIdentity == false)
                 return;
 
-            Audit(AuditType.New, $"Content '{content.Name}' was created with Id {content.Id}", content.CreatorId, content.Id);
+            Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
         }
 
         #endregion
@@ -405,28 +405,40 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContentType"/></param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetByType(int id)
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords
+            , IQuery<IContent> filter = null, Ordering ordering = null)
         {
+            if(pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(
+                    Query<IContent>().Where(x => x.ContentTypeId == contentTypeId),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
-        internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
+        /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering ordering = null)
         {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(
+                    Query<IContent>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -471,6 +483,19 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetAllVersions(id);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by Id
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetAllVersionsSlim(id, skip, take);
             }
         }
 
@@ -524,21 +549,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == id);
-                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
-            }
-        }
-
-        /// <summary>
         /// Gets a collection of published <see cref="IContent"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Children from</param>
@@ -555,18 +565,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            string filter = null, Ordering ordering = null)
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, filterQuery, ordering);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IContent> filter, Ordering ordering = null)
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -584,26 +583,15 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IContent>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter)
-        {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null)
+                ordering = Ordering.By("Path");
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-
-                var query = Query<IContent>();
 
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
@@ -614,65 +602,24 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith($"{contentPath[0].Path},", TextColumnType.NVarchar));
+                    return GetPagedDescendantsLocked(contentPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-
-                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
-        /// </summary>
-        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
-        /// <param name="name">Full or partial name of the children</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetChildren(int parentId, string name)
+        private IEnumerable<IContent> GetPagedDescendantsLocked(string contentPath, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter, Ordering ordering)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var query = Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
-                return _documentRepository.Get(query);
-            }
-        }
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var content = GetById(id);
-                if (content == null)
-                {
-                    scope.Complete(); // else causes rollback
-                    return Enumerable.Empty<IContent>();
-                }
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
-            }
-        }
+            var query = Query<IContent>();
+            if (!contentPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith($"{contentPath},", TextColumnType.NVarchar));
 
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetDescendants(IContent content)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.ContentTree);
-                var pathMatch = content.Path + ",";
-                var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return _documentRepository.Get(query);
-            }
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
         /// <summary>
@@ -759,13 +706,17 @@ namespace Umbraco.Core.Services.Implement
         /// Gets a collection of an <see cref="IContent"/> objects, which resides in the Recycle Bin
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetContentInRecycleBin()
+        public IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
+                if (ordering == null)
+                    ordering = Ordering.By("Path");
+
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-                return _documentRepository.Get(query);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -834,6 +785,15 @@ namespace Umbraco.Core.Services.Implement
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
+                //track the cultures that have changed
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 _documentRepository.Save(content);
 
                 if (raiseEvents)
@@ -843,7 +803,17 @@ namespace Umbraco.Core.Services.Implement
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                Audit(AuditType.Save, "Saved by user", userId, content.Id);
+
+                if (culturesChanging != null)
+                {
+                    var langs = string.Join(", ", _languageRepository.GetMany()
+                        .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                        .Select(x => x.CultureName));
+                    Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
+                }   
+                else
+                    Audit(AuditType.Save, userId, content.Id);
+
                 scope.Complete();
             }
 
@@ -883,7 +853,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(AuditType.Save, "Bulk-saved by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
 
                 scope.Complete();
             }
@@ -988,14 +958,19 @@ namespace Umbraco.Core.Services.Implement
                     UnpublishResultType result;
                     if (culture == "*" || culture == null)
                     {
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         result = UnpublishResultType.Success;
                     }
                     else
                     {
-                        Audit(AuditType.Unpublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
+                        //unpublishing a specific culture
+                        Audit(AuditType.UnpublishVariant, userId, content.Id, $"Culture \"{culture}\" unpublished", culture);
                         if (!content.Published)
-                            Audit(AuditType.Unpublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
+                        {
+                            //log that the whole content item has been unpublished due to mandatory culture unpublished
+                            Audit(AuditType.Unpublish, userId, content.Id, $"Unpublished (culture \"{culture}\" is mandatory)");
+                        }
+                            
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1025,6 +1000,8 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
+            IEnumerable<string> culturesChanging = null;
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // is the content going to end up published, or unpublished?
@@ -1045,6 +1022,10 @@ namespace Umbraco.Core.Services.Implement
 
                         // we may end up in a state where we won't publish nor unpublish
                         // keep going, though, as we want to save anways
+                    }
+                    else
+                    {
+                        culturesChanging = content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList();
                     }
                 }
 
@@ -1085,6 +1066,7 @@ namespace Umbraco.Core.Services.Implement
                         // ensure that the document can be unpublished, and unpublish
                         // handling events, business rules, etc
                         // note: StrategyUnpublish flips the PublishedState to Unpublishing!
+                        // note: This unpublishes the entire document (not different variants)
                         unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                         if (unpublishResult.Success)
                             unpublishResult = StrategyUnpublish(scope, content, true, userId, evtMsgs);
@@ -1122,7 +1104,7 @@ namespace Umbraco.Core.Services.Implement
                         // events and audit
                         scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                        Audit(AuditType.Unpublish, "Unpublished by user", userId, content.Id);
+                        Audit(AuditType.Unpublish, userId, content.Id);
                         scope.Complete();
                         return new PublishResult(PublishResultType.Success, evtMsgs, content);
                     }
@@ -1153,7 +1135,16 @@ namespace Umbraco.Core.Services.Implement
                             scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                         }
 
-                        Audit(AuditType.Publish, "Published by user", userId, content.Id);
+                        if (culturesChanging != null)
+                        {
+                            var langs = string.Join(", ", _languageRepository.GetMany()
+                                .Where(x => culturesChanging.InvariantContains(x.IsoCode))
+                                .Select(x => x.CultureName));
+                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
+                        }
+                        else
+                            Audit(AuditType.Publish, userId, content.Id);
+
                         scope.Complete();
                         return publishResult;
                     }
@@ -1229,10 +1220,47 @@ namespace Umbraco.Core.Services.Implement
 
             bool IsEditing(IContent c, string l)
                 => c.PublishName != c.Name ||
-                   c.PublishedCultures.Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
-                   c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture == l).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                   c.PublishedCultures.Where(x => x.InvariantEquals(l)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                   c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture.InvariantEquals(l)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
 
             return SaveAndPublishBranch(content, force, document => IsEditing(document, culture), document => document.PublishCulture(culture), userId);
+        }
+
+        // fixme - make this public once we know it works + document
+        private IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0)
+        {
+            // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
+            // and not to == them, else we would be comparing references, and that is a bad thing
+
+            cultures = cultures ?? Array.Empty<string>();
+
+            // determines whether the document is edited, and thus needs to be published,
+            // for the specified cultures (it may be edited for other cultures and that
+            // should not trigger a publish).
+            bool IsEdited(IContent c)
+            {
+                if (cultures.Length == 0)
+                {
+                    // nothing = everything
+                    return c.PublishName != c.Name ||
+                           c.PublishedCultures.Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                           c.Properties.Any(x => x.Values.Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+                }
+
+                return c.PublishName != c.Name ||
+                       c.PublishedCultures.Where(x => cultures.Contains(x, StringComparer.InvariantCultureIgnoreCase)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
+                       c.Properties.Any(x => x.Values.Where(y => cultures.Contains(y.Culture, StringComparer.InvariantCultureIgnoreCase)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
+            }
+
+            // publish the specified cultures
+            bool PublishCultures(IContent c)
+            {
+                return cultures.Length == 0
+                    ? c.PublishCulture() // nothing = everything
+                    : cultures.All(c.PublishCulture);
+            }
+
+            return SaveAndPublishBranch(content, force, IsEdited, PublishCultures, userId);
         }
 
         /// <inheritdoc />
@@ -1264,30 +1292,40 @@ namespace Umbraco.Core.Services.Implement
                 // deal with descendants
                 // if one fails, abort its branch
                 var exclude = new HashSet<int>();
-                foreach (var d in GetDescendants(document))
+
+                const int pageSize = 500;
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
                 {
-                    // if parent is excluded, exclude document and ignore
-                    // if not forcing, and not publishing, exclude document and ignore
-                    if (exclude.Contains(d.ParentId)  ||  !force && !d.Published)
+                    var descendants = GetPagedDescendants(document.Id, page++, pageSize, out total);
+
+                    foreach (var d in descendants)
                     {
+                        // if parent is excluded, exclude document and ignore
+                        // if not forcing, and not publishing, exclude document and ignore
+                        if (exclude.Contains(d.ParentId) || !force && !d.Published)
+                        {
+                            exclude.Add(d.Id);
+                            continue;
+                        }
+
+                        // no need to check path here,
+                        // 1. because we know the parent is path-published (we just published it)
+                        // 2. because it would not work as nothing's been written out to the db until the uow completes
+                        result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        results.Add(result);
+                        if (result.Success) continue;
+
+                        // abort branch
                         exclude.Add(d.Id);
-                        continue;
                     }
-
-                    // no need to check path here,
-                    // 1. because we know the parent is path-published (we just published it)
-                    // 2. because it would not work as nothing's been written out to the db until the uow completes
-                    result = SaveAndPublishBranchOne(scope, d, editing, publishCultures, false, publishedDocuments, evtMsgs, userId);
-                    results.Add(result);
-                    if (result.Success) continue;
-
-                    // abort branch
-                    exclude.Add(d.Id);
                 }
+                
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
-                Audit(AuditType.Publish, "Branch published by user", userId, document.Id);
+                Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 scope.Complete();
             }
@@ -1356,7 +1394,7 @@ namespace Umbraco.Core.Services.Implement
                 DeleteLocked(scope, content);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(AuditType.Delete, "Deleted by user", userId, content.Id);
+                Audit(AuditType.Delete, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1366,25 +1404,8 @@ namespace Umbraco.Core.Services.Implement
 
         private void DeleteLocked(IScope scope, IContent content)
         {
-            // then recursively delete descendants, bottom-up
-            // just repository.Delete + an event
-            var stack = new Stack<IContent>();
-            stack.Push(content);
-            var level = 1;
-            while (stack.Count > 0)
+            void DoDelete(IContent c)
             {
-                var c = stack.Peek();
-                IContent[] cc;
-                if (c.Level == level)
-                    while ((cc = c.Children(this).ToArray()).Length > 0)
-                    {
-                        foreach (var ci in cc)
-                            stack.Push(ci);
-                        c = cc[cc.Length - 1];
-                    }
-                c = stack.Pop();
-                level = c.Level;
-
                 _documentRepository.Delete(c);
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
@@ -1393,6 +1414,18 @@ namespace Umbraco.Core.Services.Implement
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<ContentService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
+
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                //get descendants - ordered from deepest to shallowest
+                var descendants = GetPagedDescendants(content.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                foreach (var c in descendants)
+                    DoDelete(c);
+            }
+            DoDelete(content);
         }
 
         //TODO:
@@ -1424,7 +1457,7 @@ namespace Umbraco.Core.Services.Implement
 
                 deleteRevisionsEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
-                Audit(AuditType.Delete, "Delete (by version date) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
                 scope.Complete();
             }
@@ -1461,7 +1494,7 @@ namespace Umbraco.Core.Services.Implement
                     _documentRepository.DeleteVersion(versionId);
 
                 scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
-                Audit(AuditType.Delete, "Delete (by version) by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 
                 scope.Complete();
             }
@@ -1506,7 +1539,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
-                Audit(AuditType.Move, "Moved to Recycle Bin by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
                 scope.Complete();
             }
@@ -1578,7 +1611,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
-                Audit(AuditType.Move, "Moved by user", userId, content.Id);
+                Audit(AuditType.Move, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1602,8 +1635,8 @@ namespace Umbraco.Core.Services.Implement
 
             moves.Add(Tuple.Create(content, content.Path)); // capture original path
 
-            // get before moving, in case uow is immediate
-            var descendants = GetDescendants(content);
+            //need to store the original path to lookup descendants based on it below
+            var originalPath = content.Path;
 
             // these will be updated by the repo because we changed parentId
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
@@ -1616,22 +1649,28 @@ namespace Umbraco.Core.Services.Implement
             //paths[content.Id] = content.Path;
             paths[content.Id] = (parent == null ? (parentId == Constants.System.RecycleBinContent ? "-1,-20" : "-1") : parent.Path) + "," + content.Id;
 
-            foreach (var descendant in descendants)
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
             {
-                moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                foreach (var descendant in descendants)
+                {
+                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                if (paths.ContainsKey(descendant.ParentId) == false)
-                    Console.WriteLine("oops on " + descendant.ParentId + " for " + content.Path + " " + parent?.Path);
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                    // update path and level since we do not update parentId
+                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                    descendant.Level += levelDelta;
+                    PerformMoveContentLocked(descendant, userId, trash);
+                }
             }
+            
         }
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
+            //fixme no casting
             if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
             _documentRepository.Save(content);
@@ -1675,7 +1714,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, "Recycle Bin emptied by user", 0, Constants.System.RecycleBinContent);
+                Audit(AuditType.Delete, 0, Constants.System.RecycleBinContent, "Recycle bin emptied");
 
                 scope.Complete();
             }
@@ -1760,29 +1799,36 @@ namespace Umbraco.Core.Services.Implement
 
                 if (recursive) // process descendants
                 {
-                    foreach (var descendant in GetDescendants(content))
+                    const int pageSize = 500;
+                    var page = 0;
+                    var total = long.MaxValue;
+                    while(page * pageSize < total)
                     {
-                        // if parent has not been copied, skip, else gets its copy id
-                        if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
+                        var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
+                        foreach (var descendant in descendants)
+                        {
+                            // if parent has not been copied, skip, else gets its copy id
+                            if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
 
-                        var descendantCopy = descendant.DeepCloneWithResetIdentities();
-                        descendantCopy.ParentId = parentId;
+                            var descendantCopy = descendant.DeepCloneWithResetIdentities();
+                            descendantCopy.ParentId = parentId;
 
-                        if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
-                            continue;
+                            if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
+                                continue;
 
-                        // a copy is not published (but not really unpublishing either)
-                        // update the create author and last edit author
-                        if (descendantCopy.Published)
-                            ((Content) descendantCopy).Published = false;
-                        descendantCopy.CreatorId = userId;
-                        descendantCopy.WriterId = userId;
+                            // a copy is not published (but not really unpublishing either)
+                            // update the create author and last edit author
+                            if (descendantCopy.Published)
+                                ((Content)descendantCopy).Published = false;
+                            descendantCopy.CreatorId = userId;
+                            descendantCopy.WriterId = userId;
 
-                        // save and flush (see above)
-                        _documentRepository.Save(descendantCopy);
+                            // save and flush (see above)
+                            _documentRepository.Save(descendantCopy);
 
-                        copies.Add(Tuple.Create(descendant, descendantCopy));
-                        idmap[descendant.Id] = descendantCopy.Id;
+                            copies.Add(Tuple.Create(descendant, descendantCopy));
+                            idmap[descendant.Id] = descendantCopy.Id;
+                        }
                     }
                 }
 
@@ -1793,7 +1839,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
                     scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
-                Audit(AuditType.Copy, "Copy Content performed by user", userId, content.Id);
+                Audit(AuditType.Copy, userId, content.Id);
 
                 scope.Complete();
             }
@@ -1818,16 +1864,35 @@ namespace Umbraco.Core.Services.Implement
                     return false;
                 }
 
+                //track the cultures changing for auditing
+                var culturesChanging = content.ContentType.VariesByCulture()
+                    ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
+                    : null;
+                //TODO: Currently there's no way to change track which variant properties have changed, we only have change
+                // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+                // in this particular case, determining which cultures have changed works with the above with names since it will
+                // have always changed if it's been saved in the back office but that's not really fail safe.
+
                 //Save before raising event
                 // fixme - nesting uow?
-                Save(content, userId);
+                var saveResult = Save(content, userId);
 
-                sendToPublishEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-                Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+                if (saveResult.Success)
+                {
+                    sendToPublishEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+
+                    if (culturesChanging != null)
+                        Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+                    else
+                        Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                }
+
+                // fixme here, on only on success?                
+                scope.Complete();
+
+                return saveResult.Success;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -1841,17 +1906,19 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="items"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
+        public OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             var itemsA = items.ToArray();
-            if (itemsA.Length == 0) return true;
+            if (itemsA.Length == 0) return new OperationResult(OperationResultType.NoOperation, evtMsgs);
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
                 scope.Complete();
                 return ret;
             }
@@ -1868,28 +1935,38 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="ids"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
+        public OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             var idsA = ids.ToArray();
-            if (idsA.Length == 0) return true;
+            if (idsA.Length == 0) return new OperationResult(OperationResultType.NoOperation, evtMsgs);
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var itemsA = GetByIds(idsA).ToArray();
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
                 scope.Complete();
                 return ret;
             }
         }
 
-        private bool Sort(IScope scope, IContent[] itemsA, int userId, bool raiseEvents)
+        private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
             var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
-            if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                return false;
+            if (raiseEvents)
+            {
+                //raise cancelable sorting event
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                    return OperationResult.Cancel(evtMsgs);
+
+                //raise saving event (this one cannot be canceled)
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saving, this, saveEventArgs, nameof(Saving));
+            }
 
             var published = new List<IContent>();
             var saved = new List<IContent>();
@@ -1921,8 +1998,9 @@ namespace Umbraco.Core.Services.Implement
 
             if (raiseEvents)
             {
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                //first saved, then sorted
+                scope.Events.Dispatch(Saved, this, saveEventArgs, nameof(Saved));
+                scope.Events.Dispatch(Sorted, this, saveEventArgs, nameof(Sorted));
             }
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
@@ -1930,8 +2008,8 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents && published.Any())
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
-            Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
-            return true;
+            Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
+            return OperationResult.Succeed(evtMsgs);
         }
 
         #endregion
@@ -1977,9 +2055,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Private Methods
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Document), message, parameters));
         }
 
         #endregion
@@ -2005,6 +2083,16 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Delete Versions
         /// </summary>
         public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
+
+        /// <summary>
+        /// Occurs before Sorting
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorting;
+
+        /// <summary>
+        /// Occurs after Sorting
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorted;
 
         /// <summary>
         /// Occurs before Save
@@ -2311,7 +2399,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
-                Audit(AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeIdsA)}");
 
                 scope.Complete();
             }
@@ -2487,6 +2575,69 @@ namespace Umbraco.Core.Services.Implement
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
         {
             DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+        }
+
+        #endregion
+
+        #region Rollback
+
+        public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            
+            //Get the current copy of the node
+            var content = GetById(id);
+
+            //Get the version
+            var version = GetVersion(versionId);
+
+            //Good ole null checks
+            if (content == null || version == null)
+            {
+                return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
+            }
+
+            //Store the result of doing the save of content for the rollback
+            OperationResult rollbackSaveResult;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
+
+                //Emit RollingBack event aka before
+                if (scope.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
+                {
+                    scope.Complete();
+                    return OperationResult.Cancel(evtMsgs);
+                }
+
+                //Copy the changes from the version
+                content.CopyFrom(version, culture);
+
+                //Save the content for the rollback
+                rollbackSaveResult = Save(content, userId);
+
+                //Depending on the save result - is what we log & audit along with what we return
+                if (rollbackSaveResult.Success == false)
+                {
+                    //Log the error/warning
+                    Logger.Error<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                }
+                else
+                {
+                    //Emit RolledBack event aka after
+                    rollbackEventArgs.CanCancel = false;
+                    scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
+
+                    //Logging & Audit message
+                    Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
+                }
+                
+                scope.Complete();
+            }
+
+            return rollbackSaveResult;
         }
 
         #endregion

@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic.packager {
         {
 #if DEBUG
             _saveHitCount++;
-            Current.Logger.Info<InstalledPackage>("The InstalledPackage class save method has been hit " + _saveHitCount + " times.");
+            Current.Logger.Info<InstalledPackage>("The InstalledPackage class save method has been hit {Total} times.", _saveHitCount);
 #endif
             this.FireBeforeSave(EventArgs.Empty);
             data.Save(this.Data, IOHelper.MapPath(Settings.InstalledPackagesSettings));
@@ -67,7 +67,7 @@ namespace umbraco.cms.businesslogic.packager {
 
         public void Delete(int userId)
         {
-            Current.Services.AuditService.Add(AuditType.PackagerUninstall, string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid), userId, -1);
+            Current.Services.AuditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", string.Format("Package '{0}' uninstalled. Package guid: {1}", Data.Name, Data.PackageGuid));
             Delete();
         }
 

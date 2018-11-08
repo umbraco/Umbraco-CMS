@@ -8,11 +8,12 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -92,6 +93,7 @@ namespace Umbraco.Web.Trees
                         }
                     }
 
+                    node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
 
@@ -113,23 +115,21 @@ namespace Umbraco.Web.Trees
                 // if the user's start node is not the root then the only menu item to display is refresh
                 if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
-                    menu.Items.Add<RefreshNode, ActionRefresh>(
-                        Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
-                        true);
+                    menu.Items.Add(new RefreshNode(Services.TextService, true));
                     return menu;
                 }
 
                 //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
                 var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
-                var nodeActions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
+                var nodeActions = Current.Actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true);
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionSort>(Services.TextService, true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Trees
                 // add default actions for *all* users
                 // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
                 //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
@@ -164,9 +164,7 @@ namespace Umbraco.Web.Trees
             if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize(string.Concat("actions/", ActionRefresh.Instance.Alias)),
-                    true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
 
@@ -181,7 +179,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 //set the default to create
-                nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                nodeMenu.DefaultMenuAlias = ActionNew.ActionAlias;
             }
 
             var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
@@ -227,27 +225,25 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
-            AddActionNode<ActionNew>(item, menu);
-            AddActionNode<ActionDelete>(item, menu);
-
-            AddActionNode<ActionCreateBlueprintFromContent>(item, menu);
-
-            //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
-            AddActionNode<ActionMove>(item, menu, true);
-            AddActionNode<ActionCopy>(item, menu);
-
+            AddActionNode<ActionNew>(item, menu, opensDialog: true);
+            AddActionNode<ActionDelete>(item, menu, opensDialog: true);
+            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
+            AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
+            AddActionNode<ActionCopy>(item, menu, opensDialog: true);
             AddActionNode<ActionSort>(item, menu, true);
+            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
+            AddActionNode<ActionRights>(item, menu, opensDialog: true);
+            //fixme - conver this editor to angular
+            AddActionNode<ActionProtect>(item, menu, true, convert: true, opensDialog: true);
 
-            AddActionNode<ActionRollback>(item, menu);
-            AddActionNode<ActionToPublish>(item, menu, convert: true);
-            AddActionNode<ActionAssignDomain>(item, menu);
-            AddActionNode<ActionRights>(item, menu, convert: true);
-            AddActionNode<ActionProtect>(item, menu, true, true);
-            
-            AddActionNode<ActionNotify>(item, menu, true);
-            AddActionNode<ActionSendToTranslate>(item, menu, convert: true);
+            menu.Items.Add(new MenuItem("notify", Services.TextService)
+            {
+                Icon = "megaphone",
+                SeperatorBefore = true,
+                OpensDialog = true
+            });
 
-            AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -260,10 +256,10 @@ namespace Umbraco.Web.Trees
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
-            menu.Items.Add<ActionRestore>(Services.TextService.Localize("actions", ActionRestore.Instance.Alias));
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -307,19 +303,14 @@ namespace Umbraco.Web.Trees
                 entity.Name = "[[" + entity.Id + "]]";
         }
 
-        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)
+        //fixme: Remove the need for converting to legacy
+        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false, bool opensDialog = false)
             where TAction : IAction
         {
+            //fixme: Inject
             var menuItem = menu.Items.Add<TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
             if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
-        }
-
-        private void AddActionNode<TItem, TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)
-            where TItem : MenuItem, new()
-            where TAction : IAction
-        {
-            var menuItem = menu.Items.Add<TItem, TAction>(Services.TextService.Localize("actions", Current.Actions.GetAction<TAction>().Alias), hasSeparator);
-            if (convert) menuItem.ConvertLegacyMenuItem(item, "content", "content");
+            menuItem.OpensDialog = opensDialog;
         }
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)

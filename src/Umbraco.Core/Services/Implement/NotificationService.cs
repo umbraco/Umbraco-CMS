@@ -6,8 +6,8 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using System.Web;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -24,89 +24,23 @@ namespace Umbraco.Core.Services.Implement
         private readonly IScopeProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
+        private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IContentSection _contentSection;
         private readonly ILogger _logger;
 
-        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILogger logger,
-            INotificationsRepository notificationsRepository, IGlobalSettings globalSettings)
+        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
+            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
+            _contentSection = contentSection;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _localizationService = localizationService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <summary>
-        /// Sends the notifications for the specified user regarding the specified node and action.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="operatingUser"></param>
-        /// <param name="action"></param>
-        /// <param name="actionName"></param>
-        /// <param name="http"></param>
-        /// <param name="createSubject"></param>
-        /// <param name="createBody"></param>
-        /// <remarks>
-        /// Currently this will only work for Content entities!
-        /// </remarks>
-        public void SendNotifications(IUser operatingUser, IUmbracoEntity entity, string action, string actionName, HttpContextBase http,
-            Func<IUser, string[], string> createSubject,
-            Func<IUser, string[], string> createBody)
-        {
-            if (entity is IContent == false)
-                throw new NotSupportedException();
-
-            var content = (IContent) entity;
-
-            // lazily get previous version
-            IContentBase prevVersion = null;
-
-            // do not load *all* users in memory at once
-            // do not load notifications *per user* (N+1 select)
-            // cannot load users & notifications in 1 query (combination btw User2AppDto and User2NodeNotifyDto)
-            // => get batches of users, get all their notifications in 1 query
-            // re. users:
-            //  users being (dis)approved = not an issue, filtered in memory not in SQL
-            //  users being modified or created = not an issue, ordering by ID, as long as we don't *insert* low IDs
-            //  users being deleted = not an issue for GetNextUsers
-            var id = 0;
-            var nodeIds = content.Path.Split(',').Select(int.Parse).ToArray();
-            const int pagesz = 400; // load batches of 400 users
-            do
-            {
-                // users are returned ordered by id, notifications are returned ordered by user id
-                var users = ((UserService) _userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, nodeIds, Constants.ObjectTypes.Document).ToList();
-                if (notifications.Count == 0) break;
-
-                var i = 0;
-                foreach (var user in users)
-                {
-                    // continue if there's no notification for this user
-                    if (notifications[i].UserId != user.Id) continue; // next user
-
-                    // lazy load prev version
-                    if (prevVersion == null)
-                    {
-                        prevVersion = GetPreviousVersion(entity.Id);
-                    }
-
-                    // queue notification
-                    var req = CreateNotificationRequest(operatingUser, user, content, prevVersion, actionName, http, createSubject, createBody);
-                    Enqueue(req);
-
-                    // skip other notifications for this user
-                    while (i < notifications.Count && notifications[i++].UserId == user.Id) ;
-                    if (i >= notifications.Count) break; // break if no more notifications
-                }
-
-                // load more users if any
-                id = users.Count == pagesz ? users.Last().Id + 1 : -1;
-
-            } while (id > 0);
         }
 
         /// <summary>
@@ -131,20 +65,14 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="operatingUser"></param>
         /// <param name="action"></param>
         /// <param name="actionName"></param>
-        /// <param name="http"></param>
+        /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        /// <remarks>
-        /// Currently this will only work for Content entities!
-        /// </remarks>
-        public void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, HttpContextBase http,
-            Func<IUser, string[], string> createSubject,
-            Func<IUser, string[], string> createBody)
+        public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+            Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
+            Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
         {
-            if (entities is IEnumerable<IContent> == false)
-                throw new NotSupportedException();
-
-            var entitiesL = entities as List<IContent> ?? entities.Cast<IContent>().ToList();
+            var entitiesL = entities.ToList();
 
             //exit if there are no entities
             if (entitiesL.Count == 0) return;
@@ -156,7 +84,7 @@ namespace Umbraco.Core.Services.Implement
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
             // see notes above
-            var id = 0;
+            var id = Constants.Security.SuperUserId;
             const int pagesz = 400; // load batches of 400 users
             do
             {
@@ -185,7 +113,7 @@ namespace Umbraco.Core.Services.Implement
                         }
 
                         // queue notification
-                        var req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, http, createSubject, createBody);
+                        var req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, siteUri, createSubject, createBody);
                         Enqueue(req);
                     }
 
@@ -350,118 +278,141 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content"></param>
         /// <param name="oldDoc"></param>
         /// <param name="actionName">The action readable name - currently an action is just a single letter, this is the name associated with the letter </param>
-        /// <param name="http"></param>
+        /// <param name="siteUri"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContentBase content, IContentBase oldDoc,
-            string actionName, HttpContextBase http,
-            Func<IUser, string[], string> createSubject,
-            Func<IUser, string[], string> createBody)
+        private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content, IContentBase oldDoc,
+            string actionName,
+            Uri siteUri,
+            Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
+            Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
         {
             if (performingUser == null) throw new ArgumentNullException("performingUser");
             if (mailingUser == null) throw new ArgumentNullException("mailingUser");
             if (content == null) throw new ArgumentNullException("content");
-            if (http == null) throw new ArgumentNullException("http");
+            if (siteUri == null) throw new ArgumentNullException("siteUri");
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
 
             // build summary
             var summary = new StringBuilder();
-            var props = content.Properties.ToArray();
-            foreach (var p in props)
+
+            if (content.ContentType.VariesByNothing())
             {
-                //fixme doesn't take into account variants
-
-                var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
-                var oldText = newText;
-
-                // check if something was changed and display the changes otherwise display the fields
-                if (oldDoc.Properties.Contains(p.PropertyType.Alias))
+                if (!_contentSection.DisableHtmlEmail)
                 {
-                    var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                    oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
+                    //create the html summary for invariant content
 
-                    // replace html with char equivalent
-                    ReplaceHtmlSymbols(ref oldText);
-                    ReplaceHtmlSymbols(ref newText);
+                    //list all of the property values like we used to
+                    summary.Append("<table style=\"width: 100 %; \">");
+                    foreach (var p in content.Properties)
+                    {
+                        //fixme doesn't take into account variants
+
+                        var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
+                        var oldText = newText;
+
+                        // check if something was changed and display the changes otherwise display the fields
+                        if (oldDoc.Properties.Contains(p.PropertyType.Alias))
+                        {
+                            var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
+                            oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
+
+                            // replace html with char equivalent
+                            ReplaceHtmlSymbols(ref oldText);
+                            ReplaceHtmlSymbols(ref newText);
+                        }
+
+                        //show the values
+                        summary.Append("<tr>");
+                        summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
+                        summary.Append(p.PropertyType.Name);
+                        summary.Append("</th>");
+                        summary.Append("<td style='text-align: left; vertical-align: top;border-bottom: 1px solid #CCC'>");
+                        summary.Append(newText);
+                        summary.Append("</td>");
+                        summary.Append("</tr>");
+                    }
+                    summary.Append("</table>");
                 }
+                
+            }
+            else if (content.ContentType.VariesByCulture())
+            {
+                //it's variant, so detect what cultures have changed
 
-
-                // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
-                // TODO: We should probably allow more than just tinymce??
-                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.TinyMce)
-                    && string.CompareOrdinal(oldText, newText) != 0)
+                if (!_contentSection.DisableHtmlEmail)
                 {
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Note: </th>");
-                    summary.Append(
-                        "<td style='text-align: left; vertical-align: top;'> <span style='background-color:red;'>Red for deleted characters</span>&nbsp;<span style='background-color:yellow;'>Yellow for inserted characters</span></td>");
-                    summary.Append("</tr>");
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> New ");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(ReplaceLinks(CompareText(oldText, newText, true, false, "<span style='background-color:yellow;'>", string.Empty), http.Request));
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Old ");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(ReplaceLinks(CompareText(newText, oldText, true, false, "<span style='background-color:red;'>", string.Empty), http.Request));
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
+                    //Create the html based summary (ul of culture names)
+
+                    var culturesChanged = content.CultureInfos.Where(x => x.Value.WasDirty())
+                        .Select(x => x.Key)
+                        .Select(_localizationService.GetLanguageByIsoCode)
+                        .WhereNotNull()
+                        .Select(x => x.CultureName);
+                    summary.Append("<ul>");
+                    foreach (var culture in culturesChanged)
+                    {
+                        summary.Append("<li>");
+                        summary.Append(culture);
+                        summary.Append("</li>");
+                    }
+                    summary.Append("</ul>");
                 }
                 else
                 {
-                    summary.Append("<tr>");
-                    summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>");
-                    summary.Append(p.PropertyType.Name);
-                    summary.Append("</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>");
-                    summary.Append(newText);
-                    summary.Append("</td>");
-                    summary.Append("</tr>");
+                    //Create the text based summary (csv of culture names)
+
+                    var culturesChanged = string.Join(", ", content.CultureInfos.Where(x => x.Value.WasDirty())
+                        .Select(x => x.Key)
+                        .Select(_localizationService.GetLanguageByIsoCode)
+                        .WhereNotNull()
+                        .Select(x => x.CultureName));
+
+                    summary.Append("'");
+                    summary.Append(culturesChanged);
+                    summary.Append("'");
                 }
-                summary.Append(
-                    "<tr><td colspan=\"2\" style=\"border-bottom: 1px solid #CCC; font-size: 2px;\">&nbsp;</td></tr>");
+            }
+            else
+            {
+                //not supported yet...
+                throw new NotSupportedException();
             }
 
-            string protocol = _globalSettings.UseHttps ? "https" : "http";
+            var protocol = _globalSettings.UseHttps ? "https" : "http";
 
+            var subjectVars = new NotificationEmailSubjectParams(
+                string.Concat(siteUri.Authority, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                actionName,
+                content.Name);
 
-            string[] subjectVars = {
-                                       string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
-                                       actionName,
-                                       content.Name
-                                   };
-            string[] bodyVars = {
-                                    mailingUser.Name,
-                                    actionName,
-                                    content.Name,
-                                    performingUser.Name,
-                                    string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
-                                    content.Id.ToString(CultureInfo.InvariantCulture), summary.ToString(),
-                                    string.Format("{2}://{0}/{1}",
-                                                  string.Concat(http.Request.ServerVariables["SERVER_NAME"], ":", http.Request.Url.Port),
-                                                  //TODO: RE-enable this so we can have a nice url
-                                                  /*umbraco.library.NiceUrl(documentObject.Id))*/
-                                                  string.Concat(content.Id, ".aspx"),
-                                                  protocol)
-
-                                };
+            var bodyVars = new NotificationEmailBodyParams(
+                mailingUser.Name,
+                actionName,
+                content.Name,
+                content.Id.ToString(CultureInfo.InvariantCulture),
+                string.Format("{2}://{0}/{1}",
+                    string.Concat(siteUri.Authority),
+                    //TODO: RE-enable this so we can have a nice url
+                    /*umbraco.library.NiceUrl(documentObject.Id))*/
+                    string.Concat(content.Id, ".aspx"),
+                    protocol),
+                performingUser.Name,
+                string.Concat(siteUri.Authority, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                summary.ToString());
 
             // create the mail message
-            var mail = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, mailingUser.Email);
+            var mail = new MailMessage(_contentSection.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
-            mail.Subject = createSubject(mailingUser, subjectVars);
-            if (UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail)
+
+
+            mail.Subject = createSubject((mailingUser, subjectVars));
+            if (_contentSection.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
-                mail.Body = createBody(mailingUser, bodyVars);
+                mail.Body = createBody((user: mailingUser, body: bodyVars, false));
             }
             else
             {
@@ -470,14 +421,14 @@ namespace Umbraco.Core.Services.Implement
                     string.Concat(@"<html><head>
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
-", createBody(mailingUser, bodyVars));
+", createBody((user: mailingUser, body: bodyVars, true)));
             }
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
             // adding the server name to make sure we don't replace external links
             if (_globalSettings.UseHttps && string.IsNullOrEmpty(mail.Body) == false)
             {
-                string serverName = http.Request.ServerVariables["SERVER_NAME"];
+                string serverName = siteUri.Host;
                 mail.Body = mail.Body.Replace(
                     string.Format("http://{0}", serverName),
                     string.Format("https://{0}", serverName));
@@ -486,12 +437,10 @@ namespace Umbraco.Core.Services.Implement
             return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
         }
 
-        private string ReplaceLinks(string text, HttpRequestBase request)
+        private string ReplaceLinks(string text, Uri siteUri)
         {
             var sb = new StringBuilder(_globalSettings.UseHttps ? "https://" : "http://");
-            sb.Append(request.ServerVariables["SERVER_NAME"]);
-            sb.Append(":");
-            sb.Append(request.Url.Port);
+            sb.Append(siteUri.Authority);
             sb.Append("/");
             var domain = sb.ToString();
             text = text.Replace("href=\"/", "href=\"" + domain);
@@ -505,6 +454,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="oldString">The old string.</param>
         private static void ReplaceHtmlSymbols(ref string oldString)
         {
+            if (oldString.IsNullOrWhiteSpace()) return;
             oldString = oldString.Replace("&nbsp;", " ");
             oldString = oldString.Replace("&rsquo;", "'");
             oldString = oldString.Replace("&amp;", "&");
@@ -512,69 +462,7 @@ namespace Umbraco.Core.Services.Implement
             oldString = oldString.Replace("&rdquo;", "”");
             oldString = oldString.Replace("&quot;", "\"");
         }
-
-        /// <summary>
-        /// Compares the text.
-        /// </summary>
-        /// <param name="oldText">The old text.</param>
-        /// <param name="newText">The new text.</param>
-        /// <param name="displayInsertedText">if set to <c>true</c> [display inserted text].</param>
-        /// <param name="displayDeletedText">if set to <c>true</c> [display deleted text].</param>
-        /// <param name="insertedStyle">The inserted style.</param>
-        /// <param name="deletedStyle">The deleted style.</param>
-        /// <returns></returns>
-        private static string CompareText(string oldText, string newText, bool displayInsertedText,
-                                          bool displayDeletedText, string insertedStyle, string deletedStyle)
-        {
-            var sb = new StringBuilder();
-            var diffs = Diff.DiffText1(oldText, newText);
-
-            int pos = 0;
-            for (var n = 0; n < diffs.Length; n++)
-            {
-                var it = diffs[n];
-
-                // write unchanged chars
-                while ((pos < it.StartB) && (pos < newText.Length))
-                {
-                    sb.Append(newText[pos]);
-                    pos++;
-                } // while
-
-                // write deleted chars
-                if (displayDeletedText && it.DeletedA > 0)
-                {
-                    sb.Append(deletedStyle);
-                    for (var m = 0; m < it.DeletedA; m++)
-                    {
-                        sb.Append(oldText[it.StartA + m]);
-                    } // for
-                    sb.Append("</span>");
-                }
-
-                // write inserted chars
-                if (displayInsertedText && pos < it.StartB + it.InsertedB)
-                {
-                    sb.Append(insertedStyle);
-                    while (pos < it.StartB + it.InsertedB)
-                    {
-                        sb.Append(newText[pos]);
-                        pos++;
-                    } // while
-                    sb.Append("</span>");
-                } // if
-            } // while
-
-            // write rest of unchanged chars
-            while (pos < newText.Length)
-            {
-                sb.Append(newText[pos]);
-                pos++;
-            } // while
-
-            return sb.ToString();
-        }
-
+        
         // manage notifications
         // ideally, would need to use IBackgroundTasks - but they are not part of Core!
 

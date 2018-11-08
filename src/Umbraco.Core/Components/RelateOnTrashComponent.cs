@@ -82,11 +82,12 @@ namespace Umbraco.Core.Components
                     relationService.Save(relation);
 
                     Current.Services.AuditService.Add(AuditType.Delete,
+                        item.Entity.WriterId,
+                        item.Entity.Id,
+                        ObjectTypes.GetName(UmbracoObjectTypes.Document),
                         string.Format(textService.Localize(
                                 "recycleBin/contentTrashed"),
-                            item.Entity.Id, originalParentId),
-                        item.Entity.WriterId,
-                        item.Entity.Id);
+                            item.Entity.Id, originalParentId));
                 }
             }
         }
@@ -120,11 +121,12 @@ namespace Umbraco.Core.Components
                     var relation = new Relation(originalParentId, item.Entity.Id, relationType);
                     relationService.Save(relation);
                     Current.Services.AuditService.Add(AuditType.Delete,
-                       string.Format(textService.Localize(
+                        item.Entity.CreatorId,
+                        item.Entity.Id,
+                        ObjectTypes.GetName(UmbracoObjectTypes.Media),
+                        string.Format(textService.Localize(
                                "recycleBin/mediaTrashed"),
-                           item.Entity.Id, originalParentId),
-                       item.Entity.CreatorId,
-                       item.Entity.Id);
+                            item.Entity.Id, originalParentId));
                 }
             }
         }

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $filter, contentResource, navigationService) {
+    function ContentSortController($scope, $filter, $routeParams, contentResource, navigationService) {
 
         var vm = this;
         var parentId = $scope.currentNode.parentId ? $scope.currentNode.parentId : "-1";
@@ -30,7 +30,7 @@
 
         function onInit() {
             vm.loading = true;
-            contentResource.getChildren(id)
+            contentResource.getChildren(id, { cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture })
                 .then(function(data){
                     vm.children = data.items;
                     vm.loading = false;

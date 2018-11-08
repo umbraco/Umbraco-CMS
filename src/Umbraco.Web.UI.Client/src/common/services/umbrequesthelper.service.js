@@ -126,12 +126,21 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             /** The default error callback used if one is not supplied in the opts */
             function defaultError(data, status, headers, config) {
-                return {
+
+                var err = {
                     //NOTE: the default error message here should never be used based on the above docs!
                     errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
                     data: data,
                     status: status
                 };
+
+                // if "opts" is a promise, we set "err.errorMsg" to be that promise
+                if (typeof(opts) == "object" && typeof(opts.then) == "function") {
+                    err.errorMsg = opts;
+                }
+
+                return err;
+
             }
 
             //create the callbacs based on whats been passed in.

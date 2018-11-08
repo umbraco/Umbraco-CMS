@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Umbraco.Core.Security
 {

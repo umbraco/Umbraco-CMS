@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private string VariantNameSqlExpression
             => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv").Sql;
 
-        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
+        protected Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
         {
             var sql = SqlContext.Sql();
 
@@ -218,6 +218,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
+        }
+
+        public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
+        {
+            var sql = GetBaseQuery(QueryType.Many, false)
+                .Where<NodeDto>(x => x.NodeId == nodeId)
+                .OrderByDescending<ContentVersionDto>(x => x.Current)
+                .AndByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true);
         }
 
         public override IContent GetVersion(int versionId)
@@ -362,8 +372,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.CultureNames)
-                    if (name != content.GetPublishName(culture))
+                foreach (var (culture, infos) in content.CultureInfos)
+                    if (infos.Name != content.GetPublishName(culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
                 // insert content variations
@@ -524,8 +534,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     content.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.CultureNames)
-                    if (name != content.GetPublishName(culture))
+                foreach (var (culture, infos) in content.CultureInfos)
+                    if (infos.Name != content.GetPublishName(culture))
                     {
                         edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
@@ -911,7 +921,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 
-        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false)
+        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false, bool slim = false)
         {
             var temps = new List<TempContent<Content>>();
             var contentTypes = new Dictionary<int, IContentType>();
@@ -944,18 +954,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-                // need templates
-                var templateId = dto.DocumentVersionDto.TemplateId;
-                if (templateId.HasValue && templateId.Value > 0)
-                    templateIds.Add(templateId.Value);
-                if (dto.Published)
+                if (!slim)
                 {
-                    templateId = dto.PublishedVersionDto.TemplateId;
+                    // need templates
+                    var templateId = dto.DocumentVersionDto.TemplateId;
                     if (templateId.HasValue && templateId.Value > 0)
                         templateIds.Add(templateId.Value);
+                    if (dto.Published)
+                    {
+                        templateId = dto.PublishedVersionDto.TemplateId;
+                        if (templateId.HasValue && templateId.Value > 0)
+                            templateIds.Add(templateId.Value);
+                    }
                 }
 
-                // need properties
+                // need temps, for properties, templates and variations
                 var versionId = dto.DocumentVersionDto.Id;
                 var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
                 var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
@@ -966,25 +979,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            // load all required templates in 1 query, and index
-            var templates = _templateRepository.GetMany(templateIds.ToArray())
-                .ToDictionary(x => x.Id, x => x);
-
-            // load all properties for all documents from database in 1 query - indexed by version id
-            var properties = GetPropertyCollections(temps);
-
-            // assign templates and properties
-            foreach (var temp in temps)
+            if (!slim)
             {
-                // complete the item
-                if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
-                    temp.Content.Template = template;
-                if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
-                    temp.Content.PublishTemplate = template;
-                temp.Content.Properties = properties[temp.VersionId];
+                // load all required templates in 1 query, and index
+                var templates = _templateRepository.GetMany(templateIds.ToArray())
+                    .ToDictionary(x => x.Id, x => x);
 
-                // reset dirty initial properties (U4-1946)
-                temp.Content.ResetDirtyProperties(false);
+                // load all properties for all documents from database in 1 query - indexed by version id
+                var properties = GetPropertyCollections(temps);
+
+                // assign templates and properties
+                foreach (var temp in temps)
+                {
+                    // complete the item
+                    if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
+                        temp.Content.Template = template;
+                    if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
+                        temp.Content.PublishTemplate = template;
+
+                if (properties.ContainsKey(temp.VersionId))
+                    temp.Content.Properties = properties[temp.VersionId];
+                else
+                    throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+
+                    // reset dirty initial properties (U4-1946)
+                    temp.Content.ResetDirtyProperties(false);
+                }
             }
 
             // set variations, if varying
@@ -1115,13 +1135,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
             // create dtos for the 'current' (non-published) version, all cultures
-            foreach (var (culture, name) in content.CultureNames)
+            foreach (var (culture, name) in content.CultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
-                    Name = name,
+                    Name = name.Name,
                     UpdateDate = content.GetUpdateDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
@@ -1130,13 +1150,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishNames)
+            foreach (var (culture, name) in content.PublishCultureInfos)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
-                    Name = name,
+                    Name = name.Name,
                     UpdateDate = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
@@ -1203,15 +1223,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 // content varies by culture
                 // then it must have at least a variant name, else it makes no sense
-                if (content.CultureNames.Count == 0)
+                if (content.CultureInfos.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
                 // and then, we need to set the invariant name implicitely,
                 // using the default culture if it has a name, otherwise anything we can
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                content.Name = defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName)
-                    ? cultureName
-                    : content.CultureNames.First().Value;
+                content.Name = defaultCulture != null && content.CultureInfos.TryGetValue(defaultCulture, out var cultureName)
+                    ? cultureName.Name
+                    : content.CultureInfos.First().Value.Name;
             }
             else
             {
@@ -1244,7 +1264,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureVariantNamesAreUnique(Content content, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureNames.Count == 0) return;
+            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
 
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
@@ -1258,7 +1278,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // of whether the name has changed (ie the culture has been updated) - some saving culture
             // fr-FR could cause culture en-UK name to change - not sure that is clean
 
-            foreach (var (culture, name) in content.CultureNames)
+            foreach (var (culture, name) in content.CultureInfos)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(culture);
                 if (!langId.HasValue) continue;
@@ -1266,13 +1286,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name);
+                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name.Name);
 
                 if (uniqueName == content.GetCultureName(culture)) continue;
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishNames.ContainsKey(culture))
+                if (publishing && content.PublishCultureInfos.ContainsKey(culture))
                     content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }

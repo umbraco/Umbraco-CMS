@@ -1,84 +1,117 @@
 ﻿namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Enums for vailable types of auditing
+    /// Defines audit types.
     /// </summary>
     public enum AuditType
     {
         /// <summary>
-        /// Used when new nodes are added
+        /// New node(s) being added.
         /// </summary>
         New,
+
         /// <summary>
-        /// Used when nodes are saved
+        /// Node(s) being saved.
         /// </summary>
         Save,
+
         /// <summary>
-        /// Used when nodes are opened
+        /// Variant(s) being saved.
+        /// </summary>
+        SaveVariant,
+
+        /// <summary>
+        /// Node(s) being opened.
         /// </summary>
         Open,
+
         /// <summary>
-        /// Used when nodes are deleted
+        /// Node(s) being deleted.
         /// </summary>
         Delete,
+
         /// <summary>
-        /// Used when nodes are published
+        /// Node(s) being published.
         /// </summary>
         Publish,
+
         /// <summary>
-        /// Used when nodes are send to publishing
+        /// Variant(s) being published.
+        /// </summary>
+        PublishVariant,
+
+        /// <summary>
+        /// Node(s) being sent to publishing.
         /// </summary>
         SendToPublish,
+
         /// <summary>
-        /// Used when nodes are unpublished
+        /// Variant(s) being sent to publishing.
+        /// </summary>        
+        SendToPublishVariant,
+
+        /// <summary>
+        /// Node(s) being unpublished.
         /// </summary>
         Unpublish,
+
         /// <summary>
-        /// Used when nodes are moved
+        /// Variant(s) being unpublished.
+        /// </summary>
+        UnpublishVariant,
+
+        /// <summary>
+        /// Node(s) being moved.
         /// </summary>
         Move,
+
         /// <summary>
-        /// Used when nodes are copied
+        /// Node(s) being copied.
         /// </summary>
         Copy,
+
         /// <summary>
-        /// Used when nodes are assígned a domain
+        /// Node(s) being assigned domains.
         /// </summary>
         AssignDomain,
+
         /// <summary>
-        /// Used when public access are changed for a node
+        /// Node(s) public access changing.
         /// </summary>
         PublicAccess,
+
         /// <summary>
-        /// Used when nodes are sorted
+        /// Node(s) being sorted.
         /// </summary>
         Sort,
+
         /// <summary>
-        /// Used when a notification are send to a user
+        /// Notification(s) being sent to user.
         /// </summary>
         Notify,
+
         /// <summary>
-        /// General system notification
+        /// General system audit message.
         /// </summary>
         System,
+
         /// <summary>
-        /// Used when a node's content is rolled back to a previous version
+        /// Node's content being rolled back to a previous version.
         /// </summary>
         RollBack,
+
         /// <summary>
-        /// Used when a package is installed
+        /// Package being installed.
         /// </summary>
         PackagerInstall,
+
         /// <summary>
-        /// Used when a package is uninstalled
+        /// Package being uninstalled.
         /// </summary>
         PackagerUninstall,
+        
         /// <summary>
-        /// Used when a node is send to translation
-        /// </summary>
-        SendToTranslate,
-        /// <summary>
-        /// Use this log action for custom log messages that should be shown in the audit trail
+        /// Custom audit message.
         /// </summary>
         Custom
     }
