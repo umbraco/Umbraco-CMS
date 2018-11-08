@@ -48,7 +48,15 @@
 
         #endregion
 
-        //TODO: WE need something like SuccessPublishCultureMixed, FailedPublishCultureMixed - for when a culture is published and another is unpublished at the same time
+        #region Success - Mixed
+
+        /// <summary>
+        /// A variant content item has a culture published and another culture unpublished in the same operation
+        /// </summary>
+        SuccessMixedCulture = 7,
+
+        #endregion
+
 
         #region Failed - Publish
 

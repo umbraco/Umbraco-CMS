@@ -1554,6 +1554,41 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.Published);
         }
 
+        [Test]
+        public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()
+        {
+            var langFr = new Language("fr");
+            var langDa = new Language("da");
+            ServiceContext.LocalizationService.Save(langFr);
+            ServiceContext.LocalizationService.Save(langDa);
+
+            var ct = MockedContentTypes.CreateBasicContentType();
+            ct.Variations = ContentVariation.Culture;
+            ServiceContext.ContentTypeService.Save(ct);
+
+            IContent content = MockedContent.CreateBasicContent(ct);
+            content.SetCultureName("name-fr", langFr.IsoCode);
+            content.SetCultureName("name-da", langDa.IsoCode);
+
+            content.PublishCulture(langFr.IsoCode);
+            var result = ServiceContext.ContentService.SavePublishing(content);
+            Assert.IsTrue(result.Success);
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
+
+            content.UnpublishCulture(langFr.IsoCode);
+            content.PublishCulture(langDa.IsoCode);
+
+            result = ServiceContext.ContentService.SavePublishing(content);
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
+
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langDa.IsoCode));
+        }
+
         // documents: an enumeration of documents, in tree order
         // map: applies (if needed) PublishValue, returns a value indicating whether to proceed with the branch
         private IEnumerable<IContent> MapPublishValues(IEnumerable<IContent> documents, Func<IContent, bool> map)

@@ -1002,11 +1002,8 @@ namespace Umbraco.Core.Services.Implement
                 publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, culturesPublishing, culturesUnpublishing, evtMsgs);
                 if (publishResult.Success)
                 {
-                    
-
                     // note: StrategyPublish flips the PublishedState to Publishing!
                     publishResult = StrategyPublish(scope, content, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
-
                 }
                 else
                 {
@@ -2382,7 +2379,9 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
-            //TODO: If we are both publishing and unpublishing cultures, then there should be a status for that (mixed?)
+            //If we are both publishing and unpublishing cultures, then return a mixed status
+            if (variesByCulture && culturesPublishing.Count > 0 && culturesUnpublishing.Count > 0)
+                return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
 
             return new PublishResult(evtMsgs, content);
         }
@@ -2409,15 +2408,23 @@ namespace Umbraco.Core.Services.Implement
             //if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
             if (content.ContentType.VariesByCulture())
             {
+                if (content.Published && culturesUnpublishing.Count == 0 && culturesPublishing.Count == 0)
+                    return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
+
                 if (culturesUnpublishing.Count > 0)
-                {
                     Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
                         content.Name, content.Id, string.Join(",", culturesUnpublishing));
-                    return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
-                }
 
-                Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                if (culturesPublishing.Count > 0)
+                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
                         content.Name, content.Id, string.Join(",", culturesPublishing));
+
+                if (culturesUnpublishing.Count > 0 && culturesPublishing.Count > 0)
+                    return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
+
+                if (culturesUnpublishing.Count > 0 && culturesPublishing.Count == 0)
+                    return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
+
                 return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
             }
 
