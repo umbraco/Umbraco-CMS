@@ -289,6 +289,12 @@ Use this directive to generate a thumbnail grid of media items.
                 }
             };
 
+            scope.middleClickItemName = function (item, $event, $index) {
+                if (scope.onMiddleClickName) {
+                    scope.onMiddleClickName(item, $event, $index);
+                }
+            };
+
             scope.hoverItemDetails = function(item, $event, hover) {
                 if (scope.onDetailsHover) {
                     scope.onDetailsHover(item, $event, hover);
@@ -315,6 +321,7 @@ Use this directive to generate a thumbnail grid of media items.
                 items: '=',
                 onDetailsHover: "=",
                 onClick: '=',
+                onMiddleClick: '=',
                 onClickName: "=",
                 filterBy: "=",
                 itemMaxWidth: "@",

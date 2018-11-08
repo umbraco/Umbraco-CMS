@@ -118,9 +118,16 @@ Use this directive to generate a list of content items presented as a flexbox gr
 
          scope.clickItemName = function(item, $event, $index) {
             if(scope.onClickName) {
-               scope.onClickName(item, $event, $index);
+                scope.onClickName(item, $event, $index);
+                $event.stopPropagation();
             }
-         };
+          };
+
+          scope.middleClickItemName = function (item, $event, $index) {
+              if (scope.onMiddleClickName) {
+                  scope.onMiddleClickName(item, $event, $index);
+              }
+          };
 
       }
 
@@ -132,7 +139,8 @@ Use this directive to generate a list of content items presented as a flexbox gr
             content: '=',
             contentProperties: "=",
             onClick: "=",
-            onClickName: "="
+            onClickName: "=",
+            onMiddleClickName: "="
          },
          link: link
       };

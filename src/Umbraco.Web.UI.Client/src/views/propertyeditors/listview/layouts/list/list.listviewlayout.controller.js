@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper, mediaTypeHelper) {
+    function ListViewListLayoutController($scope, $window, listViewHelper, $location, mediaHelper, mediaTypeHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -22,6 +22,7 @@
 
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
+        vm.middleClickItem = middleClickItem;
         vm.selectAll = selectAll;
         vm.isSelectedAll = isSelectedAll;
         vm.isSortDirection = isSortDirection;
@@ -52,9 +53,23 @@
             listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
         }
 
-        function clickItem(item) {
+        function clickItem(item, event) {
+            var path = getItemPath(item);
+            if (event.ctrlKey) {
+                $window.open("#/" + path);
+            } else {
+                $location.path(path);
+            }
+        }
+
+        function middleClickItem(item, event) {
+            var path = getItemPath(item);
+            $window.open("#/" + path);
+        }
+
+        function getItemPath(item) {
             // if item.id is 2147483647 (int.MaxValue) use item.key
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
+           return $scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id);
         }
 
         function isSortDirection(col, direction) {

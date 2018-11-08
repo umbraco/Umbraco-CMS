@@ -118,17 +118,23 @@
 
          scope.clickItem = function (item, $event) {
             if (scope.onClick) {
-               scope.onClick(item);
+               scope.onClick(item, $event);
                $event.stopPropagation();
             }
-         };
+          };
+
+          scope.middleClickItem = function(item, $event) {
+              if (scope.onMiddleClick) {
+                  scope.onMiddleClick(item, $event);
+              }
+          };
 
          scope.selectItem = function (item, $index, $event) {
             if (scope.onSelect) {
                scope.onSelect(item, $index, $event);
                $event.stopPropagation();
             }
-         };
+          };
 
          scope.selectAll = function ($event) {
             if (scope.onSelectAll) {
@@ -170,6 +176,7 @@
             allowSelectAll: '=',
             onSelect: '=',
             onClick: '=',
+            onMiddleClick: '=',
             onSelectAll: '=',
             onSelectedAll: '=',
             onSortingDirection: '=',

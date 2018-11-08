@@ -7,8 +7,9 @@
          ng-if="items"
          content="items"
          content-properties="options.includeProperties"
-         on-click="vm.selectContentItem"
-         on-click-name="vm.goToItem">
+          on-click="vm.selectContentItem"
+          on-click-name="vm.goToItem"
+          on-middle-click-name="vm.middleClickGoToItem">
       </umb-content-grid>
 
       <umb-empty-state
@@ -54,14 +55,16 @@
          ng-if="folders.length > 0"
          folders="folders"
          on-click="vm.selectFolder"
-         on-click-name="vm.goToItem">
+         on-click-name="vm.goToItem"
+         on-middle-click-name="vm.middleClickGoToItem">
       </umb-folder-grid>
 
       <umb-media-grid
          items="vm.itemsWithoutFolders"
          on-details-hover="vm.hoverMediaItemDetails"
          on-click="vm.selectItem"
-         on-click-name="vm.goToItem">
+         on-click-name="vm.goToItem"
+         on-middle-click-name="vm.middleClickGoToItem">
       </umb-media-grid>
 
       <umb-tooltip

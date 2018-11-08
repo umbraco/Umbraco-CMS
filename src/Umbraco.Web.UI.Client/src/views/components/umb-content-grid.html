@@ -14,7 +14,10 @@
 
       <div class="umb-content-grid__content">
 
-          <div class="umb-content-grid__item-name" ng-click="clickItemName(item, $event, $index)" ng-class="{'-light': !item.published && item.updater != null}">{{ item.name }}</div>
+          <div class="umb-content-grid__item-name"
+               ng-click="clickItemName(item, $event, $index)"
+               on-middle-click="middleClickItemName(item, $event, $index)"
+               ng-class="{'-light': !item.published && item.updater != null}">{{ item.name }}</div>
 
           <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published&& item.updater != null}">
               <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">

@@ -234,6 +234,26 @@ angular.module('umbraco.directives')
     };
 })
 
+.directive('onMiddleClick', function () {
+    return {
+        link: function (scope, element, attrs) {
+
+            // Using 'auxclick' because modern browsers no longer trigger 'click' event for middle button
+            // https://w3c.github.io/uievents/#event-type-auxclick
+            var event = ('onauxclick' in document.documentElement) ? 'auxclick' : 'mousedown';
+
+            element.on(event, function(e) {
+                if (e.which === 2) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    scope.$apply(attrs.onMiddleClick);
+                }
+            });
+            
+        }
+    };
+})
+
 .directive('onDelayedMouseleave', function ($timeout, $parse) {
         return {
 

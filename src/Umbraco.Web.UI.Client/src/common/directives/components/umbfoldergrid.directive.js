@@ -97,7 +97,13 @@ Use this directive to generate a list of folders presented as a flexbox grid.
                scope.onClickName(folder, $event, $index);
                $event.stopPropagation();
             }
-         };
+          };
+
+          scope.middleClickFolderName = function (folder, $event, $index) {
+              if (scope.onMiddleClickName) {
+                  scope.onMiddleClickName(folder, $event, $index);
+              }
+          };
 
       }
 
@@ -108,7 +114,8 @@ Use this directive to generate a list of folders presented as a flexbox grid.
          scope: {
             folders: '=',
             onClick: "=",
-            onClickName: "="
+            onClickName: "=",
+            onMiddleClickName: "="
          },
          link: link
       };

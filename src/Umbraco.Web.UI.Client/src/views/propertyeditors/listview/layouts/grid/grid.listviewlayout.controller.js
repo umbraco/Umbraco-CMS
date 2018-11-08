@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
+    function ListViewGridLayoutController($scope, $window, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
@@ -39,6 +39,7 @@
         vm.selectItem = selectItem;
         vm.selectFolder = selectFolder;
         vm.goToItem = goToItem;
+        vm.middleClickGoToItem = middleClickGoToItem;
 
         function activate() {
             vm.itemsWithoutFolders = filterOutFolders($scope.items);
@@ -116,8 +117,23 @@
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
 
-        function goToItem(item, $event, $index) {
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+        function goToItem(item, event) {
+            var path = getItemPath(item);
+            if (event.ctrlKey) {
+                $window.open("#/" + path);
+            } else {
+                $location.path(path);
+            }
+        }
+
+        function middleClickGoToItem(item, event) {
+            var path = getItemPath(item);
+            $window.open("#/" + path);
+        }
+
+        function getItemPath(item) {
+            // if item.id is 2147483647 (int.MaxValue) use item.key
+            return $scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id);
         }
 
         activate();
