@@ -235,10 +235,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
@@ -298,10 +295,7 @@ namespace Umbraco.Tests.Models
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
@@ -342,8 +336,8 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
-            Assert.AreNotSame(clone.Template, content.Template);
-            Assert.AreEqual(clone.Template, content.Template);
+            Assert.AreNotSame(clone.TemplateId, content.TemplateId);
+            Assert.AreEqual(clone.TemplateId, content.TemplateId);
             Assert.AreEqual(clone.Trashed, content.Trashed);
             Assert.AreEqual(clone.UpdateDate, content.UpdateDate);
             Assert.AreEqual(clone.VersionId, content.VersionId);
@@ -419,16 +413,12 @@ namespace Umbraco.Tests.Models
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
             content.SortOrder = 5;
-            content.Template = new Template((string)"Test Template", (string)"testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-
-            content.Template.UpdateDate = DateTime.Now; //update a child object
+            
             content.ContentType.UpdateDate = DateTime.Now;  //update a child object
 
             // Act
@@ -469,7 +459,7 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
             //verify child objects were reset too
-            Assert.IsTrue(content.Template.WasPropertyDirty("UpdateDate"));
+            Assert.Zero(content.TemplateId);
             Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
@@ -497,10 +487,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;

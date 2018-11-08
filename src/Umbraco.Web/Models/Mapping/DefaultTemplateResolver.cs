@@ -1,24 +1,34 @@
 ﻿using AutoMapper;
+using LightInject;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
     internal class DefaultTemplateResolver : IValueResolver<IContent, ContentItemDisplay, string>
     {
+        /// <summary>
+        /// Gets or sets the services context.
+        /// </summary>
+        [Inject]
+        public ServiceContext Services { get; set; }
+
         public string Resolve(IContent source, ContentItemDisplay destination, string destMember, ResolutionContext context)
         {
-            if (source == null || source.Template == null) return null;
+            if (source == null)
+                return null;
 
-            var alias = source.Template.Alias;
+            // If no template id was set return default template.
+            if (source.TemplateId == 0 && !string.IsNullOrWhiteSpace(source.ContentType.DefaultTemplate?.Alias))
+            {
+                var defaultTemplate = Services.FileService.GetTemplate(source.ContentType.DefaultTemplate.Alias);
+                return defaultTemplate.Alias;
+            }
 
-            //set default template if template isn't set
-            if (string.IsNullOrEmpty(alias))
-                alias = source.ContentType.DefaultTemplate == null
-                    ? string.Empty
-                    : source.ContentType.DefaultTemplate.Alias;
+            var template = Services.FileService.GetTemplate(source.TemplateId);
 
-            return alias;
+            return template.Alias;
         }
     }
 }

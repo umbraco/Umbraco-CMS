@@ -1427,12 +1427,9 @@ namespace Umbraco.Web.Editors
             contentSave.PersistedContent.ReleaseDate = contentSave.ReleaseDate;
 
             //only set the template if it didn't change
-            var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
-                                                        || (contentSave.PersistedContent.Template != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
+            var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
+            if (contentSave.PersistedContent.TemplateId != template.Id)
             {
-                var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
                 if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
@@ -1441,7 +1438,7 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentSave.PersistedContent.Template = template;
+                    contentSave.PersistedContent.TemplateId = template.Id;
                 }
             }
         }
