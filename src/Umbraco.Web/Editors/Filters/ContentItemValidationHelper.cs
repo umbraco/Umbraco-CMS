@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -36,9 +37,9 @@ namespace Umbraco.Web.Editors.Filters
     /// If any severe errors occur then the response gets set to an error and execution will not continue. Property validation
     /// errors will just be added to the ModelState.
     /// </remarks>
-    internal class ContentItemValidationHelper<TPersisted, TModelSave>: ContentItemValidationHelper
+    internal class ContentItemValidationHelper<TPersisted, TModelSave> : ContentItemValidationHelper
         where TPersisted : class, IContentBase
-        where TModelSave: IContentSave<TPersisted>
+        where TModelSave : IContentSave<TPersisted>
     {
         public ContentItemValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
@@ -81,6 +82,17 @@ namespace Umbraco.Web.Editors.Filters
         {
             var persistedContent = model.PersistedContent;
             return ValidateProperties(modelWithProperties.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
+        }
+
+        public virtual bool ValidateName(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ModelStateDictionary modelState)
+        {
+            if (string.IsNullOrEmpty(model.PersistedContent.Name))
+            {
+                var message = $"variant node name was not set";
+                modelState.AddValidationError(new ValidationResult(message), "");
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -158,7 +170,7 @@ namespace Umbraco.Web.Editors.Filters
 
                     modelState.AddPropertyError(r, p.Alias, p.Culture);
                 }
-                    
+
             }
 
             return modelState.IsValid;
