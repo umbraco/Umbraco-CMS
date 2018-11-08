@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
 {
     public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable, IEquatable<ContentScheduleCollection>
     {
-        //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date
+        //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date and that duplicate dates per culture are not allowed
         private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule
             = new Dictionary<string, SortedList<DateTime, ContentSchedule>>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -173,13 +173,11 @@ namespace Umbraco.Core.Models
             return Enumerable.Empty<ContentSchedule>();
         }
 
-        //fixme - should this just return IEnumerable<ContentSchedule> since the culture is part of the ContentSchedule object already?
         /// <summary>
-        /// Returns all schedules for both invariant and variant cultures
+        /// Returns all schedules registered
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, IEnumerable<ContentSchedule>> FullSchedule => _schedule.ToDictionary(x => x.Key, x => (IEnumerable<ContentSchedule>)x.Value.Values);
-        //public IEnumerable<ContentSchedule> FullSchedule => _schedule.SelectMany(x => x.Value.Values);
+        public IReadOnlyList<ContentSchedule> FullSchedule => _schedule.SelectMany(x => x.Value.Values).ToList();
 
         public object DeepClone()
         {
@@ -203,8 +201,8 @@ namespace Umbraco.Core.Models
 
         public bool Equals(ContentScheduleCollection other)
         {
-            var thisSched = this.FullSchedule;
-            var thatSched = other.FullSchedule;
+            var thisSched = this._schedule;
+            var thatSched = other._schedule;
 
             var equal = false;
             if (thisSched.Count == thatSched.Count)

@@ -2475,9 +2475,7 @@ namespace Umbraco.Core.Services.Implement
             // they should be removed so they don't interrupt an unpublish
             // otherwise it would remain released == published
 
-            var pastReleases = content.ContentSchedule.FullSchedule.SelectMany(x => x.Value)
-                .Where(x => x.Change == ContentScheduleChange.End && x.Date <= DateTime.Now)
-                .ToList();
+            var pastReleases = content.ContentSchedule.GetPending(ContentScheduleChange.End, DateTime.Now);
             foreach (var p in pastReleases)
                 content.ContentSchedule.Remove(p);
             if (pastReleases.Count > 0)
