@@ -60,31 +60,18 @@
                     vm.tabs = [{
                         active: true,
                         id: 1,
-                        label: vm.labels.availableDataTypes,
-                        alias: "Default",
-                        typesAndEditors: []
-                    }, {
-                        active: false,
-                        id: 2,
                         label: vm.labels.reuse,
                         alias: "Reuse",
                         userConfigured: []
+                    }, {
+                        active: false,
+                        id: 2,
+                        label: vm.labels.availableDataTypes,
+                        alias: "Default",
+                        typesAndEditors: []
                     }];
 
                 });
-        }
-
-        function getGroupedPropertyEditors() {
-
-            vm.loading = true;
-
-            dataTypeResource.getGroupedPropertyEditors().then(function(data) {
-                vm.tabs[0].typesAndEditors = data;
-                vm.typesAndEditors = data;
-                vm.tabsLoaded = vm.tabsLoaded + 1;
-                checkIfTabContentIsLoaded();
-            });
-
         }
 
         function getGroupedDataTypes() {
@@ -92,7 +79,7 @@
             vm.loading = true;
 
             dataTypeResource.getGroupedDataTypes().then(function(data) {
-                vm.tabs[1].userConfigured = data;
+                vm.tabs[0].userConfigured = data;
                 vm.userConfigured = data;
                 vm.tabsLoaded = vm.tabsLoaded + 1;
                 checkIfTabContentIsLoaded();
@@ -100,6 +87,18 @@
 
         }
 
+        function getGroupedPropertyEditors() {
+
+            vm.loading = true;
+
+            dataTypeResource.getGroupedPropertyEditors().then(function (data) {
+                vm.tabs[1].typesAndEditors = data;
+                vm.typesAndEditors = data;
+                vm.tabsLoaded = vm.tabsLoaded + 1;
+                checkIfTabContentIsLoaded();
+            });
+
+        }
         function checkIfTabContentIsLoaded() {
             if (vm.tabsLoaded === 2) {
                 vm.loading = false;
