@@ -8,7 +8,7 @@
     <key alias="assignDomain">Beheer domeinnamen</key>
     <key alias="auditTrail">Documentgeschiedenis</key>
     <key alias="browse">Node bekijken</key>
-    <key alias="changeDocType">Wijzig document type</key>
+    <key alias="changeDocType">Wijzig documenttype</key>
     <key alias="copy">Kopiëren</key>
     <key alias="create">Nieuw</key>
     <key alias="createPackage">Nieuwe package</key>
@@ -151,7 +151,7 @@
     <key alias="nodeName">Pagina Titel</key>
     <key alias="otherElements">Eigenschappen</key>
     <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende node '%0%' niet gepubliceerd is</key>
-    <key alias="parentNotPublishedAnomaly">Dit document is gepubliceerd, maar het is niet in de cache (interne serverfout)</key>
+    <key alias="parentNotPublishedAnomaly">Dit document is gepubliceerd, maar het staat niet in de cache (interne serverfout)</key>
 	<key alias="getUrlException">Kan de Url niet ophalen</key>
     <key alias="routeError">Dit document is gepubliceerd, maar de Url conflicteert met %0%</key>
     <key alias="publish">Publiceren</key>
@@ -225,7 +225,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
-    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggende paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -720,7 +720,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="forgottenPasswordInstruction">Er zal een email worden gestuurd naar het emailadres van jouw account. Hierin staat een link om je wachtwoord te resetten</key>
     <key alias="requestPasswordResetConfirmation">Een email met daarin de wachtwoord reset uitleg zal worden gestuurd als het emailadres in onze database voorkomt.</key>
     <key alias="returnToLogin">Terug naar loginformulier</key>
-    <key alias="setPasswordInstruction">Geeft alsjeblieft een nieuw wachtwoord op</key>
+    <key alias="setPasswordInstruction">Geef alsjeblieft een nieuw wachtwoord op</key>
     <key alias="setPasswordConfirmation">Je wachtwoord is aangepast</key>
     <key alias="resetCodeExpired">De link die je hebt aangeklikt is niet (meer) geldig.</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: Wachtwoord Reset</key>
@@ -803,7 +803,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="packageName">Package naam</key>
     <key alias="packageNoItemsHeader">Package bevat geen inhoud</key>
     <key alias="packageNoItemsText"><![CDATA[Deze package bevat geen inhoud om te verwijderen.<br/><br/>
-      Je kunt dit package veilig verwijderen door 'verwijder package' te klikken.
+      Je kunt deze package veilig verwijderen door op 'verwijder package' te klikken.
     ]]></key>
     <key alias="packageNoUpgrades">Geen upgrades beschikbaar</key>
     <key alias="packageOptions">Package opties</key>
@@ -815,7 +815,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="packageUninstallHeader">Verwijder package</key>
     <key alias="packageUninstallText"><![CDATA[Je kunt de items die je niet wilt verwijderen deselecteren. Als je 'Bevestig verwijderen' klikt worden alle geselecteerde items verwijderd.<br />
       <span style="color: Red; font-weight: bold;">Waarschuwing:</span> alle documenten, media etc, die afhankelijk zijn van de items die je verwijderd, zullen niet meer werken en kan leiden tot een instabiele installatie,
-      wees dus voorzichtig met verwijderen. Als je niet zeker bent, neem dan contact op met de auteur van de package.
+      wees dus voorzichtig met verwijderen. Als je het niet zeker weet, neem dan contact op met de auteur van de package.
     ]]></key>
     <key alias="packageUpgradeDownload">Download update uit de repository</key>
     <key alias="packageUpgradeHeader">Upgrade package</key>
@@ -832,7 +832,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="installStateInstalling">Aan het installeren...</key>
     <key alias="installStateRestarting">Aan het herstarten, een ongenblik geduld aub...</key>
     <key alias="installStateComplete">Geinstalleerd! Je browser zal nu automatisch ververst worden...</key>
-    <key alias="installStateCompleted">Kruk op "finish" om de installate te voltooien en de pagina te verversen.</key>
+    <key alias="installStateCompleted">Klik op "finish" om de installatie te voltooien en de pagina te verversen.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Plakken met alle opmaak (Niet aanbevolen)</key>
@@ -853,7 +853,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="paLoginPageHelp">Kies de pagina met het login-formulier</key>
     <key alias="paRemoveProtection">Verwijder beveiliging</key>
     <key alias="paSelectPages">Kies de pagina's die het login-formulier en de error-berichten bevatten</key>
-    <key alias="paSelectRoles">Kies de roles wie toegang hebben tot deze pagina</key>
+    <key alias="paSelectRoles">Kies de roles die toegang hebben tot deze pagina</key>
     <key alias="paSetLogin">Geef de gebruikersnaam en wachtwoord voor deze pagina</key>
     <key alias="paSimple">Eenvoudig: Beveilig door middel van gebruikersnaam en wachtwoord</key>
     <key alias="paSimpleHelp">Als je eenvoudige beveiliging wilt gebruiken met behulp van een enkele gebruikersnaam en wachtwoord</key>
@@ -903,7 +903,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Huidige versie</key>
-    <key alias="diffHelp"><![CDATA[Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie , <ins>groen betekent toegevoegd</ins>]]></key>
+    <key alias="diffHelp"><![CDATA[Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie, <ins>groen betekent toegevoegd</ins>]]></key>
     <key alias="documentRolledBack">Document is teruggezet</key>
     <key alias="htmlHelp">Hiermee wordt de geselecteerde versie als html getoond, als u de verschillen tussen de 2 versies tegelijk wilt zien, gebruik dan de diff view</key>
     <key alias="rollbackTo">Terugzetten naar</key>
@@ -970,10 +970,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 	<key alias="operationFailedHeader">Mislukt</key>
 	<key alias="invalidUserPermissionsText">Wegens onvoldoende rechten kon deze handeling kon niet worden uitegevoerd </key>
 	<key alias="operationCancelledHeader">Geannuleerd</key>
-	<key alias="operationCancelledText">Uitvoering is g eannuleerd door de plugin van een 3e partij</key>
-    <key alias="contentPublishedFailedByEvent">Publicatie werd geannuleerd doordeeen plugin van een 3e partij</key>
-    <key alias="contentTypeDublicatePropertyType">Eigenschappen type bestaat al</key>
-    <key alias="contentTypePropertyTypeCreated">Eigenschappen type aangemaakt</key>
+	<key alias="operationCancelledText">Uitvoering is geannuleerd door de plugin van een 3e partij</key>
+    <key alias="contentPublishedFailedByEvent">Publicatie werd geannuleerd door een plugin van een 3e partij</key>
+    <key alias="contentTypeDublicatePropertyType">Eigenschappentype bestaat al</key>
+    <key alias="contentTypePropertyTypeCreated">Eigenschappentype aangemaakt</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Naam: %0% <br /> Data type: %1%]]></key>
     <key alias="contentTypePropertyTypeDeleted">Eigenschappen type verwijderd</key>
     <key alias="contentTypeSavedHeader">Inhoudstype opgeslagen</key>
@@ -1145,12 +1145,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="allowAsRootCheckbox">Ja - sta content van dit type toe op root-niveau</key>
 
     <key alias="childNodesHeading">Toegestane child node types</key>
-    <key alias="childNodesDescription">Sta contetn van een bepaalde type toe om onder dit type aangemaakt te kunnen worden</key>
+    <key alias="childNodesDescription">Sta content van een bepaald type toe om onder dit type aangemaakt te kunnen worden</key>
 
     <key alias="chooseChildNode">Kies child node</key>
-    <key alias="compositionsDescription">Overerfde tabs en properties van een bestaand document-type. Nieuwe tabs worden toegevoegd aan het huidige document-type of samengevoegd als een tab met de identieke naam al bestaat.</key>
-    <key alias="compositionInUse">Dit content-type wordt gebruikt in een compositie en kan daarom niet zelf een compositie worden.</key>
-    <key alias="noAvailableCompositions">Er zijn geen content-typen beschikbaar om als compositie te gebruiken.</key>
+    <key alias="compositionsDescription">Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.</key>
+    <key alias="compositionInUse">Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een compositie worden.</key>
+    <key alias="noAvailableCompositions">Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.</key>
 
     <key alias="availableEditors">Beschikbare editors</key>
     <key alias="reuse">Herbruik</key>
@@ -1191,7 +1191,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
 
   <area alias="modelsBuilder">
-      <key alias="buildingModels">Models aan het gereneren</key>
+      <key alias="buildingModels">Models aan het genereren</key>
       <key alias="waitingMessage">dit kan enige tijd duren, geduld aub</key>
       <key alias="modelsGenerated">Models gegenereerd</key>
       <key alias="modelsGeneratedError">Models konden niet gegenereerd worden</key>
@@ -1228,7 +1228,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Taken aan jou toegewezen</key>
-    <key alias="assignedTasksHelp"><![CDATA[Onderstaande lijst toont vertalingstaken aan jou toegewezen. Om een meer gedetailleerd overzicht te zien, met comments, klik op "Details" of de naam van de pagina. 
+    <key alias="assignedTasksHelp"><![CDATA[Onderstaande lijst toont vertalingstaken die aan jou zijn toegewezen. Om een meer gedetailleerd overzicht te zien, met comments, klik op "Details" of de naam van de pagina. 
 	Je kan ook de pagina direct downloaden als XML door te klikken op "Download Xml".
 Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de "Sluit" knop.
     ]]></key>
@@ -1255,14 +1255,14 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       De Umbraco Robot    
         ]]></key>
     <key alias="mailSubject">[%0%] Vertaalopdracht voor %1%</key>
-    <key alias="noTranslators">Geen vertaal-gebruikers gevonden. Maak eerst een vertaal-gebruiker aan voordat je pagina's voor vertaling verstuurd</key>
+    <key alias="noTranslators">Geen vertaal-gebruikers gevonden. Maak eerst een vertaal-gebruiker aan voordat je pagina's voor vertaling verstuurt</key>
     <key alias="ownedTasks">Taken aangemaakt door jou</key>
     <key alias="ownedTasksHelp"><![CDATA[De lijst hieronder toont pagina's <strong>die je aanmaakte</strong>. 
 	Om een detailweergave met opmerkingen te zien, klik op "Detail" of op de paginanaam. 
 	Je kan ook de pagina in XML-formaat downloaden door op de "Download XML"-link te klikken. 
 	Om een vertalingstaak te sluiten, klik je op de "Sluiten"-knop in detailweergave.]]></key>
     <key alias="pageHasBeenSendToTranslation">De pagina '%0%' is verstuurd voor vertaling</key>
-	<key alias="noLanguageSelected">Kies de taal waarin deze contetn vertaald moet worden</key>
+	<key alias="noLanguageSelected">Kies de taal waarin deze content vertaald moet worden</key>
     <key alias="sendToTranslate">Stuur voor vertaling</key>
     <key alias="taskAssignedBy">Toegewezen door</key>
     <key alias="taskOpened">Taak geopend</key>
@@ -1315,7 +1315,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
   </area>
   <area alias="user">
     <key alias="access">Toegang</key>
-    <key alias="accessHelp">Gebaseerd op de gebruikers groepen en start pagina's heeft de bruiker toegang tot de volgende pagina's</key>
+    <key alias="accessHelp">Gebaseerd op de gebruikersgroepen en startpagina's heeft de gebruiker toegang tot de volgende pagina's</key>
     <key alias="assignAccess">Toegang geven</key>
     <key alias="administrators">Beheerders</key>
     <key alias="categoryField">Categorieveld</key>
@@ -1326,7 +1326,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="noLockouts">is niet gedeblokkeerd</key>
     <key alias="noPasswordChange">Het wachtwoord is niet gewijzigd</key>
     <key alias="confirmNewPassword">Bevestig nieuw password</key>
-    <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaan formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
+    <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
     <key alias="contentChannel">Inhoudskanaal</key>
     <key alias="createAnotherUser">Nog een gebruiker aanmaken</key>
     <key alias="createUserHelp">Maak nieuwe gebruikers aan om hun toegang te geven tot Umbraco. Wanneer een nieuwe gebruiker wordt aangemaakt wordt er een wachtwoord gegenereerd dat je met hun kan delen.</key>
@@ -1341,15 +1341,15 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="inviteAnotherUser">Nog een gebruiker uitnodigen</key>
     <key alias="inviteUserHelp">Nodig gebruikers uit om hen toegang te geven to Umbraco. Een uitnodiging wordt via e-mail verstuurd met instructies hoe de gebruiker kan inloggen.</key>
     <key alias="language">Taal</key>
-    <key alias="languageHelp">Stel de taal in die gebruiker zal zien in menu's en dialoog vensters</key>
-      <key alias="lastLockoutDate">Laatst geblokkeerd datu,</key>
+    <key alias="languageHelp">Stel de taal in die gebruiker zal zien in menu's en dialoogvensters</key>
+      <key alias="lastLockoutDate">Laatst geblokkeerd datum</key>
       <key alias="lastLogin">Laatste keer ingelogd</key>
       <key alias="lastPasswordChangeDate">Laatste keer paswoord gewijzigd</key>
     <key alias="loginname">Loginnaam</key>
     <key alias="mediastartnode">Startnode in Mediabibliotheek</key>
       <key alias="mediastartnodehelp">Beperk de mediabibliotheek tot een specifieke startnode</key>
       <key alias="mediastartnodes">Startnodes in Mediabibliotheek</key>
-      <key alias="mediastartnodeshelp">Beperk de mediabibliotheek tot een specifieke startnodes</key>
+      <key alias="mediastartnodeshelp">Beperk de mediabibliotheek tot een specifieke startnode</key>
     <key alias="modules">Secties</key>
     <key alias="noConsole">Blokkeer Umbraco toegang</key>
       <key alias="noLogin">heeft nog niet ingelogd</key>
@@ -1383,9 +1383,9 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       <key alias="stateLockedOut">Geblokkeerd</key>
       <key alias="stateInvited">Uitgenodigd</key>
       <key alias="startnode">Startnode in Content</key>
-      <key alias="startnodehelp">Beperk de content toegan een specifieke start node</key>
+      <key alias="startnodehelp">Beperk de content toegang tot een specifieke startnode</key>
       <key alias="startnodes">Startnodes in Content</key>
-      <key alias="startnodeshelp">Beperk de content toegan een specifieke start nodes</key>
+      <key alias="startnodeshelp">Beperk de content toegang tot specifieke startnodes</key>
       <key alias="sortNameAscending">Naam (A-Z)</key>
       <key alias="sortNameDescending">Naam (Z-A)</key>
       <key alias="sortCreateDateDescending">Nieuwste</key>
@@ -1402,7 +1402,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       <key alias="userGroups">Gebruikersgroepen</key>
       <key alias="userInvited">is uitgenodigd</key>
       <key alias="userInvitedSuccessHelp">Een uitnodiging is gestuurd naar de nieuwe gebruiker met informatie over hoe in te loggen in Umbraco</key>
-      <key alias="userinviteWelcomeMessage">Hallo en welk in Umbraco! Binnen ongeveer 1 minuut kan je aan de slag. Je moet enkel je wachtwoord instellen en een foto toevoegen.</key>
+      <key alias="userinviteWelcomeMessage">Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je moet enkel je wachtwoord instellen en een foto toevoegen.</key>
       <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
@@ -1511,7 +1511,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       <key alias="invite">Uitnodigen</key>
       <key alias="defaultInvitationMessage">Uitnodiging opnieuw aan het versturen...</key>
       <key alias="deleteUser">Verwijder gebruiker</key>
-      <key alias="deleteUserConfirmation">Ben je zeker dat je deze gebruiker wil verwijderen?</key>
+      <key alias="deleteUserConfirmation">Weet je zeker dat je deze gebruiker wil verwijderen?</key>
   </area>
 	 <area alias="validation">
     <key alias="validation">Validatie</key>
@@ -1529,9 +1529,9 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 		   3: Configuration file path
 	  -->
     <key alias="checkSuccessMessage">Waarde is insteld naar the aanbevolen waarde: '%0%'.</key>
-    <key alias="rectifySuccessMessage">Waarde was '%1%' voor XPath '%2%' in configuratie bestand '%3%'.</key>
-    <key alias="checkErrorMessageDifferentExpectedValue">De verwachtte waarde voor '%2%' is '%1%' in configuratie bestand '%3%', maar is '%0%'.</key>
-    <key alias="checkErrorMessageUnexpectedValue">Onverwachte waarde '%0%' gevonden voor '%2%' in configuratie bestand '%3%'.</key>
+    <key alias="rectifySuccessMessage">Waarde was '%1%' voor XPath '%2%' in configuratiebestand '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">De verwachte waarde voor '%2%' is '%1%' in configuratiebestand '%3%', maar is '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Onverwachte waarde '%0%' gevonden voor '%2%' in configuratiebestand '%3%'.</key>
 
     <!-- The following keys get these tokens passed in:
 	     0: Current value
@@ -1581,15 +1581,15 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>
     <key alias="valueToRectifyNotProvided">Waarde om te herstellen niet gedefinieerd.</key>
 
-    <key alias="compilationDebugCheckSuccessMessage">Debug compiliate mode staat uit.</key>
-    <key alias="compilationDebugCheckErrorMessage">Debug compiliate mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compiliate mode uitgezet.</key>
+    <key alias="compilationDebugCheckSuccessMessage">Debug compilatie mode staat uit.</key>
+    <key alias="compilationDebugCheckErrorMessage">Debug compilatie mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilatie mode uitgezet.</key>
 
     <key alias="traceModeCheckSuccessMessage">Trace mode staat uit.</key>
     <key alias="traceModeCheckErrorMessage">Trace mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
     <key alias="traceModeCheckRectifySuccessMessage">Trace mode uitgezet.</key>
 
-    <key alias="folderPermissionsCheckMessage">Alle mappen hebben de juiste permissie-instellingen!.</key>
+    <key alias="folderPermissionsCheckMessage">Alle mappen hebben de juiste permissie-instellingen!</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
