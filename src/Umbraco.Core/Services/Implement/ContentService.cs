@@ -1906,17 +1906,19 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="items"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
+        public OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             var itemsA = items.ToArray();
-            if (itemsA.Length == 0) return true;
+            if (itemsA.Length == 0) return new OperationResult(OperationResultType.NoOperation, evtMsgs);
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
                 scope.Complete();
                 return ret;
             }
@@ -1933,28 +1935,38 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="ids"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        /// <returns>Result indicating what action was taken when handling the command.</returns>
+        public OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             var idsA = ids.ToArray();
-            if (idsA.Length == 0) return true;
+            if (idsA.Length == 0) return new OperationResult(OperationResultType.NoOperation, evtMsgs);
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var itemsA = GetByIds(idsA).ToArray();
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId, evtMsgs, raiseEvents);
                 scope.Complete();
                 return ret;
             }
         }
 
-        private bool Sort(IScope scope, IContent[] itemsA, int userId, bool raiseEvents)
+        private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
             var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
-            if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                return false;
+            if (raiseEvents)
+            {
+                //raise cancelable sorting event
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                    return OperationResult.Cancel(evtMsgs);
+
+                //raise saving event (this one cannot be canceled)
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saving, this, saveEventArgs, nameof(Saving));
+            }
 
             var published = new List<IContent>();
             var saved = new List<IContent>();
@@ -1986,8 +1998,9 @@ namespace Umbraco.Core.Services.Implement
 
             if (raiseEvents)
             {
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                //first saved, then sorted
+                scope.Events.Dispatch(Saved, this, saveEventArgs, nameof(Saved));
+                scope.Events.Dispatch(Sorted, this, saveEventArgs, nameof(Sorted));
             }
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
@@ -1996,7 +2009,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
             Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
-            return true;
+            return OperationResult.Succeed(evtMsgs);
         }
 
         #endregion
@@ -2070,6 +2083,16 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Delete Versions
         /// </summary>
         public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
+
+        /// <summary>
+        /// Occurs before Sorting
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorting;
+
+        /// <summary>
+        /// Occurs after Sorting
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorted;
 
         /// <summary>
         /// Occurs before Save

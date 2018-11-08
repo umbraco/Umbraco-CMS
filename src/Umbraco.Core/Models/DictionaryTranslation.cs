@@ -104,23 +104,14 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (DictionaryTranslation)base.DeepClone();
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (DictionaryTranslation)clone;
 
             // clear fields that were memberwise-cloned and that we don't want to clone
-            clone._language = null;
-
-            // turn off change tracking
-            clone.DisableChangeTracking();
-
-            // this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-
-            // re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity._language = null;
         }
     }
 }

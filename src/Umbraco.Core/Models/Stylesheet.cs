@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.IO;
 using Umbraco.Core.Strings.Css;
 
 namespace Umbraco.Core.Models
@@ -21,7 +20,7 @@ namespace Umbraco.Core.Models
         { }
 
         internal Stylesheet(string path, Func<File, string> getFileContent)
-            : base(path.EnsureEndsWith(".css"), getFileContent)
+            : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
         }

@@ -309,12 +309,14 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
-        <key alias="newJavascriptFile">New JavaScript file</key>
+    <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
     <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
     <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
+    <key alias="newStyleSheetFile">New style sheet file</key>
+    <key alias="newRteStyleSheetFile">New Rich Text Editor style sheet file</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -967,10 +969,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       Go to http://%4%/#/content/content/edit/%5% to edit.
 
+      %6%
+
       Have a nice day!
 
       Cheers from the Umbraco robot
     ]]></key>
+    <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
     <key alias="mailBodyHtml"><![CDATA[
         <html>
 			<head>
@@ -1026,9 +1031,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 														</table>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<h3>Update summary:</h3>
-															<table style="width: 100%;">
-																 %6%
-															</table>
+															%6%
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Have a nice day!<br /><br />
@@ -1049,6 +1052,9 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
 		</html>
 	]]></key>
+    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
+        %0%
+    ]]></key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
   </area>
@@ -1340,12 +1346,21 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
+    <key alias="editorRules">Rich text editor styles</key>
+    <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
-    <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="preview">Preview</key>
+    <key alias="nameHelp">The name displayed in the editor style selector</key>
+    <key alias="overlayTitleAddRule">Add style</key>
+    <key alias="overlayTitleEditRule">Edit style</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Uses CSS syntax, e.g. "h1" or ".redHeader"</key>
     <key alias="styles">Styles</key>
+    <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
+    <key alias="tabCode">Code</key>
+    <key alias="tabRules">Rich Text Editor</key>
+    <key alias="preview">Preview</key>
+    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>

@@ -598,20 +598,15 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Member)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (Member)clone;
+
             //need to manually clone this since it's not settable
-            clone._contentType = (IMemberType)ContentType.DeepClone();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
-
+            clonedEntity._contentType = (IMemberType)ContentType.DeepClone();
+            
         }
 
         /// <inheritdoc />

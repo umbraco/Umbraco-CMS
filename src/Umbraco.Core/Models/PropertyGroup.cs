@@ -100,24 +100,18 @@ namespace Umbraco.Core.Models
             return baseHash ^ nameHash;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (PropertyGroup)base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedEntity = (PropertyGroup)clone;
 
-            if (clone._propertyTypes != null)
+            if (clonedEntity._propertyTypes != null)
             {
-                clone._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
-                clone._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
-                clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;       //re-assign correct event handler
+                clonedEntity._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
+                clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
+                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
             }
-
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
         }
     }
 }
