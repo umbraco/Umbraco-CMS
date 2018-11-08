@@ -1614,7 +1614,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 	    0: Comma delimitted list of headers found
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[De volgende header welke informatie tonen over de gebruikte website technologie zijn aangetroffen: <strong>%0%</strong>.]]></key>
-    <key alias="excessiveHeadersNotFound">Er zijn geen headeres gevonden welke informatie over de gebruikte website technologie prijsgeven!</key>
+    <key alias="excessiveHeadersNotFound">Er zijn geen headers gevonden die informatie prijsgeven over de gebruikte website technologie!</key>
 
     <key alias="smtpMailSettingsNotFound">In de Web.config werd system.net/mailsettings niet gevonden</key>
     <key alias="smtpMailSettingsHostNotConfigured">In de Web.config sectie system.net/mailsettings is de host niet geconfigureerd.</key>
