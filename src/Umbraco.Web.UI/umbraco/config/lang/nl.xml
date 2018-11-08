@@ -38,7 +38,7 @@
     <key alias="update">Bijwerken</key>
     <key alias="setPermissions">Rechten instellen</key>
     <key alias="unlock">Deblokkeer</key>
-    <key alias="createblueprint">Content sjabloon aanmaken</key>
+    <key alias="createblueprint">Content template aanmaken</key>
     <key alias="resendInvite">Uitnodiging opnieuw versturen</key>
   </area>
   <area alias="assignDomain">
@@ -112,7 +112,7 @@
     <key alias="docTypeChanged">Documenttype gewijzigd</key>
     <key alias="mapProperties">Eigenschappen toewijzen</key>
     <key alias="mapToProperty">Toewijzen aan eigenschap</key>
-    <key alias="newTemplate">Nieuw sjabloon</key>
+    <key alias="newTemplate">Nieuwe template</key>
     <key alias="newType">Nieuw type</key>
     <key alias="none">geen</key>
     <key alias="selectedContent">Inhoud</key>
@@ -1069,9 +1069,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="insertDictionaryItem">Invoegen dictionary item</key>
     <key alias="insertMacro">Invoegen Macro</key>
     <key alias="insertPageField">Invoegen Umbraco page field</key>
-    <key alias="mastertemplate">Basis sjabloon</key>
+    <key alias="mastertemplate">Basistemplate</key>
     <key alias="quickGuide">Quick Guide voor Umbraco template tags</key>
-    <key alias="template">Sjabloon</key>
+    <key alias="template">Template</key>
   </area>
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
