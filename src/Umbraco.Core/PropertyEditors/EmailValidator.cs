@@ -16,7 +16,7 @@ namespace Umbraco.Core.PropertyEditors
             var asString = value.ToString();
 
             // This is not the ffficial RFC 5322 regular expression, but it's a version which comes pretty close to. (Inspired by: https://www.regular-expressions.info/email.html)
-            var emailSyntax = @"^[a-z0-9][a-z0-9!#$%&'*+\/=?^_`{|}~.-]*@([a-z0-9]([a-z0-9-]*)\.)+([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
+            var emailSyntax = @"^[a-z0-9][a-z0-9!#$%&'*+\/=?^_`{|}~.-]*@([a-z0-9]([a-z0-9-]*)\.)*([a-z0-9]([a-z0-9-]*[a-z0-9]))+$";
             var isMatch = Regex.IsMatch(asString, emailSyntax, RegexOptions.IgnoreCase);
             if (!string.IsNullOrEmpty(asString) && !isMatch)
             {
