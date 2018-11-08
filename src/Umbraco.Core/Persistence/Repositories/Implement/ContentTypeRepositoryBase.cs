@@ -328,7 +328,7 @@ AND umbracoNode.id <> @id",
             // We check if the entity's own PropertyTypes has been modified and then also check
             // any of the property groups PropertyTypes has been modified.
             // This specifically tells us if any property type collections have changed.
-            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
+            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(pt => pt.IsDirty()))
             {
                 var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
                 var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
