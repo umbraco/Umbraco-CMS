@@ -4,7 +4,6 @@
  *
  * @requires $rootScope
  * @requires $routeParams
- * @requires $log
  * @requires $location
  * @requires dialogService
  * @requires treeService
@@ -15,7 +14,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $route, $routeParams, $log, $location, $q, $timeout, $injector, urlHelper, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
+function navigationService($rootScope, $routeParams, $location, $q, $timeout, $injector, eventsService, dialogService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();

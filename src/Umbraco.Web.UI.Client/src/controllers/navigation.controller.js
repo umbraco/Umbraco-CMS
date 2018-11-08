@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();

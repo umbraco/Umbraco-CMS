@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function mediaPickerController($scope, dialogService, entityResource, $log, iconHelper, editorService) {
+function mediaPickerController($scope, entityResource, iconHelper, editorService) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');

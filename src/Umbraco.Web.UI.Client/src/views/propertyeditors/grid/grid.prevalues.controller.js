@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, gridService, imageHelper, $timeout) {
+    function ($scope, gridService) {
 
         var emptyModel = {
             styles:[

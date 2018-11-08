@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, requestRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, dialogService, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
