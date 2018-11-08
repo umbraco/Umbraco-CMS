@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // ensure that the default template is assigned
             if (entity.TemplateId == 0)
-                entity.TemplateId = entity.ContentType.DefaultTemplate.Id;
+                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id ?? 0;
 
             // sanitize names
             SanitizeNames(content, publishing);
@@ -405,6 +405,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
+                content.PublishTemplateId = 0;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -604,6 +605,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
+                content.PublishTemplateId = 0;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
@@ -990,9 +992,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var temp in temps)
                 {
                     // complete the item
-                    if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
+                    if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
                         temp.Content.TemplateId = temp.Template1Id.Value;
-                    if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
+                    if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id.Value;
 
                 if (properties.ContainsKey(temp.VersionId))

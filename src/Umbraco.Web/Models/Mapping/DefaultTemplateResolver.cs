@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using LightInject;
 using System.Web.Mvc;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -11,17 +10,21 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string Resolve(IContent source, ContentItemDisplay destination, string destMember, ResolutionContext context)
         {
-            var fileService = DependencyResolver.Current.GetService<IFileService>();
             if (source == null)
                 return null;
 
-            // If no template id was set return default template.
-            if (source.TemplateId == 0 && !string.IsNullOrWhiteSpace(source.ContentType.DefaultTemplate?.Alias))
+            // If no template id was set...
+            if (source.TemplateId == 0)
             {
-                var defaultTemplate = fileService.GetTemplate(source.ContentType.DefaultTemplate.Alias);
-                return defaultTemplate.Alias;
-            }
+                // ... and no default template is set, return null...
+                if (string.IsNullOrWhiteSpace(source.ContentType.DefaultTemplate?.Alias))
+                    return null;
 
+                // ... otherwise return the content type default template alias.
+                return source.ContentType.DefaultTemplate?.Alias;
+            }
+            
+            var fileService = DependencyResolver.Current.GetService<IFileService>();
             var template = fileService.GetTemplate(source.TemplateId);
 
             return template.Alias;
