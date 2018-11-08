@@ -815,7 +815,6 @@ namespace Umbraco.Core.Services
                         var parentPath = media.Path;
                         var parentLevel = media.Level;
                         var parentTrashed = media.Trashed;
-                        // TODO : Unobfuscate child untrashed media
                         var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed, moveInfo);
                         Save(updatedDescendants, userId, false); //no events!
                     }
@@ -1149,7 +1148,7 @@ namespace Umbraco.Core.Services
                     {
                         repository.DeleteContentXml(descendant);
                         descendant.ChangeTrashedState(true, descendant.ParentId);
-                        // TODO : Obfuscate trashed child media
+                        ObfuscateTrashedMedia(descendant);
                         repository.AddOrUpdate(descendant);
                         
                         moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
@@ -1169,8 +1168,6 @@ namespace Umbraco.Core.Services
 
         private void ObfuscateTrashedMedia(IMedia media)
         {
-            // TODO This *has* to work, if it part fails we've made a mess on the FS
-
             var umbracoFile = media.GetValue<string>("umbracoFile");
             var filename = Path.GetFileName(umbracoFile);
             var newUmbracoFile = MediaPath(umbracoFile) + ObfuscateFilename(filename);
@@ -1436,6 +1433,14 @@ namespace Umbraco.Core.Services
                 if (parentTrashed != child.Trashed)
                 {
                     child.ChangeTrashedState(parentTrashed, child.ParentId);
+                    if (parentTrashed)
+                    {
+                        ObfuscateTrashedMedia(child);
+                    }
+                    else
+                    {
+                        UnobfuscateTrashedMedia(child);
+                    }
                 }
 
                 eventInfo.Add(new MoveEventInfo<IMedia>(child, originalPath, child.ParentId));
