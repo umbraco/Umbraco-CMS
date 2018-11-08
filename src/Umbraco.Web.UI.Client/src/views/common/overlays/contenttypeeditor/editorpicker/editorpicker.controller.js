@@ -10,7 +10,7 @@
 (function() {
     "use strict";
 
-    function EditorPickerOverlay($scope, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService) {
+    function EditorPickerOverlay($scope, $element, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService) {
 
         var vm = this;
 
@@ -29,13 +29,15 @@
             id: 1,
             label: localizationService.localize("contentTypeEditor_availableEditors"),
             alias: "Default",
-            typesAndEditors: []
+            typesAndEditors: [],
+            clickEvent: updateFocus
         }, {
             active: false,
             id: 2,
             label: localizationService.localize("contentTypeEditor_reuse"),
             alias: "Reuse",
-            userConfigured: []
+            userConfigured: [],
+            clickEvent: updateFocus
         }];
 
         vm.filterItems = filterItems;
@@ -43,6 +45,10 @@
         vm.hideDetailsOverlay = hideDetailsOverlay;
         vm.pickEditor = pickEditor;
         vm.pickDataType = pickDataType;
+
+        function updateFocus() {
+            $element.find('.editor-overlay-search').focus();
+        }
 
         function activate() {
 
