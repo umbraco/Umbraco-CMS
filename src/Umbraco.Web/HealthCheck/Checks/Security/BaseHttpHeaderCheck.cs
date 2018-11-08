@@ -13,14 +13,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        private readonly ILocalizedTextService _textService;
+        protected readonly ILocalizedTextService _textService;
 
-        private const string SetHeaderInConfigAction = "setHeaderInConfig";
+        protected const string SetHeaderInConfigAction = "setHeaderInConfig";
 
-        private readonly string _header;
-        private readonly string _value;
-        private readonly string _localizedTextPrefix;
-        private readonly bool _metaTagOptionAvailable;
+        protected readonly string _header;
+        protected readonly string _value;
+        protected readonly string _localizedTextPrefix;
+        protected readonly bool _metaTagOptionAvailable;
 
         public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext, 
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
