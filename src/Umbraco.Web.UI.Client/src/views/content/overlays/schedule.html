@@ -49,7 +49,7 @@
 
                 <div class="btn-group flex" style="font-size: 15px;">
                     <umb-flatpickr
-                        ng-model="vm.variants[0].removeDate"
+                        ng-model="vm.variants[0].expireDate"
                         options="vm.variants[0].datePickerConfig"
                         on-setup="vm.datePickerSetup(vm.variants[0], 'unpublish', fpItem)"
                         on-change="vm.datePickerChange(vm.variants[0], dateStr, 'unpublish')"
@@ -57,18 +57,18 @@
                         on-close="vm.datePickerClose(vm.variants[0], 'unpublish')">
 
                         <div>
-                            <button ng-if="vm.variants[0].removeDate" class="btn umb-button--xs" style="outline: none;">
+                            <button ng-if="vm.variants[0].expireDate" class="btn umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].removeDateFormatted}}
                             </button>
             
-                            <a ng-hide="vm.variants[0].removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                            <a ng-hide="vm.variants[0].expireDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                 <localize key="content_setDate">Set date</localize>
                             </a>
                         </div>
 
                     </umb-flatpickr>
 
-                    <a ng-if="vm.variants[0].removeDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                    <a ng-if="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                         <span class="icon icon-wrong"></span>
                     </a>
 
@@ -93,7 +93,7 @@
                             id="{{variant.language.culture}}"
                             name="saveVariantSelector"
                             type="checkbox"
-                            ng-model="variant.schedule"
+                            ng-model="variant.save"
                             ng-change="vm.changeSelection(variant)"
                             style="margin-right: 8px;" />
                         <div>
@@ -107,7 +107,7 @@
                                 <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                             </div>
 
-                            <div ng-if="variant.schedule" class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
+                            <div ng-if="variant.save" class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
                                 <div style="font-size: 13px; margin-right: 5px;">Publish: </div>
             
                                 <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;">
@@ -137,23 +137,23 @@
             
                                 <div class="btn-group flex" style="font-size: 14px;">
                                     <umb-flatpickr
-                                        ng-model="variant.removeDate"
+                                        ng-model="variant.expireDate"
                                         options="variant.datePickerConfig"
                                         on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
                                         on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
                                         on-open="vm.datePickerShow(variant, 'unpublish')"
                                         on-close="vm.datePickerClose(variant, 'unpublish')">
                                         <div>
-                                            <button ng-if="variant.removeDate" class="btn umb-button--xxs" style="outline: none;">
+                                            <button ng-if="variant.expireDate" class="btn umb-button--xxs" style="outline: none;">
                                                 {{variant.removeDateFormatted}}
                                             </button>
                             
-                                            <a ng-hide="variant.removeDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
+                                            <a ng-hide="variant.expireDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                                 <localize key="content_setDate">Set date</localize>
                                             </a>
                                         </div>
                                     </umb-flatpickr>
-                                    <a ng-if="variant.removeDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                                    <a ng-if="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                                         <span class="icon icon-wrong"></span>
                                     </a>
                                 </div>
