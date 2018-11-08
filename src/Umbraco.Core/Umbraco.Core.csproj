@@ -1268,7 +1268,6 @@
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
-    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />

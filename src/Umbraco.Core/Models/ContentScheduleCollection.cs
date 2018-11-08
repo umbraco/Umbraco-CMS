@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
             {
                 changes = new SortedList<DateTime, ContentSchedule>();
                 _schedule[culture] = changes;
-            }   
+            }
 
             //TODO: Below will throw if there are duplicate dates added, should validate/return bool?
             // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
                 changes.Add(releaseDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
-                
+
             if (expireDate.HasValue)
             {
                 var entry = new ContentSchedule(0, culture, expireDate.Value, ContentScheduleChange.End);
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Models
                     if (s.Count == 0)
                         _schedule.Remove(change.Culture);
                 }
-                    
+
             }
         }
 
@@ -135,9 +135,9 @@ namespace Umbraco.Core.Models
                         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ofChange.Value));
                         if (s.Count == 0)
                             _schedule.Remove(culture);
-                    }   
+                    }
                 }
-                    
+
             }
         }
 
@@ -193,41 +193,27 @@ namespace Umbraco.Core.Models
         }
 
         public override bool Equals(object obj)
-        {
-            if (!(obj is ContentScheduleCollection c))
-                return false;
-            return Equals(c);
-        }
+            => obj is ContentScheduleCollection other && Equals(other);
 
         public bool Equals(ContentScheduleCollection other)
         {
-            var thisSched = this._schedule;
+            if (other == null) return false;
+
+            var thisSched = _schedule;
             var thatSched = other._schedule;
 
-            var equal = false;
-            if (thisSched.Count == thatSched.Count)
+            if (thisSched.Count != thatSched.Count)
+                return false;
+
+            // fixme/review - code was returning false *if* thatList.SequenceEqual(thisList) and not the opposite?
+            foreach (var (culture, thisList) in thisSched)
             {
-                equal = true;
-                foreach (var pair in thisSched)
-                {
-                    if (thatSched.TryGetValue(pair.Key, out var val))
-                    {
-                        if (val.SequenceEqual(pair.Value))
-                        {
-                            equal = false;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // Require key be present.
-                        equal = false;
-                        break;
-                    }
-                }
+                // if culture is missing, or actions differ, false
+                if (!thatSched.TryGetValue(culture, out var thatList) || !thatList.SequenceEqual(thisList))
+                    return false;
             }
-            return equal;
+
+            return true;
         }
-        
     }
 }

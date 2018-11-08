@@ -1,7 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -12,16 +11,14 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
         private readonly ILogger _logger;
-        private readonly IUserService _userService;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IContentService contentService, ILogger logger, IUserService userService)
+            IRuntimeState runtime, IContentService contentService, ILogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _contentService = contentService;
             _logger = logger;
-            _userService = userService;
         }
 
         public override bool PerformRun()
@@ -58,9 +55,8 @@ namespace Umbraco.Web.Scheduling
                 // run
                 // fixme context & events during scheduled publishing?
                 // in v7 we create an UmbracoContext and an HttpContext, and cache instructions
-                // are batched, and we have to explicitely flush them, how is it going to work here?
-                var publisher = new ScheduledPublisher(_contentService, _logger, _userService);
-                var count = publisher.CheckPendingAndProcess();
+                // are batched, and we have to explicitly flush them, how is it going to work here?
+                _contentService.PerformScheduledPublish(DateTime.Now);
             }
             catch (Exception ex)
             {

@@ -51,23 +51,20 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Method to return the cultures that have been flagged for unpublishing
+        /// Gets the cultures that have been flagged for unpublishing.
         /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
+        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
         internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
         {
-            if (!content.ContentType.VariesByCulture() && !content.IsPropertyDirty("PublishCultureInfos") && !content.Published)
+            // fixme/review - assuming it's || here not && ?
+            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
                 return Array.Empty<string>();
 
             var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
-
-            var result = new List<string>();
-            foreach (var culture in culturesChanging)
-                if (!content.IsCulturePublished(culture) && content.WasCulturePublished(culture))
-                    result.Add(culture);
-
-            return result;
+            return culturesChanging
+                .Where(x => !content.IsCulturePublished(x) && // is not published anymore
+                            content.WasCulturePublished(x))   // but was published before
+                .ToList();
         }
 
         /// <summary>
