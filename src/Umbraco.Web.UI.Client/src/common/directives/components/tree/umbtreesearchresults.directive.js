@@ -11,8 +11,8 @@ function treeSearchResults() {
             results: "=",
             selectResultCallback: "="
         },
-        restrict: "E",    // restrict to an element
-        replace: true,   // replace the html element with the template
+        restrict: "E",  
+        replace: true, 
         templateUrl: 'views/components/tree/umb-tree-search-results.html',
         link: function (scope, element, attrs, ctrl) {
 

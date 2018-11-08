@@ -15,8 +15,8 @@ function treeSearchBox(localizationService, searchService, $q) {
             hideSearchCallback: "=",
             searchCallback: "="
         },
-        restrict: "E",    // restrict to an element
-        replace: true,   // replace the html element with the template
+        restrict: "E",   
+        replace: true,  
         templateUrl: 'views/components/tree/umb-tree-search-box.html',
         link: function (scope, element, attrs, ctrl) {
 
@@ -77,7 +77,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             }, 200));
 
             var searcher = searchService.searchContent;
-            //search
+       
             if (scope.section === "member") {
                 searcher = searchService.searchMembers;
             }

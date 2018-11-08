@@ -28,7 +28,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
         compile: function (element, attrs) {
             //config
-            //var showheader = (attrs.showheader !== 'false');
+            
             var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
             var template = '<ul class="umb-tree ' + hideoptions + '"><li class="root">';
             template += '<div data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">' +

@@ -27,8 +27,6 @@
 
 
       scope.$on('$destroy', function () {
-
-          //ensure to destroy tabdrop (unbinds window resize listeners)
           el.tabdrop("destroy");
 
           unbindModelWatch();
