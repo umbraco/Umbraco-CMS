@@ -20,10 +20,12 @@
         /// <summary>
         /// The item was already published.
         /// </summary>
-        SuccessPublishAlready = 2, 
+        SuccessPublishAlready = 2,
+
         #endregion
 
         #region Success - Unpublish
+
         /// <summary>
         /// The unpublishing was successful.
         /// </summary>
@@ -43,9 +45,13 @@
         /// The specified variant was a mandatory culture therefore it was unpublished and the content item itself is unpublished
         /// </summary>
         SuccessUnpublishMandatoryCulture = 6,
+
         #endregion
 
+        //TODO: WE need something like SuccessPublishCultureMixed, FailedPublishCultureMixed - for when a culture is published and another is unpublished at the same time
+
         #region Failed - Publish
+
         /// <summary>
         /// The operation failed.
         /// </summary>
@@ -105,6 +111,7 @@
         /// Some mandatory cultures are missing.
         /// </summary>
         FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing 
+
         #endregion
 
         #region Failed - Unpublish

@@ -943,12 +943,8 @@ namespace Umbraco.Core.Services.Implement
 
             // finally, "save publishing"
             // what happens next depends on whether the content can be published or not
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var saved = SavePublishing(content, userId);
-                scope.Complete();
-                return saved;
-            }
+            var saved = SavePublishing(content, userId);
+            return saved;
         }
 
         /// <inheritdoc />
@@ -2324,7 +2320,7 @@ namespace Umbraco.Core.Services.Implement
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
             {
-                if (culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
+                if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing.Count == 0) // no published cultures = cannot be published
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
 
                 // missing mandatory culture = cannot be published
