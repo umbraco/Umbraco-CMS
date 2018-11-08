@@ -309,13 +309,14 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
-        <key alias="newJavascriptFile">New JavaScript file</key>
+    <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
     <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
     <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
     <key alias="newStyleSheetFile">New style sheet file</key>
+    <key alias="newRteStyleSheetFile">New Rich Text Editor style sheet file</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -1357,7 +1358,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="styles">Styles</key>
     <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
     <key alias="tabCode">Code</key>
-    <key alias="tabRules">Editor</key>
+    <key alias="tabRules">Rich Text Editor</key>
+    <key alias="preview">Preview</key>
+    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
