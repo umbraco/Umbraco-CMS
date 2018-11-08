@@ -21,6 +21,12 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 			if(this.myForm.$valid){
 				installerService.forward();
 			}
-	};
+    };
+
+    $scope.togglePassword = function () {
+        var elem = $("#password");
+        elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+        $(".password-text.show, .password-text.hide").toggle();
+    };
 	
 });
