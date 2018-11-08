@@ -21,8 +21,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var schedules = Database.Dictionary<int, (DateTime? releaseDate, DateTime? expireDate)> (scheduleSql);
 
             //drop old cols
-            Delete.Column("releaseDate").FromTable("cmsDocument").Do();
-            Delete.Column("expireDate").FromTable("cmsDocument").Do();
+            Delete.Column("releaseDate").FromTable("umbracoDocument").Do();
+            Delete.Column("expireDate").FromTable("umbracoDocument").Do();
             //add new table
             Create.Table<ContentScheduleDto>().Do();
 
