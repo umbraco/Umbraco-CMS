@@ -27,7 +27,7 @@
 					<label class="control-label" for="password">Password</label>
                     <div class="controls">
                         <!-- why isn't this masked: https://www.nngroup.com/articles/stop-password-masking/ -->
-                        <input type="password" name="installer.current.model.password"
+                        <input type="text" name="installer.current.model.password"
                                ng-minlength="{{installer.current.model.minCharLength}}"
                                ng-pattern="passwordPattern"
                                autocorrect="off"
@@ -37,8 +37,8 @@
 
                         <div class="password-toggle">
                             <a href="#" prevent-default ng-click="togglePassword()">
-                                <span class="password-text show">Show password</span>
-                                <span class="password-text hide">Hide password</span>
+                                <span class="password-text hide">Show password</span>
+                                <span class="password-text show">Hide password</span>
                             </a>
                         </div>
                         <small class="inline-help">At least {{installer.current.model.minCharLength}} characters long</small>
