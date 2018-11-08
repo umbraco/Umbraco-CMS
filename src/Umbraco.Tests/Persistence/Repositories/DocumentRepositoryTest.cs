@@ -432,7 +432,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var fetched = repository.Get(textpage.Id);
 
-                Assert.NotZero(textpage.TemplateId);
+                Assert.True(textpage.TemplateId.HasValue);
+                Assert.NotZero(textpage.TemplateId.Value);
                 Assert.AreEqual(textpage.TemplateId, contentType.DefaultTemplate.Id);
 
                 scope.Complete();
@@ -562,7 +563,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
-                Assert.Zero(updatedContent.TemplateId);
+                Assert.False(updatedContent.TemplateId.HasValue);
             }
 
         }

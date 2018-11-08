@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
                 return null;
 
             // If no template id was set...
-            if (source.TemplateId == 0)
+            if (!source.TemplateId.HasValue)
             {
                 // ... and no default template is set, return null...
                 if (string.IsNullOrWhiteSpace(source.ContentType.DefaultTemplate?.Alias))
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             }
             
             var fileService = DependencyResolver.Current.GetService<IFileService>();
-            var template = fileService.GetTemplate(source.TemplateId);
+            var template = fileService.GetTemplate(source.TemplateId.Value);
 
             return template.Alias;
         }

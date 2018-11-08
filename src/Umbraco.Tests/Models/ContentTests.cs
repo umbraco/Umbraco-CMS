@@ -426,19 +426,19 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.IsTrue(content.WasDirty());
-            Assert.IsTrue(content.WasPropertyDirty("Id"));
-            Assert.IsTrue(content.WasPropertyDirty("CreateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("CreatorId"));
-            Assert.IsTrue(content.WasPropertyDirty("ExpireDate"));
-            Assert.IsTrue(content.WasPropertyDirty("Key"));
-            Assert.IsTrue(content.WasPropertyDirty("Level"));
-            Assert.IsTrue(content.WasPropertyDirty("Path"));
-            Assert.IsTrue(content.WasPropertyDirty("ReleaseDate"));
-            Assert.IsTrue(content.WasPropertyDirty("SortOrder"));
-            Assert.IsTrue(content.WasPropertyDirty("Template"));
-            Assert.IsTrue(content.WasPropertyDirty("Trashed"));
-            Assert.IsTrue(content.WasPropertyDirty("UpdateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("WriterId"));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Id)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreatorId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ExpireDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ReleaseDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.UpdateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.WriterId)));
             foreach (var prop in content.Properties)
             {
                 Assert.IsTrue(prop.WasDirty());
@@ -459,7 +459,6 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
             //verify child objects were reset too
-            Assert.Zero(content.TemplateId);
             Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 

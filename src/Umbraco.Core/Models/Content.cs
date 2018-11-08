@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     public class Content : ContentBase, IContent
     {
         private IContentType _contentType;
-        private int _templateId;
+        private int? _templateId;
         private bool _published;
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.TemplateId);
+            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, int?>(x => x.TemplateId);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
-        public virtual int TemplateId
+        public virtual int? TemplateId
         {
             get => _templateId;
             set => SetPropertyValueAndDetectChanges(value, ref _templateId, Ps.Value.TemplateSelector);
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public int PublishTemplateId { get; internal set; } // set by persistence
+        public int? PublishTemplateId { get; internal set; } // set by persistence
 
         /// <inheritdoc />
         [IgnoreDataMember]

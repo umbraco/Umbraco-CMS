@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the template id used to render the content.
         /// </summary>
-        int TemplateId { get; set; }
+        int? TemplateId { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content is published.
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models
         /// Gets the template id used to render the published version of the content.
         /// </summary>
         /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
-        int PublishTemplateId { get; }
+        int? PublishTemplateId { get; }
 
         /// <summary>
         /// Gets the name of the published version of the content.

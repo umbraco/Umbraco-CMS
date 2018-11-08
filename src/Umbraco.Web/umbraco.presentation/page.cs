@@ -357,7 +357,7 @@ namespace umbraco
                 get { return _key; }
             }
 
-            public int TemplateId => _inner.TemplateId;
+            public int TemplateId => _inner.TemplateId ?? 0;
 
             public int SortOrder
             {
