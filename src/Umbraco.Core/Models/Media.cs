@@ -117,6 +117,7 @@ namespace Umbraco.Core.Models
             Trashed = isTrashed;
             //The Media Recycle Bin Id is -21 so we correct that here
             ParentId = parentId == -20 ? -21 : parentId;
+
         }
     }
 }

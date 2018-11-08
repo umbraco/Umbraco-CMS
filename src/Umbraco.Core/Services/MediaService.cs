@@ -797,6 +797,7 @@ namespace Umbraco.Core.Services
                     if (media.Trashed)
                     {
                         media.ChangeTrashedState(false, parentId);
+                        UnobfuscateTrashedMedia(media);
                     }
                     Save(media, userId, false); //no events!
 
@@ -1133,6 +1134,8 @@ namespace Umbraco.Core.Services
                     //must be processed with shallowest levels first
                     var descendants = ignoreDescendants ? Enumerable.Empty<IMedia>() : GetDescendants(media).OrderBy(x => x.Level);
 
+                    ObfuscateTrashedMedia(media);
+
                     //Do the updates for this item
                     var repository = RepositoryFactory.CreateMediaRepository(uow);
                     repository.DeleteContentXml(media);
@@ -1158,6 +1161,28 @@ namespace Umbraco.Core.Services
                 }
 
                 return OperationStatus.Success(evtMsgs);
+            }
+        }
+
+        private void ObfuscateTrashedMedia(IMedia media)
+        {
+            // TODO This will have to work, if it part fails we've made a mess on the FS
+            var currentFilename = media.GetValue<string>("umbracoFile");
+            var newFilename = Guid.NewGuid() + "$" + currentFilename;
+            _mediaFileSystem.CopyFile(currentFilename, newFilename);
+            _mediaFileSystem.DeleteFile(currentFilename);
+            media.SetValue("umbracoFile", newFilename);
+        }
+
+        private void UnobfuscateTrashedMedia(IMedia media)
+        {
+            var currentFilename = media.GetValue<string>("umbracoFile");
+            if (currentFilename.Contains("$")) // TODO : Not good enough, files could contain $ already
+            {
+                var newFilename = currentFilename.Split('$')[1];
+                _mediaFileSystem.CopyFile(currentFilename, newFilename);
+                _mediaFileSystem.DeleteFile(currentFilename);
+                media.SetValue("umbracoFile", newFilename);
             }
         }
 
