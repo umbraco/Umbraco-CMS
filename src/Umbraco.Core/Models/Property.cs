@@ -83,7 +83,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns the instance of the tag support, by default tags are not enabled
         /// </summary>
-        internal PropertyTags TagSupport
+        public PropertyTags TagSupport
         {
             get { return _tagSupport; }
         }

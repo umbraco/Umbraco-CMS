@@ -31,7 +31,10 @@
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
     "clipboard": "1.7.1",
-    "font-awesome": "~4.2"
+    "font-awesome": "~4.7"
+  },
+  "resolutions": {
+    "font-awesome": "~4.7"
   },
   "install": {
     "path": "lib-bower",
@@ -43,11 +46,11 @@
     ],
     "sources": {
       "moment": [
-          "bower_components/moment/min/moment.min.js",
-          "bower_components/moment/min/moment-with-locales.js",
-          "bower_components/moment/min/moment-with-locales.min.js",
-          "bower_components/moment/locale/*.js"
-        ],
+        "bower_components/moment/min/moment.min.js",
+        "bower_components/moment/min/moment-with-locales.js",
+        "bower_components/moment/min/moment-with-locales.min.js",
+        "bower_components/moment/locale/*.js"
+      ],
       "underscore": [
         "bower_components/underscore/underscore-min.js",
         "bower_components/underscore/underscore-min.map"

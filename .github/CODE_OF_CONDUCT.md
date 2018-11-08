@@ -17,7 +17,7 @@ Assume positive intent and try to understand before being understood.
 
 Treat others as you would like to be treated.
 
-This also goes for treating the HQ with respect. For example: don’t promote products on [our.umbraco.org](https://our.umbraco.org) that directly compete with our commercial offerings which enables us to work for a sustainable Umbraco.
+This also goes for treating the HQ with respect. For example: don’t promote products on [our.umbraco.com](https://our.umbraco.com) that directly compete with our commercial offerings which enables us to work for a sustainable Umbraco.
 
 ## Open
 

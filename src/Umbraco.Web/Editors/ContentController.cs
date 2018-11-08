@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -545,9 +546,9 @@ namespace Umbraco.Web.Editors
 
             EnsureUniqueName(name, content, "name");
 
-            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
+            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.CurrentUser.Id);
 
-            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
+            Services.ContentService.SaveBlueprint(blueprint, Security.CurrentUser.Id);
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -575,7 +576,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter]
         [ContentPostValidate]
         public ContentItemDisplay PostSaveBlueprint(
-            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+            [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
@@ -608,6 +609,17 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, Attempt<OperationStatus>> saveMethod)
         {
+            //Recent versions of IE/Edge may send in the full clientside file path instead of just the file name.
+            //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
+            //uploaded files to being *only* the actual file name (as it should be).
+            if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
+            {
+                foreach (var file in contentItem.UploadedFiles)
+                {
+                    file.FileName = Path.GetFileName(file.FileName);
+                }
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -743,7 +755,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.GetUserId());
+            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.CurrentUser.Id);
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -796,7 +808,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.IsInRecycleBin() == false)
             {
-                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.GetUserId());
+                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.CurrentUser.Id);
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending 
@@ -806,7 +818,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.GetUserId());
+                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.CurrentUser.Id);
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending 
@@ -859,7 +871,7 @@ namespace Umbraco.Web.Editors
                 var contentService = Services.ContentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(sorted.IdSortOrder) == false)
+                if (contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id) == false)
                 {
                     LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
@@ -883,7 +895,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId);
+            Services.ContentService.Move(toMove, move.ParentId, Security.CurrentUser.Id);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");

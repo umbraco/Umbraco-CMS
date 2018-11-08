@@ -465,7 +465,7 @@ namespace Umbraco.Core.Services
                 return repository.GetByQuery(query);
             }
         }
-
+        
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
@@ -758,19 +758,20 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public void Move(IMedia media, int parentId, int userId = 0)
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        public Attempt<OperationStatus> Move(IMedia media, int parentId, int userId = 0)
         {
             //TODO: This all needs to be on the repo layer in one transaction!
 
             if (media == null) throw new ArgumentNullException("media");
-
+            var evtMsgs = EventMessagesFactory.Get();
             using (new WriteLock(Locker))
             {
                 //This ensures that the correct method is called if this method is used to Move to recycle bin.
                 if (parentId == Constants.System.RecycleBinMedia)
                 {
                     MoveToRecycleBin(media, userId);
-                    return;
+                    return OperationStatus.Success(evtMsgs);
                 }
 
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -781,8 +782,15 @@ namespace Umbraco.Core.Services
                     var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
                     if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs, "Moving"))
                     {
+                        if (moveEventArgs.Messages.Count > 0)
+                        {
+                            foreach (var message in moveEventArgs.Messages.GetAll())
+                            {
+                                evtMsgs.Add(message);
+                            }
+                        }
                         uow.Commit();
-                        return;
+                        return OperationStatus.Cancelled(evtMsgs); ;
                     }
 
                     media.ParentId = parentId;
@@ -816,6 +824,8 @@ namespace Umbraco.Core.Services
                     Audit(uow, AuditType.Move, "Move Media performed by user", userId, media.Id);
                     uow.Commit();
                 }
+
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1104,6 +1114,13 @@ namespace Umbraco.Core.Services
                     var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
                     if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs, "Trashing"))
                     {
+                        if (moveEventArgs.Messages.Count > 0)
+                        {
+                            foreach (var message in moveEventArgs.Messages.GetAll())
+                            {
+                                evtMsgs.Add(message);
+                            }
+                        }
                         uow.Commit();
                         return OperationStatus.Cancelled(evtMsgs);
                     }
@@ -1466,6 +1483,11 @@ namespace Umbraco.Core.Services
             {
                 _mediaFileSystem.GenerateThumbnails(filestream, filepath, propertyType);
             }
+        }
+
+        void IMediaService.Move(IMedia media, int parentId, int userId)
+        {
+            Move(media, parentId, userId);
         }
 
 

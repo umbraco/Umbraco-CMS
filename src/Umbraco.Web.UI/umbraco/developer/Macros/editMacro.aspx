@@ -113,7 +113,7 @@
     <cc1:Pane ID="Pane1_4" runat="server" Title="Cache settings">
 
         <cc1:PropertyPanel runat="server" Text="Cache period">
-            <asp:TextBox ID="cachePeriod" runat="server" CssClass="guiInputText input-small"></asp:TextBox>&nbsp;Seconds
+            <asp:TextBox ID="cachePeriod" runat="server" CssClass="guiInputText input-small" type="number" min="0"></asp:TextBox>&nbsp;Seconds
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel runat="server" Text="Cache by page">
@@ -158,7 +158,7 @@
                     </td>
                     <td>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="macroPropertyName" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                        <asp:TextBox runat="server" ID="macroPropertyName" CLASS="-full-width-input" Text='<%#Eval("Name")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertyName" CssClass="-full-width-input" Text='<%#Eval("Name")%>' />
                     </td>
                     <td>
 
@@ -170,10 +170,10 @@
                     <td>
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                          <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
-                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CLASS="-full-width-input" Text='<%#Eval("SortOrder")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertySortOrder" CssClass="-full-width-input" Text='<%#Eval("SortOrder")%>' type="number" />
                     </td>
                     <td>
-                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
+                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default btn-danger delete-button" />
                     </td>
                 </tr>
             </ItemTemplate>
@@ -181,11 +181,11 @@
                         <tr>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator1" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyAliasNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" CLASS="-full-width-input" PlaceHolder='New Alias'  />
+                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" CssClass="-full-width-input" PlaceHolder='New Alias'  />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator4" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyNameNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyNameNew" CLASS="-full-width-input" PlaceHolder='New Name' />
+                                <asp:TextBox runat="server" ID="macroPropertyNameNew" CssClass="-full-width-input" PlaceHolder='New Name' />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator5" EnableViewState="false" Enabled="false" EnableClientScript="false" runat="server" ControlToValidate="macroPropertyTypeNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
@@ -199,7 +199,7 @@
                                 <%-- The macro parameter will automatically get sort order when created. --%>
                             </td>
                             <td>
-                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default add-button" OnClick="macroPropertyCreate" />
+                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default btn-info add-button" OnClick="macroPropertyCreate" />
                             </td>
                         </tr>
                 </tbody>

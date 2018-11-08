@@ -15,6 +15,17 @@ namespace Umbraco.Web.PropertyEditors
         {
             [PreValueField("default", "Default Value", "boolean")]
             public string Default { get; set; }
+
+            public TrueFalsePreValueEditor()
+            {
+                Fields.Add(new PreValueField()
+                {
+                    Description = "Write a label text",
+                    Key = "labelOn",
+                    Name = "Label",
+                    View = "textstring"
+                });
+            }
         }
     }
 }

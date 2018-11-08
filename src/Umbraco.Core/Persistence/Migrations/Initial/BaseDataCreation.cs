@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if(tableName.Equals("umbracoNode"))
             {
-                CreateUmbracNodeData();
+                CreateUmbracoNodeData();
             }
 
             if (tableName.Equals("umbracoLock"))
@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
-        private void CreateUmbracNodeData()
+        private void CreateUmbracoNodeData()
         {
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -1, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1", SortOrder = 0, UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"), Text = "SYSTEM DATA: umbraco master root", NodeObjectType = new Guid(Constants.ObjectTypes.SystemRoot), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -20, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-20", SortOrder = 0, UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"), Text = "Recycle Bin", NodeObjectType = new Guid(Constants.ObjectTypes.ContentRecycleBin), CreateDate = DateTime.Now });
@@ -256,10 +256,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 7, DataTypeId = -92, PropertyEditorAlias = Constants.PropertyEditors.NoEditAlias, DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 8, DataTypeId = -36, PropertyEditorAlias = Constants.PropertyEditors.DateTimeAlias, DbType = "Date" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 9, DataTypeId = -37, PropertyEditorAlias = Constants.PropertyEditors.ColorPickerAlias, DbType = "Nvarchar" });            
-            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 11, DataTypeId = -39, PropertyEditorAlias = Constants.PropertyEditors.DropDownListMultipleAlias, DbType = "Nvarchar" });
+            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 11, DataTypeId = -39, PropertyEditorAlias = Constants.PropertyEditors.DropDownListFlexibleAlias, DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 12, DataTypeId = -40, PropertyEditorAlias = Constants.PropertyEditors.RadioButtonListAlias, DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 13, DataTypeId = -41, PropertyEditorAlias = Constants.PropertyEditors.DateAlias, DbType = "Date" });
-            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -42, PropertyEditorAlias = Constants.PropertyEditors.DropDownListAlias, DbType = "Integer" });
+            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -42, PropertyEditorAlias = Constants.PropertyEditors.DropDownListFlexibleAlias, DbType = "Integer" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 15, DataTypeId = -43, PropertyEditorAlias = Constants.PropertyEditors.CheckBoxListAlias, DbType = "Nvarchar" });                        
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = 1041, PropertyEditorAlias = Constants.PropertyEditors.TagsAlias, DbType = "Ntext" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = 1043, PropertyEditorAlias = Constants.PropertyEditors.ImageCropperAlias, DbType = "Ntext" });
@@ -300,6 +300,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             //default's for MultipleMediaPickerAlias picker
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 6, Alias = "multiPicker", SortOrder = 0, DataTypeNodeId = 1049, Value = "1" });
+
+            // Defaults for single item dropdown
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 7, Alias = "multiple", SortOrder = 0, DataTypeNodeId = -42, Value = "0" });
+
+            // Defaults for multiple item dropdown
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 8, Alias = "multiple", SortOrder = 0, DataTypeNodeId = -39, Value = "1" });
         }
 
         private void CreateUmbracoRelationTypeData()

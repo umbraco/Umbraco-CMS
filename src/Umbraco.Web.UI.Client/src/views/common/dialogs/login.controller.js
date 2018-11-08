@@ -29,6 +29,7 @@
         function init() {
             // Check if it is a new user
             var inviteVal = $location.search().invite;
+            //1 = enter password, 2 = password set, 3 = invalid token
             if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
                 $q.all([
@@ -58,6 +59,8 @@
                     $scope.inviteStep = Number(inviteVal);
 
                 });
+            } else if (inviteVal && inviteVal === "3") {
+                $scope.inviteStep = Number(inviteVal);
             }
         }
 
@@ -204,7 +207,7 @@
             }
         }
 
-        $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
+        $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
 
         $scope.showLogin = function () {
             $scope.errorMsg = "";
