@@ -815,6 +815,7 @@ namespace Umbraco.Core.Services
                         var parentPath = media.Path;
                         var parentLevel = media.Level;
                         var parentTrashed = media.Trashed;
+                        // TODO : Unobfuscate child untrashed media
                         var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed, moveInfo);
                         Save(updatedDescendants, userId, false); //no events!
                     }
@@ -1148,8 +1149,9 @@ namespace Umbraco.Core.Services
                     {
                         repository.DeleteContentXml(descendant);
                         descendant.ChangeTrashedState(true, descendant.ParentId);
+                        // TODO : Obfuscate trashed child media
                         repository.AddOrUpdate(descendant);
-
+                        
                         moveInfo.Add(new MoveEventInfo<IMedia>(descendant, descendant.Path, descendant.ParentId));
                     }
 
