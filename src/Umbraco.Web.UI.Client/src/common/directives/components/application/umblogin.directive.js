@@ -59,6 +59,7 @@
         vm.showSetPassword = showSetPassword;
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
+        vm.setPasswordSubmit = setPasswordSubmit;
 
         function onInit() {
 

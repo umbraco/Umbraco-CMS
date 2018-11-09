@@ -17,7 +17,7 @@
                         <localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password and avatar setup and then you're good to go</localize>
                     </p>
 
-                    <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
+                    <div class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
                         <label>
                             <localize key="user_newPassword">New password</localize>
                             <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
@@ -30,7 +30,7 @@
                         </span>
                     </div>
 
-                    <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
+                    <div class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
                         <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
                         <input type="password" ng-model="vm.invitedUserPasswordModel.confirmPassword" name="confirmPassword" class="-full-width-input" required val-compare="password" />
                         <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit >
@@ -228,17 +228,17 @@
 
                     <form method="POST" name="vm.setPasswordForm" ng-submit="vm.setPasswordSubmit(vm.password, vm.confirmPassword)">
 
-                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
+                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
                             <label><localize key="user_newPassword">New password</localize></label>
                             <input type="password" ng-model="vm.password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
                         </div>
 
-                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
+                        <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">
                             <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
                             <input type="password" ng-model="vm.confirmPassword" name="confirmPassword" class="-full-width-input" localize="placeholder" placeholder="@placeholders_confirmPassword" />
                         </div>
 
-                        <div ng-hide="vm.resetComplete" class="control-group" ng-show="setPasswordForm.$invalid">
+                        <div ng-hide="vm.resetComplete" class="control-group" ng-show="vm.setPasswordForm.$invalid">
                             <div class="text-error">{{vm.errorMsg}}</div>
                         </div>
 
