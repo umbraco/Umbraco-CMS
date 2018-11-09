@@ -155,6 +155,7 @@
     <Compile Include="ContentApps\ContentEditorContentAppDefinition.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
     <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
+    <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />

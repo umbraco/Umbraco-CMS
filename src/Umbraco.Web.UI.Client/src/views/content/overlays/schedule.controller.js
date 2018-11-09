@@ -298,7 +298,7 @@
                 //if this variant will show up in the publish-able list
                 var publishable = dirtyVariantFilter(variant);
 
-                if ((variant.language.isMandatory && (variant.state === "NotCreated" || variant.state === "Draft"))
+                if (((!variant.language || variant.language.isMandatory) && (variant.state === "NotCreated" || variant.state === "Draft"))
                     && (!publishable || !variant.save)) {
                     //if a mandatory variant isn't published and it's not publishable or not selected to be published
                     //then we cannot publish anything

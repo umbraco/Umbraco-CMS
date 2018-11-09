@@ -665,9 +665,13 @@ namespace Umbraco.Web.Editors
                     switch (contentItem.Action)
                     {
                         case ContentSaveAction.Publish:
+                        case ContentSaveAction.SendPublish:
+                        case ContentSaveAction.Schedule:
                             contentItem.Action = ContentSaveAction.Save;
                             break;
                         case ContentSaveAction.PublishNew:
+                        case ContentSaveAction.SendPublishNew:
+                        case ContentSaveAction.ScheduleNew:
                             contentItem.Action = ContentSaveAction.SaveNew;
                             break;
                     }
@@ -713,6 +717,18 @@ namespace Umbraco.Web.Editors
                         }
                     }
                     break;
+                case ContentSaveAction.Schedule:
+                case ContentSaveAction.ScheduleNew:
+
+                    if (SaveSchedule(contentItem, globalNotifications))
+                        goto case ContentSaveAction.Save;
+                    else
+                    {
+                        ModelState.AddModelError("hello", "world");
+                        wasCancelled = false;
+                        break;
+                    }
+                    
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
                     var sendResult = Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
@@ -784,6 +800,169 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Validates the incoming schedule and update the model
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="globalNotifications"></param>
+        private bool SaveSchedule(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        {
+            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
+                return SaveScheduleInvariant(contentItem, globalNotifications);
+            else
+                return SaveScheduleVariant(contentItem);
+        }
+
+        private bool SaveScheduleInvariant(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        {
+            var v = contentItem.Variants.First();
+
+            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.Start).ToList();
+            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.End).ToList();
+
+            //TODO: Do we really care about this?
+            ////Cannot schedule an expiry date for a non-published content item
+            //// * if expiry is being added (not removed)
+            //// * the content is not published, nor is it being scheduled for publishing
+            //if (v.ExpireDate.HasValue && currExpire.Count == 0 && !contentItem.PersistedContent.Published && !v.ReleaseDate.HasValue && currRelease.Count == 0)
+            //{
+            //    globalNotifications.AddErrorNotification(
+            //        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
+            //        Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate3"));
+            //    return false;
+            //}
+
+            //TODO: We need to validate first before doing anything
+
+            if (v.ReleaseDate.HasValue)
+            {
+                if (v.ReleaseDate < DateTime.Now)
+                {
+                    globalNotifications.AddErrorNotification(
+                        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
+                        Services.TextService.Localize("speechBubbles", "scheduleErrReleaseDate1"));
+                    return false;
+                }
+                else
+                {
+                    //remove any existing release dates so we can replace it
+                    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
+                }
+            }
+            else if (currRelease.Count > 0)
+            {
+                //if there was a release and the value is null, we are clearing the schedule
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
+            }
+
+            if (v.ExpireDate.HasValue)
+            {
+                if (v.ExpireDate < DateTime.Now)
+                {
+                    globalNotifications.AddErrorNotification(
+                        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
+                        Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate1"));
+                    return false;
+                }
+                else if (v.ReleaseDate.HasValue && v.ExpireDate <= v.ReleaseDate)
+                {
+                    globalNotifications.AddErrorNotification(
+                        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
+                        Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate2"));
+                    return false;
+                }
+                else
+                {
+                    //remove any existing expire dates so we can replace it
+                    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
+                }
+            }
+            else if (currExpire.Count > 0)
+            {
+                //if there was an expiry and the value is null, we are clearing the schedule
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
+            }
+
+            //add the new schedule
+            contentItem.PersistedContent.ContentSchedule.Add(v.ReleaseDate, v.ExpireDate);
+            return true;
+        }
+
+        private bool SaveScheduleVariant(ContentItemSave contentItem)
+        {
+            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
+            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+
+            //validate if we can continue based on the mandatory language requirements
+            if (!ValidatePublishingMandatoryLanguages(contentItem, cultureVariants, "speechBubbles/scheduleErrReleaseDate2"))
+                return false;
+
+            //TODO: Fill in other validation
+
+            var isValid = true;
+            foreach (var v in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
+            {
+                //TODO: Check the currently scheduled data too like we are doing for invariant!
+                var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(v.Culture, ContentScheduleChange.Start).ToList();
+                var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(v.Culture, ContentScheduleChange.End).ToList();
+
+                //TODO: Deal with clearing a schedule that is persisted like we are doing invariant
+
+                ///Cannot schedule an expiry date for a non-published content item
+                //TODO: Fix this logic like in the invariant since the user can be turning off expiry
+                if ((!contentItem.PersistedContent.Published || !contentItem.PersistedContent.IsCulturePublished(v.Culture)) && !v.ReleaseDate.HasValue)
+                {
+                    AddCultureValidationError(v.Culture, "scheduleErrExpireDate3");
+                    isValid = false;
+                    continue;
+                }
+
+                if (v.ReleaseDate.HasValue)
+                {
+                    if (v.ReleaseDate < DateTime.Now)
+                    {
+                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrReleaseDate1");
+                        isValid = false;
+                        continue;
+                    }
+                    else
+                    {
+                        //remove any existing release dates so we can replace it
+                        contentItem.PersistedContent.ContentSchedule.Clear(v.Culture, ContentScheduleChange.Start);
+                    }
+                }
+
+                if (v.ExpireDate.HasValue)
+                {
+                    if (v.ExpireDate < DateTime.Now)
+                    {
+                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrExpireDate1");
+                        isValid = false;
+                        continue;
+                    }
+                    else if (v.ReleaseDate.HasValue && v.ExpireDate <= v.ReleaseDate)
+                    {
+                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrExpireDate2");
+                        isValid = false;
+                        continue;
+                    }
+                    else
+                    {
+                        //remove any existing expire dates so we can replace it
+                        contentItem.PersistedContent.ContentSchedule.Clear(v.Culture, ContentScheduleChange.End);
+                    }
+                }
+
+                if (isValid)
+                {
+                    //add the new schedule
+                    contentItem.PersistedContent.ContentSchedule.Add(v.Culture, v.ReleaseDate, v.ExpireDate);
+                }
+            }
+
+            return isValid;
+        }
+
+        /// <summary>
         /// Used to add success notifications globally and for the culture
         /// </summary>
         /// <param name="notifications"></param>
@@ -831,7 +1010,7 @@ namespace Umbraco.Web.Editors
                 var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
 
                 //validate if we can publish based on the mandatory language requirements
-                var canPublish = ValidatePublishingMandatoryLanguages(contentItem, cultureVariants);
+                var canPublish = ValidatePublishingMandatoryLanguages(contentItem, cultureVariants, "speechBubbles/contentReqCulturePublishError");
 
                 //Now check if there are validation errors on each variant.
                 //If validation errors are detected on a variant and it's state is set to 'publish', then we
@@ -875,12 +1054,15 @@ namespace Umbraco.Web.Editors
         /// <param name="contentItem"></param>
         /// <param name="cultureVariants"></param>
         /// <returns></returns>
-        private bool ValidatePublishingMandatoryLanguages(ContentItemSave contentItem, IReadOnlyCollection<ContentVariantSave> cultureVariants)
+        private bool ValidatePublishingMandatoryLanguages(
+            ContentItemSave contentItem,
+            IReadOnlyCollection<ContentVariantSave> cultureVariants,
+            string localizationKey)
         {
             var canPublish = true;
 
             //validate any mandatory variants that are not in the list
-            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(_allLangs.Value.Values).Where(x => x.IsMandatory);
+            var mandatoryLangs = _allLangs.Value.Values.Where(x => x.IsMandatory);
 
             foreach (var lang in mandatoryLangs)
             {
@@ -893,7 +1075,7 @@ namespace Umbraco.Web.Editors
                 if (isPublished || isPublishing) continue;
 
                 //cannot continue publishing since a required language that is not currently being published isn't published
-                AddCultureValidationError(lang.IsoCode, "speechBubbles/contentReqCulturePublishError");
+                AddCultureValidationError(lang.IsoCode, localizationKey);
                 canPublish = false;
             }
 
@@ -926,7 +1108,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Adds a generic culture error for use in displaying the culture validation error in the save/publish dialogs
+        /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
         /// <param name="culture"></param>
         /// <param name="localizationKey"></param>
@@ -1424,12 +1606,7 @@ namespace Umbraco.Web.Editors
 
                 variantIndex++;
             }
-
-            //TODO: We need to support 'send to publish'
-
-            //fixme - deal with variants too
-            contentSave.PersistedContent.ContentSchedule.Add(contentSave.ExpireDate, contentSave.ReleaseDate);
-
+            
             //only set the template if it didn't change
             var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                                                         || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)

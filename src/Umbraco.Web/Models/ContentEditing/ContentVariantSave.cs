@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
@@ -44,6 +45,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "publish")]
         public bool Publish { get; set; }
+
+        [DataMember(Name = "expireDate")]
+        public DateTime? ExpireDate { get; set; }
+
+        [DataMember(Name = "releaseDate")]
+        public DateTime? ReleaseDate { get; set; }
 
         /// <summary>
         /// The property DTO object is used to gather all required property data including data type information etc... for use with validation - used during inbound model binding

@@ -97,32 +97,32 @@
                             ng-change="vm.changeSelection(variant)"
                             style="margin-right: 8px;" />
                         <div>
-                            
+
                             <label for="{{variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
                             </label>
 
-                            <div class="umb-permission__description">
+                            <div class="umb-permission__description"
+                                 ng-if="!scheduleSelectorForm.saveVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                             </div>
 
                             <div ng-if="variant.save" class="flex items-center" style="margin-top: 10px; margin-bottom: 10px;">
                                 <div style="font-size: 13px; margin-right: 5px;">Publish: </div>
-            
+
                                 <div class="btn-group flex" style="font-size: 14px; margin-right: 10px;">
-                                    <umb-flatpickr
-                                        ng-model="variant.releaseDate"
-                                        options="variant.datePickerConfig"
-                                        on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
-                                        on-change="vm.datePickerChange(variant, dateStr, 'publish')"
-                                        on-open="vm.datePickerShow(variant, 'publish')"
-                                        on-close="vm.datePickerClose(variant, 'publish')">
+                                    <umb-flatpickr ng-model="variant.releaseDate"
+                                                   options="variant.datePickerConfig"
+                                                   on-setup="vm.datePickerSetup(variant, 'publish', fpItem)"
+                                                   on-change="vm.datePickerChange(variant, dateStr, 'publish')"
+                                                   on-open="vm.datePickerShow(variant, 'publish')"
+                                                   on-close="vm.datePickerClose(variant, 'publish')">
                                         <div>
                                             <button ng-if="variant.releaseDate" class="btn umb-button--xxs" style="outline: none;">
                                                 {{variant.releaseDateFormatted}}
                                             </button>
-                
+
                                             <a ng-hide="variant.releaseDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                                 <localize key="content_setDate">Set date</localize>
                                             </a>
@@ -132,22 +132,21 @@
                                         <span class="icon icon-wrong"></span>
                                     </a>
                                 </div>
-            
+
                                 <div style="font-size: 13px; margin-right: 5px;">Unpublish:</div>
-            
+
                                 <div class="btn-group flex" style="font-size: 14px;">
-                                    <umb-flatpickr
-                                        ng-model="variant.expireDate"
-                                        options="variant.datePickerConfig"
-                                        on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
-                                        on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
-                                        on-open="vm.datePickerShow(variant, 'unpublish')"
-                                        on-close="vm.datePickerClose(variant, 'unpublish')">
+                                    <umb-flatpickr ng-model="variant.expireDate"
+                                                   options="variant.datePickerConfig"
+                                                   on-setup="vm.datePickerSetup(variant, 'unpublish', fpItem)"
+                                                   on-change="vm.datePickerChange(variant, dateStr, 'unpublish')"
+                                                   on-open="vm.datePickerShow(variant, 'unpublish')"
+                                                   on-close="vm.datePickerClose(variant, 'unpublish')">
                                         <div>
                                             <button ng-if="variant.expireDate" class="btn umb-button--xxs" style="outline: none;">
                                                 {{variant.removeDateFormatted}}
                                             </button>
-                            
+
                                             <a ng-hide="variant.expireDate" href="" class="bold" style="color: #00aea2; text-decoration: underline;">
                                                 <localize key="content_setDate">Set date</localize>
                                             </a>
@@ -157,7 +156,15 @@
                                         <span class="icon icon-wrong"></span>
                                     </a>
                                 </div>
-            
+
+                            </div>
+
+                            <div ng-messages="scheduleSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
+                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{scheduleSelectorForm.saveVariantSelector.errorMsg}}</div>
+                            </div>
+
+                            <div ng-repeat="notification in variant.notifications">
+                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
                             </div>
 
                         </div>

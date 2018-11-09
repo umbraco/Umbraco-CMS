@@ -86,8 +86,8 @@
             }
         }
 
-        /** Returns true if the save/publish dialog should be shown when pressing the button */
-        function showSaveOrPublishDialog() {
+        /** Returns true if the content item varies by culture */
+        function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
 
@@ -434,8 +434,8 @@
 
                         model.submitButtonState = "busy";
 
-                        var selectedVariants = _.filter(model.variants, function (variant) { return variant.save; });
-                        var culturesForUnpublishing = _.map(selectedVariants, function (variant) { return variant.language.culture; });
+                        var selectedVariants = _.filter(model.variants, v => v.save && v.language); //ignore invariant
+                        var culturesForUnpublishing = _.map(selectedVariants, v => v.language.culture);
 
                         contentResource.unpublish($scope.content.id, culturesForUnpublishing)
                             .then(function (data) {
@@ -462,7 +462,7 @@
 
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -518,7 +518,7 @@
 
         $scope.saveAndPublish = function () {
             clearNotifications($scope.content);
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -561,7 +561,8 @@
                 }
             }
             else {
-                //ensure the publish flag is set
+                //ensure the flags are set
+                $scope.content.variants[0].save = true;
                 $scope.content.variants[0].publish = true;
                 $scope.page.buttonGroupState = "busy";
                 return performSave({
@@ -578,7 +579,7 @@
         $scope.save = function () {
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "save" })) {
 
@@ -620,6 +621,8 @@
                 }
             }
             else {
+                //ensure the flags are set
+                $scope.content.variants[0].save = true;
                 $scope.page.saveButtonState = "busy";
                 return performSave({
                     saveMethod: $scope.saveMethod(),
@@ -638,6 +641,11 @@
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
 
+                if (!isContentCultureVariant()) {
+                    //ensure the flags are set
+                    $scope.content.variants[0].save = true;
+                }
+
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/schedule.html",
@@ -647,7 +655,31 @@
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
-                        model.submitButtonState = "success";
+
+                        //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                        return performSave({
+                            saveMethod: contentResource.saveSchedule,
+                            action: "schedule",
+                            showNotifications: false
+                        }).then(function (data) {
+                            //show all notifications manually here since we disabled showing them automatically in the save method
+                            formHelper.showNotifications(data);
+                            clearNotifications($scope.content);
+                            overlayService.close();
+                            return $q.when(data);
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //if this is invariant, show the notification errors, else they'll be shown inline with the variant
+                            if (!isContentCultureVariant()) {
+                                formHelper.showNotifications(err.data);
+                            }
+                            model.submitButtonState = "error";
+                            //re-map the dialog model since we've re-bound the properties
+                            dialog.variants = $scope.content.variants;
+                            //don't reject, we've handled the error
+                            return $q.when(err);
+                        });
+
                     },
                     close: function () {
                         overlayService.close();
@@ -661,6 +693,13 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
+
+                if (!isContentCultureVariant()) {
+                    //ensure the flags are set
+                    $scope.content.variants[0].save = true;
+                    //TODO: we'll prob want the publish flag(s) set here too for invariant?
+                }
+
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/publishdescendants.html",

@@ -109,6 +109,12 @@ namespace Umbraco.Web.Editors.Filters
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
+                case ContentSaveAction.Schedule:
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
+                    contentToCheck = contentItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
+                    break;
                 case ContentSaveAction.SaveNew:
                     //Save new requires ActionNew
 
@@ -144,6 +150,22 @@ namespace Umbraco.Web.Editors.Filters
                     //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
                     permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
+
+                    if (contentItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = _contentService.GetById(contentItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = contentItem.ParentId;
+                    }
+                    break;
+                case ContentSaveAction.ScheduleNew:
+                    
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);
 
                     if (contentItem.ParentId != Constants.System.Root)

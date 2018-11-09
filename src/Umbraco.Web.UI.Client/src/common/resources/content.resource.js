@@ -768,6 +768,27 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
 
         /**
           * @ngdoc method
+          * @name umbraco.resources.contentResource#saveSchedule
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Saves changes made to a content item, and saves the publishing schedule
+          *
+          * @param {Object} content The content item object with changes applied
+          * @param {Bool} isNew set to true to create a new item or to update an existing
+          * @param {Array} files collection of files for the document
+          * @returns {Promise} resourcePromise object containing the saved content item.
+          *
+          */
+        saveSchedule: function (content, isNew, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "schedule" + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
+
+        /**
+          * @ngdoc method
           * @name umbraco.resources.contentResource#publishByid
           * @methodOf umbraco.resources.contentResource
           *

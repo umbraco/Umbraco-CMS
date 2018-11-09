@@ -33,6 +33,16 @@
         /// <summary>
         /// Creates and sends publish notification
         /// </summary>
-        SendPublishNew = 5
+        SendPublishNew = 5,
+
+        /// <summary>
+        /// Saves and schedules publishing
+        /// </summary>
+        Schedule = 6,
+
+        /// <summary>
+        /// Creates and schedules publishing
+        /// </summary>
+        ScheduleNew = 7
     }
 }

@@ -20,7 +20,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
-    [OutgoingDateTimeFormat]
+    [JsonDateTimeFormatAttribute]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)

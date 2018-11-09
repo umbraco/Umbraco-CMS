@@ -1299,7 +1299,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editMediaSaved">Media saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
-        <key alias="editMemberGroupSaved">Member group saved</key>
+    <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
     <key alias="editStylesheetSaved">Stylesheet saved</key>
     <key alias="editTemplateSaved">Template saved</key>
@@ -1344,6 +1344,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
+    <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
+    <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not published</key>
+    <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
+    <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="scheduleErrExpireDate3">Cannot schedule an expiry date for a non-published content item</key>
   </area>
   <area alias="stylesheet">
     <key alias="editorRules">Rich text editor styles</key>
