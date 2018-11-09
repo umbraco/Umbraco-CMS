@@ -183,7 +183,7 @@
                                 state="vm.loginStates.submitButton"
                                 type="submit">
                             </umb-button>
-                            <div ng-show="allowPasswordReset">
+                            <div ng-show="vm.allowPasswordReset">
                                 <a class="muted" style="text-decoration: underline;" href="#" prevent-default ng-click="vm.showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
                             </div>
                         </div>
@@ -214,7 +214,7 @@
 
                         <div class="flex justify-between items-center">
                             <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_submit">Submit</localize></button>
-                            <a class="muted" href="#" prevent-default ng-click="showLogin()" style="text-decoration: underline;"><localize key="login_returnToLogin">Return to login form</localize></a>
+                            <a class="muted" href="#" prevent-default ng-click="vm.showLogin()" style="text-decoration: underline;"><localize key="login_returnToLogin">Return to login form</localize></a>
                         </div>
 
                     </form>
