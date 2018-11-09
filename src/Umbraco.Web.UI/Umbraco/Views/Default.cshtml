@@ -112,6 +112,11 @@
                  view="ysodOverlay.view">
     </umb-overlay>
 
+    <umb-login 
+        ng-if="login.show"
+        on-login="">
+    </umb-login>
+
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, UmbracoConfig.For.GlobalSettings())
 
     <script>

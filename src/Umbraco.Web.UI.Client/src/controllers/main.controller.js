@@ -17,6 +17,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     $scope.overlay = {};
     $scope.drawer = {};
     $scope.search = {};
+    $scope.login = {};
     
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -48,11 +49,19 @@ function MainController($scope, $location, appState, treeService, notificationsS
     };
 
     var evts = [];
-
+    
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function () {
+    evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
+
+        // show the login screen
+        if(data) {
+            $scope.login.isTimedOut = data.isTimedOut;
+        }
+
+        $scope.login.show = true;
+
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {
@@ -71,6 +80,10 @@ function MainController($scope, $location, appState, treeService, notificationsS
 
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
+
+        if($scope.authenticated === true) {
+            $scope.login.show = false;
+        }
 
         updateChecker.check().then(function (update) {
             if (update && update !== "null") {

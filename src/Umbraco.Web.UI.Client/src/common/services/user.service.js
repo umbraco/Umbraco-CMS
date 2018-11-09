@@ -3,34 +3,18 @@ angular.module('umbraco.services')
 
         var currentUser = null;
         var lastUserId = null;
-        var loginDialog = null;
 
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
 
         function openLoginDialog(isTimedOut) {
-            if (!loginDialog) {
-                loginDialog = dialogService.open({
-
-                    //very special flag which means that global events cannot close this dialog
-                    manualClose: true,
-
-                    template: 'views/common/dialogs/login.html',
-                    modalClass: "login-overlay",
-                    animation: "slide",
-                    show: true,
-                    callback: onLoginDialogClose,
-                    dialogData: {
-                        isTimedOut: isTimedOut
-                    }
-                });
-            }
+            //broadcast a global event that the user is no longer logged in
+            const args = { isTimedOut: isTimedOut };
+            eventsService.emit("app.notAuthenticated", args);
         }
 
         function onLoginDialogClose(success) {
-            loginDialog = null;
-
             if (success) {
                 requestRetryQueue.retryAll(currentUser.name);
             }
@@ -163,9 +147,6 @@ angular.module('umbraco.services')
 
             lastServerTimeoutSet = null;
             currentUser = null;
-
-            //broadcast a global event that the user is no longer logged in
-            eventsService.emit("app.notAuthenticated");
 
             openLoginDialog(isLogout === undefined ? true : !isLogout);
         }
