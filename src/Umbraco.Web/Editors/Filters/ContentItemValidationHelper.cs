@@ -84,12 +84,12 @@ namespace Umbraco.Web.Editors.Filters
             return ValidateProperties(modelWithProperties.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
         }
 
-        public virtual bool ValidateName(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ModelStateDictionary modelState)
+        public virtual bool ValidateVariantName(ContentVariantSave variant, ModelStateDictionary modelState)
         {
-            if (string.IsNullOrEmpty(model.PersistedContent.Name))
+            if (string.IsNullOrEmpty(variant.Name))
             {
-                var message = $"variant node name was not set";
-                modelState.AddValidationError(new ValidationResult(message), "");
+                var message = $"node name was not set for variant {variant.Culture}";
+                modelState.AddValidationError(new ValidationResult(message), string.Empty);
                 return false;
             }
             return true;
