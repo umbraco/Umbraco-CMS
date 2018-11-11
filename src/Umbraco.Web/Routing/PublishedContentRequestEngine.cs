@@ -603,7 +603,6 @@ namespace Umbraco.Web.Routing
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
 
 			    var membershipHelper = new MembershipHelper(_routingContext.UmbracoContext);
-
 				if (membershipHelper.IsLoggedIn() == false)
 				{
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Not logged in, redirect to login page", () => tracePrefix);
@@ -622,9 +621,31 @@ namespace Umbraco.Web.Routing
 				}
 				else
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member has access", () => tracePrefix);
-				}
-			}
+                    // grab the current member
+                    var member = membershipHelper.GetCurrentMember();
+                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                    var memberIsActive = member != null
+                                         && (
+                                             member.HasProperty(Constants.Conventions.Member.IsApproved) == false
+                                             || member.GetPropertyValue<bool>(Constants.Conventions.Member.IsApproved) == true
+                                         )
+                                         && (
+                                             member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false
+                                             || member.GetPropertyValue<bool>(Constants.Conventions.Member.IsLockedOut) == false
+                                                     );
+                    if (memberIsActive == false)
+                    {
+                        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member is either unapproved or locked out, redirect to error page", () => tracePrefix);
+                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                        if (errorPageId != _pcr.PublishedContent.Id)
+                            _pcr.PublishedContent = _routingContext.UmbracoContext.ContentCache.GetById(errorPageId);
+                    }
+                    else
+                    {
+                        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member has access", () => tracePrefix);
+                    }
+                }
+            }
 			else
 			{
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Page is not protected", () => tracePrefix);
