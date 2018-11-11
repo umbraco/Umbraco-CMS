@@ -603,7 +603,8 @@ namespace Umbraco.Web.Routing
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
 
 			    var membershipHelper = new MembershipHelper(_routingContext.UmbracoContext);
-				if (membershipHelper.IsLoggedIn() == false)
+
+			    if (membershipHelper.IsLoggedIn() == false)
 				{
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Not logged in, redirect to login page", () => tracePrefix);
 
@@ -632,7 +633,7 @@ namespace Umbraco.Web.Routing
                                          && (
                                              member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false
                                              || member.GetPropertyValue<bool>(Constants.Conventions.Member.IsLockedOut) == false
-                                                     );
+                                        );
                     if (memberIsActive == false)
                     {
                         ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member is either unapproved or locked out, redirect to error page", () => tracePrefix);
