@@ -20,7 +20,10 @@ namespace Umbraco.Web.Models.Mapping
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _contentService.GetParent(source);
-            return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
+            if (parent == null) return false;
+
+            var contentType = _contentTypeService.Get(parent.ContentTypeId);
+            return parent != null && (contentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
         }
     }
 }

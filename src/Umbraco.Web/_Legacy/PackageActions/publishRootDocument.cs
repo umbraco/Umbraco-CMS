@@ -33,7 +33,7 @@ namespace Umbraco.Web._Legacy.PackageActions
 
             foreach (var rootDoc in rootDocs)
             {
-                if (rootDoc.Name.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
+                if (rootDoc != null && rootDoc.Name.Trim() == documentName.Trim() && rootDoc.ContentTypeId != 0)
                 {
                     // fixme variants?
                     Current.Services.ContentService.SaveAndPublishBranch(rootDoc, true);

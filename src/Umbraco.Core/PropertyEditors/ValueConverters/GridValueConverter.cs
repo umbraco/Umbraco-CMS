@@ -51,6 +51,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     var gridConfig = UmbracoConfig.For.GridConfig(
                         Current.ProfilingLogger.Logger,
                         Current.ApplicationCache.RuntimeCache,
+                        Current.Services.ContentTypeService,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
                         Current.RuntimeState.Debug);

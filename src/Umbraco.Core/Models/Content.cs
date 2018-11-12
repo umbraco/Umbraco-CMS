@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -15,7 +16,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Content : ContentBase, IContent
     {
-        private IContentType _contentType;
         private int? _templateId;
         private bool _published;
         private PublishedState _publishedState;
@@ -49,7 +49,9 @@ namespace Umbraco.Core.Models
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parent, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+
+            ContentTypeId = contentType.Id;
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -76,7 +78,9 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+
+            ContentTypeId = contentType.Id;
             _publishedState = PublishedState.Unpublished;
             PublishedVersionId = 0;
         }
@@ -189,11 +193,9 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
         }
 
-        /// <summary>
-        /// Gets the ContentType used by this content object
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
-        public IContentType ContentType => _contentType;
+        public int ContentTypeId { get; private set; }
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -229,7 +231,7 @@ namespace Umbraco.Core.Models
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -279,38 +281,8 @@ namespace Umbraco.Core.Models
             return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
 
-        // internal for repository
-        internal void SetPublishInfo(string culture, string name, DateTime date)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
 
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
 
-            if (_publishInfos == null)
-            {
-                _publishInfos = new ContentCultureInfosCollection();
-                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
-            }
-
-            _publishInfos.AddOrUpdate(culture, name, date);
-        }
-
-        private void ClearPublishInfos()
-        {
-            _publishInfos = null;
-        }
-
-        private void ClearPublishInfo(string culture)
-        {
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-
-            if (_publishInfos == null) return;
-            _publishInfos.Remove(culture);
-            if (_publishInfos.Count == 0) _publishInfos = null;
-        }
 
         // sets a publish edited
         internal void SetCultureEdited(string culture)
@@ -339,7 +311,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Handles culture infos collection changes.
         /// </summary>
-        private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(Ps.Value.PublishCultureInfosSelector);
         }
@@ -350,79 +322,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool Blueprint { get; internal set; }
 
-        /// <inheritdoc />
-        public virtual bool PublishCulture(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
 
-            // the variation should be supported by the content type properties
-            //  if the content type is invariant, only '*' and 'null' is ok
-            //  if the content type varies, everything is ok because some properties may be invariant
-            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
-
-            // the values we want to publish should be valid
-            if (ValidateProperties(culture).Any())
-                return false;
-
-            var alsoInvariant = false;
-            if (culture == "*") // all cultures
-            {
-                foreach (var c in AvailableCultures)
-                {
-                    var name = GetCultureName(c);
-                    if (string.IsNullOrWhiteSpace(name))
-                        return false;
-                    SetPublishInfo(c, name, DateTime.Now);
-                }
-            }
-            else if (culture == null) // invariant culture
-            {
-                if (string.IsNullOrWhiteSpace(Name))
-                    return false;
-                // PublishName set by repository - nothing to do here
-            }
-            else // one single culture
-            {
-                var name = GetCultureName(culture);
-                if (string.IsNullOrWhiteSpace(name))
-                    return false;
-                SetPublishInfo(culture, name, DateTime.Now);
-                alsoInvariant = true; // we also want to publish invariant values
-            }
-
-            // property.PublishValues only publishes what is valid, variation-wise
-            foreach (var property in Properties)
-            {
-                property.PublishValues(culture);
-                if (alsoInvariant)
-                    property.PublishValues(null);
-            }
-
-            _publishedState = PublishedState.Publishing;
-            return true;
-        }
-
-        /// <inheritdoc />
-        public virtual void UnpublishCulture(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
-
-            // the variation should be supported by the content type properties
-            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
-                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
-
-            if (culture == "*") // all cultures
-                ClearPublishInfos();
-            else // one single culture
-                ClearPublishInfo(culture);
-
-            // property.PublishValues only publishes what is valid, variation-wise
-            foreach (var property in Properties)
-                property.UnpublishValues(culture);
-
-            _publishedState = PublishedState.Publishing;
-        }
 
         /// <summary>
         /// Changes the <see cref="ContentType"/> for the current content object
@@ -432,7 +332,6 @@ namespace Umbraco.Core.Models
         public void ChangeContentType(IContentType contentType)
         {
             ContentTypeId = contentType.Id;
-            _contentType = contentType;
             ContentTypeBase = contentType;
             Properties.EnsurePropertyTypes(PropertyTypes);
 
@@ -451,7 +350,6 @@ namespace Umbraco.Core.Models
             if(clearProperties)
             {
                 ContentTypeId = contentType.Id;
-                _contentType = contentType;
                 ContentTypeBase = contentType;
                 Properties.EnsureCleanPropertyTypes(PropertyTypes);
 
@@ -466,9 +364,6 @@ namespace Umbraco.Core.Models
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
-            
-            if (ContentType != null)
-                ContentType.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
@@ -502,14 +397,31 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
+        // internal for repository
+        internal void SetPublishInfo(string culture, string name, DateTime date)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_publishInfos == null)
+            {
+                _publishInfos = new ContentCultureInfosCollection();
+                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+            }
+
+            _publishInfos.AddOrUpdate(culture, name, date);
+        }
+
         protected override void PerformDeepClone(object clone)
         {
             base.PerformDeepClone(clone);
 
             var clonedContent = (Content)clone;
 
-            //need to manually clone this since it's not settable
-            clonedContent._contentType = (IContentType) ContentType.DeepClone();
+            clonedContent.ContentTypeId = ContentTypeId;
 
             //if culture infos exist then deal with event bindings
             if (clonedContent._publishInfos != null)
@@ -518,7 +430,7 @@ namespace Umbraco.Core.Models
                 clonedContent._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
                 clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
-            
+
         }
     }
 }

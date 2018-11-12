@@ -13,12 +13,14 @@ namespace Umbraco.Core.Publishing
     internal class ScheduledPublisher
     {
         private readonly IContentService _contentService;
+        private readonly IContentPublishingService _contentPublishingService;
         private readonly ILogger _logger;
         private readonly IUserService _userService;
 
-        public ScheduledPublisher(IContentService contentService, ILogger logger, IUserService userService)
+        public ScheduledPublisher(IContentService contentService, IContentPublishingService contentPublishingService, ILogger logger, IUserService userService)
         {
             _contentService = contentService;
+            _contentPublishingService = contentPublishingService;
             _logger = logger;
             _userService = userService;
         }
@@ -41,7 +43,7 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ReleaseDate = null;
-                    d.PublishCulture(); // fixme variants?
+                    _contentPublishingService.PublishCulture(d); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
                     _logger.Debug<ContentService>("Result of publish attempt: {PublishResult}", result.Result);
                     if (result.Success == false)

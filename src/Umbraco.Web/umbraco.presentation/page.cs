@@ -141,7 +141,7 @@ namespace umbraco
             _elements.Add("path", path);
             _elements.Add("splitpath", _splitpath);
         }
-        
+
         /// <summary>
         /// Puts the properties of the node into the elements table
         /// </summary>
@@ -308,6 +308,7 @@ namespace umbraco
             private readonly IVariationContextAccessor _variationContextAccessor;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
+            private IContentType _innerContentType;
 
             private PagePublishedContent(int id)
             {
@@ -328,7 +329,8 @@ namespace umbraco
                 _creatorName = _inner.GetCreatorProfile().Name;
                 _writerName = _inner.GetWriterProfile().Name;
 
-                _contentType = Current.PublishedContentTypeFactory.CreateContentType(_inner.ContentType);
+                _innerContentType = Current.Services.ContentTypeService.Get(_inner.ContentTypeId);
+                _contentType = Current.PublishedContentTypeFactory.CreateContentType(_innerContentType);
 
                 _properties = _contentType.PropertyTypes
                     .Select(x =>
@@ -386,7 +388,7 @@ namespace umbraco
             {
                 get
                 {
-                    if (!_inner.ContentType.VariesByCulture())
+                    if (!_innerContentType.VariesByCulture())
                         return NoCultureInfos;
 
                     if (_cultureInfos != null)
@@ -404,7 +406,7 @@ namespace umbraco
 
             public string DocumentTypeAlias
             {
-                get { return _inner.ContentType.Alias; }
+                get { return _innerContentType.Alias; }
             }
 
             public int DocumentTypeId

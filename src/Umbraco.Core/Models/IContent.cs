@@ -71,9 +71,9 @@ namespace Umbraco.Core.Models
         DateTime? ExpireDate { get; set; }
 
         /// <summary>
-        /// Gets the content type of this content.
+        /// Gets the content type id of this content.
         /// </summary>
-        IContentType ContentType { get; }
+        int ContentTypeId { get; }
 
         /// <summary>
         /// Gets the current status of the content.
@@ -166,23 +166,5 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Registers a culture to be published.
-        /// </summary>
-        /// <returns>A value indicating whether the culture can be published.</returns>
-        /// <remarks>
-        /// <para>Fails if properties don't pass variant validtion rules.</para>
-        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        bool PublishCulture(string culture = "*");
-
-        /// <summary>
-        /// Registers a culture to be unpublished.
-        /// </summary>
-        /// <remarks>
-        /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
-        /// </remarks>
-        void UnpublishCulture(string culture = "*");
     }
 }

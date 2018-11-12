@@ -1,7 +1,9 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Manifest
 {
@@ -10,7 +12,14 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class ContentAppDefinitionConverter : JsonReadConverter<IContentAppDefinition>
     {
+        private readonly IContentTypeService _contentTypeService;
+
+        public ContentAppDefinitionConverter(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
+
         protected override IContentAppDefinition Create(Type objectType, string path, JObject jObject)
-            => new ManifestContentAppDefinition();
+            => new ManifestContentAppDefinition(_contentTypeService);
     }
 }

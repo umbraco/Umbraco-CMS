@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // left join on optional culture variation
                 //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
                 .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv") 
+                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
                 .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
 
             sql
@@ -265,9 +265,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.AddingEntity();
             var publishing = content.PublishedState == PublishedState.Publishing;
 
+            var contentType = _contentTypeRepository.Get(entity.ContentTypeId);
             // ensure that the default template is assigned
             if (entity.TemplateId == 0)
-                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id ?? 0;
+                entity.TemplateId = contentType.DefaultTemplate?.Id ?? 0;
 
             // sanitize names
             SanitizeNames(content, publishing);
@@ -364,8 +365,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
 
+
             // persist the variations
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
                 if (publishing)
@@ -527,7 +529,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing && content.PublishName != content.Name)
                 edited = true;
 
-            if (content.ContentType.VariesByCulture())
+            var contentType = _contentTypeRepository.Get(content.ContentTypeId);
+            if (contentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
                 if (publishing)
@@ -1219,7 +1222,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureInvariantNameExists(Content content)
         {
-            if (content.ContentType.VariesByCulture())
+            var contentType = _contentTypeRepository.Get(content.ContentTypeId);
+            if (contentType.VariesByCulture())
             {
                 // content varies by culture
                 // then it must have at least a variant name, else it makes no sense
@@ -1264,7 +1268,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureVariantNamesAreUnique(Content content, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
+            var contentType = _contentTypeRepository.Get(content.ContentTypeId);
+
+            if (!EnsureUniqueNaming || !contentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
 
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);

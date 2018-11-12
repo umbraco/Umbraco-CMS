@@ -2,6 +2,7 @@
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -14,7 +15,12 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentBasicSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState?>
         where T : ContentPropertyBasic
     {
-        private readonly ContentSavedStateResolver<T> _inner = new ContentSavedStateResolver<T>();
+        private readonly ContentSavedStateResolver<T> _inner;
+
+        public ContentBasicSavedStateResolver(IContentTypeService contentTypeService)
+        {
+            _inner = new ContentSavedStateResolver<T>(contentTypeService);
+        }
 
         public ContentSavedState? Resolve(IContent source, IContentProperties<T> destination, ContentSavedState? destMember, ResolutionContext context)
         {
@@ -29,13 +35,22 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentSavedStateResolver<T> : IValueResolver<IContent, IContentProperties<T>, ContentSavedState>
         where T : ContentPropertyBasic
     {
+        private readonly IContentTypeService _contentTypeService;
+
+        public ContentSavedStateResolver(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
+
         public ContentSavedState Resolve(IContent source, IContentProperties<T> destination, ContentSavedState destMember, ResolutionContext context)
         {
             PublishedState publishedState;
             bool isEdited;
             bool isCreated;
 
-            if (source.ContentType.VariesByCulture())
+
+            var contentType = _contentTypeService.Get(source.ContentTypeId);
+            if (contentType.VariesByCulture())
             {
                 //Get the culture from the context which will be set during the mapping operation for each variant
                 var culture = context.Options.GetCulture();

@@ -15,11 +15,13 @@ namespace Umbraco.Web.ContentApps
         private const int Weight = -666;
 
         private readonly IDataTypeService _dataTypeService;
+        private readonly IContentTypeService _contentTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
 
-        public ListViewContentAppDefinition(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditors)
+        public ListViewContentAppDefinition(IDataTypeService dataTypeService, IContentTypeService contentTypeService, PropertyEditorCollection propertyEditors)
         {
             _dataTypeService = dataTypeService;
+            _contentTypeService = contentTypeService;
             _propertyEditors = propertyEditors;
         }
 
@@ -28,12 +30,14 @@ namespace Umbraco.Web.ContentApps
             string contentTypeAlias, entityType;
             int dtdId;
 
+
+
             switch (o)
             {
-                case IContent content when !content.ContentType.IsContainer:
+                case IContent content when !_contentTypeService.Get(content.ContentTypeId).IsContainer:
                     return null;
                 case IContent content:
-                    contentTypeAlias = content.ContentType.Alias;
+                    contentTypeAlias = _contentTypeService.Get(content.ContentTypeId).Alias;
                     entityType = "content";
                     dtdId = Core.Constants.DataTypes.DefaultContentListView;
                     break;
@@ -72,7 +76,7 @@ namespace Umbraco.Web.ContentApps
             };
 
             var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
-            
+
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataType(customDtdName)
                      ?? dataTypeService.GetDataType(defaultListViewDataType);

@@ -13,16 +13,20 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentVariantResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariantDisplay>>
     {
         private readonly ILocalizationService _localizationService;
+        private readonly IContentTypeService _contentTypeService;
 
-        public ContentVariantResolver(ILocalizationService localizationService)
+        public ContentVariantResolver(ILocalizationService localizationService, IContentTypeService contentTypeService)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _contentTypeService = contentTypeService  ?? throw new ArgumentNullException(nameof(contentTypeService));;
         }
 
         public IEnumerable<ContentVariantDisplay> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariantDisplay> destMember, ResolutionContext context)
         {
             var result = new List<ContentVariantDisplay>();
-            if (!source.ContentType.VariesByCulture())
+
+            var contentType = _contentTypeService.Get(source.ContentTypeId);
+            if (!contentType.VariesByCulture())
             {
                 //this is invariant so just map the IContent instance to ContentVariationDisplay
                 result.Add(context.Mapper.Map<ContentVariantDisplay>(source));
@@ -69,5 +73,5 @@ namespace Umbraco.Web.Models.Mapping
             return result;
         }
     }
-    
+
 }

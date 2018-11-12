@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -15,14 +16,16 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
+        private readonly IContentTypeService _contentTypeService;
         private readonly ILogger _logger;
 
         public ContentUrlResolver(
             IUmbracoContextAccessor umbracoContextAccessor,
-            PublishedRouter publishedRouter, 
+            PublishedRouter publishedRouter,
             ILocalizationService localizationService,
             ILocalizedTextService textService,
             IContentService contentService,
+            IContentTypeService contentTypeService,
             ILogger logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
@@ -30,6 +33,7 @@ namespace Umbraco.Web.Models.Mapping
             _localizationService = localizationService ?? throw new System.ArgumentNullException(nameof(localizationService));
             _textService = textService ?? throw new System.ArgumentNullException(nameof(textService));
             _contentService = contentService ?? throw new System.ArgumentNullException(nameof(contentService));
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
         }
 
@@ -39,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var urls = umbracoContext == null
                 ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
-                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _textService, _contentService, _logger).ToArray();
+                : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _textService,  _contentService, _contentTypeService, _logger).ToArray();
 
             return urls;
         }

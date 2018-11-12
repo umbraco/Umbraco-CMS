@@ -1318,6 +1318,7 @@
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="Services\IConsentService.cs" />
+    <Compile Include="Services\IContentPublishingService.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -1327,6 +1328,7 @@
     <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
     <Compile Include="Services\Changes\TreeChangeTypes.cs" />
     <Compile Include="Services\Implement\ConsentService.cs" />
+    <Compile Include="Services\Implement\ContentPublishingService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />

@@ -68,7 +68,7 @@ namespace Umbraco.Web.Search
                 var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
                 return simpleFsLockFactory;
             };
-            
+
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = mainDom.Register(() =>
             {
@@ -333,9 +333,9 @@ namespace Umbraco.Web.Search
 
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
-                        
+
             var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
-           
+
             foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (!changedIds.TryGetValue(payload.ItemType, out var idLists))
@@ -545,7 +545,7 @@ namespace Umbraco.Web.Search
                         var total = long.MaxValue;
                         while(page * pageSize < total)
                         {
-                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, 
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check it's published state without checking every item
                                 ordering: Ordering.By("Path", Direction.Ascending));
 
@@ -642,7 +642,7 @@ namespace Umbraco.Web.Search
             if (actions != null)
                 actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
             else
-                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);            
+                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);
         }
 
         private class DeferedActions
@@ -686,7 +686,7 @@ namespace Umbraco.Web.Search
             private readonly bool? _supportUnpublished;
 
             public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
-            {                
+            {
                 _examineComponent = examineComponent;
                 _content = content;
                 _supportUnpublished = supportUnpublished;
@@ -699,7 +699,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
             {
-                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, content);
+                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, examineComponent._services.ContentTypeService,content);
 
                 ExamineManager.Instance.IndexItems(
                     valueSet.ToArray(),

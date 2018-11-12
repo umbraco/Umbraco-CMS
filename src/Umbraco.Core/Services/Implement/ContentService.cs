@@ -28,6 +28,8 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentPublishingService _contentPublishingService;
         private readonly MediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
@@ -36,7 +38,10 @@ namespace Umbraco.Core.Services.Implement
         public ContentService(IScopeProvider provider, ILogger logger,
             IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
+            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository,
+            ILanguageRepository languageRepository,
+            IContentTypeService contentTypeService,
+            IContentPublishingService contentPublishingService)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -46,6 +51,8 @@ namespace Umbraco.Core.Services.Implement
             _contentTypeRepository = contentTypeRepository;
             _documentBlueprintRepository = documentBlueprintRepository;
             _languageRepository = languageRepository;
+            _contentTypeService = contentTypeService;
+            _contentPublishingService = contentPublishingService;
         }
 
         #endregion
@@ -323,7 +330,9 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent));
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+
+            scope.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, contentType.Alias, parent));
 
             if (withIdentity == false)
                 return;
@@ -785,8 +794,11 @@ namespace Umbraco.Core.Services.Implement
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
+
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+
                 //track the cultures that have changed
-                var culturesChanging = content.ContentType.VariesByCulture()
+                var culturesChanging = contentType.VariesByCulture()
                     ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
@@ -810,7 +822,7 @@ namespace Umbraco.Core.Services.Implement
                         .Where(x => culturesChanging.InvariantContains(x.IsoCode))
                         .Select(x => x.CultureName));
                     Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
-                }   
+                }
                 else
                     Audit(AuditType.Save, userId, content.Id);
 
@@ -870,9 +882,12 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
 
+
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 if (culture.IsNullOrWhiteSpace())
                     throw new NotSupportedException("Invariant culture is not supported by variant content types.");
@@ -890,13 +905,13 @@ namespace Umbraco.Core.Services.Implement
             if (!culture.IsNullOrWhiteSpace() && culture != "*")
             {
                 // publish the invariant values
-                var publishInvariant = content.PublishCulture(null);
+                var publishInvariant = _contentPublishingService.PublishCulture(content, null);
                 if (!publishInvariant)
                     return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, content);
             }
 
             // publish the culture(s)
-            var publishCulture = content.PublishCulture(culture);
+            var publishCulture = _contentPublishingService.PublishCulture(content,culture);
             if (!publishCulture)
                 return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, content);
 
@@ -916,9 +931,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
 
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 if (culture == null)
                     throw new NotSupportedException("Invariant culture is not supported by variant content types.");
@@ -934,7 +951,7 @@ namespace Umbraco.Core.Services.Implement
                 return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content);
 
             // all cultures = unpublish whole
-            if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
+            if (culture == "*" || (!contentType.VariesByCulture() && culture == null))
             {
                 ((Content) content).PublishedState = PublishedState.Unpublishing;
             }
@@ -945,7 +962,7 @@ namespace Umbraco.Core.Services.Implement
                     return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content);
 
                 // unpublish the culture
-                content.UnpublishCulture(culture);
+                _contentPublishingService.UnpublishCulture(content, culture);
             }
 
             // finally, "save publishing"
@@ -970,7 +987,7 @@ namespace Umbraco.Core.Services.Implement
                             //log that the whole content item has been unpublished due to mandatory culture unpublished
                             Audit(AuditType.Unpublish, userId, content.Id, $"Unpublished (culture \"{culture}\" is mandatory)");
                         }
-                            
+
                         result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
                     }
                     scope.Complete();
@@ -1004,8 +1021,9 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
                 // is the content going to end up published, or unpublished?
-                if (publishing && content.ContentType.VariesByCulture())
+                if (publishing && contentType.VariesByCulture())
                 {
                     var publishedCultures = content.PublishedCultures.ToList();
                     var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
@@ -1180,7 +1198,7 @@ namespace Umbraco.Core.Services.Implement
                     try
                     {
                         d.ReleaseDate = null;
-                        d.PublishCulture(); // fixme variants?
+                        _contentPublishingService.PublishCulture(d); // fixme variants?
                         result = SaveAndPublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1223,7 +1241,7 @@ namespace Umbraco.Core.Services.Implement
                    c.PublishedCultures.Where(x => x.InvariantEquals(l)).Any(x => c.GetCultureName(x) != c.GetPublishName(x)) ||
                    c.Properties.Any(x => x.Values.Where(y => culture == "*" || y.Culture.InvariantEquals(l)).Any(y => !y.EditedValue.Equals(y.PublishedValue)));
 
-            return SaveAndPublishBranch(content, force, document => IsEditing(document, culture), document => document.PublishCulture(culture), userId);
+            return SaveAndPublishBranch(content, force, document => IsEditing(document, culture), document => _contentPublishingService.PublishCulture(document), userId);
         }
 
         // fixme - make this public once we know it works + document
@@ -1253,11 +1271,11 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // publish the specified cultures
-            bool PublishCultures(IContent c)
+            bool PublishCultures(IContent con)
             {
                 return cultures.Length == 0
-                    ? c.PublishCulture() // nothing = everything
-                    : cultures.All(c.PublishCulture);
+                    ? _contentPublishingService.PublishCulture(con) // nothing = everything
+                    : cultures.All(c => _contentPublishingService.PublishCulture(con, c));
             }
 
             return SaveAndPublishBranch(content, force, IsEdited, PublishCultures, userId);
@@ -1321,7 +1339,7 @@ namespace Umbraco.Core.Services.Implement
                         exclude.Add(d.Id);
                     }
                 }
-                
+
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
@@ -1665,7 +1683,7 @@ namespace Umbraco.Core.Services.Implement
                     PerformMoveContentLocked(descendant, userId, trash);
                 }
             }
-            
+
         }
 
         private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -1864,8 +1882,9 @@ namespace Umbraco.Core.Services.Implement
                     return false;
                 }
 
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
                 //track the cultures changing for auditing
-                var culturesChanging = content.ContentType.VariesByCulture()
+                var culturesChanging = contentType.VariesByCulture()
                     ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
@@ -1888,7 +1907,7 @@ namespace Umbraco.Core.Services.Implement
                         Audit(AuditType.SendToPublish, content.WriterId, content.Id);
                 }
 
-                // fixme here, on only on success?                
+                // fixme here, on only on success?
                 scope.Complete();
 
                 return saveResult.Success;
@@ -2515,7 +2534,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
-            var contentType = blueprint.ContentType;
+            var contentType = _contentTypeService.Get(blueprint.ContentTypeId);
             var content = new Content(name, -1, contentType);
             content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
@@ -2584,7 +2603,7 @@ namespace Umbraco.Core.Services.Implement
         public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            
+
             //Get the current copy of the node
             var content = GetById(id);
 
@@ -2633,7 +2652,7 @@ namespace Umbraco.Core.Services.Implement
                     Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
-                
+
                 scope.Complete();
             }
 

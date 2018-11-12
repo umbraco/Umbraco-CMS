@@ -193,7 +193,7 @@ namespace Umbraco.Web.Editors
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
-        
+
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
             var storeInContainer = false;
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Editors
             itemDocType.Name = collectionItemName;
             itemDocType.Alias = collectionItemName.ToSafeAlias(true);
             itemDocType.Icon = collectionItemIcon;
-            
+
             // create item doctype template
             if (collectionItemCreateTemplate)
             {
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Editors
             {
                 new ContentTypeSort(itemDocType.Id, 0)
             };
-            
+
             // create collection doctype template
             if (collectionCreateTemplate)
             {
@@ -257,7 +257,7 @@ namespace Umbraco.Web.Editors
                     allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
                     parentCt.AllowedContentTypes = allowedCts;
                     Services.ContentTypeService.Save(parentCt);
-                } 
+                }
             }
 
 
@@ -400,7 +400,8 @@ namespace Umbraco.Web.Editors
                     return Enumerable.Empty<ContentTypeBasic>();
                 }
 
-                var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var contentType = Services.ContentTypeService.Get(contentItem.ContentTypeId);
+                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 

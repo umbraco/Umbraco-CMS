@@ -4,6 +4,7 @@ using System.Web;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -15,6 +16,13 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentTypeBasicResolver<TSource, TDestination> : IValueResolver<TSource, TDestination, ContentTypeBasic>
         where TSource : IContentBase
     {
+        private readonly IContentTypeService _contentTypeService;
+
+        public ContentTypeBasicResolver(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
+
         public ContentTypeBasic Resolve(TSource source, TDestination destination, ContentTypeBasic destMember, ResolutionContext context)
         {
             //TODO: We can resolve the UmbracoContext from the IValueResolver options!
@@ -24,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 ContentTypeBasic contentTypeBasic;
                 if (source is IContent content)
-                    contentTypeBasic = Mapper.Map<IContentType, ContentTypeBasic>(content.ContentType);
+                    contentTypeBasic = Mapper.Map<IContentType, ContentTypeBasic>(_contentTypeService.Get(content.ContentTypeId));
                 else if (source is IMedia media)
                     contentTypeBasic = Mapper.Map<IMediaType, ContentTypeBasic>(media.ContentType);
                 else

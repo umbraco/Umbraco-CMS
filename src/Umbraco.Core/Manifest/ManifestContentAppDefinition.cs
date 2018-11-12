@@ -7,6 +7,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Manifest
 {
@@ -33,9 +34,15 @@ namespace Umbraco.Core.Manifest
     [DataContract(Name = "appdef", Namespace = "")]
     public class ManifestContentAppDefinition : IContentAppDefinition
     {
+        private readonly IContentTypeService _contentTypeService;
         private string _view;
         private ContentApp _app;
         private ShowRule[] _showRules;
+
+        public ManifestContentAppDefinition(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
 
         /// <summary>
         /// Gets or sets the name of the content app.
@@ -92,7 +99,7 @@ namespace Umbraco.Core.Manifest
             {
                 case IContent content:
                     partA = "content";
-                    partB = content.ContentType.Alias;
+                    partB = _contentTypeService.Get(content.ContentTypeId).Alias;
                     break;
 
                 case IMedia media:

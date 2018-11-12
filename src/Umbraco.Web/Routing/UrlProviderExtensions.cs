@@ -18,12 +18,13 @@ namespace Umbraco.Web.Routing
         /// <para>Use when displaying Urls. If errors occur when generating the Urls, they will show in the list.</para>
         /// <para>Contains all the Urls that we can figure out (based upon domains, etc).</para>
         /// </remarks>
-        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content, 
+        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content,
             PublishedRouter publishedRouter,
             UmbracoContext umbracoContext,
             ILocalizationService localizationService,
             ILocalizedTextService textService,
             IContentService contentService,
+            IContentTypeService contentTypeService,
             ILogger logger)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -32,6 +33,7 @@ namespace Umbraco.Web.Routing
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (contentTypeService == null) throw new ArgumentNullException(nameof(contentTypeService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             var urls = new List<UrlInfo>();
@@ -41,7 +43,7 @@ namespace Umbraco.Web.Routing
                 urls.Add(UrlInfo.Message(textService.Localize("content/itemNotPublished")));
                 return urls;
             }
-            
+
             // build a list of urls, for the back-office
             // which will contain
             // - the 'main' urls, which is what .Url would return, for each culture
@@ -55,8 +57,9 @@ namespace Umbraco.Web.Routing
 
             foreach (var culture in cultures)
             {
+                var contentType = contentTypeService.Get(content.ContentTypeId);
                 // if content is variant, and culture is not published, skip
-                if (content.ContentType.VariesByCulture() && !content.IsCulturePublished(culture))
+                if (contentType.VariesByCulture() && !content.IsCulturePublished(culture))
                     continue;
 
                 // if it's variant and culture is published, or if it's invariant, proceed
@@ -76,7 +79,7 @@ namespace Umbraco.Web.Routing
                 {
                     // deal with 'could not get the url'
                     case "#":
-                        HandleCouldNotGetUrl(content, culture, urls, contentService, textService);
+                        HandleCouldNotGetUrl(content, culture, urls, contentService, textService,contentTypeService);
                         break;
 
                     // deal with exceptions
@@ -122,7 +125,7 @@ namespace Umbraco.Web.Routing
             return ret;
         }
 
-        private static void HandleCouldNotGetUrl(IContent content, string culture, List<UrlInfo> urls, IContentService contentService, ILocalizedTextService textService)
+        private static void HandleCouldNotGetUrl(IContent content, string culture, List<UrlInfo> urls, IContentService contentService, ILocalizedTextService textService, IContentTypeService contentTypeService)
         {
             // document has a published version yet its url is "#" => a parent must be
             // unpublished, walk up the tree until we find it, and report.
@@ -131,7 +134,7 @@ namespace Umbraco.Web.Routing
             {
                 parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
             }
-            while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
+            while (parent != null && parent.Published && (!contentTypeService.Get(parent.ContentTypeId).VariesByCulture() || parent.IsCulturePublished(culture)));
 
             if (parent == null) // oops, internal error
                 urls.Add(UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture));

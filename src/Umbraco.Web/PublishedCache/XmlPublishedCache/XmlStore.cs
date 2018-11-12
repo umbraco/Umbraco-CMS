@@ -1241,7 +1241,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // the types will be reloaded if/when needed
             foreach (var payload in payloads)
                 _contentTypeCache.ClearDataType(payload.Id);
-            
+
             foreach (var payload in payloads)
                 Current.Logger.Debug<XmlStore>("Notified {RemovedStatus} for data type {payload.Id}",
                     payload.Removed ? "Removed" : "Refreshed",
@@ -1536,7 +1536,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var entity = args.Entity;
 
             // serialize edit values for preview
-            var editXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, false).ToDataString();
+            var editXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.ContentTypeService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, false).ToDataString();
 
             // change below to write only one row - not one per version
             var dto1 = new PreviewXmlDto
@@ -1565,7 +1565,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 return;
 
             // serialize published values for content cache
-            var publishedXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, true).ToDataString();
+            var publishedXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.ContentTypeService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, true).ToDataString();
             var dto2 = new ContentXmlDto { NodeId = entity.Id, Xml = publishedXml };
             OnRepositoryRefreshed(db, dto2);
 
@@ -1749,7 +1749,7 @@ WHERE cmsContentXml.nodeId IN (
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // contentXml contains published content!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
-                    EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
+                    EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.ContentTypeService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1824,7 +1824,7 @@ WHERE cmsPreviewXml.nodeId IN (
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
                     NodeId = c.Id,
-                    Xml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString()
+                    Xml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.ContentTypeService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString()
                 }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

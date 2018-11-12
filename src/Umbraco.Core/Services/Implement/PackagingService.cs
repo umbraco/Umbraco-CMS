@@ -67,7 +67,8 @@ namespace Umbraco.Core.Services.Implement
             IUserService userService,
             IScopeProvider scopeProvider,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
             PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
@@ -101,7 +102,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
         public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            var nodeName = contentType.Alias.ToSafeAliasWithForcingCheck();
 
             if (raiseEvents)
             {
@@ -110,7 +112,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             const bool published = false; // fixme - what shall we export?
-            var xml = EntityXmlSerializer.Serialize(_contentService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, content, published, deep);
+            var xml = EntityXmlSerializer.Serialize(_contentService, _contentTypeService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, content, published, deep);
 
             if (raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
@@ -1300,7 +1302,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
-            var macro = existingMacro ?? new Macro(macroAlias, macroName, macroSource, macroType, 
+            var macro = existingMacro ?? new Macro(macroAlias, macroName, macroSource, macroType,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");

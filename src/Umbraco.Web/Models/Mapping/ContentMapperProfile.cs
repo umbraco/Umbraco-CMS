@@ -29,10 +29,10 @@ namespace Umbraco.Web.Models.Mapping
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
-            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
-            var defaultTemplateResolver = new DefaultTemplateResolver();
-            var variantResolver = new ContentVariantResolver(localizationService);
-            
+            var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeService);
+            var defaultTemplateResolver = new DefaultTemplateResolver(contentTypeService);
+            var variantResolver = new ContentVariantResolver(localizationService, contentTypeService);
+
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AllowedTemplates, opt =>
                     opt.MapFrom(content => content.ContentType.AllowedTemplates
                         .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                        .ToDictionary(t => t.Alias, t => t.Name)))                
+                        .ToDictionary(t => t.Alias, t => t.Name)))
                 .ForMember(dest => dest.AllowedActions, opt => opt.ResolveUsing(src => actionButtonsResolver.Resolve(src)))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
@@ -95,10 +95,19 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         private class UpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
         {
+            private readonly IContentTypeService _contentTypeService;
+
+            public UpdateDateResolver(IContentTypeService contentTypeService)
+            {
+                _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+            }
+
             public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
             {
+
+                var contentType = _contentTypeService.Get(source.ContentTypeId);
                 // invariant = global date
-                if (!source.ContentType.VariesByCulture()) return source.UpdateDate;
+                if (!contentType.VariesByCulture()) return source.UpdateDate;
 
                 // variant = depends on culture
                 var culture = context.Options.GetCulture();
@@ -119,10 +128,18 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         private class NameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
         {
+            private readonly IContentTypeService _contentTypeService;
+
+            public NameResolver(IContentTypeService contentTypeService)
+            {
+                _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+
+            }
             public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
             {
+                var contentType = _contentTypeService.Get(source.ContentTypeId);
                 // invariant = only 1 name
-                if (!source.ContentType.VariesByCulture()) return source.Name;
+                if (!contentType.VariesByCulture()) return source.Name;
 
                 // variant = depends on culture
                 var culture = context.Options.GetCulture();
@@ -136,5 +153,5 @@ namespace Umbraco.Web.Models.Mapping
                 return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"(({source.Name}))";
             }
         }
-    }    
+    }
 }

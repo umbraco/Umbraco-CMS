@@ -24,12 +24,13 @@ namespace Umbraco.Web.Models.Mapping
             IDataTypeService dataTypeService,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
+            IContentTypeService contentTypeService,
             ILogger logger)
         {
             // create, capture, cache
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
-            var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
+            var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>(contentTypeService);
 
             //FROM IMedia TO MediaItemDisplay
             CreateMap<IMedia, MediaItemDisplay>()

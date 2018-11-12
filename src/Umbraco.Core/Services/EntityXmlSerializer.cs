@@ -24,6 +24,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static XElement Serialize(
             IContentService contentService,
+            IContentTypeService contentTypeService,
             IDataTypeService dataTypeService,
             IUserService userService,
             ILocalizationService localizationService,
@@ -33,6 +34,7 @@ namespace Umbraco.Core.Services
             bool withDescendants = false) //fixme take care of usage! only used for the packager
         {
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (contentTypeService == null) throw new ArgumentNullException(nameof(contentTypeService));
             if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
             if (userService == null) throw new ArgumentNullException(nameof(userService));
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
@@ -40,12 +42,13 @@ namespace Umbraco.Core.Services
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var contentType = contentTypeService.Get(content.ContentTypeId);
+            var nodeName = contentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = SerializeContentBase(dataTypeService, localizationService, content, content.GetUrlSegment(urlSegmentProviders), nodeName, published);
 
-            xml.Add(new XAttribute("nodeType", content.ContentType.Id));
-            xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
+            xml.Add(new XAttribute("nodeType", content.ContentTypeId));
+            xml.Add(new XAttribute("nodeTypeAlias", contentType.Alias));
 
             xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService)?.Name ?? "??"));
             //xml.Add(new XAttribute("creatorID", content.CreatorId));
@@ -64,9 +67,9 @@ namespace Umbraco.Core.Services
                 while(page * pageSize < total)
                 {
                     var children = contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
-                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml, published);
+                    SerializeChildren(contentService, contentTypeService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml, published);
                 }
-                
+
             }
 
             return xml;
@@ -462,12 +465,12 @@ namespace Umbraco.Core.Services
         }
 
         // exports an IContent item descendants.
-        private static void SerializeChildren(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IContent> children, XElement xml, bool published)
+        private static void SerializeChildren(IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IContent> children, XElement xml, bool published)
         {
             foreach (var child in children)
             {
                 // add the child xml
-                var childXml = Serialize(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, child, published);
+                var childXml = Serialize(contentService, contentTypeService, dataTypeService, userService, localizationService, urlSegmentProviders, child, published);
                 xml.Add(childXml);
 
                 const int pageSize = 500;
@@ -477,7 +480,7 @@ namespace Umbraco.Core.Services
                 {
                     var grandChildren = contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
                     // recurse
-                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml, published);
+                    SerializeChildren(contentService, contentTypeService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml, published);
                 }
             }
         }

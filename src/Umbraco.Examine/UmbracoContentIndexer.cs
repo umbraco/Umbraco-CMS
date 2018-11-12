@@ -33,6 +33,7 @@ namespace Umbraco.Examine
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected IUserService UserService { get; }
+        protected IContentTypeService ContentTypeService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private int? _parentId;
@@ -48,6 +49,7 @@ namespace Umbraco.Examine
             ContentService = Current.Services.ContentService;
             MediaService = Current.Services.MediaService;
             UserService = Current.Services.UserService;
+            ContentTypeService = Current.Services.ContentTypeService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
 
@@ -266,14 +268,14 @@ namespace Umbraco.Examine
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
                         if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
                         {
-                            content = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(x.ContentType.Alias)).ToArray();
+                            content = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(ContentTypeService.Get(x.ContentTypeId).Alias)).ToArray();
                         }
                         else
                         {
                             content = descendants.ToArray();
                         }
 
-                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, content));
+                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, ContentTypeService, content));
 
                         pageIndex++;
                     } while (content.Length == pageSize);
@@ -317,14 +319,18 @@ namespace Umbraco.Examine
             }
         }
 
-        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IContent[] content)
+        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IUserService userService,
+            IContentTypeService contentTypeService,
+            params IContent[] content)
         {
             foreach (var c in content)
             {
                 var urlValue = c.GetUrlSegment(urlSegmentProviders); // for now, index with invariant culture
+                var contentType = contentTypeService.Get(c.ContentTypeId);
                 var values = new Dictionary<string, object[]>
                 {
-                    {"icon", new object[] {c.ContentType.Icon}},
+                    {"icon", new object[] {contentType.Icon}},
                     {PublishedFieldName, new object[] {c.Published ? 1 : 0}},
                     {"id", new object[] {c.Id}},
                     {"key", new object[] {c.Key}},
@@ -337,7 +343,7 @@ namespace Umbraco.Examine
                     {"nodeName", new object[] {c.Name}},
                     {"urlName", new object[] {urlValue}},
                     {"path", new object[] {c.Path}},
-                    {"nodeType", new object[] {c.ContentType.Id}},
+                    {"nodeType", new object[] {contentType.Id}},
                     {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
                     {"writerName", new object[] {c.GetWriterProfile(userService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
@@ -362,7 +368,7 @@ namespace Umbraco.Examine
                     }
                 }
 
-                var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
+                var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, contentType.Alias, values);
 
                 yield return vs;
             }

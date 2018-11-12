@@ -1,0 +1,1622 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Bjarke\.Rider2018.2\config\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\Bjarke\.Rider2018.2\config\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\Bjarke\.Rider2018.2\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Bjarke\.Rider2018.2\system\resharper-host\local\Transient\ReSharperHost\v182\SolutionCaches\_Umbraco.-795814198.00" t="ExcludeRecursive" />
+    <e p="D:\Projects\Umbraco-CMS\src\Umbraco.Core" t="IncludeRecursive">
+      <e p="_Legacy" t="Include">
+        <e p="PackageActions" t="Include">
+          <e p="IPackageAction.cs" t="Include" />
+          <e p="PackageActionCollection.cs" t="Include" />
+          <e p="PackageActionCollectionBuilder.cs" t="Include" />
+        </e>
+      </e>
+      <e p="AssemblyExtensions.cs" t="Include" />
+      <e p="AsyncLock.cs" t="Include" />
+      <e p="Attempt.cs" t="Include" />
+      <e p="AttemptOfTResult.cs" t="Include" />
+      <e p="AttemptOfTResultTStatus.cs" t="Include" />
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="BindingRedirects.cs" t="Include" />
+      <e p="ByteArrayExtensions.cs" t="Include" />
+      <e p="Cache" t="Include">
+        <e p="CacheHelper.cs" t="Include" />
+        <e p="CacheKeys.cs" t="Include" />
+        <e p="CacheProviderExtensions.cs" t="Include" />
+        <e p="CacheRefresherBase.cs" t="Include" />
+        <e p="CacheRefresherCollection.cs" t="Include" />
+        <e p="CacheRefresherCollectionBuilder.cs" t="Include" />
+        <e p="CacheRefresherEventArgs.cs" t="Include" />
+        <e p="DeepCloneRuntimeCacheProvider.cs" t="Include" />
+        <e p="DefaultRepositoryCachePolicy.cs" t="Include" />
+        <e p="DictionaryCacheProvider.cs" t="Include" />
+        <e p="DictionaryCacheProviderBase.cs" t="Include" />
+        <e p="FullDataSetRepositoryCachePolicy.cs" t="Include" />
+        <e p="HttpRequestCacheProvider.cs" t="Include" />
+        <e p="HttpRuntimeCacheProvider.cs" t="Include" />
+        <e p="ICacheProvider.cs" t="Include" />
+        <e p="ICacheRefresher.cs" t="Include" />
+        <e p="IJsonCacheRefresher.cs" t="Include" />
+        <e p="IPayloadCacheRefresher.cs" t="Include" />
+        <e p="IRepositoryCachePolicy.cs" t="Include" />
+        <e p="IRuntimeCacheProvider.cs" t="Include" />
+        <e p="IsolatedRuntimeCache.cs" t="Include" />
+        <e p="JsonCacheRefresherBase.cs" t="Include" />
+        <e p="NoCacheRepositoryCachePolicy.cs" t="Include" />
+        <e p="NullCacheProvider.cs" t="Include" />
+        <e p="ObjectCacheRuntimeCacheProvider.cs" t="Include" />
+        <e p="PayloadCacheRefresherBase.cs" t="Include" />
+        <e p="RepositoryCachePolicyBase.cs" t="Include" />
+        <e p="RepositoryCachePolicyOptions.cs" t="Include" />
+        <e p="SingleItemsOnlyRepositoryCachePolicy.cs" t="Include" />
+        <e p="StaticCacheProvider.cs" t="Include" />
+        <e p="TypedCacheRefresherBase.cs" t="Include" />
+      </e>
+      <e p="CodeAnnotations" t="Include">
+        <e p="FriendlyNameAttribute.cs" t="Include" />
+        <e p="UmbracoObjectTypeAttribute.cs" t="Include" />
+        <e p="UmbracoUdiTypeAttribute.cs" t="Include" />
+      </e>
+      <e p="Collections" t="Include">
+        <e p="CompositeIntStringKey.cs" t="Include" />
+        <e p="CompositeNStringNStringKey.cs" t="Include" />
+        <e p="CompositeStringStringKey.cs" t="Include" />
+        <e p="CompositeTypeTypeKey.cs" t="Include" />
+        <e p="ConcurrentHashSet.cs" t="Include" />
+        <e p="DeepCloneableList.cs" t="Include" />
+        <e p="ListCloneBehavior.cs" t="Include" />
+        <e p="ObservableDictionary.cs" t="Include" />
+        <e p="OrderedHashSet.cs" t="Include" />
+        <e p="TopoGraph.cs" t="Include" />
+        <e p="TypeList.cs" t="Include" />
+      </e>
+      <e p="Components" t="Include">
+        <e p="AuditEventsComponent.cs" t="Include" />
+        <e p="BootLoader.cs" t="Include" />
+        <e p="Composition.cs" t="Include" />
+        <e p="CompositionExtensions.cs" t="Include" />
+        <e p="DisableComponentAttribute.cs" t="Include" />
+        <e p="EnableComponentAttribute.cs" t="Include" />
+        <e p="IRuntimeComponent.cs" t="Include" />
+        <e p="IUmbracoComponent.cs" t="Include" />
+        <e p="IUmbracoCoreComponent.cs" t="Include" />
+        <e p="IUmbracoUserComponent.cs" t="Include" />
+        <e p="ManifestWatcherComponent.cs" t="Include" />
+        <e p="RelateOnCopyComponent.cs" t="Include" />
+        <e p="RelateOnTrashComponent.cs" t="Include" />
+        <e p="RequireComponentAttribute.cs" t="Include" />
+        <e p="RequiredComponentAttribute.cs" t="Include" />
+        <e p="RuntimeLevelAttribute.cs" t="Include" />
+        <e p="UmbracoComponentBase.cs" t="Include" />
+        <e p="UmbracoCoreComponent.cs" t="Include" />
+      </e>
+      <e p="Composing" t="Include">
+        <e p="BuilderCollectionBase.cs" t="Include" />
+        <e p="CollectionBuilderBase.cs" t="Include" />
+        <e p="CompositionRoots" t="Include">
+          <e p="ConfigurationCompositionRoot.cs" t="Include" />
+          <e p="CoreMappingProfilesCompositionRoot.cs" t="Include" />
+          <e p="RepositoryCompositionRoot.cs" t="Include" />
+          <e p="ServicesCompositionRoot.cs" t="Include" />
+        </e>
+        <e p="Current.cs" t="Include" />
+        <e p="HideFromTypeFinderAttribute.cs" t="Include" />
+        <e p="IBuilderCollection.cs" t="Include" />
+        <e p="ICollectionBuilder.cs" t="Include" />
+        <e p="IDiscoverable.cs" t="Include" />
+        <e p="LazyCollectionBuilderBase.cs" t="Include" />
+        <e p="LightInjectExtensions.cs" t="Include" />
+        <e p="MixedLightInjectScopeManagerProvider.cs" t="Include" />
+        <e p="OrderedCollectionBuilderBase.cs" t="Include" />
+        <e p="TypeFinder.cs" t="Include" />
+        <e p="TypeHelper.cs" t="Include" />
+        <e p="TypeLoader.cs" t="Include" />
+        <e p="TypeLoaderExtensions.cs" t="Include" />
+        <e p="WeightAttribute.cs" t="Include" />
+        <e p="WeightedCollectionBuilderBase.cs" t="Include" />
+      </e>
+      <e p="Configuration" t="Include">
+        <e p="CaseInsensitiveEnumConfigConverter.cs" t="Include" />
+        <e p="CommaDelimitedConfigurationElement.cs" t="Include" />
+        <e p="CoreDebug.cs" t="Include" />
+        <e p="Dashboard" t="Include">
+          <e p="AccessElement.cs" t="Include" />
+          <e p="AccessItem.cs" t="Include" />
+          <e p="AccessType.cs" t="Include" />
+          <e p="AreaCollection.cs" t="Include" />
+          <e p="AreaElement.cs" t="Include" />
+          <e p="AreasElement.cs" t="Include" />
+          <e p="ControlCollection.cs" t="Include" />
+          <e p="ControlElement.cs" t="Include" />
+          <e p="DashboardSection.cs" t="Include" />
+          <e p="IAccess.cs" t="Include" />
+          <e p="IAccessItem.cs" t="Include" />
+          <e p="IArea.cs" t="Include" />
+          <e p="IDashboardControl.cs" t="Include" />
+          <e p="IDashboardSection.cs" t="Include" />
+          <e p="IDashboardTab.cs" t="Include" />
+          <e p="ISection.cs" t="Include" />
+          <e p="SectionCollection.cs" t="Include" />
+          <e p="SectionElement.cs" t="Include" />
+          <e p="TabCollection.cs" t="Include" />
+          <e p="TabElement.cs" t="Include" />
+        </e>
+        <e p="FileSystemProviderElement.cs" t="Include" />
+        <e p="FileSystemProviderElementCollection.cs" t="Include" />
+        <e p="FileSystemProvidersSection.cs" t="Include" />
+        <e p="GlobalSettings.cs" t="Include" />
+        <e p="GlobalSettingsExtensions.cs" t="Include" />
+        <e p="Grid" t="Include">
+          <e p="GridConfig.cs" t="Include" />
+          <e p="GridEditorsConfig.cs" t="Include" />
+          <e p="IGridConfig.cs" t="Include" />
+          <e p="IGridEditorConfig.cs" t="Include" />
+          <e p="IGridEditorsConfig.cs" t="Include" />
+        </e>
+        <e p="HealthChecks" t="Include">
+          <e p="DisabledHealthCheckElement.cs" t="Include" />
+          <e p="DisabledHealthChecksElementCollection.cs" t="Include" />
+          <e p="HealthCheckNotificationSettingsElement.cs" t="Include" />
+          <e p="HealthCheckNotificationVerbosity.cs" t="Include" />
+          <e p="HealthChecksSection.cs" t="Include" />
+          <e p="IDisabledHealthCheck.cs" t="Include" />
+          <e p="IHealthCheckNotificationSettings.cs" t="Include" />
+          <e p="IHealthChecks.cs" t="Include" />
+          <e p="INotificationMethod.cs" t="Include" />
+          <e p="INotificationMethodSettings.cs" t="Include" />
+          <e p="NotificationMethodElement.cs" t="Include" />
+          <e p="NotificationMethodsElementCollection.cs" t="Include" />
+          <e p="NotificationMethodSettingsElement.cs" t="Include" />
+          <e p="NotificationMethodSettingsElementCollection.cs" t="Include" />
+        </e>
+        <e p="IFileSystemProviderElement.cs" t="Include" />
+        <e p="IFileSystemProvidersSection.cs" t="Include" />
+        <e p="IGlobalSettings.cs" t="Include" />
+        <e p="InnerTextConfigurationElement.cs" t="Include" />
+        <e p="LocalTempStorage.cs" t="Include" />
+        <e p="OptionalCommaDelimitedConfigurationElement.cs" t="Include" />
+        <e p="OptionalInnerTextConfigurationElement.cs" t="Include" />
+        <e p="RawXmlConfigurationElement.cs" t="Include" />
+        <e p="UmbracoConfig.cs" t="Include" />
+        <e p="UmbracoConfigurationSection.cs" t="Include" />
+        <e p="UmbracoSettings" t="Include">
+          <e p="AppCodeFileExtensionsCollection.cs" t="Include" />
+          <e p="AppCodeFileExtensionsElement.cs" t="Include" />
+          <e p="BackOfficeElement.cs" t="Include" />
+          <e p="CharCollection.cs" t="Include" />
+          <e p="CharElement.cs" t="Include" />
+          <e p="ContentElement.cs" t="Include" />
+          <e p="ContentError404Collection.cs" t="Include" />
+          <e p="ContentErrorPageElement.cs" t="Include" />
+          <e p="ContentErrorsElement.cs" t="Include" />
+          <e p="ContentImagingElement.cs" t="Include" />
+          <e p="ContentScriptEditorElement.cs" t="Include" />
+          <e p="ContentSectionExtensions.cs" t="Include" />
+          <e p="DisabledLogTypesCollection.cs" t="Include" />
+          <e p="ExternalLoggerElement.cs" t="Include" />
+          <e p="FileExtensionElement.cs" t="Include" />
+          <e p="IBackOfficeSection.cs" t="Include" />
+          <e p="IChar.cs" t="Include" />
+          <e p="IContentErrorPage.cs" t="Include" />
+          <e p="IContentSection.cs" t="Include" />
+          <e p="IFileExtension.cs" t="Include" />
+          <e p="IImagingAutoFillUploadField.cs" t="Include" />
+          <e p="ILoggingSection.cs" t="Include" />
+          <e p="ILogType.cs" t="Include" />
+          <e p="ImagingAutoFillPropertiesCollection.cs" t="Include" />
+          <e p="ImagingAutoFillUploadFieldElement.cs" t="Include" />
+          <e p="IProvidersSection.cs" t="Include" />
+          <e p="IRequestHandlerSection.cs" t="Include" />
+          <e p="IScheduledTask.cs" t="Include" />
+          <e p="IScheduledTasksSection.cs" t="Include" />
+          <e p="ISecuritySection.cs" t="Include" />
+          <e p="ITemplatesSection.cs" t="Include" />
+          <e p="ITourSection.cs" t="Include" />
+          <e p="IUmbracoSettingsSection.cs" t="Include" />
+          <e p="IWebRoutingSection.cs" t="Include" />
+          <e p="LoggingElement.cs" t="Include" />
+          <e p="LogTypeElement.cs" t="Include" />
+          <e p="NotificationsElement.cs" t="Include" />
+          <e p="ProvidersElement.cs" t="Include" />
+          <e p="RequestHandlerElement.cs" t="Include" />
+          <e p="ScheduledTaskElement.cs" t="Include" />
+          <e p="ScheduledTasksCollection.cs" t="Include" />
+          <e p="ScheduledTasksElement.cs" t="Include" />
+          <e p="SecurityElement.cs" t="Include" />
+          <e p="TemplatesElement.cs" t="Include" />
+          <e p="TourConfigElement.cs" t="Include" />
+          <e p="UmbracoConfigurationElement.cs" t="Include" />
+          <e p="UmbracoSettingsSection.cs" t="Include" />
+          <e p="UrlReplacingElement.cs" t="Include" />
+          <e p="UserProviderElement.cs" t="Include" />
+          <e p="WebRoutingElement.cs" t="Include" />
+        </e>
+        <e p="UmbracoVersion.cs" t="Include" />
+      </e>
+      <e p="Constants-Applications.cs" t="Include" />
+      <e p="Constants-Composing.cs" t="Include" />
+      <e p="Constants-Conventions.cs" t="Include" />
+      <e p="Constants-DatabaseProviders.cs" t="Include" />
+      <e p="Constants-DataTypes.cs" t="Include" />
+      <e p="Constants-DeploySelector.cs" t="Include" />
+      <e p="Constants-Examine.cs" t="Include" />
+      <e p="Constants-Icons.cs" t="Include" />
+      <e p="Constants-ObjectTypes.cs" t="Include" />
+      <e p="Constants-PackageRepository.cs" t="Include" />
+      <e p="Constants-Packaging.cs" t="Include" />
+      <e p="Constants-PropertyEditors.cs" t="Include" />
+      <e p="Constants-PropertyTypeGroups.cs" t="Include" />
+      <e p="Constants-Security.cs" t="Include" />
+      <e p="Constants-System.cs" t="Include" />
+      <e p="Constants-Web.cs" t="Include" />
+      <e p="Constants.cs" t="Include" />
+      <e p="ContentExtensions.cs" t="Include" />
+      <e p="ContentVariationExtensions.cs" t="Include" />
+      <e p="Core.csproj" t="IncludeRecursive" />
+      <e p="CustomBooleanTypeConverter.cs" t="Include" />
+      <e p="DataTableExtensions.cs" t="Include" />
+      <e p="DateTimeExtensions.cs" t="Include" />
+      <e p="DecimalExtensions.cs" t="Include" />
+      <e p="DelegateEqualityComparer.cs" t="Include" />
+      <e p="DelegateExtensions.cs" t="Include" />
+      <e p="Deploy" t="Include">
+        <e p="ArtifactBase.cs" t="Include" />
+        <e p="ArtifactDependency.cs" t="Include" />
+        <e p="ArtifactDependencyCollection.cs" t="Include" />
+        <e p="ArtifactDependencyMode.cs" t="Include" />
+        <e p="ArtifactDeployState.cs" t="Include" />
+        <e p="ArtifactDeployStateOfTArtifactTEntity.cs" t="Include" />
+        <e p="ArtifactSignature.cs" t="Include" />
+        <e p="Difference.cs" t="Include" />
+        <e p="Direction.cs" t="Include" />
+        <e p="IArtifact.cs" t="Include" />
+        <e p="IArtifactSignature.cs" t="Include" />
+        <e p="IDeployContext.cs" t="Include" />
+        <e p="IFileSource.cs" t="Include" />
+        <e p="IFileType.cs" t="Include" />
+        <e p="IFileTypeCollection.cs" t="Include" />
+        <e p="IGridCellValueConnector.cs" t="Include" />
+        <e p="IImageSourceParser.cs" t="Include" />
+        <e p="ILocalLinkParser.cs" t="Include" />
+        <e p="IMacroParser.cs" t="Include" />
+        <e p="IPreValueConnector.cs" t="Include" />
+        <e p="IServiceConnector.cs" t="Include" />
+        <e p="IUniqueIdentifyingServiceConnector.cs" t="Include" />
+        <e p="IValueConnector.cs" t="Include" />
+      </e>
+      <e p="Diagnostics" t="Include">
+        <e p="MiniDump.cs" t="Include" />
+      </e>
+      <e p="Dictionary" t="Include">
+        <e p="ICultureDictionary.cs" t="Include" />
+        <e p="ICultureDictionaryFactory.cs" t="Include" />
+      </e>
+      <e p="DictionaryExtensions.cs" t="Include" />
+      <e p="DisposableObject.cs" t="Include" />
+      <e p="DisposableObjectSlim.cs" t="Include" />
+      <e p="EmailSender.cs" t="Include" />
+      <e p="Enum.cs" t="Include" />
+      <e p="EnumerableExtensions.cs" t="Include" />
+      <e p="Events" t="Include">
+        <e p="CancellableEventArgs.cs" t="Include" />
+        <e p="CancellableObjectEventArgs.cs" t="Include" />
+        <e p="ContentCacheEventArgs.cs" t="Include" />
+        <e p="CopyEventArgs.cs" t="Include" />
+        <e p="DatabaseCreationEventArgs.cs" t="Include" />
+        <e p="DeleteEventArgs.cs" t="Include" />
+        <e p="DeleteRevisionsEventArgs.cs" t="Include" />
+        <e p="EventDefinition.cs" t="Include" />
+        <e p="EventDefinitionBase.cs" t="Include" />
+        <e p="EventDefinitionFilter.cs" t="Include" />
+        <e p="EventExtensions.cs" t="Include" />
+        <e p="EventMessage.cs" t="Include" />
+        <e p="EventMessages.cs" t="Include" />
+        <e p="EventMessageType.cs" t="Include" />
+        <e p="EventNameExtractor.cs" t="Include" />
+        <e p="EventNameExtractorError.cs" t="Include" />
+        <e p="EventNameExtractorResult.cs" t="Include" />
+        <e p="ExportedMemberEventArgs.cs" t="Include" />
+        <e p="ExportEventArgs.cs" t="Include" />
+        <e p="IDeletingMediaFilesEventArgs.cs" t="Include" />
+        <e p="IEventDefinition.cs" t="Include" />
+        <e p="IEventDispatcher.cs" t="Include" />
+        <e p="IEventMessagesAccessor.cs" t="Include" />
+        <e p="IEventMessagesFactory.cs" t="Include" />
+        <e p="ImportEventArgs.cs" t="Include" />
+        <e p="ImportPackageEventArgs.cs" t="Include" />
+        <e p="MacroErrorEventArgs.cs" t="Include" />
+        <e p="MigrationEventArgs.cs" t="Include" />
+        <e p="MoveEventArgs.cs" t="Include" />
+        <e p="MoveEventInfo.cs" t="Include" />
+        <e p="NewEventArgs.cs" t="Include" />
+        <e p="PassThroughEventDispatcher.cs" t="Include" />
+        <e p="PublishEventArgs.cs" t="Include" />
+        <e p="QueuingEventDispatcher.cs" t="Include" />
+        <e p="QueuingEventDispatcherBase.cs" t="Include" />
+        <e p="RecycleBinEventArgs.cs" t="Include" />
+        <e p="RefreshContentEventArgs.cs" t="Include" />
+        <e p="RolesEventArgs.cs" t="Include" />
+        <e p="RollbackEventArgs.cs" t="Include" />
+        <e p="SaveEventArgs.cs" t="Include" />
+        <e p="ScopeLifetimeMessagesFactory.cs" t="Include" />
+        <e p="SendEmailEventArgs.cs" t="Include" />
+        <e p="SendToPublishEventArgs.cs" t="Include" />
+        <e p="SupersedeEventAttribute.cs" t="Include" />
+        <e p="TransientEventMessagesFactory.cs" t="Include" />
+        <e p="TypedEventHandler.cs" t="Include" />
+        <e p="UninstallPackageEventArgs.cs" t="Include" />
+        <e p="UserGroupWithUsers.cs" t="Include" />
+      </e>
+      <e p="Exceptions" t="Include">
+        <e p="ArgumentNullOrEmptyException.cs" t="Include" />
+        <e p="AuthorizationException.cs" t="Include" />
+        <e p="BootFailedException.cs" t="Include" />
+        <e p="ConnectionException.cs" t="Include" />
+        <e p="DataOperationException.cs" t="Include" />
+        <e p="InvalidCompositionException.cs" t="Include" />
+        <e p="LightInjectException.cs" t="Include" />
+        <e p="WontImplementException.cs" t="Include" />
+      </e>
+      <e p="ExpressionExtensions.cs" t="Include" />
+      <e p="ExpressionHelper.cs" t="Include" />
+      <e p="FileResources" t="Include">
+        <e p="BlockingWeb.config" t="Include" />
+        <e p="Files.Designer.cs" t="Include" />
+        <e p="Files.resx" t="Include" />
+      </e>
+      <e p="GuidUdi.cs" t="Include" />
+      <e p="HashCodeCombiner.cs" t="Include" />
+      <e p="HashCodeHelper.cs" t="Include" />
+      <e p="HashGenerator.cs" t="Include" />
+      <e p="HttpContextExtensions.cs" t="Include" />
+      <e p="ICompletable.cs" t="Include" />
+      <e p="IDisposeOnRequestEnd.cs" t="Include" />
+      <e p="IEmailSender.cs" t="Include" />
+      <e p="IfExtensions.cs" t="Include" />
+      <e p="IntExtensions.cs" t="Include" />
+      <e p="IO" t="Include">
+        <e p="FileSecurityException.cs" t="Include" />
+        <e p="FileSystemExtensions.cs" t="Include" />
+        <e p="FileSystemProviderAttribute.cs" t="Include" />
+        <e p="FileSystems.cs" t="Include" />
+        <e p="FileSystemWrapper.cs" t="Include" />
+        <e p="IFileSystem.cs" t="Include" />
+        <e p="IMediaPathScheme.cs" t="Include" />
+        <e p="IOHelper.cs" t="Include" />
+        <e p="MasterPageHelper.cs" t="Include" />
+        <e p="MediaFileSystem.cs" t="Include" />
+        <e p="MediaPathSchemes" t="Include">
+          <e p="CombinedGuidsMediaPathScheme.cs" t="Include" />
+          <e p="OriginalMediaPathScheme.cs" t="Include" />
+          <e p="TwoGuidsMediaPathScheme.cs" t="Include" />
+        </e>
+        <e p="PhysicalFileSystem.cs" t="Include" />
+        <e p="ShadowFileSystem.cs" t="Include" />
+        <e p="ShadowFileSystems.cs" t="Include" />
+        <e p="ShadowWrapper.cs" t="Include" />
+        <e p="SystemDirectories.cs" t="Include" />
+        <e p="SystemFiles.cs" t="Include" />
+        <e p="ViewHelper.cs" t="Include" />
+      </e>
+      <e p="IRuntime.cs" t="Include" />
+      <e p="IRuntimeState.cs" t="Include" />
+      <e p="KeyValuePairExtensions.cs" t="Include" />
+      <e p="LambdaExpressionCacheKey.cs" t="Include" />
+      <e p="ListExtensions.cs" t="Include" />
+      <e p="Logging" t="Include">
+        <e p="DebugDiagnosticsLogger.cs" t="Include" />
+        <e p="DisposableTimer.cs" t="Include" />
+        <e p="ILogger.cs" t="Include" />
+        <e p="IProfiler.cs" t="Include" />
+        <e p="LoggerExtensions.cs" t="Include" />
+        <e p="LoggingTaskExtension.cs" t="Include" />
+        <e p="LogHttpRequest.cs" t="Include" />
+        <e p="LogLevel.cs" t="Include" />
+        <e p="LogProfiler.cs" t="Include" />
+        <e p="MessageTemplates.cs" t="Include" />
+        <e p="OwinLogger.cs" t="Include" />
+        <e p="OwinLoggerFactory.cs" t="Include" />
+        <e p="ProfilerExtensions.cs" t="Include" />
+        <e p="ProfilingLogger.cs" t="Include" />
+        <e p="Serilog" t="Include">
+          <e p="Enrichers" t="Include">
+            <e p="HttpRequestIdEnricher.cs" t="Include" />
+            <e p="HttpRequestNumberEnricher.cs" t="Include" />
+            <e p="HttpSessionIdEnricher.cs" t="Include" />
+            <e p="Log4NetLevelMapperEnricher.cs" t="Include" />
+          </e>
+          <e p="LoggerConfigExtensions.cs" t="Include" />
+          <e p="SerilogLogger.cs" t="Include" />
+        </e>
+        <e p="VoidProfiler.cs" t="Include" />
+        <e p="WebProfiler.cs" t="Include" />
+        <e p="WebProfilerComponent.cs" t="Include" />
+        <e p="WebProfilerProvider.cs" t="Include" />
+      </e>
+      <e p="Macros" t="Include">
+        <e p="MacroErrorBehaviour.cs" t="Include" />
+      </e>
+      <e p="MainDom.cs" t="Include" />
+      <e p="Manifest" t="Include">
+        <e p="ContentAppDefinitionConverter.cs" t="Include" />
+        <e p="DataEditorConverter.cs" t="Include" />
+        <e p="ManifestContentAppDefinition.cs" t="Include" />
+        <e p="ManifestParser.cs" t="Include" />
+        <e p="ManifestWatcher.cs" t="Include" />
+        <e p="PackageManifest.cs" t="Include" />
+        <e p="ValueValidatorConverter.cs" t="Include" />
+      </e>
+      <e p="Media" t="Include">
+        <e p="IEmbedProvider.cs" t="Include" />
+        <e p="IEmbedSettingProvider.cs" t="Include" />
+        <e p="ProviderSetting.cs" t="Include" />
+        <e p="Result.cs" t="Include" />
+        <e p="Status.cs" t="Include" />
+      </e>
+      <e p="Migrations" t="Include">
+        <e p="DataLossException.cs" t="Include" />
+        <e p="Expressions" t="Include">
+          <e p="Alter" t="Include">
+            <e p="AlterBuilder.cs" t="Include" />
+            <e p="Expressions" t="Include">
+              <e p="AlterColumnExpression.cs" t="Include" />
+              <e p="AlterDefaultConstraintExpression.cs" t="Include" />
+              <e p="AlterTableExpression.cs" t="Include" />
+            </e>
+            <e p="IAlterBuilder.cs" t="Include" />
+            <e p="Table" t="Include">
+              <e p="AlterTableBuilder.cs" t="Include" />
+              <e p="IAlterTableBuilder.cs" t="Include" />
+              <e p="IAlterTableColumnOptionBuilder.cs" t="Include" />
+              <e p="IAlterTableColumnOptionForeignKeyCascadeBuilder.cs" t="Include" />
+              <e p="IAlterTableColumnTypeBuilder.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Common" t="Include">
+            <e p="ExecutableBuilder.cs" t="Include" />
+            <e p="Expressions" t="Include">
+              <e p="CreateColumnExpression.cs" t="Include" />
+              <e p="CreateForeignKeyExpression.cs" t="Include" />
+              <e p="CreateIndexExpression.cs" t="Include" />
+            </e>
+            <e p="IColumnOptionBuilder.cs" t="Include" />
+            <e p="IColumnTypeBuilder.cs" t="Include" />
+            <e p="IExecutableBuilder.cs" t="Include" />
+            <e p="IForeignKeyCascadeBuilder.cs" t="Include" />
+          </e>
+          <e p="Create" t="Include">
+            <e p="Column" t="Include">
+              <e p="CreateColumnBuilder.cs" t="Include" />
+              <e p="ICreateColumnOnTableBuilder.cs" t="Include" />
+              <e p="ICreateColumnOptionBuilder.cs" t="Include" />
+              <e p="ICreateColumnOptionForeignKeyCascadeBuilder.cs" t="Include" />
+              <e p="ICreateColumnTypeBuilder.cs" t="Include" />
+            </e>
+            <e p="Constraint" t="Include">
+              <e p="CreateConstraintBuilder.cs" t="Include" />
+              <e p="ICreateConstraintColumnsBuilder.cs" t="Include" />
+              <e p="ICreateConstraintOnTableBuilder.cs" t="Include" />
+            </e>
+            <e p="CreateBuilder.cs" t="Include" />
+            <e p="Expressions" t="Include">
+              <e p="CreateConstraintExpression.cs" t="Include" />
+              <e p="CreateTableExpression.cs" t="Include" />
+            </e>
+            <e p="ForeignKey" t="Include">
+              <e p="CreateForeignKeyBuilder.cs" t="Include" />
+              <e p="ICreateForeignKeyCascadeBuilder.cs" t="Include" />
+              <e p="ICreateForeignKeyForeignColumnBuilder.cs" t="Include" />
+              <e p="ICreateForeignKeyFromTableBuilder.cs" t="Include" />
+              <e p="ICreateForeignKeyPrimaryColumnBuilder.cs" t="Include" />
+              <e p="ICreateForeignKeyToTableBuilder.cs" t="Include" />
+            </e>
+            <e p="ICreateBuilder.cs" t="Include" />
+            <e p="Index" t="Include">
+              <e p="CreateIndexBuilder.cs" t="Include" />
+              <e p="ICreateIndexColumnOptionsBuilder.cs" t="Include" />
+              <e p="ICreateIndexForTableBuilder.cs" t="Include" />
+              <e p="ICreateIndexOnColumnBuilder.cs" t="Include" />
+              <e p="ICreateIndexOptionsBuilder.cs" t="Include" />
+            </e>
+            <e p="KeysAndIndexes" t="Include">
+              <e p="CreateKeysAndIndexesBuilder.cs" t="Include" />
+            </e>
+            <e p="Table" t="Include">
+              <e p="CreateTableBuilder.cs" t="Include" />
+              <e p="CreateTableOfDtoBuilder.cs" t="Include" />
+              <e p="ICreateTableColumnAsTypeBuilder.cs" t="Include" />
+              <e p="ICreateTableColumnOptionBuilder.cs" t="Include" />
+              <e p="ICreateTableColumnOptionForeignKeyCascadeBuilder.cs" t="Include" />
+              <e p="ICreateTableWithColumnBuilder.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Delete" t="Include">
+            <e p="Column" t="Include">
+              <e p="DeleteColumnBuilder.cs" t="Include" />
+              <e p="IDeleteColumnBuilder.cs" t="Include" />
+            </e>
+            <e p="Constraint" t="Include">
+              <e p="DeleteConstraintBuilder.cs" t="Include" />
+              <e p="IDeleteConstraintBuilder.cs" t="Include" />
+            </e>
+            <e p="Data" t="Include">
+              <e p="DeleteDataBuilder.cs" t="Include" />
+              <e p="IDeleteDataBuilder.cs" t="Include" />
+            </e>
+            <e p="DefaultConstraint" t="Include">
+              <e p="DeleteDefaultConstraintBuilder.cs" t="Include" />
+              <e p="IDeleteDefaultConstraintOnColumnBuilder.cs" t="Include" />
+              <e p="IDeleteDefaultConstraintOnTableBuilder.cs" t="Include" />
+            </e>
+            <e p="DeleteBuilder.cs" t="Include" />
+            <e p="Expressions" t="Include">
+              <e p="DeleteColumnExpression.cs" t="Include" />
+              <e p="DeleteConstraintExpression.cs" t="Include" />
+              <e p="DeleteDataExpression.cs" t="Include" />
+              <e p="DeleteDefaultConstraintExpression.cs" t="Include" />
+              <e p="DeleteForeignKeyExpression.cs" t="Include" />
+              <e p="DeleteIndexExpression.cs" t="Include" />
+              <e p="DeleteTableExpression.cs" t="Include" />
+            </e>
+            <e p="ForeignKey" t="Include">
+              <e p="DeleteForeignKeyBuilder.cs" t="Include" />
+              <e p="IDeleteForeignKeyForeignColumnBuilder.cs" t="Include" />
+              <e p="IDeleteForeignKeyFromTableBuilder.cs" t="Include" />
+              <e p="IDeleteForeignKeyOnTableBuilder.cs" t="Include" />
+              <e p="IDeleteForeignKeyPrimaryColumnBuilder.cs" t="Include" />
+              <e p="IDeleteForeignKeyToTableBuilder.cs" t="Include" />
+            </e>
+            <e p="IDeleteBuilder.cs" t="Include" />
+            <e p="Index" t="Include">
+              <e p="DeleteIndexBuilder.cs" t="Include" />
+              <e p="IDeleteIndexForTableBuilder.cs" t="Include" />
+              <e p="IDeleteIndexOnColumnBuilder.cs" t="Include" />
+            </e>
+            <e p="KeysAndIndexes" t="Include">
+              <e p="DeleteKeysAndIndexesBuilder.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Execute" t="Include">
+            <e p="ExecuteBuilder.cs" t="Include" />
+            <e p="Expressions" t="Include">
+              <e p="ExecuteSqlStatementExpression.cs" t="Include" />
+            </e>
+            <e p="IExecuteBuilder.cs" t="Include" />
+          </e>
+          <e p="ExpressionBuilderBase.cs" t="Include" />
+          <e p="ExpressionBuilderBaseOfNext.cs" t="Include" />
+          <e p="IFluentBuilder.cs" t="Include" />
+          <e p="Insert" t="Include">
+            <e p="Expressions" t="Include">
+              <e p="InsertDataExpression.cs" t="Include" />
+            </e>
+            <e p="IInsertBuilder.cs" t="Include" />
+            <e p="IInsertIntoBuilder.cs" t="Include" />
+            <e p="InsertBuilder.cs" t="Include" />
+            <e p="InsertIntoBuilder.cs" t="Include" />
+          </e>
+          <e p="Rename" t="Include">
+            <e p="Column" t="Include">
+              <e p="IRenameColumnBuilder.cs" t="Include" />
+              <e p="IRenameColumnToBuilder.cs" t="Include" />
+              <e p="RenameColumnBuilder.cs" t="Include" />
+            </e>
+            <e p="Expressions" t="Include">
+              <e p="RenameColumnExpression.cs" t="Include" />
+              <e p="RenameTableExpression.cs" t="Include" />
+            </e>
+            <e p="IRenameBuilder.cs" t="Include" />
+            <e p="RenameBuilder.cs" t="Include" />
+            <e p="Table" t="Include">
+              <e p="IRenameTableBuilder.cs" t="Include" />
+              <e p="RenameTableBuilder.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Update" t="Include">
+            <e p="Expressions" t="Include">
+              <e p="UpdateDataExpression.cs" t="Include" />
+            </e>
+            <e p="IUpdateBuilder.cs" t="Include" />
+            <e p="IUpdateTableBuilder.cs" t="Include" />
+            <e p="IUpdateWhereBuilder.cs" t="Include" />
+            <e p="UpdateBuilder.cs" t="Include" />
+            <e p="UpdateDataBuilder.cs" t="Include" />
+          </e>
+        </e>
+        <e p="IMigration.cs" t="Include" />
+        <e p="IMigrationBuilder.cs" t="Include" />
+        <e p="IMigrationContext.cs" t="Include" />
+        <e p="IMigrationExpression.cs" t="Include" />
+        <e p="Install" t="Include">
+          <e p="DatabaseBuilder.cs" t="Include" />
+          <e p="DatabaseDataCreator.cs" t="Include" />
+          <e p="DatabaseSchemaCreator.cs" t="Include" />
+          <e p="DatabaseSchemaResult.cs" t="Include" />
+        </e>
+        <e p="IPostMigration.cs" t="Include" />
+        <e p="MigrationBase.cs" t="Include" />
+        <e p="MigrationBase_Extra.cs" t="Include" />
+        <e p="MigrationBuilder.cs" t="Include" />
+        <e p="MigrationContext.cs" t="Include" />
+        <e p="MigrationExpressionBase.cs" t="Include" />
+        <e p="MigrationPlan.cs" t="Include" />
+        <e p="NoopMigration.cs" t="Include" />
+        <e p="PostMigrationCollection.cs" t="Include" />
+        <e p="PostMigrationCollectionBuilder.cs" t="Include" />
+        <e p="Upgrade" t="Include">
+          <e p="UmbracoPlan.cs" t="Include" />
+          <e p="UmbracoUpgrader.cs" t="Include" />
+          <e p="Upgrader.cs" t="Include" />
+          <e p="V_7_10_0" t="Include">
+            <e p="RenamePreviewFolder.cs" t="Include" />
+          </e>
+          <e p="V_7_12_0" t="Include">
+            <e p="AddRelationTypeForMediaFolderOnDelete.cs" t="Include" />
+            <e p="IncreaseLanguageIsoCodeColumnLength.cs" t="Include" />
+            <e p="RenameTrueFalseField.cs" t="Include" />
+            <e p="SetDefaultTagsStorageType.cs" t="Include" />
+            <e p="UpdateUmbracoConsent.cs" t="Include" />
+          </e>
+          <e p="V_7_5_0" t="Include">
+            <e p="AddRedirectUrlTable.cs" t="Include" />
+            <e p="RemoveStylesheetDataAndTablesAgain.cs" t="Include" />
+            <e p="UpdateUniqueIndexOnPropertyData.cs" t="Include" />
+          </e>
+          <e p="V_7_5_5" t="Include">
+            <e p="UpdateAllowedMediaTypesAtRoot.cs" t="Include" />
+          </e>
+          <e p="V_7_6_0" t="Include">
+            <e p="AddIndexesToUmbracoRelationTables.cs" t="Include" />
+            <e p="AddIndexToCmsMemberLoginName.cs" t="Include" />
+            <e p="AddIndexToUmbracoNodePath.cs" t="Include" />
+            <e p="AddIndexToUser2NodePermission.cs" t="Include" />
+            <e p="AddLockObjects.cs" t="Include" />
+            <e p="AddLockTable.cs" t="Include" />
+            <e p="AddMacroUniqueIdColumn.cs" t="Include" />
+            <e p="AddRelationTypeUniqueIdColumn.cs" t="Include" />
+            <e p="NormalizeTemplateGuids.cs" t="Include" />
+            <e p="ReduceLoginNameColumnsSize.cs" t="Include" />
+            <e p="RemovePropertyDataIdIndex.cs" t="Include" />
+            <e p="RemoveUmbracoDeployTables.cs" t="Include" />
+          </e>
+          <e p="V_7_7_0" t="Include">
+            <e p="AddIndexToDictionaryKeyColumn.cs" t="Include" />
+            <e p="AddUserGroupTables.cs" t="Include" />
+            <e p="AddUserStartNodeTable.cs" t="Include" />
+            <e p="EnsureContentTemplatePermissions.cs" t="Include" />
+            <e p="ReduceDictionaryKeyColumnsSize.cs" t="Include" />
+            <e p="UpdateUserTables.cs" t="Include" />
+          </e>
+          <e p="V_7_8_0" t="Include">
+            <e p="AddIndexToPropertyTypeAliasColumn.cs" t="Include" />
+            <e p="AddInstructionCountColumn.cs" t="Include" />
+            <e p="AddMediaVersionTable.cs" t="Include" />
+            <e p="AddTourDataUserColumn.cs" t="Include" />
+            <e p="AddUserLoginTable.cs" t="Include" />
+          </e>
+          <e p="V_7_9_0" t="Include">
+            <e p="AddIsSensitiveMemberTypeColumn.cs" t="Include" />
+            <e p="AddUmbracoAuditTable.cs" t="Include" />
+            <e p="AddUmbracoConsentTable.cs" t="Include" />
+            <e p="CreateSensitiveDataUserGroup.cs" t="Include" />
+          </e>
+          <e p="V_8_0_0" t="Include">
+            <e p="AddContentNuTable.cs" t="Include" />
+            <e p="AddLockObjects.cs" t="Include" />
+            <e p="AddLockTable.cs" t="Include" />
+            <e p="AddLogTableColumns.cs" t="Include" />
+            <e p="AddTypedLabels.cs" t="Include" />
+            <e p="AddVariationTables1A.cs" t="Include" />
+            <e p="AddVariationTables2.cs" t="Include" />
+            <e p="ContentVariationMigration.cs" t="Include" />
+            <e p="DataTypeMigration.cs" t="Include" />
+            <e p="DropDownPropertyEditorsMigration.cs" t="Include" />
+            <e p="DropMigrationsTable.cs" t="Include" />
+            <e p="DropPreValueTable.cs" t="Include" />
+            <e p="DropTaskTables.cs" t="Include" />
+            <e p="FallbackLanguage.cs" t="Include" />
+            <e p="FixLockTablePrimaryKey.cs" t="Include" />
+            <e p="LanguageColumns.cs" t="Include" />
+            <e p="PropertyEditorsMigration.cs" t="Include" />
+            <e p="RefactorMacroColumns.cs" t="Include" />
+            <e p="RefactorVariantsModel.cs" t="Include" />
+            <e p="RefactorXmlColumns.cs" t="Include" />
+            <e p="SuperZero.cs" t="Include" />
+            <e p="TagsMigration.cs" t="Include" />
+            <e p="UpdateDefaultMandatoryLanguage.cs" t="Include" />
+            <e p="UserForeignKeys.cs" t="Include" />
+            <e p="VariantsMigration.cs" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="Models" t="Include">
+        <e p="ApplicationTree.cs" t="Include" />
+        <e p="AuditEntry.cs" t="Include" />
+        <e p="AuditItem.cs" t="Include" />
+        <e p="AuditType.cs" t="Include" />
+        <e p="Consent.cs" t="Include" />
+        <e p="ConsentExtensions.cs" t="Include" />
+        <e p="ConsentState.cs" t="Include" />
+        <e p="Content.cs" t="Include" />
+        <e p="ContentBase.cs" t="Include" />
+        <e p="ContentCultureInfos.cs" t="Include" />
+        <e p="ContentCultureInfosCollection.cs" t="Include" />
+        <e p="ContentEditing" t="Include">
+          <e p="ContentApp.cs" t="Include" />
+          <e p="IContentAppDefinition.cs" t="Include" />
+        </e>
+        <e p="ContentStatus.cs" t="Include" />
+        <e p="ContentTagsExtensions.cs" t="Include" />
+        <e p="ContentType.cs" t="Include" />
+        <e p="ContentTypeAvailableCompositionsResult.cs" t="Include" />
+        <e p="ContentTypeAvailableCompositionsResults.cs" t="Include" />
+        <e p="ContentTypeBase.cs" t="Include" />
+        <e p="ContentTypeBaseExtensions.cs" t="Include" />
+        <e p="ContentTypeCompositionBase.cs" t="Include" />
+        <e p="ContentTypeSort.cs" t="Include" />
+        <e p="ContentVariation.cs" t="Include" />
+        <e p="DataType.cs" t="Include" />
+        <e p="DataTypeExtensions.cs" t="Include" />
+        <e p="DeepCloneHelper.cs" t="Include" />
+        <e p="DictionaryItem.cs" t="Include" />
+        <e p="DictionaryItemExtensions.cs" t="Include" />
+        <e p="DictionaryTranslation.cs" t="Include" />
+        <e p="DoNotCloneAttribute.cs" t="Include" />
+        <e p="Editors" t="Include">
+          <e p="ContentPropertyData.cs" t="Include" />
+          <e p="ContentPropertyFile.cs" t="Include" />
+        </e>
+        <e p="Entities" t="Include">
+          <e p="BeingDirty.cs" t="Include" />
+          <e p="BeingDirtyBase.cs" t="Include" />
+          <e p="ContentEntitySlim.cs" t="Include" />
+          <e p="DocumentEntitySlim.cs" t="Include" />
+          <e p="EntityBase.cs" t="Include" />
+          <e p="EntitySlim.cs" t="Include" />
+          <e p="ICanBeDirty.cs" t="Include" />
+          <e p="IContentEntitySlim.cs" t="Include" />
+          <e p="IDocumentEntitySlim.cs" t="Include" />
+          <e p="IEntity.cs" t="Include" />
+          <e p="IEntitySlim.cs" t="Include" />
+          <e p="IHaveAdditionalData.cs" t="Include" />
+          <e p="IRememberBeingDirty.cs" t="Include" />
+          <e p="ITreeEntity.cs" t="Include" />
+          <e p="IUmbracoEntity.cs" t="Include" />
+          <e p="IValueObject.cs" t="Include" />
+          <e p="TreeEntityBase.cs" t="Include" />
+          <e p="TreeEntityPath.cs" t="Include" />
+        </e>
+        <e p="EntityContainer.cs" t="Include" />
+        <e p="EntityExtensions.cs" t="Include" />
+        <e p="File.cs" t="Include" />
+        <e p="Folder.cs" t="Include" />
+        <e p="GridValue.cs" t="Include" />
+        <e p="IAuditEntry.cs" t="Include" />
+        <e p="IAuditItem.cs" t="Include" />
+        <e p="IConsent.cs" t="Include" />
+        <e p="IContent.cs" t="Include" />
+        <e p="IContentBase.cs" t="Include" />
+        <e p="IContentType.cs" t="Include" />
+        <e p="IContentTypeBase.cs" t="Include" />
+        <e p="IContentTypeComposition.cs" t="Include" />
+        <e p="IDataType.cs" t="Include" />
+        <e p="IDeepCloneable.cs" t="Include" />
+        <e p="Identity" t="Include">
+          <e p="BackOfficeIdentityUser.cs" t="Include" />
+          <e p="IdentityMapperProfile.cs" t="Include" />
+          <e p="IdentityUser.cs" t="Include" />
+          <e p="IdentityUserClaim.cs" t="Include" />
+          <e p="IdentityUserLogin.cs" t="Include" />
+          <e p="IdentityUserRole.cs" t="Include" />
+          <e p="IIdentityUserLogin.cs" t="Include" />
+        </e>
+        <e p="IDictionaryItem.cs" t="Include" />
+        <e p="IDictionaryTranslation.cs" t="Include" />
+        <e p="IDomain.cs" t="Include" />
+        <e p="IFile.cs" t="Include" />
+        <e p="ILanguage.cs" t="Include" />
+        <e p="IMacro.cs" t="Include" />
+        <e p="IMacroProperty.cs" t="Include" />
+        <e p="IMedia.cs" t="Include" />
+        <e p="IMediaType.cs" t="Include" />
+        <e p="IMember.cs" t="Include" />
+        <e p="IMemberGroup.cs" t="Include" />
+        <e p="IMemberType.cs" t="Include" />
+        <e p="IMigrationEntry.cs" t="Include" />
+        <e p="IPartialView.cs" t="Include" />
+        <e p="IRedirectUrl.cs" t="Include" />
+        <e p="IRelation.cs" t="Include" />
+        <e p="IRelationType.cs" t="Include" />
+        <e p="IServerRegistration.cs" t="Include" />
+        <e p="ITag.cs" t="Include" />
+        <e p="ITemplate.cs" t="Include" />
+        <e p="Language.cs" t="Include" />
+        <e p="Macro.cs" t="Include" />
+        <e p="MacroProperty.cs" t="Include" />
+        <e p="MacroPropertyCollection.cs" t="Include" />
+        <e p="MacroTypes.cs" t="Include" />
+        <e p="Media.cs" t="Include" />
+        <e p="MediaExtensions.cs" t="Include" />
+        <e p="MediaType.cs" t="Include" />
+        <e p="Member.cs" t="Include" />
+        <e p="MemberGroup.cs" t="Include" />
+        <e p="Membership" t="Include">
+          <e p="ContentPermissionSet.cs" t="Include" />
+          <e p="EntityPermission.cs" t="Include" />
+          <e p="EntityPermissionCollection.cs" t="Include" />
+          <e p="EntityPermissionSet.cs" t="Include" />
+          <e p="IMembershipUser.cs" t="Include" />
+          <e p="IProfile.cs" t="Include" />
+          <e p="IReadOnlyUserGroup.cs" t="Include" />
+          <e p="IUser.cs" t="Include" />
+          <e p="IUserGroup.cs" t="Include" />
+          <e p="MemberCountType.cs" t="Include" />
+          <e p="MemberExportModel.cs" t="Include" />
+          <e p="MemberExportProperty.cs" t="Include" />
+          <e p="MembershipScenario.cs" t="Include" />
+          <e p="MembershipUserExtensions.cs" t="Include" />
+          <e p="ReadOnlyUserGroup.cs" t="Include" />
+          <e p="UmbracoMembershipMember.cs" t="Include" />
+          <e p="UmbracoMembershipUser.cs" t="Include" />
+          <e p="User.cs" t="Include" />
+          <e p="UserGroup.cs" t="Include" />
+          <e p="UserGroupExtensions.cs" t="Include" />
+          <e p="UserProfile.cs" t="Include" />
+          <e p="UserState.cs" t="Include" />
+        </e>
+        <e p="MemberType.cs" t="Include" />
+        <e p="MemberTypePropertyProfileAccess.cs" t="Include" />
+        <e p="MigrationEntry.cs" t="Include" />
+        <e p="Notification.cs" t="Include" />
+        <e p="NotificationEmailBodyParams.cs" t="Include" />
+        <e p="NotificationEmailSubjectParams.cs" t="Include" />
+        <e p="ObjectTypes.cs" t="Include" />
+        <e p="Packaging" t="Include">
+          <e p="InstallationSummary.cs" t="Include" />
+          <e p="MetaData.cs" t="Include" />
+          <e p="PackageAction.cs" t="Include" />
+          <e p="PreInstallWarnings.cs" t="Include" />
+        </e>
+        <e p="PagedResult.cs" t="Include" />
+        <e p="PartialView.cs" t="Include" />
+        <e p="PartialViewType.cs" t="Include" />
+        <e p="PathValidationExtensions.cs" t="Include" />
+        <e p="Property.cs" t="Include" />
+        <e p="PropertyCollection.cs" t="Include" />
+        <e p="PropertyGroup.cs" t="Include" />
+        <e p="PropertyGroupCollection.cs" t="Include" />
+        <e p="PropertyTagsExtensions.cs" t="Include" />
+        <e p="PropertyType.cs" t="Include" />
+        <e p="PropertyTypeCollection.cs" t="Include" />
+        <e p="PublicAccessEntry.cs" t="Include" />
+        <e p="PublicAccessRule.cs" t="Include" />
+        <e p="PublishedContent" t="Include">
+          <e p="Fallback.cs" t="Include" />
+          <e p="IndexedArrayItem.cs" t="Include" />
+          <e p="IPublishedContent.cs" t="Include" />
+          <e p="IPublishedContentTypeFactory.cs" t="Include" />
+          <e p="IPublishedElement.cs" t="Include" />
+          <e p="IPublishedModelFactory.cs" t="Include" />
+          <e p="IPublishedProperty.cs" t="Include" />
+          <e p="IPublishedValueFallback.cs" t="Include" />
+          <e p="IVariationContextAccessor.cs" t="Include" />
+          <e p="ModelType.cs" t="Include" />
+          <e p="NoopPublishedModelFactory.cs" t="Include" />
+          <e p="NoopPublishedValueFallback.cs" t="Include" />
+          <e p="PublishedContentEnumerable.cs" t="Include" />
+          <e p="PublishedContentExtensionsForModels.cs" t="Include" />
+          <e p="PublishedContentModel.cs" t="Include" />
+          <e p="PublishedContentType.cs" t="Include" />
+          <e p="PublishedContentTypeConverter.cs" t="Include" />
+          <e p="PublishedContentTypeFactory.cs" t="Include" />
+          <e p="PublishedContentWrapped.cs" t="Include" />
+          <e p="PublishedCultureInfos.cs" t="Include" />
+          <e p="PublishedDataType.cs" t="Include" />
+          <e p="PublishedElementModel.cs" t="Include" />
+          <e p="PublishedElementWrapped.cs" t="Include" />
+          <e p="PublishedItemType.cs" t="Include" />
+          <e p="PublishedModelAttribute.cs" t="Include" />
+          <e p="PublishedModelFactory.cs" t="Include" />
+          <e p="PublishedPropertyBase.cs" t="Include" />
+          <e p="PublishedPropertyType.cs" t="Include" />
+          <e p="PublishedSearchResult.cs" t="Include" />
+          <e p="RawValueProperty.cs" t="Include" />
+          <e p="ThreadCultureVariationContextAccessor.cs" t="Include" />
+          <e p="VariationContext.cs" t="Include" />
+          <e p="VariationContextAccessorExtensions.cs" t="Include" />
+        </e>
+        <e p="PublishedState.cs" t="Include" />
+        <e p="Range.cs" t="Include" />
+        <e p="RedirectUrl.cs" t="Include" />
+        <e p="Relation.cs" t="Include" />
+        <e p="RelationType.cs" t="Include" />
+        <e p="Script.cs" t="Include" />
+        <e p="Section.cs" t="Include" />
+        <e p="ServerRegistration.cs" t="Include" />
+        <e p="Stylesheet.cs" t="Include" />
+        <e p="StylesheetProperty.cs" t="Include" />
+        <e p="Tag.cs" t="Include" />
+        <e p="TaggableObjectTypes.cs" t="Include" />
+        <e p="TaggedEntity.cs" t="Include" />
+        <e p="TaggedProperty.cs" t="Include" />
+        <e p="TagsStorageType.cs" t="Include" />
+        <e p="Template.cs" t="Include" />
+        <e p="TemplateNode.cs" t="Include" />
+        <e p="TemplateOnDisk.cs" t="Include" />
+        <e p="UmbracoDomain.cs" t="Include" />
+        <e p="UmbracoObjectTypes.cs" t="Include" />
+        <e p="UserExtensions.cs" t="Include" />
+        <e p="Validation" t="Include">
+          <e p="RequiredForPersistenceAttribute.cs" t="Include" />
+        </e>
+        <e p="ValueStorageType.cs" t="Include" />
+      </e>
+      <e p="MonitorLock.cs" t="Include" />
+      <e p="NamedUdiRange.cs" t="Include" />
+      <e p="NameValueCollectionExtensions.cs" t="Include" />
+      <e p="NetworkHelper.cs" t="Include" />
+      <e p="obj" t="ExcludeRecursive">
+        <e p="Debug" t="Include">
+          <e p="netstandard2.0" t="Include">
+            <e p="Core.AssemblyInfo.cs" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="ObjectExtensions.cs" t="Include" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Packaging" t="Include">
+        <e p="ConflictingPackageData.cs" t="Include" />
+        <e p="IConflictingPackageData.cs" t="Include" />
+        <e p="IPackageExtraction.cs" t="Include" />
+        <e p="IPackageInstallation.cs" t="Include" />
+        <e p="Models" t="Include">
+          <e p="UninstallationSummary.cs" t="Include" />
+        </e>
+        <e p="PackageBinaryInspector.cs" t="Include" />
+        <e p="PackageExtraction.cs" t="Include" />
+        <e p="PackageInstallation.cs" t="Include" />
+      </e>
+      <e p="Persistence" t="Include">
+        <e p="BulkDataReader.cs" t="Include" />
+        <e p="Constants-DatabaseSchema.cs" t="Include" />
+        <e p="Constants-DbProviderNames.cs" t="Include" />
+        <e p="Constants-Locks.cs" t="Include" />
+        <e p="DatabaseAnnotations" t="Include">
+          <e p="ConstraintAttribute.cs" t="Include" />
+          <e p="ForeignKeyAttribute.cs" t="Include" />
+          <e p="IndexAttribute.cs" t="Include" />
+          <e p="IndexTypes.cs" t="Include" />
+          <e p="LengthAttribute.cs" t="Include" />
+          <e p="NullSettingAttribute.cs" t="Include" />
+          <e p="NullSettings.cs" t="Include" />
+          <e p="PrimaryKeyColumnAttribute.cs" t="Include" />
+          <e p="ReferencesAttribute.cs" t="Include" />
+          <e p="SpecialDbTypeAttribute.cs" t="Include" />
+          <e p="SpecialDbTypes.cs" t="Include" />
+        </e>
+        <e p="DatabaseDebugHelper.cs" t="Include" />
+        <e p="DatabaseModelDefinitions" t="Include">
+          <e p="ColumnDefinition.cs" t="Include" />
+          <e p="ConstraintDefinition.cs" t="Include" />
+          <e p="ConstraintType.cs" t="Include" />
+          <e p="DbIndexDefinition.cs" t="Include" />
+          <e p="DefinitionFactory.cs" t="Include" />
+          <e p="DeletionDataDefinition.cs" t="Include" />
+          <e p="Direction.cs" t="Include" />
+          <e p="ForeignKeyDefinition.cs" t="Include" />
+          <e p="IndexColumnDefinition.cs" t="Include" />
+          <e p="IndexDefinition.cs" t="Include" />
+          <e p="InsertionDataDefinition.cs" t="Include" />
+          <e p="ModificationType.cs" t="Include" />
+          <e p="SystemMethods.cs" t="Include" />
+          <e p="TableDefinition.cs" t="Include" />
+        </e>
+        <e p="DatabasenodeLockExtensions.cs" t="Include" />
+        <e p="DbCommandExtensions.cs" t="Include" />
+        <e p="DbConnectionExtensions.cs" t="Include" />
+        <e p="Dtos" t="Include">
+          <e p="AccessDto.cs" t="Include" />
+          <e p="AccessRuleDto.cs" t="Include" />
+          <e p="AuditEntryDto.cs" t="Include" />
+          <e p="CacheInstructionDto.cs" t="Include" />
+          <e p="ConsentDto.cs" t="Include" />
+          <e p="ContentDto.cs" t="Include" />
+          <e p="ContentNuDto.cs" t="Include" />
+          <e p="ContentType2ContentTypeDto.cs" t="Include" />
+          <e p="ContentTypeAllowedContentTypeDto.cs" t="Include" />
+          <e p="ContentTypeDto.cs" t="Include" />
+          <e p="ContentTypeTemplateDto.cs" t="Include" />
+          <e p="ContentVersionCultureVariationDto.cs" t="Include" />
+          <e p="ContentVersionDto.cs" t="Include" />
+          <e p="ContentXmlDto.cs" t="Include" />
+          <e p="DataTypeDto.cs" t="Include" />
+          <e p="DictionaryDto.cs" t="Include" />
+          <e p="DocumentCultureVariationDto.cs" t="Include" />
+          <e p="DocumentDto.cs" t="Include" />
+          <e p="DocumentPublishedReadOnlyDto.cs" t="Include" />
+          <e p="DocumentVersionDto.cs" t="Include" />
+          <e p="DomainDto.cs" t="Include" />
+          <e p="ExternalLoginDto.cs" t="Include" />
+          <e p="KeyValueDto.cs" t="Include" />
+          <e p="LanguageDto.cs" t="Include" />
+          <e p="LanguageTextDto.cs" t="Include" />
+          <e p="LockDto.cs" t="Include" />
+          <e p="LogDto.cs" t="Include" />
+          <e p="MacroDto.cs" t="Include" />
+          <e p="MacroPropertyDto.cs" t="Include" />
+          <e p="MediaDto.cs" t="Include" />
+          <e p="MediaVersionDto.cs" t="Include" />
+          <e p="Member2MemberGroupDto.cs" t="Include" />
+          <e p="MemberDto.cs" t="Include" />
+          <e p="MemberTypeDto.cs" t="Include" />
+          <e p="MemberTypeReadOnlyDto.cs" t="Include" />
+          <e p="NodeDto.cs" t="Include" />
+          <e p="PreviewXmlDto.cs" t="Include" />
+          <e p="PropertyDataDto.cs" t="Include" />
+          <e p="PropertyTypeDto.cs" t="Include" />
+          <e p="PropertyTypeGroupDto.cs" t="Include" />
+          <e p="PropertyTypeGroupReadOnlyDto.cs" t="Include" />
+          <e p="PropertyTypeReadOnlyDto.cs" t="Include" />
+          <e p="RedirectUrlDto.cs" t="Include" />
+          <e p="RelationDto.cs" t="Include" />
+          <e p="RelationTypeDto.cs" t="Include" />
+          <e p="ServerRegistrationDto.cs" t="Include" />
+          <e p="TagDto.cs" t="Include" />
+          <e p="TagRelationshipDto.cs" t="Include" />
+          <e p="TemplateDto.cs" t="Include" />
+          <e p="User2NodeNotifyDto.cs" t="Include" />
+          <e p="User2UserGroupDto.cs" t="Include" />
+          <e p="UserDto.cs" t="Include" />
+          <e p="UserGroup2AppDto.cs" t="Include" />
+          <e p="UserGroup2NodePermissionDto.cs" t="Include" />
+          <e p="UserGroupDto.cs" t="Include" />
+          <e p="UserLoginDto.cs" t="Include" />
+          <e p="UserStartNodeDto.cs" t="Include" />
+        </e>
+        <e p="EntityNotFoundException.cs" t="Include" />
+        <e p="Factories" t="Include">
+          <e p="AuditEntryFactory.cs" t="Include" />
+          <e p="ConsentFactory.cs" t="Include" />
+          <e p="ContentBaseFactory.cs" t="Include" />
+          <e p="ContentTypeFactory.cs" t="Include" />
+          <e p="DataTypeFactory.cs" t="Include" />
+          <e p="DictionaryItemFactory.cs" t="Include" />
+          <e p="DictionaryTranslationFactory.cs" t="Include" />
+          <e p="ExternalLoginFactory.cs" t="Include" />
+          <e p="LanguageFactory.cs" t="Include" />
+          <e p="MacroFactory.cs" t="Include" />
+          <e p="MemberGroupFactory.cs" t="Include" />
+          <e p="MemberTypeReadOnlyFactory.cs" t="Include" />
+          <e p="PropertyFactory.cs" t="Include" />
+          <e p="PropertyGroupFactory.cs" t="Include" />
+          <e p="PublicAccessEntryFactory.cs" t="Include" />
+          <e p="RelationFactory.cs" t="Include" />
+          <e p="RelationTypeFactory.cs" t="Include" />
+          <e p="ServerRegistrationFactory.cs" t="Include" />
+          <e p="TagFactory.cs" t="Include" />
+          <e p="TemplateFactory.cs" t="Include" />
+          <e p="UserFactory.cs" t="Include" />
+          <e p="UserGroupFactory.cs" t="Include" />
+        </e>
+        <e p="FaultHandling" t="Include">
+          <e p="ITransientErrorDetectionStrategy.cs" t="Include" />
+          <e p="RetryDbConnection.cs" t="Include" />
+          <e p="RetryingEventArgs.cs" t="Include" />
+          <e p="RetryLimitExceededException.cs" t="Include" />
+          <e p="RetryPolicy.cs" t="Include" />
+          <e p="RetryPolicyFactory.cs" t="Include" />
+          <e p="RetryStrategy.cs" t="Include" />
+          <e p="Strategies" t="Include">
+            <e p="ExponentialBackoff.cs" t="Include" />
+            <e p="FixedInterval.cs" t="Include" />
+            <e p="Incremental.cs" t="Include" />
+            <e p="NetworkConnectivityErrorDetectionStrategy.cs" t="Include" />
+            <e p="SqlAzureTransientErrorDetectionStrategy.cs" t="Include" />
+          </e>
+          <e p="ThrottlingCondition.cs" t="Include" />
+        </e>
+        <e p="IQueryRepository.cs" t="Include" />
+        <e p="IReadRepository.cs" t="Include" />
+        <e p="IReadWriteQueryRepository.cs" t="Include" />
+        <e p="IRepository.cs" t="Include" />
+        <e p="ISqlContext.cs" t="Include" />
+        <e p="IUmbracoDatabase.cs" t="Include" />
+        <e p="IUmbracoDatabaseFactory.cs" t="Include" />
+        <e p="IWriteRepository.cs" t="Include" />
+        <e p="LocalDb.cs" t="Include" />
+        <e p="Mappers" t="Include">
+          <e p="AccessMapper.cs" t="Include" />
+          <e p="AuditEntryMapper.cs" t="Include" />
+          <e p="AuditItemMapper.cs" t="Include" />
+          <e p="BaseMapper.cs" t="Include" />
+          <e p="ConsentMapper.cs" t="Include" />
+          <e p="ContentMapper.cs" t="Include" />
+          <e p="ContentTypeMapper.cs" t="Include" />
+          <e p="DataTypeMapper.cs" t="Include" />
+          <e p="DictionaryMapper.cs" t="Include" />
+          <e p="DictionaryTranslationMapper.cs" t="Include" />
+          <e p="DomainMapper.cs" t="Include" />
+          <e p="DtoMapModel.cs" t="Include" />
+          <e p="ExternalLoginMapper.cs" t="Include" />
+          <e p="IMapperCollection.cs" t="Include" />
+          <e p="LanguageMapper.cs" t="Include" />
+          <e p="MacroMapper.cs" t="Include" />
+          <e p="MapperCollection.cs" t="Include" />
+          <e p="MapperCollectionBuilder.cs" t="Include" />
+          <e p="MapperForAttribute.cs" t="Include" />
+          <e p="MediaMapper.cs" t="Include" />
+          <e p="MediaTypeMapper.cs" t="Include" />
+          <e p="MemberGroupMapper.cs" t="Include" />
+          <e p="MemberMapper.cs" t="Include" />
+          <e p="MemberTypeMapper.cs" t="Include" />
+          <e p="PocoMapper.cs" t="Include" />
+          <e p="PropertyGroupMapper.cs" t="Include" />
+          <e p="PropertyMapper.cs" t="Include" />
+          <e p="PropertyTypeMapper.cs" t="Include" />
+          <e p="RelationMapper.cs" t="Include" />
+          <e p="RelationTypeMapper.cs" t="Include" />
+          <e p="ServerRegistrationMapper.cs" t="Include" />
+          <e p="TagMapper.cs" t="Include" />
+          <e p="TemplateMapper.cs" t="Include" />
+          <e p="UmbracoEntityMapper.cs" t="Include" />
+          <e p="UserGroupMapper.cs" t="Include" />
+          <e p="UserMapper.cs" t="Include" />
+          <e p="UserSectionMapper.cs" t="Include" />
+          <e p="UserTypeMapper.cs" t="Include" />
+        </e>
+        <e p="NPocoDatabaseExtensions-Bulk.cs" t="Include" />
+        <e p="NPocoDatabaseExtensions.cs" t="Include" />
+        <e p="NPocoDatabaseTypeExtensions.cs" t="Include" />
+        <e p="NPocoSqlExtensions.cs" t="Include" />
+        <e p="PocoDataDataReader.cs" t="Include" />
+        <e p="Querying" t="Include">
+          <e p="CachedExpression.cs" t="Include" />
+          <e p="ExpressionVisitorBase.cs" t="Include" />
+          <e p="IQuery.cs" t="Include" />
+          <e p="ModelToSqlExpressionVisitor.cs" t="Include" />
+          <e p="PocoToSqlExpressionVisitor.cs" t="Include" />
+          <e p="Query.cs" t="Include" />
+          <e p="QueryExtensions.cs" t="Include" />
+          <e p="SqlExpressionExtensions.cs" t="Include" />
+          <e p="SqlTranslator.cs" t="Include" />
+          <e p="StringPropertyMatchType.cs" t="Include" />
+          <e p="TextColumnType.cs" t="Include" />
+          <e p="ValuePropertyMatchType.cs" t="Include" />
+        </e>
+        <e p="RecordPersistenceType.cs" t="Include" />
+        <e p="Repositories" t="Include">
+          <e p="IAuditEntryRepository.cs" t="Include" />
+          <e p="IAuditRepository.cs" t="Include" />
+          <e p="IConsentRepository.cs" t="Include" />
+          <e p="IContentRepository.cs" t="Include" />
+          <e p="IContentTypeRepository.cs" t="Include" />
+          <e p="IContentTypeRepositoryBase.cs" t="Include" />
+          <e p="IDataTypeContainerRepository.cs" t="Include" />
+          <e p="IDataTypeRepository.cs" t="Include" />
+          <e p="IDictionaryRepository.cs" t="Include" />
+          <e p="IDocumentBlueprintRepository.cs" t="Include" />
+          <e p="IDocumentRepository.cs" t="Include" />
+          <e p="IDocumentTypeContainerRepository.cs" t="Include" />
+          <e p="IDomainRepository.cs" t="Include" />
+          <e p="IEntityContainerRepository.cs" t="Include" />
+          <e p="IEntityRepository.cs" t="Include" />
+          <e p="IExternalLoginRepository.cs" t="Include" />
+          <e p="ILanguageRepository.cs" t="Include" />
+          <e p="IMacroRepository.cs" t="Include" />
+          <e p="IMediaRepository.cs" t="Include" />
+          <e p="IMediaTypeContainerRepository.cs" t="Include" />
+          <e p="IMediaTypeRepository.cs" t="Include" />
+          <e p="IMemberGroupRepository.cs" t="Include" />
+          <e p="IMemberRepository.cs" t="Include" />
+          <e p="IMemberTypeRepository.cs" t="Include" />
+          <e p="Implement" t="Include">
+            <e p="AuditEntryRepository.cs" t="Include" />
+            <e p="AuditRepository.cs" t="Include" />
+            <e p="ConsentRepository.cs" t="Include" />
+            <e p="ContentRepositoryBase.cs" t="Include" />
+            <e p="ContentTypeRepository.cs" t="Include" />
+            <e p="ContentTypeRepositoryBase.cs" t="Include" />
+            <e p="DataTypeContainerRepository.cs" t="Include" />
+            <e p="DataTypeRepository.cs" t="Include" />
+            <e p="DictionaryRepository.cs" t="Include" />
+            <e p="DocumentBlueprintRepository.cs" t="Include" />
+            <e p="DocumentRepository.cs" t="Include" />
+            <e p="DocumentTypeContainerRepository.cs" t="Include" />
+            <e p="DomainRepository.cs" t="Include" />
+            <e p="EntityContainerRepository.cs" t="Include" />
+            <e p="EntityRepository.cs" t="Include" />
+            <e p="ExternalLoginRepository.cs" t="Include" />
+            <e p="FileRepository.cs" t="Include" />
+            <e p="LanguageRepository.cs" t="Include" />
+            <e p="MacroRepository.cs" t="Include" />
+            <e p="MediaRepository.cs" t="Include" />
+            <e p="MediaTypeContainerRepository.cs" t="Include" />
+            <e p="MediaTypeRepository.cs" t="Include" />
+            <e p="MemberGroupRepository.cs" t="Include" />
+            <e p="MemberRepository.cs" t="Include" />
+            <e p="MemberTypeRepository.cs" t="Include" />
+            <e p="NotificationsRepository.cs" t="Include" />
+            <e p="NPocoRepositoryBase.cs" t="Include" />
+            <e p="PartialViewMacroRepository.cs" t="Include" />
+            <e p="PartialViewRepository.cs" t="Include" />
+            <e p="PermissionRepository.cs" t="Include" />
+            <e p="PublicAccessRepository.cs" t="Include" />
+            <e p="QueryType.cs" t="Include" />
+            <e p="RedirectUrlRepository.cs" t="Include" />
+            <e p="RelationRepository.cs" t="Include" />
+            <e p="RelationTypeRepository.cs" t="Include" />
+            <e p="RepositoryBaseOfTIdTEntity.cs" t="Include" />
+            <e p="RepositoryCacheKeys.cs" t="Include" />
+            <e p="ScriptRepository.cs" t="Include" />
+            <e p="ServerRegistrationRepository.cs" t="Include" />
+            <e p="SimilarNodeName.cs" t="Include" />
+            <e p="SimpleGetRepository.cs" t="Include" />
+            <e p="StylesheetRepository.cs" t="Include" />
+            <e p="TagRepository.cs" t="Include" />
+            <e p="TemplateRepository.cs" t="Include" />
+            <e p="TupleExtensions.cs" t="Include" />
+            <e p="UserGroupRepository.cs" t="Include" />
+            <e p="UserRepository.cs" t="Include" />
+          </e>
+          <e p="INotificationsRepository.cs" t="Include" />
+          <e p="IPartialViewMacroRepository.cs" t="Include" />
+          <e p="IPartialViewRepository.cs" t="Include" />
+          <e p="IPublicAccessRepository.cs" t="Include" />
+          <e p="IRedirectUrlRepository.cs" t="Include" />
+          <e p="IRelationRepository.cs" t="Include" />
+          <e p="IRelationTypeRepository.cs" t="Include" />
+          <e p="IScriptRepository.cs" t="Include" />
+          <e p="IServerRegistrationRepository.cs" t="Include" />
+          <e p="IStylesheetRepository.cs" t="Include" />
+          <e p="ITagRepository.cs" t="Include" />
+          <e p="ITemplateRepository.cs" t="Include" />
+          <e p="IUserGroupRepository.cs" t="Include" />
+          <e p="IUserRepository.cs" t="Include" />
+        </e>
+        <e p="SqlContext.cs" t="Include" />
+        <e p="SqlContextExtensions.cs" t="Include" />
+        <e p="SqlSyntax" t="Include">
+          <e p="ColumnInfo.cs" t="Include" />
+          <e p="DbTypes.cs" t="Include" />
+          <e p="ISqlSyntaxProvider.cs" t="Include" />
+          <e p="MicrosoftSqlSyntaxProviderBase.cs" t="Include" />
+          <e p="MySqlSyntaxProvider.cs" t="Include" />
+          <e p="SqlCeSyntaxProvider.cs" t="Include" />
+          <e p="SqlServerSyntaxProvider.cs" t="Include" />
+          <e p="SqlServerVersionName.cs" t="Include" />
+          <e p="SqlSyntaxProviderAttribute.cs" t="Include" />
+          <e p="SqlSyntaxProviderBase.cs" t="Include" />
+          <e p="SqlSyntaxProviderExtensions.cs" t="Include" />
+        </e>
+        <e p="SqlSyntaxExtensions.cs" t="Include" />
+        <e p="SqlTemplate.cs" t="Include" />
+        <e p="SqlTemplates.cs" t="Include" />
+        <e p="UmbracoDatabase.cs" t="Include" />
+        <e p="UmbracoDatabaseExtensions.cs" t="Include" />
+        <e p="UmbracoDatabaseFactory.cs" t="Include" />
+        <e p="UmbracoPocoDataBuilder.cs" t="Include" />
+      </e>
+      <e p="Properties" t="Include">
+        <e p="AssemblyInfo.cs" t="Include" />
+      </e>
+      <e p="PropertyEditors" t="Include">
+        <e p="ColorPickerConfiguration.cs" t="Include" />
+        <e p="ConfigurationEditor.cs" t="Include" />
+        <e p="ConfigurationEditorOfTConfiguration.cs" t="Include" />
+        <e p="ConfigurationField.cs" t="Include" />
+        <e p="ConfigurationFieldAttribute.cs" t="Include" />
+        <e p="DataEditor.cs" t="Include" />
+        <e p="DataEditorAttribute.cs" t="Include" />
+        <e p="DataEditorCollection.cs" t="Include" />
+        <e p="DataEditorCollectionBuilder.cs" t="Include" />
+        <e p="DataValueEditor.cs" t="Include" />
+        <e p="DefaultPropertyValueConverterAttribute.cs" t="Include" />
+        <e p="EditorType.cs" t="Include" />
+        <e p="GridEditor.cs" t="Include" />
+        <e p="IConfigurationEditor.cs" t="Include" />
+        <e p="IConfigureValueType.cs" t="Include" />
+        <e p="IDataEditor.cs" t="Include" />
+        <e p="IDataValueEditor.cs" t="Include" />
+        <e p="ImageCropperConfiguration.cs" t="Include" />
+        <e p="IManifestValueValidator.cs" t="Include" />
+        <e p="IPropertyValueConverter.cs" t="Include" />
+        <e p="IValueFormatValidator.cs" t="Include" />
+        <e p="IValueRequiredValidator.cs" t="Include" />
+        <e p="IValueValidator.cs" t="Include" />
+        <e p="LabelConfiguration.cs" t="Include" />
+        <e p="LabelConfigurationEditor.cs" t="Include" />
+        <e p="LabelPropertyEditor.cs" t="Include" />
+        <e p="ManifestValueValidatorCollection.cs" t="Include" />
+        <e p="ManifestValueValidatorCollectionBuilder.cs" t="Include" />
+        <e p="ParameterEditorCollection.cs" t="Include" />
+        <e p="PropertyCacheLevel.cs" t="Include" />
+        <e p="PropertyEditorCollection.cs" t="Include" />
+        <e p="PropertyEditorTagsExtensions.cs" t="Include" />
+        <e p="PropertyValueConverterBase.cs" t="Include" />
+        <e p="PropertyValueConverterCollection.cs" t="Include" />
+        <e p="PropertyValueConverterCollectionBuilder.cs" t="Include" />
+        <e p="PropertyValueLevel.cs" t="Include" />
+        <e p="SliderConfiguration.cs" t="Include" />
+        <e p="TagConfiguration.cs" t="Include" />
+        <e p="TagsPropertyEditorAttribute.cs" t="Include" />
+        <e p="Validators" t="Include">
+          <e p="DecimalValidator.cs" t="Include" />
+          <e p="DelimitedValueValidator.cs" t="Include" />
+          <e p="EmailValidator.cs" t="Include" />
+          <e p="IntegerValidator.cs" t="Include" />
+          <e p="RegexValidator.cs" t="Include" />
+          <e p="RequiredValidator.cs" t="Include" />
+        </e>
+        <e p="ValueConverters" t="Include">
+          <e p="CheckboxListValueConverter.cs" t="Include" />
+          <e p="ColorPickerValueConverter.cs" t="Include" />
+          <e p="DatePickerValueConverter.cs" t="Include" />
+          <e p="DecimalValueConverter.cs" t="Include" />
+          <e p="EmailAddressValueConverter.cs" t="Include" />
+          <e p="GridValueConverter.cs" t="Include" />
+          <e p="ImageCropperValue.cs" t="Include" />
+          <e p="ImageCropperValueConverter.cs" t="Include" />
+          <e p="ImageCropperValueTypeConverter.cs" t="Include" />
+          <e p="IntegerValueConverter.cs" t="Include" />
+          <e p="JsonValueConverter.cs" t="Include" />
+          <e p="LabelValueConverter.cs" t="Include" />
+          <e p="MarkdownEditorValueConverter.cs" t="Include" />
+          <e p="MemberGroupPickerValueConverter.cs" t="Include" />
+          <e p="MultipleTextStringValueConverter.cs" t="Include" />
+          <e p="MustBeStringValueConverter.cs" t="Include" />
+          <e p="RadioButtonListValueConverter.cs" t="Include" />
+          <e p="SliderValueConverter.cs" t="Include" />
+          <e p="TagsValueConverter.cs" t="Include" />
+          <e p="TextStringValueConverter.cs" t="Include" />
+          <e p="TinyMceValueConverter.cs" t="Include" />
+          <e p="UploadPropertyConverter.cs" t="Include" />
+          <e p="YesNoValueConverter.cs" t="Include" />
+        </e>
+        <e p="ValueListConfiguration.cs" t="Include" />
+        <e p="ValueTypes.cs" t="Include" />
+        <e p="VoidEditor.cs" t="Include" />
+      </e>
+      <e p="Publishing" t="Include">
+        <e p="ScheduledPublisher.cs" t="Include" />
+      </e>
+      <e p="ReadLock.cs" t="Include" />
+      <e p="ReflectionUtilities-Unused.cs" t="Include" />
+      <e p="ReflectionUtilities.cs" t="Include" />
+      <e p="RenderingEngine.cs" t="Include" />
+      <e p="Runtime" t="Include">
+        <e p="CoreRuntime.cs" t="Include" />
+        <e p="CoreRuntimeComponent.cs" t="Include" />
+      </e>
+      <e p="RuntimeLevel.cs" t="Include" />
+      <e p="RuntimeState.cs" t="Include" />
+      <e p="SafeCallContext.cs" t="Include" />
+      <e p="Scoping" t="Include">
+        <e p="IInstanceIdentifiable.cs" t="Include" />
+        <e p="IScope.cs" t="Include" />
+        <e p="IScopeAccessor.cs" t="Include" />
+        <e p="IScopeContext.cs" t="Include" />
+        <e p="IScopeProvider.cs" t="Include" />
+        <e p="RepositoryCacheMode.cs" t="Include" />
+        <e p="Scope.cs" t="Include" />
+        <e p="ScopeContext.cs" t="Include" />
+        <e p="ScopeContextualBase.cs" t="Include" />
+        <e p="ScopeProvider.cs" t="Include" />
+        <e p="ScopeReference.cs" t="Include" />
+      </e>
+      <e p="Security" t="Include">
+        <e p="AuthenticationExtensions.cs" t="Include" />
+        <e p="BackOfficeUserStore.cs" t="Include" />
+        <e p="BackOfficeUserValidator.cs" t="Include" />
+        <e p="EmailService.cs" t="Include" />
+        <e p="IMembershipProviderPasswordHasher.cs" t="Include" />
+        <e p="IUmbracoMemberTypeMembershipProvider.cs" t="Include" />
+        <e p="IUserAwarePasswordHasher.cs" t="Include" />
+        <e p="IUserSessionStore.cs" t="Include" />
+        <e p="IUsersMembershipProvider.cs" t="Include" />
+        <e p="MachineKeyGenerator.cs" t="Include" />
+        <e p="MembershipProviderBase.cs" t="Include" />
+        <e p="MembershipProviderExtensions.cs" t="Include" />
+        <e p="MembershipProviderPasswordHasher.cs" t="Include" />
+        <e p="MembershipProviderPasswordValidator.cs" t="Include" />
+        <e p="UmbracoBackOfficeIdentity.cs" t="Include" />
+        <e p="UmbracoEmailMessage.cs" t="Include" />
+        <e p="UmbracoMembershipProviderBase.cs" t="Include" />
+        <e p="UserAwareMembershipProviderPasswordHasher.cs" t="Include" />
+      </e>
+      <e p="SemVersionExtensions.cs" t="Include" />
+      <e p="Serialization" t="Include">
+        <e p="AbstractSerializationService.cs" t="Include" />
+        <e p="ForceInt32Converter.cs" t="Include" />
+        <e p="Formatter.cs" t="Include" />
+        <e p="FuzzyBooleanConverter.cs" t="Include" />
+        <e p="IFormatter.cs" t="Include" />
+        <e p="ISerializer.cs" t="Include" />
+        <e p="IStreamedResult.cs" t="Include" />
+        <e p="JsonNetSerializer.cs" t="Include" />
+        <e p="JsonReadConverter.cs" t="Include" />
+        <e p="JsonToStringConverter.cs" t="Include" />
+        <e p="KnownTypeUdiJsonConverter.cs" t="Include" />
+        <e p="NoTypeConverterJsonConverter.cs" t="Include" />
+        <e p="SerializationExtensions.cs" t="Include" />
+        <e p="SerializationService.cs" t="Include" />
+        <e p="StreamedResult.cs" t="Include" />
+        <e p="StreamResultExtensions.cs" t="Include" />
+        <e p="UdiJsonConverter.cs" t="Include" />
+        <e p="UdiRangeJsonConverter.cs" t="Include" />
+      </e>
+      <e p="ServiceContextExtensions.cs" t="Include" />
+      <e p="Services" t="Include">
+        <e p="Changes" t="Include">
+          <e p="ContentTypeChange.cs" t="Include" />
+          <e p="ContentTypeChangeExtensions.cs" t="Include" />
+          <e p="ContentTypeChangeTypes.cs" t="Include" />
+          <e p="DomainChangeTypes.cs" t="Include" />
+          <e p="TreeChange.cs" t="Include" />
+          <e p="TreeChangeExtensions.cs" t="Include" />
+          <e p="TreeChangeTypes.cs" t="Include" />
+        </e>
+        <e p="ContentServiceExtensions.cs" t="Include" />
+        <e p="ContentTypeServiceExtensions.cs" t="Include" />
+        <e p="EntityXmlSerializer.cs" t="Include" />
+        <e p="IApplicationTreeService.cs" t="Include" />
+        <e p="IAuditService.cs" t="Include" />
+        <e p="IConsentService.cs" t="Include" />
+        <e p="IContentService.cs" t="Include" />
+        <e p="IContentServiceBase.cs" t="Include" />
+        <e p="IContentTypeService.cs" t="Include" />
+        <e p="IContentTypeServiceBase.cs" t="Include" />
+        <e p="IDataTypeService.cs" t="Include" />
+        <e p="IdkMap.cs" t="Include" />
+        <e p="IDomainService.cs" t="Include" />
+        <e p="IEntityService.cs" t="Include" />
+        <e p="IExternalLoginService.cs" t="Include" />
+        <e p="IFileService.cs" t="Include" />
+        <e p="IKeyValueService.cs" t="Include" />
+        <e p="ILocalizationService.cs" t="Include" />
+        <e p="ILocalizedTextService.cs" t="Include" />
+        <e p="IMacroService.cs" t="Include" />
+        <e p="IMediaService.cs" t="Include" />
+        <e p="IMediaTypeService.cs" t="Include" />
+        <e p="IMemberGroupService.cs" t="Include" />
+        <e p="IMemberService.cs" t="Include" />
+        <e p="IMembershipMemberService.cs" t="Include" />
+        <e p="IMembershipRoleService.cs" t="Include" />
+        <e p="IMembershipUserService.cs" t="Include" />
+        <e p="IMemberTypeService.cs" t="Include" />
+        <e p="Implement" t="Include">
+          <e p="AuditService.cs" t="Include" />
+          <e p="ConsentService.cs" t="Include" />
+          <e p="ContentService.cs" t="Include" />
+          <e p="ContentTypeService.cs" t="Include" />
+          <e p="ContentTypeServiceBase.cs" t="Include" />
+          <e p="ContentTypeServiceBaseOfTItemTService.cs" t="Include" />
+          <e p="ContentTypeServiceBaseOfTRepositoryTItemTService.cs" t="Include" />
+          <e p="DataTypeService.cs" t="Include" />
+          <e p="DomainService.cs" t="Include" />
+          <e p="EntityService.cs" t="Include" />
+          <e p="ExternalLoginService.cs" t="Include" />
+          <e p="FileService.cs" t="Include" />
+          <e p="KeyValueService.cs" t="Include" />
+          <e p="LocalizationService.cs" t="Include" />
+          <e p="LocalizedTextService.cs" t="Include" />
+          <e p="LocalizedTextServiceFileSources.cs" t="Include" />
+          <e p="LocalizedTextServiceSupplementaryFileSource.cs" t="Include" />
+          <e p="MacroService.cs" t="Include" />
+          <e p="MediaService.cs" t="Include" />
+          <e p="MediaTypeService.cs" t="Include" />
+          <e p="MemberGroupService.cs" t="Include" />
+          <e p="MemberService.cs" t="Include" />
+          <e p="MemberTypeService.cs" t="Include" />
+          <e p="NotificationService.cs" t="Include" />
+          <e p="PackagingService.cs" t="Include" />
+          <e p="PublicAccessService.cs" t="Include" />
+          <e p="RedirectUrlService.cs" t="Include" />
+          <e p="RelationService.cs" t="Include" />
+          <e p="RepositoryService.cs" t="Include" />
+          <e p="ScopeRepositoryService.cs" t="Include" />
+          <e p="ServerRegistrationService.cs" t="Include" />
+          <e p="TagService.cs" t="Include" />
+          <e p="UserService.cs" t="Include" />
+        </e>
+        <e p="INotificationService.cs" t="Include" />
+        <e p="IPackagingService.cs" t="Include" />
+        <e p="IPublicAccessService.cs" t="Include" />
+        <e p="IRedirectUrlService.cs" t="Include" />
+        <e p="IRelationService.cs" t="Include" />
+        <e p="ISectionService.cs" t="Include" />
+        <e p="IServerRegistrationService.cs" t="Include" />
+        <e p="IService.cs" t="Include" />
+        <e p="ITagService.cs" t="Include" />
+        <e p="IUserService.cs" t="Include" />
+        <e p="LocalizedTextServiceExtensions.cs" t="Include" />
+        <e p="MediaServiceExtensions.cs" t="Include" />
+        <e p="MoveOperationStatusType.cs" t="Include" />
+        <e p="OperationResult.cs" t="Include" />
+        <e p="OperationResultType.cs" t="Include" />
+        <e p="Ordering.cs" t="Include" />
+        <e p="PublicAccessServiceExtensions.cs" t="Include" />
+        <e p="PublishResult.cs" t="Include" />
+        <e p="PublishResultType.cs" t="Include" />
+        <e p="ServiceContext.cs" t="Include" />
+        <e p="UnpublishResult.cs" t="Include" />
+        <e p="UnpublishResultType.cs" t="Include" />
+        <e p="UserServiceExtensions.cs" t="Include" />
+      </e>
+      <e p="Settable.cs" t="Include" />
+      <e p="StringExtensions.cs" t="Include" />
+      <e p="Strings" t="Include">
+        <e p="CleanStringType.cs" t="Include" />
+        <e p="ContentBaseExtensions.cs" t="Include" />
+        <e p="Css" t="Include">
+          <e p="StylesheetHelper.cs" t="Include" />
+          <e p="StylesheetRule.cs" t="Include" />
+        </e>
+        <e p="DefaultShortStringHelper.cs" t="Include" />
+        <e p="DefaultShortStringHelperConfig.cs" t="Include" />
+        <e p="DefaultUrlSegmentProvider.cs" t="Include" />
+        <e p="Diff.cs" t="Include" />
+        <e p="IShortStringHelper.cs" t="Include" />
+        <e p="IUrlSegmentProvider.cs" t="Include" />
+        <e p="UrlSegmentProviderCollection.cs" t="Include" />
+        <e p="UrlSegmentProviderCollectionBuilder.cs" t="Include" />
+        <e p="Utf8ToAsciiConverter.cs" t="Include" />
+      </e>
+      <e p="StringUdi.cs" t="Include" />
+      <e p="Sync" t="Include">
+        <e p="ApplicationUrlHelper.cs" t="Include" />
+        <e p="DatabaseServerMessenger.cs" t="Include" />
+        <e p="DatabaseServerMessengerOptions.cs" t="Include" />
+        <e p="DatabaseServerRegistrar.cs" t="Include" />
+        <e p="DatabaseServerRegistrarOptions.cs" t="Include" />
+        <e p="IServerAddress.cs" t="Include" />
+        <e p="IServerMessenger.cs" t="Include" />
+        <e p="IServerRegistrar.cs" t="Include" />
+        <e p="MessageType.cs" t="Include" />
+        <e p="RefreshInstruction.cs" t="Include" />
+        <e p="RefreshInstructionEnvelope.cs" t="Include" />
+        <e p="RefreshMethodType.cs" t="Include" />
+        <e p="ServerMessengerBase.cs" t="Include" />
+        <e p="ServerRole.cs" t="Include" />
+        <e p="ServerSyncWebServiceClient.cs" t="Include" />
+        <e p="SingleServerRegistrar.cs" t="Include" />
+      </e>
+      <e p="SystemUtilities.cs" t="Include" />
+      <e p="ThreadExtensions.cs" t="Include" />
+      <e p="TypeExtensions.cs" t="Include" />
+      <e p="Udi.cs" t="Include" />
+      <e p="UdiDefinitionAttribute.cs" t="Include" />
+      <e p="UdiEntityType.cs" t="Include" />
+      <e p="UdiGetterExtensions.cs" t="Include" />
+      <e p="UdiRange.cs" t="Include" />
+      <e p="UdiType.cs" t="Include" />
+      <e p="UdiTypeConverter.cs" t="Include" />
+      <e p="UmbracoApplicationBase.cs" t="Include" />
+      <e p="UpgradeableReadLock.cs" t="Include" />
+      <e p="UriExtensions.cs" t="Include" />
+      <e p="VersionExtensions.cs" t="Include" />
+      <e p="WaitHandleExtensions.cs" t="Include" />
+      <e p="WriteLock.cs" t="Include" />
+      <e p="Xml" t="Include">
+        <e p="DynamicContext.cs" t="Include" />
+        <e p="UmbracoXPathPathSyntaxParser.cs" t="Include" />
+        <e p="XmlHelper.cs" t="Include" />
+        <e p="XmlNamespaces.cs" t="Include" />
+        <e p="XmlNodeListFactory.cs" t="Include" />
+        <e p="XPath" t="Include">
+          <e p="INavigableContent.cs" t="Include" />
+          <e p="INavigableContentType.cs" t="Include" />
+          <e p="INavigableFieldType.cs" t="Include" />
+          <e p="INavigableSource.cs" t="Include" />
+          <e p="MacroNavigator.cs" t="Include" />
+          <e p="NavigableNavigator.cs" t="Include" />
+          <e p="RenamedRootNavigator.cs" t="Include" />
+        </e>
+        <e p="XPathNavigatorExtensions.cs" t="Include" />
+        <e p="XPathVariable.cs" t="Include" />
+      </e>
+      <e p="XmlExtensions.cs" t="Include" />
+    </e>
+  </component>
+</project>

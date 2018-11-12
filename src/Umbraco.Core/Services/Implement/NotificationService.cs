@@ -28,14 +28,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSection _contentSection;
+        private readonly IContentTypeService _contentTypeService;
         private readonly ILogger _logger;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
+            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection, IContentTypeService contentTypeService)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
             _contentSection = contentSection;
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -294,10 +296,12 @@ namespace Umbraco.Core.Services.Implement
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
 
+
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
             // build summary
             var summary = new StringBuilder();
 
-            if (content.ContentType.VariesByNothing())
+            if (contentType.VariesByNothing())
             {
                 if (!_contentSection.DisableHtmlEmail)
                 {
@@ -335,9 +339,9 @@ namespace Umbraco.Core.Services.Implement
                     }
                     summary.Append("</table>");
                 }
-                
+
             }
-            else if (content.ContentType.VariesByCulture())
+            else if (contentType.VariesByCulture())
             {
                 //it's variant, so detect what cultures have changed
 
@@ -462,7 +466,7 @@ namespace Umbraco.Core.Services.Implement
             oldString = oldString.Replace("&rdquo;", "”");
             oldString = oldString.Replace("&quot;", "\"");
         }
-        
+
         // manage notifications
         // ideally, would need to use IBackgroundTasks - but they are not part of Core!
 
