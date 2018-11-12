@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
     [JsonConverter(typeof(NoTypeConverterJsonConverter<MediaCropDataSet>))]
     [TypeConverter(typeof(MediaCropDataSetConverter))]
     [DataContract(Name="mediaCropDataSet")]
-    public class MediaCropDataSet : ImageCropDataSet, IHtmlString, IEquatable<MediaCropDataSet>
+    public class MediaCropDataSet : ImageCropDataSet, IEquatable<MediaCropDataSet>
     {
         [DataMember(Name = "udi")]
         public Udi Udi { get; set; }
