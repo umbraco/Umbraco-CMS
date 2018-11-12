@@ -720,11 +720,16 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.Schedule:
                 case ContentSaveAction.ScheduleNew:
 
+                    //TODO: For some reason the content item is being saved with a schedule even if validation fails 
+
                     if (SaveSchedule(contentItem, globalNotifications))
+                    {
+                        //TODO: Change this - we need to change the notification messages that are sent to the UI when scheduled publishing
+                        //vs saving a content item.
                         goto case ContentSaveAction.Save;
+                    }   
                     else
                     {
-                        ModelState.AddModelError("hello", "world");
                         wasCancelled = false;
                         break;
                     }
@@ -868,21 +873,41 @@ namespace Umbraco.Web.Editors
 
         private bool SaveScheduleVariant(ContentItemSave contentItem)
         {
-            var cultureVariants = contentItem.Variants
-                .Where(x => !x.Culture.IsNullOrWhiteSpace() //All variants in this collection should have a culture if we get here but we'll double check and filter here
-                    && x.ReleaseDate.HasValue || x.ExpireDate.HasValue)
-                .ToList();
+            //All variants in this collection should have a culture if we get here but we'll double check and filter here)
+            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
 
-            //validate if we can continue based on the mandatory language requirements
-            if (!ValidatePublishingMandatoryLanguages(contentItem, cultureVariants, "speechBubbles/scheduleErrReleaseDate2"))
-                return false;
-
-            //TODO: Fill in other validation https://github.com/umbraco/Umbraco.Private/issues/226
+            var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
             //Do all validation of data first
 
             var isValid = true;
-            foreach (var variant in cultureVariants)
+
+            //validate if we can continue based on the mandatory language requirements
+            if (!ValidatePublishingMandatoryLanguages(
+                    contentItem, cultureVariants, mandatoryCultures, "speechBubbles/scheduleErrReleaseDate2",
+                    //if the mandatory lang has a release date then continue since this means it is 'publishing'
+                    mandatoryVariant => mandatoryVariant.ReleaseDate.HasValue,
+                    out var mandatoryVariants))
+                return false;
+
+            //so all mandatory langs are either published or being schedule published at this point,
+            //now we need to check if any mandatory language that is not published is scheduled for release later than a non-mandatory lang
+            var nonMandatoryReleaseDates = cultureVariants
+                .Where(x => x.Save && x.ReleaseDate.HasValue && !mandatoryCultures.Contains(x.Culture, StringComparer.InvariantCultureIgnoreCase))
+                .Select(x => x.ReleaseDate.Value)
+                .ToList();
+            foreach(var (mandatoryVariant, isPublished) in mandatoryVariants)
+            {
+                if (!isPublished && nonMandatoryReleaseDates.Any(r => mandatoryVariant.ReleaseDate.Value > r))
+                {
+                    AddCultureValidationError(mandatoryVariant.Culture, "speechBubbles/scheduleErrReleaseDate3");
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) return false;
+            
+            foreach (var variant in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
             {
                 //1) release date cannot be less than now
                 if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
@@ -982,8 +1007,12 @@ namespace Umbraco.Web.Editors
                 //All variants in this collection should have a culture if we get here! but we'll double check and filter here
                 var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
 
+                var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
+
                 //validate if we can publish based on the mandatory language requirements
-                var canPublish = ValidatePublishingMandatoryLanguages(contentItem, cultureVariants, "speechBubbles/contentReqCulturePublishError");
+                var canPublish = ValidatePublishingMandatoryLanguages(
+                    contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
+                    mandatoryVariant => mandatoryVariant.Publish, out var _);
 
                 //Now check if there are validation errors on each variant.
                 //If validation errors are detected on a variant and it's state is set to 'publish', then we
@@ -1030,28 +1059,33 @@ namespace Umbraco.Web.Editors
         private bool ValidatePublishingMandatoryLanguages(
             ContentItemSave contentItem,
             IReadOnlyCollection<ContentVariantSave> cultureVariants,
-            string localizationKey)
+            IReadOnlyList<string> mandatoryCultures,
+            string localizationKey,
+            Func<ContentVariantSave, bool> publishingCheck,
+            out IReadOnlyList<(ContentVariantSave mandatoryVariant, bool isPublished)> mandatoryVariants)
         {
             var canPublish = true;
+            var result = new List<(ContentVariantSave, bool)>();
 
-            //validate any mandatory variants that are not in the list
-            var mandatoryLangs = _allLangs.Value.Values.Where(x => x.IsMandatory);
-
-            foreach (var lang in mandatoryLangs)
+            foreach (var culture in mandatoryCultures)
             {
                 //Check if a mandatory language is missing from being published
 
-                var variant = cultureVariants.First(x => x.Culture == lang.IsoCode);
-                var isPublished = contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
-                var isPublishing = variant.Publish;
+                var mandatoryVariant = cultureVariants.First(x => x.Culture.InvariantEquals(culture));
+                
+                var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
+                result.Add((mandatoryVariant, isPublished));
+
+                var isPublishing = isPublished ? true : publishingCheck(mandatoryVariant); 
 
                 if (isPublished || isPublishing) continue;
 
                 //cannot continue publishing since a required language that is not currently being published isn't published
-                AddCultureValidationError(lang.IsoCode, localizationKey);
+                AddCultureValidationError(culture, localizationKey);
                 canPublish = false;
             }
 
+            mandatoryVariants = result;
             return canPublish;
         }
 

@@ -1346,6 +1346,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
     <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
     <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not published</key>
+    <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
     <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
   </area>
