@@ -105,7 +105,7 @@
             if (type === 'publish') {
                 variant.releaseDatePickerInstance = datePickerInstance;
             } else if (type === 'unpublish') {
-                variant.removeDatePickerInstance = datePickerInstance;
+                variant.expireDatePickerInstance = datePickerInstance;
             }
             $scope.model.disableSubmitButton = !canSchedule();
         };
@@ -134,7 +134,7 @@
             if (type === 'publish') {
                 variant.releaseDatePickerOpen = true;
             } else if (type === 'unpublish') {
-                variant.removeDatePickerOpen = true;
+                variant.expireDatePickerOpen = true;
             }
             checkForBackdropClick();
             $scope.model.disableSubmitButton = !canSchedule();
@@ -150,7 +150,7 @@
                 if (type === 'publish') {
                     variant.releaseDatePickerOpen = false;
                 } else if (type === 'unpublish') {
-                    variant.removeDatePickerOpen = false;
+                    variant.expireDatePickerOpen = false;
                 }
                 checkForBackdropClick();
                 $scope.model.disableSubmitButton = !canSchedule();
@@ -164,7 +164,7 @@
         function checkForBackdropClick() {
 
             var open = _.find(vm.variants, function (variant) {
-                return variant.releaseDatePickerOpen || variant.removeDatePickerOpen;
+                return variant.releaseDatePickerOpen || variant.expireDatePickerOpen;
             });
 
             if(open) {
@@ -196,7 +196,7 @@
             formatDatesToLocal(variant);
 
             // make sure the unpublish date can't be before the publish date
-            variant.removeDatePickerInstance.set("minDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
+            variant.expireDatePickerInstance.set("minDate", moment(variant.releaseDate).format("YYYY-MM-DD HH:mm"));
 
         }
 
@@ -236,7 +236,7 @@
                 // we don't have a publish date anymore so we can clear the min date for unpublish
                 var now = new Date();
                 var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
-                variant.removeDatePickerInstance.set("minDate", nowFormatted);
+                variant.expireDatePickerInstance.set("minDate", nowFormatted);
             }
         }
 
@@ -261,7 +261,7 @@
                 variant.releaseDateFormatted = dateHelper.getLocalDate(variant.releaseDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
             if(variant && variant.expireDate) {
-                variant.removeDateFormatted = dateHelper.getLocalDate(variant.expireDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
+                variant.expireDateFormatted = dateHelper.getLocalDate(variant.expireDate, vm.currentUser.locale, "MMM Do YYYY, HH:mm");
             }
         }
         
@@ -322,12 +322,12 @@
                 vm.variants[i].save = false;
                 // remove properties only needed for this dialog
                 delete vm.variants[i].releaseDateFormatted;
-                delete vm.variants[i].removeDateFormatted;
+                delete vm.variants[i].expireDateFormatted;
                 delete vm.variants[i].datePickerConfig;
                 delete vm.variants[i].releaseDatePickerInstance;
-                delete vm.variants[i].removeDatePickerInstance;
+                delete vm.variants[i].expireDatePickerInstance;
                 delete vm.variants[i].releaseDatePickerOpen;
-                delete vm.variants[i].removeDatePickerOpen;
+                delete vm.variants[i].expireDatePickerOpen;
             } 
         });
 
