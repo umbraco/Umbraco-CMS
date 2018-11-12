@@ -20,24 +20,11 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         {
             // assumes that cuid and puid keys can be trusted - and that a single property type
             // for a single content cannot store two different files with the same name
-            var directory = Combine(itemGuid, propertyGuid).ToHexString(/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
+            var directory = HexEncoder.Encode(GuidUtils.Combine(itemGuid, propertyGuid).ToByteArray()/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
             return Path.Combine(directory, filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(string filepath)
-        {
-            return Path.GetDirectoryName(filepath);
-        }
-
-        private static byte[] Combine(Guid guid1, Guid guid2)
-        {
-            var bytes1 = guid1.ToByteArray();
-            var bytes2 = guid2.ToByteArray();
-            var bytes = new byte[bytes1.Length];
-            for (var i = 0; i < bytes1.Length; i++)
-                bytes[i] = (byte) (bytes1[i] ^ bytes2[i]);
-            return bytes;
-        }
+        public string GetDeleteDirectory(string filepath) => Path.GetDirectoryName(filepath);
     }
 }
