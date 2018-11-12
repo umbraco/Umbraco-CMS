@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -22,7 +23,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         protected readonly string LocalizedTextPrefix;
         protected readonly bool MetaTagOptionAvailable;
 
-        public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext, 
+        public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
         {
             TextService = healthCheckContext.ApplicationContext.Services.TextService;
@@ -136,10 +137,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
         }
 
-        private HealthCheckStatus SetHeaderInConfig()
+        /// <summary>
+        /// Sets the header value in Web.Config. If the value already exists, it will be updated
+        /// </summary>
+        /// <param name="ignoreCasing">If ignoreCasing is true, StringComparison.InvariantCultureIgnoreCase will be used for string comparison if the header already exists</param>
+        /// <returns></returns>
+        protected HealthCheckStatus SetHeaderInConfig(bool ignoreCasing = false)
         {
             var errorMessage = string.Empty;
-            var success = SaveHeaderToConfigFile(out errorMessage);
+            var success = SaveHeaderToConfigFile(out errorMessage, ignoreCasing);
 
             if (success)
             {
@@ -151,13 +157,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
 
             return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new[] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };
         }
 
-        private bool SaveHeaderToConfigFile(out string errorMessage)
+        private bool SaveHeaderToConfigFile(out string errorMessage, bool ignoreCasing = false)
         {
             try
             {
@@ -167,6 +173,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var doc = XDocument.Load(configFile);
                 var systemWebServerElement = doc.XPathSelectElement("/configuration/system.webServer");
                 var httpProtocolElement = systemWebServerElement.Element("httpProtocol");
+                var stringCompatison = ignoreCasing ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
                 if (httpProtocolElement == null)
                 {
                     httpProtocolElement = new XElement("httpProtocol");
@@ -181,24 +188,32 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 var removeHeaderElement = customHeadersElement.Elements("remove")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name")?.Value == Value);
+                         .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringCompatison));
+
                 if (removeHeaderElement == null)
                 {
                     removeHeaderElement = new XElement("remove");
                     removeHeaderElement.Add(new XAttribute("name", Header));
                     customHeadersElement.Add(removeHeaderElement);
                 }
+                else
+                {
+                    removeHeaderElement.Attribute("name").SetValue(Header);
+                }
 
                 var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name").Value == Header);
+                    .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringCompatison));
+
                 if (addHeaderElement == null)
                 {
                     addHeaderElement = new XElement("add");
                     addHeaderElement.Add(new XAttribute("name", Header));
                     addHeaderElement.Add(new XAttribute("value", Value));
                     customHeadersElement.Add(addHeaderElement);
+                }
+                else
+                {
+                    addHeaderElement.Attribute("name").SetValue(Header);
                 }
 
                 doc.Save(configFile);

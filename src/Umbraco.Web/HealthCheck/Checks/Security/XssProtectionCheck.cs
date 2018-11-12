@@ -40,7 +40,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             switch (action.Alias)
             {
                 case UpdateHeaderInConfigAction:
-                    return UpdateHeaderInConfig();
+                    return SetHeaderInConfig(true);
                 default:
                     return base.ExecuteAction(action);
             }
@@ -117,91 +117,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                     Actions = actions
                 };
         }
-
-        private HealthCheckStatus UpdateHeaderInConfig()
-        {
-            var errorMessage = string.Empty;
-            var success = UpdateHeaderToConfigFile(out errorMessage);
-
-            if (success)
-            {
-                return
-                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", LocalizedTextPrefix)))
-                    {
-                        ResultType = StatusResultType.Success
-                    };
-            }
-
-            return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new[] { errorMessage }))
-                {
-                    ResultType = StatusResultType.Error
-                };
-        }
-
-        private bool UpdateHeaderToConfigFile(out string errorMessage)
-        {
-            try
-            {
-                // There don't look to be any useful classes defined in https://msdn.microsoft.com/en-us/library/system.web.configuration(v=vs.110).aspx
-                // for working with the customHeaders section, so working with the XML directly.
-                var configFile = IOHelper.MapPath("~/Web.config");
-                var doc = XDocument.Load(configFile);
-                var systemWebServerElement = doc.XPathSelectElement("/configuration/system.webServer");
-                var httpProtocolElement = systemWebServerElement.Element("httpProtocol");
-                if (httpProtocolElement == null)
-                {
-                    httpProtocolElement = new XElement("httpProtocol");
-                    systemWebServerElement.Add(httpProtocolElement);
-                }
-
-                var customHeadersElement = httpProtocolElement.Element("customHeaders");
-                if (customHeadersElement == null)
-                {
-                    customHeadersElement = new XElement("customHeaders");
-                    httpProtocolElement.Add(customHeadersElement);
-                }
-
-
-                var removeHeaderElement = customHeadersElement.Elements("remove")
-                    .SingleOrDefault(x => Header.InvariantEquals(x.Attribute("name")?.Value));
-                if (removeHeaderElement == null)
-                {
-                    removeHeaderElement = new XElement("remove");
-                    removeHeaderElement.Add(new XAttribute("name", Header));
-                    customHeadersElement.Add(removeHeaderElement);
-                }
-                else
-                {
-                    removeHeaderElement.Attribute("name").SetValue(Header);
-                }
-
-                var addHeaderElement1 = customHeadersElement.Elements("add");
-                var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => Header.InvariantEquals(x.Attribute("name")?.Value));
-                if (addHeaderElement == null)
-                {
-                    addHeaderElement = new XElement("add");
-                    addHeaderElement.Add(new XAttribute("name", Header));
-                    addHeaderElement.Add(new XAttribute("value", Value));
-                    customHeadersElement.Add(addHeaderElement);
-                }
-                else
-                {
-                    addHeaderElement.Attribute("name").SetValue(Header);
-                }
-
-
-                doc.Save(configFile);
-
-                errorMessage = string.Empty;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                errorMessage = ex.Message;
-                return false;
-            }
-        }
+   
     }
 }

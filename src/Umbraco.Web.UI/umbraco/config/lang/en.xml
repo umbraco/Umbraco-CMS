@@ -2174,7 +2174,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="hSTSSetHeaderInConfigSuccess">The HSTS header has been added to your web.config file.</key>
 
         <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
-        <key alias="xssProtectionCheckHeaderFoundWrongCase"><![CDATA[The header <strong>X-XSS-Protection</strong> was found, but is in the wrong case. <br/><br/> There is a risk that a browser may not be fully w3c compliant and when parsing the headers and do a straight string match, instead of a case insensitive one, resulting in the security header not being applied.]]></key>
+        <key alias="xssProtectionCheckHeaderFoundWrongCase"><![CDATA[The header <strong>X-XSS-Protection</strong> was found, but is in the wrong case.<br /><br />There is a risk that a browser may not be fully W3C compliant when parsing the headers and do a straight string match, instead of a case insensitive one, resulting in the security header not being applied.]]></key>
         <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
         <key alias="xssProtectionSetHeaderInConfigDescription">Adds the header 'X-XSS-Protection' with the value '1; mode=block' to the httpProtocol/customHeaders section of web.config. </key>
         <key alias="xssProtectionSetHeaderInConfigSuccess">The X-XSS-Protection header has been added to your web.config file.</key>
