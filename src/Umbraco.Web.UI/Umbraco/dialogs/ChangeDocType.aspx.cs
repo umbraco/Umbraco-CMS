@@ -231,7 +231,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 if (NewTemplateList.SelectedItem != null)
                 {
                     var templateId = int.Parse(NewTemplateList.SelectedItem.Value);
-                    _content.Template = templateId > 0 ? Services.FileService.GetTemplate(templateId) : null;
+                    _content.TemplateId = templateId;
                 }
 
                 // Set the property values

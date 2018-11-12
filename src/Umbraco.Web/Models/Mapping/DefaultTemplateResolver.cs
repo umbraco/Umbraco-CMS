@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using System.Web.Mvc;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -8,17 +10,24 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string Resolve(IContent source, ContentItemDisplay destination, string destMember, ResolutionContext context)
         {
-            if (source == null || source.Template == null) return null;
+            if (source == null)
+                return null;
 
-            var alias = source.Template.Alias;
+            // If no template id was set...
+            if (!source.TemplateId.HasValue)
+            {
+                // ... and no default template is set, return null...
+                if (string.IsNullOrWhiteSpace(source.ContentType.DefaultTemplate?.Alias))
+                    return null;
 
-            //set default template if template isn't set
-            if (string.IsNullOrEmpty(alias))
-                alias = source.ContentType.DefaultTemplate == null
-                    ? string.Empty
-                    : source.ContentType.DefaultTemplate.Alias;
+                // ... otherwise return the content type default template alias.
+                return source.ContentType.DefaultTemplate?.Alias;
+            }
+            
+            var fileService = DependencyResolver.Current.GetService<IFileService>();
+            var template = fileService.GetTemplate(source.TemplateId.Value);
 
-            return alias;
+            return template.Alias;
         }
     }
 }

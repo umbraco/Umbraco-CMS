@@ -341,7 +341,7 @@ namespace Umbraco.Examine
                     {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
                     {"writerName", new object[] {c.GetWriterProfile(userService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
-                    {"template", new object[] {c.Template?.Id ?? 0}}
+                    {"template", new object[] {c.TemplateId}}
                 };
 
                 foreach (var property in c.Properties)

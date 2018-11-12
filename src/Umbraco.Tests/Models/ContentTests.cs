@@ -235,10 +235,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
@@ -298,10 +295,7 @@ namespace Umbraco.Tests.Models
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
@@ -342,8 +336,8 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
-            Assert.AreNotSame(clone.Template, content.Template);
-            Assert.AreEqual(clone.Template, content.Template);
+            Assert.AreNotSame(clone.TemplateId, content.TemplateId);
+            Assert.AreEqual(clone.TemplateId, content.TemplateId);
             Assert.AreEqual(clone.Trashed, content.Trashed);
             Assert.AreEqual(clone.UpdateDate, content.UpdateDate);
             Assert.AreEqual(clone.VersionId, content.VersionId);
@@ -419,16 +413,12 @@ namespace Umbraco.Tests.Models
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
             content.SortOrder = 5;
-            content.Template = new Template((string)"Test Template", (string)"testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             
             content.Trashed = true;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-
-            content.Template.UpdateDate = DateTime.Now; //update a child object
+            
             content.ContentType.UpdateDate = DateTime.Now;  //update a child object
 
             // Act
@@ -436,19 +426,19 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.IsTrue(content.WasDirty());
-            Assert.IsTrue(content.WasPropertyDirty("Id"));
-            Assert.IsTrue(content.WasPropertyDirty("CreateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("CreatorId"));
-            Assert.IsTrue(content.WasPropertyDirty("ExpireDate"));
-            Assert.IsTrue(content.WasPropertyDirty("Key"));
-            Assert.IsTrue(content.WasPropertyDirty("Level"));
-            Assert.IsTrue(content.WasPropertyDirty("Path"));
-            Assert.IsTrue(content.WasPropertyDirty("ReleaseDate"));
-            Assert.IsTrue(content.WasPropertyDirty("SortOrder"));
-            Assert.IsTrue(content.WasPropertyDirty("Template"));
-            Assert.IsTrue(content.WasPropertyDirty("Trashed"));
-            Assert.IsTrue(content.WasPropertyDirty("UpdateDate"));
-            Assert.IsTrue(content.WasPropertyDirty("WriterId"));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Id)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreatorId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ExpireDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ReleaseDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.UpdateDate)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.WriterId)));
             foreach (var prop in content.Properties)
             {
                 Assert.IsTrue(prop.WasDirty());
@@ -469,7 +459,6 @@ namespace Umbraco.Tests.Models
                 Assert.IsTrue(culture.Value.WasPropertyDirty("Date"));
             }
             //verify child objects were reset too
-            Assert.IsTrue(content.Template.WasPropertyDirty("UpdateDate"));
             Assert.IsTrue(content.ContentType.WasPropertyDirty("UpdateDate"));
         }
 
@@ -497,10 +486,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
-            content.Template = new Template((string) "Test Template", (string) "testTemplate")
-            {
-                Id = 88
-            };
+            content.TemplateId = 88;
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
