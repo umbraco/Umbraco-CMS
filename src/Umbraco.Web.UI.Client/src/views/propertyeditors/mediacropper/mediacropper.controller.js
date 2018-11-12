@@ -263,7 +263,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
 
         $scope.showAdd = function () {
             if (!multiPicker) {
-                if ($scope.model.value && $scope.model.value !== "") {
+                if ($scope.model.value && $scope.model.value.length > 0) {
                     return false;
                 }
             }
