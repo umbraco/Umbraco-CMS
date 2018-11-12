@@ -40,7 +40,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             switch (action.Alias)
             {
                 case UpdateHeaderInConfigAction:
-                    return SetHeaderInConfig(true);
+                    return SetHeaderInConfig(false);
                 default:
                     return base.ExecuteAction(action);
             }
@@ -64,9 +64,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
                 if (string.IsNullOrWhiteSpace(key) == false)
                 {
-                    var headerValue = response.Headers[key];
-
-                    if (key.Equals(headerValue, StringComparison.InvariantCulture))
+                    if (key.Equals(Header, StringComparison.InvariantCulture))
                     {
                         resultType = StatusResultType.Success;
                         message = TextService.Localize($"healthcheck/{LocalizedTextPrefix}CheckHeaderFound");

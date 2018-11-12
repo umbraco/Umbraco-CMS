@@ -22,6 +22,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         protected readonly string Value;
         protected readonly string LocalizedTextPrefix;
         protected readonly bool MetaTagOptionAvailable;
+        protected readonly bool IgnoreCasing;
 
         public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
@@ -111,7 +112,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private bool DoHttpHeadersContainHeader(WebResponse response)
         {
-            return response.Headers.AllKeys.Contains(Header);
+            return string.IsNullOrWhiteSpace(response.Headers.AllKeys.FirstOrDefault(k => Header.InvariantEquals(k))) == false;
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -142,7 +143,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         /// </summary>
         /// <param name="ignoreCasing">If ignoreCasing is true, StringComparison.InvariantCultureIgnoreCase will be used for string comparison if the header already exists</param>
         /// <returns></returns>
-        protected HealthCheckStatus SetHeaderInConfig(bool ignoreCasing = false)
+        protected HealthCheckStatus SetHeaderInConfig(bool ignoreCasing = true)
         {
             var errorMessage = string.Empty;
             var success = SaveHeaderToConfigFile(out errorMessage, ignoreCasing);
@@ -163,7 +164,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 };
         }
 
-        private bool SaveHeaderToConfigFile(out string errorMessage, bool ignoreCasing = false)
+        private bool SaveHeaderToConfigFile(out string errorMessage, bool ignoreCasing = true)
         {
             try
             {
@@ -173,7 +174,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var doc = XDocument.Load(configFile);
                 var systemWebServerElement = doc.XPathSelectElement("/configuration/system.webServer");
                 var httpProtocolElement = systemWebServerElement.Element("httpProtocol");
-                var stringCompatison = ignoreCasing ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+                var stringComparison = ignoreCasing == true ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
                 if (httpProtocolElement == null)
                 {
                     httpProtocolElement = new XElement("httpProtocol");
@@ -188,7 +189,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 var removeHeaderElement = customHeadersElement.Elements("remove")
-                         .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringCompatison));
+                         .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringComparison));
 
                 if (removeHeaderElement == null)
                 {
@@ -198,11 +199,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
                 else
                 {
-                    removeHeaderElement.Attribute("name").SetValue(Header);
+                    if(ignoreCasing == false)
+                    {
+                        removeHeaderElement.Attribute("name").SetValue(Header);
+                    }
                 }
 
                 var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringCompatison));
+                    .SingleOrDefault(x => Header.Equals(x.Attribute("name")?.Value, stringComparison));
 
                 if (addHeaderElement == null)
                 {
@@ -213,7 +217,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
                 else
                 {
-                    addHeaderElement.Attribute("name").SetValue(Header);
+                    if (ignoreCasing == false)
+                    {
+                        addHeaderElement.Attribute("name").SetValue(Header);
+                    }
                 }
 
                 doc.Save(configFile);
