@@ -10,7 +10,7 @@
 
         <div ng-show="vm.invitedUser != null" class="umb-login-container">
 
-            <form name="vm.inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
+            <form name="inviteUserPasswordForm" novalidate="" ng-submit="vm.inviteSavePassword()" val-form-manager>
                 <div class="form" ng-if="vm.inviteStep === 1">
                     <h1 style="margin-bottom: 10px; text-align: left;">Hi, {{vm.invitedUser.name}}</h1>
                     <p style="line-height: 1.6; margin-bottom: 25px;">
