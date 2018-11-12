@@ -641,6 +641,15 @@
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
 
+                //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
+                let origDates = [];
+                for (let i = 0; i < $scope.content.variants.length; i++) {
+                    origDates.push({
+                        releaseDate: $scope.content.variants[i].releaseDate,
+                        expireDate: $scope.content.variants[i].expireDate
+                    });
+                }
+
                 if (!isContentCultureVariant()) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
@@ -683,6 +692,11 @@
                     },
                     close: function () {
                         overlayService.close();
+                        //restore the dates
+                        for (let i = 0; i < $scope.content.variants.length; i++) {
+                            $scope.content.variants[i].releaseDate = origDates[i].releaseDate;
+                            $scope.content.variants[i].expireDate = origDates[i].expireDate;
+                        }
                     }
                 };
                 overlayService.open(dialog);
