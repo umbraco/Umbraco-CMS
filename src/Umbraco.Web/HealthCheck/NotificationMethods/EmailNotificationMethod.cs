@@ -65,7 +65,16 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 results.ResultsAsHtml(Verbosity)
             });
 
+           
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
+
+            // Include the umbraco Application URL in the message subject so that you can identify the
+            // site that these results are for.
+            string umbracoApplicationUrl = UmbracoConfig.For.UmbracoSettings().WebRouting.UmbracoApplicationUrl;
+            if (string.IsNullOrEmpty(umbracoApplicationUrl) == false)
+            {
+                subject += " : " + umbracoApplicationUrl;
+            }
 
             var mailSender = new EmailSender();
             using (var mailMessage = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
