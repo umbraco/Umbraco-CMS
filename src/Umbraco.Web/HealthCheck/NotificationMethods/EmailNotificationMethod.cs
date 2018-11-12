@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
@@ -65,16 +67,26 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 results.ResultsAsHtml(Verbosity)
             });
 
-           
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
+            // Include the umbraco Application URL host in the message subject so that
+            // you can identify the site that these results are for.
 
-            // Include the umbraco Application URL in the message subject so that you can identify the
-            // site that these results are for.
             string umbracoApplicationUrl = UmbracoConfig.For.UmbracoSettings().WebRouting.UmbracoApplicationUrl;
+            string host = string.Empty;
+
             if (string.IsNullOrEmpty(umbracoApplicationUrl) == false)
             {
-                subject += " : " + umbracoApplicationUrl;
+                try
+                {
+                    Uri umbracoApplicationUri = new Uri(umbracoApplicationUrl);
+                    host = umbracoApplicationUri.Host;
+                }
+                catch (UriFormatException uriFormatException)
+                {
+                    LogHelper.WarnWithException<EmailNotificationMethod>(string.Format("{0} is not a valid URL for umbracoApplicationUrl", umbracoApplicationUrl), uriFormatException);
+                }
             }
+
+            string subject = string.Format(_textService.Localize("healthcheck/scheduledHealthCheckEmailSubject"), host);
 
             var mailSender = new EmailSender();
             using (var mailMessage = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
