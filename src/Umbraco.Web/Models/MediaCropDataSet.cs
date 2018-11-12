@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Udi, other.Udi) && Equals(FocalPoint, other.FocalPoint) 
+            return Udi.Equals(other.Udi) && Equals(FocalPoint, other.FocalPoint) 
                 && Crops.SequenceEqual(other.Crops);
         }
 
