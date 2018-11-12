@@ -25,9 +25,11 @@ using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Events;
 using Constants = Umbraco.Core.Constants;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using umbraco.cms.businesslogic;
 using System.Collections;
 using umbraco;
+using Umbraco.Web.UI;
 
 namespace Umbraco.Web.Editors
 {
@@ -895,11 +897,25 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId, Security.CurrentUser.Id);
+            var destinationParentID = move.ParentId;
+            var sourceParentID = toMove.ParentId;
 
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            return response;
+            var moveResult = Services.ContentService.WithResult().Move(toMove, move.ParentId, Security.CurrentUser.Id);
+
+            if (sourceParentID == destinationParentID)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("", Services.TextService.Localize("content/moveToSameFolderFailed"), SpeechBubbleIcon.Error)));
+            }
+            if (moveResult == false)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
         }
 
         /// <summary>

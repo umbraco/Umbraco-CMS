@@ -790,7 +790,7 @@ namespace Umbraco.Core.Services
                             }
                         }
                         uow.Commit();
-                        return OperationStatus.Cancelled(evtMsgs); ;
+                        return OperationStatus.Cancelled(evtMsgs);
                     }
 
                     media.ParentId = parentId;

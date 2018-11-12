@@ -1701,15 +1701,19 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        public void Move(IContent content, int parentId, int userId = 0)
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        public Attempt<OperationStatus> Move(IContent content, int parentId, int userId = 0)
         {
             using (new WriteLock(Locker))
             {
+                if (content == null) throw new ArgumentNullException("content");
+                var evtMsgs = EventMessagesFactory.Get();
+
                 //This ensures that the correct method is called if this method is used to Move to recycle bin.
                 if (parentId == Constants.System.RecycleBinContent)
                 {
                     MoveToRecycleBin(content, userId);
-                    return;
+                    return OperationStatus.Success(evtMsgs);
                 }
 
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -1718,8 +1722,15 @@ namespace Umbraco.Core.Services
                     var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
                     if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs, "Moving"))
                     {
+                        if (moveEventArgs.Messages.Count > 0)
+                        {
+                            foreach (var message in moveEventArgs.Messages.GetAll())
+                            {
+                                evtMsgs.Add(message);
+                            }
+                        }
                         uow.Commit();
-                        return;
+                        return OperationStatus.Cancelled(evtMsgs);
                     }
 
                     //used to track all the moved entities to be given to the event
@@ -1735,7 +1746,25 @@ namespace Umbraco.Core.Services
                     Audit(uow, AuditType.Move, "Move Content performed by user", userId, content.Id);
                     uow.Commit();
                 }
+
+                return OperationStatus.Success(evtMsgs);
             }
+        }
+
+        /// <summary>
+        /// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="IContent"/> object is already published it will be
+        /// published after being moved to its new location. Otherwise it'll just
+        /// be saved with a new parent id.
+        /// </remarks>
+        /// <param name="content">The <see cref="IContent"/> to move</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="userId">Optional Id of the User moving the Content</param>
+        void IContentService.Move(IContent content, int parentId, int userId = 0)
+        {
+            Move(content, parentId, userId);
         }
 
         /// <summary>

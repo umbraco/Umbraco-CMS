@@ -89,6 +89,15 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         Attempt<UnPublishStatus> UnPublish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Moves an <see cref="IMedia"/> object to a new location
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to move</param>
+        /// <param name="parentId">Id of the Media's new Parent</param>
+        /// <param name="userId">Id of the User moving the Media</param>
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        Attempt<OperationStatus> Move(IContent content, int parentId, int userId = 0);
     }
 
     /// <summary>

@@ -145,12 +145,37 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                   $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostMove"),
-                         {
-                             parentId: args.parentId,
-                             id: args.id
-                         }),
-                   'Failed to move content');
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                {
+                    error: function (data) {
+                        var errorMsg = 'Failed to move content';
+                        if (data.id !== undefined && data.parentId !== undefined) {
+                            if (data.id === data.parentId) {
+                                errorMsg = 'Content can\'t be moved into itself';
+                            }
+                        }
+                        else if (data.notifications !== undefined) {
+                            if (data.notifications.length > 0) {
+                                if (data.notifications[0].header.length > 0) {
+                                    errorMsg = data.notifications[0].header;
+                                }
+                                if (data.notifications[0].message.length > 0) {
+                                    errorMsg = errorMsg + ": " + data.notifications[0].message;
+                                }
+                            }
+                        }
+
+                        return {
+                            errorMsg: errorMsg,
+                            data: data
+                        };
+                    }
+                });
+
         },
 
         /**
