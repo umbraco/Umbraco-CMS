@@ -236,7 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // fast way of getting an id for an isoCode - avoiding cloning
         // _codeIdMap is rebuilt whenever PerformGetAll runs
-        public int? GetIdByIsoCode(string isoCode, bool throwOnNotFound)
+        public int? GetIdByIsoCode(string isoCode, bool throwOnNotFound = true)
         {
             if (isoCode == null) return null;
 

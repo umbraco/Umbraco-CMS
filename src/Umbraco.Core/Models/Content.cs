@@ -20,8 +20,6 @@ namespace Umbraco.Core.Models
         private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
-        private DateTime? _releaseDate;
-        private DateTime? _expireDate;
         private ContentCultureInfosCollection _publishInfos;
         private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
@@ -102,7 +100,7 @@ namespace Umbraco.Core.Models
                     _schedule = new ContentScheduleCollection();
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
                 }
-                return _schedule ?? (_schedule = new ContentScheduleCollection());
+                return _schedule;
             }
             set
             {
@@ -301,7 +299,8 @@ namespace Umbraco.Core.Models
             _publishInfos.Remove(culture);
 
             //we need to set the culture name to be dirty so we know it's being modified
-            //fixme is there a better way to do this, not as far as i know. 
+            //fixme is there a better way to do this, not as far as i know.
+            // fixme why do we need this?
             SetCultureName(GetCultureName(culture), culture);
 
             if (_publishInfos.Count == 0) _publishInfos = null;

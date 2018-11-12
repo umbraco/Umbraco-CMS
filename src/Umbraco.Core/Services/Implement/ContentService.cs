@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -942,9 +940,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // finally, "save publishing"
-            // what happens next depends on whether the content can be published or not
-            var saved = SavePublishing(content, userId);
-            return saved;
+            return SavePublishing(content, userId);
         }
 
         /// <inheritdoc />
@@ -970,6 +966,7 @@ namespace Umbraco.Core.Services.Implement
                 ((Content)content).PublishedState = PublishedState.Publishing;
 
             // state here is either Publishing or Unpublishing
+            // (even though, Publishing to unpublish a culture may end up unpublishing everything)
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
@@ -1014,11 +1011,11 @@ namespace Umbraco.Core.Services.Implement
                         unpublishing = content.Published; // if not published yet, nothing to do
 
                         // we may end up in a state where we won't publish nor unpublish
-                        // keep going, though, as we want to save anways
+                        // keep going, though, as we want to save anyways
                     }
 
                     //fixme - casting
-                    ((Content)content).Published = content.Published; // reset published state = save unchanged
+                    ((Content)content).Published = content.Published; // reset published state = save unchanged - fixme doh?
                 }
             }
 
@@ -1026,7 +1023,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 var newest = GetById(content.Id); // ensure we have the newest version - in scope
                 if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
-                    content = newest;
+                    content = newest; // fixme confusing should just die here - else we'll miss some changes
 
                 if (content.Published)
                 {
@@ -1269,18 +1266,20 @@ namespace Umbraco.Core.Services.Implement
             // should not trigger a publish).
             HashSet<string> ShouldPublish(IContent c)
             {
+                var isRoot = c.Id == content.Id;
+
                 if (c.ContentType.VariesByCulture())
                 {
                     // variant content type
                     // add culture if edited, and already published or forced
-                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force))
+                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
                         return new HashSet<string> { culture.ToLowerInvariant() };
                 }
                 else
                 {
                     // invariant content type
                     // add "*" if edited, and already published or forced
-                    if (c.Edited && (c.Published || force))
+                    if (c.Edited && (c.Published || force || isRoot))
                         return new HashSet<string> { "*" };
                 }
 
@@ -1314,6 +1313,7 @@ namespace Umbraco.Core.Services.Implement
             HashSet<string> ShouldPublish(IContent c)
             {
                 var culturesToPublish = new HashSet<string>();
+                var isRoot = c.Id == content.Id;
 
                 if (c.ContentType.VariesByCulture())
                 {
@@ -1321,7 +1321,7 @@ namespace Umbraco.Core.Services.Implement
                     // add cultures which are edited, and already published or forced
                     foreach (var culture in cultures)
                     {
-                        if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force))
+                        if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
                             culturesToPublish.Add(culture.ToLowerInvariant());
                     }
                 }
@@ -1329,7 +1329,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // invariant content type
                     // add "*" if edited, and already published or forced
-                    if (c.Edited && (c.Published || force))
+                    if (c.Edited && (c.Published || force || isRoot))
                         culturesToPublish.Add("*");
                 }
 
@@ -1425,7 +1425,7 @@ namespace Umbraco.Core.Services.Implement
         // publishValues: a function publishing values (using the appropriate PublishCulture calls)
         private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
             Func<IContent, HashSet<string>> shouldPublish, Func<IContent, HashSet<string>, bool> publishCultures,
-            bool checkPath,
+            bool isRoot,
             ICollection<IContent> publishedDocuments,
             EventMessages evtMsgs, int userId)
         {
@@ -1442,8 +1442,28 @@ namespace Umbraco.Core.Services.Implement
             if (publishCultures != null && !publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            return SavePublishingInternal(scope, document, userId);
+            // fixme - this is totally kinda wrong
 
+            var culturesPublishing = document.ContentType.VariesByCulture()
+                ? document.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
+                : null;
+            var result = StrategyCanPublish(scope, document, userId, /*checkPath:*/ isRoot, culturesPublishing, Array.Empty<string>(), evtMsgs);
+            if (!result.Success)
+                return result;
+            result = StrategyPublish(scope, document, userId, culturesPublishing, Array.Empty<string>(), evtMsgs);
+            if (!result.Success)
+                throw new Exception("panic");
+            if (document.HasIdentity == false)
+                document.CreatorId = userId;
+            document.WriterId = userId;
+            _documentRepository.Save(document);
+            publishedDocuments.Add(document);
+            // fixme - but then, we have all the audit thing to run
+            // so... it would be better to re-run the internal thing?
+            return result;
+
+            // we want _some part_ of it but not all of it
+            return SavePublishingInternal(scope, document, userId);
         }
 
         #endregion
@@ -1969,7 +1989,7 @@ namespace Umbraco.Core.Services.Implement
                         Audit(AuditType.SendToPublish, content.WriterId, content.Id);
                 }
 
-                // fixme here, on only on success?                
+                // fixme here, on only on success?
                 scope.Complete();
 
                 return saveResult.Success;
@@ -2312,7 +2332,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             var variesByCulture = content.ContentType.VariesByCulture();
-            
+
             //First check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
             if (variesByCulture)
@@ -2322,7 +2342,7 @@ namespace Umbraco.Core.Services.Implement
 
                 // missing mandatory culture = cannot be published
                 var mandatoryCultures = _languageRepository.GetMany().Where(x => x.IsMandatory).Select(x => x.IsoCode);
-                var mandatoryMissing = mandatoryCultures.Any(x => !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); 
+                var mandatoryMissing = mandatoryCultures.Any(x => !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase));
                 if (mandatoryMissing)
                     return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, evtMsgs, content);
 
@@ -2454,7 +2474,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Unpublishes a document 
+        /// Unpublishes a document
         /// </summary>
         /// <param name="scope"></param>
         /// <param name="content"></param>

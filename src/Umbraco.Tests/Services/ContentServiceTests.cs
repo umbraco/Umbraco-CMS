@@ -351,10 +351,11 @@ namespace Umbraco.Tests.Services
 
             content.ContentSchedule.Add(null, DateTime.Now.AddHours(2));
             contentService.Save(content, Constants.Security.SuperUserId);
+            Assert.AreEqual(1, content.ContentSchedule.FullSchedule.Count);
 
             content = contentService.GetById(content.Id);
             var sched = content.ContentSchedule.FullSchedule;
-            Assert.AreEqual(1, sched.Count());
+            Assert.AreEqual(1, sched.Count);
             Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
             content.ContentSchedule.Clear(ContentScheduleChange.End);
             contentService.Save(content, Constants.Security.SuperUserId);
@@ -363,7 +364,7 @@ namespace Umbraco.Tests.Services
             // Assert
             content = contentService.GetById(content.Id);
             sched = content.ContentSchedule.FullSchedule;
-            Assert.AreEqual(0, sched.Count());
+            Assert.AreEqual(0, sched.Count);
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
 

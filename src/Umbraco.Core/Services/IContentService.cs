@@ -132,7 +132,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetRootContent();
 
         /// <summary>
-        /// Gets documents with an expiration date greater then today.
+        /// Gets documents having an expiration date before (lower than, or equal to) a specified date.
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         /// <remarks>
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetContentForExpiration(DateTime date);
 
         /// <summary>
-        /// Gets documents with a release date greater then today.
+        /// Gets documents having a release date before (lower than, or equal to) a specified date.
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         /// <remarks>
@@ -362,23 +362,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
 
-        /*
-         fixme - document this better + test
-         If the item being published is Invariant and it has Variant descendants and
-          we are NOT forcing publishing of anything not published - the result will be that the Variant cultures that are
-          already published (but may contain a draft) are published. Any cultures that don't have a published version are not published
-          fixme: now, if publishing '*' then all cultures
-         If the item being published is Invariant and it has Variant descendants and
-           we ARE forcing publishing of anything not published - the result will be that all Variant cultures are
-           published regardless of whether they don't have any current published versions
-
-         If the item being published is Variant and it has Invariant descendants and
-           we are NOT forcing publishing of anything not published - the result will be that all Invariant documents are
-           published that already have a published versions, regardless of what cultures are selected to be published
-         If the item being published is Variant and it has Invariant descendants and
-           we ARE forcing publishing of anything not published - the result will be that all Invariant documents are
-           published regardless of whether they have a published version or not and regardless of what cultures are selected to be published
-         */
+        // fixme/review - should SaveAndPublishBranch always publish the root document of the branch, even when !force?
 
         /// <summary>
         /// Saves and publishes a document branch.
@@ -392,7 +376,7 @@ namespace Umbraco.Core.Services
         /// than one culture, see the other overloads of this method.</para>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published.</para>
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
 
@@ -406,7 +390,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published.</para>
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0);
 
@@ -421,7 +405,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published.</para>
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
         /// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
         /// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other

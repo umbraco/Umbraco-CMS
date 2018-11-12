@@ -1,5 +1,4 @@
 ﻿using NPoco;
-using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
@@ -55,6 +54,5 @@ namespace Umbraco.Core.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]
         public DocumentVersionDto PublishedVersionDto { get; set; }
-        
     }
 }

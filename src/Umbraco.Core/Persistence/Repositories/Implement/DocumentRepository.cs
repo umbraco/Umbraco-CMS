@@ -83,11 +83,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate();
 
+            AddGetByQueryOrderBy(sql);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+        }
+
+        private void AddGetByQueryOrderBy(Sql<ISqlContext> sql)
+        {
             sql // fixme why - this should be Path
                 .OrderBy<NodeDto>(x => x.Level)
                 .OrderBy<NodeDto>(x => x.SortOrder);
-
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
@@ -321,7 +326,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
-            contentVersionDto.Text = content.Name; //fixme is this requried? isn't this mapped in the ContentBaseFactory?
             Database.Insert(contentVersionDto);
             content.VersionId = contentVersionDto.Id;
 
@@ -367,11 +371,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             //insert the schedule
-            var scheduleDto = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
-            foreach (var c in scheduleDto)
+            var scheduleDtos = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
+            foreach (var scheduleDto in scheduleDtos)
             {
-                c.NodeId = nodeDto.NodeId;
-                Database.Insert(c);
+                scheduleDto.NodeId = nodeDto.NodeId;
+                Database.Insert(scheduleDto);
             }
 
             // persist the variations
@@ -502,7 +506,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 documentVersionDto.Published = true; // now published
                 contentVersionDto.Current = false; // no more current
-                contentVersionDto.Text = content.Name;
             }
             Database.Update(contentVersionDto);
             Database.Update(documentVersionDto);
@@ -596,22 +599,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.IsPropertyDirty("ContentSchedule"))
             {
                 //update the schedule, get the existing one so we know what to update
-                var dtoSchedule = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
-                var existingSched = Database.Fetch<int>(Sql()
-                    .Select<ContentScheduleDto>(x => x.Id)
-                    .From<ContentScheduleDto>()
-                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id));
+                var scheduleDtos = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
+
                 //remove any that no longer exist
-                var schedToRemove = existingSched.Except(dtoSchedule.Select(x => x.Id));
-                foreach (var c in schedToRemove)
-                    Database.DeleteWhere<ContentScheduleDto>("id = @id", new { id = c });
+                var ids = scheduleDtos.Where(x => x.Id > 0).Select(x => x.Id).Distinct();
+                Database.Execute(Sql()
+                    .Delete<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
+                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
+
                 //add/update the rest
-                foreach (var c in dtoSchedule)
+                foreach (var scheduleDto in scheduleDtos)
                 {
-                    if (c.Id == 0)
-                        Database.Insert(c);
+                    if (scheduleDto.Id == 0)
+                        Database.Insert(scheduleDto);
                     else
-                        Database.Update(c);
+                        Database.Update(scheduleDto);
                 }
             }
 
@@ -907,47 +910,41 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
-            var sqlSchedule = Sql()
-                .Select<ContentScheduleDto>(x => x.NodeId)
-                .From<ContentScheduleDto>()
-                .Where<ContentScheduleDto>(x =>
-                    x.Action == ContentScheduleChange.Start.ToString()
-                    && x.Date <= date);
+            var action = ContentScheduleChange.Start.ToString();
 
-            //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
-            // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
-            // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
-            // no time to investigate right now.
-            // fixed here: https://github.com/umbraco/Umbraco-CMS/pull/3516/files so when that's merged we don't need the AsEnumerable() thing
-            var scheduledIds = Database.Fetch<int>(sqlSchedule);
-            if (scheduledIds.Count == 0) return Enumerable.Empty<IContent>();
-            var e = scheduledIds.AsEnumerable();
+            // fixme/review - code would blow if more than 2000 items
+            // fixme/review - isn't this simpler?
+            var sql = GetBaseQuery(QueryType.Many)
+                .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                    .Select<ContentScheduleDto>(x => x.NodeId)
+                    .From<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
 
-            var query = Query<IContent>().Where(x => x.Published == false && e.Contains(x.Id));
-            return Get(query);
+            sql.Where<NodeDto>(x => !x.Trashed); // fixme/review - shouldn't we exclude trashed nodes?
+            sql.Where<DocumentDto>(x => !x.Published);
+
+            AddGetByQueryOrderBy(sql);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
         }
 
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForExpiration(DateTime date)
         {
-            var sqlSchedule = Sql()
-                .Select<ContentScheduleDto>(x => x.NodeId)
-                .From<ContentScheduleDto>()
-                .Where<ContentScheduleDto>(x =>
-                    x.Action == ContentScheduleChange.End.ToString()
-                    && x.Date <= date);
+            var action = ContentScheduleChange.End.ToString();
 
-            //fixme - If we don't cast to IEnumerable<T> or do a ToArray, the Expression Visitor will FAIL!
-            // in the ExpressionVisitorBase.VisitMethodCall where the switch checks for "Contains" for some reason
-            // the 'special case' that redirects to `SqlIn` fails because the m.Arguments.Count is only ONE instead of TWO,
-            // no time to investigate right now.
-            // fixed here: https://github.com/umbraco/Umbraco-CMS/pull/3516/files so when that's merged we don't need the AsEnumerable() thing
-            var scheduledIds = Database.Fetch<int>(sqlSchedule);
-            if (scheduledIds.Count == 0) return Enumerable.Empty<IContent>();
-            var e = scheduledIds.AsEnumerable();
+            // fixme/review - see as above
+            var sql = GetBaseQuery(QueryType.Many)
+                .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                    .Select<ContentScheduleDto>(x => x.NodeId)
+                    .From<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
 
-            var query = Query<IContent>().Where(x => x.Published && e.Contains(x.Id));
-            return Get(query);
+            sql.Where<DocumentDto>(x => x.Published);
+
+            AddGetByQueryOrderBy(sql);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
         }
 
         #endregion
@@ -1160,23 +1157,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IDictionary<int, ContentScheduleCollection> GetContentSchedule(params int[] contentIds)
         {
             var result = new Dictionary<int, ContentScheduleCollection>();
-            foreach(var ids in contentIds.InGroupsOf(2000))
-            {
-                var sql = Sql().Select<ContentScheduleDto>().From<ContentScheduleDto>().Where<ContentScheduleDto>(x => ids.Contains(x.NodeId));
-                var scheduleDto = Database.Fetch<ContentScheduleDto>(sql);
 
-                foreach (var dto in scheduleDto)
-                {
-                    var schedule = new ContentScheduleCollection();
-                    schedule.Add(new ContentSchedule(dto.Id,
-                                LanguageRepository.GetIsoCodeById(dto.LanguageId) ?? string.Empty,
-                                dto.Date,
-                                dto.Action == ContentScheduleChange.Start.ToString()
-                                    ? ContentScheduleChange.Start
-                                    : ContentScheduleChange.End));
-                    result[dto.NodeId] = schedule;
-                }
+            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+                .Select<ContentScheduleDto>()
+                .From<ContentScheduleDto>()
+                .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
+
+            foreach (var scheduleDto in scheduleDtos)
+            {
+                // fixme/review - code was adding a new collection on each dto?
+
+                if (!result.TryGetValue(scheduleDto.NodeId, out var col))
+                    col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
+
+                col.Add(new ContentSchedule(scheduleDto.Id,
+                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
+                    scheduleDto.Date,
+                    scheduleDto.Action == ContentScheduleChange.Start.ToString()
+                        ? ContentScheduleChange.Start
+                        : ContentScheduleChange.End));
             }
+
             return result;
         }
 

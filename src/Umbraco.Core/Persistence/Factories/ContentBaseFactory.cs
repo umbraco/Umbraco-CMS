@@ -175,20 +175,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static IEnumerable<ContentScheduleDto> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
         {
-            var schedule = new List<ContentScheduleDto>();
-            foreach(var s in entity.ContentSchedule.FullSchedule)
-            {
-                schedule.Add(new ContentScheduleDto
+            return entity.ContentSchedule.FullSchedule.Select(x =>
+                new ContentScheduleDto
                 {
-                    Action = s.Change.ToString(),
-                    Date = s.Date,
+                    Action = x.Change.ToString(),
+                    Date = x.Date,
                     NodeId = entity.Id,
-                    LanguageId = languageRepository.GetIdByIsoCode(s.Culture, false),
-                    Id = s.Id
+                    LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
+                    Id = x.Id
                 });
-            }
-
-            return schedule;
         }
 
         /// <summary>

@@ -37,13 +37,13 @@ namespace Umbraco.Tests.Services
             //  ii2     !published   !edited
 
             // !force = publishes those that are actually published, and have changes
-            // here: nothing
+            // here: root (root is always published)
 
             var r = SaveAndPublishInvariantBranch(iRoot, false, method).ToArray();
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "ii2");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish,
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready);
 
@@ -220,8 +220,8 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Content.Name,
                 "vroot.de", "iv1.de", "iv2.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublish,
-                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishCulture,
+                PublishResultType.SuccessPublishCulture,
                 PublishResultType.SuccessPublishAlready);
 
             // reload - SaveAndPublishBranch has modified other instances
@@ -291,7 +291,7 @@ namespace Umbraco.Tests.Services
             AssertPublishResults(r, x => x.Result,
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublish,
-                PublishResultType.SuccessPublish);
+                PublishResultType.SuccessPublishCulture);
 
             // reload - SaveAndPublishBranch has modified other instances
             Reload(ref ii1);
