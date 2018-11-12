@@ -77,7 +77,7 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
                 ));
             }
         }
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }   
+        }
 
         /// <summary>
         /// Gets an empty content item for the
@@ -366,7 +366,7 @@ namespace Umbraco.Web.Editors
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
-            
+
             return mapped;
         }
 
@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
-                int pageNumber = 0,  
+                int pageNumber = 0,
                 int pageSize = 0,
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
@@ -500,7 +500,7 @@ namespace Umbraco.Web.Editors
                     opts =>
                     {
 
-                        opts.SetCulture(cultureName);                        
+                        opts.SetCulture(cultureName);
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (!includeProperties.IsNullOrWhiteSpace())
@@ -676,7 +676,7 @@ namespace Umbraco.Web.Editors
                             break;
                     }
                 }
-               
+
             }
 
             //initialize this to successful
@@ -706,7 +706,7 @@ namespace Umbraco.Web.Editors
                             {
                                 AddSuccessNotification(notifications, c,
                                     Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                                    Services.TextService.Localize("speechBubbles/editVariantSavedText", new[] {_allLangs.Value[c].CultureName}));
+                                    Services.TextService.Localize("speechBubbles/editVariantSavedText", new[] { _allLangs.Value[c].CultureName }));
                             }
                         }
                         else if (ModelState.IsValid)
@@ -728,7 +728,7 @@ namespace Umbraco.Web.Editors
                         wasCancelled = false;
                         break;
                     }
-                    
+
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
                     var sendResult = Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
@@ -793,7 +793,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
                 }
             }
-            
+
             display.PersistedContent = contentItem.PersistedContent;
 
             return display;
@@ -814,149 +814,122 @@ namespace Umbraco.Web.Editors
 
         private bool SaveScheduleInvariant(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
         {
-            var v = contentItem.Variants.First();
+            var variant = contentItem.Variants.First();
 
             var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.Start).ToList();
             var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.End).ToList();
 
-            //TODO: Do we really care about this?
-            ////Cannot schedule an expiry date for a non-published content item
-            //// * if expiry is being added (not removed)
-            //// * the content is not published, nor is it being scheduled for publishing
-            //if (v.ExpireDate.HasValue && currExpire.Count == 0 && !contentItem.PersistedContent.Published && !v.ReleaseDate.HasValue && currRelease.Count == 0)
-            //{
-            //    globalNotifications.AddErrorNotification(
-            //        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
-            //        Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate3"));
-            //    return false;
-            //}
+            //Do all validation of data first
 
-            //TODO: We need to validate first before doing anything
-
-            if (v.ReleaseDate.HasValue)
+            //1) release date cannot be less than now
+            if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
             {
-                if (v.ReleaseDate < DateTime.Now)
-                {
-                    globalNotifications.AddErrorNotification(
+                globalNotifications.AddErrorNotification(
                         Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
                         Services.TextService.Localize("speechBubbles", "scheduleErrReleaseDate1"));
-                    return false;
-                }
-                else
-                {
-                    //remove any existing release dates so we can replace it
-                    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
-                }
-            }
-            else if (currRelease.Count > 0)
-            {
-                //if there was a release and the value is null, we are clearing the schedule
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
+                return false;
             }
 
-            if (v.ExpireDate.HasValue)
+            //2) expire date cannot be less than now
+            if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
             {
-                if (v.ExpireDate < DateTime.Now)
-                {
-                    globalNotifications.AddErrorNotification(
+                globalNotifications.AddErrorNotification(
                         Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
                         Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate1"));
-                    return false;
-                }
-                else if (v.ReleaseDate.HasValue && v.ExpireDate <= v.ReleaseDate)
-                {
-                    globalNotifications.AddErrorNotification(
-                        Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
-                        Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate2"));
-                    return false;
-                }
-                else
-                {
-                    //remove any existing expire dates so we can replace it
-                    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
-                }
-            }
-            else if (currExpire.Count > 0)
-            {
-                //if there was an expiry and the value is null, we are clearing the schedule
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
+                return false;
             }
 
+            //3) expire date cannot be less than release date
+            if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
+            {
+                globalNotifications.AddErrorNotification(
+                    Services.TextService.Localize("speechBubbles", "validationFailedHeader"),
+                    Services.TextService.Localize("speechBubbles", "scheduleErrExpireDate2"));
+                return false;
+            }
+
+
+            //Now we can do the data updates
+
+            //remove any existing release dates so we can replace it
+            //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
+            if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
+
+            //remove any existing expire dates so we can replace it
+            //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
+            if (variant.ExpireDate.HasValue || currExpire.Count > 0)
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
+
             //add the new schedule
-            contentItem.PersistedContent.ContentSchedule.Add(v.ReleaseDate, v.ExpireDate);
+            contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
             return true;
         }
 
         private bool SaveScheduleVariant(ContentItemSave contentItem)
         {
-            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
-            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+            var cultureVariants = contentItem.Variants
+                .Where(x => !x.Culture.IsNullOrWhiteSpace() //All variants in this collection should have a culture if we get here but we'll double check and filter here
+                    && x.ReleaseDate.HasValue || x.ExpireDate.HasValue)
+                .ToList();
 
             //validate if we can continue based on the mandatory language requirements
             if (!ValidatePublishingMandatoryLanguages(contentItem, cultureVariants, "speechBubbles/scheduleErrReleaseDate2"))
                 return false;
 
-            //TODO: Fill in other validation
+            //TODO: Fill in other validation https://github.com/umbraco/Umbraco.Private/issues/226
+
+            //Do all validation of data first
 
             var isValid = true;
-            foreach (var v in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
+            foreach (var variant in cultureVariants)
             {
-                //TODO: Check the currently scheduled data too like we are doing for invariant!
-                var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(v.Culture, ContentScheduleChange.Start).ToList();
-                var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(v.Culture, ContentScheduleChange.End).ToList();
-
-                //TODO: Deal with clearing a schedule that is persisted like we are doing invariant
-
-                ///Cannot schedule an expiry date for a non-published content item
-                //TODO: Fix this logic like in the invariant since the user can be turning off expiry
-                if ((!contentItem.PersistedContent.Published || !contentItem.PersistedContent.IsCulturePublished(v.Culture)) && !v.ReleaseDate.HasValue)
+                //1) release date cannot be less than now
+                if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
                 {
-                    AddCultureValidationError(v.Culture, "scheduleErrExpireDate3");
+                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrReleaseDate1");
                     isValid = false;
                     continue;
                 }
 
-                if (v.ReleaseDate.HasValue)
+                //2) expire date cannot be less than now
+                if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
                 {
-                    if (v.ReleaseDate < DateTime.Now)
-                    {
-                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrReleaseDate1");
-                        isValid = false;
-                        continue;
-                    }
-                    else
-                    {
-                        //remove any existing release dates so we can replace it
-                        contentItem.PersistedContent.ContentSchedule.Clear(v.Culture, ContentScheduleChange.Start);
-                    }
+                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrExpireDate1");
+                    isValid = false;
+                    continue;
                 }
 
-                if (v.ExpireDate.HasValue)
+                //3) expire date cannot be less than release date
+                if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
                 {
-                    if (v.ExpireDate < DateTime.Now)
-                    {
-                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrExpireDate1");
-                        isValid = false;
-                        continue;
-                    }
-                    else if (v.ReleaseDate.HasValue && v.ExpireDate <= v.ReleaseDate)
-                    {
-                        AddCultureValidationError(v.Culture, "speechBubbles/scheduleErrExpireDate2");
-                        isValid = false;
-                        continue;
-                    }
-                    else
-                    {
-                        //remove any existing expire dates so we can replace it
-                        contentItem.PersistedContent.ContentSchedule.Clear(v.Culture, ContentScheduleChange.End);
-                    }
+                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrExpireDate2");
+                    isValid = false;
+                    continue;
                 }
+            }
 
-                if (isValid)
-                {
-                    //add the new schedule
-                    contentItem.PersistedContent.ContentSchedule.Add(v.Culture, v.ReleaseDate, v.ExpireDate);
-                }
+            if (!isValid) return false;
+
+            //Now we can do the data updates
+
+            foreach (var variant in cultureVariants)
+            {
+                var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(variant.Culture, ContentScheduleChange.Start).ToList();
+                var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(variant.Culture, ContentScheduleChange.End).ToList();
+
+                //remove any existing release dates so we can replace it
+                //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
+                if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
+                    contentItem.PersistedContent.ContentSchedule.Clear(variant.Culture, ContentScheduleChange.Start);
+
+                //remove any existing expire dates so we can replace it
+                //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
+                if (variant.ExpireDate.HasValue || currExpire.Count > 0)
+                    contentItem.PersistedContent.ContentSchedule.Clear(variant.Culture, ContentScheduleChange.End);
+
+                //add the new schedule
+                contentItem.PersistedContent.ContentSchedule.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
             }
 
             return isValid;
@@ -1093,7 +1066,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants)
         {
-            foreach(var variant in cultureVariants.Where(x => x.Publish))
+            foreach (var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
                 var valid = persistentContent.PublishCulture(variant.Culture);
@@ -1329,7 +1302,7 @@ namespace Umbraco.Web.Editors
 
                 var content = MapToDisplay(foundContent);
 
-                if (!unpublishResult.Success)   
+                if (!unpublishResult.Success)
                 {
                     AddCancelMessage(content);
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
@@ -1346,7 +1319,7 @@ namespace Umbraco.Web.Editors
             {
                 //we only want to unpublish some of the variants
                 var results = new Dictionary<string, PublishResult>();
-                foreach(var c in model.Cultures)
+                foreach (var c in model.Cultures)
                 {
                     var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
                     results[c] = result;
@@ -1463,7 +1436,7 @@ namespace Umbraco.Web.Editors
             {
                 Services.DomainService.Delete(domain);
             }
-            
+
             var names = new List<string>();
 
             // create or update domains in the model
@@ -1551,7 +1524,7 @@ namespace Umbraco.Web.Editors
                     AddCultureValidationError(cultureError, "speechBubbles/contentCultureValidationError");
                 }
             }
-                
+
             base.HandleInvalidModelState(display);
         }
 
@@ -1606,7 +1579,7 @@ namespace Umbraco.Web.Editors
 
                 variantIndex++;
             }
-            
+
             //only set the template if it didn't change
             var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                                                         || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
@@ -1850,7 +1823,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<ContentItemDisplay>(content);
             return display;
         }
-		
+
         [EnsureUserPermissionForContent("contentId", 'R')]
         public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
         {
@@ -1867,7 +1840,7 @@ namespace Umbraco.Web.Editors
                 var n = new NotifySetting
                 {
                     Name = Services.TextService.Localize("actions", a.Alias),
-                    Checked = userNotifications.FirstOrDefault(x=> x.Action == a.Letter.ToString()) != null,
+                    Checked = userNotifications.FirstOrDefault(x => x.Action == a.Letter.ToString()) != null,
                     NotifyCode = a.Letter.ToString()
                 };
                 notifications.Add(n);
@@ -1928,7 +1901,7 @@ namespace Umbraco.Web.Editors
                 if (users.TryGetValue(rollbackVersion.VersionAuthorId, out var userName))
                     rollbackVersion.VersionAuthorName = userName;
             }
-            
+
             return rollbackVersions;
         }
 
@@ -1937,9 +1910,9 @@ namespace Umbraco.Web.Editors
         {
             var version = Services.ContentService.GetVersion(versionId);
             var content = MapToDisplay(version);
-                       
-			return culture == null
-				? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
+
+            return culture == null
+                ? content.Variants.FirstOrDefault()  //No culture set - so this is an invariant node - so just list me the first item in here
                 : content.Variants.FirstOrDefault(x => x.Language.IsoCode == culture);
         }
 
@@ -1949,7 +1922,7 @@ namespace Umbraco.Web.Editors
         {
             var rollbackResult = Services.ContentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
 
-			if (rollbackResult.Success)
+            if (rollbackResult.Success)
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             var notificationModel = new SimpleNotificationModel();
