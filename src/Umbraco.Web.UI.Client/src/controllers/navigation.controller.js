@@ -168,6 +168,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
+        if (args.key === "dialogTemplateUrl") {
+            $scope.dialogTemplateUrl = args.value;
+        }
         if (args.key === "showMenu") {
             $scope.showContextMenu = args.value;
         }

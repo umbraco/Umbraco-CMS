@@ -404,19 +404,13 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
                             //NOTE: This is assigning the current action node - this is not the same as the currently selected node!
                             appState.setMenuState("currentNode", args.node);
 
-                            //ensure the current dialog is cleared before creating another!
-                            if (currentDialog) {
-                                dialogService.close(currentDialog);
-                            }
-
-                            var dialog = self.showDialog({
+                            self.showDialog({
                                 node: args.node,
                                 action: found,
                                 section: appState.getSectionState("currentSection")
                             });
 
-                            //return the dialog this is opening.
-                            return $q.resolve(dialog);
+                            return $q.resolve();
                         }
                     }
 
@@ -545,22 +539,6 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
                 throw "The args parameter must have a 'node' as the active tree node";
             }
 
-            //ensure the current dialog is cleared before creating another!
-            if (currentDialog) {
-                dialogService.close(currentDialog);
-                currentDialog = null;
-            }
-
-            setMode("dialog");
-
-            //NOTE: Set up the scope object and assign properties, this is legacy functionality but we have to live with it now.
-            // we should be passing in currentNode and currentAction using 'dialogData' for the dialog, not attaching it to a scope.
-            // This scope instance will be destroyed by the dialog so it cannot be a scope that exists outside of the dialog.
-            // If a scope instance has been passed in, we'll have to create a child scope of it, otherwise a new root scope.
-            var dialogScope = args.scope ? args.scope.$new() : $rootScope.$new();
-            dialogScope.currentNode = args.node;
-            dialogScope.currentAction = args.action;
-
             //the title might be in the meta data, check there first
             if (args.action.metaData["dialogTitle"]) {
                 appState.setMenuState("dialogTitle", args.action.metaData["dialogTitle"]);
@@ -570,15 +548,9 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
             }
 
             var templateUrl;
-            var iframe;
 
-            if (args.action.metaData["actionUrl"]) {
-                templateUrl = args.action.metaData["actionUrl"];
-                iframe = true;
-            }
-            else if (args.action.metaData["actionView"]) {
+            if (args.action.metaData["actionView"]) {
                 templateUrl = args.action.metaData["actionView"];
-                iframe = false;
             }
             else {
 
@@ -604,35 +576,14 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
                     templateUrl = "views/" + treeAlias + "/" + args.action.alias + ".html";
                 }
 
-                iframe = false;
             }
 
-            //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
-            // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog
-            // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window,
-            // though would be v-easy, just not sure we want to ever support that?
+            setMode("dialog");
 
-            var dialog = dialogService.open(
-                {
-                    container: $("#dialog div.umb-modalcolumn-body"),
-                    //The ONLY reason we're passing in scope to the dialogService (which is legacy functionality) is
-                    // for backwards compatibility since many dialogs require $scope.currentNode or $scope.currentAction
-                    // to exist
-                    scope: dialogScope,
-                    inline: true,
-                    show: true,
-                    iframe: iframe,
-                    modalClass: "umb-dialog",
-                    template: templateUrl,
-
-                    //These will show up on the dialog controller's $scope under dialogOptions
-                    currentNode: args.node,
-                    currentAction: args.action
-                });
-
-            //save the currently assigned dialog so it can be removed before a new one is created
-            currentDialog = dialog;
-            return dialog;
+            if(templateUrl) {
+                appState.setMenuState("dialogTemplateUrl", templateUrl);
+            }
+            
         },
 
         /**
