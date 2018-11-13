@@ -328,10 +328,13 @@
                 var published = !(variant.state === "NotCreated" || variant.state === "Draft");
                 var isScheduledPublished = variant.releaseDate;
 
-                if (isMandatory) {
-                    if (!publishable || (!published && !isScheduledPublished)) {
-                        return false;
-                    }
+                if (isMandatory && !published && !isScheduledPublished && (!publishable || !variant.save)) {
+                    //if a mandatory variant isn't published or scheduled published
+                    //and it's not publishable or not selected to be published
+                    //then we cannot continue
+
+                    //TODO: Show a message when this occurs
+                    return false;
                 }
 
                 if (variant.save && (variant.releaseDate || variant.expireDate)) {
