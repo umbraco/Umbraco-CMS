@@ -87,14 +87,15 @@
             <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
                 <ng-form name="scheduleSelectorForm">
                     <div class="flex">
-                        <input name="saveVariantSelector"
+                        <input id="{{'saveVariantSelector_' + variant.language.culture}}"
+                               name="saveVariantSelector"
                                type="checkbox"
                                ng-model="variant.save"
                                ng-change="vm.changeSelection(variant)"
                                style="margin-right: 8px;" />
                         <div>
 
-                            <label for="{{variant.language.culture}}" style="margin-bottom: 2px;">
+                            <label for="{{'saveVariantSelector_' + variant.language.culture}}" style="margin-bottom: 2px;">
                                 <span>{{ variant.language.name }}</span>
                             </label>
 

@@ -42,9 +42,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="releaseDate"></param>
         /// <param name="expireDate"></param>
-        public void Add(DateTime? releaseDate, DateTime? expireDate)
+        public bool Add(DateTime? releaseDate, DateTime? expireDate)
         {
-            Add(string.Empty, releaseDate, expireDate);
+            return Add(string.Empty, releaseDate, expireDate);
         }
 
         /// <summary>
@@ -53,13 +53,14 @@ namespace Umbraco.Core.Models
         /// <param name="culture"></param>
         /// <param name="releaseDate"></param>
         /// <param name="expireDate"></param>
-        public void Add(string culture, DateTime? releaseDate, DateTime? expireDate)
+        /// <returns>true if successfully added, false if validation fails</returns>
+        public bool Add(string culture, DateTime? releaseDate, DateTime? expireDate)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (releaseDate.HasValue && expireDate.HasValue && releaseDate >= expireDate)
-                throw new InvalidOperationException($"The {nameof(releaseDate)} must be less than {nameof(expireDate)}");
+                return false;
 
-            if (!releaseDate.HasValue && !expireDate.HasValue) return;
+            if (!releaseDate.HasValue && !expireDate.HasValue) return false;
 
             //TODO: Do we allow passing in a release or expiry date that is before now?
 
@@ -85,6 +86,8 @@ namespace Umbraco.Core.Models
                 changes.Add(expireDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
+
+            return true;
         }
 
         /// <summary>

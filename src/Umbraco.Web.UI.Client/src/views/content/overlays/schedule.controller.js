@@ -18,10 +18,20 @@
         vm.firstSelectedDates = {};
         vm.currentUser = null;
 
+        //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
+        var origDates = [];
+
         function onInit() {
 
             vm.variants = $scope.model.variants;
             vm.hasPristineVariants = false;
+
+            for (let i = 0; i < vm.variants.length; i++) {
+                origDates.push({
+                    releaseDate: vm.variants[i].releaseDate,
+                    expireDate: vm.variants[i].expireDate
+                });
+            }
 
             if(!$scope.model.title) {
                 localizationService.localize("general_scheduledPublishing").then(function(value){
@@ -238,6 +248,7 @@
                 var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
                 variant.expireDatePickerInstance.set("minDate", nowFormatted);
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -250,6 +261,7 @@
                 // we don't have a unpublish date anymore so we can clear the max date for publish
                 variant.releaseDatePickerInstance.set("maxDate", null);
             }
+            $scope.model.disableSubmitButton = !canSchedule();
         }
 
         /**
@@ -291,20 +303,35 @@
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canSchedule() {
+
+            // sched is enabled if
+            //  1) when mandatory langs are not published AND all mandatory langs are selected AND all mandatory langs have a release date
+            //  2) OR all mandatory langs are published
+            //  3) OR all mandatory langs are are scheduled for publishing
+            //  4) OR there has been a persisted schedule for a variant and it has now been changed
+
             var selectedWithDates = [];
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
 
+                //if the sched dates for this variant have been removed then we must allow the schedule button to be used to save the changes
+                var schedCleared = (origDates[i].releaseDate && origDates[i].releaseDate !== variant.releaseDate)
+                    || (origDates[i].expireDate && origDates[i].expireDate !== variant.expireDate);
+                if (schedCleared) {
+                    return true;
+                }
+
+                var isMandatory = variant.language && variant.language.isMandatory;
+
                 //if this variant will show up in the publish-able list
                 var publishable = dirtyVariantFilter(variant);
+                var published = !(variant.state === "NotCreated" || variant.state === "Draft");
+                var isScheduledPublished = variant.releaseDate;
 
-                if (((!variant.language || variant.language.isMandatory) && (variant.state === "NotCreated" || variant.state === "Draft"))
-                    && (!publishable || !variant.save)) {
-                    //if a mandatory variant isn't published and it's not publishable or not selected to be published
-                    //then we cannot publish anything
-
-                    //TODO: Show a message when this occurs
-                    return false;
+                if (isMandatory) {
+                    if (!publishable || (!published && !isScheduledPublished)) {
+                        return false;
+                    }
                 }
 
                 if (variant.save && (variant.releaseDate || variant.expireDate)) {
@@ -313,7 +340,7 @@
             }
             return selectedWithDates.length > 0;
         }
-
+        
         onInit();
 
         //when this dialog is closed, clean up

@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         {
             var now = DateTime.Now;
             var schedule = new ContentScheduleCollection();
-            Assert.Throws<InvalidOperationException>(() => schedule.Add(now, now));
+            Assert.IsFalse(schedule.Add(now, now));
         }
 
         [Test]
