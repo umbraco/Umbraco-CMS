@@ -114,7 +114,7 @@
 
     <umb-login 
         ng-if="login.show"
-        on-login="">
+        on-login="hideLoginScreen()">
     </umb-login>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, UmbracoConfig.For.GlobalSettings())

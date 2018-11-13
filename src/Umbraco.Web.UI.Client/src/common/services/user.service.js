@@ -14,7 +14,7 @@ angular.module('umbraco.services')
             eventsService.emit("app.notAuthenticated", args);
         }
 
-        function onLoginDialogClose(success) {
+        function retryRequestQueue(success) {
             if (success) {
                 requestRetryQueue.retryAll(currentUser.name);
             }
@@ -164,6 +164,12 @@ angular.module('umbraco.services')
             _showLoginDialog: function () {
                 openLoginDialog();
             },
+
+            /** Internal method to retry all request after sucessfull login */
+            _retryRequestQueue: function(success) {
+                retryRequestQueue(success)
+            },
+
             /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
             isAuthenticated: function () {
                 //if we've got a current user then just return true

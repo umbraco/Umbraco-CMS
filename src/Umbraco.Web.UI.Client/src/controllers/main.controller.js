@@ -48,20 +48,23 @@ function MainController($scope, $location, appState, treeService, notificationsS
         appState.setSearchState("show", false);
     };
 
+    $scope.showLoginScreen = function(isTimedOut) {
+        $scope.login.isTimedOut = isTimedOut;
+        $scope.login.show = true;
+    };
+
+    $scope.hideLoginScreen = function() {
+        $scope.login.show = false;
+    };
+
     var evts = [];
     
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
-
-        // show the login screen
-        if(data) {
-            $scope.login.isTimedOut = data.isTimedOut;
-        }
-
-        $scope.login.show = true;
-
+        const isTimedOut = data && data.isTimedOut ? true : false;
+        $scope.showLoginScreen(isTimedOut);
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {
@@ -80,10 +83,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
 
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
-
-        if($scope.authenticated === true) {
-            $scope.login.show = false;
-        }
 
         updateChecker.check().then(function (update) {
             if (update && update !== "null") {

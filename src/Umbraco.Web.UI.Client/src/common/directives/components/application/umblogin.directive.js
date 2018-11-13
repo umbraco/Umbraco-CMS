@@ -127,7 +127,9 @@
 
         function getStarted() {
             $location.search('invite', null);
-            submit(true);
+            if(vm.onLogin) {
+                vm.onLogin();
+            }
         }
 
         function inviteSavePassword () {
@@ -199,6 +201,7 @@
             userService.authenticate(login, password)
                 .then(function (data) {
                     vm.loginStates.submitButton = "success";
+                    userService._retryRequestQueue(true);
                     if(vm.onLogin) {
                         vm.onLogin();
                     }
@@ -218,6 +221,9 @@
                         vm.loginForm.username.$setValidity("auth", false);
                         vm.loginForm.password.$setValidity("auth", false);
                     }
+
+                    userService._retryRequestQueue();
+
                 });
 
             //setup a watch for both of the model values changing, if they change
