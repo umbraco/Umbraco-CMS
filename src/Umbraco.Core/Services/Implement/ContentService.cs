@@ -955,7 +955,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true)
+        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -996,7 +996,7 @@ namespace Umbraco.Core.Services.Implement
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, culturesPublishing, culturesUnpublishing, evtMsgs);
+                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs);
                 if (publishResult.Success)
                 {
                     // note: StrategyPublish flips the PublishedState to Publishing!
@@ -1004,7 +1004,11 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else
                 {
-                    //check for mandatory culture missing, if this is the case we'll switch the unpublishing flag
+                    // in a branch, just give up
+                    if (branchOne && !branchRoot)
+                        return publishResult;
+
+                    //check for mandatory culture missing, and then unpublish document as a whole
                     if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
                     {
                         publishing = false;
@@ -1015,15 +1019,17 @@ namespace Umbraco.Core.Services.Implement
                     }
 
                     //fixme - casting
-                    ((Content)content).Published = content.Published; // reset published state = save unchanged - fixme doh?
+                    // reset published state from temp values (publishing, unpublishing) to original value
+                    // (published, unpublished) in order to save the document, unchanged
+                    ((Content)content).Published = content.Published;
                 }
             }
 
-            if (unpublishing)
+            if (unpublishing) // won't happen in a branch
             {
                 var newest = GetById(content.Id); // ensure we have the newest version - in scope
-                if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
-                    content = newest; // fixme confusing should just die here - else we'll miss some changes
+                if (content.VersionId != newest.VersionId)
+                    return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, evtMsgs, content);
 
                 if (content.Published)
                 {
@@ -1037,7 +1043,9 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //fixme - casting
-                        ((Content)content).Published = content.Published; // reset published state = save unchanged
+                        // reset published state from temp values (publishing, unpublishing) to original value
+                        // (published, unpublished) in order to save the document, unchanged
+                        ((Content)content).Published = content.Published;
                     }
                 }
                 else
@@ -1064,7 +1072,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
             }
 
-            if (unpublishing) // we have tried to unpublish
+            if (unpublishing) // we have tried to unpublish - won't happen in a branch
             {
                 if (unpublishResult.Success) // and succeeded, trigger events
                 {
@@ -1101,13 +1109,14 @@ namespace Umbraco.Core.Services.Implement
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
 
                     // invalidate the node/branch
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    if (!branchOne || branchRoot)
+                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                     scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
 
                     // if was not published and now is... descendants that were 'published' (but
                     // had an unpublished ancestor) are 're-published' ie not explicitely published
                     // but back as 'published' nevertheless
-                    if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
+                    if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
                         var descendants = GetPublishedDescendantsLocked(content).ToArray();
                         scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
@@ -1140,11 +1149,14 @@ namespace Umbraco.Core.Services.Implement
 
                     return publishResult;
                 }
-
             }
 
+            // should not happen
+            if (branchOne && !branchRoot)
+                throw new Exception("panic");
+
             //if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-            if (publishResult == null || !publishResult.Success)
+            if (!branchOne && (publishResult == null || !publishResult.Success))
             {
                 if (culturesChanging != null)
                 {
@@ -1154,7 +1166,9 @@ namespace Umbraco.Core.Services.Implement
                     Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
                 }
                 else
+                {
                     Audit(AuditType.Save, userId, content.Id);
+                }
             }
 
             // or, failed
@@ -1429,8 +1443,6 @@ namespace Umbraco.Core.Services.Implement
                     page++;
                 } while (count > 0);
 
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 scope.Complete();
@@ -1461,28 +1473,7 @@ namespace Umbraco.Core.Services.Implement
             if (publishCultures != null && !publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            // fixme - this is totally kinda wrong
-
-            var culturesPublishing = document.ContentType.VariesByCulture()
-                ? document.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
-                : null;
-            var result = StrategyCanPublish(scope, document, userId, /*checkPath:*/ isRoot, culturesPublishing, Array.Empty<string>(), evtMsgs);
-            if (!result.Success)
-                return result;
-            result = StrategyPublish(scope, document, userId, culturesPublishing, Array.Empty<string>(), evtMsgs);
-            if (!result.Success)
-                throw new Exception("panic");
-            if (document.HasIdentity == false)
-                document.CreatorId = userId;
-            document.WriterId = userId;
-            _documentRepository.Save(document);
-            publishedDocuments.Add(document);
-            // fixme - but then, we have all the audit thing to run
-            // so... it would be better to re-run the internal thing?
-            return result;
-
-            // we want _some part_ of it but not all of it
-            return SavePublishingInternal(scope, document, userId);
+            return SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
         }
 
         #endregion

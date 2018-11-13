@@ -113,7 +113,7 @@
         FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
-        /// The document cannot be published because it has no publishing flags or values.
+        /// The document could not be published because it has no publishing flags or values.
         /// </summary>
         FailedPublishNothingToPublish = FailedPublish | 9, // in ContentService.StrategyCanPublish - fixme weird
 
@@ -121,6 +121,11 @@
         /// The document could not be published because some mandatory cultures are missing.
         /// </summary>
         FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing 
+
+        /// <summary>
+        /// The document could not be published because it has been modified by another user. 
+        /// </summary>
+        FailedPublishConcurrencyViolation = FailedPublish | 11,
 
         #endregion
 
