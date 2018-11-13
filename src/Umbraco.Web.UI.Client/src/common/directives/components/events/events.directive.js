@@ -27,18 +27,6 @@ angular.module('umbraco.directives')
     };
 })
 
-.directive('onBlur', function () {
-    return {
-        link: function (scope, elm, attrs) {
-            var f = function () {
-                scope.$apply(attrs.onBlur);
-            };
-            elm.on("blur", f);
-            scope.$on("$destroy", function(){ elm.off("blur", f);} );
-        }
-    };
-})
-
 .directive('onFocus', function () {
     return {
         link: function (scope, elm, attrs) {
