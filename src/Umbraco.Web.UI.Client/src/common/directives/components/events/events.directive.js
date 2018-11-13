@@ -3,18 +3,6 @@
 **/
 angular.module('umbraco.directives')
 
-.directive('onFocus', function () {
-    return {
-        link: function (scope, elm, attrs) {
-            var f = function () {
-                scope.$apply(attrs.onFocus);
-            };
-            elm.on("focus", f);
-            scope.$on("$destroy", function(){ elm.off("focus", f);} );
-        }
-    };
-})
-
 .directive('onDragEnter', function () {
     return {
         link: function (scope, elm, attrs) {

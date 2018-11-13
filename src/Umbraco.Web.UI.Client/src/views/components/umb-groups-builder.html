@@ -65,7 +65,7 @@
                                    ng-disabled="tab.inherited"
                                    umb-auto-focus
                                    umb-auto-resize
-                                   on-focus="activateGroup(tab)"
+                                   ng-focus="activateGroup(tab)"
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
 
@@ -121,7 +121,7 @@
                             hotkey="alt+shift+p"
                             hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
                             ng-click="addProperty(property, tab)"
-                            on-focus="activateGroup(tab)"
+                            ng-focus="activateGroup(tab)"
                             focus-when="{{property.focus}}">
                             <localize key="contentTypeEditor_addProperty"></localize>
                         </a>
