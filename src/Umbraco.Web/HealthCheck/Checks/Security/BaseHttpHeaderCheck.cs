@@ -22,7 +22,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         protected readonly string Value;
         protected readonly string LocalizedTextPrefix;
         protected readonly bool MetaTagOptionAvailable;
-        protected readonly bool IgnoreCasing;
 
         public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
