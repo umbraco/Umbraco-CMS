@@ -8,6 +8,12 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
         /// <summary>
+        /// Clears the publishing schedule for all entries before this date
+        /// </summary>
+        /// <param name="date"></param>
+        void ClearSchedule(DateTime date);
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which has an expiration date less than or equal to today.
         /// </summary>
         /// <returns></returns>
