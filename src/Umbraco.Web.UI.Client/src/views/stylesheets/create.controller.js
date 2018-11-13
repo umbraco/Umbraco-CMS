@@ -4,7 +4,7 @@
     function StyleSheetsCreateController($scope, $location, navigationService) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.createFile = createFile;
         vm.createRichtextStyle = createRichtextStyle;

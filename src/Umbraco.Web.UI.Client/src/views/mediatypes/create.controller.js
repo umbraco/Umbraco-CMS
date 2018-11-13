@@ -13,7 +13,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;

@@ -13,7 +13,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
     var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {

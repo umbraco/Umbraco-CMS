@@ -4,7 +4,7 @@
     function PartialViewsCreateController($scope, codefileResource, $location, navigationService, formHelper, localizationService, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.snippets = [];
         vm.showSnippets = false;

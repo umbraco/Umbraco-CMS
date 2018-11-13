@@ -9,7 +9,7 @@
 function ContentBlueprintCreateController($scope, $location, contentTypeResource, navigationService, appState) {
 
     var vm = this;
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
     var section = appState.getSectionState("currentSection");
 
     vm.createBlueprint = createBlueprint;

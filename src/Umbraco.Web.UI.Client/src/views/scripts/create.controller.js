@@ -4,7 +4,7 @@
     function ScriptsCreateController($scope, $location, navigationService, formHelper, codefileResource, localizationService, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.creatingFolder = false;
         vm.folderName = "";

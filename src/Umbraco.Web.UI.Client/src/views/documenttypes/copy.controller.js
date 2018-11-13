@@ -1,7 +1,7 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.DocumentTypes.CopyController",
     function ($scope, contentTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
-        var dialogOptions = $scope.dialogOptions;
+
         $scope.dialogTreeApi = {};
 
         function nodeSelectHandler(args) {
@@ -22,7 +22,7 @@ angular.module("umbraco")
             $scope.busy = true;
             $scope.error = false;
 
-            contentTypeResource.copy({ parentId: $scope.target.id, id: dialogOptions.currentNode.id })
+            contentTypeResource.copy({ parentId: $scope.target.id, id: $scope.currentNode.id })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
