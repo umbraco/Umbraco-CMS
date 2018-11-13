@@ -558,7 +558,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
-                content.TemplateId = 0;
+                content.TemplateId = null;
                 repository.Save(content);
 
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
