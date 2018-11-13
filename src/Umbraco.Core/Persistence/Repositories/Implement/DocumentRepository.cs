@@ -405,7 +405,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishTemplateId = 0;
+                content.PublishTemplateId = null;
                 content.PublisherId = null;
                 content.PublishName = null;
                 content.PublishDate = null;
