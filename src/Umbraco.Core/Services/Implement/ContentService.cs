@@ -1164,6 +1164,12 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
+            => PerformScheduledPublishInternal(date).ToList();
+
+        // beware! this method yields results, so the returned IEnumerable *must* be
+        // enumerated for anything to happen - dangerous, so private + exposed via
+        // the public method above, which forces ToList().
+        private IEnumerable<PublishResult> PerformScheduledPublishInternal(DateTime date)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1171,61 +1177,64 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var now = date;
-
-                foreach (var d in _documentRepository.GetContentForRelease(now))
+                foreach (var d in _documentRepository.GetContentForRelease(date))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, now)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
 
-                        foreach (var c in pendingCultures)
+                        var publishing = true;
+                        foreach (var culture in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleChange.Start, now);
-                            if (!d.Trashed)
-                                d.PublishCulture(c); //set the culture to be published
+                            d.ContentSchedule.Clear(culture, ContentScheduleChange.Start, date);
+
+                            if (d.Trashed) continue; // won't publish
+
+                            publishing &= d.PublishCulture(culture); //set the culture to be published
+                            if (!publishing) break; // no point continuing
                         }
 
-                        if (pendingCultures.Count > 0)
-                        {
-                            if (!d.Trashed)
-                                result = SavePublishing(d, d.WriterId);
-                            else
-                                result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+                        if (d.Trashed)
+                            result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
+                        else if (!publishing)
+                            result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
+                        else
+                            result = SavePublishing(d, d.WriterId);
 
-                            if (result.Success == false)
-                                Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-                            yield return result;
-                        }
+                        if (result.Success == false)
+                            Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+
+                        yield return result;
                     }
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.Start, now);
-                        if (!d.Trashed)
-                            result = SaveAndPublish(d, userId: d.WriterId);
-                        else
-                            result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+                        d.ContentSchedule.Clear(ContentScheduleChange.Start, date);
+
+                        result = d.Trashed
+                            ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
+                            : SaveAndPublish(d, userId: d.WriterId);
 
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+
                         yield return result;
                     }
                 }
 
-                foreach (var d in _documentRepository.GetContentForExpiration(now))
+                foreach (var d in _documentRepository.GetContentForExpiration(date))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, now)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1233,7 +1242,7 @@ namespace Umbraco.Core.Services.Implement
                         foreach (var c in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleChange.End, now);
+                            d.ContentSchedule.Clear(c, ContentScheduleChange.End, date);
                             //set the culture to be published
                             d.UnpublishCulture(c);
                         }
@@ -1249,7 +1258,7 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.End, now);
+                        d.ContentSchedule.Clear(ContentScheduleChange.End, date);
                         result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1259,7 +1268,7 @@ namespace Umbraco.Core.Services.Implement
 
                 }
 
-                _documentRepository.ClearSchedule(now);
+                _documentRepository.ClearSchedule(date);
 
                 scope.Complete();
             }
