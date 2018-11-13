@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -56,7 +57,10 @@ namespace Umbraco.Web.Scheduling
                 // fixme context & events during scheduled publishing?
                 // in v7 we create an UmbracoContext and an HttpContext, and cache instructions
                 // are batched, and we have to explicitly flush them, how is it going to work here?
-                _contentService.PerformScheduledPublish(DateTime.Now);
+                var result = _contentService.PerformScheduledPublish(DateTime.Now).ToList();
+                if (result.Count > 0)
+                    foreach(var grouped in result.GroupBy(x => x.Result))
+                        _logger.Info<ScheduledPublishing>("Scheduled publishing result: '{StatusCount}' items with status {Status}", grouped.Count(), grouped.Key);
             }
             catch (Exception ex)
             {
