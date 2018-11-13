@@ -1988,28 +1988,28 @@ namespace Umbraco.Core.Services.Implement
                 var culturesChanging = content.ContentType.VariesByCulture()
                     ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
+
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
                 // in this particular case, determining which cultures have changed works with the above with names since it will
                 // have always changed if it's been saved in the back office but that's not really fail safe.
 
                 //Save before raising event
-                // fixme - nesting uow?
                 var saveResult = Save(content, userId);
 
-                if (saveResult.Success)
-                {
-                    sendToPublishEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-
-                    if (culturesChanging != null)
-                        Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
-                    else
-                        Audit(AuditType.SendToPublish, content.WriterId, content.Id);
-                }
-
-                // fixme here, on only on success?
+                // always complete (but maybe return a failed status)
                 scope.Complete();
+
+                if (!saveResult.Success)
+                    return saveResult.Success;
+
+                sendToPublishEventArgs.CanCancel = false;
+                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+
+                if (culturesChanging != null)
+                    Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+                else
+                    Audit(AuditType.SendToPublish, content.WriterId, content.Id);
 
                 return saveResult.Success;
             }
