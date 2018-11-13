@@ -70,22 +70,20 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             // Include the umbraco Application URL host in the message subject so that
             // you can identify the site that these results are for.
 
-            string umbracoApplicationUrl = UmbracoConfig.For.UmbracoSettings().WebRouting.UmbracoApplicationUrl;
+            string umbracoApplicationUrl = ApplicationContext.Current.UmbracoApplicationUrl;
             string host = string.Empty;
+            Uri umbracoApplicationUri;
 
-            if (string.IsNullOrEmpty(umbracoApplicationUrl) == false)
+            if (Uri.TryCreate(umbracoApplicationUrl, UriKind.Absolute, out umbracoApplicationUri))
             {
-                try
-                {
-                    Uri umbracoApplicationUri = new Uri(umbracoApplicationUrl);
-                    host = umbracoApplicationUri.Host;
-                }
-                catch (UriFormatException uriFormatException)
-                {
-                    LogHelper.WarnWithException<EmailNotificationMethod>(string.Format("{0} is not a valid URL for umbracoApplicationUrl", umbracoApplicationUrl), uriFormatException);
-                }
+                host = umbracoApplicationUri.Host;
             }
-
+            else
+            {
+                host = umbracoApplicationUrl;
+                LogHelper.Warn<EmailNotificationMethod>(string.Format("umbracoApplicationUrl {0} appears to be invalid", umbracoApplicationUrl));
+            }
+            
             string subject = string.Format(_textService.Localize("healthcheck/scheduledHealthCheckEmailSubject"), host);
 
             var mailSender = new EmailSender();
