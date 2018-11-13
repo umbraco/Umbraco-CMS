@@ -3,30 +3,6 @@
 **/
 angular.module('umbraco.directives')
 
-.directive('onKeyup', function () {
-    return {
-        link: function (scope, elm, attrs) {
-            var f = function () {
-                scope.$apply(attrs.onKeyup);
-            };
-            elm.on("keyup", f);
-            scope.$on("$destroy", function(){ elm.off("keyup", f);} );
-        }
-    };
-})
-
-.directive('onKeydown', function () {
-    return {
-        link: function (scope, elm, attrs) {
-            var f = function () {
-                scope.$apply(attrs.onKeydown);
-            };
-            elm.on("keydown", f);
-            scope.$on("$destroy", function(){ elm.off("keydown", f);} );
-        }
-    };
-})
-
 .directive('onFocus', function () {
     return {
         link: function (scope, elm, attrs) {
