@@ -422,8 +422,7 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
                     appState.setMenuState("menuActions", data.menuItems);
                     appState.setMenuState("dialogTitle", args.node.name);
 
-                    //we're not opening a dialog, return null.
-                    return $q.resolve(null);
+                    return $q.resolve();
                 });
             
         },

@@ -81,4 +81,9 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
 					$scope.error = err;
 				});
 		};
+
+		$scope.close = function() {
+			navigationService.hideDialog();
+		};
+
 	});

@@ -73,7 +73,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	    $scope.onSearchResults = function (results) {
 	        $scope.searchInfo.results = results;
 	        $scope.searchInfo.showSearch = true;
-	    };
+		};
+		
+		$scope.close = function() {
+			navigationService.hideDialog();
+		};
 
 	    $scope.move = function () {
 

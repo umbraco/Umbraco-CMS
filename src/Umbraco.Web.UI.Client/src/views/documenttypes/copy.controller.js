@@ -54,5 +54,8 @@ angular.module("umbraco")
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
         }
         
+        $scope.close = function() {
+            navigationService.hideDialog();
+        };
         
     });

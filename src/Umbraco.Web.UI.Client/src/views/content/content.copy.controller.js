@@ -77,7 +77,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
                 }
                 $scope.recursive = true;
             }
-        }
+		}
+		
+		$scope.closeDialog = function() {
+			navigationService.hideDialog();
+		};
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;

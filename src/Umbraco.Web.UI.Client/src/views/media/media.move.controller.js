@@ -47,7 +47,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
             $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
             $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
-        }	    
+        }	  
+        
+        $scope.close = function() {
+            navigationService.hideDialog();
+        };
 
 	    $scope.move = function () {
 	        mediaResource.move({ parentId: $scope.target.id, id: node.id })
