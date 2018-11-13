@@ -908,21 +908,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Schedule
 
         /// <inheritdoc />
+        public void ClearSchedule(DateTime date)
+        {
+            var sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date);
+            Database.Execute(sql);
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
             var action = ContentScheduleChange.Start.ToString();
 
-            // fixme/review - code would blow if more than 2000 items
-            // fixme/review - isn't this simpler?
             var sql = GetBaseQuery(QueryType.Many)
                 .WhereIn<NodeDto>(x => x.NodeId, Sql()
                     .Select<ContentScheduleDto>(x => x.NodeId)
                     .From<ContentScheduleDto>()
                     .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
-
-            sql.Where<NodeDto>(x => !x.Trashed); // fixme/review - shouldn't we exclude trashed nodes?
-            sql.Where<DocumentDto>(x => !x.Published);
-
+            
             AddGetByQueryOrderBy(sql);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
@@ -939,8 +941,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .Select<ContentScheduleDto>(x => x.NodeId)
                     .From<ContentScheduleDto>()
                     .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
-
-            sql.Where<DocumentDto>(x => x.Published);
 
             AddGetByQueryOrderBy(sql);
 

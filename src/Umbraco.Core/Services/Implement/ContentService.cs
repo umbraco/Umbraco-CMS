@@ -1173,7 +1173,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var now = date;
 
-                foreach (var d in GetContentForRelease(now))
+                foreach (var d in _documentRepository.GetContentForRelease(now))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
@@ -1188,13 +1188,17 @@ namespace Umbraco.Core.Services.Implement
                         {
                             //Clear this schedule for this culture
                             d.ContentSchedule.Clear(c, ContentScheduleChange.Start, now);
-                            //set the culture to be published
-                            d.PublishCulture(c);
+                            if (!d.Trashed)
+                                d.PublishCulture(c); //set the culture to be published
                         }
 
                         if (pendingCultures.Count > 0)
                         {
-                            result = SavePublishing(d, d.WriterId);
+                            if (!d.Trashed)
+                                result = SavePublishing(d, d.WriterId);
+                            else
+                                result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+
                             if (result.Success == false)
                                 Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                             yield return result;
@@ -1204,14 +1208,18 @@ namespace Umbraco.Core.Services.Implement
                     {
                         //Clear this schedule
                         d.ContentSchedule.Clear(ContentScheduleChange.Start, now);
-                        result = SaveAndPublish(d, userId: d.WriterId);
+                        if (!d.Trashed)
+                            result = SaveAndPublish(d, userId: d.WriterId);
+                        else
+                            result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         yield return result;
                     }
                 }
 
-                foreach (var d in GetContentForExpiration(now))
+                foreach (var d in _documentRepository.GetContentForExpiration(now))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
@@ -1250,6 +1258,8 @@ namespace Umbraco.Core.Services.Implement
 
 
                 }
+
+                _documentRepository.ClearSchedule(now);
 
                 scope.Complete();
             }
