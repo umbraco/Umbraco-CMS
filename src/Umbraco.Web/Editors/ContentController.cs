@@ -837,8 +837,8 @@ namespace Umbraco.Web.Editors
         {
             var variant = contentItem.Variants.First();
 
-            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.Start).ToList();
-            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleChange.End).ToList();
+            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
+            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
 
             //Do all validation of data first
 
@@ -875,12 +875,12 @@ namespace Umbraco.Web.Editors
             //remove any existing release dates so we can replace it
             //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
             if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.Start);
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Release);
 
             //remove any existing expire dates so we can replace it
             //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
             if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleChange.End);
+                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Expire);
 
             //add the new schedule
             contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
@@ -899,18 +899,18 @@ namespace Umbraco.Web.Editors
 
             foreach (var variant in cultureVariants.Where(x => x.Save))
             {
-                var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleChange.Start).ToList();
-                var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleChange.End).ToList();
+                var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
+                var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
 
                 //remove any existing release dates so we can replace it
                 //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
                 if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleChange.Start);
+                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Release);
 
                 //remove any existing expire dates so we can replace it
                 //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
                 if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleChange.End);
+                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Expire);
 
                 //add the new schedule
                 schedCopy.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
@@ -926,7 +926,7 @@ namespace Umbraco.Web.Editors
             foreach (var groupedSched in schedCopy.FullSchedule.GroupBy(x => x.Culture))
             {
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(groupedSched.Key);
-                var releaseDates = groupedSched.Where(x => x.Change == ContentScheduleChange.Start).Select(x => x.Date).ToList();
+                var releaseDates = groupedSched.Where(x => x.Action == ContentScheduleAction.Release).Select(x => x.Date).ToList();
                 if (mandatoryCultures.Contains(groupedSched.Key, StringComparer.InvariantCultureIgnoreCase))
                     mandatoryVariants.Add((groupedSched.Key, isPublished, releaseDates));
                 else

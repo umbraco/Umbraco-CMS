@@ -7,9 +7,9 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class ScheduledPublishDateResolver : IValueResolver<IContent, ContentVariantDisplay, DateTime?>
     {
-        private readonly ContentScheduleChange _changeType;
+        private readonly ContentScheduleAction _changeType;
 
-        public ScheduledPublishDateResolver(ContentScheduleChange changeType)
+        public ScheduledPublishDateResolver(ContentScheduleAction changeType)
         {
             _changeType = changeType;
         }
