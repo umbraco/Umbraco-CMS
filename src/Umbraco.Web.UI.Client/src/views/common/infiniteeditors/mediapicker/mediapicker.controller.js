@@ -4,9 +4,12 @@ angular.module("umbraco")
         function($scope, mediaResource, entityResource, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
 
             if (!$scope.model.title) {
-                localizationService.localize("defaultdialogs_selectMedia")
-                    .then(function(data){
-                        $scope.model.title = data;
+                localizationService.localizeMany(["defaultdialogs_selectMedia", "general_includeFromsubFolders"])
+                    .then(function (data) {
+                        $scope.labels = {
+                            title: data[0],
+                            includeSubFolders: data[1]
+                        }
                     });
             }
 
