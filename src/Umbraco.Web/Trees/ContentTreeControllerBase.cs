@@ -375,6 +375,11 @@ namespace Umbraco.Web.Trees
             foreach (var m in notAllowed)
             {
                 menuWithAllItems.Items.Remove(m);
+                // if the disallowed action is set as default action, make sure to reset the default action as well
+                if (menuWithAllItems.DefaultMenuAlias == m.Alias)
+                {
+                    menuWithAllItems.DefaultMenuAlias = null;
+                }
             }
         }
 
