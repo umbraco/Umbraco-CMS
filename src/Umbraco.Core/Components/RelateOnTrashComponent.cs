@@ -18,13 +18,13 @@ namespace Umbraco.Core.Components
             MediaService.Trashed += MediaService_Trashed;
         }
 
-        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<NotificationData> e)
         {
             foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContent.ToInvariantString())))
             {
                 var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
-                var relations = relationService.GetByChildId(item.Entity.Id);
+                var relations = relationService.GetByChildId(item.Entity.Content.Id);
 
                 foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
                 {
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<NotificationData> e)
         {
             var relationService = Current.Services.RelationService;
             var entityService = Current.Services.EntityService;
@@ -78,16 +78,16 @@ namespace Umbraco.Core.Components
                 if (entityService.Exists(originalParentId))
                 {
                     // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                    var relation = new Relation(originalParentId, item.Entity.Id, relationType);
+                    var relation = new Relation(originalParentId, item.Entity.Content.Id, relationType);
                     relationService.Save(relation);
 
                     Current.Services.AuditService.Add(AuditType.Delete,
-                        item.Entity.WriterId,
-                        item.Entity.Id,
+                        item.Entity.Content.WriterId,
+                        item.Entity.Content.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Document),
                         string.Format(textService.Localize(
                                 "recycleBin/contentTrashed"),
-                            item.Entity.Id, originalParentId));
+                            item.Entity.Content.Id, originalParentId));
                 }
             }
         }

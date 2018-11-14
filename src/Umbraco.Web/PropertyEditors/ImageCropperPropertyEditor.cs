@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.
         /// </summary>
-        /// <param name="property">The property.</param>        
+        /// <param name="property">The property.</param>
         /// <returns>A value indicating whether a property is an image cropper field, and (optionaly) has a non-empty value.</returns>
         private static bool IsCropperField(Property property)
         {
@@ -142,10 +142,10 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        public void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
+        public void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<NotificationData> args)
         {
             // get the image cropper field properties
-            var properties = args.Original.Properties.Where(IsCropperField);
+            var properties = args.Original.Content.Properties.Where(IsCropperField);
 
             // copy files
             var isUpdated = false;
@@ -158,15 +158,15 @@ namespace Umbraco.Web.PropertyEditors
                     var src = GetFileSrcFromPropertyValue(propVal, out var jo);
                     if (src == null) continue;
                     var sourcePath = _mediaFileSystem.GetRelativePath(src);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                    var copyPath = _mediaFileSystem.CopyFile(args.Copy.Content, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileSystem.GetUrl(copyPath);
-                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
+                    args.Copy.Content.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
             // if updated, re-save the copy with the updated value
             if (isUpdated)
-                sender.Save(args.Copy);
+                sender.Save(args.Copy.Content);
         }
 
         /// <summary>

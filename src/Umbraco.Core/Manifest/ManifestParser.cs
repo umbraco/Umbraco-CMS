@@ -19,6 +19,7 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser
     {
+        private readonly IContentTypeService _contentTypeService;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IRuntimeCacheProvider _cache;
@@ -30,8 +31,8 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger)
-            : this(cache, validators, "~/App_Plugins", logger)
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger, IContentTypeService contentTypeService)
+            : this(cache, validators, "~/App_Plugins", logger, contentTypeService)
         {
 
         }
@@ -39,13 +40,14 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, string path, ILogger logger, IContentTypeService contentTypeService)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _contentTypeService = contentTypeService;
         }
 
         public string Path
@@ -154,7 +156,7 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                new ContentAppDefinitionConverter());
+                new ContentAppDefinitionConverter(_contentTypeService));
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)

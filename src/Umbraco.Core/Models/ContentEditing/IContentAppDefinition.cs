@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.ContentEditing
 {

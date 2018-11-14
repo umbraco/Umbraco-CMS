@@ -234,6 +234,7 @@ namespace Umbraco.Web.Editors
         {
             var gridConfig = UmbracoConfig.For.GridConfig(
                 Logger,
+                Services.ContentTypeService,
                 ApplicationCache.RuntimeCache,
                 new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
                 new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),

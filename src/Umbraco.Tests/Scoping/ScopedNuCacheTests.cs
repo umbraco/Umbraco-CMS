@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Scoping
             ContentService.Published -= OnPublishedAssert;
         }
 
-        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
+        private void OnPublishedAssert(IContentService sender, PublishEventArgs<NotificationData> args)
         {
             _onPublishedAssertAction?.Invoke();
         }

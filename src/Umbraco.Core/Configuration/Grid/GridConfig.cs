@@ -9,6 +9,7 @@ namespace Umbraco.Core.Configuration.Grid
     {
         public GridConfig(
             ILogger logger,
+            IContentTypeService contentTypeService,
             IRuntimeCacheProvider runtimeCache,
             DirectoryInfo appPlugins,
             DirectoryInfo configFolder,
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Configuration.Grid
         {
             EditorsConfig = new GridEditorsConfig(
                 logger,
+                contentTypeService,
                 runtimeCache,
                 appPlugins,
                 configFolder,

@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+        public void SendNotifications(IUser operatingUser, IEnumerable<NotificationData> entities, string action, string actionName, Uri siteUri,
             Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
             Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
         {
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services.Implement
             if (entitiesL.Count == 0) return;
 
             //put all entity's paths into a list with the same indicies
-            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
+            var paths = entitiesL.Select(x => x.Content.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Services.Implement
 
                     for (var j = 0; j < entitiesL.Count; j++)
                     {
-                        var content = entitiesL[j];
+                        var content = entitiesL[j].Content;
                         var path = paths[j];
 
                         // test if the notification applies to the path ie to this entity

@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // publish = new edit version
                 content1.SetValue("title", "title");
-                ((Content)content1).PublishCulture();
+                ServiceContext.ContentPublishingService.PublishCulture(content1);
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
-                ((Content)content1).PublishCulture();
+                ServiceContext.ContentPublishingService.PublishCulture(content1);
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish = new version
                 content1.Name = "name-4";
                 content1.SetValue("title", "title-4");
-                ((Content)content1).PublishCulture();
+                ServiceContext.ContentPublishingService.PublishCulture(content1);
                 ((Content)content1).PublishedState = PublishedState.Publishing;
                 repository.Save(content1);
 
@@ -432,9 +432,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var fetched = repository.Get(textpage.Id);
 
-                Assert.True(textpage.TemplateId.HasValue);
-                Assert.NotZero(textpage.TemplateId.Value);
-                Assert.AreEqual(textpage.TemplateId, contentType.DefaultTemplate.Id);
+                Assert.NotNull(textpage.TemplateId);
+                Assert.AreEqual(textpage.TemplateId, contentType.DefaultTemplateId);
 
                 scope.Complete();
 
@@ -650,7 +649,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish them all
                 foreach (var content in result)
                 {
-                    content.PublishCulture();
+                    ServiceContext.ContentPublishingService.PublishCulture(content);
                     repository.Save(content);
                 }
 
@@ -742,7 +741,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             var child1 = children[1];
-            Assert.IsTrue(child1.ContentType.VariesByCulture());
+            Assert.IsTrue(ServiceContext.ContentTypeService.Get(child1.ContentTypeId).VariesByCulture());
             Assert.IsTrue(child1.Name.StartsWith("VAR"));
             Assert.IsTrue(child1.GetCultureName("en-US").StartsWith("VAR"));
 
@@ -752,7 +751,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
 
                 var child = repository.Get(children[1].Id); // 1 is variant
-                Assert.IsTrue(child.ContentType.VariesByCulture());
+                Assert.IsTrue(ServiceContext.ContentTypeService.Get(child.ContentTypeId).VariesByCulture());
                 Assert.IsTrue(child.Name.StartsWith("VAR"));
                 Assert.IsTrue(child.GetCultureName("en-US").StartsWith("VAR"));
 
@@ -767,7 +766,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreEqual(25, totalRecords);
                     foreach (var r in result)
                     {
-                        var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
+                        var isInvariant = ServiceContext.ContentTypeService.Get(r.ContentTypeId).Alias == "umbInvariantTextpage";
                         var name = isInvariant ? r.Name : r.CultureInfos["en-US"].Name;
                         var namePrefix = isInvariant ? "INV" : "VAR";
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Web.Mvc;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
@@ -66,12 +68,22 @@ namespace Umbraco.Tests.Manifest
 
         private void AssertDefinition(object source, bool expected, string[] show, IReadOnlyUserGroup[] groups)
         {
-            var definition = JsonConvert.DeserializeObject<ManifestContentAppDefinition>("{" + (show.Length == 0 ? "" : " \"show\": [" + string.Join(",", show.Select(x => "\"" + x + "\"")) + "] ") + "}");
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new LightInjectCustomConverter<ManifestContentAppDefinition>());
+            var definition = JsonConvert.DeserializeObject<ManifestContentAppDefinition>("{" + (show.Length == 0 ? "" : " \"show\": [" + string.Join(",", show.Select(x => "\"" + x + "\"")) + "] ") + "}", settings);
             var app = definition.GetContentAppFor(source, groups);
             if (expected)
                 Assert.IsNotNull(app);
             else
                 Assert.IsNull(app);
+        }
+    }
+
+    internal class LightInjectCustomConverter<T> : CustomCreationConverter<T> where T : class
+    {
+        public override T Create(Type objectType)
+        {
+            return DependencyResolver.Current.GetService(objectType) as T;
         }
     }
 }

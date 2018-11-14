@@ -124,14 +124,14 @@ namespace Umbraco.Web.Redirects
             }
         }
 
-        private static void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
+        private static void ContentService_Publishing(IContentService sender, PublishEventArgs<NotificationData> args)
         {
             if (LockedEvents) return;
 
             var contentCache = UmbracoContext.Current.ContentCache;
             foreach (var entity in args.PublishedEntities)
             {
-                var entityContent = contentCache.GetById(entity.Id);
+                var entityContent = contentCache.GetById(entity.Content.Id);
                 if (entityContent == null) continue;
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
@@ -144,19 +144,19 @@ namespace Umbraco.Web.Redirects
             LockedEvents = true; // we only want to see the "first batch"
         }
 
-        private static void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e)
+        private static void ContentService_Published(IContentService sender, PublishEventArgs<NotificationData> e)
         {
             // look note in CacheUpdated
             // we might want to set a flag on the entities we are seeing here
         }
 
-        private static void ContentService_Moving(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Moving(IContentService sender, MoveEventArgs<NotificationData> e)
         {
             //TODO: Use the new e.EventState to track state between Moving/Moved events!
             Moving = true;
         }
 
-        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<NotificationData> e)
         {
             Moving = false;
             LockedEvents = false;

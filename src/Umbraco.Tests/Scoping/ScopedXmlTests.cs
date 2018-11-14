@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Scoping
             SafeXmlReaderWriter.Cloning = null;
         }
 
-        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
+        private void OnPublishedAssert(IContentService sender, PublishEventArgs<NotificationData> args)
         {
             _onPublishedAssertAction?.Invoke();
         }

@@ -147,7 +147,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      Trashed = false
+                                      Trashed = false,
                                   };
 
             var contentCollection = new PropertyTypeCollection(true);

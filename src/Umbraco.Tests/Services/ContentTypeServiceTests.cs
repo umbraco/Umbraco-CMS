@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Services
             //change the content type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello2", "en-US");
             ServiceContext.ContentService.Save(doc);
-            contentType.Variations = ContentVariation.Nothing;            
+            contentType.Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType);
             doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
 
@@ -372,7 +372,7 @@ namespace Umbraco.Tests.Services
             doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
 
             //this will be null because the doc type was changed back to variant but it's property types don't get changed back
-            Assert.IsNull(doc.GetValue("title", "en-US")); 
+            Assert.IsNull(doc.GetValue("title", "en-US"));
             Assert.IsNull(doc2.GetValue("title", "en-US"));
         }
 
@@ -597,12 +597,12 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        private void ContentServiceOnTrashed(IContentService sender, MoveEventArgs<IContent> e)
+        private void ContentServiceOnTrashed(IContentService sender, MoveEventArgs<NotificationData> e)
         {
             foreach (var item in e.MoveInfoCollection)
             {
                 //if this item doesn't exist then Fail!
-                var exists = ServiceContext.ContentService.GetById(item.Entity.Id);
+                var exists = ServiceContext.ContentService.GetById(item.Entity.Content.Id);
                 if (exists == null)
                     Assert.Fail("The item doesn't exist");
             }

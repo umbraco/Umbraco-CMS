@@ -14,7 +14,7 @@ namespace Umbraco.Core.Components
             ContentService.Copied += ContentServiceCopied;
         }
 
-        private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
+        private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<NotificationData> e)
         {
             if (e.RelateToOriginal == false) return;
 
@@ -32,14 +32,14 @@ namespace Umbraco.Core.Components
                 relationService.Save(relationType);
             }
 
-            var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
+            var relation = new Relation(e.Original.Content.Id, e.Copy.Content.Id, relationType);
             relationService.Save(relation);
 
             Current.Services.AuditService.Add(
                 AuditType.Copy,
-                e.Copy.WriterId,
-                e.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),
-                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'");
+                e.Copy.Content.WriterId,
+                e.Copy.Content.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),
+                $"Copied content with Id: '{e.Copy.Content.Id}' related to original content with Id: '{e.Original.Content.Id}'");
         }
     }
 }

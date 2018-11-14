@@ -102,7 +102,8 @@ namespace Umbraco.Core.Services
             IExternalLoginService externalLoginService = null,
             IServerRegistrationService serverRegistrationService = null,
             IRedirectUrlService redirectUrlService = null,
-            IConsentService consentService = null)
+            IConsentService consentService = null,
+            IContentPublishingService contentPublishingService = null)
         {
             if (serverRegistrationService != null) _serverRegistrationService = new Lazy<IServerRegistrationService>(() => serverRegistrationService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
@@ -131,6 +132,7 @@ namespace Umbraco.Core.Services
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
             if (consentService != null) _consentService = new Lazy<IConsentService>(() => consentService);
+            if (contentPublishingService != null) _contentPublishingService = new Lazy<IContentPublishingService>(() => contentPublishingService);
         }
 
         /// <summary>

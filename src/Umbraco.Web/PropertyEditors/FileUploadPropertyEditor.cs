@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
-        
+
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>
@@ -87,10 +87,10 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
+        internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<NotificationData> args)
         {
             // get the upload field properties with a value
-            var properties = args.Original.Properties.Where(IsUploadField);
+            var properties = args.Original.Content.Properties.Where(IsUploadField);
 
             // copy files
             var isUpdated = false;
@@ -102,15 +102,15 @@ namespace Umbraco.Web.PropertyEditors
                     var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
                     if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace()) continue;
                     var sourcePath = _mediaFileSystem.GetRelativePath(str);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
+                    var copyPath = _mediaFileSystem.CopyFile(args.Copy.Content, property.PropertyType, sourcePath);
+                    args.Copy.Content.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
 
             // if updated, re-save the copy with the updated value
             if (isUpdated)
-                sender.Save(args.Copy);
+                sender.Save(args.Copy.Content);
         }
 
         /// <summary>

@@ -26,30 +26,30 @@ namespace Umbraco.Web.Components
             composition.Container.RegisterSingleton<Notifier>();
         }
 
-        public void Initialize(IContentTypeService contentTypeService, Notifier notifier, ActionCollection actions)
+        public void Initialize(Notifier notifier, ActionCollection actions)
         {
             //Send notifications for the send to publish action
-            ContentService.SentToPublish += (sender, args) => notifier.Notify(contentTypeService, actions.GetAction<ActionToPublish>(), args.Entity);
+            ContentService.SentToPublish += (sender, args) => notifier.Notify(actions.GetAction<ActionToPublish>(), args.Entity);
 
             //Send notifications for the published action
-            ContentService.Published += (sender, args) => notifier.Notify(contentTypeService, actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
+            ContentService.Published += (sender, args) => notifier.Notify(actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
 
             //Send notifications for the saved action
-            ContentService.Sorted += (sender, args) => ContentServiceSorted(contentTypeService, notifier, sender, args, actions);
+            ContentService.Sorted += (sender, args) => ContentServiceSorted(notifier, sender, args, actions);
 
             //Send notifications for the update and created actions
-            ContentService.Saved += (sender, args) => ContentServiceSaved(contentTypeService, notifier, sender, args, actions);
+            ContentService.Saved += (sender, args) => ContentServiceSaved(notifier, sender, args, actions);
 
             //Send notifications for the delete action
-            ContentService.Deleted += (sender, args) => notifier.Notify(contentTypeService, actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
+            ContentService.Deleted += (sender, args) => notifier.Notify(actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
 
             //Send notifications for the unpublish action
-            ContentService.Unpublished += (sender, args) => notifier.Notify(contentTypeService, actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
+            ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
 
-        private void ContentServiceSorted(IContentTypeService contentTypeService, Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
+        private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<NotificationData> args, ActionCollection actions)
         {
-            var parentId = args.SavedEntities.Select(x => x.ParentId).Distinct().ToList();
+            var parentId = args.SavedEntities.Select(x => x.Content.ParentId).Distinct().ToList();
             if (parentId.Count != 1) return; // this shouldn't happen, for sorting all entities will have the same parent id
 
             // in this case there's nothing to report since if the root is sorted we can't report on a fake entity.
@@ -59,18 +59,18 @@ namespace Umbraco.Web.Components
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
 
-            notifier.Notify(contentTypeService, actions.GetAction<ActionSort>(), new[] { parent });
+            notifier.Notify(actions.GetAction<ActionSort>(), new[] { new NotificationData(parent, null, null)});
         }
 
-        private void ContentServiceSaved(IContentTypeService contentTypeService, Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
+        private void ContentServiceSaved(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<NotificationData> args, ActionCollection actions)
         {
-            var newEntities = new List<IContent>();
-            var updatedEntities = new List<IContent>();
+            var newEntities = new List<NotificationData>();
+            var updatedEntities = new List<NotificationData>();
 
             //need to determine if this is updating or if it is new
             foreach (var entity in args.SavedEntities)
             {
-                var dirty = (IRememberBeingDirty)entity;
+                var dirty = (IRememberBeingDirty)entity.Content;
                 if (dirty.WasPropertyDirty("Id"))
                 {
                     //it's new
@@ -82,8 +82,8 @@ namespace Umbraco.Web.Components
                     updatedEntities.Add(entity);
                 }
             }
-            notifier.Notify(contentTypeService, actions.GetAction<ActionNew>(), newEntities.ToArray());
-            notifier.Notify(contentTypeService, actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Components
                 _logger = logger;
             }
 
-            public void Notify(IContentTypeService contentTypeService, IAction action, params IContent[] entities)
+            public void Notify(IAction action, params NotificationData[] entities)
             {
                 IUser user = null;
                 if (_umbracoContextAccessor.UmbracoContext != null)
@@ -142,17 +142,16 @@ namespace Umbraco.Web.Components
                     }
                 }
 
-                SendNotification(contentTypeService, user, entities, action, _runtimeState.ApplicationUrl);
+                SendNotification(user, entities, action, _runtimeState.ApplicationUrl);
             }
 
-            private void SendNotification(IContentTypeService contentTypeService, IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
+            private void SendNotification(IUser sender, IEnumerable<NotificationData> entities, IAction action, Uri siteUri)
             {
-                if (contentTypeService == null) throw new ArgumentNullException(nameof(contentTypeService));
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null) throw new ArgumentNullException(nameof(siteUri));
 
                 //group by the content type variation since the emails will be different
-                foreach(var contentVariantGroup in entities.GroupBy(x => contentTypeService.Get(x.ContentTypeId)?.Variations))
+                foreach(var contentVariantGroup in entities.GroupBy(x => x.ContentType.Variations))
                 {
                     if (contentVariantGroup.Key == ContentVariation.CultureAndSegment || contentVariantGroup.Key == ContentVariation.Segment)
                         throw new NotSupportedException("Segments are not yet supported in Umbraco");

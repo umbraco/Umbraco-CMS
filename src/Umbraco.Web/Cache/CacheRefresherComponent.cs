@@ -284,7 +284,7 @@ namespace Umbraco.Web.Cache
         /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
         /// case then we need to clear all user permissions cache.
         /// </remarks>
-        private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
+        private void ContentService_Copied(IContentService sender, CopyEventArgs<NotificationData> e)
         { }
 
         /// <summary>
@@ -296,21 +296,21 @@ namespace Umbraco.Web.Cache
         /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
         /// stay up-to-date for unpublished content.
         /// </remarks>
-        private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
+        private void ContentService_Saved(IContentService sender, SaveEventArgs<NotificationData> e)
         { }
 
-        private void ContentService_Changed(IContentService sender, TreeChange<IContent>.EventArgs args)
+        private void ContentService_Changed(IContentService sender, TreeChange<NotificationData>.EventArgs args)
         {
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
 
         // fixme our weird events handling wants this for now
-        private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
-        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
+        private void ContentService_Deleted(IContentService sender, DeleteEventArgs<NotificationData> e) { }
+        private void ContentService_Moved(IContentService sender, MoveEventArgs<NotificationData> e) { }
+        private void ContentService_Trashed(IContentService sender, MoveEventArgs<NotificationData> e) { }
         private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
-        private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
-        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> e) { }
+        private void ContentService_Published(IContentService sender, PublishEventArgs<NotificationData> e) { }
+        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<NotificationData> e) { }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
         //{

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Services
 {
@@ -22,7 +21,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+        void SendNotifications(IUser operatingUser, IEnumerable<NotificationData> entities, string action, string actionName, Uri siteUri,
                                Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
                                Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody);
 

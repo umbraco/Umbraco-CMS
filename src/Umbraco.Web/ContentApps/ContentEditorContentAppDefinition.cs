@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.ContentApps
 {

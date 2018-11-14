@@ -182,11 +182,11 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the IGridConfig
         /// </summary>
-        public IGridConfig GridConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
+        public IGridConfig GridConfig(ILogger logger, IContentTypeService contentTypeService, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
         {
             if (_gridConfig == null)
             {
-                _gridConfig = new GridConfig(logger, runtimeCache, appPlugins, configFolder, isDebug);
+                _gridConfig = new GridConfig(logger, contentTypeService, runtimeCache, appPlugins, configFolder, isDebug);
             }
 
             return _gridConfig;

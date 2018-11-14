@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertBasicProperty(invariantContent, p);
                 AssertDisplayProperty(invariantContent, p);
             }
-            
+
             Assert.AreEqual(content.PropertyGroups.Count(), invariantContent.Tabs.Count());
         }
 

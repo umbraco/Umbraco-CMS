@@ -40,9 +40,9 @@ namespace Umbraco.Core.Manifest
         private ContentApp _app;
         private ShowRule[] _showRules;
 
-        public ManifestContentAppDefinition()
+        public ManifestContentAppDefinition(IContentTypeService contentTypeService)
         {
-            _contentTypeService = DependencyResolver.Current.GetService<IContentTypeService>(); // fixme: We should find a better way to inject
+            _contentTypeService = contentTypeService;
         }
 
         /// <summary>

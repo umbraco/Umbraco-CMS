@@ -131,12 +131,12 @@ namespace Umbraco.Web.Cache
             dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RefreshContentCache(this DistributedCache dc, TreeChange<IContent>[] changes)
+        public static void RefreshContentCache(this DistributedCache dc, TreeChange<NotificationData>[] changes)
         {
             if (changes.Length == 0) return;
 
             var payloads = changes
-                .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.ChangeTypes));
+                .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Content.Id, x.ChangeTypes));
 
             dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
         }

@@ -50,6 +50,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     //TODO: That would mean that property value converters would need to be request lifespan, hrm....
                     var gridConfig = UmbracoConfig.For.GridConfig(
                         Current.ProfilingLogger.Logger,
+                        Current.Services.ContentTypeService,
                         Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),

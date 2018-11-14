@@ -267,8 +267,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var contentType = _contentTypeRepository.Get(entity.ContentTypeId);
             // ensure that the default template is assigned
-            if (entity.TemplateId == 0)
-                entity.TemplateId = contentType.DefaultTemplate?.Id ?? 0;
+            if (entity.TemplateId == null)
+                entity.TemplateId = contentType.DefaultTemplate?.Id;
 
             // sanitize names
             SanitizeNames(content, publishing);

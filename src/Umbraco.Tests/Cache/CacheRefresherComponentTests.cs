@@ -88,18 +88,18 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IMediaService, MoveEventArgs<IMedia>>(null, serviceContext.MediaService, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(null, "", -1)), "Trashed"),
                 new EventDefinition<IMediaService, RecycleBinEventArgs>(null, serviceContext.MediaService, new RecycleBinEventArgs(Guid.NewGuid())),
 
-                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, serviceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "Saved"),
-                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, serviceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "Deleted"),
+                new EventDefinition<IContentService, SaveEventArgs<NotificationData>>(null, serviceContext.ContentService, new SaveEventArgs<NotificationData>(Enumerable.Empty<NotificationData>()), "Saved"),
+                new EventDefinition<IContentService, DeleteEventArgs<NotificationData>>(null, serviceContext.ContentService, new DeleteEventArgs<NotificationData>(Enumerable.Empty<NotificationData>()), "Deleted"),
 
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, serviceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
                 //new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, serviceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
 
-                new EventDefinition<IContentService, CopyEventArgs<IContent>>(null, serviceContext.ContentService, new CopyEventArgs<IContent>(null, null, -1)),
-                new EventDefinition<IContentService, MoveEventArgs<IContent>>(null, serviceContext.ContentService, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(null, "", -1)), "Trashed"),
+                new EventDefinition<IContentService, CopyEventArgs<NotificationData>>(null, serviceContext.ContentService, new CopyEventArgs<NotificationData>(null, null, -1)),
+                new EventDefinition<IContentService, MoveEventArgs<NotificationData>>(null, serviceContext.ContentService, new MoveEventArgs<NotificationData>(new MoveEventInfo<NotificationData>(null, "", -1)), "Trashed"),
                 new EventDefinition<IContentService, RecycleBinEventArgs>(null, serviceContext.ContentService, new RecycleBinEventArgs(Guid.NewGuid())),
-                new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, serviceContext.ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Published"),
-                new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, serviceContext.ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Unpublished"),
+                new EventDefinition<IContentService, PublishEventArgs<NotificationData>>(null, serviceContext.ContentService, new PublishEventArgs<NotificationData>(Enumerable.Empty<NotificationData>()), "Published"),
+                new EventDefinition<IContentService, PublishEventArgs<NotificationData>>(null, serviceContext.ContentService, new PublishEventArgs<NotificationData>(Enumerable.Empty<NotificationData>()), "Unpublished"),
 
                 new EventDefinition<IPublicAccessService, SaveEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new SaveEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
                 new EventDefinition<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new DeleteEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
