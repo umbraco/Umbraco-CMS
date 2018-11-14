@@ -13,7 +13,7 @@
             }
         });
 
-    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, dialogService, $q) {
+    function UmbLoginController($scope, $location, currentUserResource, formHelper, mediaHelper, umbRequestHelper, Upload, localizationService, userService, externalLoginInfo, resetPasswordCodeInfo, $timeout, authResource, $q) {
 
         const vm = this;
         let twoFactorloginDialog = null;
@@ -402,17 +402,7 @@
         }
 
         function show2FALoginDialog(view, callback) {
-            if (!twoFactorloginDialog) {
-                twoFactorloginDialog = dialogService.open({
-                    //very special flag which means that global events cannot close this dialog
-                    manualClose: true,
-                    template: view,
-                    modalClass: "login-overlay",
-                    animation: "slide",
-                    show: true,
-                    callback: callback
-                });
-            }
+            // TODO: show 2FA window
         }
 
         function resetInputValidation() {
