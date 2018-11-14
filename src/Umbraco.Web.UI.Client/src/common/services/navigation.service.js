@@ -5,7 +5,6 @@
  * @requires $rootScope
  * @requires $routeParams
  * @requires $location
- * @requires dialogService
  * @requires treeService
  * @requires sectionResource
  *
@@ -14,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $location, $q, $timeout, $injector, eventsService, dialogService, umbModelMapper, treeService, appState) {
+function navigationService($rootScope, $routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -513,14 +512,13 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
          *
          * @description
          * Opens a dialog, for a given action on a given tree node
-         * uses the dialogService to inject the selected action dialog
-         * into #dialog div.umb-panel-body
          * the path to the dialog view is determined by:
          * "views/" + current tree + "/" + action alias + ".html"
          * The dialog controller will get passed a scope object that is created here with the properties:
-         *  scope.currentNode = the selected tree node
-         *  scope.currentAction = the selected menu item
-         *  so that the dialog controllers can use these properties
+         * scope.currentNode = the selected tree node
+         * scope.title = the title of the menu item
+         * scope.view = the path to the view html file
+         * so that the dialog controllers can use these properties
          *
          * @param {Object} args arguments passed to the function
          * @param {Scope} args.scope current scope passed to the dialog
