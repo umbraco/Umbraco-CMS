@@ -178,7 +178,7 @@ namespace Umbraco.Core.Persistence.Factories
             return entity.ContentSchedule.FullSchedule.Select(x =>
                 new ContentScheduleDto
                 {
-                    Action = x.Change.ToString(),
+                    Action = x.Action.ToString(),
                     Date = x.Date,
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),

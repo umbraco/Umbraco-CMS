@@ -917,7 +917,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
-            var action = ContentScheduleChange.Start.ToString();
+            var action = ContentScheduleAction.Release.ToString();
 
             var sql = GetBaseQuery(QueryType.Many)
                 .WhereIn<NodeDto>(x => x.NodeId, Sql()
@@ -933,9 +933,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForExpiration(DateTime date)
         {
-            var action = ContentScheduleChange.End.ToString();
+            var action = ContentScheduleAction.Expire.ToString();
 
-            // fixme/review - see as above
             var sql = GetBaseQuery(QueryType.Many)
                 .WhereIn<NodeDto>(x => x.NodeId, Sql()
                     .Select<ContentScheduleDto>(x => x.NodeId)
@@ -1173,9 +1172,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 col.Add(new ContentSchedule(scheduleDto.Id,
                     LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
                     scheduleDto.Date,
-                    scheduleDto.Action == ContentScheduleChange.Start.ToString()
-                        ? ContentScheduleChange.Start
-                        : ContentScheduleChange.End));
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire));
             }
 
             return result;

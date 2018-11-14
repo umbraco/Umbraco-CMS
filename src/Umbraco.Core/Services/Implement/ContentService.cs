@@ -1197,7 +1197,7 @@ namespace Umbraco.Core.Services.Implement
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, date)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Release, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1206,7 +1206,7 @@ namespace Umbraco.Core.Services.Implement
                         foreach (var culture in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(culture, ContentScheduleChange.Start, date);
+                            d.ContentSchedule.Clear(culture, ContentScheduleAction.Release, date);
 
                             if (d.Trashed) continue; // won't publish
 
@@ -1229,7 +1229,7 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.Start, date);
+                        d.ContentSchedule.Clear(ContentScheduleAction.Release, date);
 
                         result = d.Trashed
                             ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
@@ -1248,7 +1248,7 @@ namespace Umbraco.Core.Services.Implement
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, date)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Expire, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1256,7 +1256,7 @@ namespace Umbraco.Core.Services.Implement
                         foreach (var c in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleChange.End, date);
+                            d.ContentSchedule.Clear(c, ContentScheduleAction.Expire, date);
                             //set the culture to be published
                             d.UnpublishCulture(c);
                         }
@@ -1272,7 +1272,7 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.End, date);
+                        d.ContentSchedule.Clear(ContentScheduleAction.Expire, date);
                         result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -2505,7 +2505,7 @@ namespace Umbraco.Core.Services.Implement
             // they should be removed so they don't interrupt an unpublish
             // otherwise it would remain released == published
 
-            var pastReleases = content.ContentSchedule.GetPending(ContentScheduleChange.End, DateTime.Now);
+            var pastReleases = content.ContentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
             foreach (var p in pastReleases)
                 content.ContentSchedule.Remove(p);
             if (pastReleases.Count > 0)

@@ -71,10 +71,10 @@ namespace Umbraco.Tests.Models
             var schedule = new ContentScheduleCollection();
             schedule.Add(now, now.AddDays(1));
 
-            schedule.Clear(ContentScheduleChange.Start);
+            schedule.Clear(ContentScheduleAction.Release);
 
-            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleChange.Start).Count());
-            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.End).Count());
+            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Release).Count());
+            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
             Assert.AreEqual(1, schedule.FullSchedule.Count());
         }
 
@@ -86,20 +86,20 @@ namespace Umbraco.Tests.Models
             schedule.Add(now, now.AddDays(1));
             schedule.Add("en-US", now, now.AddDays(1));
 
-            schedule.Clear(ContentScheduleChange.End);
+            schedule.Clear(ContentScheduleAction.Expire);
 
-            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleChange.End).Count());
-            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.Start).Count());
-            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.End).Count());
-            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.Start).Count());
+            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
+            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Release).Count());
+            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count());
+            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count());
             Assert.AreEqual(3, schedule.FullSchedule.Count());
 
-            schedule.Clear("en-US", ContentScheduleChange.End);
+            schedule.Clear("en-US", ContentScheduleAction.Expire);
 
-            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleChange.End).Count());
-            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleChange.Start).Count());
-            Assert.AreEqual(0, schedule.GetSchedule("en-US", ContentScheduleChange.End).Count());
-            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleChange.Start).Count());
+            Assert.AreEqual(0, schedule.GetSchedule(ContentScheduleAction.Expire).Count());
+            Assert.AreEqual(1, schedule.GetSchedule(ContentScheduleAction.Release).Count());
+            Assert.AreEqual(0, schedule.GetSchedule("en-US", ContentScheduleAction.Expire).Count());
+            Assert.AreEqual(1, schedule.GetSchedule("en-US", ContentScheduleAction.Release).Count());
             Assert.AreEqual(2, schedule.FullSchedule.Count());
         }
 

@@ -30,11 +30,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             foreach(var s in schedules)
             {
                 var date = s.Value.releaseDate;
-                var action = ContentScheduleChange.Start.ToString();
+                var action = ContentScheduleAction.Release.ToString();
                 if (!date.HasValue)
                 {
                     date = s.Value.expireDate;
-                    action = ContentScheduleChange.End.ToString();
+                    action = ContentScheduleAction.Expire.ToString();
                 }
 
                 Insert.IntoTable(ContentScheduleDto.TableName)

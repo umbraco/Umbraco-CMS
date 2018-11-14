@@ -362,8 +362,6 @@ namespace Umbraco.Core.Services
         /// </remarks>
         PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
 
-        // fixme/review - should SaveAndPublishBranch always publish the root document of the branch, even when !force?
-
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>

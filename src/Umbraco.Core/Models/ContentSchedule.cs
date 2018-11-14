@@ -13,12 +13,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentSchedule"/> class.
         /// </summary>
-        public ContentSchedule(int id, string culture, DateTime date, ContentScheduleChange change)
+        public ContentSchedule(int id, string culture, DateTime date, ContentScheduleAction action)
         {
             Id = id;
             Culture = culture;
             Date = date;
-            Change = change;
+            Action = action;
         }
 
         /// <summary>
@@ -46,12 +46,8 @@ namespace Umbraco.Core.Models
         /// Gets the action to take.
         /// </summary>
         [DataMember]
-        public ContentScheduleChange Change { get; }
+        public ContentScheduleAction Action { get; }
 
-        // fixme/review - must implement Equals?
-        //  fixing ContentScheduleCollection.Equals which was broken, breaks content Can_Deep_Clone test
-        //  because SequenceEqual on the inner sorted lists fails, because it ends up doing reference-equal
-        //  on each content schedule - so we *have* to implement Equals for us too?
         public override bool Equals(object obj)
             => obj is ContentSchedule other && Equals(other);
 
@@ -59,12 +55,12 @@ namespace Umbraco.Core.Models
         {
             // don't compare Ids, two ContentSchedule are equal if they are for the same change
             // for the same culture, on the same date - and the collection deals w/duplicates
-            return Culture.InvariantEquals(other.Culture) && Date == other.Date && Change == other.Change;
+            return Culture.InvariantEquals(other.Culture) && Date == other.Date && Action == other.Action;
         }
 
         public object DeepClone()
         {
-            return new ContentSchedule(Id, Culture, Date, Change);
+            return new ContentSchedule(Id, Culture, Date, Action);
         }
     }
 }
