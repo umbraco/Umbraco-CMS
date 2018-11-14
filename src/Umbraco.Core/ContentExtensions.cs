@@ -36,11 +36,11 @@ namespace Umbraco.Core
             else if (culture.IsNullOrWhiteSpace())
                 throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
 
-            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleChange.End);
+            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
             if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
                 return ContentStatus.Expired;
 
-            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleChange.Start);
+            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
             if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
                 return ContentStatus.AwaitingRelease;
 
@@ -56,7 +56,6 @@ namespace Umbraco.Core
         /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
         internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
         {
-            // fixme/review - assuming it's || here not && ?
             if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
                 return Array.Empty<string>();
 

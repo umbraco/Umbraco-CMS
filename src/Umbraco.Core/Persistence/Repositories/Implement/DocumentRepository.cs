@@ -917,14 +917,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
-            var action = ContentScheduleChange.Start.ToString();
+            var action = ContentScheduleAction.Release.ToString();
 
             var sql = GetBaseQuery(QueryType.Many)
                 .WhereIn<NodeDto>(x => x.NodeId, Sql()
                     .Select<ContentScheduleDto>(x => x.NodeId)
                     .From<ContentScheduleDto>()
                     .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
-            
+
             AddGetByQueryOrderBy(sql);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
@@ -933,9 +933,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IContent> GetContentForExpiration(DateTime date)
         {
-            var action = ContentScheduleChange.End.ToString();
+            var action = ContentScheduleAction.Expire.ToString();
 
-            // fixme/review - see as above
             var sql = GetBaseQuery(QueryType.Many)
                 .WhereIn<NodeDto>(x => x.NodeId, Sql()
                     .Select<ContentScheduleDto>(x => x.NodeId)
@@ -1165,17 +1164,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var scheduleDto in scheduleDtos)
             {
-                // fixme/review - code was adding a new collection on each dto?
-
                 if (!result.TryGetValue(scheduleDto.NodeId, out var col))
                     col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
 
                 col.Add(new ContentSchedule(scheduleDto.Id,
                     LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
                     scheduleDto.Date,
-                    scheduleDto.Action == ContentScheduleChange.Start.ToString()
-                        ? ContentScheduleChange.Start
-                        : ContentScheduleChange.End));
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire));
             }
 
             return result;

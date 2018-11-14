@@ -75,14 +75,14 @@ namespace Umbraco.Core.Models
 
             if (releaseDate.HasValue)
             {
-                var entry = new ContentSchedule(0, culture, releaseDate.Value, ContentScheduleChange.Start);
+                var entry = new ContentSchedule(0, culture, releaseDate.Value, ContentScheduleAction.Release);
                 changes.Add(releaseDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
 
             if (expireDate.HasValue)
             {
-                var entry = new ContentSchedule(0, culture, expireDate.Value, ContentScheduleChange.End);
+                var entry = new ContentSchedule(0, culture, expireDate.Value, ContentScheduleAction.Expire);
                 changes.Add(expireDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
@@ -112,45 +112,46 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Clear all of the scheduled change type for invariant content
         /// </summary>
-        /// <param name="changeType"></param>
+        /// <param name="action"></param>
         /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
-        public void Clear(ContentScheduleChange changeType, DateTime? changeDate = null)
+        public void Clear(ContentScheduleAction action, DateTime? changeDate = null)
         {
-            Clear(string.Empty, changeType, changeDate);
+            Clear(string.Empty, action, changeDate);
         }
 
         /// <summary>
         /// Clear all of the scheduled change type for the culture
         /// </summary>
         /// <param name="culture"></param>
-        /// <param name="changeType"></param>
-        /// <param name="changeDate">If specified, will clear all entries with dates less than or equal to the value</param>
-        public void Clear(string culture, ContentScheduleChange changeType, DateTime? changeDate = null)
+        /// <param name="action"></param>
+        /// <param name="date">If specified, will clear all entries with dates less than or equal to the value</param>
+        public void Clear(string culture, ContentScheduleAction action, DateTime? date = null)
         {
-            if (_schedule.TryGetValue(culture, out var s))
-            {
-                foreach (var ofChange in s.Where(x => x.Value.Change == changeType
-                    && (changeDate.HasValue ? x.Value.Date <= changeDate.Value : true)).ToList())
-                {
-                    var removed = s.Remove(ofChange.Value.Date);
-                    if (removed)
-                    {
-                        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, ofChange.Value));
-                        if (s.Count == 0)
-                            _schedule.Remove(culture);
-                    }
-                }
+            if (!_schedule.TryGetValue(culture, out var schedules))
+                return;
 
+            var removes = schedules.Where(x => x.Value.Action == action && (!date.HasValue || x.Value.Date <= date.Value)).ToList();
+
+            foreach (var remove in removes)
+            {
+                var removed = schedules.Remove(remove.Value.Date);
+                if (!removed)
+                    continue;
+
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, remove.Value));
             }
+
+            if (schedules.Count == 0)
+                _schedule.Remove(culture);
         }
 
         /// <summary>
         /// Returns all pending schedules based on the date and type provided
         /// </summary>
-        /// <param name="changeType"></param>
+        /// <param name="action"></param>
         /// <param name="date"></param>
         /// <returns></returns>
-        public IReadOnlyList<ContentSchedule> GetPending(ContentScheduleChange changeType, DateTime date)
+        public IReadOnlyList<ContentSchedule> GetPending(ContentScheduleAction action, DateTime date)
         {
             return _schedule.Values.SelectMany(x => x.Values).Where(x => x.Date <= date).ToList();
         }
@@ -159,9 +160,9 @@ namespace Umbraco.Core.Models
         /// Gets the schedule for invariant content
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ContentSchedule> GetSchedule(ContentScheduleChange? changeType = null)
+        public IEnumerable<ContentSchedule> GetSchedule(ContentScheduleAction? action = null)
         {
-            return GetSchedule(string.Empty, changeType);
+            return GetSchedule(string.Empty, action);
         }
 
         /// <summary>
@@ -169,10 +170,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public IEnumerable<ContentSchedule> GetSchedule(string culture, ContentScheduleChange? changeType = null)
+        public IEnumerable<ContentSchedule> GetSchedule(string culture, ContentScheduleAction? action = null)
         {
             if (_schedule.TryGetValue(culture, out var changes))
-                return changeType == null ? changes.Values : changes.Values.Where(x => x.Change == changeType.Value);
+                return action == null ? changes.Values : changes.Values.Where(x => x.Action == action.Value);
             return Enumerable.Empty<ContentSchedule>();
         }
 
@@ -208,7 +209,6 @@ namespace Umbraco.Core.Models
             if (thisSched.Count != thatSched.Count)
                 return false;
 
-            // fixme/review - code was returning false *if* thatList.SequenceEqual(thisList) and not the opposite?
             foreach (var (culture, thisList) in thisSched)
             {
                 // if culture is missing, or actions differ, false

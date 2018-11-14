@@ -357,7 +357,7 @@ namespace Umbraco.Tests.Services
             var sched = content.ContentSchedule.FullSchedule;
             Assert.AreEqual(1, sched.Count);
             Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
-            content.ContentSchedule.Clear(ContentScheduleChange.End);
+            content.ContentSchedule.Clear(ContentScheduleAction.Expire);
             contentService.Save(content, Constants.Security.SuperUserId);
 
 

@@ -73,10 +73,9 @@ namespace Umbraco.Core.Models
             // so, the logic below ensures that the name always end up being the correct name
             // see also LanguageController.GetAllCultures which is doing the same
             //
-            // fixme/review - stop saving language names in database?
             // all this, including the ugly settings injection, because se store language names in db,
             // otherwise it would be ok to simply return new CultureInfo(IsoCode).DisplayName to get the name
-            // in whatever culture is current - could we ... not do it?
+            // in whatever culture is current - we should not do it, see task #3623
             //
             // but then, some tests that compare audit strings (for culture names) would need to be fixed
 

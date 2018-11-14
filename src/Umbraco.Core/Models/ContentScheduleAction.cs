@@ -1,21 +1,18 @@
 ﻿namespace Umbraco.Core.Models
 {
-    // fixme/review - should this be named DocumentScheduleAction?
-    // fixme/review - should values be Release and Expire not Start and Stop?
-
     /// <summary>
     /// Defines scheduled actions for documents.
     /// </summary>
-    public enum ContentScheduleChange
+    public enum ContentScheduleAction
     {
         /// <summary>
         /// Release the document.
         /// </summary>
-        Start,
+        Release,
 
         /// <summary>
         /// Expire the document.
         /// </summary>
-        End
+        Expire
     }
 }
