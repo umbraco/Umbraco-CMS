@@ -77,6 +77,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == 0 && p.Name == "admin"));
             }
 
+            if (contentTypeService == null)
+            {
+                contentTypeService = Mock.Of<IContentTypeService>(x => x.Get(It.IsAny<int>()) == Mock.Of<IContentType>(p => p.Id == 1));
+            }
+
             if (mediaService == null)
             {
                 long totalRecs;
@@ -174,6 +179,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer,
                 profilingLogger,
                 contentService,
+                contentTypeService,
                 mediaService,
                 userService,
                 sqlContext,

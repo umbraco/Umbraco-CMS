@@ -45,7 +45,7 @@ namespace Umbraco.Core.Publishing
                     d.ReleaseDate = null;
                     _contentPublishingService.PublishCulture(d); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
-                    _logger.Debug<ContentService>("Result of publish attempt: {PublishResult}", result.Result);
+                    _logger.Debug<ScheduledPublisher>("Result of publish attempt: {PublishResult}", result.Result);
                     if (result.Success == false)
                     {
                         _logger.Error<ScheduledPublisher>(null, "Error publishing node {NodeId}", d.Id);

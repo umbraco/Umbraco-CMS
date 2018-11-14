@@ -15,16 +15,14 @@ namespace Umbraco.Core.Configuration.Grid
     {
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCache;
-        private readonly IContentTypeService _contentTypeService;
         private readonly DirectoryInfo _appPlugins;
         private readonly DirectoryInfo _configFolder;
         private readonly bool _isDebug;
 
-        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, IContentTypeService contentTypeService, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
+        public GridEditorsConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
         {
             _logger = logger;
             _runtimeCache = runtimeCache;
-            _contentTypeService = contentTypeService;
             _appPlugins = appPlugins;
             _configFolder = configFolder;
             _isDebug = isDebug;
@@ -37,7 +35,7 @@ namespace Umbraco.Core.Configuration.Grid
                 Func<List<GridEditor>> getResult = () =>
                 {
                     // fixme - should use the common one somehow! + ignoring _appPlugins here!
-                    var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger,_contentTypeService);
+                    var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger);
 
                     var editors = new List<GridEditor>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");

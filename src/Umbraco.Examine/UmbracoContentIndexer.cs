@@ -79,6 +79,7 @@ namespace Umbraco.Examine
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             IContentService contentService,
+            IContentTypeService contentTypeService,
             IMediaService mediaService,
             IUserService userService,
             ISqlContext sqlContext,
@@ -98,6 +99,7 @@ namespace Umbraco.Examine
             ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             UserService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ContentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
             _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             InitializeQueries(sqlContext);

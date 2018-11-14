@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using System.Web.Mvc;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
@@ -39,9 +40,9 @@ namespace Umbraco.Core.Manifest
         private ContentApp _app;
         private ShowRule[] _showRules;
 
-        public ManifestContentAppDefinition(IContentTypeService contentTypeService)
+        public ManifestContentAppDefinition()
         {
-            _contentTypeService = contentTypeService;
+            _contentTypeService = DependencyResolver.Current.GetService<IContentTypeService>(); // fixme: We should find a better way to inject
         }
 
         /// <summary>

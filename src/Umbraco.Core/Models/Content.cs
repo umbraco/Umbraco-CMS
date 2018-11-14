@@ -201,10 +201,6 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public int ContentTypeId { get; private set; }
-
-        /// <inheritdoc />
-        [IgnoreDataMember]
         public DateTime? PublishDate { get; internal set; } // set by persistence
 
         /// <inheritdoc />

@@ -32,6 +32,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IAuditService, AuditService>();
             container.RegisterSingleton<ITagService, TagService>();
             container.RegisterSingleton<IContentService, ContentService>();
+            container.RegisterSingleton<IContentPublishingService, ContentPublishingService>();
             container.RegisterSingleton<IUserService, UserService>();
             container.RegisterSingleton<IMemberService, MemberService>();
             container.RegisterSingleton<IMediaService, MediaService>();

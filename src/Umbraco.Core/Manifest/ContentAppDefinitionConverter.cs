@@ -12,14 +12,7 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class ContentAppDefinitionConverter : JsonReadConverter<IContentAppDefinition>
     {
-        private readonly IContentTypeService _contentTypeService;
-
-        public ContentAppDefinitionConverter(IContentTypeService contentTypeService)
-        {
-            _contentTypeService = contentTypeService;
-        }
-
         protected override IContentAppDefinition Create(Type objectType, string path, JObject jObject)
-            => new ManifestContentAppDefinition(_contentTypeService);
+            => new ManifestContentAppDefinition();
     }
 }

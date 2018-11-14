@@ -19,7 +19,6 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser
     {
-        private readonly IContentTypeService _contentTypeService;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IRuntimeCacheProvider _cache;
@@ -31,10 +30,10 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger, IContentTypeService contentTypeService)
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger)
             : this(cache, validators, "~/App_Plugins", logger)
         {
-            _contentTypeService = contentTypeService;
+
         }
 
         /// <summary>
@@ -155,7 +154,7 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
                 new ValueValidatorConverter(_validators),
-                new ContentAppDefinitionConverter(_contentTypeService));
+                new ContentAppDefinitionConverter());
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
