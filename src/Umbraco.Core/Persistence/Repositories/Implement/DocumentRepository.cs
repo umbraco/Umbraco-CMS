@@ -924,7 +924,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .Select<ContentScheduleDto>(x => x.NodeId)
                     .From<ContentScheduleDto>()
                     .Where<ContentScheduleDto>(x => x.Action == action && x.Date <= date));
-            
+
             AddGetByQueryOrderBy(sql);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
@@ -1164,8 +1164,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var scheduleDto in scheduleDtos)
             {
-                // fixme/review - code was adding a new collection on each dto?
-
                 if (!result.TryGetValue(scheduleDto.NodeId, out var col))
                     col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
 
