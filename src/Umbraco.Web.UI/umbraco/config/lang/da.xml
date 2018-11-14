@@ -211,7 +211,7 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
-    <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
+    <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
