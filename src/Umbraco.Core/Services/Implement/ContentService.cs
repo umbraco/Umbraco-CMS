@@ -955,7 +955,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true)
+        private PublishResult SavePublishingInternal(IScope scope, IContent content, int userId = 0, bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -996,7 +996,7 @@ namespace Umbraco.Core.Services.Implement
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, culturesPublishing, culturesUnpublishing, evtMsgs);
+                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs);
                 if (publishResult.Success)
                 {
                     // note: StrategyPublish flips the PublishedState to Publishing!
@@ -1004,7 +1004,11 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else
                 {
-                    //check for mandatory culture missing, if this is the case we'll switch the unpublishing flag
+                    // in a branch, just give up
+                    if (branchOne && !branchRoot)
+                        return publishResult;
+
+                    //check for mandatory culture missing, and then unpublish document as a whole
                     if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
                     {
                         publishing = false;
@@ -1015,15 +1019,17 @@ namespace Umbraco.Core.Services.Implement
                     }
 
                     //fixme - casting
-                    ((Content)content).Published = content.Published; // reset published state = save unchanged - fixme doh?
+                    // reset published state from temp values (publishing, unpublishing) to original value
+                    // (published, unpublished) in order to save the document, unchanged
+                    ((Content)content).Published = content.Published;
                 }
             }
 
-            if (unpublishing)
+            if (unpublishing) // won't happen in a branch
             {
                 var newest = GetById(content.Id); // ensure we have the newest version - in scope
-                if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
-                    content = newest; // fixme confusing should just die here - else we'll miss some changes
+                if (content.VersionId != newest.VersionId)
+                    return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, evtMsgs, content);
 
                 if (content.Published)
                 {
@@ -1037,7 +1043,9 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //fixme - casting
-                        ((Content)content).Published = content.Published; // reset published state = save unchanged
+                        // reset published state from temp values (publishing, unpublishing) to original value
+                        // (published, unpublished) in order to save the document, unchanged
+                        ((Content)content).Published = content.Published;
                     }
                 }
                 else
@@ -1064,7 +1072,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
             }
 
-            if (unpublishing) // we have tried to unpublish
+            if (unpublishing) // we have tried to unpublish - won't happen in a branch
             {
                 if (unpublishResult.Success) // and succeeded, trigger events
                 {
@@ -1101,13 +1109,14 @@ namespace Umbraco.Core.Services.Implement
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
 
                     // invalidate the node/branch
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    if (!branchOne || branchRoot)
+                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                     scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
 
                     // if was not published and now is... descendants that were 'published' (but
                     // had an unpublished ancestor) are 're-published' ie not explicitely published
                     // but back as 'published' nevertheless
-                    if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
+                    if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
                         var descendants = GetPublishedDescendantsLocked(content).ToArray();
                         scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
@@ -1140,11 +1149,14 @@ namespace Umbraco.Core.Services.Implement
 
                     return publishResult;
                 }
-
             }
 
+            // should not happen
+            if (branchOne && !branchRoot)
+                throw new Exception("panic");
+
             //if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-            if (publishResult == null || !publishResult.Success)
+            if (!branchOne && (publishResult == null || !publishResult.Success))
             {
                 if (culturesChanging != null)
                 {
@@ -1154,7 +1166,9 @@ namespace Umbraco.Core.Services.Implement
                     Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
                 }
                 else
+                {
                     Audit(AuditType.Save, userId, content.Id);
+                }
             }
 
             // or, failed
@@ -1164,6 +1178,12 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
+            => PerformScheduledPublishInternal(date).ToList();
+
+        // beware! this method yields results, so the returned IEnumerable *must* be
+        // enumerated for anything to happen - dangerous, so private + exposed via
+        // the public method above, which forces ToList().
+        private IEnumerable<PublishResult> PerformScheduledPublishInternal(DateTime date)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1171,61 +1191,64 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var now = date;
-
-                foreach (var d in _documentRepository.GetContentForRelease(now))
+                foreach (var d in _documentRepository.GetContentForRelease(date))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, now)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.Start, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
 
-                        foreach (var c in pendingCultures)
+                        var publishing = true;
+                        foreach (var culture in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleChange.Start, now);
-                            if (!d.Trashed)
-                                d.PublishCulture(c); //set the culture to be published
+                            d.ContentSchedule.Clear(culture, ContentScheduleChange.Start, date);
+
+                            if (d.Trashed) continue; // won't publish
+
+                            publishing &= d.PublishCulture(culture); //set the culture to be published
+                            if (!publishing) break; // no point continuing
                         }
 
-                        if (pendingCultures.Count > 0)
-                        {
-                            if (!d.Trashed)
-                                result = SavePublishing(d, d.WriterId);
-                            else
-                                result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+                        if (d.Trashed)
+                            result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
+                        else if (!publishing)
+                            result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
+                        else
+                            result = SavePublishing(d, d.WriterId);
 
-                            if (result.Success == false)
-                                Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-                            yield return result;
-                        }
+                        if (result.Success == false)
+                            Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+
+                        yield return result;
                     }
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.Start, now);
-                        if (!d.Trashed)
-                            result = SaveAndPublish(d, userId: d.WriterId);
-                        else
-                            result = new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, d);
+                        d.ContentSchedule.Clear(ContentScheduleChange.Start, date);
+
+                        result = d.Trashed
+                            ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
+                            : SaveAndPublish(d, userId: d.WriterId);
 
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+
                         yield return result;
                     }
                 }
 
-                foreach (var d in _documentRepository.GetContentForExpiration(now))
+                foreach (var d in _documentRepository.GetContentForExpiration(date))
                 {
                     PublishResult result;
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, now)
+                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleChange.End, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1233,7 +1256,7 @@ namespace Umbraco.Core.Services.Implement
                         foreach (var c in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleChange.End, now);
+                            d.ContentSchedule.Clear(c, ContentScheduleChange.End, date);
                             //set the culture to be published
                             d.UnpublishCulture(c);
                         }
@@ -1249,7 +1272,7 @@ namespace Umbraco.Core.Services.Implement
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleChange.End, now);
+                        d.ContentSchedule.Clear(ContentScheduleChange.End, date);
                         result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1259,7 +1282,7 @@ namespace Umbraco.Core.Services.Implement
 
                 }
 
-                _documentRepository.ClearSchedule(now);
+                _documentRepository.ClearSchedule(date);
 
                 scope.Complete();
             }
@@ -1420,8 +1443,6 @@ namespace Umbraco.Core.Services.Implement
                     page++;
                 } while (count > 0);
 
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 scope.Complete();
@@ -1452,28 +1473,7 @@ namespace Umbraco.Core.Services.Implement
             if (publishCultures != null && !publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            // fixme - this is totally kinda wrong
-
-            var culturesPublishing = document.ContentType.VariesByCulture()
-                ? document.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
-                : null;
-            var result = StrategyCanPublish(scope, document, userId, /*checkPath:*/ isRoot, culturesPublishing, Array.Empty<string>(), evtMsgs);
-            if (!result.Success)
-                return result;
-            result = StrategyPublish(scope, document, userId, culturesPublishing, Array.Empty<string>(), evtMsgs);
-            if (!result.Success)
-                throw new Exception("panic");
-            if (document.HasIdentity == false)
-                document.CreatorId = userId;
-            document.WriterId = userId;
-            _documentRepository.Save(document);
-            publishedDocuments.Add(document);
-            // fixme - but then, we have all the audit thing to run
-            // so... it would be better to re-run the internal thing?
-            return result;
-
-            // we want _some part_ of it but not all of it
-            return SavePublishingInternal(scope, document, userId);
+            return SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
         }
 
         #endregion
@@ -1979,28 +1979,28 @@ namespace Umbraco.Core.Services.Implement
                 var culturesChanging = content.ContentType.VariesByCulture()
                     ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
+
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
                 // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
                 // in this particular case, determining which cultures have changed works with the above with names since it will
                 // have always changed if it's been saved in the back office but that's not really fail safe.
 
                 //Save before raising event
-                // fixme - nesting uow?
                 var saveResult = Save(content, userId);
 
-                if (saveResult.Success)
-                {
-                    sendToPublishEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-
-                    if (culturesChanging != null)
-                        Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
-                    else
-                        Audit(AuditType.SendToPublish, content.WriterId, content.Id);
-                }
-
-                // fixme here, on only on success?
+                // always complete (but maybe return a failed status)
                 scope.Complete();
+
+                if (!saveResult.Success)
+                    return saveResult.Success;
+
+                sendToPublishEventArgs.CanCancel = false;
+                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+
+                if (culturesChanging != null)
+                    Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+                else
+                    Audit(AuditType.SendToPublish, content.WriterId, content.Id);
 
                 return saveResult.Success;
             }

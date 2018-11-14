@@ -53,17 +53,36 @@ namespace Umbraco.Web.Scheduling
 
             try
             {
-                // run
-                // fixme context & events during scheduled publishing?
-                // in v7 we create an UmbracoContext and an HttpContext, and cache instructions
-                // are batched, and we have to explicitly flush them, how is it going to work here?
-                var result = _contentService.PerformScheduledPublish(DateTime.Now).ToList();
-                if (result.Count > 0)
-                    foreach(var grouped in result.GroupBy(x => x.Result))
-                        _logger.Info<ScheduledPublishing>("Scheduled publishing result: '{StatusCount}' items with status {Status}", grouped.Count(), grouped.Key);
+                // ensure we run with an UmbracoContext, because this may run in a background task,
+                // yet developers may be using the 'current' UmbracoContext in the event handlers
+                //
+                // fixme
+                // - or maybe not, CacheRefresherComponent already ensures a context when handling events
+                // - UmbracoContext 'current' needs to be refactored and cleaned up
+                // - batched messenger should not depend on a current HttpContext
+                //    but then what should be its "scope"? could we attach it to scopes?
+                // - and we should definitively *not* have to flush it here (should be auto)
+                //
+                using (var tempContext = UmbracoContext.EnsureContext())
+                {
+                    try
+                    {
+                        // run
+                        var result = _contentService.PerformScheduledPublish(DateTime.Now);
+                        foreach (var grouped in result.GroupBy(x => x.Result))
+                            _logger.Info<ScheduledPublishing>("Scheduled publishing result: '{StatusCount}' items with status {Status}", grouped.Count(), grouped.Key);
+                    }
+                    finally
+                    {
+                        // if running on a temp context, we have to flush the messenger
+                        if (tempContext != null && Composing.Current.ServerMessenger is BatchedDatabaseServerMessenger m)
+                            m.FlushBatch();
+                    }
+                }
             }
             catch (Exception ex)
             {
+                // important to catch *everything* to ensure the task repeats
                 _logger.Error<ScheduledPublishing>(ex, "Failed.");
             }
 

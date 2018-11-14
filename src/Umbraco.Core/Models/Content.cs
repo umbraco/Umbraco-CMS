@@ -217,7 +217,7 @@ namespace Umbraco.Core.Models
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -297,13 +297,10 @@ namespace Umbraco.Core.Models
 
             if (_publishInfos == null) return;
             _publishInfos.Remove(culture);
-
-            //we need to set the culture name to be dirty so we know it's being modified
-            //fixme is there a better way to do this, not as far as i know.
-            // fixme why do we need this?
-            SetCultureName(GetCultureName(culture), culture);
-
             if (_publishInfos.Count == 0) _publishInfos = null;
+
+            // set the culture to be dirty - it's been modified
+            TouchCultureInfo(culture);
         }
 
         // sets a publish edited
@@ -522,7 +519,6 @@ namespace Umbraco.Core.Models
                 clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
                 clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
             }
-            
         }
     }
 }
