@@ -116,10 +116,10 @@ angular.module("umbraco")
             };
 
             $scope.submitFolder = function() {
-                if ($scope.newFolderName) {
+                if ($scope.model.newFolderName) {
                     $scope.creatingFolder = true;
                     mediaResource
-                        .addFolder($scope.newFolderName, $scope.currentFolder.id)
+                        .addFolder($scope.model.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
                             //we've added a new folder so lets clear the tree cache for that specific item
                             treeService.clearCache({
@@ -129,7 +129,7 @@ angular.module("umbraco")
                             $scope.creatingFolder = false;
                             $scope.gotoFolder(data);
                             $scope.showFolderInput = false;
-                            $scope.newFolderName = "";
+                            $scope.model.newFolderName = "";
                         });
                 } else {
                     $scope.showFolderInput = false;
