@@ -116,7 +116,6 @@ function serverValidationManager($timeout) {
          * @name subscribe
          * @methodOf umbraco.services.serverValidationManager
          * @function
-         * @returns {} a method to unsubscribe this callback
          * @description
          *  Adds a callback method that is executed whenever validation changes for the field name + property specified.
          *  This is generally used for server side validation in order to match up a server side validation error with 
