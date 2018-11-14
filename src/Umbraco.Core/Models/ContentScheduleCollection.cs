@@ -74,14 +74,14 @@ namespace Umbraco.Core.Models
 
             if (releaseDate.HasValue)
             {
-                var entry = new ContentSchedule(0, culture, releaseDate.Value, ContentScheduleAction.Release);
+                var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release);
                 changes.Add(releaseDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }
 
             if (expireDate.HasValue)
             {
-                var entry = new ContentSchedule(0, culture, expireDate.Value, ContentScheduleAction.Expire);
+                var entry = new ContentSchedule(culture, expireDate.Value, ContentScheduleAction.Expire);
                 changes.Add(expireDate.Value, entry);
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, entry));
             }

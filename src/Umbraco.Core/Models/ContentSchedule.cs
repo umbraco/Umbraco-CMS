@@ -13,7 +13,18 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentSchedule"/> class.
         /// </summary>
-        public ContentSchedule(int id, string culture, DateTime date, ContentScheduleAction action)
+        public ContentSchedule(string culture, DateTime date, ContentScheduleAction action)
+        {
+            Id = Guid.Empty; // will be assigned by document repository
+            Culture = culture;
+            Date = date;
+            Action = action;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentSchedule"/> class.
+        /// </summary>
+        public ContentSchedule(Guid id, string culture, DateTime date, ContentScheduleAction action)
         {
             Id = id;
             Culture = culture;
@@ -25,7 +36,7 @@ namespace Umbraco.Core.Models
         /// Gets the unique identifier of the document targeted by the scheduled action.
         /// </summary>
         [DataMember]
-        public int Id { get; }
+        public Guid Id { get; internal set; }
 
         /// <summary>
         /// Gets the culture of the scheduled action.

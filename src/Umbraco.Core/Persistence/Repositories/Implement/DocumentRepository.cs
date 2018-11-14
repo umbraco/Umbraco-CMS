@@ -363,7 +363,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // persist the document dto
             // at that point, when publishing, the entity still has its old Published value
-            // so we need to explicitely update the dto to persist the correct value
+            // so we need to explicitly update the dto to persist the correct value
             if (content.PublishedState == PublishedState.Publishing)
                 dto.Published = true;
             dto.NodeId = nodeDto.NodeId;
@@ -371,12 +371,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             //insert the schedule
-            var scheduleDtos = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository);
-            foreach (var scheduleDto in scheduleDtos)
-            {
-                scheduleDto.NodeId = nodeDto.NodeId;
-                Database.Insert(scheduleDto);
-            }
+            PersistContentSchedule(content, false);
 
             // persist the variations
             if (content.ContentType.VariesByCulture())
@@ -588,7 +583,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // update the document dto
             // at that point, when un/publishing, the entity still has its old Published value
-            // so we need to explicitely update the dto to persist the correct value
+            // so we need to explicitly update the dto to persist the correct value
             if (content.PublishedState == PublishedState.Publishing)
                 dto.Published = true;
             else if (content.PublishedState == PublishedState.Unpublishing)
@@ -596,30 +591,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Update(dto);
 
+            //update the schedule
             if (content.IsPropertyDirty("ContentSchedule"))
-            {
-                //update the schedule, get the existing one so we know what to update
-                var scheduleDtos = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
-
-                //remove any that no longer exist
-                var ids = scheduleDtos.Where(x => x.Id > 0).Select(x => x.Id).Distinct();
-                Database.Execute(Sql()
-                    .Delete<ContentScheduleDto>()
-                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
-                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
-
-                //add/update the rest
-                foreach (var scheduleDto in scheduleDtos)
-                {
-                    if (scheduleDto.Id == 0)
-                        Database.Insert(scheduleDto);
-                    else
-                        Database.Update(scheduleDto);
-                }
-            }
+                PersistContentSchedule(content, true);
 
             // if entity is publishing, update tags, else leave tags there
-            // means that implicitely unpublished, or trashed, entities *still* have tags in db
+            // means that implicitly unpublished, or trashed, entities *still* have tags in db
             if (content.PublishedState == PublishedState.Publishing)
                 SetEntityTags(entity, _tagRepository);
 
@@ -649,8 +626,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            // note re. tags: explicitely unpublished entities have cleared tags,
-            // but masked or trashed entitites *still* have tags in the db fixme so what?
+            // note re. tags: explicitly unpublished entities have cleared tags,
+            // but masked or trashed entities *still* have tags in the db fixme so what?
 
             entity.ResetDirtyProperties();
 
@@ -665,6 +642,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
+        }
+
+        private void PersistContentSchedule(IContent content, bool update)
+        {
+            var schedules = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
+
+            //remove any that no longer exist
+            if (update)
+            {
+                var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
+                Database.Execute(Sql()
+                    .Delete<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
+                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
+            }
+
+            //add/update the rest
+            foreach (var schedule in schedules)
+            {
+                if (schedule.Model.Id == Guid.Empty)
+                {
+                    schedule.Model.Id = schedule.Dto.Id = Guid.NewGuid();
+                    Database.Insert(schedule.Dto);
+                }
+                else
+                {
+                    Database.Update(schedule.Dto);
+                }
+            }
         }
 
         protected override void PersistDeletedItem(IContent entity)
