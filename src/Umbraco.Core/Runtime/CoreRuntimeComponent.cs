@@ -22,6 +22,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<PropertyEditorCollection>();
             composition.Container.RegisterSingleton<ParameterEditorCollection>();
 
-            // register a server registrar, by default it's the db registrar 
+            // register a server registrar, by default it's the db registrar
             composition.Container.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
@@ -120,6 +121,8 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             composition.Container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+            composition.Container.RegisterSingleton<IContentPublishingService, ContentPublishingService>();
+
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

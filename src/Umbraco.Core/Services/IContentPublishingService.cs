@@ -2,7 +2,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    public interface IContentPublishingService
+    public interface IContentPublishingService : IService
     {
         /// <summary>
         /// Registers a culture to be published.

@@ -30,6 +30,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -181,7 +182,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-            
+
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course

@@ -81,6 +81,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var contentTypeService = Mock.Of<IContentTypeService>();
 
             return new PublishedSnapshotService(
                 options,
@@ -96,7 +97,8 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
+                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                contentTypeService);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

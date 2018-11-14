@@ -95,6 +95,12 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
         }
 
+        public ContentCultureInfosCollection PublishInfos
+        {
+            get => _publishInfos;
+            set => _publishInfos = value;
+        }
+
         /// <summary>
         /// Gets or sets the template used by the Content.
         /// This is used to override the default one from the ContentType.
@@ -397,8 +403,7 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        // internal for repository
-        internal void SetPublishInfo(string culture, string name, DateTime date)
+        public void SetPublishInfo(string culture, string name, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullOrEmptyException(nameof(name));

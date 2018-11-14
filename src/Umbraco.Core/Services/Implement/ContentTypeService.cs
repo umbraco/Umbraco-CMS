@@ -14,20 +14,23 @@ namespace Umbraco.Core.Services.Implement
     /// </summary>
     internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
-        public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
+        //Lazy to avoid circular dependency. It would have been better to refactor the delete logic into its own service
+        private readonly Lazy<IContentService> _contentService;
+
+        public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, Lazy<IContentService> contentService,
             IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository)
         {
-            ContentService = contentService;
+            _contentService = contentService;
         }
 
+        private IContentService ContentService => _contentService.Value;
         protected override IContentTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
         protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
 
-        private IContentService ContentService { get; }
 
         protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 

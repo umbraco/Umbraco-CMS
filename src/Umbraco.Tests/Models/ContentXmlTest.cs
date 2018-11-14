@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);
             ServiceContext.ContentService.Save(content, Constants.Security.SuperUserId);
 
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = "TODO BMB"; //content.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });
 
             // Act
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
             Assert.AreEqual(content.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
-            Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
+            Assert.AreEqual(content.ContentTypeId.ToString(), (string)element.Attribute("nodeType"));
             Assert.AreEqual(content.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("creatorName"));
             Assert.AreEqual(content.GetWriterProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));

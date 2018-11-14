@@ -42,10 +42,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.Published == true &&
-                        m.ContentType == Mock.Of<IContentType>(mt =>
-                            mt.Icon == "test" &&
-                            mt.Alias == x.Name.LocalName &&
-                            mt.Id == (int)x.Attribute("nodeType"))))
+                        m.ContentTypeId == (int)x.Attribute("nodeType")))
                 .ToArray();
             var contentService = Mock.Of<IContentService>(
                 x => x.GetPagedDescendants(
@@ -58,7 +55,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var searcher = indexer.GetSearcher();
 

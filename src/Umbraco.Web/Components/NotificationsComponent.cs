@@ -147,11 +147,12 @@ namespace Umbraco.Web.Components
 
             private void SendNotification(IContentTypeService contentTypeService, IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
             {
+                if (contentTypeService == null) throw new ArgumentNullException(nameof(contentTypeService));
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null) throw new ArgumentNullException(nameof(siteUri));
 
                 //group by the content type variation since the emails will be different
-                foreach(var contentVariantGroup in entities.GroupBy(x => contentTypeService.Get(x.ContentTypeId).Variations))
+                foreach(var contentVariantGroup in entities.GroupBy(x => contentTypeService.Get(x.ContentTypeId)?.Variations))
                 {
                     if (contentVariantGroup.Key == ContentVariation.CultureAndSegment || contentVariantGroup.Key == ContentVariation.Segment)
                         throw new NotSupportedException("Segments are not yet supported in Umbraco");

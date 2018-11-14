@@ -10,6 +10,8 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Moq;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Models.Mapping
 {
@@ -24,7 +26,8 @@ namespace Umbraco.Tests.Models.Mapping
             var manifestBuilder = new ManifestParser(
                 CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
                 new ManifestValueValidatorCollection(Enumerable.Empty<IManifestValueValidator>()),
-                Logger)
+                Logger,
+                Mock.Of<IContentTypeService>())
             {
                 Path = TestHelper.CurrentAssemblyDirectory
             };

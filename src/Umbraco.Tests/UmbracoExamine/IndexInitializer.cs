@@ -62,10 +62,7 @@ namespace Umbraco.Tests.UmbracoExamine
                             m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                             m.Path == (string)x.Attribute("path") &&
                             m.Properties == new PropertyCollection() &&
-                            m.ContentType == Mock.Of<IContentType>(mt =>
-                                mt.Icon == "test" &&
-                                mt.Alias == x.Name.LocalName &&
-                                mt.Id == (int)x.Attribute("nodeType"))))
+                            m.ContentTypeId == (int)x.Attribute("nodeType")))
                     .ToArray();
 
 
@@ -165,7 +162,7 @@ namespace Umbraco.Tests.UmbracoExamine
             //query
             //    .Setup(x => x.GetWhereClauses())
             //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>($"{Constants.DatabaseSchema.Tables.Document}.published", new object[] { 1 }) });
-            
+
             //scopeProvider
             //    .Setup(x => x.Query<IContent>())
             //    .Returns(query.Object);

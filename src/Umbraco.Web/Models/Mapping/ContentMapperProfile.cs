@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
+using Lucene.Net.Search;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -32,18 +33,18 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>(contentTypeService);
             var defaultTemplateResolver = new DefaultTemplateResolver(contentTypeService);
             var variantResolver = new ContentVariantResolver(localizationService, contentTypeService);
+            var updateDateResolver = new UpdateDateResolver(contentTypeService);
+            var nameResolver = new NameResolver(contentTypeService);
+            var contentSavedStateResolver = new ContentSavedStateResolver<ContentPropertyDisplay>(contentTypeService);
 
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
+                .ConstructUsing((content, context)=>GetInitialContentItemDisplay(content, context, contentTypeService))
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
                 .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(contentAppResolver))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
-                .ForMember(dest => dest.IsContainer, opt => opt.MapFrom(src => src.ContentType.IsContainer))
                 .ForMember(dest => dest.IsBlueprint, opt => opt.MapFrom(src => src.Blueprint))
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.ResolveUsing(childOfListViewResolver))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
@@ -54,10 +55,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentType, opt => opt.ResolveUsing(contentTypeBasicResolver))
-                .ForMember(dest => dest.AllowedTemplates, opt =>
-                    opt.MapFrom(content => content.ContentType.AllowedTemplates
-                        .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                        .ToDictionary(t => t.Alias, t => t.Name)))
                 .ForMember(dest => dest.AllowedActions, opt => opt.ResolveUsing(src => actionButtonsResolver.Resolve(src)))
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
@@ -66,28 +63,60 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentSavedStateResolver<ContentPropertyDisplay>>())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             CreateMap<IContent, ContentItemBasic<ContentPropertyBasic>>()
+                .ConstructUsing((content, context)=>GetInitialContentItemBasic(content, context, contentTypeService))
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
                     Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<UpdateDateResolver>())
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NameResolver>())
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>())
-                .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
+                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing((src, dest, destMember, context) => updateDateResolver.Resolve(src, dest, destMember, context)))
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing((src, dest, destMember, context) => nameResolver.Resolve(src, dest, destMember, context)))
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
+        }
+
+        private ContentItemBasic<ContentPropertyBasic> GetInitialContentItemBasic(IContent src, ResolutionContext context, IContentTypeService contentTypeService)
+        {
+            var contentType = contentTypeService.Get(src.ContentTypeId);
+
+            var result = new ContentItemBasic<ContentPropertyBasic>()
+            {
+                VariesByCulture = contentType.VariesByCulture(),
+                Icon = contentType.Icon,
+                ContentTypeAlias = contentType.Alias
+            };
+
+            return result;
+        }
+
+        private ContentItemDisplay GetInitialContentItemDisplay(IContent src, ResolutionContext context, IContentTypeService contentTypeService)
+        {
+            var contentType = contentTypeService.Get(src.ContentTypeId);
+
+            var result = new ContentItemDisplay
+            {
+                Icon = contentType.Icon,
+                ContentTypeAlias = contentType.Alias,
+                ContentTypeName = contentType.Name,
+                IsContainer = contentType.IsContainer,
+                AllowedTemplates = contentType.AllowedTemplates
+                    .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
+                    .ToDictionary(t => t.Alias, t => t.Name)
+            };
+
+
+
+            return result;
         }
 
         /// <summary>

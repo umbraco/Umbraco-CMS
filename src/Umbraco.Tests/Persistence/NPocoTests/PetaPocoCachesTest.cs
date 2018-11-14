@@ -145,6 +145,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         private void CreateStuff(out int id1, out int id2, out int id3, out string alias)
         {
             var contentService = ServiceContext.ContentService;
+            var contentPublishingService = ServiceContext.ContentPublishingService;
 
             var ctAlias = "umbTextpage" + Guid.NewGuid().ToString("N");
             alias = ctAlias;
@@ -181,13 +182,14 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content1.PublishCulture();
+            contentPublishingService.PublishCulture(content1);
             contentService.SaveAndPublish(content1);
             id2 = content1.Id;
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishCulture();
+
+            contentPublishingService.PublishCulture(content2);
             contentService.SaveAndPublish(content2);
             id3 = content2.Id;
 

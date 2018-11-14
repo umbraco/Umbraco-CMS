@@ -17,11 +17,11 @@ namespace Umbraco.Core.Models
         int? TemplateId { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the content is published.
+        /// Gets or sets a value indicating whether the content is published.
         /// </summary>
         bool Published { get; }
 
-        PublishedState PublishedState { get; }
+        PublishedState PublishedState { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content has been edited.
@@ -69,11 +69,6 @@ namespace Umbraco.Core.Models
         /// Gets or sets the date and time the content should be unpublished.
         /// </summary>
         DateTime? ExpireDate { get; set; }
-
-        /// <summary>
-        /// Gets the content type id of this content.
-        /// </summary>
-        int ContentTypeId { get; }
 
         /// <summary>
         /// Gets the current status of the content.
@@ -166,5 +161,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
+
+        void SetPublishInfo(string culture, string name, DateTime now);
+        ContentCultureInfosCollection PublishInfos  { get; set; }
     }
 }

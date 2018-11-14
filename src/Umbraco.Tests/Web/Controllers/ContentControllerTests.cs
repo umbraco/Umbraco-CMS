@@ -212,8 +212,10 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }
@@ -240,8 +242,11 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
+
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }
@@ -273,8 +278,10 @@ namespace Umbraco.Tests.Web.Controllers
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }
@@ -312,8 +319,10 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }
@@ -345,8 +354,10 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }
@@ -382,8 +393,10 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var contentTypeService = Mock.Of<IContentTypeService>();
+                var contentPublishingService = Mock.Of<IContentPublishingService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                var usersController = new ContentController(publishedSnapshot, contentTypeService, contentPublishingService, propertyEditorCollection);
                 Container.InjectProperties(usersController);
                 return usersController;
             }

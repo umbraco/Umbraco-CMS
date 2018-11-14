@@ -22,11 +22,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         }
 
         private IContent _content;
+        private IContentType _contentContentType;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             var contentNodeId = int.Parse(Request.QueryString["id"]);
             _content = Services.ContentService.GetById(contentNodeId);
+            _contentContentType = Services.ContentTypeService.Get(_content.ContentTypeId);
 
             LocalizeTexts();
 
@@ -60,7 +62,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private void DisplayContentDetails()
         {
             ContentNameLabel.Text = _content.Name;
-            CurrentTypeLabel.Text = _content.ContentType.Name;
+            CurrentTypeLabel.Text = _contentContentType.Name;
         }
 
         private bool PopulateListOfValidAlternateDocumentTypes()
@@ -89,7 +91,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private IEnumerable<IContentType> RemoveCurrentDocumentTypeFromAlternatives(IEnumerable<IContentType> documentTypes)
         {
             return documentTypes
-                .Where(x => x.Id != _content.ContentType.Id);
+                .Where(x => x.Id != _content.ContentTypeId);
         }
 
         private IEnumerable<IContentType> RemoveInvalidByParentDocumentTypesFromAlternatives(IEnumerable<IContentType> documentTypes)
@@ -105,7 +107,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 // Below root, so only include those allowed as sub-nodes for the parent
                 var parentNode = Services.ContentService.GetById(_content.ParentId);
                 return documentTypes
-                    .Where(x => parentNode.ContentType.AllowedContentTypes
+                    .Where(x => Services.ContentTypeService.Get(parentNode.ContentTypeId).AllowedContentTypes
                         .Select(y => y.Id.Value)
                         .Contains(x.Id));
             }
@@ -115,7 +117,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         {
             //fixme Should do proper paging here ... when this is refactored we will
             var docTypeIdsOfChildren = Services.ContentService.GetPagedChildren(_content.Id, 0, int.MaxValue, out var total)
-                .Select(x => x.ContentType.Id)
+                .Select(x => x.ContentTypeId)
                 .Distinct()
                 .ToList();
             return documentTypes
@@ -149,7 +151,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private void PopulatePropertyMappingWithSources()
         {
-            PropertyMappingRepeater.DataSource = GetPropertiesOfContentType(_content.ContentType);
+            var contentType = Services.ContentTypeService.Get(_content.ContentTypeId);
+
+            PropertyMappingRepeater.DataSource = GetPropertiesOfContentType(contentType);
             PropertyMappingRepeater.DataBind();
         }
 
