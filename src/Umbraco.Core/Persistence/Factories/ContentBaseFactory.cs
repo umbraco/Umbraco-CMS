@@ -173,17 +173,17 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<ContentScheduleDto> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
+        public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(IContent entity, ILanguageRepository languageRepository)
         {
             return entity.ContentSchedule.FullSchedule.Select(x =>
-                new ContentScheduleDto
+                (x, new ContentScheduleDto
                 {
                     Action = x.Action.ToString(),
                     Date = x.Date,
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id
-                });
+                }));
         }
 
         /// <summary>
