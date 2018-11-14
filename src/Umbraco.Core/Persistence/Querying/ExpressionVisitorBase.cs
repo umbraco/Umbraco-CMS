@@ -440,6 +440,7 @@ namespace Umbraco.Core.Persistence.Querying
                         (
                             m.Object != null && // instance method
                             TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Object.Type) && // of an enumerable
+                            m.Object.Type != typeof(string) && // but not for string
                             m.Arguments.Count == 1 && // with 1 arg
                             m.Arguments[0].NodeType == ExpressionType.MemberAccess // arg being a member access
                         );
