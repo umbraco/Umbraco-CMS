@@ -5,15 +5,15 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Persistence.Dtos
 {
     [TableName(TableName)]
-    [PrimaryKey("id", AutoIncrement = true)]
+    [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentScheduleDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentSchedule;
 
         [Column("id")]
-        [PrimaryKeyColumn(AutoIncrement = true)]
-        public int Id { get; set; }
+        [PrimaryKeyColumn(AutoIncrement = false)]
+        public Guid Id { get; set; }
 
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
