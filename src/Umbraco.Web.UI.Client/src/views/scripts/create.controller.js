@@ -14,6 +14,7 @@
         vm.createFile = createFile;
         vm.showCreateFolder = showCreateFolder;
         vm.createFolder = createFolder;
+        vm.close = close;
 
         function createFile() {
             $location.path("/settings/scripts/edit/" + node.id).search("create", "true");
@@ -50,6 +51,11 @@
                 });
             }
 
+        }
+
+        function close() {
+            const showMenu = true;
+            navigationService.hideDialog(showMenu);
         }
 
     }

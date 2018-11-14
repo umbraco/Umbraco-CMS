@@ -45,7 +45,12 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         $location.search('create', null);
         $location.path("/settings/mediatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.MediaTypes.CreateController", MediaTypesCreateController);

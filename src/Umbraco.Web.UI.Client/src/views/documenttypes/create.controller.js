@@ -123,6 +123,11 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
         navigationService.hideMenu();
     };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);

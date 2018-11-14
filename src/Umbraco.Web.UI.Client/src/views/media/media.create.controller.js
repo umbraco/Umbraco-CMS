@@ -16,6 +16,11 @@ function mediaCreateController($scope, $routeParams, $location, mediaTypeResourc
         $location.path("/media/media/edit/" + $scope.currentNode.id).search("doctype", docType.alias).search("create", "true");
         navigationService.hideMenu();
     };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
     
 }
 
