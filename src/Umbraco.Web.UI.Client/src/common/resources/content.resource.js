@@ -732,6 +732,18 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
+        publishWithDescendants: function (content, isNew, force, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+
+            var action = "publishWithDescendants";
+            if (force === true) {
+                action += "Force";
+            }
+
+            return saveContentItem(content, action + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
 
         /**
           * @ngdoc method

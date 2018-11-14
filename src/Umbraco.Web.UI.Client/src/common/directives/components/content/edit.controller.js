@@ -392,6 +392,34 @@
             }
         }
 
+        function moveNode(node, target) {
+
+            contentResource.move({ "parentId": target.id, "id": node.id })
+                .then(function (path) {
+
+                    // remove the node that we're working on
+                    if ($scope.page.menu.currentNode) {
+                        treeService.removeNode($scope.page.menu.currentNode);
+                    }
+
+                    // sync the destination node
+                    if (!infiniteMode) {
+                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    }
+
+                    $scope.page.buttonRestore = "success";
+                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
+
+                    // reload the node
+                    loadContent();
+
+                }, function (err) {
+                    $scope.page.buttonRestore = "error";
+                    notificationsService.error("Cannot automatically restore this item", err);
+                });
+
+        }
+
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -711,7 +739,7 @@
                 if (!isContentCultureVariant()) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
-                    //TODO: we'll prob want the publish flag(s) set here too for invariant?
+                    $scope.content.variants[0].publish = true;
                 }
 
                 var dialog = {
@@ -723,7 +751,33 @@
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
-                        model.submitButtonState = "success";
+
+                        //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                        return performSave({
+                            saveMethod: function (content, create, files, showNotifications) {
+                                return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
+                            },
+                            action: "publishDescendants",
+                            showNotifications: false
+                        }).then(function (data) {
+                            //show all notifications manually here since we disabled showing them automatically in the save method
+                            formHelper.showNotifications(data);
+                            clearNotifications($scope.content);
+                            overlayService.close();
+                            return $q.when(data);
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //if this is invariant, show the notification errors, else they'll be shown inline with the variant
+                            if (!isContentCultureVariant()) {
+                                formHelper.showNotifications(err.data);
+                            }
+                            model.submitButtonState = "error";
+                            //re-map the dialog model since we've re-bound the properties
+                            dialog.variants = $scope.content.variants;
+                            //don't reject, we've handled the error
+                            return $q.when(err);
+                        });
+
                     },
                     close: function () {
                         overlayService.close();
@@ -854,34 +908,6 @@
         $scope.appChanged = function (app) {
             createButtons($scope.content, app);
         };
-
-        function moveNode(node, target) {
-
-            contentResource.move({ "parentId": target.id, "id": node.id })
-                .then(function (path) {
-
-                    // remove the node that we're working on
-                    if ($scope.page.menu.currentNode) {
-                        treeService.removeNode($scope.page.menu.currentNode);
-                    }
-
-                    // sync the destination node
-                    if (!infiniteMode) {
-                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
-                    }
-
-                    $scope.page.buttonRestore = "success";
-                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
-
-                    // reload the node
-                    loadContent();
-
-                }, function (err) {
-                    $scope.page.buttonRestore = "error";
-                    notificationsService.error("Cannot automatically restore this item", err);
-                });
-
-        }
 
         // methods for infinite editing
         $scope.close = function () {

@@ -665,11 +665,15 @@ namespace Umbraco.Web.Editors
                     switch (contentItem.Action)
                     {
                         case ContentSaveAction.Publish:
+                        case ContentSaveAction.PublishWithDescendants:
+                        case ContentSaveAction.PublishWithDescendantsForce:
                         case ContentSaveAction.SendPublish:
                         case ContentSaveAction.Schedule:
                             contentItem.Action = ContentSaveAction.Save;
                             break;
                         case ContentSaveAction.PublishNew:
+                        case ContentSaveAction.PublishWithDescendantsNew:
+                        case ContentSaveAction.PublishWithDescendantsForceNew:
                         case ContentSaveAction.SendPublishNew:
                         case ContentSaveAction.ScheduleNew:
                             contentItem.Action = ContentSaveAction.SaveNew;
@@ -679,8 +683,6 @@ namespace Umbraco.Web.Editors
 
             }
 
-            //initialize this to successful
-            var publishStatus = new PublishResult(null, contentItem.PersistedContent);
             bool wasCancelled;
 
             //used to track successful notifications
@@ -734,13 +736,39 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    PublishInternal(contentItem, ref publishStatus, out wasCancelled, out var successfulCultures);
-                    //global notifications
-                    AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                    //variant specific notifications
-                    foreach (var c in successfulCultures)
                     {
-                        AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        var publishStatus = PublishInternal(contentItem, out wasCancelled, out var successfulCultures);
+                        //global notifications
+                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+                        //variant specific notifications
+                        foreach (var c in successfulCultures)
+                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                    }
+                    break;
+                case ContentSaveAction.PublishWithDescendants:
+                case ContentSaveAction.PublishWithDescendantsNew:
+                    {
+                        var publishStatus = PublishBranchInternal(contentItem, false, out wasCancelled, out var successfulCultures);
+
+                        //TODO: Deal with the multiple result
+                        ////global notifications
+                        //AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+                        ////variant specific notifications
+                        //foreach (var c in successfulCultures)
+                        //    AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                    }
+                    break;
+                case ContentSaveAction.PublishWithDescendantsForce:
+                case ContentSaveAction.PublishWithDescendantsForceNew:
+                    {
+                        var publishStatus = PublishBranchInternal(contentItem, true, out wasCancelled, out var successfulCultures);
+
+                        //TODO: Deal with the multiple result
+                        ////global notifications
+                        //AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+                        ////variant specific notifications
+                        //foreach (var c in successfulCultures)
+                        //    AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
                     }
                     break;
                 default:
@@ -1011,6 +1039,65 @@ namespace Umbraco.Web.Editors
             notifications.GetOrCreate(culture).AddSuccessNotification(header, msg);
         }
 
+        private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force,
+                out bool wasCancelled, out string[] successfulCultures)
+        {
+            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
+            {
+                //its invariant, proceed normally
+                var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
+                //TODO: Deal with multiple cancelations
+                wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
+                successfulCultures = Array.Empty<string>();
+            }
+
+            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
+            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+
+            var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
+
+            //validate if we can publish based on the mandatory language requirements
+            var canPublish = ValidatePublishingMandatoryLanguages(
+                contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
+                mandatoryVariant => mandatoryVariant.Publish, out var _);
+
+            //Now check if there are validation errors on each variant.
+            //If validation errors are detected on a variant and it's state is set to 'publish', then we
+            //need to change it to 'save'.
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
+            var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+            foreach (var variant in contentItem.Variants)
+            {
+                if (cultureErrors.Contains(variant.Culture))
+                    variant.Publish = false;
+            }
+
+            var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+
+            if (canPublish)
+            {
+                //proceed to publish if all validation still succeeds
+                var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, Security.CurrentUser.Id);
+                //TODO: Deal with multiple cancelations
+                wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
+                successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+                return publishStatus;
+            }
+            else
+            {
+                //can only save
+                var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var publishStatus = new[]
+                {
+                    new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
+                };
+                wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
+                successfulCultures = Array.Empty<string>();
+                return publishStatus;
+            }
+
+        }
+
         /// <summary>
         /// Performs the publishing operation for a content item
         /// </summary>
@@ -1023,62 +1110,61 @@ namespace Umbraco.Web.Editors
         /// <remarks>
         /// If this is a culture variant than we need to do some validation, if it's not we'll publish as normal
         /// </remarks>
-        private void PublishInternal(ContentItemSave contentItem, ref PublishResult publishStatus, out bool wasCancelled, out string[] successfulCultures)
+        private PublishResult PublishInternal(ContentItemSave contentItem, out bool wasCancelled, out string[] successfulCultures)
         {
-            if (publishStatus == null) throw new ArgumentNullException(nameof(publishStatus));
-
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
+                var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
+                return publishStatus;
+            }
+
+            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
+            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+
+            var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
+
+            //validate if we can publish based on the mandatory language requirements
+            var canPublish = ValidatePublishingMandatoryLanguages(
+                contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
+                mandatoryVariant => mandatoryVariant.Publish, out var _);
+
+            //Now check if there are validation errors on each variant.
+            //If validation errors are detected on a variant and it's state is set to 'publish', then we
+            //need to change it to 'save'.
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
+            var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+            foreach (var variant in contentItem.Variants)
+            {
+                if (cultureErrors.Contains(variant.Culture))
+                    variant.Publish = false;
+            }
+
+            if (canPublish)
+            {
+                //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
+                //since there's no reason variant rules would be violated in normal cases.
+                canPublish = PublishCulture(contentItem.PersistedContent, cultureVariants);
+            }
+
+            if (canPublish)
+            {
+                //proceed to publish if all validation still succeeds
+                var publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
+                wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
+                successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+                return publishStatus;
             }
             else
             {
-                //All variants in this collection should have a culture if we get here! but we'll double check and filter here
-                var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
-
-                var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
-
-                //validate if we can publish based on the mandatory language requirements
-                var canPublish = ValidatePublishingMandatoryLanguages(
-                    contentItem, cultureVariants, mandatoryCultures, "speechBubbles/contentReqCulturePublishError",
-                    mandatoryVariant => mandatoryVariant.Publish, out var _);
-
-                //Now check if there are validation errors on each variant.
-                //If validation errors are detected on a variant and it's state is set to 'publish', then we
-                //need to change it to 'save'.
-                //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-                var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
-                foreach (var variant in contentItem.Variants)
-                {
-                    if (cultureErrors.Contains(variant.Culture))
-                        variant.Publish = false;
-                }
-
-                if (canPublish)
-                {
-                    //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
-                    //since there's no reason variant rules would be violated in normal cases.
-                    canPublish = PublishCulture(contentItem.PersistedContent, cultureVariants);
-                }
-
-                if (canPublish)
-                {
-                    //proceed to publish if all validation still succeeds
-                    publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                    successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
-                }
-                else
-                {
-                    //can only save
-                    var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
-                    wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
-                    successfulCultures = Array.Empty<string>();
-                }
+                //can only save
+                var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
+                wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
+                successfulCultures = Array.Empty<string>();
+                return publishStatus;
             }
         }
 

@@ -43,6 +43,26 @@
         /// <summary>
         /// Creates and schedules publishing
         /// </summary>
-        ScheduleNew = 7
+        ScheduleNew = 7,
+
+        /// <summary>
+        /// Saves and publishes the content item including all descendants that have a published version
+        /// </summary>
+        PublishWithDescendants = 8,
+
+        /// <summary>
+        /// Creates and publishes the content item including all descendants that have a published version
+        /// </summary>
+        PublishWithDescendantsNew = 9,
+
+        /// <summary>
+        /// Saves and publishes the content item including all descendants regardless of whether they have a published version or not
+        /// </summary>
+        PublishWithDescendantsForce = 10,
+
+        /// <summary>
+        /// Creates and publishes the content item including all descendants regardless of whether they have a published version or not
+        /// </summary>
+        PublishWithDescendantsForceNew = 11
     }
 }

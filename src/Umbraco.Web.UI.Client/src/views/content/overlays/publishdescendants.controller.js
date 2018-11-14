@@ -6,6 +6,7 @@
         var vm = this;
 
         vm.changeSelection = changeSelection;
+        vm.includeUnpublishedChanged = includeUnpublishedChanged;
 
         function onInit() {
 
@@ -18,6 +19,12 @@
                     $scope.model.title = value;
                 });
             }
+
+            _.each(vm.variants,
+                function (variant) {
+                    variant.compositeId = (variant.language ? variant.language.culture : "inv") + "_" + (variant.segment ? variant.segment : "");
+                    variant.htmlId = "_content_variant_" + variant.compositeId;
+                });
 
             if (vm.variants.length > 1) {
 
@@ -32,9 +39,11 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.publishDescendants = true;
+                    active.publish = true;
                     active.save = true;
                 }
+
+                $scope.model.disableSubmitButton = !canPublish();
                 
             } else {
                 // localize help text for invariant content
@@ -53,8 +62,20 @@
             var selected = [];
             for (var i = 0; i < vm.variants.length; i++) {
                 var variant = vm.variants[i];
-                if (variant.publishDescendants) {
-                    selected.push(variant.publishDescendants);
+
+                var published = !(variant.state === "NotCreated" || variant.state === "Draft");
+
+                if (variant.language.isMandatory && !published && !variant.publish) {
+                    //if a mandatory variant isn't published 
+                    //and not flagged for saving
+                    //then we cannot continue
+
+                    //TODO: Show a message when this occurs
+                    return false;
+                }
+
+                if (variant.publish) {
+                    selected.push(variant.publish);
                 }
             }
             return selected.length > 0;
@@ -63,13 +84,13 @@
         function changeSelection(variant) {
             $scope.model.disableSubmitButton = !canPublish();
             //need to set the Save state to true if publish is true
-            variant.save = variant.publishDescendants;
+            variant.save = variant.publish;
         }
 
         //when this dialog is closed, reset all 'publish' flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].publishDescendants = false;
+                vm.variants[i].publish = false;
                 vm.variants[i].save = false;
             }
         });
