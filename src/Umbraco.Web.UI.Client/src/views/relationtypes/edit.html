@@ -4,8 +4,8 @@
     <form name="relationTypeForm" novalidate val-form-manager>
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
-                name="vm.relation.name"
-                alias="vm.relation.alias"
+                name="vm.relationType.name"
+                alias="vm.relationType.alias"
                 hide-description="true"
                 hide-icon="true">
             </umb-editor-header>
@@ -15,8 +15,8 @@
                     <umb-box-content>
                         <!-- ID -->
                         <umb-control-group label="Id">
-                            <div>{{vm.relation.id}}</div>
-                            <small>{{vm.relation.key}}</small>
+                            <div>{{vm.relationType.id}}</div>
+                            <small>{{vm.relationType.key}}</small>
                         </umb-control-group>
 
                         <!-- Direction -->
@@ -24,12 +24,12 @@
                             <ul class="unstyled">
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relation.isBidirectional" ng-value="false"> Parent to child
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false"> Parent to child
                                     </label>
                                 </li>
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relation.isBidirectional" ng-value="true"> Bidirectional
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true"> Bidirectional
                                     </label>
                                 </li>
                             </ul>
@@ -37,23 +37,22 @@
 
                         <!-- Parent-->
                         <umb-control-group label="Parent">
-                            <div>{{vm.relation.parentObjectTypeName}}</div>
+                            <div>{{vm.relationType.parentObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Child -->
                         <umb-control-group label="Child">
-                            <div>{{vm.relation.childObjectTypeName}}</div>
+                            <div>{{vm.relationType.childObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Relation count -->
-                        <umb-control-group label="Count">
-                            <div>12</div>
+                        <umb-control-group label="Count" ng-if="vm.relationType.relations.length > 0">
+                            <div>{{vm.relationType.relations.length}}</div>
                         </umb-control-group>
 
                         <!-- Relations -->
-                        <umb-control-group label="Relations">
+                        <umb-control-group label="Relations" ng-if="vm.relationType.relations.length > 0">
                             <div>
-                                <!-- TODO: Replace with umb-table directive -->
                                 <table class="table">
                                     <thead>
                                         <th>Parent</th>
@@ -61,23 +60,11 @@
                                         <th>Created</th>
                                         <th>Comment</th>
                                     </thead>
-                                    <tr>
-                                        <td>Something</td>
-                                        <td>Something else</td>
-                                        <td>2018-10-27 18:58</td>
-                                        <td>A comment here</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Something</td>
-                                        <td>Something else</td>
-                                        <td>2018-10-27 18:58</td>
-                                        <td>A comment here</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Something</td>
-                                        <td>Something else</td>
-                                        <td>2018-10-27 18:58</td>
-                                        <td>A comment here</td>
+                                    <tr ng-repeat="relation in vm.relationType.relations">
+                                        <td>{{relation.parentId}}</td>
+                                        <td>{{relation.childId}}</td>
+                                        <td>{{relation.timestampFormatted}}</td>
+                                        <td>{{relation.comment}}</td>
                                     </tr>
                                 </table>
                             </div>

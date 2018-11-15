@@ -20,6 +20,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                 .ForMember(x => x.ChildObjectTypeName, expression => expression.Ignore())
                 .ForMember(x => x.ParentObjectTypeName, expression => expression.Ignore())
+                .ForMember(x => x.Relations, expression => expression.Ignore())
                 .ForMember(
                     x => x.Udi,
                     expression => expression.MapFrom(
@@ -33,6 +34,9 @@ namespace Umbraco.Web.Models.Mapping
                     dest.ParentObjectTypeName = ObjectTypes.GetUmbracoObjectType(src.ParentObjectType).GetFriendlyName();
                     dest.ChildObjectTypeName = ObjectTypes.GetUmbracoObjectType(src.ChildObjectType).GetFriendlyName();
                 });
+
+            // FROM IRelation to RelationDisplay
+            CreateMap<IRelation, RelationDisplay>();
 
             //FROM IRelationType TO RelationType
             CreateMap<IRelationType, RelationType>();

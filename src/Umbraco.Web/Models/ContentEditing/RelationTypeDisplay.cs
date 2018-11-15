@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -40,5 +42,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "childObjectTypeName")]
         [ReadOnly(true)]
         public string ChildObjectTypeName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the relations associated with this relation type.
+        /// </summary>
+        [DataMember(Name = "relations")]
+        [ReadOnly(true)]
+        public IEnumerable<RelationDisplay> Relations { get; set; }
     }
 }

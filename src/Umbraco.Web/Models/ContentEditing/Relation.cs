@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+    [Obsolete("Use Umbraco.Web.Models.ContentEditing.RelationDisplay instead")]
     [DataContract(Name = "relation", Namespace = "")]
     public class Relation
     {
