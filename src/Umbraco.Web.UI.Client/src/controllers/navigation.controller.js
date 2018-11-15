@@ -147,11 +147,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    //trigger dialods with a hotkey:
-    keyboardService.bind("esc", function () {
-        eventsService.emit("app.closeDialogs");
-    });
-
     $scope.selectedId = navigationService.currentId;
 
     var evts = [];
@@ -239,15 +234,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             loadLanguages().then(function (languages) {
                 $scope.languages = languages;
             });
-        }
-    }));
-
-    //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    evts.push(eventsService.on("app.closeDialogs", function (event) {
-        if (appState.getGlobalState("stickyNavigation")) {
-            navigationService.hideNavigation();
-            //TODO: don't know why we need this? - we are inside of an angular event listener.
-            angularHelper.safeApply($scope);
         }
     }));
 

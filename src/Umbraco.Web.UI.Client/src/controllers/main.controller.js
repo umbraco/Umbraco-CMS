@@ -23,27 +23,6 @@ function MainController($scope, $location, appState, treeService, notificationsS
         notificationsService.remove(index);
     };
 
-    $scope.closeDialogs = function (event) {
-        //only close dialogs if non-link and non-buttons are clicked
-        var el = event.target.nodeName;
-        var els = ["INPUT", "A", "BUTTON"];
-
-        if (els.indexOf(el) >= 0) { return; }
-
-        var parents = $(event.target).parents("a,button");
-        if (parents.length > 0) {
-            return;
-        }
-
-        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        var nav = $(event.target).parents("#dialog");
-        if (nav.length === 1) {
-            return;
-        }
-
-        eventsService.emit("app.closeDialogs", event);
-    };
-
     $scope.closeSearch = function() {
         appState.setSearchState("show", false);
     };

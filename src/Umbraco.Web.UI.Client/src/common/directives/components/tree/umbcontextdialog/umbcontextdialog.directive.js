@@ -1,7 +1,24 @@
 (function() {
     'use strict';
 
-    function UmbContextDialog() {
+    function UmbContextDialog(navigationService, keyboardService) {
+
+        function link($scope) {
+            
+            $scope.outSideClick = function() {
+                navigationService.hideNavigation();
+            }
+
+            keyboardService.bind("esc", function() {
+                navigationService.hideNavigation();
+            });
+
+            //ensure to unregister from all events!
+            $scope.$on('$destroy', function () {
+                keyboardService.unbind("esc");
+            });
+
+        }
 
         var directive = {
             restrict: 'E',
@@ -11,7 +28,8 @@
                 title: "<",
                 currentNode: "<",
                 view: "<"
-            }
+            },
+            link: link
         };
         return directive;
     }
