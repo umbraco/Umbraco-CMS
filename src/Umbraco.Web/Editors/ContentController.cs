@@ -1870,15 +1870,16 @@ namespace Umbraco.Web.Editors
         /// </param>
         private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
         {
+            var totalStatusCount = statuses.Count();
+
             //Put the statuses into groups, each group results in a different message
             var statusGroup = statuses.GroupBy(x =>
             {
                 switch (x.Result)
                 {
                     case PublishResultType.SuccessPublish:
-                    case PublishResultType.SuccessPublishAlready:
                     case PublishResultType.SuccessPublishCulture:
-                        //these 3 belong to a single group
+                        //these 2 belong to a single group
                         return PublishResultType.SuccessPublish;                    
                     case PublishResultType.FailedPublishAwaitingRelease:
                     case PublishResultType.FailedPublishCultureAwaitingRelease:
@@ -1888,6 +1889,7 @@ namespace Umbraco.Web.Editors
                     case PublishResultType.FailedPublishCultureHasExpired:
                         //these 2 belong to a single group
                         return PublishResultType.FailedPublishHasExpired;
+                    case PublishResultType.SuccessPublishAlready:
                     case PublishResultType.FailedPublishPathNotPublished:
                     case PublishResultType.FailedPublishCancelledByEvent:
                     case PublishResultType.FailedPublishIsTrashed:
@@ -1904,25 +1906,54 @@ namespace Umbraco.Web.Editors
             {   
                 switch (status.Key)
                 {
-                    case PublishResultType.SuccessPublish:
-                        var itemCount = status.Count();
-                        if (successfulCultures == null)
+                    case PublishResultType.SuccessPublishAlready:
                         {
-                            display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                itemCount > 1
-                                    ? Services.TextService.Localize("speechBubbles/editContentPublishedText")
-                                    : Services.TextService.Localize("speechBubbles/editMultiContentPublishedText", new[] { itemCount.ToInvariantString() }));
+                            //special case, we will only show messages for this if:
+                            // * it's not a bulk publish operation
+                            // * it's a bulk publish operation and all successful statuses are this one
+                            var itemCount = status.Count();
+                            if (totalStatusCount == 1 || totalStatusCount == itemCount)
+                            {
+                                if (successfulCultures == null || totalStatusCount == itemCount)
+                                {
+                                    //either invariant single publish, or bulk publish where all statuses are already published
+                                    display.AddSuccessNotification(
+                                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                        Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                                }
+                                else
+                                {
+                                    foreach (var c in successfulCultures)
+                                    {
+                                        display.AddSuccessNotification(
+                                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                            Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                    }
+                                }
+                            }
                         }
-                        else
+                        break;
+                    case PublishResultType.SuccessPublish:
                         {
-                            foreach (var c in successfulCultures)
+                            var itemCount = status.Count();
+                            if (successfulCultures == null)
                             {
                                 display.AddSuccessNotification(
                                     Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                    itemCount > 1
-                                        ? Services.TextService.Localize("speechBubbles/editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
-                                        : Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                    totalStatusCount > 1
+                                        ? Services.TextService.Localize("speechBubbles/editMultiContentPublishedText", new[] { itemCount.ToInvariantString() })
+                                        : Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                            }
+                            else
+                            {
+                                foreach (var c in successfulCultures)
+                                {
+                                    display.AddSuccessNotification(
+                                        Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                        totalStatusCount > 1
+                                            ? Services.TextService.Localize("speechBubbles/editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
+                                            : Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                }
                             }
                         }
                         break;
