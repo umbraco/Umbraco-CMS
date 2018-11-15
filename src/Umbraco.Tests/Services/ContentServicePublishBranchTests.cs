@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Services
     {
         [TestCase(1)] // use overload w/ culture: "*"
         [TestCase(2)] // use overload w/ cultures: new [] { "*" }
-        public void Can_Publish_InvariantBranch(int method)
+        public void Can_Publish_Invariant_Branch(int method)
         {
             CreateTypes(out var iContentType, out _);
 
@@ -141,7 +141,43 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Publish_VariantBranch()
+        public void Can_Publish_Variant_Branch_When_No_Changes_On_Root()
+        {
+            CreateTypes(out _, out var vContentType);
+
+            //create/publish root
+            IContent vRoot = new Content("vroot", -1, vContentType, "de");
+            vRoot.SetCultureName("vroot.de", "de");
+            vRoot.SetCultureName("vroot.ru", "ru");
+            vRoot.SetCultureName("vroot.es", "es");
+            vRoot.SetValue("ip", "vroot");
+            vRoot.SetValue("vp", "vroot.de", "de");
+            vRoot.SetValue("vp", "vroot.ru", "ru");
+            vRoot.SetValue("vp", "vroot.es", "es");
+            ServiceContext.ContentService.SaveAndPublish(vRoot);
+
+            //create/publish child
+            IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
+            iv1.SetCultureName("iv1.de", "de");
+            iv1.SetCultureName("iv1.ru", "ru");
+            iv1.SetCultureName("iv1.es", "es");
+            iv1.SetValue("ip", "iv1");
+            iv1.SetValue("vp", "iv1.de", "de");
+            iv1.SetValue("vp", "iv1.ru", "ru");
+            iv1.SetValue("vp", "iv1.es", "es");
+            ServiceContext.ContentService.SaveAndPublish(iv1);
+
+            //update the child
+            iv1.SetValue("vp", "UPDATED-iv1.de", "de");
+            ServiceContext.ContentService.Save(iv1);
+
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray();
+            Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
+            Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
+        }
+
+        [Test]
+        public void Can_Publish_Variant_Branch()
         {
             CreateTypes(out _, out var vContentType);
 
@@ -248,7 +284,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Publish_MixedBranch()
+        public void Can_Publish_Mixed_Branch()
         {
             // invariant root -> variant -> invariant
             // variant root -> variant -> invariant
