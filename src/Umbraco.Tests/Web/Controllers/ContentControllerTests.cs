@@ -81,12 +81,16 @@ namespace Umbraco.Tests.Web.Controllers
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("");
 
+            var contentTypeServiceMock = new Mock<IContentTypeService>();
+            contentTypeServiceMock.Setup(x => x.Get(It.IsAny<int>())).Returns(Mock.Of<IContentType>());
+
             Container.RegisterSingleton(f => Mock.Of<IContentService>());
             Container.RegisterSingleton(f => userServiceMock.Object);
             Container.RegisterSingleton(f => entityService.Object);
             Container.RegisterSingleton(f => dataTypeService.Object);
             Container.RegisterSingleton(f => langService.Object);
             Container.RegisterSingleton(f => textService.Object);
+            Container.RegisterSingleton(f => contentTypeServiceMock.Object);
             Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
             Container.RegisterSingleton(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
         }

@@ -40,7 +40,13 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ConstructUsing((content, context)=>GetInitialContentItemDisplay(content, context, contentTypeService))
+                .ForMember(dest => dest.Icon, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.ContentTypeName, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.IsContainer, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.AllowedTemplates, opt => opt.Ignore()) // Handled in ConstructUsing
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
+
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
@@ -69,6 +75,9 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             CreateMap<IContent, ContentItemBasic<ContentPropertyBasic>>()
                 .ConstructUsing((content, context)=>GetInitialContentItemBasic(content, context, contentTypeService))
+                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.VariesByCulture, opt => opt.Ignore()) // Handled in ConstructUsing
+                .ForMember(dest => dest.Icon, opt => opt.Ignore()) // Handled in ConstructUsing
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
                     Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))

@@ -22,11 +22,15 @@ namespace Umbraco.Tests.Models.Mapping
     [UmbracoTest(AutoMapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ContentWebModelMappingTests : TestWithDatabaseBase
     {
+        private Mock<IContentTypeService> _contentTypeServiceMock;
+
         protected override void Compose()
         {
             base.Compose();
 
+            _contentTypeServiceMock = new Mock<IContentTypeService>();
             Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
+            Container.RegisterSingleton(f => _contentTypeServiceMock.Object);
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]
@@ -118,6 +122,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+
+            _contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(contentType);
             FixUsers(content);
 
             // need ids for tabs
@@ -147,6 +153,8 @@ namespace Umbraco.Tests.Models.Mapping
             var contentType = MockedContentTypes.CreateSimpleContentType();
             contentType.PropertyGroups.Clear();
             var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+
+            _contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(contentType);
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
@@ -196,6 +204,8 @@ namespace Umbraco.Tests.Models.Mapping
             contentType.ResetDirtyProperties(false);
             //ensure that nothing is marked as dirty
             content.ResetDirtyProperties(false);
+
+            _contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(contentType);
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 

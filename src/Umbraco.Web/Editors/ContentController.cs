@@ -1395,7 +1395,7 @@ namespace Umbraco.Web.Editors
                 if (!variant.Name.IsNullOrWhiteSpace())
                 {
                     var contentType = _contentTypeService.Get(contentSave.PersistedContent.ContentTypeId);
-                    if (contentType.VariesByCulture())
+                    if (contentType != null && contentType.VariesByCulture())
                     {
                         if (variant.Culture.IsNullOrWhiteSpace())
                             throw new InvalidOperationException($"Cannot set culture name without a culture.");
