@@ -51,7 +51,7 @@ namespace Umbraco.Web.Models
         public abstract string Path { get; }
 
         /// <inheritdoc />
-        public abstract int TemplateId { get; }
+        public abstract int? TemplateId { get; }
 
         /// <inheritdoc />
         public abstract int CreatorId { get; }

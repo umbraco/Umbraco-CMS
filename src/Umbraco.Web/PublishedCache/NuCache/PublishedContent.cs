@@ -215,7 +215,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override string Path => _contentNode.Path;
 
         /// <inheritdoc />
-        public override int TemplateId => _contentData.TemplateId;
+        public override int? TemplateId => _contentData.TemplateId;
 
         /// <inheritdoc />
         public override int CreatorId => _contentNode.CreatorId;

@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Published
 
             // ReSharper disable UnassignedGetOnlyAutoProperty
             public override int Id { get; }
-            public override int TemplateId { get; }
+            public override int? TemplateId { get; }
             public override int SortOrder { get; }
             public override string Name { get; }
             public override PublishedCultureInfo GetCulture(string culture = ".") => throw new NotSupportedException();
