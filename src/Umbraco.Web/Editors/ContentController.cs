@@ -38,7 +38,8 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
-
+using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -739,36 +740,52 @@ namespace Umbraco.Web.Editors
                     {
                         var publishStatus = PublishInternal(contentItem, out wasCancelled, out var successfulCultures);
                         //global notifications
+                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures);
+                        //variant specific notifications
+                        foreach (var c in successfulCultures)
+                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures);
+                    }
+                    break;
+                case ContentSaveAction.PublishWithDescendants:
+                case ContentSaveAction.PublishWithDescendantsNew:
+                    {
+                        if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
+                        {
+                            globalNotifications.AddErrorNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/invalidPublishBranchPermissions"));
+                            wasCancelled = false;
+                            break;
+                        }
+
+                        var publishStatus = PublishBranchInternal(contentItem, false, out wasCancelled, out var successfulCultures);
+
+                        //global notifications
                         AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
                         //variant specific notifications
                         foreach (var c in successfulCultures)
                             AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
                     }
                     break;
-                case ContentSaveAction.PublishWithDescendants:
-                case ContentSaveAction.PublishWithDescendantsNew:
-                    {
-                        var publishStatus = PublishBranchInternal(contentItem, false, out wasCancelled, out var successfulCultures);
-
-                        //TODO: Deal with the multiple result
-                        ////global notifications
-                        //AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        ////variant specific notifications
-                        //foreach (var c in successfulCultures)
-                        //    AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
-                    }
-                    break;
                 case ContentSaveAction.PublishWithDescendantsForce:
                 case ContentSaveAction.PublishWithDescendantsForceNew:
                     {
+                        if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
+                        {
+                            globalNotifications.AddErrorNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/invalidPublishBranchPermissions"));
+                            wasCancelled = false;
+                            break;
+                        }
+
                         var publishStatus = PublishBranchInternal(contentItem, true, out wasCancelled, out var successfulCultures);
 
-                        //TODO: Deal with the multiple result
-                        ////global notifications
-                        //AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        ////variant specific notifications
-                        //foreach (var c in successfulCultures)
-                        //    AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        //global notifications
+                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+                        //variant specific notifications
+                        foreach (var c in successfulCultures)
+                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
                     }
                     break;
                 default:
@@ -1039,6 +1056,40 @@ namespace Umbraco.Web.Editors
             notifications.GetOrCreate(culture).AddSuccessNotification(header, msg);
         }
 
+        /// <summary>
+        /// The user must have publish access to all descendant nodes of the content item in order to continue
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <returns></returns>
+        private bool ValidatePublishBranchPermissions(ContentItemSave contentItem, out IReadOnlyList<IUmbracoEntity> noAccess)
+        {
+            var denied = new List<IUmbracoEntity>();
+            var page = 0;
+            const int pageSize = 500;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                var descendants = Services.EntityService.GetPagedDescendants(contentItem.Id, UmbracoObjectTypes.Document, page++, pageSize, out total,
+                                //order by shallowest to deepest, this allows us to check permissions from top to bottom so we can exit
+                                //early if a permission higher up fails
+                                "path", Direction.Ascending);
+
+                foreach (var c in descendants)
+                {
+                    //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
+                    if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
+                        || (ContentPermissionsHelper.CheckPermissions(c,
+                            Security.CurrentUser, Services.UserService, Services.EntityService,
+                            ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
+                    {
+                        denied.Add(c);
+                    }   
+                }
+            }
+            noAccess = denied;
+            return denied.Count == 0;
+        }
+
         private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force,
                 out bool wasCancelled, out string[] successfulCultures)
         {
@@ -1269,7 +1320,7 @@ namespace Umbraco.Web.Editors
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                AddMessageForPublishStatus(publishResult, notificationModel);
+                AddMessageForPublishStatus(new [] { publishResult }, notificationModel);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -1817,152 +1868,124 @@ namespace Umbraco.Web.Editors
         /// <param name="successfulCultures">
         /// This is null when dealing with invariant content, else it's the cultures that were succesfully published
         /// </param>
-        private void AddMessageForPublishStatus(PublishResult status, INotificationModel display, string[] successfulCultures = null)
+        private void AddMessageForPublishStatus(IEnumerable<PublishResult> statuses, INotificationModel display, string[] successfulCultures = null)
         {
-            switch (status.Result)
+            //Put the statuses into groups, each group results in a different message
+            var statusGroup = statuses.GroupBy(x =>
             {
-                case PublishResultType.SuccessPublish:
-                case PublishResultType.SuccessPublishAlready:
-                case PublishResultType.SuccessPublishCulture:
-                    if (successfulCultures == null)
-                    {
-                        display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                            Services.TextService.Localize("speechBubbles/editContentPublishedText"));
-                    }
-                    else
-                    {
-                        foreach (var c in successfulCultures)
+                switch (x.Result)
+                {
+                    case PublishResultType.SuccessPublish:
+                    case PublishResultType.SuccessPublishAlready:
+                    case PublishResultType.SuccessPublishCulture:
+                        //these 3 belong to a single group
+                        return PublishResultType.SuccessPublish;                    
+                    case PublishResultType.FailedPublishAwaitingRelease:
+                    case PublishResultType.FailedPublishCultureAwaitingRelease:
+                        //these 2 belong to a single group
+                        return PublishResultType.FailedPublishAwaitingRelease;
+                    case PublishResultType.FailedPublishHasExpired:
+                    case PublishResultType.FailedPublishCultureHasExpired:
+                        //these 2 belong to a single group
+                        return PublishResultType.FailedPublishHasExpired;
+                    case PublishResultType.FailedPublishPathNotPublished:
+                    case PublishResultType.FailedPublishCancelledByEvent:
+                    case PublishResultType.FailedPublishIsTrashed:
+                    case PublishResultType.FailedPublishContentInvalid:
+                    case PublishResultType.FailedPublishMandatoryCultureMissing:
+                        //the rest that we are looking for each belong in their own group
+                        return x.Result;
+                    default:
+                        throw new IndexOutOfRangeException($"{x.Result}\" was not expected.");
+                }
+            });
+
+            foreach (var status in statusGroup)
+            {   
+                switch (status.Key)
+                {
+                    case PublishResultType.SuccessPublish:
+                        var itemCount = status.Count();
+                        if (successfulCultures == null)
                         {
                             display.AddSuccessNotification(
                                 Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
-                                Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                                itemCount > 1
+                                    ? Services.TextService.Localize("speechBubbles/editContentPublishedText")
+                                    : Services.TextService.Localize("speechBubbles/editMultiContentPublishedText", new[] { itemCount.ToInvariantString() }));
                         }
-                    }
-                    break;
-                case PublishResultType.FailedPublishPathNotPublished:
-                    display.AddWarningNotification(
+                        else
+                        {
+                            foreach (var c in successfulCultures)
+                            {
+                                display.AddSuccessNotification(
+                                    Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                    itemCount > 1
+                                        ? Services.TextService.Localize("speechBubbles/editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
+                                        : Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
+                            }
+                        }
+                        break;
+                    case PublishResultType.FailedPublishPathNotPublished:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddWarningNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/contentPublishedFailedByParent",
+                                    new[] { names }).Trim());
+                        }
+                        break;
+                    case PublishResultType.FailedPublishCancelledByEvent:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            AddCancelMessage(display, message: "publish/contentPublishedFailedByEvent", messageParams: new[] { names });
+                        }
+                        break;
+                    case PublishResultType.FailedPublishAwaitingRelease:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddWarningNotification(
+                                    Services.TextService.Localize("publish"),
+                                    Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
+                                        new[] { names }).Trim());
+                        }
+                        break;
+                    case PublishResultType.FailedPublishHasExpired:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddWarningNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                                    new[] { names }).Trim());
+                        }
+                        break;
+                    case PublishResultType.FailedPublishIsTrashed:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddWarningNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/contentPublishedFailedIsTrashed",
+                                    new[] { names }).Trim());
+                        }
+                        break;
+                    case PublishResultType.FailedPublishContentInvalid:
+                        {
+                            var names = string.Join(", ", status.Select(x => $"{x.Content.Name} ({x.Content.Id})"));
+                            display.AddWarningNotification(
+                                Services.TextService.Localize("publish"),
+                                Services.TextService.Localize("publish/contentPublishedFailedInvalid",
+                                    new[] { names }).Trim());
+                        }
+                        break;
+                    case PublishResultType.FailedPublishMandatoryCultureMissing:
+                        display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
-                            Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
-                    break;
-                case PublishResultType.FailedPublishCancelledByEvent:
-                    AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
-                    break;
-                case PublishResultType.FailedPublishAwaitingRelease:
-                case PublishResultType.FailedPublishCultureAwaitingRelease:
-                    //TODO: We'll need to deal with variants here eventually
-                    display.AddWarningNotification(
-                            Services.TextService.Localize("publish"),
-                            Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
-                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
-                    break;
-                case PublishResultType.FailedPublishHasExpired:
-                case PublishResultType.FailedPublishCultureHasExpired:
-                    //TODO: We'll need to deal with variants here eventually
-                    display.AddWarningNotification(
-                            Services.TextService.Localize("publish"),
-                            Services.TextService.Localize("publish/contentPublishedFailedExpired",
-                                new[] { $"{status.Content.Name} ({status.Content.Id})", }).Trim());
-                    break;
-                case PublishResultType.FailedPublishIsTrashed:
-                    display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        "publish/contentPublishedFailedIsTrashed"); // fixme properly localize, these keys are missing from lang files!
-                    break;
-                case PublishResultType.FailedPublishContentInvalid:
-                    display.AddWarningNotification(
-                            Services.TextService.Localize("publish"),
-                            Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                new[]
-                                {
-                                    $"{status.Content.Name} ({status.Content.Id})",
-                                    string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                                }).Trim());
-                    break;
-                case PublishResultType.FailedPublishMandatoryCultureMissing:
-                    display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
-                    break;
-                default:
-                    throw new IndexOutOfRangeException($"PublishedResultType \"{status.Result}\" was not expected.");
-            }
-        }
-
-        /// <summary>
-        /// Performs a permissions check for the user to check if it has access to the node based on
-        /// start node and/or permissions for the node
-        /// </summary>
-        /// <param name="storage">The storage to add the content item to so it can be reused</param>
-        /// <param name="user"></param>
-        /// <param name="userService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
-        /// <param name="permissionsToCheck"></param>
-        /// <param name="contentItem">Specifies the already resolved content item to check against</param>
-        /// <returns></returns>
-        internal static bool CheckPermissions(
-                IDictionary<string, object> storage,
-                IUser user,
-                IUserService userService,
-                IContentService contentService,
-                IEntityService entityService,
-                int nodeId,
-                char[] permissionsToCheck = null,
-                IContent contentItem = null)
-        {
-            if (storage == null) throw new ArgumentNullException("storage");
-            if (user == null) throw new ArgumentNullException("user");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (entityService == null) throw new ArgumentNullException("entityService");
-
-            if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
-            {
-                contentItem = contentService.GetById(nodeId);
-                //put the content item into storage so it can be retreived
-                // in the controller (saves a lookup)
-                storage[typeof(IContent).ToString()] = contentItem;
-            }
-
-            if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            var hasPathAccess = (nodeId == Constants.System.Root)
-                ? user.HasContentRootAccess(entityService)
-                : (nodeId == Constants.System.RecycleBinContent)
-                    ? user.HasContentBinAccess(entityService)
-                    : user.HasPathAccess(contentItem, entityService);
-
-            if (hasPathAccess == false)
-            {
-                return false;
-            }
-
-            if (permissionsToCheck == null || permissionsToCheck.Length == 0)
-            {
-                return true;
-            }
-
-            //get the implicit/inherited permissions for the user for this path,
-            //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
-            var path = contentItem != null ? contentItem.Path : nodeId.ToString();
-            var permission = userService.GetPermissionsForPath(user, path);
-
-            var allowed = true;
-            foreach (var p in permissionsToCheck)
-            {
-                if (permission == null
-                    || permission.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
-                {
-                    allowed = false;
+                            "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
                 }
             }
-            return allowed;
         }
 
         /// <summary>

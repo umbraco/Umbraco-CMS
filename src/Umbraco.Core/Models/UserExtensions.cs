@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Models
 {
@@ -146,68 +147,46 @@ namespace Umbraco.Core.Models
 
         internal static bool HasContentRootAccess(this IUser user, IEntityService entityService)
         {
-            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasContentBinAccess(this IUser user, IEntityService entityService)
         {
-            return HasPathAccess(Constants.System.RecycleBinContent.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinContent.ToInvariantString(), user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService)
         {
-            return HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.Root.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService)
         {
-            return HasPathAccess(Constants.System.RecycleBinMedia.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinMedia.ToInvariantString(), user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService)
         {
-            return HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            return ContentPermissionsHelper.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
         {
-            return HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
+            if (media == null) throw new ArgumentNullException(nameof(media));
+            return ContentPermissionsHelper.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
-        internal static bool HasPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId)
+        internal static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService)
         {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), recycleBinId);
-                case Constants.System.RecycleBinContent:
-                    return HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), recycleBinId);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
-        internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
+        internal static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService)
         {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-
-            // check for no access
-            if (startNodeIds.Length == 0)
-                return false;
-
-            // check for root access
-            if (startNodeIds.Contains(Constants.System.Root))
-                return true;
-
-            var formattedPath = string.Concat(",", path, ",");
-
-            // only users with root access have access to the recycle bin,
-            // if the above check didn't pass then access is denied
-            if (formattedPath.Contains(string.Concat(",", recycleBinId, ",")))
-                return false;
-
-            // check for a start node in the path
-            return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
@@ -215,56 +194,12 @@ namespace Umbraco.Core.Models
             switch (recycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
+                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
                 case Constants.System.RecycleBinContent:
-                    return IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
+                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
             }
-        }
-
-        internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
-        {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-
-            hasPathAccess = false;
-
-            // check for no access
-            if (startNodeIds.Length == 0)
-                return false;
-
-            // check for root access
-            if (startNodeIds.Contains(Constants.System.Root))
-            {
-                hasPathAccess = true;
-                return true;
-            }
-
-            //is it self?
-            var self = startNodePaths.Any(x => x == path);
-            if (self)
-            {
-                hasPathAccess = true;
-                return true;
-            }
-
-            //is it ancestor?
-            var ancestor = startNodePaths.Any(x => x.StartsWith(path));
-            if (ancestor)
-            {
-                //hasPathAccess = false;
-                return true;
-            }
-
-            //is it descendant?
-            var descendant = startNodePaths.Any(x => path.StartsWith(x));
-            if (descendant)
-            {
-                hasPathAccess = true;
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>

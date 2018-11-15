@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -79,7 +80,7 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
+                var hasPathAccess = (item != null && ContentPermissionsHelper.HasPathAccess(item.Path, GetUserStartNodes(user), RecycleBinId));
                 if (hasPathAccess == false)
                 {
                     toRemove.Add(item);

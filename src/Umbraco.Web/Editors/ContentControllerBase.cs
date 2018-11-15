@@ -148,7 +148,9 @@ namespace Umbraco.Web.Editors
             string header = "speechBubbles/operationCancelledHeader",
             string message = "speechBubbles/operationCancelledText",
             bool localizeHeader = true,
-            bool localizeMessage = true)
+            bool localizeMessage = true,
+            string[] headerParams = null,
+            string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
             //fixme inject
@@ -156,8 +158,8 @@ namespace Umbraco.Web.Editors
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(
-                localizeHeader ? Services.TextService.Localize(header) : header,
-                localizeMessage ? Services.TextService.Localize(message): message);
+                localizeHeader ? Services.TextService.Localize(header, headerParams) : header,
+                localizeMessage ? Services.TextService.Localize(message, messageParams): message);
         }
     }
 }

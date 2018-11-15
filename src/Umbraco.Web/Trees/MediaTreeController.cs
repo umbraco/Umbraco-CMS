@@ -112,7 +112,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
+            if (!Security.CurrentUser.HasMediaPathAccess(item, Services.EntityService))
             {
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;

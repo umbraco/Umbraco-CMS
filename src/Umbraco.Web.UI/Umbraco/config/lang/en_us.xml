@@ -1158,6 +1158,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
+    <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
+    <key alias="contentPublishedFailedIsTrashed"><![CDATA[
+      %0% could not be published because the item is in the recycle bin.
+    ]]></key>
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
     ]]></key>
@@ -1165,7 +1169,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% could not be published because the item has expired.
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% could not be published because these properties:  %1%  did not pass validation rules.
+      %0% could not be published because some properties did not pass validation rules.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% could not be published, a 3rd party add-in cancelled the action.
@@ -1272,7 +1276,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
-    <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
@@ -1286,10 +1289,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="dataTypeSaved">Datatype saved</key>
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
-    <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and is visible on the website</key>
+    <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
     <key alias="editVariantPublishedText">%0% published and visible on the website</key>
+    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>

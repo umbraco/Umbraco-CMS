@@ -6,7 +6,6 @@
         var vm = this;
 
         vm.changeSelection = changeSelection;
-        vm.includeUnpublishedChanged = includeUnpublishedChanged;
 
         function onInit() {
 

@@ -232,7 +232,9 @@ namespace Umbraco.Web.Trees
         protected bool HasPathAccess(IUmbracoEntity entity, FormDataCollection queryStrings)
         {
             if (entity == null) return false;
-            return Security.CurrentUser.HasPathAccess(entity, Services.EntityService, RecycleBinId);
+            return RecycleBinId == Constants.System.RecycleBinContent
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
         }
 
         /// <summary>
