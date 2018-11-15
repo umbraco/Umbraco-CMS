@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Publish_Variant_Branch_When_No_Changes_On_Root()
+        public void Can_Publish_Variant_Branch_When_No_Changes_On_Root_All_Cultures()
         {
             CreateTypes(out _, out var vContentType);
 
@@ -171,7 +171,43 @@ namespace Umbraco.Tests.Services
             iv1.SetValue("vp", "UPDATED-iv1.de", "de");
             ServiceContext.ContentService.Save(iv1);
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray();
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); //no culture specified so "*" is used, so all cultures
+            Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
+            Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
+        }
+
+        [Test]
+        public void Can_Publish_Variant_Branch_When_No_Changes_On_Root_Specific_Culture()
+        {
+            CreateTypes(out _, out var vContentType);
+
+            //create/publish root
+            IContent vRoot = new Content("vroot", -1, vContentType, "de");
+            vRoot.SetCultureName("vroot.de", "de");
+            vRoot.SetCultureName("vroot.ru", "ru");
+            vRoot.SetCultureName("vroot.es", "es");
+            vRoot.SetValue("ip", "vroot");
+            vRoot.SetValue("vp", "vroot.de", "de");
+            vRoot.SetValue("vp", "vroot.ru", "ru");
+            vRoot.SetValue("vp", "vroot.es", "es");
+            ServiceContext.ContentService.SaveAndPublish(vRoot);
+
+            //create/publish child
+            IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
+            iv1.SetCultureName("iv1.de", "de");
+            iv1.SetCultureName("iv1.ru", "ru");
+            iv1.SetCultureName("iv1.es", "es");
+            iv1.SetValue("ip", "iv1");
+            iv1.SetValue("vp", "iv1.de", "de");
+            iv1.SetValue("vp", "iv1.ru", "ru");
+            iv1.SetValue("vp", "iv1.es", "es");
+            ServiceContext.ContentService.SaveAndPublish(iv1);
+
+            //update the child
+            iv1.SetValue("vp", "UPDATED-iv1.de", "de");
+            ServiceContext.ContentService.Save(iv1);
+
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
             Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
             Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
         }
@@ -218,24 +254,24 @@ namespace Umbraco.Tests.Services
             // !force = publishes those that are actually published, and have changes
             // here: nothing
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray();
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); //no culture specified = all cultures
             AssertPublishResults(r, x => x.Content.Name,
                 "vroot.de", "iv1.de", "iv2.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublishCulture, //the root will always get published
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready);
 
             // prepare
-            ServiceContext.ContentService.SaveAndPublish(vRoot, "de");
+            //ServiceContext.ContentService.SaveAndPublish(vRoot, "de"); //fixme/review no need for this, all cultures in the root are published above
             vRoot.SetValue("ip", "changed");
             vRoot.SetValue("vp", "changed.de", "de");
             vRoot.SetValue("vp", "changed.ru", "ru");
             vRoot.SetValue("vp", "changed.es", "es");
-            ServiceContext.ContentService.Save(vRoot);
+            ServiceContext.ContentService.Save(vRoot); //now there's drafts in all cultures
             iv1.PublishCulture("de");
             iv1.PublishCulture("ru");
-            ServiceContext.ContentService.SavePublishing(iv1);
+            ServiceContext.ContentService.SavePublishing(iv1); 
             iv1.SetValue("ip", "changed");
             iv1.SetValue("vp", "changed.de", "de");
             iv1.SetValue("vp", "changed.ru", "ru");
@@ -244,13 +280,13 @@ namespace Umbraco.Tests.Services
 
             // validate
             Assert.IsTrue(vRoot.Published);
-            Assert.IsTrue(vRoot.IsCulturePublished("de"));
-            Assert.IsFalse(vRoot.IsCulturePublished("ru"));
-            Assert.IsFalse(vRoot.IsCulturePublished("es"));
+            Assert.IsTrue(vRoot.IsCulturePublished("de"));  //all cultures are published because "*" was specified
+            Assert.IsTrue(vRoot.IsCulturePublished("ru"));  //all cultures are published because "*" was specified
+            Assert.IsTrue(vRoot.IsCulturePublished("es"));  //all cultures are published because "*" was specified
             Assert.IsTrue(iv1.Published);
             Assert.IsTrue(iv1.IsCulturePublished("de"));
             Assert.IsTrue(iv1.IsCulturePublished("ru"));
-            Assert.IsFalse(vRoot.IsCulturePublished("es"));
+            Assert.IsFalse(iv1.IsCulturePublished("es"));
 
             r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
             AssertPublishResults(r, x => x.Content.Name,
@@ -267,8 +303,12 @@ namespace Umbraco.Tests.Services
             // de is published, ru and es have not been published
             Assert.IsTrue(vRoot.Published);
             Assert.IsTrue(vRoot.IsCulturePublished("de"));
-            Assert.IsFalse(vRoot.IsCulturePublished("ru"));
-            Assert.IsFalse(vRoot.IsCulturePublished("es"));
+            Assert.IsFalse(vRoot.IsCultureEdited("de"));    //no drafts, this was just published
+            Assert.IsTrue(vRoot.IsCulturePublished("ru"));
+            Assert.IsTrue(vRoot.IsCultureEdited("ru"));     //has draft
+            Assert.IsTrue(vRoot.IsCulturePublished("es"));
+            Assert.IsTrue(vRoot.IsCultureEdited("es"));     //has draft
+
             Assert.AreEqual("changed", vRoot.GetValue("ip", published: true)); // publishing de implies publishing invariants
             Assert.AreEqual("changed.de", vRoot.GetValue("vp", "de", published: true));
 
@@ -276,7 +316,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(iv1.Published);
             Assert.IsTrue(iv1.IsCulturePublished("de"));
             Assert.IsTrue(iv1.IsCulturePublished("ru"));
-            Assert.IsFalse(vRoot.IsCulturePublished("es"));
+            Assert.IsFalse(iv1.IsCulturePublished("es"));
             Assert.AreEqual("changed", iv1.GetValue("ip", published: true));
             Assert.AreEqual("changed.de", iv1.GetValue("vp", "de", published: true));
             Assert.AreEqual("iv1.ru", iv1.GetValue("vp", "ru", published: true));

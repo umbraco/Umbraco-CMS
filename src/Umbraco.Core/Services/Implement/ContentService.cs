@@ -1303,10 +1303,26 @@ namespace Umbraco.Core.Services.Implement
 
                 if (c.ContentType.VariesByCulture())
                 {
-                    // variant content type
-                    // add culture if edited, and already published or forced
-                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
-                        return new HashSet<string> { culture.ToLowerInvariant() };
+                    //we need to check all available cultures when *
+                    if (culture == "*")
+                    {
+                        var culturesToPublish = new HashSet<string>();
+                        foreach (var availableCulture in c.AvailableCultures)
+                        {
+                            // variant content type
+                            // add culture if edited, and already published or forced
+                            if (c.IsCultureEdited(availableCulture) && (c.IsCulturePublished(availableCulture) || force || isRoot))
+                                culturesToPublish.Add(availableCulture.ToLowerInvariant());
+                        }
+                        return culturesToPublish;
+                    }
+                    else
+                    {
+                        // variant content type
+                        // add culture if edited, and already published or forced
+                        if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
+                            return new HashSet<string> { culture.ToLowerInvariant() };
+                    }
                 }
                 else
                 {
