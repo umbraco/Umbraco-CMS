@@ -1303,26 +1303,21 @@ namespace Umbraco.Core.Services.Implement
 
                 if (c.ContentType.VariesByCulture())
                 {
-                    //we need to check all available cultures when *
+                    // if "*" ie all cultures, see if at least one culture should be published
                     if (culture == "*")
                     {
+                        // variant content type, all cultures
+                        // ensure that at least one culture is edited, and already published or forced
                         var culturesToPublish = new HashSet<string>();
-                        foreach (var availableCulture in c.AvailableCultures)
-                        {
-                            // variant content type
-                            // add culture if edited, and already published or forced
-                            if (c.IsCultureEdited(availableCulture) && (c.IsCulturePublished(availableCulture) || force || isRoot))
-                                culturesToPublish.Add(availableCulture.ToLowerInvariant());
-                        }
-                        return culturesToPublish;
+                        if (c.AvailableCultures.Any(x => c.IsCultureEdited(x) && (c.IsCulturePublished(x) || force || isRoot)))
+                            culturesToPublish.Add("*"); // and then ok to do everything
+                        return culturesToPublish; // empty or "*"
                     }
-                    else
-                    {
-                        // variant content type
-                        // add culture if edited, and already published or forced
-                        if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
-                            return new HashSet<string> { culture.ToLowerInvariant() };
-                    }
+
+                    // else, variant content type, specific culture
+                    // add culture if edited, and already published or forced
+                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
+                        return new HashSet<string> { culture.ToLowerInvariant() };
                 }
                 else
                 {
@@ -1489,7 +1484,10 @@ namespace Umbraco.Core.Services.Implement
             if (publishCultures != null && !publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
-            return SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
+            var result = SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
+            if (result.Success)
+                publishedDocuments.Add(document);
+            return result;
         }
 
         #endregion

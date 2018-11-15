@@ -80,6 +80,7 @@ namespace Umbraco.Core.Models
         /// whenever values for this culture are unpublished.</para>
         /// <para>A culture becomes published as soon as PublishCulture has been invoked,
         /// even though the document might now have been saved yet (and can have no identity).</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
 
@@ -103,6 +104,7 @@ namespace Umbraco.Core.Models
         /// <para>A culture is edited when it is available, and not published or published but
         /// with changes.</para>
         /// <para>A culture can be edited even though the document might now have been saved yet (and can have no identity).</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCultureEdited(string culture);
 

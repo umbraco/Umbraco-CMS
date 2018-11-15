@@ -208,7 +208,6 @@ namespace Umbraco.Core.Models
         public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
 
         /// <inheritdoc />
-        // fixme/review: Do we deal with passing in * here since this can happen when publishing branches
         public bool IsCulturePublished(string culture)
             // just check _publishInfos
             // a non-available culture could not become published anyways
@@ -241,7 +240,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        // fixme/review: Do we deal with passing in * here since this can happen when publishing branches
         public bool IsCultureEdited(string culture)
             => IsCultureAvailable(culture) && // is available, and
                (!IsCulturePublished(culture) || // is not published, or
