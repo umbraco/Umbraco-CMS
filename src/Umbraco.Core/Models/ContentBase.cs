@@ -153,7 +153,6 @@ namespace Umbraco.Core.Models
             => _cultureInfos?.Keys ?? Enumerable.Empty<string>();
 
         /// <inheritdoc />
-        // fixme/review: Do we deal with passing in * here since this can happen when publishing branches
         public bool IsCultureAvailable(string culture)
             => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
 

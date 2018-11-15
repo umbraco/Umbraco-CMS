@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(ii2);
 
             // iroot    !published   !edited
-            //  ii1     !published   !edited 
+            //  ii1     !published   !edited
             //  ii2     !published   !edited
 
             // !force = publishes those that are actually published, and have changes
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Unpublish(ii2);
 
             // iroot    published    !edited
-            //  ii1     published    !edited 
+            //  ii1     published    !edited
             //    ii11  published    !edited
             //    ii12  !published   !edited
             //  ii2     !published   !edited
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(ii11);
 
             // iroot    published    edited     ***
-            //  ii1     published    !edited 
+            //  ii1     published    !edited
             //    ii11  published    edited     ***
             //    ii12  !published   !edited
             //  ii2     !published   !edited
@@ -248,41 +248,44 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(iv2);
 
             // vroot    !published   !edited
-            //  iv1     !published   !edited 
+            //  iv1     !published   !edited
             //  iv2     !published   !edited
 
             // !force = publishes those that are actually published, and have changes
             // here: nothing
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); //no culture specified = all cultures
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); // no culture specified = all cultures
             AssertPublishResults(r, x => x.Content.Name,
                 "vroot.de", "iv1.de", "iv2.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublishCulture, //the root will always get published
+                PublishResultType.SuccessPublishCulture, // the root will always get published
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready);
 
             // prepare
-            //ServiceContext.ContentService.SaveAndPublish(vRoot, "de"); //fixme/review no need for this, all cultures in the root are published above
             vRoot.SetValue("ip", "changed");
             vRoot.SetValue("vp", "changed.de", "de");
             vRoot.SetValue("vp", "changed.ru", "ru");
             vRoot.SetValue("vp", "changed.es", "es");
-            ServiceContext.ContentService.Save(vRoot); //now there's drafts in all cultures
+            ServiceContext.ContentService.Save(vRoot); // now root has drafts in all cultures
+
             iv1.PublishCulture("de");
             iv1.PublishCulture("ru");
-            ServiceContext.ContentService.SavePublishing(iv1); 
+            ServiceContext.ContentService.SavePublishing(iv1); // now iv1 de and ru are published
+
             iv1.SetValue("ip", "changed");
             iv1.SetValue("vp", "changed.de", "de");
             iv1.SetValue("vp", "changed.ru", "ru");
             iv1.SetValue("vp", "changed.es", "es");
-            ServiceContext.ContentService.Save(iv1);
+            ServiceContext.ContentService.Save(iv1); // now iv1 has drafts in all cultures
 
-            // validate
+            // validate - everything published for root, because no culture was specified = all
             Assert.IsTrue(vRoot.Published);
-            Assert.IsTrue(vRoot.IsCulturePublished("de"));  //all cultures are published because "*" was specified
-            Assert.IsTrue(vRoot.IsCulturePublished("ru"));  //all cultures are published because "*" was specified
-            Assert.IsTrue(vRoot.IsCulturePublished("es"));  //all cultures are published because "*" was specified
+            Assert.IsTrue(vRoot.IsCulturePublished("de"));
+            Assert.IsTrue(vRoot.IsCulturePublished("ru"));
+            Assert.IsTrue(vRoot.IsCulturePublished("es"));
+
+            // validate - only some cultures published for iv1
             Assert.IsTrue(iv1.Published);
             Assert.IsTrue(iv1.IsCulturePublished("de"));
             Assert.IsTrue(iv1.IsCulturePublished("ru"));
@@ -300,19 +303,19 @@ namespace Umbraco.Tests.Services
             Reload(ref iv1);
             Reload(ref iv2);
 
-            // de is published, ru and es have not been published
+            // validate - root
             Assert.IsTrue(vRoot.Published);
             Assert.IsTrue(vRoot.IsCulturePublished("de"));
-            Assert.IsFalse(vRoot.IsCultureEdited("de"));    //no drafts, this was just published
+            Assert.IsFalse(vRoot.IsCultureEdited("de"));    // no drafts, this was just published
             Assert.IsTrue(vRoot.IsCulturePublished("ru"));
-            Assert.IsTrue(vRoot.IsCultureEdited("ru"));     //has draft
+            Assert.IsTrue(vRoot.IsCultureEdited("ru"));     // has draft
             Assert.IsTrue(vRoot.IsCulturePublished("es"));
-            Assert.IsTrue(vRoot.IsCultureEdited("es"));     //has draft
+            Assert.IsTrue(vRoot.IsCultureEdited("es"));     // has draft
 
             Assert.AreEqual("changed", vRoot.GetValue("ip", published: true)); // publishing de implies publishing invariants
             Assert.AreEqual("changed.de", vRoot.GetValue("vp", "de", published: true));
 
-            // de and ru are published, es has not been published
+            // validate - de and ru are published, es has not been published
             Assert.IsTrue(iv1.Published);
             Assert.IsTrue(iv1.IsCulturePublished("de"));
             Assert.IsTrue(iv1.IsCulturePublished("ru"));
@@ -320,7 +323,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("changed", iv1.GetValue("ip", published: true));
             Assert.AreEqual("changed.de", iv1.GetValue("vp", "de", published: true));
             Assert.AreEqual("iv1.ru", iv1.GetValue("vp", "ru", published: true));
-
         }
 
         [Test]
