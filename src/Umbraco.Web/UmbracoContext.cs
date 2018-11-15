@@ -111,7 +111,7 @@ namespace Umbraco.Web
             return EnsureContext(
                 Composing.Current.UmbracoContextAccessor,
                 httpContext,
-                null,
+                Composing.Current.PublishedSnapshotService,
                 new WebSecurity(httpContext, Composing.Current.Services.UserService, UmbracoConfig.For.GlobalSettings()),
                 UmbracoConfig.For.UmbracoSettings(),
                 Composing.Current.UrlProviders,
