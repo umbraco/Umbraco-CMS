@@ -266,8 +266,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
 
             // ensure that the default template is assigned
-            if (entity.TemplateId == 0)
-                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id ?? 0;
+            if (entity.TemplateId.HasValue == false)
+                entity.TemplateId = entity.ContentType.DefaultTemplate?.Id;
 
             // sanitize names
             SanitizeNames(content, publishing);
@@ -993,9 +993,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     // complete the item
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
-                        temp.Content.TemplateId = temp.Template1Id.Value;
+                        temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
-                        temp.Content.PublishTemplateId = temp.Template2Id.Value;
+                        temp.Content.PublishTemplateId = temp.Template2Id;
 
                 if (properties.ContainsKey(temp.VersionId))
                     temp.Content.Properties = properties[temp.VersionId];
@@ -1028,7 +1028,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get template
             if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                content.TemplateId = dto.DocumentVersionDto.TemplateId.Value;
+                content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
             // get properties - indexed by version id
             var versionId = dto.DocumentVersionDto.Id;
