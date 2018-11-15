@@ -357,7 +357,6 @@
     <Compile Include="PropertyEditors\DateValueEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />

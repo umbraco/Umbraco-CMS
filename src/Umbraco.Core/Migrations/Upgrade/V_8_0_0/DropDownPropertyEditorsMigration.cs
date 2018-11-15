@@ -1,92 +1,105 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class DropDownPropertyEditorsMigration : MigrationBase
     {
-        public DropDownPropertyEditorsMigration(IMigrationContext context) : base(context)
+        private readonly CacheRefresherCollection _cacheRefreshers;
+        private readonly IServerMessenger _serverMessenger;
+
+        public DropDownPropertyEditorsMigration(IMigrationContext context, CacheRefresherCollection cacheRefreshers, IServerMessenger serverMessenger)
+            : base(context)
         {
+            _cacheRefreshers = cacheRefreshers;
+            _serverMessenger = serverMessenger;
         }
+
+        // dummy editor for deserialization
+        private class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
+        { }
 
         public override void Migrate()
         {
             //need to convert the old drop down data types to use the new one
-            var oldDropDowns = Database.Fetch<DataTypeDto>(Sql()
+            var dataTypes = Database.Fetch<DataTypeDto>(Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
                 .Where<DataTypeDto>(x => x.EditorAlias.Contains(".DropDown")));
-            foreach (var dd in oldDropDowns)
+
+            foreach (var dataType in dataTypes)
             {
-                //nothing to change if there is no config
-                if (dd.Configuration.IsNullOrWhiteSpace()) continue;
-
                 ValueListConfiguration config;
-                try
-                {
-                    config = JsonConvert.DeserializeObject<ValueListConfiguration>(dd.Configuration);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error<DropDownPropertyEditorsMigration>(
-                        ex, "Invalid drop down configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
-                        dd.Configuration);
-                    dd.Configuration = null;
-                    Database.Update(dd);
-                    continue;
-                }
 
-                var propDataSql = Sql().Select<PropertyDataDto>().From<PropertyDataDto>()
-                    .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>(x => x.Id, x => x.PropertyTypeId)
-                    .InnerJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(x => x.NodeId, x => x.DataTypeId)
-                    .Where<PropertyTypeDto>(x => x.DataTypeId == dd.NodeId);
-
-                var propDatas = Database.Query<PropertyDataDto>(propDataSql);
-                var toUpdate = new List<PropertyDataDto>();
-                foreach (var propData in propDatas)
+                if (!dataType.Configuration.IsNullOrWhiteSpace())
                 {
-                    if (UpdatePropertyDataDto(propData, config))
+                    // parse configuration, and update everything accordingly
+                    try
                     {
-                        //update later, we are iterating all values right now so no SQL can be run inside of this iteration (i.e. Query<T>)
-                        toUpdate.Add(propData);
+                        config = (ValueListConfiguration) new ValueListConfigurationEditor().FromDatabase(dataType.Configuration);
                     }
-                }
+                    catch (Exception ex)
+                    {
+                        Logger.Error<DropDownPropertyEditorsMigration>(
+                            ex, "Invalid drop down configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
+                            dataType.Configuration);
 
-                //run the property data updates
-                foreach (var propData in toUpdate)
+                        // reset
+                        config = new ValueListConfiguration();
+                    }
+
+                    // get property data dtos
+                    var propertyDataDtos = Database.Fetch<PropertyDataDto>(Sql()
+                        .Select<PropertyDataDto>()
+                        .From<PropertyDataDto>()
+                        .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((pt, pd) => pt.Id == pd.PropertyTypeId)
+                        .InnerJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>((dt, pt) => dt.NodeId == pt.DataTypeId)
+                        .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
+
+                    // update dtos
+                    var updatedDtos = propertyDataDtos.Where(x => UpdatePropertyDataDto(x, config));
+
+                    // persist changes
+                    foreach (var propertyDataDto in updatedDtos)
+                        Database.Update(propertyDataDto);
+                }
+                else
                 {
-                    Database.Update(propData);
+                    // default configuration
+                    config = new ValueListConfiguration();
                 }
 
                 var requiresCacheRebuild = false;
-                switch (dd.EditorAlias)
+                switch (dataType.EditorAlias)
                 {
                     case string ea when ea.InvariantEquals("Umbraco.DropDown"):
-                        UpdateDataType(dd, config, false);
+                        UpdateDataType(dataType, config, false);
                         break;
                     case string ea when ea.InvariantEquals("Umbraco.DropdownlistPublishingKeys"):
-                        UpdateDataType(dd, config, false);
+                        UpdateDataType(dataType, config, false);
                         requiresCacheRebuild = true;
                         break;
                     case string ea when ea.InvariantEquals("Umbraco.DropDownMultiple"):
-                        UpdateDataType(dd, config, true);
+                        UpdateDataType(dataType, config, true);
                         break;
                     case string ea when ea.InvariantEquals("Umbraco.DropdownlistMultiplePublishKeys"):
-                        UpdateDataType(dd, config, true);
+                        UpdateDataType(dataType, config, true);
                         requiresCacheRebuild = true;
                         break;
                 }
 
                 if (requiresCacheRebuild)
                 {
-                    //TODO: How to force rebuild the cache?
+                    var dataTypeCacheRefresher = _cacheRefreshers[Guid.Parse("35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2")];
+                    _serverMessenger.PerformRefreshAll(dataTypeCacheRefresher);
                 }
             }
         }
@@ -94,13 +107,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private void UpdateDataType(DataTypeDto dataType, ValueListConfiguration config, bool isMultiple)
         {
             dataType.EditorAlias = Constants.PropertyEditors.Aliases.DropDownListFlexible;
-            var flexConfig = new
-            {
-                multiple = isMultiple,
-                items = config.Items
-            };
             dataType.DbType = ValueStorageType.Nvarchar.ToString();
-            dataType.Configuration = JsonConvert.SerializeObject(flexConfig);
+
+            var flexConfig = new DropDownFlexibleConfiguration
+            {
+                Items = config.Items,
+                Multiple = isMultiple
+            };
+            dataType.Configuration = ConfigurationEditor.ToDatabase(flexConfig);
+
             Database.Update(dataType);
         }
 
@@ -137,7 +152,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         Logger.Warn<DropDownPropertyEditorsMigration>(
                             "Could not find associated data type configuration for stored Id {DataTypeId}", id);
                         canConvert = false;
-                    }   
+                    }
                 }
                 if (canConvert)
                 {
@@ -146,7 +161,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     propData.IntegerValue = null;
                     return true;
                 }
-                
             }
 
             return false;
@@ -167,6 +181,5 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             return null;
         }
-
     }
 }

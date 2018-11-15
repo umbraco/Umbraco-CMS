@@ -431,6 +431,7 @@
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\IConfigureValueType.cs" />
