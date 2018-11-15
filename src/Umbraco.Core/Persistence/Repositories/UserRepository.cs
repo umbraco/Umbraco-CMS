@@ -152,7 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IProfile GetProfile(string username)
         {
-            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.UserName == username, SqlSyntax);
+            var sql = GetBaseQuery(false).Where<UserDto>(userDto => userDto.Login == username, SqlSyntax);
 
             var dto = Database.Fetch<UserDto>(sql)
                 .FirstOrDefault();
