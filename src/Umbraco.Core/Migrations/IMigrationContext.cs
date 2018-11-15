@@ -24,8 +24,13 @@ namespace Umbraco.Core.Migrations
         ISqlContext SqlContext { get; }
 
         /// <summary>
-        /// Gets the expression index.
+        /// Gets or sets the expression index.
         /// </summary>
         int Index { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether an expression is being built.
+        /// </summary>
+        bool BuildingExpression { get; set; }
     }
 }
