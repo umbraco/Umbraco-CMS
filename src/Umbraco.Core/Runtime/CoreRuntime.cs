@@ -246,7 +246,7 @@ namespace Umbraco.Core.Runtime
 
         private void SetRuntimeStateLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = UmbracoVersion.Local; // the local, files, version
+            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = _state.SemanticVersion; // the executing code version
             var connect = false;
 
