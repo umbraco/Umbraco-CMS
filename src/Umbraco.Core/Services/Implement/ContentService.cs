@@ -1109,9 +1109,11 @@ namespace Umbraco.Core.Services.Implement
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
 
                     // invalidate the node/branch
-                    if (!branchOne || branchRoot)
+                    if (!branchOne) // for branches, handled by SaveAndPublishBranch
+                    {
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                    scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+                    }
 
                     // if was not published and now is... descendants that were 'published' (but
                     // had an unpublished ancestor) are 're-published' ie not explicitely published
@@ -1455,6 +1457,10 @@ namespace Umbraco.Core.Services.Implement
                 } while (count > 0);
 
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
+
+                // trigger events for the entire branch
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
 
                 scope.Complete();
             }
