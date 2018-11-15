@@ -1,4 +1,4 @@
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource) {
 
     var vm = this;
 
@@ -23,6 +23,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 });
 
                 formatDates(vm.relationType.relations);
+                getRelationNames(vm.relationType);
 
                 vm.page.loading = false;
             });
@@ -33,6 +34,19 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             userService.getCurrentUser().then(function (currentUser) {
                 angular.forEach(relations, function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
+                });
+            });
+        }
+    }
+
+    function getRelationNames(relationType) {
+        if(relationType.relations) {
+            angular.forEach(relationType.relations, function(relation){
+                entityResource.getById(relation.parentId, relationType.parentObjectTypeName).then(function(entity) {
+                    relation.parentName = entity.name;
+                });
+                entityResource.getById(relation.childId, relationType.childObjectTypeName).then(function(entity) {
+                    relation.childName = entity.name;
                 });
             });
         }
