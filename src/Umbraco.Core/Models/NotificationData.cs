@@ -2,20 +2,18 @@ namespace Umbraco.Core.Models
 {
     public class NotificationData
     {
-        public NotificationData(IContent content, IContentType contentType, ITemplate template)
+        public NotificationData(IContent content, IContentType contentType)
         {
             Content = content;
             ContentType = contentType;
-            Template = template;
         }
 
         public IContent Content { get;  }
         public IContentType ContentType { get;  }
-        public ITemplate Template { get;  }
 
         protected bool Equals(NotificationData other)
         {
-            return Equals(Content, other.Content) && Equals(ContentType, other.ContentType) && Equals(Template, other.Template);
+            return Equals(Content, other.Content) && Equals(ContentType, other.ContentType);
         }
 
         public override bool Equals(object obj)
@@ -32,7 +30,6 @@ namespace Umbraco.Core.Models
             {
                 var hashCode = (Content != null ? Content.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Template != null ? Template.GetHashCode() : 0);
                 return hashCode;
             }
         }

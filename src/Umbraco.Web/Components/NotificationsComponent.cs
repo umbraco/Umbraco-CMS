@@ -47,7 +47,7 @@ namespace Umbraco.Web.Components
             ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
 
-        private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<NotificationData> args, ActionCollection actions)
+        private void ContentServiceSorted(Notifier notifier, IContentService sender,Core.Events.SaveEventArgs<NotificationData> args, ActionCollection actions)
         {
             var parentId = args.SavedEntities.Select(x => x.Content.ParentId).Distinct().ToList();
             if (parentId.Count != 1) return; // this shouldn't happen, for sorting all entities will have the same parent id
@@ -58,8 +58,8 @@ namespace Umbraco.Web.Components
 
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
-
-            notifier.Notify(actions.GetAction<ActionSort>(), new[] { new NotificationData(parent, null, null)});
+            var contentType = Current.Services.ContentTypeService.Get(parent.ContentTypeId);
+            notifier.Notify(actions.GetAction<ActionSort>(), new[] { new NotificationData(parent, contentType)});
         }
 
         private void ContentServiceSaved(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<NotificationData> args, ActionCollection actions)

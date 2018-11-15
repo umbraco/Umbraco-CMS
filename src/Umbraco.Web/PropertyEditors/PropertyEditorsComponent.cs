@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
             MediaService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             ContentService.Deleted += (sender, args)
-                => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Select(x=>x.Content).Cast<ContentBase>()));
             MemberService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
             MediaService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             ContentService.Deleted += (sender, args)
-                => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+                => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Select(x=>x.Content).Cast<ContentBase>()));
             MemberService.Deleted += (sender, args)
                 => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
