@@ -1820,6 +1820,107 @@ namespace Umbraco.Core.Services
             return Copy(content, parentId, relateToOriginal, true, userId);
         }
 
+
+        /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="recursive">A value indicating whether to recursively copy children.</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <param name="contentOut">The newly created <see cref="IContent"/> object</param>
+        /// <returns>True if copy succeeded, otherwise False </returns>
+        public Attempt<OperationStatus> Copy(out IContent contentOut, IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0)
+        {
+            //TODO: This all needs to be managed correctly so that the logic is submitted in one
+            // transaction, the CRUD needs to be moved to the repo
+            var evtMsgs = EventMessagesFactory.Get();
+            using (new WriteLock(Locker))
+            {
+                var copy = content.DeepCloneWithResetIdentities();
+                copy.ParentId = parentId;
+
+                // A copy should never be set to published automatically even if the original was.
+                copy.ChangePublishedState(PublishedState.Unpublished);
+
+                using (var uow = UowProvider.GetUnitOfWork())
+                {
+                    var copyEventArgs = new CopyEventArgs<IContent>(content, copy, true, parentId, relateToOriginal);
+                    if (uow.Events.DispatchCancelable(Copying, this, copyEventArgs))
+                    {
+                        if (copyEventArgs.Messages.Count > 0)
+                        {
+                            foreach (var message in copyEventArgs.Messages.GetAll())
+                            {
+                                evtMsgs.Add(message);
+                            }
+                        }
+                        uow.Commit();
+                        contentOut = null;
+                        return OperationStatus.Cancelled(evtMsgs);
+                    }
+
+                    var repository = RepositoryFactory.CreateContentRepository(uow);
+
+                    // Update the create author and last edit author
+                    copy.CreatorId = userId;
+                    copy.WriterId = userId;
+
+                    //get the current permissions, if there are any explicit ones they need to be copied
+                    var currentPermissions = GetPermissionsForEntity(content);
+                    currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
+
+                    repository.AddOrUpdate(copy);
+                    repository.AddOrUpdatePreviewXml(copy, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
+
+                    //add permissions
+                    if (currentPermissions.Count > 0)
+                    {
+                        var permissionSet = new ContentPermissionSet(copy, currentPermissions);
+                        repository.AddOrUpdatePermissions(permissionSet);
+                    }
+
+                    uow.Commit(); // todo - this should flush, not commit
+
+                    //Special case for the associated tags
+                    //TODO: Move this to the repository layer in a single transaction!
+                    //don't copy tags data in tags table if the item is in the recycle bin
+                    if (parentId != Constants.System.RecycleBinContent)
+                    {
+                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
+                        foreach (var tag in tags)
+                            uow.Database.Insert(new TagRelationshipDto
+                            {
+                                NodeId = copy.Id,
+                                TagId = tag.TagId,
+                                PropertyTypeId = tag.PropertyTypeId
+                            });
+                    }
+                    uow.Commit(); // todo - this should flush, not commit
+                    contentOut = copy;
+                    if (recursive)
+                    {
+                        //Look for children and copy those as well
+                        var children = GetChildren(content.Id);
+                        foreach (var child in children)
+                        {
+                            //TODO: This shouldn't recurse back to this method, it should be done in a private method
+                            // that doesn't have a nested lock and so we can perform the entire operation in one commit.
+                            Copy(child, copy.Id, relateToOriginal, true, userId);
+                        }
+                    }
+                    copyEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Copied, this, copyEventArgs);
+                    Audit(uow, AuditType.Copy, "Copy Content performed by user", userId, content.Id);
+                    uow.Commit();
+                }
+
+                return OperationStatus.Success(evtMsgs);
+            }
+        }
+
         /// <summary>
         /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current
         /// to the new copy which is returned.

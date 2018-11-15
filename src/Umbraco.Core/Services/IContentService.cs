@@ -98,6 +98,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User moving the Media</param>
         /// <returns>True if moving succeeded, otherwise False</returns>
         Attempt<OperationStatus> Move(IContent content, int parentId, int userId = 0);
+
+        /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="recursive">A value indicating whether to recursively copy children.</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <param name="contentOut">The newly created <see cref="IContent"/> object</param>
+        /// <returns>True if copy succeeded, otherwise False</returns>
+        Attempt<OperationStatus> Copy(out IContent contentOut, IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
     }
 
     /// <summary>

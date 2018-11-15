@@ -926,16 +926,17 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("copy.ParentId", 'C')]
         public HttpResponseMessage PostCopy(MoveOrCopy copy)
         {
+
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
+            var c = Services.ContentService.WithResult().Copy(out IContent contentOut, toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
 
-            if (c == null)
+            if (!c)
             {
                 return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(contentOut.Path, Encoding.UTF8, "application/json");
             return response;
         }
 
