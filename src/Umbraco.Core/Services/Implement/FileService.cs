@@ -348,7 +348,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 template.Content = content;
             }
-            
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 Content = GetViewContent(name) ?? content
             };
-            
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
@@ -437,11 +437,15 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="id">The identifer of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        public ITemplate GetTemplate(int id)
+        public ITemplate GetTemplate(int? id)
         {
+            if (!id.HasValue)
+            {
+                return null;
+            }
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _templateRepository.Get(id);
+                return _templateRepository.Get(id.Value);
             }
         }
 
@@ -647,7 +651,7 @@ namespace Umbraco.Core.Services.Implement
                 return _templateRepository.GetFileSize(filepath);
             }
         }
-        
+
         private string GetViewContent(string fileName)
         {
             if (fileName.IsNullOrWhiteSpace())
@@ -1037,7 +1041,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
-        
+
         private void Audit(AuditType type, int userId, int objectId, string entityType)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));

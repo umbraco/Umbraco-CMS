@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using System.Web.Mvc;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
@@ -43,6 +43,11 @@ namespace Umbraco.Core.Manifest
         public ManifestContentAppDefinition(IContentTypeService contentTypeService)
         {
             _contentTypeService = contentTypeService;
+        }
+
+        public ManifestContentAppDefinition()
+        {
+            _contentTypeService = Current.Services.ContentTypeService;
         }
 
         /// <summary>

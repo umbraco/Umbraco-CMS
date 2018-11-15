@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
             var updateDateResolver = new UpdateDateResolver(contentTypeService);
             var nameResolver = new NameResolver(contentTypeService);
             var contentSavedStateResolver = new ContentSavedStateResolver<ContentPropertyDisplay>(contentTypeService);
-
+            var contentBasicSavedStateResolver = new ContentBasicSavedStateResolver<ContentPropertyBasic>(contentTypeService);
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ConstructUsing((content, context)=>GetInitialContentItemDisplay(content, context, contentTypeService))
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing((src, dest, destMember, context) => updateDateResolver.Resolve(src, dest, destMember, context)))
                 .ForMember(dest => dest.Name, opt => opt.ResolveUsing((src, dest, destMember, context) => nameResolver.Resolve(src, dest, destMember, context)))
-                .ForMember(dest => dest.State, opt => opt.ResolveUsing<ContentBasicSavedStateResolver<ContentPropertyBasic>>());
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing((src, dest, destMember, context) => contentBasicSavedStateResolver.Resolve(src, dest, destMember, context)));
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context

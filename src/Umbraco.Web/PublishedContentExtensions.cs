@@ -135,8 +135,13 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetTemplateAlias(this IPublishedContent content)
         {
-            var template = Current.Services.FileService.GetTemplate(content.TemplateId);
-            return template == null ? string.Empty : template.Alias;
+            if (content.TemplateId.HasValue)
+            {
+                var template = Current.Services.FileService.GetTemplate(content.TemplateId.Value);
+                return template == null ? string.Empty : template.Alias;
+            }
+
+            return string.Empty;
         }
 
         #endregion

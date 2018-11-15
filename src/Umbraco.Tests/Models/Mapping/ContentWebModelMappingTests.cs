@@ -75,6 +75,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+
+            _contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(contentType);
             FixUsers(content);
 
             var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content);
@@ -92,6 +94,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+
+            _contentTypeServiceMock.Setup(x => x.Get(content.ContentTypeId)).Returns(contentType);
             FixUsers(content);
 
             var result = Mapper.Map<IContent, ContentPropertyCollectionDto>(content);

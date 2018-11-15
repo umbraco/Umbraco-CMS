@@ -148,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override Guid Key => _key;
 
-        public override int TemplateId => 0;
+        public override int? TemplateId => null;
 
         public override int SortOrder => _sortOrder;
 
