@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var contentType = _contentTypeRepository.Get(entity.ContentTypeId);
             // ensure that the default template is assigned
-            if (entity.TemplateId == null)
+            if (!entity.TemplateId.HasValue)
                 entity.TemplateId = contentType.DefaultTemplate?.Id;
 
             // sanitize names
@@ -364,7 +364,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             dto.NodeId = nodeDto.NodeId;
             content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
-
 
             // persist the variations
             if (contentType.VariesByCulture())
@@ -996,9 +995,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     // complete the item
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
-                        temp.Content.TemplateId = temp.Template1Id.Value;
+                        temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
-                        temp.Content.PublishTemplateId = temp.Template2Id.Value;
+                        temp.Content.PublishTemplateId = temp.Template2Id;
 
                 if (properties.ContainsKey(temp.VersionId))
                     temp.Content.Properties = properties[temp.VersionId];
@@ -1031,7 +1030,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get template
             if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                content.TemplateId = dto.DocumentVersionDto.TemplateId.Value;
+                content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
             // get properties - indexed by version id
             var versionId = dto.DocumentVersionDto.Id;
