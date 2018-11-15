@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -64,7 +64,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var entitySql = translator.Translate();
-            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
+            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false));
+            pagedSql = (orderDirection == Direction.Descending) ? pagedSql.OrderByDescending("umbracoNode.id") : pagedSql.OrderBy("umbracoNode.id");
 
             IEnumerable<IUmbracoEntity> result;
 
@@ -80,8 +81,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var idGroup in ids)
                 {
                     var propSql = GetPropertySql(Constants.ObjectTypes.Media)
-                        .Where("contentNodeId IN (@ids)", new {ids = idGroup})
-                        .OrderBy("contentNodeId");
+                        .Where("contentNodeId IN (@ids)", new { ids = idGroup });
+                    propSql = (orderDirection == Direction.Descending) ? propSql.OrderByDescending("contentNodeId") : propSql.OrderBy("contentNodeId");
 
                     //This does NOT fetch all data into memory in a list, this will read
                     // over the records as a data reader, this is much better for performance and memory,
