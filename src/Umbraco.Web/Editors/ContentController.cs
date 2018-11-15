@@ -930,6 +930,10 @@ namespace Umbraco.Web.Editors
 
             var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
 
+            if (c == null)
+            {
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+            }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
             return response;
