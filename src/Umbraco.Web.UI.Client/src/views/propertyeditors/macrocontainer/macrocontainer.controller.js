@@ -2,7 +2,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.MacroContainerController",
 	
-	function($scope, dialogService, entityResource, macroService){
+	function($scope, macroService){
 
 		$scope.renderModel = [];
 		$scope.allowOpenButton = true;
