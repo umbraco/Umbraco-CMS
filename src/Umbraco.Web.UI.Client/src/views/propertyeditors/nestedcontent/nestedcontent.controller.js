@@ -52,9 +52,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "$timeout",
     "contentResource",
     "localizationService",
+    "dictionaryResource",
     "iconHelper",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, dictionaryResource, iconHelper) {
 
         var inited = false;
 
@@ -83,11 +84,28 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.moveIconTitle = value;
         });
 
+        // localize the default help text
+        localizationService.localize('grid_addElement').then(function (value) {
+            $scope.helpText = value;
+        });
+
         $scope.nodes = [];
         $scope.currentNode = undefined;
         $scope.realCurrentNode = undefined;
         $scope.scaffolds = undefined;
         $scope.sorting = false;
+        
+        var helpText = $scope.model.config.helpText;
+        if (helpText) {
+            if (helpText.startsWith("#")) {
+                dictionaryResource.getByKey(helpText.substring(1)).then(function (value) {
+                    console.log(value);
+                    $scope.helpText = value;
+                });
+            } else {
+                $scope.helpText = helpText;
+            }
+        }
 
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;

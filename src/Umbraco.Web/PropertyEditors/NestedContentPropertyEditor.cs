@@ -52,6 +52,9 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField(ContentTypesPreValueKey, "Doc Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
             public string[] ContentTypes { get; set; }
 
+            [PreValueField("helpText", "Help Text", "textstring", Description = "Set the help text visible while adding new element.")]
+            public string HelpText { get; set; }
+
             [PreValueField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
             public string MinItems { get; set; }
 
