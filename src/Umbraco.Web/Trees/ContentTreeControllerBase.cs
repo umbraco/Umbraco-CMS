@@ -347,7 +347,7 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 // get the default assigned permissions for this user
-                var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions("-1", Services.UserService)).ToList();
+                var actions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService)).ToList();
 
                 var menu = new MenuItemCollection();
                 // only add empty recycle bin if the current user is allowed to delete by default 
