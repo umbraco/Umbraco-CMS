@@ -11,8 +11,15 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
-        
-        private static readonly string SearchesConfigPath = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+        public LogViewerSourceBase(string pathToSearches = "")
+        {
+            if (string.IsNullOrEmpty(pathToSearches))
+                pathToSearches = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+
+            _searchesConfigPath = pathToSearches;
+        }
+
+        private string _searchesConfigPath;
 
         public abstract bool CanHandleLargeLogs { get; }
         
@@ -25,9 +32,9 @@ namespace Umbraco.Core.Logging.Viewer
             //Our default implementation
 
             //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
+            IOHelper.EnsureFileExists(_searchesConfigPath, "[]");
 
-            var rawJson = System.IO.File.ReadAllText(SearchesConfigPath);
+            var rawJson = System.IO.File.ReadAllText(_searchesConfigPath);
             return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
         }
 
@@ -43,10 +50,10 @@ namespace Umbraco.Core.Logging.Viewer
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
             //If file does not exist - lets create it with an empty array
-            IOHelper.EnsureFileExists(SearchesConfigPath, "[]");
+            IOHelper.EnsureFileExists(_searchesConfigPath, "[]");
 
             //Write it back down to file
-            System.IO.File.WriteAllText(SearchesConfigPath, rawJson);
+            System.IO.File.WriteAllText(_searchesConfigPath, rawJson);
 
             //Return the updated object - so we can instantly reset the entire array from the API response
             //As opposed to push a new item into the array
@@ -65,7 +72,7 @@ namespace Umbraco.Core.Logging.Viewer
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
             //Write it back down to file
-            System.IO.File.WriteAllText(SearchesConfigPath, rawJson);
+            System.IO.File.WriteAllText(_searchesConfigPath, rawJson);
 
             //Return the updated object - so we can instantly reset the entire array from the API response
             return searches;

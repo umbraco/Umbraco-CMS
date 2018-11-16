@@ -8,6 +8,16 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public partial class JsonLogViewer : LogViewerSourceBase
     {
+        private string _logsPath;
+
+        public JsonLogViewer(string logsPath = "", string searchPath = "") : base(pathToSearches: searchPath)
+        {
+            if (string.IsNullOrEmpty(logsPath))
+                logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+
+            _logsPath = logsPath;
+        }
+
         const int FileSizeCap = 100;
 
         public override bool CanHandleLargeLogs { get => false; }
@@ -18,7 +28,7 @@ namespace Umbraco.Core.Logging.Viewer
             var dateRange = endDate - startDate;
 
             //Log Directory
-            var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+            var logDirectory = _logsPath;
 
             //Number of entries
             long fileSizeCount = 0;
