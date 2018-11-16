@@ -412,7 +412,11 @@ namespace Umbraco.Core.Services
         /// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
         /// whether the cultures could be published.</para>
         /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, HashSet<string>> shouldPublish, Func<IContent, HashSet<string>, bool> publishCultures, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
+            Func<IContent, bool> shouldPublish,
+            Func<IContent, bool> alreadyPublished,
+            Func<IContent, bool> publishCultures,
+            int userId = 0);
 
         /// <summary>
         /// Unpublishes a document.
