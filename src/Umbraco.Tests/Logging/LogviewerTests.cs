@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 
@@ -67,6 +68,50 @@ namespace Umbraco.Tests.Logging
 
             //Our dummy log should contain 2 errors
             Assert.AreEqual(2, numberOfErrors);
+        }
+
+        [Test]
+        public void Logs_Contain_Correct_Log_Level_Counts()
+        {
+            var logCounts = _logViewer.GetLogLevelCounts(startDate: _startDate, endDate: _endDate);
+
+            Assert.AreEqual(1954, logCounts.Debug);
+            Assert.AreEqual(2, logCounts.Error);
+            Assert.AreEqual(0, logCounts.Fatal);
+            Assert.AreEqual(62, logCounts.Information);
+            Assert.AreEqual(7, logCounts.Warning);
+        }
+
+        [Test]
+        public void Log_Search_Can_Persist()
+        {
+            //Add a new search
+            _logViewer.AddSavedSearch("Unit Test Example", "Has(UnitTest)");
+
+            var searches = _logViewer.GetSavedSearches();
+
+            var savedSearch = new SavedLogSearch
+            {
+                Name = "Unit Test Example",
+                Query = "Has(UnitTest)"
+            };
+
+            //Check if we can find the newly added item from the results we get back
+            var findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");
+
+            Assert.IsNotNull(findItem, "We should have found the saved search, but get no results");
+            Assert.AreEqual(1, findItem.Count(), "Our list of searches should only contain one result");
+
+            //TODO: Need someone to help me find out why these don't work
+            //CollectionAssert.Contains(searches, savedSearch, "Can not find the new search that was saved");
+            //Assert.That(searches, Contains.Item(savedSearch));
+
+            //Remove the search from above & ensure it no longer exists
+            _logViewer.DeleteSavedSearch("Unit Test Example", "Has(UnitTest)");
+
+            searches = _logViewer.GetSavedSearches();
+            findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");
+            Assert.IsEmpty(findItem, "The search item should no longer exist");
         }
 
         
