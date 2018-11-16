@@ -40,12 +40,12 @@ namespace Umbraco.Tests.Services
             // here: root (root is always published)
 
             var r = SaveAndPublishInvariantBranch(iRoot, false, method).ToArray();
+
+            // not forcing, ii1 and ii2 not published yet: only root got published
             AssertPublishResults(r, x => x.Content.Name,
-                "iroot", "ii1", "ii2");
+                "iroot");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublish,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready);
+                PublishResultType.SuccessPublish);
 
             // prepare
 
@@ -80,13 +80,11 @@ namespace Umbraco.Tests.Services
             // here: nothing
 
             r = SaveAndPublishInvariantBranch(iRoot, false, method).ToArray();
+
+            // not forcing, ii12 and ii2, ii21, ii22 not published yet: only root, ii1, ii11 got published
             AssertPublishResults(r, x => x.Content.Name,
-                "iroot", "ii1", "ii11", "ii12", "ii2", "ii21", "ii22");
+                "iroot", "ii1", "ii11");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready,
                 PublishResultType.SuccessPublishAlready);
@@ -109,17 +107,14 @@ namespace Umbraco.Tests.Services
             // !force = publishes those that are actually published, and have changes
             // here: iroot and ii11
 
+            // not forcing, ii12 and ii2, ii21, ii22 not published yet: only root, ii1, ii11 got published
             r = SaveAndPublishInvariantBranch(iRoot, false, method).ToArray();
             AssertPublishResults(r, x => x.Content.Name,
-                "iroot", "ii1", "ii11", "ii12", "ii2", "ii21", "ii22");
+                "iroot", "ii1", "ii11");
             AssertPublishResults(r, x => x.Result,
                 PublishResultType.SuccessPublish,
                 PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublish,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready);
+                PublishResultType.SuccessPublish);
 
             // force = publishes everything that has changes
             // here: ii12, ii2, ii22 - ii21 was published already but masked
@@ -255,12 +250,12 @@ namespace Umbraco.Tests.Services
             // here: nothing
 
             var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); // no culture specified = all cultures
+
+            // not forcing, iv1 and iv2 not published yet: only root got published
             AssertPublishResults(r, x => x.Content.Name,
-                "vroot.de", "iv1.de", "iv2.de");
+                "vroot.de");
             AssertPublishResults(r, x => x.Result,
-                PublishResultType.SuccessPublishCulture, // the root will always get published
-                PublishResultType.SuccessPublishAlready,
-                PublishResultType.SuccessPublishAlready);
+                PublishResultType.SuccessPublishCulture);
 
             // prepare
             vRoot.SetValue("ip", "changed");
@@ -292,12 +287,13 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(iv1.IsCulturePublished("es"));
 
             r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
+
+            // not forcing, iv2 not published yet: only root and iv1 got published
             AssertPublishResults(r, x => x.Content.Name,
-                "vroot.de", "iv1.de", "iv2.de");
+                "vroot.de", "iv1.de");
             AssertPublishResults(r, x => x.Result,
                 PublishResultType.SuccessPublishCulture,
-                PublishResultType.SuccessPublishCulture,
-                PublishResultType.SuccessPublishAlready);
+                PublishResultType.SuccessPublishCulture);
 
             // reload - SaveAndPublishBranch has modified other instances
             Reload(ref iv1);
@@ -325,8 +321,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("iv1.ru", iv1.GetValue("vp", "ru", published: true));
         }
 
-        [Test]
-        public void Can_Publish_Mixed_Branch()
+        private void Can_Publish_Mixed_Branch(out IContent iRoot, out IContent ii1, out IContent iv11)
         {
             // invariant root -> variant -> invariant
             // variant root -> variant -> invariant
@@ -335,15 +330,15 @@ namespace Umbraco.Tests.Services
             CreateTypes(out var iContentType, out var vContentType);
 
             // invariant root -> invariant -> variant
-            IContent iRoot = new Content("iroot", -1, iContentType);
+            iRoot = new Content("iroot", -1, iContentType);
             iRoot.SetValue("ip", "iroot");
             ServiceContext.ContentService.SaveAndPublish(iRoot);
-            IContent ii1 = new Content("ii1", iRoot, iContentType);
+            ii1 = new Content("ii1", iRoot, iContentType);
             ii1.SetValue("ip", "vii1");
             ServiceContext.ContentService.SaveAndPublish(ii1);
             ii1.SetValue("ip", "changed");
             ServiceContext.ContentService.Save(ii1);
-            IContent iv11 = new Content("iv11.de", ii1, vContentType, "de");
+            iv11 = new Content("iv11.de", ii1, vContentType, "de");
             iv11.SetValue("ip", "iv11");
             iv11.SetValue("vp", "iv11.de", "de");
             iv11.SetValue("vp", "iv11.ru", "ru");
@@ -362,6 +357,12 @@ namespace Umbraco.Tests.Services
             iv11.SetValue("vp", "changed.de", "de");
             iv11.SetValue("vp", "changed.ru", "ru");
             ServiceContext.ContentService.Save(iv11);
+        }
+
+        [Test]
+        public void Can_Publish_Mixed_Branch_1()
+        {
+            Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
 
             var r = ServiceContext.ContentService.SaveAndPublishBranch(iRoot, false, "de").ToArray();
             AssertPublishResults(r, x => x.Content.Name,
@@ -384,9 +385,38 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));
         }
 
+        [Test]
+        public void Can_Publish_MixedBranch_2()
+        {
+            Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
+
+            var r = ServiceContext.ContentService.SaveAndPublishBranch(iRoot, false, new[] { "de", "ru" }).ToArray();
+            AssertPublishResults(r, x => x.Content.Name,
+                "iroot", "ii1", "iv11.de");
+            AssertPublishResults(r, x => x.Result,
+                PublishResultType.SuccessPublishAlready,
+                PublishResultType.SuccessPublish,
+                PublishResultType.SuccessPublishCulture);
+
+            // reload - SaveAndPublishBranch has modified other instances
+            Reload(ref ii1);
+            Reload(ref iv11);
+
+            // the invariant child has been published
+            // the variant child has been published for 'de' and 'ru'
+
+            Assert.AreEqual("changed", ii1.GetValue("ip", published: true));
+            Assert.AreEqual("changed", iv11.GetValue("ip", published: true));
+            Assert.AreEqual("changed.de", iv11.GetValue("vp", "de", published: true));
+            Assert.AreEqual("changed.ru", iv11.GetValue("vp", "ru", published: true));
+        }
+
         private void AssertPublishResults<T>(PublishResult[] values, Func<PublishResult, T> getter, params T[] expected)
         {
+            if (expected.Length != values.Length)
+                Console.WriteLine(string.Join(", ", values.Select(x => getter(x).ToString())));
             Assert.AreEqual(expected.Length, values.Length);
+
             for (var i = 0; i < values.Length; i++)
             {
                 var value = getter(values[i]);

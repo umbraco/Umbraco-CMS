@@ -397,7 +397,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The root document.</param>
         /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-        /// <param name="editing">A function determining whether a document has changes to publish.</param>
+        /// <param name="shouldPublish">A function determining cultures to publish.</param>
         /// <param name="publishCultures">A function publishing cultures.</param>
         /// <param name="userId">The identifier of the user performing the operation.</param>
         /// <remarks>
@@ -413,9 +413,8 @@ namespace Umbraco.Core.Services
         /// whether the cultures could be published.</para>
         /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
-            Func<IContent, bool> shouldPublish,
-            Func<IContent, bool> alreadyPublished,
-            Func<IContent, bool> publishCultures,
+            Func<IContent, HashSet<string>> shouldPublish,
+            Func<IContent, HashSet<string>, bool> publishCultures,
             int userId = 0);
 
         /// <summary>

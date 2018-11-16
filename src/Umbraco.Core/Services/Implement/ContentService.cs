@@ -1290,89 +1290,74 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        private bool SaveAndPublishBranch_PublishCultures(IContent c, HashSet<string> culturesToPublish)
+        {
+            // variant content type - publish specified cultures
+            // invariant content type - publish only the invariant culture
+            return c.ContentType.VariesByCulture()
+                ? culturesToPublish.All(c.PublishCulture)
+                : c.PublishCulture();
+        }
+
+        private HashSet<string> SaveAndPublishBranch_ShouldPublish3(ref HashSet<string> cultures, string c, bool published, bool edited, bool isRoot, bool force)
+        {
+            // if published, republish
+            if (published)
+            {
+                if (cultures == null) cultures = new HashSet<string>(); // empty means 'already published'
+                if (edited) cultures.Add(c); // <culture> means 'republish this culture'
+                return cultures;
+            }
+
+            // if not published, publish if force/root else do nothing
+            if (!force && !isRoot) return cultures; // null means 'nothing to do'
+
+            if (cultures == null) cultures = new HashSet<string>();
+            cultures.Add(c); // <culture> means 'publish this culture'
+            return cultures;
+        }
+
+
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0)
         {
             // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
             // and not to == them, else we would be comparing references, and that is a bad thing
 
-            // determine if this document should be included in the
-            // branch publishing. If it's !root && !force && !published then it cannot be
-            // included.
-            bool ShouldPublish(IContent c)
+            // determines whether the document is edited, and thus needs to be published,
+            // for the specified culture (it may be edited for other cultures and that
+            // should not trigger a publish).
+
+            // determines cultures to be published
+            // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
+            HashSet<string> ShouldPublish(IContent c)
             {
                 var isRoot = c.Id == content.Id;
-                if (c.ContentType.VariesByCulture())
+                HashSet<string> culturesToPublish = null;
+
+                if (!c.ContentType.VariesByCulture()) // invariant content type
+                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+
+                if (culture != "*") // variant content type, specific culture
+                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
+
+                // variant content type, all cultures
+                if (c.Published)
                 {
-                    // if "*" ie all cultures, see if at least one culture must pass rules
-                    if (culture == "*")
-                    {
-                        if (isRoot || c.AvailableCultures.Any(x => c.IsCulturePublished(x) || force))
-                            return true;
-                    }
-                    if (isRoot || c.IsCulturePublished(culture) || force)
-                        return true;
+                    // then some (and maybe all) cultures will be 'already published' (unless forcing),
+                    // others will have to 'republish this culture'
+                    foreach (var x in c.AvailableCultures)
+                        SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                    return culturesToPublish;
                 }
-                else
-                {
-                    if (isRoot || c.Published || force)
-                        return true;
-                }
-                return false;
+
+                // if not published, publish if force/root else do nothing
+                return force || isRoot
+                    ? new HashSet<string> { "*" } // "*" means 'publish all'
+                    : null; // null means 'nothing to do'
             }
 
-            bool AlreadyPublished(IContent c)
-            {
-                if (c.ContentType.VariesByCulture())
-                {
-                    // if "*" ie all cultures, see if at least one culture must pass rules
-                    if (culture == "*")
-                    {
-                        if (c.AvailableCultures.Any(x => c.IsCultureEdited(x) && c.IsCulturePublished(x)))
-                            return false;
-                    }
-                    if (c.IsCultureEdited(culture) && c.IsCulturePublished(culture))
-                        return false;
-                }
-                else
-                {
-                    if (c.Edited && c.Published)
-                        return false;
-                }
-                return true;
-            }
-
-            // publish the specified cultures
-            bool PublishCultures(IContent c)
-            {
-                var isRoot = c.Id == content.Id;
-
-                if (c.ContentType.VariesByCulture())
-                {
-                    // if "*" ie all cultures, see if at least one culture should be published
-                    if (culture == "*")
-                    {
-                        foreach (var availableCulture in c.AvailableCultures)
-                            if (c.IsCultureEdited(availableCulture) && (c.IsCulturePublished(availableCulture) || force || isRoot))
-                                if (!c.PublishCulture(availableCulture))
-                                    return false;
-                        return true;
-                    }
-
-                    // else, variant content type, specific culture
-                    if (c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force || isRoot))
-                        return c.PublishCulture(culture);
-                }
-                else
-                {
-                    // invariant content type
-                    if (c.Edited && (c.Published || force || isRoot))
-                        return c.PublishCulture();
-                }
-                return true;
-            }
-
-            return SaveAndPublishBranch(content, force, ShouldPublish, AlreadyPublished, PublishCultures, userId);
+            return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
         }
 
         /// <inheritdoc />
@@ -1383,73 +1368,44 @@ namespace Umbraco.Core.Services.Implement
 
             cultures = cultures ?? Array.Empty<string>();
 
-            // determine if this document should be included in the
-            // branch publishing. If it's !root && !force && !published then it cannot be
-            // included.
-            bool ShouldPublish(IContent c)
+            // determines cultures to be published
+            // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
+            HashSet<string> ShouldPublish(IContent c)
             {
                 var isRoot = c.Id == content.Id;
+                HashSet<string> culturesToPublish = null;
 
-                if (c.ContentType.VariesByCulture())
+                if (!c.ContentType.VariesByCulture()) // invariant content type
+                    return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+
+                // variant content type, specific cultures
+                if (c.Published)
                 {
-                    foreach (var culture in cultures)
-                        if (isRoot || (c.IsCulturePublished(culture) || force))
-                            return true;
+                    // then some (and maybe all) cultures will be 'already published' (unless forcing),
+                    // others will have to 'republish this culture'
+                    foreach (var x in cultures)
+                        SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                    return culturesToPublish;
                 }
-                else
-                {
-                    if (isRoot || c.Published || force)
-                        return true;
-                }
-                return false;
+
+                // if not published, publish if force/root else do nothing
+                return force || isRoot
+                    ? new HashSet<string>(cultures) // means 'publish specified cultures'
+                    : null; // null means 'nothing to do'
             }
 
-            bool AlreadyPublished(IContent c)
-            {
-                if (c.ContentType.VariesByCulture())
-                {
-                    foreach (var culture in cultures)
-                        if (c.IsCulturePublished(culture))
-                            return false;
-                }
-                else
-                {
-                    if (c.Published)
-                        return false;
-                }
-                return true;
-            }
-
-            // publish the specified cultures
-            bool PublishCultures(IContent c)
-            {
-                var isRoot = c.Id == content.Id;
-
-                if (c.ContentType.VariesByCulture())
-                {
-                    foreach (var culture in cultures)
-                        if (isRoot || c.IsCultureEdited(culture) && (c.IsCulturePublished(culture) || force))
-                            if (!c.PublishCulture(culture))
-                                return false;
-                }
-                else
-                {
-                    if (c.Edited && (c.Published || force || isRoot))
-                        return c.PublishCulture();
-                }
-                return true;
-            }
-
-            return SaveAndPublishBranch(content, force, ShouldPublish, AlreadyPublished, PublishCultures, userId);
+            return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
         }
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
-            Func<IContent, bool> shouldPublish,
-            Func<IContent, bool> alreadyPublished,
-            Func<IContent, bool> publishCultures,
+            Func<IContent, HashSet<string>> shouldPublish,
+            Func<IContent, HashSet<string>, bool> publishCultures,
             int userId = 0)
         {
+            if (shouldPublish == null) throw new ArgumentNullException(nameof(shouldPublish));
+            if (publishCultures == null) throw new ArgumentNullException(nameof(publishCultures));
+
             var evtMsgs = EventMessagesFactory.Get();
             var results = new List<PublishResult>();
             var publishedDocuments = new List<IContent>();
@@ -1468,7 +1424,7 @@ namespace Umbraco.Core.Services.Implement
                     throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
                 // deal with the branch root - if it fails, abort
-                var result = SaveAndPublishBranchOne(scope, document, shouldPublish, alreadyPublished, publishCultures, true, publishedDocuments, evtMsgs, userId);
+                var result = SaveAndPublishBranchOne(scope, document, shouldPublish, publishCultures, true, publishedDocuments, evtMsgs, userId);
                 if (result != null)
                 {
                     results.Add(result);
@@ -1499,7 +1455,7 @@ namespace Umbraco.Core.Services.Implement
                         }
 
                         // no need to check path here, parent has to be published here
-                        result = SaveAndPublishBranchOne(scope, d, shouldPublish, alreadyPublished, publishCultures, false, publishedDocuments, evtMsgs, userId);
+                        result = SaveAndPublishBranchOne(scope, d, shouldPublish, publishCultures, false, publishedDocuments, evtMsgs, userId);
                         if (result != null)
                         {
                             results.Add(result);
@@ -1529,28 +1485,20 @@ namespace Umbraco.Core.Services.Implement
         //  note - 'force' is handled by 'editing'
         // publishValues: a function publishing values (using the appropriate PublishCulture calls)
         private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
-            Func<IContent, bool> shouldPublish,
-            Func<IContent, bool> alreadyPublished,
-            Func<IContent, bool> publishCultures,
+            Func<IContent, HashSet<string>> shouldPublish,
+            Func<IContent, HashSet<string>, bool> publishCultures,
             bool isRoot,
             ICollection<IContent> publishedDocuments,
             EventMessages evtMsgs, int userId)
         {
-            // use 'shouldPublish' to determine if this document should be included in the
-            // branch publishing. If it's !root && !force && !published then it cannot be
-            // included.
-
-            var includeForPublishing = shouldPublish?.Invoke(document) ?? false;
-            if (!includeForPublishing)
-                return null; //null result indicates to not include
-
-            //if the document is included in branch publishing, check if it's already published
-            if (alreadyPublished?.Invoke(document) ?? false)
+            var culturesToPublish = shouldPublish(document);
+            if (culturesToPublish == null) // null = do not include
+                return null;
+            if (culturesToPublish.Count == 0) // empty = already published
                 return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
-            
+
             // publish & check if values are valid
-            var publishSuccess = publishCultures?.Invoke(document) ?? false;
-            if (!publishSuccess)
+            if (!publishCultures(document, culturesToPublish))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
 
             var result = SavePublishingInternal(scope, document, userId, branchOne: true, branchRoot: isRoot);
