@@ -110,6 +110,11 @@ namespace Umbraco.Core
 				/// Property alias for the Media's file extension.
 				/// </summary>
 				public const string Extension = "umbracoExtension";
+
+				/// <summary>
+				/// The default height/width of an image file if the size can't be determined from the metadata
+				/// </summary>
+				public const int DefaultSize = 200;
 			}
 
 			/// <summary>
@@ -341,6 +346,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }
 		}
 	}

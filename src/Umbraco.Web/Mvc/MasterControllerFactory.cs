@@ -17,11 +17,11 @@ namespace Umbraco.Web.Mvc
 	/// <remarks></remarks>
 	internal class MasterControllerFactory : DefaultControllerFactory
 	{
-		private readonly FilteredControllerFactoriesResolver _slaveFactories;
+		private readonly FilteredControllerFactoriesResolver _replicaFactories;
 
 		public MasterControllerFactory(FilteredControllerFactoriesResolver factoryResolver)
 		{
-			_slaveFactories = factoryResolver;
+			_replicaFactories = factoryResolver;
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Mvc
 		/// <remarks></remarks>
 		public override IController CreateController(RequestContext requestContext, string controllerName)
 		{
-			var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+			var factory = _replicaFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
 			return factory != null
 			       	? factory.CreateController(requestContext, controllerName)
 			       	: base.CreateController(requestContext, controllerName);
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="controllerName">The name of the controller.</param>
         internal Type GetControllerTypeInternal(RequestContext requestContext, string controllerName)
         {
-            var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+            var factory = _replicaFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
             if (factory != null)
             {
                 //check to see if the factory is of type UmbracoControllerFactory which exposes the GetControllerType method so we don't have to create
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Mvc
 				if (controller is Controller)
 				{
 					var requestContext = ((Controller)controller).ControllerContext.RequestContext;
-					var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+					var factory = _replicaFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
 					if (factory != null)
 					{
 						factory.ReleaseController(controller);

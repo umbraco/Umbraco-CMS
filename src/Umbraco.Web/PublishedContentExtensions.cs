@@ -6,11 +6,12 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using Examine.LuceneEngine.SearchCriteria;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using ContentType = umbraco.cms.businesslogic.ContentType;
@@ -130,6 +131,32 @@ namespace Umbraco.Web
         {
             var template = ApplicationContext.Current.Services.FileService.GetTemplate(content.TemplateId);
             return template == null ? string.Empty : template.Alias;
+		}
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                return publishedContentContentType.IsAllowedTemplate(templateId);
+            }
+
+            return true;
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
+            var isAllowedTemplate = (template != null) ?
+                    content.IsAllowedTemplate(template.Id) :
+                    false;
+
+            return isAllowedTemplate;
         }
 
         #endregion
@@ -860,7 +887,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
         {
-            return content.Ancestors().Any(x => x.Id == other.Id);
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -875,7 +902,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            return content.AncestorsOrSelf().Any(x => x.Id == other.Id);
+            return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
         }
 
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -890,8 +917,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using Descendants(), that's expensive
-            return other.Ancestors().Any(x => x.Id == content.Id);
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -906,8 +932,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using DescendantsOrSelf(), that's expensive
-            return other.AncestorsOrSelf().Any(x => x.Id == content.Id);
+            return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)

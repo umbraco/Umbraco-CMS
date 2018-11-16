@@ -910,7 +910,6 @@ namespace Umbraco.Web
             return ContentQuery.ContentAtRoot();
         }
 
-        /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
             switch (id)
@@ -928,7 +927,6 @@ namespace Umbraco.Web
             }
         }
 
-        /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
         {
             switch (id)
@@ -946,7 +944,6 @@ namespace Umbraco.Web
             }
         }
 
-        /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
         {
             switch (id)
@@ -1414,7 +1411,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Will take the first non-null value in the collection and return the value of it.
+        /// Joins any number of int/string/objects into one string
         /// </summary>
         public string Concatenate(params object[] args)
         {

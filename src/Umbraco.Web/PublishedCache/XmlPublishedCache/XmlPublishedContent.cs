@@ -35,6 +35,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
 
+	    private readonly object _initializeLock = new object();
+
         private bool _nodeInitialized;
 	    private bool _parentInitialized;
 	    private bool _childrenInitialized;
@@ -68,15 +70,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
-                if (_childrenInitialized == false) InitializeChildren();
+                EnsureNodeInitialized(andChildren: true);
 				return _children;
 			}
 		}
 
 		public override IPublishedProperty GetProperty(string alias)
 		{
-            if (_nodeInitialized == false) InitializeNode();
+            EnsureNodeInitialized();
             IPublishedProperty property;
 		    return _properties.TryGetValue(alias, out property) ? property : null;
 		}
@@ -114,8 +115,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
-                if (_parentInitialized == false) InitializeParent();
+                EnsureNodeInitialized(andParent: true);
 				return _parent;
 			}
 		}
@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _id;
 			}
 		}
@@ -133,7 +133,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_nodeInitialized == false) InitializeNode();
+	            EnsureNodeInitialized();
 	            return _key;
 	        }
 	    }
@@ -142,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _template;
 			}
 		}
@@ -151,7 +151,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _sortOrder;
 			}
 		}
@@ -160,7 +160,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _name;
 			}
 		}
@@ -169,7 +169,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _docTypeAlias;
 			}
 		}
@@ -178,7 +178,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _docTypeId;
 			}
 		}
@@ -187,7 +187,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _writerName;
 			}
 		}
@@ -196,7 +196,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _creatorName;
 			}
 		}
@@ -205,7 +205,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _writerId;
 			}
 		}
@@ -214,7 +214,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _creatorId;
 			}
 		}
@@ -223,7 +223,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _path;
 			}
 		}
@@ -232,7 +232,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _createDate;
 			}
 		}
@@ -241,7 +241,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _updateDate;
 			}
 		}
@@ -250,7 +250,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _version;
 			}
 		}
@@ -259,7 +259,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _urlName;
 			}
 		}
@@ -268,7 +268,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _level;
 			}
 		}
@@ -277,7 +277,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    {
 	        get
 	        {
-	            if (_nodeInitialized == false) InitializeNode();
+	            EnsureNodeInitialized();
 	            return _isDraft;
 	        }
 	    }
@@ -286,7 +286,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		{
 			get
 			{
-				if (_nodeInitialized == false) InitializeNode();
+				EnsureNodeInitialized();
 				return _properties.Values;
 			}
 		}
@@ -295,7 +295,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             get
             {
-                if (_nodeInitialized == false) InitializeNode();
+                EnsureNodeInitialized();
                 return _contentType;
             }
         }
@@ -310,9 +310,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
 		        _parent = Get(parent, _isPreviewing);
 
-            // warn: this is not thread-safe...
             _parentInitialized = true;
 		}
+
+	    private void EnsureNodeInitialized(bool andChildren = false, bool andParent = false)
+	    {
+            // In *theory* XmlPublishedContent are a per-request thing, and so should not
+            // end up being involved into multi-threaded situations - however, it's been
+            // reported that some users ended up seeing 100% CPU due to infinite loops in
+            // the properties dictionary in InitializeNode, which would indicate that the
+            // dictionary *is* indeed involved in some multi-threaded operation. No idea
+            // what users are doing that cause this, but let's be friendly and use a true
+            // lock around initialization.
+
+	        lock (_initializeLock)
+	        {
+	            if (_nodeInitialized == false) InitializeNode();
+                if (andChildren && _childrenInitialized == false) InitializeChildren();
+	            if (andParent && _parentInitialized == false) InitializeParent();
+	        }
+	    }
 
 	    private void InitializeNode()
 	    {
@@ -322,10 +339,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 out _version, out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
                 PublishedContentType.Get);
 
-            // warn: this is not thread-safe...
             _nodeInitialized = true;
         }
 
+        // internal for some benchmarks
         internal static void InitializeNode(XmlNode xmlNode, bool legacy, bool isPreviewing,
             out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
             out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
@@ -490,7 +507,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 .OrderBy(x => x.SortOrder)
                 .ToList();
 
-            // warn: this is not thread-safe
             _childrenInitialized = true;
 	    }
 

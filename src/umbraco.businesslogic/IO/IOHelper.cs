@@ -13,9 +13,9 @@ using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.IO
 {
-	[Obsolete("Use Umbraco.Core.IO.IOHelper instead")]
+    [Obsolete("Use Umbraco.Core.IO.IOHelper instead")]
     public static class IOHelper
-    {        
+    {
         public static char DirSepChar
         {
             get
@@ -27,42 +27,42 @@ namespace umbraco.IO
         //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
-        	return Umbraco.Core.IO.IOHelper.FindFile(virtualPath);
+            return Umbraco.Core.IO.IOHelper.FindFile(virtualPath);
         }
 
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {
-			return Umbraco.Core.IO.IOHelper.ResolveUrl(virtualPath); 
+            return Umbraco.Core.IO.IOHelper.ResolveUrl(virtualPath);
         }
 
-		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
+        [Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         public static string ResolveUrlsFromTextString(string text)
         {
-			return Umbraco.Core.IO.IOHelper.ResolveUrlsFromTextString(text); 
+            return Umbraco.Core.IO.IOHelper.ResolveUrlsFromTextString(text);
         }
 
         public static string MapPath(string path, bool useHttpContext)
         {
-			return Umbraco.Core.IO.IOHelper.MapPath(path, useHttpContext); 
+            return Umbraco.Core.IO.IOHelper.MapPath(path, useHttpContext);
         }
 
         public static string MapPath(string path)
         {
-			return Umbraco.Core.IO.IOHelper.MapPath(path); 
+            return Umbraco.Core.IO.IOHelper.MapPath(path);
         }
 
         //use a tilde character instead of the complete path
-		[Obsolete("This method is no longer in use and will be removed in future versions")]
+        [Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath, bool useTilde)
         {
-			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath, useTilde); 
+            return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath, useTilde);
         }
 
-		[Obsolete("This method is no longer in use and will be removed in future versions")]
+        [Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath)
         {
-			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath); 
+            return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath);
 
         }
 
@@ -75,12 +75,12 @@ namespace umbraco.IO
         /// <returns>true if valid, throws a FileSecurityException if not</returns>
         public static bool ValidateEditPath(string filePath, string validDir)
         {
-			return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDir); 
+            return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDir);
         }
 
-	    public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
-			return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions); 
+            return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions);
         }
 
 
@@ -92,7 +92,7 @@ namespace umbraco.IO
         /// <returns></returns>
         private static string getRootDirectorySafe()
         {
-			return Umbraco.Core.IO.IOHelper.GetRootDirectorySafe(); 
+            return Umbraco.Core.IO.IOHelper.GetRootDirectorySafe();
         }
 
     }

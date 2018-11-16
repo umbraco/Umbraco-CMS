@@ -94,14 +94,14 @@ function Get-UmbracoBuildEnv
   }
   
   # ensure we have node
-  $node = "$path\node-v6.9.1-win-x86"
-  $source = "http://nodejs.org/dist/v6.9.1/node-v6.9.1-win-x86.7z"
+  $node = "$path\node-v8.12.0-win-x86"
+  $source = "http://nodejs.org/dist/v8.12.0/node-v8.12.0-win-x86.7z "
   if (-not (test-path $node))
   {
     Write-Host "Download Node..."
-    Invoke-WebRequest $source -OutFile "$path\node-v6.9.1-win-x86.7z"
-    &$sevenZip x "$path\node-v6.9.1-win-x86.7z" -o"$path" -aos > $nul
-    Remove-File "$path\node-v6.9.1-win-x86.7z"    
+    Invoke-WebRequest $source -OutFile "$path\node-v8.12.0-win-x86.7z"
+    &$sevenZip x "$path\node-v8.12.0-win-x86.7z" -o"$path" -aos > $nul
+    Remove-File "$path\node-v8.12.0-win-x86.7z"    
   }
   
   # note: why? node already brings everything we need!

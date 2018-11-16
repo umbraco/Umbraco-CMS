@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]    
+    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]    
     public class MemberTypeController : ContentTypeControllerBase
     {
         /// <summary>
@@ -45,6 +45,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider;
 
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
@@ -64,6 +65,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundType = Services.MemberTypeService.Get(id);
@@ -90,6 +92,8 @@ namespace Umbraco.Web.Editors
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
+
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage GetAvailableCompositeMemberTypes(int contentTypeId,
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
@@ -103,6 +107,7 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
@@ -126,6 +131,7 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
             //get the persisted member type

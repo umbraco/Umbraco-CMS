@@ -120,13 +120,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
 
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             //in some databases there's an index (IX_Master) on the master column which needs to be dropped first
             var foundIndex = dbIndexes.FirstOrDefault(x => x.TableName.InvariantEquals("cmsTemplate") && x.ColumnName.InvariantEquals("master"));

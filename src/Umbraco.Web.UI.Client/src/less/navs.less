@@ -119,21 +119,26 @@
 // TABS
 // ----
 
-// Give the tabs something to sit on
-.nav-tabs {
-  border-bottom: 1px solid @purple-l3;
-}
 // Make the list-items overlay the bottom border
 .nav-tabs > li {
-  margin-bottom: -1px;
+
+  &.dropdown {
+    margin-bottom: -3px;
+
+    >.dropdown-toggle {
+      padding-bottom: 2px;
+    }
+  }
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
+  position: relative;
   color: @gray-3;
   padding-top: 5px;
   padding-bottom: 4px;
   line-height: @baseLineHeight;
   border: 1px solid transparent;
+  transform: translateY(1px);
 
   &:hover {
       color: @black;
@@ -173,10 +178,6 @@
 .show-validation .nav-tabs > li.active.error > a,
 .show-validation .nav-tabs > li.active.error > a:hover,
 .show-validation .nav-tabs > li.active.error > a:focus {
-}
-
-.umb-nav-tabs {
-  margin: -8px 0 0 0;
 }
 
 // PILLS

@@ -3,7 +3,9 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Formatting;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -32,6 +34,8 @@ namespace Umbraco.Web.Trees
         [HttpQueryStringFilter("queryStrings")]
         public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
+            application = application.CleanForXss();
+
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);

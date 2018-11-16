@@ -93,8 +93,14 @@
                   //in the ASP.NET Identity world, this config option will allow an admin user to change another user's password
                   //if the user has access to the user section. So if this editor is being access, the user of course has access to this section.
                   //the authorization check is also done on the server side when submitted.
-                  vm.changePasswordModel.config.allowManuallyChangingPassword = !vm.user.isCurrentUser;
-                  
+                    
+                  // only update the setting if not the current logged in user, otherwise leave the value as it is
+                  // currently set in the web.config
+                  if (!vm.user.isCurrentUser)
+                  {
+                      vm.changePasswordModel.config.allowManuallyChangingPassword = true;
+                  }
+                    
                   vm.loading = false;
                 });
             });
@@ -347,8 +353,10 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
                 vm.user.userState = 0;
+                vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
+                
                 formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";

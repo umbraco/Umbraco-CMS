@@ -980,16 +980,16 @@
   </wsdl:binding>
   <wsdl:service name="Repository">
     <wsdl:port name="RepositorySoap" binding="tns:RepositorySoap">
-      <soap:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+      <soap:address location="https://our.umbraco.com/umbraco/webservices/api/repository.asmx" />
     </wsdl:port>
     <wsdl:port name="RepositorySoap12" binding="tns:RepositorySoap12">
-      <soap12:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+      <soap12:address location="https://our.umbraco.com/umbraco/webservices/api/repository.asmx" />
     </wsdl:port>
     <wsdl:port name="RepositoryHttpGet" binding="tns:RepositoryHttpGet">
-      <http:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+      <http:address location="https://our.umbraco.com/umbraco/webservices/api/repository.asmx" />
     </wsdl:port>
     <wsdl:port name="RepositoryHttpPost" binding="tns:RepositoryHttpPost">
-      <http:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+      <http:address location="https://our.umbraco.com/umbraco/webservices/api/repository.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

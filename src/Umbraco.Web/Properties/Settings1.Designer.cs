@@ -54,7 +54,7 @@ namespace Umbraco.Web.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://our.umbraco.org/umbraco/webservices/api/repository.asmx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://our.umbraco.com/umbraco/webservices/api/repository.asmx")]
         public string umbraco_org_umbraco_our_Repository {
             get {
                 return ((string)(this["umbraco_org_umbraco_our_Repository"]));

@@ -1,4 +1,4 @@
-<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DataType.MoveController">
+<div class="umb-dialog" ng-controller="Umbraco.Editors.DataType.MoveController">
 
     <div class="umb-dialog-body">
         <div class="umb-pane">
@@ -12,12 +12,16 @@
             </div>
 
             <div ng-show="error">
-                <h5 class="text-error">{{error.errorMsg}}</h5>
-                <p class="text-error">{{error.data.message}}</p>
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
             </div>
 
             <div ng-show="success">
-                <h5 class="text-success"><strong>{{currentNode.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize>&nbsp;<strong>{{target.name}}</strong></h5>
+                <div class="alert alert-success">
+                    <strong>{{currentNode.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize>&nbsp;<strong>{{target.name}}</strong>
+                </div>
                 <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
             </div>
 
@@ -40,10 +44,10 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-if="!busy">
+        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
-        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy">
+        <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target">
             <localize key="actions_move">Move</localize>
         </button>
     </div>

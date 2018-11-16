@@ -28,6 +28,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 
+
+
+
+        [DataMember(Name = "templateId")]
+        public int TemplateId { get; set; }
+
+
+
+
         [DataMember(Name = "allowedTemplates")]
         public IDictionary<string, string> AllowedTemplates { get; set; }
 

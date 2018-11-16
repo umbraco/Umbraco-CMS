@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-1
 		..\apidocs\docfx.json = ..\apidocs\docfx.json
 		..\apidocs\index.md = ..\apidocs\index.md
 		..\LICENSE.md = ..\LICENSE.md
-		..\README.md = ..\README.md
 		..\apidocs\toc.yml = ..\apidocs\toc.yml
 	EndProjectSection
 EndProject
@@ -21,9 +20,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\build.ps1 = ..\build\build.ps1
-		..\build\InstallGit.cmd = ..\build\InstallGit.cmd
-		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
-		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
 		..\build\setversion.ps1 = ..\build\setversion.ps1
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
