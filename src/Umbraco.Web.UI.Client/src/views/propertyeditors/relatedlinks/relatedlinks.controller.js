@@ -1,6 +1,6 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService, iconHelper, editorService) {
+        function ($scope, iconHelper, editorService) {
 
             if (!$scope.model.value) {
                 $scope.model.value = [];

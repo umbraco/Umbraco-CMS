@@ -52,10 +52,26 @@ namespace Umbraco.Tests.Persistence.Querying
         }
 
         [Test]
-        public void Can_Query_With_Content_Type_Aliases()
+        public void Can_Query_With_Content_Type_Aliases_IEnumerable()
         {
-            //Arrange
+            //Arrange - Contains is IEnumerable.Contains extension method
             var aliases = new[] { "Test1", "Test2" };
+            Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Debug.Print("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("[cmsContentType].[alias] IN (@1,@2)", result);
+            Assert.AreEqual("Test1", modelToSqlExpressionHelper.GetSqlParameters()[1]);
+            Assert.AreEqual("Test2", modelToSqlExpressionHelper.GetSqlParameters()[2]);
+        }
+
+        [Test]
+        public void Can_Query_With_Content_Type_Aliases_List()
+        {
+            //Arrange - Contains is List.Contains instance method
+            var aliases = new System.Collections.Generic.List<string> { "Test1", "Test2" };
             Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);

@@ -1,7 +1,6 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	function ($scope, userService, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
-	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
 	    localizationService.localize("general_search").then(function (value) {
 	        searchText = value + "...";
@@ -23,7 +22,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
         });
 
-	    var node = dialogOptions.currentNode;
+	    var node = $scope.currentNode;
 
         function treeLoadedHandler(args) {
             if (node && node.path) {
@@ -74,7 +73,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	    $scope.onSearchResults = function (results) {
 	        $scope.searchInfo.results = results;
 	        $scope.searchInfo.showSearch = true;
-	    };
+		};
+		
+		$scope.close = function() {
+			navigationService.hideDialog();
+		};
 
 	    $scope.move = function () {
 

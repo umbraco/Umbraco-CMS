@@ -26,7 +26,7 @@ namespace Umbraco.Web.Editors
                     var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                     UmbracoVersion.Current.Minor,
                                                     UmbracoVersion.Current.Build,
-                                                    UmbracoVersion.CurrentComment);
+                                                    UmbracoVersion.Comment);
 
                     return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
                 }

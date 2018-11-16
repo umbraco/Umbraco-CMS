@@ -4,7 +4,7 @@
     function ScriptsCreateController($scope, $location, navigationService, formHelper, codefileResource, localizationService, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.creatingFolder = false;
         vm.folderName = "";
@@ -14,6 +14,7 @@
         vm.createFile = createFile;
         vm.showCreateFolder = showCreateFolder;
         vm.createFolder = createFolder;
+        vm.close = close;
 
         function createFile() {
             $location.path("/settings/scripts/edit/" + node.id).search("create", "true");
@@ -50,6 +51,11 @@
                 });
             }
 
+        }
+
+        function close() {
+            const showMenu = true;
+            navigationService.hideDialog(showMenu);
         }
 
     }

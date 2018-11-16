@@ -27,6 +27,7 @@
 
         vm.save = save;
         vm.sort = sort;
+        vm.close = close;
 
         function onInit() {
             vm.loading = true;
@@ -72,6 +73,10 @@
                 vm.sortOrder.reverse = false;
             }
             vm.children = $filter('orderBy')(vm.children, vm.sortOrder.column, vm.sortOrder.reverse);
+        }
+
+        function close() {
+            navigationService.hideDialog();
         }
 
         onInit();

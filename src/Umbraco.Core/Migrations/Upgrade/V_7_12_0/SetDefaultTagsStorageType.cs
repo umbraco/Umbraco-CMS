@@ -1,47 +1,51 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 {
     /// <summary>
-    /// Set the default storageType for the tags datatype to "CSV" to ensure backwards compatibilty since the default is going to be JSON in new versions
-    /// </summary>    
+    /// Set the default storageType for the tags datatype to "CSV" to ensure backwards compatibility since the default is going to be JSON in new versions.
+    /// </summary>
     public class SetDefaultTagsStorageType : MigrationBase
     {
-        public SetDefaultTagsStorageType(IMigrationContext context) : base(context)
-        {
-        }
+        public SetDefaultTagsStorageType(IMigrationContext context)
+            : base(context)
+        { }
+
+        // dummy editor for deserialization
+        private class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
+        { }
 
         public override void Migrate()
         {
-            if (Context?.Database == null) return;
+            // get all Umbraco.Tags datatypes
+            var dataTypeDtos = Database.Fetch<DataTypeDto>(Context.SqlContext.Sql()
+                .Select<DataTypeDto>()
+                .From<DataTypeDto>()
+                .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Aliases.Tags));
 
-            // We need to get all datatypes with an alias of "umbraco.tags" so we can loop over them and set the missing values if needed
-            var datatypes = Context.Database.Fetch<DataTypeDto>();
-            var tagsDataTypes = datatypes.Where(x => string.Equals(x.EditorAlias, Constants.PropertyEditors.Aliases.Tags, StringComparison.InvariantCultureIgnoreCase));
+            // get a dummy editor for deserialization
+            var editor = new TagConfigurationEditor();
 
-            foreach (var datatype in tagsDataTypes)
+            foreach (var dataTypeDto in dataTypeDtos)
             {
-                var dataTypePreValues = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
+                // need to check storageType on raw dictionary, as TagConfiguration would have a default value
+                var dictionary = JsonConvert.DeserializeObject<JObject>(dataTypeDto.Configuration);
 
-                // We need to check if the node has a "storageType" set
-                if (!dataTypePreValues.ContainsKey("storageType"))
+                // if missing, use TagConfiguration to properly update the configuration
+                // due to ... reasons ... the key can start with a lower or upper 'S'
+                if (!dictionary.ContainsKey("storageType") && !dictionary.ContainsKey("StorageType"))
                 {
-                    dataTypePreValues["storageType"] = "Csv";
+                    var configuration = (TagConfiguration)editor.FromDatabase(dataTypeDto.Configuration);
+                    configuration.StorageType = TagsStorageType.Csv;
+                    dataTypeDto.Configuration = ConfigurationEditor.ToDatabase(configuration);
+                    Database.Update(dataTypeDto);
                 }
-
-                Update.Table(Constants.DatabaseSchema.Tables.DataType)
-                    .Set(new { config = JsonConvert.SerializeObject(dataTypePreValues) })
-                    .Where(new { nodeId = datatype.NodeId })
-                    .Do();
             }
         }
-
-
     }
 }

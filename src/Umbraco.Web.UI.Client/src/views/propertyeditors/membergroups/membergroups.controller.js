@@ -1,4 +1,4 @@
-﻿function memberGroupController($rootScope, $scope, dialogService, mediaResource, imageHelper, $log) {
+﻿function memberGroupController($scope) {
 
     //set the available to the keys of the dictionary who's value is true
     $scope.getAvailable = function () {
