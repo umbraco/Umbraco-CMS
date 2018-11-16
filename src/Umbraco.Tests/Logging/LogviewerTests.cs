@@ -83,6 +83,36 @@ namespace Umbraco.Tests.Logging
         }
 
         [Test]
+        public void Logs_Contains_Correct_Message_Templates()
+        {
+            var templates = _logViewer.GetMessageTemplates(startDate: _startDate, endDate: _endDate);
+
+            //Count no of templates
+            Assert.AreEqual(43, templates.Count());
+
+            //Verify all templates & counts are unique
+            CollectionAssert.AllItemsAreUnique(templates);
+
+            //Ensure the collection contains LogTemplate objects
+            CollectionAssert.AllItemsAreInstancesOfType(templates, typeof(LogTemplate));
+
+            //Get first item & verify its template & count are what we expect
+            var popularTemplate = templates.FirstOrDefault();
+
+            Assert.IsNotNull(popularTemplate);
+            Assert.AreEqual("{LogPrefix} Task added {TaskType}", popularTemplate.MessageTemplate);
+            Assert.AreEqual(689, popularTemplate.Count);
+        }
+
+        [Test]
+        public void Logs_Can_Open_As_Small_File()
+        {
+            //We are just testing a return value (as we know the example file is less than 200MB)
+            //But this test method does not test/check that
+            var canOpenLogs = _logViewer.CheckCanOpenLogs(startDate: _startDate, endDate: _endDate);
+            Assert.IsTrue(canOpenLogs);
+        }
+        [Test]
         public void Log_Search_Can_Persist()
         {
             //Add a new search
