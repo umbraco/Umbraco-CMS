@@ -60,6 +60,15 @@ namespace Umbraco.Tests.Logging
                 File.Delete(_newSearchfilePath);
         }
 
+        [Test]
+        public void Logs_Contain_Correct_Error_Count()
+        {
+            var numberOfErrors = _logViewer.GetNumberOfErrors(startDate: _startDate, endDate: _endDate);
+
+            //Our dummy log should contain 2 errors
+            Assert.AreEqual(2, numberOfErrors);
+        }
+
         
     }
 }
