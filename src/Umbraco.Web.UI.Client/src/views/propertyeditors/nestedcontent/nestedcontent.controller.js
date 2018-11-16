@@ -96,11 +96,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.moveIconTitle = value;
         });
 
-        // localize the default help text
-        localizationService.localize('grid_addElement').then(function (value) {
-            $scope.helpText = value;
-        });
-
         $scope.nodes = [];
         $scope.currentNode = undefined;
         $scope.realCurrentNode = undefined;
@@ -110,13 +105,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         var helpText = $scope.model.config.helpText;
         if (helpText) {
             if (helpText.startsWith("#")) {
-                dictionaryResource.getByKey(helpText.substring(1)).then(function (value) {
-                    console.log(value);
+                // localize the custom help text
+                localizationService.localize(helpText.substring(1)).then(function(value) {
                     $scope.helpText = value;
                 });
             } else {
                 $scope.helpText = helpText;
             }
+        } else {
+            // localize the default help text
+            localizationService.localize('grid_addElement').then(function (value) {
+                $scope.helpText = value;
+            });
         }
 
         $scope.minItems = $scope.model.config.minItems || 0;
