@@ -46,8 +46,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 				// if a link exists, get the properties to build the anchor name list
 				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			} else if ($scope.model.target.url.length) {
 			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
@@ -87,8 +87,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				$scope.model.target.url = "/";
 			} else {
 				contentResource.getById(args.node.id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 					$scope.model.target.url = resp.urls[0];
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
 				});
 			}
 
