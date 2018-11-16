@@ -1,17 +1,30 @@
 <div class="umb-property-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
 
     <ng-form name="datePickerForm">
-        <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">
 
-            <input name="datepicker" data-format="{{model.config.format}}" id="{{model.alias}}" type="text"
-                   ng-model="datetimePickerValue"
-                   ng-required="model.validation.mandatory"
-                   val-server="value"
-                   class="datepickerinput" />
+        <div id="datepicker{{model.alias}}">
 
-            <span class="add-on">
-                <i class="icon-calendar"></i>
-            </span>
+            <umb-flatpickr
+                ng-model="model.value"
+                options="datePickerConfig"
+                on-setup="datePickerSetup(fpItem)"
+                on-change="datePickerChange(dateStr)">
+
+                <div class="input-append">
+                    <input
+                        name="datepicker"
+                        id="{{model.alias}}" 
+                        type="text" 
+                        ng-model="model.datetimePickerValue"
+                        ng-required="model.validation.mandatory"
+                        val-server="value" 
+                        class="datepickerinput">
+                    <span class="add-on">
+                        <i class="icon-calendar"></i>
+                    </span>
+                </div>
+
+            </umb-flatpickr>
 
         </div>
 
@@ -28,6 +41,17 @@
         <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
             <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
         </p>
+
+        <div style="margin-top: 10px;">
+            <div>
+                <div class="bold">model.value</div>
+                {{model.value}}
+            </div>
+            <div>
+                <div class="bold">Date time picker value</div>
+                {{model.datetimePickerValue}}
+            </div>
+        </div>
 
     </ng-form>
 </div>
