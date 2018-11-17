@@ -8,7 +8,7 @@ angular.module("umbraco")
             }
 
             var dialogOptions = $scope.model;
-
+            
             $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.showDetails = dialogOptions.showDetails;
@@ -18,6 +18,14 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
 
+            console.log('details:',$scope.showDetails);
+
+            if ($scope.showDetails) {
+                // hide submit since the "insertion" of the picked media will be done from the details view.
+                $scope.hideSubmitButton = true;
+                $scope.model.hideSubmitButton = true;
+            }
+            
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
             if ($scope.onlyImages) {
@@ -271,6 +279,7 @@ angular.module("umbraco")
 
                 $scope.mediaPickerDetailsOverlay = {};
                 $scope.mediaPickerDetailsOverlay.show = true;
+                $scope.mediaPickerDetailsOverlay.submitButtonLabelKey = "general_insert";
 
                 $scope.mediaPickerDetailsOverlay.submit = function(model) {
                     $scope.model.selectedImages.push($scope.target);

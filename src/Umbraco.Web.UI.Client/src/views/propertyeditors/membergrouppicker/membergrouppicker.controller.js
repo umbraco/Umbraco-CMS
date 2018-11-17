@@ -23,6 +23,7 @@ function memberGroupPicker($scope, dialogService){
       $scope.memberGroupPicker.multiPicker = true;
       $scope.memberGroupPicker.view = "memberGroupPicker";
       $scope.memberGroupPicker.show = true;
+      $scope.memberGroupPicker.submitButtonLabelKey = "buttons_select";
 
       $scope.memberGroupPicker.submit = function(model) {
 

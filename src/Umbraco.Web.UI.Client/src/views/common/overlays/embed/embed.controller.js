@@ -7,10 +7,12 @@
       var origWidth = 500;
       var origHeight = 300;
 
+      $scope.model.submitButtonLabelKey = "general_insert";
+       $scope.model.disableSubmitButton = true;
       if(!$scope.model.title) {
           $scope.model.title = localizationService.localize("general_embed");
       }
-
+       
       $scope.model.embed = {
          url: "",
          width: 360,
@@ -27,7 +29,8 @@
 
       function showPreview() {
 
-         if ($scope.model.embed.url) {
+          if ($scope.model.embed.url) {
+           
             $scope.model.embed.show = true;
             $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
             $scope.model.embed.info = "";
@@ -59,6 +62,7 @@
                         $scope.model.embed.preview = data.Markup;
                         $scope.model.embed.supportsDimensions = data.SupportsDimensions;
                         $scope.model.embed.success = true;
+                        $scope.model.disableSubmitButton = false;
                         break;
                   }
                })

@@ -29,7 +29,8 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
                 $scope.add(data);
             }
             angularHelper.getCurrentForm($scope).$setDirty();
-        }
+        },
+        submitButtonLabelKey: "buttons_select"
     };
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the

@@ -8,14 +8,15 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     $scope.macros = [];
     $scope.model.selectedMacro = null;
     $scope.model.macroParams = [];
-
+    $scope.model.submitButtonLabelKey = "general_insert";
+    $scope.model.disableSubmitButton = true;
     $scope.wizardStep = "macroSelect";
     $scope.noMacroParams = false;
 
     $scope.selectMacro = function (macro) {
 
         $scope.model.selectedMacro = macro;
-
+        $scope.model.disableSubmitButton = false;
         if ($scope.wizardStep === "macroSelect") {
             editParams(true);
         } else {
