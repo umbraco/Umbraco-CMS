@@ -1,9 +1,12 @@
-> Looking for the source code of the **next Umbraco major version**?
-> Click [here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 development branch and contribute!
+> Looking for the source code of the **next Umbraco major version**? Click [here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 development branch and contribute!
 
 # [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/umbraco/Umbraco-CMS)
 
 Umbraco is a fully-featured, open source Content Management System loved by thousands for its flexibility and great editing experience.
+
+<p align="center">
+  <img src="https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/src/Umbraco.Web.UI.Client/src/assets/img/application/logo@3x.png" alt="Umbraco Logo" />
+</p>
 
 See the official [Umbraco website](https://umbraco.com) for an introduction, core mission and values of the product and team behind it.
 
