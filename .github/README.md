@@ -8,6 +8,7 @@ Umbraco is a fully-featured, open source Content Management System loved by thou
 See the official [Umbraco website](https://umbraco.com) for an introduction, core mission and values of the product and team behind it.
 
 - [Getting Started](#getting-started)
+- [Case Studies & Testimonials](https://umbraco.com/case-studies-testimonials/)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Community](#join-the-umbraco-community)
