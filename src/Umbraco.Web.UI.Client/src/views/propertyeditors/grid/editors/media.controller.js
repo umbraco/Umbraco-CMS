@@ -18,6 +18,7 @@ angular.module("umbraco")
             $scope.mediaPickerOverlay.showDetails = true;
             $scope.mediaPickerOverlay.disableFolderSelect = true;
             $scope.mediaPickerOverlay.onlyImages = true;
+            $scope.mediaPickerOverlay.hideSubmitButton = true; // hide since new overlay opens after selection of media.
             $scope.mediaPickerOverlay.show = true;
 
             $scope.mediaPickerOverlay.submit = function(model) {

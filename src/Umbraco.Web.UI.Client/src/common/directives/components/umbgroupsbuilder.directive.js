@@ -505,6 +505,7 @@
           scope.propertySettingsDialogModel.contentType = scope.contentType;
           scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
           scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
+          scope.propertySettingsDialogModel.submitButtonLabelKey = "buttons_save";
           scope.propertySettingsDialogModel.show = true;
 
           // set state to active to access the preview

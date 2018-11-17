@@ -1,7 +1,9 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
-		var dialogOptions = $scope.model;
+        var dialogOptions = $scope.model;
+
+        $scope.model.submitButtonLabelKey = dialogOptions.currentTarget ? "general_update" : "general_insert"; 
 
 		var searchText = "Search...";
 		localizationService.localize("general_search").then(function (value) {
@@ -109,7 +111,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				$scope.mediaPickerOverlay = {
 					view: "mediapicker",
 					startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-					startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    submitButtonLabelKey: 'buttons_select',
 					show: true,
 					submit: function (model) {
 						var media = model.selectedImages[0];
