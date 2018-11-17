@@ -5,7 +5,7 @@
 Umbraco is a fully-featured, open source Content Management System loved by thousands for its flexibility and great editing experience.
 
 <p align="center">
-  <img src="https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/src/Umbraco.Web.UI.Client/src/assets/img/application/logo@3x.png" alt="Umbraco Logo" />
+  <img src="img/logo.png" alt="Umbraco Logo" />
 </p>
 
 See the official [Umbraco website](https://umbraco.com) for an introduction, core mission and values of the product and team behind it.
