@@ -295,7 +295,7 @@ namespace Umbraco.Core
         /// <exception cref="InvalidOperationException">Occurs when the constructor does not exist and <paramref name="mustExist"/> is <c>true</c>.</exception>
         /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when <paramref name="declaring"/>
         /// is specified and does not match the function's returned type.</exception>
-        public static TLambda EmitConstuctor<TLambda>(bool mustExist = true, Type declaring = null)
+        public static TLambda EmitConstructor<TLambda>(bool mustExist = true, Type declaring = null)
         {
             var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 

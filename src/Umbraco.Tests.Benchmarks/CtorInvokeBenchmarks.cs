@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Benchmarks
                 // see benchmarkdotnet FAQ
                 Add(Job.Default
                     .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(TimeInterval.FromMilliseconds(400)) 
+                    .WithIterationTime(TimeInterval.FromMilliseconds(400))
                     .WithWarmupCount(3)
                     .WithTargetCount(6));
             }
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Benchmarks
 
             // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
 
-            _emittedCtor = ReflectionUtilities.EmitConstuctor<Func<IFoo, Foo>>();
+            _emittedCtor = ReflectionUtilities.EmitConstructor<Func<IFoo, Foo>>();
         }
 
         public IFoo IlCtor(IFoo foo)

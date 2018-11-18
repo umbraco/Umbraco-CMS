@@ -14,16 +14,16 @@ namespace Umbraco.Tests.Clr
         [Test]
         public void EmitCtorEmits()
         {
-            var ctor1 = ReflectionUtilities.EmitConstuctor<Func<Class1>>();
+            var ctor1 = ReflectionUtilities.EmitConstructor<Func<Class1>>();
             Assert.IsInstanceOf<Class1>(ctor1());
 
-            var ctor2 = ReflectionUtilities.EmitConstuctor<Func<object>>(declaring: typeof(Class1));
+            var ctor2 = ReflectionUtilities.EmitConstructor<Func<object>>(declaring: typeof(Class1));
             Assert.IsInstanceOf<Class1>(ctor2());
 
-            var ctor3 = ReflectionUtilities.EmitConstuctor<Func<int, Class3>>();
+            var ctor3 = ReflectionUtilities.EmitConstructor<Func<int, Class3>>();
             Assert.IsInstanceOf<Class3>(ctor3(42));
 
-            var ctor4 = ReflectionUtilities.EmitConstuctor<Func<int, object>>(declaring: typeof(Class3));
+            var ctor4 = ReflectionUtilities.EmitConstructor<Func<int, object>>(declaring: typeof(Class3));
             Assert.IsInstanceOf<Class3>(ctor4(42));
         }
 
@@ -44,14 +44,14 @@ namespace Umbraco.Tests.Clr
         [Test]
         public void EmitCtorEmitsPrivateCtor()
         {
-            var ctor = ReflectionUtilities.EmitConstuctor<Func<string, Class3>>();
+            var ctor = ReflectionUtilities.EmitConstructor<Func<string, Class3>>();
             Assert.IsInstanceOf<Class3>(ctor("foo"));
         }
 
         [Test]
         public void EmitCtorThrowsIfNotFound()
         {
-            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitConstuctor<Func<bool, Class3>>());
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitConstructor<Func<bool, Class3>>());
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Clr
         [Test]
         public void EmitCtorReturnsNull()
         {
-            Assert.IsNull(ReflectionUtilities.EmitConstuctor<Func<bool, Class3>>(false));
+            Assert.IsNull(ReflectionUtilities.EmitConstructor<Func<bool, Class3>>(false));
         }
 
         [Test]
