@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Umbraco.Core.Composing
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Composing
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();
         private Func<IEnumerable<TItem>, TCollection> _collectionCtor;
-        private Registration[] _registrations;
+        private Type[] _registeredTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionBuilderBase{TBuilder, TCollection,TItem}"/>
@@ -50,17 +49,8 @@ namespace Umbraco.Core.Composing
         protected virtual void Initialize()
         {
             // compile the auto-collection constructor
-            var argType = typeof(IEnumerable<TItem>);
-            var ctorArgTypes = new[] { argType };
-            var constructor = typeof(TCollection).GetConstructor(ctorArgTypes);
-            if (constructor != null)
-            {
-                var exprArg = Expression.Parameter(argType, "items");
-                var exprNew = Expression.New(constructor, exprArg);
-                var expr = Expression.Lambda<Func<IEnumerable<TItem>, TCollection>>(exprNew, exprArg);
-                _collectionCtor = expr.Compile();
-            }
-            // else _collectionCtor remains null, assuming CreateCollection has been overriden
+            // can be null, if no ctor found, and then assume CreateCollection has been overriden
+            _collectionCtor = ReflectionUtilities.EmitConstructor<Func<IEnumerable<TItem>, TCollection>>(mustExist: false);
 
             // we just don't want to support re-registering collections here
             if (Container.GetRegistered<TCollection>().Any())
@@ -84,7 +74,7 @@ namespace Umbraco.Core.Composing
         {
             lock (_locker)
             {
-                if (_registrations != null)
+                if (_registeredTypes != null)
                     throw new InvalidOperationException("Cannot configure a collection builder after its types have been resolved.");
                 action(_types);
             }
@@ -105,43 +95,32 @@ namespace Umbraco.Core.Composing
         {
             lock (_locker)
             {
-                if (_registrations != null) return;
+                if (_registeredTypes != null) return;
 
                 var types = GetRegisteringTypes(_types).ToArray();
+
+                // ensure they are safe
                 foreach (var type in types)
                     EnsureType(type, "register");
 
-                var prefix = GetType().FullName + "_";
-                var i = 0;
+                // register them
                 foreach (var type in types)
-                {
-                    var name = $"{prefix}{i++:00000}";
-                    Container.Register(typeof(TItem), type, name);
-                }
+                    Container.Register(type);
 
-                // note: we do this, because we don't want to get "all",
-                // because other types implementing TItem may be registered,
-                // and we only want those for *this* builder
-
-                _registrations = Container.GetRegistered(typeof(TItem))
-                    .Where(x => x.ServiceName.StartsWith(prefix))
-                    .OrderBy(x => x.ServiceName)
-                    .ToArray();
+                _registeredTypes = types;
             }
         }
 
         /// <summary>
         /// Creates the collection items.
         /// </summary>
-        /// <param name="args">The arguments.</param>
         /// <returns>The collection items.</returns>
-        protected virtual IEnumerable<TItem> CreateItems(/*params object[] args*/)
+        protected virtual IEnumerable<TItem> CreateItems()
         {
             RegisterTypes(); // will do it only once
 
-            var type = typeof (TItem);
-            return _registrations
-                .Select(x => (TItem) Container.GetInstance(type, x.ServiceName/*, args*/))
+            return _registeredTypes // respect order
+                .Select(x => (TItem) Container.GetInstance(x))
                 .ToArray(); // safe
         }
 
