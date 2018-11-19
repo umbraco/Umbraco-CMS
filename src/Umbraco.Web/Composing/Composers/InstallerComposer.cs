@@ -1,8 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
-using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Composing.Composers
 {
@@ -10,25 +8,22 @@ namespace Umbraco.Web.Composing.Composers
     {
         public static IContainer ComposeInstaller(this IContainer container)
         {
-            //register the installer steps in order
-            container.RegisterOrdered(typeof(InstallSetupStep),
-                new[]
-                {
-                    typeof(NewInstallStep),
-                    typeof(UpgradeStep),
-                    typeof(FilePermissionsStep),
-                    typeof(ConfigureMachineKey),
-                    typeof(DatabaseConfigureStep),
-                    typeof(DatabaseInstallStep),
-                    typeof(DatabaseUpgradeStep),
+            // register the installer steps
 
-                    //TODO: Add these back once we have a compatible starter kit
-                    //typeof(StarterKitDownloadStep),
-                    //typeof(StarterKitInstallStep),
-                    //typeof(StarterKitCleanupStep),
+            container.Register<NewInstallStep>(Lifetime.Scope);
+            container.Register<UpgradeStep>(Lifetime.Scope);
+            container.Register<FilePermissionsStep>(Lifetime.Scope);
+            container.Register<ConfigureMachineKey>(Lifetime.Scope);
+            container.Register<DatabaseConfigureStep>(Lifetime.Scope);
+            container.Register<DatabaseInstallStep>(Lifetime.Scope);
+            container.Register<DatabaseUpgradeStep>(Lifetime.Scope);
 
-                    typeof(SetUmbracoVersionStep)
-                }, Lifetime.Scope);
+            //TODO: Add these back once we have a compatible starter kit
+            //container.Register<StarterKitDownloadStep>(Lifetime.Scope);
+            //container.Register<StarterKitInstallStep>(Lifetime.Scope);
+            //container.Register<StarterKitCleanupStep>(Lifetime.Scope);
+
+            container.Register<SetUmbracoVersionStep>(Lifetime.Scope);
 
             container.Register<InstallStepCollection>();
             container.Register<InstallHelper>();

@@ -230,10 +230,6 @@ namespace Umbraco.Core.Composing.LightInject
             }, null);
         }
 
-        /// <inheritdoc />
-        public void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient)
-            => Container.RegisterOrdered(serviceType, implementingTypes, _ => GetLifetime(lifetime));
-
         // was the Light-Inject specific way of dealing with args, but we've replaced it with our own
         // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
         //

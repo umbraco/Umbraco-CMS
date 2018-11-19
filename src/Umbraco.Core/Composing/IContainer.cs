@@ -116,12 +116,6 @@ namespace Umbraco.Core.Composing
         /// </remarks>
         void RegisterAuto(Type serviceBaseType);
 
-        /// <summary>
-        /// Registers a service with an ordered set of implementation types.
-        /// </summary>
-        // fixme: once we merge the installer refactoring, kill that one
-        void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient);
-
         #endregion
 
         #region Control
