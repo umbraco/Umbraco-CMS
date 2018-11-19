@@ -122,6 +122,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 						$scope.mediaPickerOverlay.show = false;
                         $scope.mediaPickerOverlay = null;
+
+                        // make sure the content tree has nothing highlighted 
+					    $scope.dialogTreeEventHandler.syncTree({
+					        path: "-1",
+					        tree: "content"
+					    });
 					}
 				};
 			});
