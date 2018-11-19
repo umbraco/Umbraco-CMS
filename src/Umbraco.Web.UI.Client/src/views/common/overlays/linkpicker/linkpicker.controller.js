@@ -24,8 +24,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 		$scope.showTarget = $scope.model.hideTarget !== true;
 
-		if (dialogOptions.currentTarget) {
-			$scope.model.target = dialogOptions.currentTarget;
+        if (dialogOptions.currentTarget) {
+            // clone the current target so we don't accidentally update the caller's model while manipulating $scope.model.target
+			$scope.model.target = angular.copy(dialogOptions.currentTarget);
 			//if we have a node ID, we fetch the current node to build the form data
 			if ($scope.model.target.id || $scope.model.target.udi) {
 
