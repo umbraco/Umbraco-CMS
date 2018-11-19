@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 using LightInject;
@@ -51,6 +52,9 @@ namespace Umbraco.Core.Runtime
             var logger = GetLogger();
             container.RegisterInstance(logger);
             // now it is ok to use Current.Logger
+
+            ConfigureUnhandledException(logger);
+            ConfigureAssemblyResolve(logger);
 
             Compose(container);
 
@@ -124,6 +128,38 @@ namespace Umbraco.Core.Runtime
         {
             return SerilogLogger.CreateWithDefaultConfiguration();
         }
+
+        protected virtual void ConfigureUnhandledException(ILogger logger)
+        {
+            //take care of unhandled exceptions - there is nothing we can do to
+            // prevent the launch process to go down but at least we can try
+            // and log the exception
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                msg += ".";
+                logger.Error<CoreRuntime>(exception, msg);
+            };
+        }
+
+        protected virtual void ConfigureAssemblyResolve(ILogger logger)
+        {
+            // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
+            // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
+                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+                if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
+                    return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+                return null;
+            };
+        }
+
 
         private void AquireMainDom(IServiceFactory container)
         {
