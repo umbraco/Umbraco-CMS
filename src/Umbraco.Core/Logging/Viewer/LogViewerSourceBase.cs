@@ -114,15 +114,29 @@ namespace Umbraco.Core.Logging.Viewer
             var filteredLogs = GetLogs(startDate, endDate, expression, 0, int.MaxValue);
             
             //This is user used the checkbox UI to toggle which log levels they wish to see
-            //If an empty array - its implied all levels to be viewed
-            if (logLevels.Length > 0)
+            //If an empty array or null - its implied all levels to be viewed
+            if (logLevels?.Length > 0)
             {
                 var logsAfterLevelFilters = new List<LogEvent>();
+                bool validLogType = true;
                 foreach (var level in logLevels)
                 {
-                    logsAfterLevelFilters.AddRange(filteredLogs.Where(x => x.Level.ToString() == level));
+                    //Check if level string is part of the LogEventLevel enum
+                    if(Enum.IsDefined(typeof(LogEventLevel), level))
+                    {
+                        validLogType = true;
+                        logsAfterLevelFilters.AddRange(filteredLogs.Where(x => x.Level.ToString().ToLowerInvariant() == level.ToLowerInvariant()));
+                    }
+                    else
+                    {
+                        validLogType = false;
+                    }
                 }
-                filteredLogs = logsAfterLevelFilters;
+
+                if (validLogType)
+                {
+                    filteredLogs = logsAfterLevelFilters;
+                }
             }
 
             long totalRecords = filteredLogs.Count();
