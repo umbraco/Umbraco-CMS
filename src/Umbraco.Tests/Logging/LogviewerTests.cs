@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Tests.Logging
 {
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Logging
         public void Logs_Contain_Correct_Log_Level_Counts()
         {
             var logCounts = _logViewer.GetLogLevelCounts(startDate: _startDate, endDate: _endDate);
-
+            
             Assert.AreEqual(1954, logCounts.Debug);
             Assert.AreEqual(2, logCounts.Error);
             Assert.AreEqual(0, logCounts.Fatal);
@@ -112,6 +113,72 @@ namespace Umbraco.Tests.Logging
             var canOpenLogs = _logViewer.CheckCanOpenLogs(startDate: _startDate, endDate: _endDate);
             Assert.IsTrue(canOpenLogs);
         }
+
+        [Test]
+        public void Logs_Can_Be_Queried()
+        {
+            //Should get me the most 100 recent log entries & using default overloads for remaining params
+            var allLogs = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1);
+
+            //Check we get 100 results back for a page & total items all good :)
+            Assert.AreEqual(100, allLogs.Items.Count());
+            Assert.AreEqual(2410, allLogs.TotalItems);
+            Assert.AreEqual(25, allLogs.TotalPages);
+
+            //Check collection all contain same object type
+            CollectionAssert.AllItemsAreInstancesOfType(allLogs.Items, typeof(LogMessage));
+
+            //Check first item is newest
+            var newestItem = allLogs.Items.First();
+            DateTimeOffset newDate;
+            DateTimeOffset.TryParse("2018-11-12T09:24:27.4057583Z", out newDate);
+            Assert.AreEqual(newDate, newestItem.Timestamp);
+
+
+            //Check we call method again with a smaller set of results & in ascending
+            var smallQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, pageSize: 10, orderDirection: Direction.Ascending);
+            Assert.AreEqual(10, smallQuery.Items.Count());
+            Assert.AreEqual(241, smallQuery.TotalPages);
+
+            //Check first item is oldest
+            var oldestItem = smallQuery.Items.First();
+            DateTimeOffset oldDate;
+            DateTimeOffset.TryParse("2018-11-12T08:34:45.8371142Z", out oldDate);
+            Assert.AreEqual(oldDate, oldestItem.Timestamp);
+
+
+            //Check invalid log levels
+            //Rather than expect 0 items - get all items back & ignore the invalid levels
+            string[] invalidLogLevels = { "Invalid", "NotALevel" };
+            var queryWithInvalidLevels = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, logLevels: invalidLogLevels);
+            Assert.AreEqual(2410, queryWithInvalidLevels.TotalItems);
+
+            //Check we can call method with an array of logLevel (error & warning)
+            string [] logLevels = { "Warning", "Error" };
+            var queryWithLevels = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, logLevels: logLevels);
+            Assert.AreEqual(9, queryWithLevels.TotalItems);
+            
+            //Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
+            string[] logLevelMismatch = { "Debug", "Information" };
+            var filterLevelQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, filterExpression: "@Level='Warning'", logLevels: logLevelMismatch); ;
+            Assert.AreEqual(0, filterLevelQuery.TotalItems);
+        }
+
+        [TestCase("", 2410)]
+        [TestCase("Has(@Exception)", 2)]
+        [TestCase("Has(Duration) and Duration > 1000", 13)]
+        [TestCase("Not(@Level = 'Verbose') and Not(@Level= 'Debug')", 71)]
+        [TestCase("StartsWith(SourceContext, 'Umbraco.Core')", 1183)]
+        [TestCase("@MessageTemplate = '{EndMessage} ({Duration}ms) [Timing {TimingId}]'", 622)]
+        [TestCase("SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'", 1)]
+        [TestCase("Contains(SortedComponentTypes[?], 'DatabaseServer')", 1)]
+        [Test]
+        public void Logs_Can_Query_With_Expressions(string queryToVerify, int expectedCount)
+        {
+            var testQuery = _logViewer.GetLogs(startDate: _startDate, endDate: _endDate, pageNumber: 1, filterExpression: queryToVerify);
+            Assert.AreEqual(expectedCount, testQuery.TotalItems);
+        }
+        
         [Test]
         public void Log_Search_Can_Persist()
         {
@@ -143,7 +210,5 @@ namespace Umbraco.Tests.Logging
             findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");
             Assert.IsEmpty(findItem, "The search item should no longer exist");
         }
-
-        
     }
 }
