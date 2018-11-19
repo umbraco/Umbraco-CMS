@@ -32,23 +32,23 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				//will be either a udi or an int
 				var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-				if (!$scope.model.target.path) {
+                // is it a content link?
+                if (!$scope.model.target.isMedia) {
+                    // get the content path
+                    entityResource.getPath(id, "Document").then(function(path) {
+                        //now sync the tree to this path
+                        $scope.dialogTreeEventHandler.syncTree({
+                            path: path,
+                            tree: "content"
+                        });
+                    });
 
-					entityResource.getPath(id, "Document").then(function (path) {
-						$scope.model.target.path = path;
-						//now sync the tree to this path
-						$scope.dialogTreeEventHandler.syncTree({
-							path: $scope.model.target.path,
-							tree: "content"
-						});
-					});
-				}
-
-				// if a link exists, get the properties to build the anchor name list
-				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
-				});
+                    // get the content properties to build the anchor name list
+                    contentResource.getById(id).then(function (resp) {
+                        $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+                        $scope.model.target.url = resp.urls[0];
+                    });
+                }
 			} else if ($scope.model.target.url.length) {
 			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
@@ -121,7 +121,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 						$scope.model.target.url = mediaHelper.resolveFile(media);
 
 						$scope.mediaPickerOverlay.show = false;
-						$scope.mediaPickerOverlay = null;
+                        $scope.mediaPickerOverlay = null;
 					}
 				};
 			});
