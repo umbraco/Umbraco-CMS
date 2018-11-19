@@ -66,6 +66,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {string=} size Set a button icon ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 @param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
+@param {string=} showCaret Shows a caret on the right side of the button label
 
 **/
 
@@ -93,7 +94,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 disabled: "<?",
                 size: "@?",
                 alias: "@?",
-                addEllipsis: "@?"
+                addEllipsis: "@?",
+                showCaret: "@?"
             }
         });
 
