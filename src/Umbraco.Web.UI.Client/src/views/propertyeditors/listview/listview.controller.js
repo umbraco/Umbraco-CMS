@@ -59,6 +59,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         items: []
     };
 
+   $scope.createAllowedButtonSingle = false;
+   $scope.createAllowedButtonSingleWithBlueprints = false;
+   $scope.createAllowedButtonMultiWithBlueprints = false;
+
+
     //when this is null, we don't check permissions
     $scope.currentNodePermissions = null;
 
@@ -695,9 +700,28 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             id = -1;
         }
 
-        getContentTypesCallback(id).then(function (items) {
-            $scope.listViewAllowedTypes = items;
-        });
+       //$scope.listViewAllowedTypes = getContentTypesCallback(id);
+      getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+          var blueprints = false;
+          $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+          angular.forEach(listViewAllowedTypes, function (allowedType) {
+              angular.forEach(allowedType.blueprints, function (value, key) {
+                  blueprints = true;
+              });
+          });
+
+          if (listViewAllowedTypes.length === 1 && blueprints === false) {
+              $scope.createAllowedButtonSingle = true;
+          }
+          if (listViewAllowedTypes.length === 1 && blueprints === true) {
+              $scope.createAllowedButtonSingleWithBlueprints = true;
+          }
+          if (listViewAllowedTypes.length > 1) {
+              $scope.createAllowedButtonMultiWithBlueprints = true;
+          }
+      });
+
 
         $scope.contentId = id;
         $scope.isTrashed = id === "-20" || id === "-21";
@@ -748,6 +772,22 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             }
         }
     }
+
+
+   function createBlank(entityType,docTypeAlias) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true");
+   }
+
+   function createFromBlueprint(entityType,docTypeAlias, blueprintId) {
+       $location
+         .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
+         .search("doctype=" + docTypeAlias + "&create=true&blueprintId=" + blueprintId);
+   }
+
+   $scope.createBlank = createBlank;
+   $scope.createFromBlueprint = createFromBlueprint;
 
     //GO!
     initView();

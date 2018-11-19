@@ -202,6 +202,9 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
+        internal override IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId)
+            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
+
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);

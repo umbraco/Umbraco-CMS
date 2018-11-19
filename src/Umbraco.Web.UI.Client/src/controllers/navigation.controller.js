@@ -242,7 +242,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         $scope.authenticated = false;
     }));
 
-    //when the application is ready and the user is authorized setup the data
+    //when the application is ready and the user is authorized, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
         init();
     }));

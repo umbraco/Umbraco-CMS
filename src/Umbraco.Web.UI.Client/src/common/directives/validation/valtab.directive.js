@@ -6,7 +6,7 @@
 * @description Used to show validation warnings for a tab to indicate that the tab content has validations errors in its data.
 * In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
-function valTab() {
+function valTab(eventsService) {
     return {
         require: ['^^form', '^^valFormManager'],
         restrict: "A",
@@ -14,7 +14,7 @@ function valTab() {
 
             var valFormManager = ctrs[1];
             var tabAlias = scope.tab.alias;                        
-            scope.tabHasError = false;
+            scope.tabHasError = false;            
 
             //listen for form validation changes
             valFormManager.onValidationStatusChanged(function (evt, args) {

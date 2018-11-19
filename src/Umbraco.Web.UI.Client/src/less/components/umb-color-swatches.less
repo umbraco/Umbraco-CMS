@@ -3,7 +3,7 @@
     flex-flow: row wrap;
 
     .umb-color-box {
-        border: 1px solid @gray-8;
+        border: 1px solid rgba(0,0,0,0.15);
         color: @white;
         cursor: pointer;
         padding: 1px;
@@ -36,10 +36,11 @@
     &.with-labels {
 
         .umb-color-box {
-            width: 120px;
-            height: 100%;
+            width: 130px;
+            height: auto;
             display: flex;
             flex-flow: row wrap;
+            border: 1px solid @gray-8;
 
             .umb-color-box-inner {
                 display: flex;
@@ -47,15 +48,21 @@
                 flex: 0 0 100%;
                 max-width: 100%;
                 min-height: 80px;
-                padding-top: 10px;
+                padding: 0;
+
+                .check_circle {
+                    margin: 15px auto;
+                }
 
                 .umb-color-box__label {
                     background: @white;
                     font-size: 14px;
                     display: flex;
                     flex-flow: column wrap;
-                    flex: 0 0 100%;
+                    flex: 1 0 100%;
+                    justify-content: flex-end;
                     padding: 1px 5px;
+                    min-height: 45px;
                     max-width: 100%;
                     margin-top: auto;
                     margin-bottom: -3px;

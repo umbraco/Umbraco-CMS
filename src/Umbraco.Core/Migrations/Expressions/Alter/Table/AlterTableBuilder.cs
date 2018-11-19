@@ -154,8 +154,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
-                TableName = Expression.TableName,
-                IsUnique = true
+                TableName = Expression.TableName,               
+                IndexType = IndexTypes.UniqueNonClustered
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition

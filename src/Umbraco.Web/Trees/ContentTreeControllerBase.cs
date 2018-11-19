@@ -14,6 +14,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using System.Globalization;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 
@@ -196,8 +197,9 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            IEntitySlim[] result;
+            return GetChildrenFromEntityService(entityId);
 
+            /*
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
             if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
@@ -211,8 +213,15 @@ namespace Umbraco.Web.Trees
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            return result;
+            return result;*/
         }
+
+        /// <summary>
+        /// Abstract method to fetch the entities from the entity service
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        internal abstract IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access

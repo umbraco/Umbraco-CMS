@@ -51,7 +51,6 @@
                         break;
                 }
 
-               // constraintValue = condition.Property.Type == "string" ? string.Format("\"{0}\"", condition.ConstraintValue) : condition.ConstraintValue;
             }
 
             switch (condition.Term.Operathor)

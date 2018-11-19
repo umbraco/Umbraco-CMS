@@ -176,8 +176,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
-                TableName = Expression.TableName,
-                IsUnique = true
+                TableName = Expression.TableName,                
+                IndexType = IndexTypes.UniqueNonClustered
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition
