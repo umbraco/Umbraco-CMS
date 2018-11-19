@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Scoping
         {
             base.TearDown();
             SafeCallContext.Clear();
-            ShadowFileSystems.ResetId();
+            FileSystems.ResetShadowId();
             ClearFiles();
         }
 
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Scoping
         public void CreateMediaTest(bool complete)
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.FileSystems.MediaFileSystem;
+            var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
@@ -72,12 +72,12 @@ namespace Umbraco.Tests.Scoping
 
             if (complete)
             {
-                Assert.IsTrue(Current.FileSystems.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(Current.MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
             }
             else
             {
-                Assert.IsFalse(Current.FileSystems.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsFalse(Current.MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Scoping
         public void MultiThread()
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.FileSystems.MediaFileSystem;
+            var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))

@@ -56,7 +56,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = FileSystems.GetFileSystem<MediaFileSystem>();
+            var fileSystem = _container.GetInstance<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
@@ -65,14 +65,6 @@ namespace Umbraco.Tests.IO
         {
             var fileSystem = _container.GetInstance<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
-        }
-
-        [Test]
-        public void MediaFileSystem_Is_Singleton()
-        {
-            var fileSystem1 = FileSystems.GetFileSystem<MediaFileSystem>();
-            var fileSystem2 = FileSystems.GetFileSystem<MediaFileSystem>();
-            Assert.AreSame(fileSystem1, fileSystem2);
         }
 
         [Test]
@@ -86,7 +78,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            var fs = FileSystems.GetFileSystem<MediaFileSystem>();
+            var fs = _container.GetInstance<IMediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
             var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);
@@ -108,6 +100,9 @@ namespace Umbraco.Tests.IO
             Assert.IsTrue(Directory.Exists(physPath));
         }
 
+
+        // fixme - don't make sense anymore
+        /*
         [Test]
         public void Cannot_Get_InvalidFileSystem()
         {
@@ -134,12 +129,13 @@ namespace Umbraco.Tests.IO
             { }
         }
 
-        [FileSystem("noconfig")]
+        [InnerFileSystem("noconfig")]
         internal class NonConfiguredFileSystem : FileSystemWrapper
         {
             public NonConfiguredFileSystem(IFileSystem innerFileSystem)
                 : base(innerFileSystem)
             { }
         }
+        */
     }
 }

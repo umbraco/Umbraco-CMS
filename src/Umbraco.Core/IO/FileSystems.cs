@@ -10,7 +10,6 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems : IFileSystems
     {
-        private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
         private readonly IContainer _container;
         private readonly ILogger _logger;
 
@@ -23,13 +22,16 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _scriptsFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
-        
+
         // well-known file systems lazy initialization
         private object _wkfsLock = new object();
         private bool _wkfsInitialized;
-        private object _wkfsObject;
+        private object _wkfsObject; // unused
 
-        private MediaFileSystem _mediaFileSystem;
+        // shadow support
+        private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
+        private readonly object _shadowLocker = new object();
+        private static Guid _shadowCurrentId = Guid.Empty; // static - unique!!
 
         #region Constructor
 
@@ -43,11 +45,19 @@ namespace Umbraco.Core.IO
         // for tests only, totally unsafe
         internal void Reset()
         {
-            _wrappers.Clear();
+            _shadowWrappers.Clear();
             _filesystems.Clear();
             Volatile.Write(ref _wkfsInitialized, false);
+            _shadowCurrentId = Guid.Empty;
         }
 
+        // for tests only, totally unsafe
+        internal static void ResetShadowId()
+        {
+            _shadowCurrentId = Guid.Empty;
+        }
+
+        // set by the scope provider when taking control of filesystems
         internal Func<bool> IsScoped { get; set; } = () => false;
 
         #endregion
@@ -114,16 +124,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        /// <inheritdoc />
-        public IMediaFileSystem MediaFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _mediaFileSystem;
-            }
-        }
-
         private void EnsureWellKnownFileSystems()
         {
             LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
@@ -140,15 +140,20 @@ namespace Umbraco.Core.IO
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", () => IsScoped());
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
-            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", IsScoped);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
+            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", IsScoped);
 
-            // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
-            _mediaFileSystem = GetFileSystem<MediaFileSystem>();
+            // fixme locking?
+            _shadowWrappers.Add(_macroPartialFileSystem);
+            _shadowWrappers.Add(_partialViewsFileSystem);
+            _shadowWrappers.Add(_stylesheetsFileSystem);
+            _shadowWrappers.Add(_scriptsFileSystem);
+            _shadowWrappers.Add(_masterPagesFileSystem);
+            _shadowWrappers.Add(_mvcViewsFileSystem);
 
             return null;
         }
@@ -166,35 +171,20 @@ namespace Umbraco.Core.IO
         /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
         /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
         /// </remarks>
-        public TFileSystem GetFileSystem<TFileSystem>()
+        public TFileSystem GetFileSystem<TFileSystem>(Func<IFileSystem> innerFileSystemFactory)
             where TFileSystem : FileSystemWrapper
         {
-            var alias = GetFileSystemAlias<TFileSystem>();
+            if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
-            // note: GetOrAdd can run multiple times - and here, since we have side effects
-            // (adding to _wrappers) we want to be sure the factory runs only once, hence the
-            // additional Lazy.
-            return (TFileSystem) _filesystems.GetOrAdd(alias, _ => new Lazy<IFileSystem>(() =>
+            var name = typeof(TFileSystem).FullName;
+            if (name == null) throw new Exception("panic!");
+
+            return (TFileSystem) _filesystems.GetOrAdd(name, _ => new Lazy<IFileSystem>(() =>
             {
-                var supportingFileSystem = _container.GetInstance<IFileSystem>(alias);
-                var shadowWrapper = new ShadowWrapper(supportingFileSystem, "typed/" + alias, () => IsScoped());
-
-                _wrappers.Add(shadowWrapper); // _wrappers is a concurrent set - this is safe
-
-                return _container.CreateInstance<TFileSystem>(new { innerFileSystem = shadowWrapper});
+                var innerFileSystem = innerFileSystemFactory();
+                var shadowWrapper = CreateShadowWrapper(innerFileSystem, "typed/" + name);
+                return _container.CreateInstance<TFileSystem>(new { innerFileSystem = shadowWrapper });
             })).Value;
-        }
-
-        private string GetFileSystemAlias<TFileSystem>()
-        {
-            var fileSystemType = typeof(TFileSystem);
-
-            // find the attribute and get the alias
-            var attr = (FileSystemAttribute) fileSystemType.GetCustomAttributes(typeof(FileSystemAttribute), false).SingleOrDefault();
-            if (attr == null)
-                throw new InvalidOperationException("Type " + fileSystemType.FullName + "is missing the required FileSystemProviderAttribute.");
-
-            return attr.Alias;
         }
 
         #endregion
@@ -223,50 +213,70 @@ namespace Umbraco.Core.IO
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
-            var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 6];
-            var i = 0;
-            while (i < typed.Length) wrappers[i] = typed[i++];
-            wrappers[i++] = _macroPartialFileSystem;
-            wrappers[i++] = _partialViewsFileSystem;
-            wrappers[i++] = _stylesheetsFileSystem;
-            wrappers[i++] = _scriptsFileSystem;
-            wrappers[i++] = _masterPagesFileSystem;
-            wrappers[i] = _mvcViewsFileSystem;
+            return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
+        }
 
-            return new ShadowFileSystems(id, wrappers, _logger);
+        internal void BeginShadow(Guid id)
+        {
+            lock (_shadowLocker)
+            {
+                // if we throw here, it means that something very wrong happened.
+                if (_shadowCurrentId != Guid.Empty)
+                    throw new InvalidOperationException("Already shadowing.");
+                _shadowCurrentId = id;
+
+                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", id);
+
+                foreach (var wrapper in _shadowWrappers)
+                    wrapper.Shadow(id);
+            }
+        }
+
+        internal void EndShadow(Guid id, bool completed)
+        {
+            lock (_shadowLocker)
+            {
+                // if we throw here, it means that something very wrong happened.
+                if (_shadowCurrentId == Guid.Empty)
+                    throw new InvalidOperationException("Not shadowing.");
+                if (id != _shadowCurrentId)
+                    throw new InvalidOperationException("Not the current shadow.");
+
+                _logger.Debug<ShadowFileSystems>("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
+
+                var exceptions = new List<Exception>();
+                foreach (var wrapper in _shadowWrappers)
+                {
+                    try
+                    {
+                        // this may throw an AggregateException if some of the changes could not be applied
+                        wrapper.UnShadow(completed);
+                    }
+                    catch (AggregateException ae)
+                    {
+                        exceptions.Add(ae);
+                    }
+                }
+
+                _shadowCurrentId = Guid.Empty;
+
+                if (exceptions.Count > 0)
+                    throw new AggregateException(completed ? "Failed to apply all changes (see exceptions)." : "Failed to abort (see exceptions).", exceptions);
+            }
+        }
+
+        private ShadowWrapper CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
+        {
+            lock (_shadowLocker)
+            {
+                var wrapper = new ShadowWrapper(filesystem, shadowPath, IsScoped);
+                if (_shadowCurrentId != Guid.Empty)
+                    wrapper.Shadow(_shadowCurrentId);
+                _shadowWrappers.Add(wrapper);
+                return wrapper;
+            }
         }
 
         #endregion
-
-        private class ConcurrentSet<T>
-            where T : class
-        {
-            private readonly HashSet<T> _set = new HashSet<T>();
-
-            public void Add(T item)
-            {
-                lock (_set)
-                {
-                    _set.Add(item);
-                }
-            }
-
-            public void Clear()
-            {
-                lock (_set)
-                {
-                    _set.Clear();
-                }
-            }
-
-            public T[] ToArray()
-            {
-                lock (_set)
-                {
-                    return _set.ToArray();
-                }
-            }
-        }
     }
 }

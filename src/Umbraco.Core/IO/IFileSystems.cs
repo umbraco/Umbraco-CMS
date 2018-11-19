@@ -34,10 +34,5 @@
         /// Gets the MVC views filesystem.
         /// </summary>
         IFileSystem MvcViewsFileSystem { get; }
-
-        /// <summary>
-        /// Gets the media filesystem.
-        /// </summary>
-        IMediaFileSystem MediaFileSystem { get; }
     }
 }

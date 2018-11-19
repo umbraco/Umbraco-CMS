@@ -19,7 +19,7 @@ namespace Umbraco.Core
     {
         // this ain't pretty
         private static IMediaFileSystem _mediaFileSystem;
-        private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.FileSystems.MediaFileSystem);
+        private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
 
         #region IContent
 

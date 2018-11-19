@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    Current.FileSystems.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
@@ -146,8 +146,8 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (Current.FileSystems.MediaFileSystem.FileExists(filePath))
-                    Current.FileSystems.MediaFileSystem.DeleteFile(filePath);
+                if (Current.MediaFileSystem.FileExists(filePath))
+                    Current.MediaFileSystem.DeleteFile(filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));

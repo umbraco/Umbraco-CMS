@@ -576,7 +576,6 @@
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
-    <Compile Include="IO\FileSystemAttribute.cs" />
     <Compile Include="IO\FileSystems.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="IO\IFileSystem.cs" />

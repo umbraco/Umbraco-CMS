@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -40,9 +41,8 @@ namespace Umbraco.Tests.Models
             base.Compose();
 
             Container.Register(_ => Mock.Of<ILogger>());
-            Container.Register<FileSystems>();
-            Container.Register<IFileSystems>(factory => factory.GetInstance<FileSystems>());
-            Container.Register(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
+            Container.ComposeFileSystems();
+
             Container.Register(_ => Mock.Of<IDataTypeService>());
             Container.Register(_ => Mock.Of<IContentSection>());
         }

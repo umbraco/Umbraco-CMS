@@ -104,6 +104,9 @@ namespace Umbraco.Core.Composing
         public static IFileSystems FileSystems
             => Container.GetInstance<IFileSystems>();
 
+        public static IMediaFileSystem MediaFileSystem
+            => Container.GetInstance<IMediaFileSystem>();
+
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();
 

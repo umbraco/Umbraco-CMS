@@ -76,15 +76,13 @@ namespace Umbraco.Core.Composing.Composers
             // register IFileSystems, which gives access too all filesystems
             container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
-            // register IMediaFileSystem
-            var virtualRoot = GetMediaFileSystemVirtualRoot();
-            container.RegisterSingleton<IFileSystem>("media", factory => new PhysicalFileSystem(virtualRoot));
-            container.RegisterSingleton<IMediaFileSystem>(factory => factory.GetInstance<FileSystems>().GetFileSystem<MediaFileSystem>());
+            // register IMediaFileSystem with its actual, underlying filesystem factory
+            container.RegisterSingleton<IMediaFileSystem>(factory => factory.GetInstance<FileSystems>().GetFileSystem<MediaFileSystem>(MediaInnerFileSystemFactory));
 
             return container;
         }
 
-        private static string GetMediaFileSystemVirtualRoot()
+        private static IFileSystem MediaInnerFileSystemFactory()
         {
             // for the time being, we still use the FileSystemProvider config file
             // but, detect if ppl are trying to use it to change the "provider"
@@ -93,13 +91,13 @@ namespace Umbraco.Core.Composing.Composers
 
             var config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             var p = config?.Providers["media"];
-            if (p == null) return virtualRoot;
+            if (p == null) return new PhysicalFileSystem(virtualRoot);
 
             if (!string.IsNullOrWhiteSpace(p.Type) && p.Type != "Umbraco.Core.IO.PhysicalFileSystem, Umbraco.Core")
                 throw new InvalidOperationException("Setting a provider type in FileSystemProviders.config is not supported anymore, see FileSystemsComposer for help.");
 
             virtualRoot = p?.Parameters["virtualRoot"]?.Value ?? "~/media";
-            return virtualRoot;
+            return new PhysicalFileSystem(virtualRoot);
         }
     }
 }
