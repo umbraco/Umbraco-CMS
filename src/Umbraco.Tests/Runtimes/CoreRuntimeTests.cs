@@ -64,14 +64,6 @@ namespace Umbraco.Tests.Runtimes
                 return new TestRuntime(this);
             }
 
-            // the application's logger is created by the application
-            // through GetLogger, that custom application can override
-            protected override ILogger GetLogger()
-            {
-                //return Mock.Of<ILogger>();
-                return new DebugDiagnosticsLogger();
-            }
-
             // don't register anything against AppDomain
             protected override void ConfigureUnhandledException(ILogger logger)
             { }
@@ -84,6 +76,14 @@ namespace Umbraco.Tests.Runtimes
                 : base()
             {
                 _umbracoApplication = umbracoApplication;
+            }
+
+            // the application's logger is created by the application
+            // through GetLogger, that custom application can override
+            protected override ILogger GetLogger()
+            {
+                //return Mock.Of<ILogger>();
+                return new DebugDiagnosticsLogger();
             }
 
             public override void Compose(ServiceContainer container)

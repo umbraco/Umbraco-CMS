@@ -23,14 +23,6 @@ namespace Umbraco.Web
         /// </summary>
         protected abstract IRuntime GetRuntime();
 
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected virtual ILogger GetLogger()
-        {
-            return SerilogLogger.CreateWithDefaultConfiguration();
-        }
-
         // events - in the order they trigger
 
         // were part of the BootManager architecture, would trigger only for the initial
@@ -62,21 +54,15 @@ namespace Umbraco.Web
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
             var container = new ServiceContainer();
-            container.ConfigureUmbracoCore(); // also sets Current.Container
-
-            // register the essential stuff,
-            // ie the global application logger
-            // (profiler etc depend on boot manager)
-            var logger = GetLogger();
-            container.RegisterInstance(logger);
-            // now it is ok to use Current.Logger
-
-            ConfigureUnhandledException(logger);
-            ConfigureAssemblyResolve(logger);
 
             // get runtime & boot
             _runtime = GetRuntime();
             _runtime.Boot(container);
+
+            var logger = container.GetInstance<ILogger>();
+
+            ConfigureUnhandledException(logger);
+            ConfigureAssemblyResolve(logger);
         }
 
         protected virtual void ConfigureUnhandledException(ILogger logger)

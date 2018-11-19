@@ -12,6 +12,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -42,6 +43,15 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
+            container.ConfigureUmbracoCore(); // also sets Current.Container
+
+            // register the essential stuff,
+            // ie the global application logger
+            // (profiler etc depend on boot manager)
+            var logger = GetLogger();
+            container.RegisterInstance(logger);
+            // now it is ok to use Current.Logger
+
             Compose(container);
 
             // prepare essential stuff
@@ -105,6 +115,14 @@ namespace Umbraco.Core.Runtime
             // everything is cleared
             //var sa = container.GetInstance<IDatabaseScopeAccessor>();
             //sa.Scope?.Dispose();
+        }
+
+        /// <summary>
+        /// Gets a logger.
+        /// </summary>
+        protected virtual ILogger GetLogger()
+        {
+            return SerilogLogger.CreateWithDefaultConfiguration();
         }
 
         private void AquireMainDom(IServiceFactory container)
