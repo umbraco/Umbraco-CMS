@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //ensure we don't append a WHERE if there is already one
                 var sqlFilter = hasWhereClause
-                    ? filterSql.SQL
+                    ? " AND " + filterSql.SQL.TrimStart(" AND ")
                     : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
