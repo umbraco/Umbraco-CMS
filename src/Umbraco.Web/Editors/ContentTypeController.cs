@@ -234,7 +234,7 @@ namespace Umbraco.Web.Editors
             Services.ContentTypeService.Save(collectionDocType);
 
             // test if the parent exist and then allow the collection underneath
-            var parentCt = Services.ContentTypeService.GetContentType(parentId);
+            var parentCt = Services.ContentTypeService.Get(parentId);
             if (parentCt != null)
             {
                 var allowedCts = parentCt.AllowedContentTypes.ToList();

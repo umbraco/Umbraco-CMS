@@ -186,7 +186,7 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            _logger.WarnWithException<PasswordChanger>("Could not change member password", ex);
+                            _logger.Warn<PasswordChanger>("Could not change member password", ex);
                             return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                         }
                     }

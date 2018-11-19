@@ -427,7 +427,7 @@ namespace Umbraco.Web.Editors
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
             
-            var moveResult = Services.MediaService.WithResult().Move(toMove, move.ParentId);
+            var moveResult = Services.MediaService.Move(toMove, move.ParentId);
 
             if (sourceParentID == destinationParentID)
             {

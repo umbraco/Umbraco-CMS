@@ -197,9 +197,8 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            return GetChildrenFromEntityService(entityId);
+            IEntitySlim[] result;
 
-            /*
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
             if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
@@ -210,10 +209,10 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
+                result = GetChildrenFromEntityService(entityId).ToArray();
             }
 
-            return result;*/
+            return result;
         }
 
         /// <summary>
@@ -221,7 +220,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        internal abstract IEnumerable<IUmbracoEntity> GetChildrenFromEntityService(int entityId);
+        internal abstract IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access

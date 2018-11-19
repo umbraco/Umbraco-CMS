@@ -3,6 +3,7 @@ using NPoco;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Migrations.Expressions.Create.Expressions;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Create.Table
