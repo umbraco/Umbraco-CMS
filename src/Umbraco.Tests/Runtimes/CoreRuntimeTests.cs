@@ -14,6 +14,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Examine;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -80,8 +81,10 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(UmbracoApplicationBase umbracoApplication)
-                : base(umbracoApplication)
-            { }
+                : base()
+            {
+                _umbracoApplication = umbracoApplication;
+            }
 
             public override void Compose(ServiceContainer container)
             {
@@ -115,6 +118,7 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private MainDom _mainDom;
+            private readonly UmbracoApplicationBase _umbracoApplication;
 
             public override void Boot(ServiceContainer container)
             {

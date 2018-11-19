@@ -4,11 +4,12 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using LightInject;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 
-namespace Umbraco.Core
+namespace Umbraco.Web
 {
     /// <summary>
     /// Provides an abstract base class for the Umbraco HttpApplication.
