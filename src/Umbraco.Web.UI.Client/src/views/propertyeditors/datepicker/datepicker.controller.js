@@ -45,31 +45,28 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             $scope.serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
         }
 
-        //get the current user to see if we can localize this picker
-        userService.getCurrentUser().then(function (user) {
+        const dateFormat = $scope.model.config.pickTime ? "Y-m-d H:i:S" : "Y-m-d";
 
-            const dateFormat = $scope.model.config.pickTime ? "Y-m-d H:i:S" : "Y-m-d";
-
-            // date picker config
-            $scope.datePickerConfig = {
-                enableTime: $scope.model.config.pickTime,
-                dateFormat: dateFormat,
-                time_24hr: true
-            };
-                
-            $scope.model.config.language = user.locale;
-
-            setDatePickerVal();
+        // date picker config
+        $scope.datePickerConfig = {
+            enableTime: $scope.model.config.pickTime,
+            dateFormat: dateFormat,
+            time_24hr: true
+        };
             
-        });
+        setDatePickerVal();
 
     }
 
     $scope.clearDate = function() {
         $scope.hasDatetimePickerValue = false;
-        $scope.model.datetimePickerValue = null;
-        $scope.model.value = null;
-        $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
+        if($scope.model) {
+            $scope.model.datetimePickerValue = null;
+            $scope.model.value = null;
+        }
+        if($scope.datePickerForm && $scope.datePickerForm.datepicker) {
+            $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
+        }
     }
 
     $scope.datePickerSetup = function(instance) {
