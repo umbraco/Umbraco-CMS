@@ -41,15 +41,6 @@ namespace Umbraco.Core.Composing
         object GetInstance(Type type);
 
         /// <summary>
-        /// Gets an instance of a named service.
-        /// </summary>
-        /// <param name="type">The type of the service.</param>
-        /// <param name="name">The name of the service.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        object GetInstance(Type type, string name);
-
-        /// <summary>
         /// Tries to get an instance of a service.
         /// </summary>
         /// <param name="type">The type of the service.</param>
@@ -104,16 +95,6 @@ namespace Umbraco.Core.Composing
         void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
 
         /// <summary>
-        /// Registers a named service with a implementation type.
-        /// </summary>
-        void Register(Type serviceType, Type implementingType, string name, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
-        /// Registers a named service with an implementation factory.
-        /// </summary>
-        void Register<TService>(Func<IContainer, TService> factory, string name, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
         /// Registers a service with an implementation factory.
         /// </summary>
         void Register<TService>(Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient);
@@ -122,11 +103,6 @@ namespace Umbraco.Core.Composing
         /// Registers a service with an implementing instance.
         /// </summary>
         void RegisterInstance(Type serviceType, object instance);
-
-        /// <summary>
-        /// Registers a named service with an implementing instance.
-        /// </summary>
-        void RegisterInstance(Type serviceType, object instance, string name);
 
         /// <summary>
         /// Registers a base type for auto-registration.

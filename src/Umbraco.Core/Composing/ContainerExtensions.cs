@@ -25,17 +25,6 @@ namespace Umbraco.Core.Composing
             => (T) container.GetInstance(typeof(T));
 
         /// <summary>
-        /// Gets an instance of a named service.
-        /// </summary>
-        /// <typeparam name="T">The type of the service.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="name">The name of the service.</param>
-        /// <returns>An instance of the specified type and name.</returns>
-        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        public static T GetInstance<T>(this IContainer container, string name)
-            => (T) container.GetInstance(typeof(T), name);
-
-        /// <summary>
         /// Tries to get an instance of a service.
         /// </summary>
         /// <typeparam name="T">The type of the service.</typeparam>
@@ -101,18 +90,6 @@ namespace Umbraco.Core.Composing
             => container.Register(typeof(TService), typeof(TImplementing), lifetime);
 
         /// <summary>
-        /// Registers a named service with an implementation type.
-        /// </summary>
-        public static void Register<TService, TImplementing>(this IContainer container, string name, Lifetime lifetime = Lifetime.Transient)
-            => container.Register(typeof(TService), typeof(TImplementing), name, lifetime);
-
-        /// <summary>
-        /// Registers a named service with an implementation factory.
-        /// </summary>
-        public static void Register<TService>(this IContainer container, string name, Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            => container.Register(factory, name, lifetime);
-
-        /// <summary>
         /// Registers a service as its own implementation.
         /// </summary>
         public static void Register<TService>(this IContainer container, Lifetime lifetime = Lifetime.Transient)
@@ -135,12 +112,6 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public static void RegisterSingleton<TService>(this IContainer container, Func<IContainer, TService> factory)
             => container.Register(factory, Lifetime.Singleton);
-
-        /// <summary>
-        /// Registers a named singleton service with an implementation factory.
-        /// </summary>
-        public static void RegisterSingleton<TService>(this IContainer container, string name, Func<IContainer, TService> factory)
-            => container.Register(factory, name, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a service with an implementing instance.
