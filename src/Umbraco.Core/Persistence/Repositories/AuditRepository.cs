@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = pagedResult.TotalItems;
 
             var pages = pagedResult.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
+                dto => new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
 
             //Mapping the DateStamp
             for (int i = 0; i < pages.Length; i++)
