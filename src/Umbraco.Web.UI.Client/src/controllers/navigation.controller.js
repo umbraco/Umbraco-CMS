@@ -307,12 +307,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     navInit = true;
                     initNav();
                 }
-                else {
-                    //keep track of the current section, when it changes change the state, and we listen for that event change above
-                    if ($scope.currentSection != $routeParams.section) {
-                        appState.setSectionState("currentSection", $routeParams.section);
-                    }
+
+                //keep track of the current section when it changes
+                if ($scope.currentSection != $routeParams.section) {
+                    appState.setSectionState("currentSection", $routeParams.section);
                 }
+
             }
         });
     }
@@ -373,8 +373,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
                     //the nav is ready, let the app know
                     eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
-                    //finally set the section state
-                    appState.setSectionState("currentSection", $routeParams.section);
+                    
                 }
             });
         });
