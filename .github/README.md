@@ -1,6 +1,6 @@
 > Looking for the source code of the **next Umbraco major version**? Click [here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 development branch and contribute!
 
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md) [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/umbraco/Umbraco-CMS)
+# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/umbraco/Umbraco-CMS)
 
 Umbraco is a fully-featured, open source Content Management System loved by thousands for its flexibility and great editing experience.
 
@@ -21,11 +21,11 @@ Please also see our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Getting Started
 
-There is couple ways how you can start playing with Umbraco CMS. The recommended way to install and run Umbraco always depends on your project and purpose. Here you can find short guides for the most common scenarios:
+There are a couple of ways you can start playing with Umbraco CMS. The recommended way to install and run Umbraco always depends on your project and purpose. Here you can find short guides for the most common scenarios:
 
 - [Building Umbraco from source code](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/BUILD.md)
 - [Dowloading Umbraco from Our or NuGet](https://our.umbraco.com/download)
-- [Using Umbraco Cloud trial](https://umbraco.com/pricing/) (always the latest, cloud-based & hosted instance free for 14 days ready to preview in less than 2 minutes)
+- [Using Umbraco Cloud Trial](https://umbraco.com/pricing/) (always the latest, cloud-based & hosted instance free for 14 days ready to preview in less than 2 minutes)
 
 ## Documentation
 
@@ -43,8 +43,7 @@ Besides "Our", we all support each other also via:
 
 - Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
 - Gitter: https://gitter.im/umbraco/Umbraco-CMS
-- Slack: http://umbracians.chat/
 
 ## License
 
-Umbraco CMS is and always will be [MIT licensed](LICENSE.md) open source software.
+Umbraco CMS is and always will be [MIT licensed](../LICENSE.md) open source software.
