@@ -64,9 +64,9 @@ namespace Umbraco.Tests.Runtimes
                 return new TestRuntime(this);
             }
 
-            // don't register anything against AppDomain
-            protected override void ConfigureUnhandledException(ILogger logger)
-            { }
+            //// don't register anything against AppDomain
+            //protected override void ConfigureUnhandledException(ILogger logger)
+            //{ }
         }
 
         // test runtime
