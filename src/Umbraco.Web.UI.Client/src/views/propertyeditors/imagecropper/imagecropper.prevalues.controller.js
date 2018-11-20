@@ -69,4 +69,8 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	        //there was an error, do the highlight (will be set back by the directive)
 	        $scope.hasError = true;
         };
+
+	    $scope.sortableOptions = {
+	        axis: 'y'
+	    }
 	});
