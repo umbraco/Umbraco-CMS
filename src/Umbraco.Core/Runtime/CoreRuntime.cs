@@ -38,8 +38,7 @@ namespace Umbraco.Core.Runtime
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
         /// </summary>
         public CoreRuntime()
-        {
-        }
+        { }
 
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
