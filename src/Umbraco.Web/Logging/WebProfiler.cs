@@ -3,8 +3,10 @@ using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Web.Logging
 {
     /// <summary>
     /// Implements <see cref="IProfiler"/> by using the MiniProfiler framework.
