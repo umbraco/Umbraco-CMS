@@ -39,17 +39,12 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Maps the dto property values to the persisted model
         /// </summary>
-        /// <typeparam name="TPersisted"></typeparam>
-        /// <typeparam name="TSaved"></typeparam>
-        /// <param name="contentItem"></param>
-        /// <param name="dto"></param>
-        /// <param name="getPropertyValue"></param>
-        /// <param name="savePropertyValue"></param>
         internal void MapPropertyValuesForPersistence<TPersisted, TSaved>(
             TSaved contentItem,
             ContentPropertyCollectionDto dto,
             Func<TSaved, Property, object> getPropertyValue,
-            Action<TSaved, Property, object> savePropertyValue)
+            Action<TSaved, Property, object> savePropertyValue,
+            string culture)
             where TPersisted : IContentBase
             where TSaved : IContentSave<TPersisted>
         {
@@ -70,7 +65,7 @@ namespace Umbraco.Web.Editors
 
                 // get the property
                 var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
-                
+
                 // prepare files, if any matching property and culture
                 var files = contentItem.UploadedFiles
                     .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture)
@@ -96,8 +91,8 @@ namespace Umbraco.Web.Editors
                 {
                     var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
                     if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
-                    //fixme how is this supposed to work with variants?
-                    property.SetTagsValue(value, tagConfiguration);
+                    var tagCulture = property.PropertyType.VariesByCulture() ? culture : null;
+                    property.SetTagsValue(value, tagConfiguration, tagCulture);
                 }
                 else
                     savePropertyValue(contentItem, property, value);

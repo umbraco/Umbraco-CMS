@@ -36,7 +36,7 @@ function valPropertyValidator(serverValidationManager) {
             
             // Validation method
             function validate (viewValue) {
-                // Calls the validition method
+                // Calls the validation method
                 var result = scope.valPropertyValidator();
                 if (!result.errorKey || result.isValid === undefined || !result.errorMsg) {
                     throw "The result object from valPropertyValidator does not contain required properties: isValid, errorKey, errorMsg";
@@ -55,6 +55,9 @@ function valPropertyValidator(serverValidationManager) {
                         propCtrl.setPropertyError(result.errorMsg);
                     }
                 }
+
+                // parsers are expected to return a value
+                return (result.isValid) ? viewValue : undefined;
             };
 
             // Parsers are called as soon as the value in the form input is modified

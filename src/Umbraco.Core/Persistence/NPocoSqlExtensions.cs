@@ -589,11 +589,14 @@ namespace Umbraco.Core.Persistence
         /// Creates a SELECT COUNT(*) Sql statement.
         /// </summary>
         /// <param name="sql">The origin sql.</param>
+        /// <param name="alias">An optional alias.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> SelectCount(this Sql<ISqlContext> sql)
+        public static Sql<ISqlContext> SelectCount(this Sql<ISqlContext> sql, string alias = null)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
-            return sql.Select("COUNT(*)");
+            var text = "COUNT(*)";
+            if (alias != null) text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+            return sql.Select(text);
         }
 
         /// <summary>
@@ -607,13 +610,29 @@ namespace Umbraco.Core.Persistence
         /// <para>If <paramref name="fields"/> is empty, all columns are counted.</para>
         /// </remarks>
         public static Sql<ISqlContext> SelectCount<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+            => sql.SelectCount(null, fields);
+
+        /// <summary>
+        /// Creates a SELECT COUNT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to count.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="alias">An alias.</param>
+        /// <param name="fields">Expressions indicating the columns to count.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are counted.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> SelectCount<TDto>(this Sql<ISqlContext> sql, string alias, params Expression<Func<TDto, object>>[] fields)
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             var sqlSyntax = sql.SqlContext.SqlSyntax;
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
-            return sql.Select("COUNT (" + string.Join(", ", columns) + ")");
+            var text = "COUNT (" + string.Join(", ", columns) + ")";
+            if (alias != null) text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+            return sql.Select(text);
         }
 
         /// <summary>
@@ -703,6 +722,56 @@ namespace Umbraco.Core.Persistence
         {
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Append(", " + string.Join(", ", sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields)));
+        }
+
+        /// <summary>
+        /// Adds a COUNT(*) to a SELECT Sql statement.
+        /// </summary>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="alias">An optional alias.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> AndSelectCount(this Sql<ISqlContext> sql, string alias = null)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            var text = ", COUNT(*)";
+            if (alias != null) text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+            return sql.Append(text);
+        }
+
+        /// <summary>
+        /// Adds a COUNT to a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to count.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="fields">Expressions indicating the columns to count.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are counted.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> AndSelectCount<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+            => sql.AndSelectCount(null, fields);
+
+        /// <summary>
+        /// Adds a COUNT to a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to count.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="alias">An alias.</param>
+        /// <param name="fields">Expressions indicating the columns to count.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are counted.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> AndSelectCount<TDto>(this Sql<ISqlContext> sql, string alias = null, params Expression<Func<TDto, object>>[] fields)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            var sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
+            var text = ", COUNT (" + string.Join(", ", columns) + ")";
+            if (alias != null) text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+            return sql.Append(text);
         }
 
         /// <summary>

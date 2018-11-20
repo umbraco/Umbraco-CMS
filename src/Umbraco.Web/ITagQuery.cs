@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 
@@ -8,76 +7,53 @@ namespace Umbraco.Web
     public interface ITagQuery
     {
         /// <summary>
-        /// Returns all content that is tagged with the specified tag value and optional tag group
+        /// Gets all documents tagged with the specified tag.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<IPublishedContent> GetContentByTag(string tag, string tagGroup = null);
+        IEnumerable<IPublishedContent> GetContentByTag(string tag, string group = null, string culture = null);
 
         /// <summary>
-        /// Returns all content that has been tagged with any tag in the specified group
+        /// Gets all documents tagged with any tag in the specified group.
         /// </summary>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<IPublishedContent> GetContentByTagGroup(string tagGroup);
+        IEnumerable<IPublishedContent> GetContentByTagGroup(string group, string culture = null);
 
         /// <summary>
-        /// Returns all Media that is tagged with the specified tag value and optional tag group
+        /// Gets all media tagged with the specified tag.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<IPublishedContent> GetMediaByTag(string tag, string tagGroup = null);
+        IEnumerable<IPublishedContent> GetMediaByTag(string tag, string group = null, string culture = null);
 
         /// <summary>
-        /// Returns all Media that has been tagged with any tag in the specified group
+        /// Gets all media tagged with any tag in the specified group.
         /// </summary>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<IPublishedContent> GetMediaByTagGroup(string tagGroup);
+        IEnumerable<IPublishedContent> GetMediaByTagGroup(string group, string culture);
 
         /// <summary>
-        /// Get every tag stored in the database (with optional group)
+        /// Gets all tags.
         /// </summary>
-        IEnumerable<TagModel> GetAllTags(string group = null);
+        IEnumerable<TagModel> GetAllTags(string group = null, string culture = null);
 
         /// <summary>
-        /// Get all tags for content items (with optional group)
+        /// Gets all document tags.
         /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        IEnumerable<TagModel> GetAllContentTags(string group = null);
+        IEnumerable<TagModel> GetAllContentTags(string group = null, string culture = null);
 
         /// <summary>
-        /// Get all tags for media items (with optional group)
+        /// Gets all media tags.
         /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        IEnumerable<TagModel> GetAllMediaTags(string group = null);
+        IEnumerable<TagModel> GetAllMediaTags(string group = null, string culture = null);
 
         /// <summary>
-        /// Get all tags for member items (with optional group)
+        /// Gets all member tags.
         /// </summary>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        IEnumerable<TagModel> GetAllMemberTags(string group = null);
+        IEnumerable<TagModel> GetAllMemberTags(string group = null, string culture = null);
 
         /// <summary>
-        /// Returns all tags attached to a property by entity id
+        /// Gets all tags attached to an entity via a property.
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null);
+        IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null);
 
         /// <summary>
-        /// Returns all tags attached to an entity (content, media or member) by entity id
+        /// Gets all tags attached to an entity.
         /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="tagGroup"></param>
-        /// <returns></returns>
-        IEnumerable<TagModel> GetTagsForEntity(int contentId, string tagGroup = null);
+        IEnumerable<TagModel> GetTagsForEntity(int contentId, string group = null, string culture = null);
     }
 }

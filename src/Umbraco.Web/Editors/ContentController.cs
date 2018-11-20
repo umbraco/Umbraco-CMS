@@ -1778,7 +1778,8 @@ namespace Umbraco.Web.Editors
                     contentSave,
                     propertyCollection,
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
+                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    variant.Culture);
 
                 variantIndex++;
             }

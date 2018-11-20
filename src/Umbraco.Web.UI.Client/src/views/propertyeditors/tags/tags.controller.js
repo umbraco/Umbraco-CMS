@@ -142,6 +142,13 @@ angular.module("umbraco")
                 });
             }
 
+            function currentCulture(scope) {
+                while (scope && !scope.activeVariant)
+                    scope = scope.$parent;
+                if (!scope || !scope.activeVariant) return null;
+                return scope.activeVariant.language.culture;
+            }
+
             var tagsHound = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -150,14 +157,14 @@ angular.module("umbraco")
                 },
                 //pre-fetch the tags for this category
                 prefetch: {
-                    url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", [{ tagGroup: $scope.model.config.group }]),
+                    url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: $scope.model.config.group, culture: currentCulture($scope) }),
                     //TTL = 5 minutes
                     ttl: 300000,
                     filter: dataTransform
                 },
                 //dynamically get the tags for this category (they may have changed on the server)
                 remote: {
-                    url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", [{ tagGroup: $scope.model.config.group }]),
+                    url: umbRequestHelper.getApiUrl("tagsDataBaseUrl", "GetTags", { tagGroup: $scope.model.config.group, culture: currentCulture($scope) }),
                     filter: dataTransform
                 }
             });

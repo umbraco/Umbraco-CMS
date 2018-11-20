@@ -67,7 +67,7 @@ namespace Umbraco.Web
             if (appCache == null) throw new ArgumentNullException(nameof(appCache));
 
             _umbracoContext = umbracoContext;
-            _tag = new TagQuery(tagQuery);
+            _tag = tagQuery;
             _dataTypeService = dataTypeService;
             _cultureDictionary = cultureDictionary;
             _componentRenderer = componentRenderer;
