@@ -16,11 +16,6 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }
 
-        [Obsolete("Use the IndexType property instead and set it to IndexTypes.UniqueNonClustered")]
-        public virtual bool IsUnique { get; set; }
-
-        [Obsolete("Use the IndexType property instead and set it to IndexTypes.Clustered")]
-        public bool IsClustered { get; set; }
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
         public IndexTypes IndexType { get; set; }
     }

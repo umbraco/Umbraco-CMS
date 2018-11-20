@@ -888,7 +888,8 @@ namespace Umbraco.Core.Services.Implement
 
                 var originalPath = media.Path;
 
-                var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia));
+                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
+                var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
                 if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs, nameof(Trashing)))
                 {
                     scope.Complete();
