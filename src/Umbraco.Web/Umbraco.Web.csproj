@@ -150,6 +150,7 @@
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\ContentEditing\RelationDisplay.cs" />
     <Compile Include="Models\ContentEditing\RelationTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\RelationTypeSave.cs" />
     <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />

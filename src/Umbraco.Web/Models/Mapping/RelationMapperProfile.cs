@@ -38,6 +38,9 @@ namespace Umbraco.Web.Models.Mapping
             // FROM IRelation to RelationDisplay
             CreateMap<IRelation, RelationDisplay>();
 
+            // FROM RelationTypeSave to IRelationType
+            CreateMap<RelationTypeSave, IRelationType>();
+
             //FROM IRelationType TO RelationType
             CreateMap<IRelationType, RelationType>();
 

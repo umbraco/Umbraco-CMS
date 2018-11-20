@@ -1,4 +1,4 @@
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper) {
 
     var vm = this;
 
@@ -7,6 +7,8 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     vm.page.saveButtonState = "init";
     vm.page.menu = {}
 
+    vm.save = saveRelationType;
+
     if($routeParams.create) {
         alert("create");
     } else {
@@ -14,19 +16,22 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
         relationTypeResource.getById($routeParams.id)
             .then(function(data) {
-                vm.relationType = data;
-
-                editorState.set(vm.relationType);
-
-                navigationService.syncTree({ tree: "relationTypes", path: data.path, forceReload: true }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
-                });
-
-                formatDates(vm.relationType.relations);
-                getRelationNames(vm.relationType);
-
+                bindRelationType(data);
                 vm.page.loading = false;
             });
+    }
+
+    function bindRelationType(relationType) {
+        formatDates(relationType.relations);
+        getRelationNames(relationType);
+
+        vm.relationType = relationType;
+
+        editorState.set(vm.relationType);
+
+        navigationService.syncTree({ tree: "relationTypes", path: relationType.path, forceReload: true }).then(function (syncArgs) {
+            vm.page.menu.currentNode = syncArgs.node;
+        });
     }
 
     function formatDates(relations) {
@@ -48,6 +53,26 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
                 entityResource.getById(relation.childId, relationType.childObjectTypeName).then(function(entity) {
                     relation.childName = entity.name;
                 });
+            });
+        }
+    }
+
+    function saveRelationType() {
+        vm.page.saveButtonState = "busy";
+
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+            relationTypeResource.save(vm.relationType).then(function (data) {
+                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                bindRelationType(data);
+                vm.page.saveButtonState = "success";
+            }, function (error) {
+                contentEditingHelper.handleSaveError({
+                    redirectOnFailure: false,
+                    err: error
+                });
+
+                notificationsService.error(error.data.message);
+                vm.page.saveButtonState = "error";
             });
         }
     }

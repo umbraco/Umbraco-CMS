@@ -429,6 +429,22 @@
                 }
 
                 return displayModel;
+            },
+
+            /**
+             * Formats the display model used to display the relation type to a model used to save the relation type.
+             * @param {Object} relationType
+             */
+            formatRelationTypePostData : function(relationType) {
+                var saveModel = {
+                    id: relationType.id,
+                    name: relationType.name,
+                    alias: relationType.alias,
+                    key : relationType.key,
+                    isBidirectional: relationType.isBidirectional
+                };
+
+                return saveModel;
             }
         };
     }

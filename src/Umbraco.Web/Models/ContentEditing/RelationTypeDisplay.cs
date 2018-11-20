@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -7,8 +6,13 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "relationType", Namespace = "")]
-    public class RelationTypeDisplay : EntityBasic
+    public class RelationTypeDisplay : EntityBasic, INotificationModel
     {
+        public RelationTypeDisplay()
+        {
+            Notifications = new List<Notification>();
+        }
+
         /// <summary>
         /// Gets or sets a boolean indicating whether the RelationType is Bidirectional (true) or Parent to Child (false)
         /// </summary>
@@ -49,5 +53,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "relations")]
         [ReadOnly(true)]
         public IEnumerable<RelationDisplay> Relations { get; set; }
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        [DataMember(Name = "notifications")]
+        public List<Notification> Notifications { get; private set; }
     }
 }

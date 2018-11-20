@@ -9,6 +9,7 @@ using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -44,9 +45,31 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        public void PostSave()
+        public RelationTypeDisplay PostSave(RelationTypeSave relationType)
         {
-            throw new NotImplementedException();
+            var relationTypePersisted = Services.RelationService.GetRelationTypeById(relationType.Key);
+
+            if (relationTypePersisted == null)
+            {
+                // TODO: Translate message
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Relation type does not exist"));
+            }
+
+            Mapper.Map(relationType, relationTypePersisted);
+
+            try
+            {
+                Services.RelationService.Save(relationTypePersisted);
+                var display = Mapper.Map<RelationTypeDisplay>(relationTypePersisted);
+                display.AddSuccessNotification("Relation type saved", "");
+
+                return display;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type"));
+            }
         }
 
         public void DeleteById()

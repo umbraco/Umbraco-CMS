@@ -1,7 +1,7 @@
 <div data-element="editor-relation-types" ng-controller="Umbraco.Editors.RelationTypes.EditController as vm">
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
-    <form name="relationTypeForm" novalidate val-form-manager>
+    <form name="relationTypeForm" novalidate val-form-manager ng-submit="vm.save()">
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
                 name="vm.relationType.name"
@@ -78,6 +78,7 @@
                     <umb-button
                         type="submit"
                         button-style="success"
+                        state="vm.page.saveButtonState"
                         shortcut="ctrl+s"
                         label="Save"
                         label-key="buttons_save">
