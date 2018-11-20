@@ -733,8 +733,7 @@ namespace Umbraco.Web.Editors
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,
-                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName,
-                            localizeMessage: false);
+                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName);
                     }
                     else
                     {

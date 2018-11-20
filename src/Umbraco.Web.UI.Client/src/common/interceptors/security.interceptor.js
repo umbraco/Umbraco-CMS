@@ -83,10 +83,7 @@
                     if (rejection.data && rejection.data.ExceptionMessage) {
                         errMsg += "<br/> with error: <br/><i>" + rejection.data.ExceptionMessage + "</i>";
                     }
-                    if (rejection.config.data) {
-                        errMsg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
-                    }
-
+                    
                     notificationsService.error(
                         "Request error",
                         errMsg);

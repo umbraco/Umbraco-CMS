@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("umbracoNode"))));
 
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsTemplate"))));
-                scope.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", Design = "", PrimaryKey = 22221});
-                scope.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", Design = "", PrimaryKey = 22222 });
+                scope.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", PrimaryKey = 22221});
+                scope.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", PrimaryKey = 22222 });
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("cmsTemplate"))));
 
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsContentType"))));

@@ -26,7 +26,7 @@
                             <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                         </label>
 
-                        <div ng-if="!saveVariantSelectorForm.saveVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                        <div ng-if="!saveVariantSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
                         </div>
 

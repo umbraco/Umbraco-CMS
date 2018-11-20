@@ -369,7 +369,9 @@
                             properties: getContentProperties(v.tabs),
                             culture: v.language ? v.language.culture : null,
                             publish: v.publish,
-                            save: v.save
+                            save: v.save,
+                            releaseDate: v.releaseDate,
+                            expireDate: v.expireDate
                         };
                     })
                 };
