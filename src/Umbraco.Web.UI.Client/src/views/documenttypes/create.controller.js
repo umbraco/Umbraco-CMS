@@ -9,7 +9,7 @@
 function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService, iconHelper) {
 
     $scope.model = {
-        allowCreateFolder: $scope.dialogOptions.currentNode.parentId === null || $scope.dialogOptions.currentNode.nodeType === "container",
+        allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === "container",
         folderName: "",
         creatingFolder: false,
         creatingDoctypeCollection: false
@@ -18,7 +18,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
     $scope.model.disableTemplates = disableTemplates;
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
 
     $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
@@ -122,6 +122,11 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $location.search('notemplate', null);
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
         navigationService.hideMenu();
+    };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
     };
 }
 

@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -147,11 +147,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    //trigger dialods with a hotkey:
-    keyboardService.bind("esc", function () {
-        eventsService.emit("app.closeDialogs");
-    });
-
     $scope.selectedId = navigationService.currentId;
 
     var evts = [];
@@ -167,6 +162,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
+        }
+        if (args.key === "dialogTemplateUrl") {
+            $scope.dialogTemplateUrl = args.value;
         }
         if (args.key === "showMenu") {
             $scope.showContextMenu = args.value;
@@ -236,15 +234,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             loadLanguages().then(function (languages) {
                 $scope.languages = languages;
             });
-        }
-    }));
-
-    //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    evts.push(eventsService.on("app.closeDialogs", function (event) {
-        if (appState.getGlobalState("stickyNavigation")) {
-            navigationService.hideNavigation();
-            //TODO: don't know why we need this? - we are inside of an angular event listener.
-            angularHelper.safeApply($scope);
         }
     }));
 

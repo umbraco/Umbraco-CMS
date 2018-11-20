@@ -1,36 +1,20 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, requestRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
-        var loginDialog = null;
 
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
 
         function openLoginDialog(isTimedOut) {
-            if (!loginDialog) {
-                loginDialog = dialogService.open({
-
-                    //very special flag which means that global events cannot close this dialog
-                    manualClose: true,
-
-                    template: 'views/common/dialogs/login.html',
-                    modalClass: "login-overlay",
-                    animation: "slide",
-                    show: true,
-                    callback: onLoginDialogClose,
-                    dialogData: {
-                        isTimedOut: isTimedOut
-                    }
-                });
-            }
+            //broadcast a global event that the user is no longer logged in
+            const args = { isTimedOut: isTimedOut };
+            eventsService.emit("app.notAuthenticated", args);
         }
 
-        function onLoginDialogClose(success) {
-            loginDialog = null;
-
+        function retryRequestQueue(success) {
             if (success) {
                 requestRetryQueue.retryAll(currentUser.name);
             }
@@ -164,9 +148,6 @@ angular.module('umbraco.services')
             lastServerTimeoutSet = null;
             currentUser = null;
 
-            //broadcast a global event that the user is no longer logged in
-            eventsService.emit("app.notAuthenticated");
-
             openLoginDialog(isLogout === undefined ? true : !isLogout);
         }
 
@@ -183,6 +164,12 @@ angular.module('umbraco.services')
             _showLoginDialog: function () {
                 openLoginDialog();
             },
+
+            /** Internal method to retry all request after sucessfull login */
+            _retryRequestQueue: function(success) {
+                retryRequestQueue(success)
+            },
+
             /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
             isAuthenticated: function () {
                 //if we've got a current user then just return true

@@ -65,6 +65,10 @@ function contentCreateController($scope,
     close();
   }
 
+  $scope.closeDialog = function(showMenu) {
+    navigationService.hideDialog(showMenu);
+  };
+
   $scope.createBlank = createBlank;
   $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
   $scope.createFromBlueprint = createFromBlueprint;
