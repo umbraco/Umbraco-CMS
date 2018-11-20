@@ -419,7 +419,7 @@
     <key alias="current">nuvarande</key>
     <key alias="embed">Inbäddning</key>
     <key alias="retrieve">Hämta</key>
-    <key alias="selected">valgt</key>
+    <key alias="selected">valda</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
@@ -625,8 +625,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Återställ</key>
-    <key alias="defineCrop">Definiera beskräning</key>
-    <key alias="defineCropDescription">Ge beskärningen ett alias och dess standardbredd och -höjd</key>
     <key alias="saveCrop">spara beskärning</key>
     <key alias="addCrop">Lägg till ny beskärning</key>
   </area>

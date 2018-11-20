@@ -14,7 +14,7 @@ function valTab() {
 
             var valFormManager = ctrs[1];
             var tabAlias = scope.tab.alias;                        
-            scope.tabHasError = false;
+            scope.tabHasError = false;            
 
             //listen for form validation changes
             valFormManager.onValidationStatusChanged(function (evt, args) {
@@ -31,7 +31,6 @@ function valTab() {
                     scope.tabHasError = false;
                 }
             });
-
         }
     };
 }

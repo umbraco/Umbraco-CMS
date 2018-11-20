@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
@@ -113,7 +114,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (contentId == Constants.System.Root)
                     {
-                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the content root");
                     }
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (mediaId == Constants.System.Root)
                     {
-                        var hasAccess = UserExtensions.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media root");
                     }

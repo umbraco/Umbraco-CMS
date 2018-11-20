@@ -41,7 +41,6 @@
     <key alias="sendToTranslate">Send To Translation</key>
     <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
-    <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
@@ -95,8 +94,10 @@
         should be avoided. Better use the culture setting above.]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
-    <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]></key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+        </key>
     <key alias="setDomains">Domains</key>
   </area>
   <area alias="buttons">
@@ -273,6 +274,10 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -619,7 +624,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we cannot find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -699,9 +704,11 @@
     <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
     <key alias="databaseFound">Your database has been found and is identified as</key>
     <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseInstall"><![CDATA[
+        <key alias="databaseInstall">
+            <![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>
+        </key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
@@ -1183,8 +1190,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="imagecropper">
         <key alias="reset">Reset crop</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
         <key alias="updateEditCrop">Done</key>

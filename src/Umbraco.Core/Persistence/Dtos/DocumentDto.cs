@@ -1,9 +1,9 @@
-﻿using System;
-using NPoco;
+﻿using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
+
     [TableName(TableName)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
@@ -22,14 +22,6 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("edited")]
         public bool Edited { get; set; }
-
-        [Column("releaseDate")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public DateTime? ReleaseDate { get; set; }
-
-        [Column("expireDate")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public DateTime? ExpiresDate { get; set; }
 
         //[Column("publishDate")]
         //[NullSetting(NullSetting = NullSettings.Null)] // is contentVersionDto.VersionDate for the published version

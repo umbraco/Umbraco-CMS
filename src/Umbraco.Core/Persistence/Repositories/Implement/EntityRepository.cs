@@ -66,6 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isContent)
                 BuildVariants(entities.Cast<DocumentEntitySlim>());
 
+            //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
             if (isMedia)
                 BuildProperties(entities, dtos);
 
@@ -110,14 +111,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetEntity(sql, isContent, isMedia);
         }
 
-        public virtual IEntitySlim Get(int id)
+        public IEntitySlim Get(int id)
         {
             var sql = GetBaseWhere(false, false, false, id);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
             return dto == null ? null : BuildEntity(false, false, dto);
         }
 
-        public virtual IEntitySlim Get(int id, Guid objectTypeId)
+        public IEntitySlim Get(int id, Guid objectTypeId)
         {
             var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
@@ -126,21 +127,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetEntity(sql, isContent, isMedia);
         }
 
-        public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
+        public IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
         {
             return ids.Length > 0
                 ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
                 : PerformGetAll(objectType);
         }
 
-        public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
+        public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
         {
             return keys.Length > 0
                 ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
                 : PerformGetAll(objectType);
         }
 
-        private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia)
+        private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool loadMediaProperties)
         {
             //isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
@@ -157,7 +158,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var entities = dtos.Select(x => BuildEntity(false, isMedia, x)).ToArray();
 
-            if (isMedia)
+            //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+            if (isMedia && loadMediaProperties)
                 BuildProperties(entities, dtos);
 
             return entities;
@@ -169,17 +171,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectType == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectType, filter);
-            return GetEntities(sql, isContent, isMedia);
+            return GetEntities(sql, isContent, isMedia, true);
         }
 
-        public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids)
+        public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids)
         {
             return ids.Any()
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
                 : PerformGetAllPaths(objectType);
         }
 
-        public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
+        public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
         {
             return keys.Any()
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -193,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.Fetch<TreeEntityPath>(sql);
         }
 
-        public virtual IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
+        public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
         {
             var sqlClause = GetBase(false, false, null);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
@@ -203,7 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dtos.Select(x => BuildEntity(false, false, x)).ToList();
         }
 
-        public virtual IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
+        public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
             var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectType == Constants.ObjectTypes.Media;
@@ -214,7 +216,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, sql);
 
-            return GetEntities(sql, isContent, isMedia);
+            return GetEntities(sql, isContent, isMedia, true);
+        }
+
+        //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
+        internal IEnumerable<IEntitySlim> GetMediaByQueryWithoutPropertyData(IQuery<IUmbracoEntity> query)
+        {
+            var isContent = false;
+            var isMedia = true;
+
+            var sql = GetBaseWhere(isContent, isMedia, false, null, Constants.ObjectTypes.Media);
+
+            var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
+            sql = translator.Translate();
+            sql = AddGroupBy(isContent, isMedia, sql);
+
+            return GetEntities(sql, isContent, isMedia, false);
         }
 
         public UmbracoObjectTypes GetObjectType(int id)
@@ -241,6 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
+        //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperties(EntitySlim entity, BaseDto dto)
         {
             var pdtos = Database.Fetch<PropertyDataDto>(GetPropertyData(dto.VersionId));
@@ -248,6 +266,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 BuildProperty(entity, pdto);
         }
 
+        //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperties(EntitySlim[] entities, List<BaseDto> dtos)
         {
             var versionIds = dtos.Select(x => x.VersionId).Distinct().ToList();
@@ -263,6 +282,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
+        //fixme - see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
         private void BuildProperty(EntitySlim entity, PropertyDataDto pdto)
         {
             // explain ?!

@@ -265,7 +265,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // create prepared sql
             // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
             psql = Sql(psql.SQL.ToSingleLine(), psql.Arguments);
-            
+
             // replace the magic culture parameter (see DocumentRepository.GetBaseQuery())
             if (!ordering.Culture.IsNullOrWhiteSpace())
             {
@@ -359,7 +359,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // fixme - what if it is NOT a document but a ... media or whatever?
                 // previously, we inserted the join+select *here* so we were sure to have it,
                 // but now that's not the case anymore!
-                return "variantName"; 
+                return "variantName";
             }
 
             // previously, we'd accept anything and just sanitize it - not anymore

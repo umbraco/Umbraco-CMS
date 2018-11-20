@@ -67,8 +67,9 @@ namespace Umbraco.Web.Editors
                 throw new InvalidOperationException("The membership provider cannot have a password format of " + membershipPasswordHasher.MembershipProvider.PasswordFormat + " and be configured with secured hashed passwords");
             }
 
-            //Are we resetting the password?? In ASP.NET Identity APIs, this flag indicates that an admin user is changing another user's password
-            //without knowing the original password.
+            //Are we resetting the password?
+            //This flag indicates that either an admin user is changing another user's password without knowing the original password
+            // or that the password needs to be reset to an auto-generated one.
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
                 //if it's the current user, the current user cannot reset their own password
@@ -109,7 +110,6 @@ namespace Umbraco.Web.Editors
             }
 
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
-            //TODO: What if the current user is admin? We should allow manually changing then?
             if (passwordModel.OldPassword.IsNullOrWhiteSpace())
             {
                 //if password retrieval is not enabled but there is no old password we cannot continue
@@ -161,10 +161,43 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            //Are we resetting the password??
-            //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
+            //Are we resetting the password?
+            //This flag indicates that either an admin user is changing another user's password without knowing the original password
+            // or that the password needs to be reset to an auto-generated one.
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
+                //if a new password is supplied then it's an admin user trying to change another user's password without knowing the original password
+                //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
+                if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
+                {
+                    if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    {
+                        //this provider allows manually changing the password without the old password, so we can just do it
+                        try
+                        {
+                            var result = umbracoBaseProvider.ChangePassword(username, string.Empty, passwordModel.NewPassword);
+
+                            if (result && backofficeUserManager != null && userId >= 0)
+                                backofficeUserManager.RaisePasswordChangedEvent(userId);
+
+                            return result == false
+                                ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
+                                : Attempt.Succeed(new PasswordChangedModel());
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Warn<PasswordChanger>("Could not change member password", ex);
+                            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
+                        }
+                    }
+                    else
+                    {
+                        return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Provider does not support manually changing passwords", new[] { "value" }) });
+                    }
+                }
+
+                //we've made it here which means we need to generate a new password
+
                 var canReset = membershipProvider.CanResetPassword(_userService);
                 if (canReset == false)
                 {
@@ -174,12 +207,13 @@ namespace Umbraco.Web.Editors
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset requires a password answer", new[] { "resetPassword" }) });
                 }
+
                 //ok, we should be able to reset it
                 try
                 {
                     var newPass = membershipProvider.ResetPassword(
-                        username,
-                        membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+                            username,
+                            membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
 
                     if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
                         backofficeUserManager.RaisePasswordResetEvent(userId);
@@ -201,25 +235,8 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            //This is an edge case and is only necessary for backwards compatibility:
-            if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
-            {
-                //this provider allows manually changing the password without the old password, so we can just do it
-                try
-                {
-                    var result = umbracoBaseProvider.ChangePassword(username, "", passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn<PasswordChanger>(ex, "Could not change member password");
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                }
-            }
-
-            //The provider does not support manually chaning the password but no old password supplied - need to return an error
+            //without being able to retrieve the original password, 
+            //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {
                 //if password retrieval is not enabled but there is no old password we cannot continue
