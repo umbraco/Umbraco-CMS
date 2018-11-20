@@ -76,32 +76,33 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     }
                 }
 
-                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon).then(function (collectionData) {
+                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon)
+                    .then(function (collectionData) {
 
-                    navigationService.hideMenu();
-                    $location.search('create', null);
-                    $location.search('notemplate', null);
+                        navigationService.hideMenu();
+                        $location.search('create', null);
+                        $location.search('notemplate', null);
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                        formHelper.resetForm({
+                            scope: $scope
+                        });
 
-                    var section = appState.getSectionState("currentSection");
+                        var section = appState.getSectionState("currentSection");
 
-                    // redirect to the item id
-                    $location.path("/settings/documenttypes/edit/" + collectionData.itemId);
+                        // redirect to the item id
+                        $location.path("/" + section + "/documenttypes/edit/" + collectionData.containerId);
 
-                }, function (err) {
+                    }, function (err) {
 
-                    $scope.error = err;
+                        $scope.error = err;
 
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
+                        //show any notifications
+                        if (angular.isArray(err.data.notifications)) {
+                            for (var i = 0; i < err.data.notifications.length; i++) {
+                                notificationsService.showNotification(err.data.notifications[i]);
+                            }
                         }
-                    }
-                });
+                    });
             });
         }
 

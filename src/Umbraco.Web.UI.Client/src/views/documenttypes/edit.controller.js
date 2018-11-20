@@ -463,9 +463,11 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            navigationService.syncTree({ tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                vm.currentNode = syncArgs.node;
-            });
+            const args = { tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true };
+            navigationService.syncTree(args)
+                .then(function (syncArgs) {
+                    vm.currentNode = syncArgs.node;
+                });
         }
 
         function close() {

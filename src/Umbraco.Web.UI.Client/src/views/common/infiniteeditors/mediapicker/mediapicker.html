@@ -32,12 +32,10 @@
                                no-dirty-check />
 
                         <div class="form-search__toggle">
+                            <input type="checkbox" ng-model="showChilds" ng-change="toggle()" />
                             <label>
                                 <localize key="general_includeFromsubFolders">Include subfolders in search</localize>
                             </label>
-                            <umb-toggle checked="showChilds"
-                                        on-click="toggle()">
-                            </umb-toggle>
                         </div>
                     </div>
     

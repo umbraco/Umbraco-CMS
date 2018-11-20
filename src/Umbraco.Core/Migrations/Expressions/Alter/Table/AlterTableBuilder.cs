@@ -4,6 +4,7 @@ using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Migrations.Expressions.Create.Expressions;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Alter.Table
@@ -154,8 +155,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
-                TableName = Expression.TableName,
-                IsUnique = true
+                TableName = Expression.TableName,               
+                IndexType = IndexTypes.UniqueNonClustered
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition

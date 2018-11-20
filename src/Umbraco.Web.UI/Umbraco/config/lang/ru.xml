@@ -788,8 +788,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Сбросить</key>
-    <key alias="defineCrop">Задать рамку</key>
-    <key alias="defineCropDescription">Задайте рамке имя (алиас), а также ширину и высоту по-умолчанию</key>
     <key alias="saveCrop">Сохранить рамку</key>
     <key alias="addCrop">Добавить новую рамку</key>
   </area>

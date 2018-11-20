@@ -1135,7 +1135,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="imagecropper">
     <key alias="reset">Réinitialiser</key>
     <key alias="defineCrop">Définir le recadrage</key>
-    <key alias="defineCropDescription">Donnez un alias au recadrage ainsi que sa largeur et sa hauteur par défaut</key>
     <key alias="saveCrop">Sauvegarder le recadrage</key>
     <key alias="addCrop">Ajouter un nouveau recadrage</key>
   </area>

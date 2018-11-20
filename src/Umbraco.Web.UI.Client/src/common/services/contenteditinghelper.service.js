@@ -432,16 +432,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     "properties",
                     "apps",
                     "createDateFormatted",
-                    "releaseDateYear",
-                    "releaseDateMonth",
-                    "releaseDateDayNumber",
-                    "releaseDateDay",
-                    "releaseDateTime",
-                    "removeDateYear",
-                    "removeDateMonth",
-                    "removeDateDayNumber",
-                    "removeDateDay",
-                    "removeDateTime"
+                    "releaseDate",
+                    "expireDate"
                 ], function (i) {
                     return i === propName;
                 });
