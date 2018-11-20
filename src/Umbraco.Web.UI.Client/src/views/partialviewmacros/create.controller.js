@@ -1,10 +1,10 @@
 (function () {
     "use strict";
 
-    function PartialViewMacrosCreateController($scope, codefileResource, macroResource, $location, navigationService, formHelper, localizationService, appState) {
+    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.snippets = [];
         vm.createFolderError = "";
@@ -19,6 +19,7 @@
         vm.createFileWithoutMacro = createFileWithoutMacro;
         vm.showCreateFromSnippet = showCreateFromSnippet;
         vm.createFileFromSnippet = createFileFromSnippet;
+        vm.close = close;
 
         function onInit() {
             codefileResource.getSnippets('partialViewMacros')
@@ -74,6 +75,11 @@
 
         function showCreateFromSnippet() {
             vm.showSnippets = true;
+        }
+
+        function close() {
+            const showMenu = true;
+            navigationService.hideDialog(showMenu);
         }
 
         onInit();

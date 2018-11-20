@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
@@ -31,7 +30,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            // if Json storage type deserialzie and return as string array
+            if (source == null) return Array.Empty<string>();
+
+            // if Json storage type deserialize and return as string array
             if (JsonStorageType(propertyType.DataType.Id))
             {
                 var jArray = JsonConvert.DeserializeObject<JArray>(source.ToString());
@@ -39,11 +40,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             }
 
             // Otherwise assume CSV storage type and return as string array
-            var sourceString = source?.ToString() ?? string.Empty;
-            var csvTags = sourceString
-                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
-                .ToArray();
-            return csvTags;
+            return source.ToString().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
@@ -62,10 +59,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private bool JsonStorageType(int dataTypeId)
         {
-            // fixme
-            // GetPreValuesCollectionByDataTypeId is cached at repository level;
-            // still, the collection is deep-cloned so this is kinda expensive,
-            // better to cache here + trigger refresh in DataTypeCacheRefresher
+            // GetDataType(id) is cached at repository level; still, there is some
+            // deep-cloning involved (expensive) - better cache here + trigger
+            // refresh in DataTypeCacheRefresher
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {

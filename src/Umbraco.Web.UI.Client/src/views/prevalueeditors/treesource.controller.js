@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper, editorService){
+	function($scope, entityResource, iconHelper, editorService){
 
 	    if (!$scope.model) {
 	        $scope.model = {};

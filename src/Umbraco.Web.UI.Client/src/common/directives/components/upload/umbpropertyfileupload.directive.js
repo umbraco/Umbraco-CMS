@@ -222,7 +222,7 @@
                 });
 
                 //special check for a comma in the name
-                newVal += files[i].name.replace(',', '-') + ",";
+                newVal += files[i].name.split(',').join('-') + ",";
 
                 if (isImage) {
 

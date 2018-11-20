@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, historyService, eventsService, angularHelper, languageResource, contentResource) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -147,11 +147,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    //trigger dialods with a hotkey:
-    keyboardService.bind("esc", function () {
-        eventsService.emit("app.closeDialogs");
-    });
-
     $scope.selectedId = navigationService.currentId;
 
     var evts = [];
@@ -167,6 +162,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
+        }
+        if (args.key === "dialogTemplateUrl") {
+            $scope.dialogTemplateUrl = args.value;
         }
         if (args.key === "showMenu") {
             $scope.showContextMenu = args.value;
@@ -239,21 +237,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }));
 
-    //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    evts.push(eventsService.on("app.closeDialogs", function (event) {
-        if (appState.getGlobalState("stickyNavigation")) {
-            navigationService.hideNavigation();
-            //TODO: don't know why we need this? - we are inside of an angular event listener.
-            angularHelper.safeApply($scope);
-        }
-    }));
-
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function () {
         $scope.authenticated = false;
     }));
 
-    //when the application is ready and the user is authorized setup the data
+    //when the application is ready and the user is authorized, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
         init();
     }));
@@ -318,12 +307,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     navInit = true;
                     initNav();
                 }
-                else {
-                    //keep track of the current section, when it changes change the state, and we listen for that event change above
-                    if ($scope.currentSection != $routeParams.section) {
-                        appState.setSectionState("currentSection", $routeParams.section);
-                    }
+
+                //keep track of the current section when it changes
+                if ($scope.currentSection != $routeParams.section) {
+                    appState.setSectionState("currentSection", $routeParams.section);
                 }
+
             }
         });
     }
@@ -384,8 +373,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
                     //the nav is ready, let the app know
                     eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
-                    //finally set the section state
-                    appState.setSectionState("currentSection", $routeParams.section);
+                    
                 }
             });
         });

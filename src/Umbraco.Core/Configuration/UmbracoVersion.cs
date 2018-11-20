@@ -10,37 +10,61 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public static class UmbracoVersion
     {
-        // BEWARE!
-        // This class is parsed and updated by the build scripts.
-        // Do NOT modify it unless you understand what you are doing.
+        static UmbracoVersion()
+        {
+            var umbracoCoreAssembly = typeof(UmbracoVersion).Assembly;
+
+            // gets the value indicated by the AssemblyVersion attribute
+            AssemblyVersion = umbracoCoreAssembly.GetName().Version;
+
+            // gets the value indicated by the AssemblyFileVersion attribute
+            AssemblyFileVersion = System.Version.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version);
+
+            // gets the value indicated by the AssemblyInformationalVersion attribute
+            // this is the true semantic version of the Umbraco Cms
+            SemanticVersion = SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
+
+            // gets the non-semantic version
+            Current = SemanticVersion.GetVersion(3);
+        }
 
         /// <summary>
-        /// Gets the version of the executing code.
+        /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        public static Version Current { get; } = new Version("8.0.0");
+        // TODO rename to Version
+        public static Version Current { get; }
 
         /// <summary>
-        /// Gets the version comment of the executing code (eg "beta").
+        /// Gets the semantic version comments of the Umbraco code.
         /// </summary>
-        public static string CurrentComment => "alpha.52";
+        public static string Comment => SemanticVersion.Prerelease;
 
         /// <summary>
-        /// Gets the assembly version of Umbraco.Code.dll.
+        /// Gets the assembly version of the Umbraco code.
         /// </summary>
-        /// <remarks>Get it by looking at a class in that dll, due to medium trust issues,
-        /// see http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx,
-        /// however fixme we don't support medium trust anymore?</remarks>
-        public static string AssemblyVersion => new AssemblyName(typeof(UmbracoVersion).Assembly.FullName).Version.ToString();
+        /// <remarks>
+        /// <para>The assembly version is the value of the <see cref="AssemblyVersionAttribute"/>.</para>
+        /// <para>Is is the one that the CLR checks for compatibility. Therefore, it changes only on
+        /// hard-breaking changes (for instance, on new major versions).</para>
+        /// </remarks>
+        public static Version AssemblyVersion {get; }
 
         /// <summary>
-        /// Gets the semantic version of the executing code.
+        /// Gets the assembly file version of the Umbraco code.
         /// </summary>
-        public static SemVersion SemanticVersion { get; } = new SemVersion(
-            Current.Major,
-            Current.Minor,
-            Current.Build,
-            CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
-            Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
+        /// <remarks>
+        /// <para>The assembly version is the value of the <see cref="AssemblyFileVersionAttribute"/>.</para>
+        /// </remarks>
+        public static Version AssemblyFileVersion { get; }
+
+        /// <summary>
+        /// Gets the semantic version of the Umbraco code.
+        /// </summary>
+        /// <remarks>
+        /// <para>The semantic version is the value of the <see cref="AssemblyInformationalVersionAttribute"/>.</para>
+        /// <para>It is the full version of Umbraco, including comments.</para>
+        /// </remarks>
+        public static SemVersion SemanticVersion { get; }
 
         /// <summary>
         /// Gets the "local" version of the site.
@@ -51,7 +75,7 @@ namespace Umbraco.Core.Configuration
         /// and changes during an upgrade. The executing code version changes when new code is
         /// deployed. The site/files version changes during an upgrade.</para>
         /// </remarks>
-        public static SemVersion Local
+        public static SemVersion LocalVersion
         {
             get
             {

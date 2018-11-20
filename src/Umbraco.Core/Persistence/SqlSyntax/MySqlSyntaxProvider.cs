@@ -334,14 +334,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return null; // NOT SUPPORTED!
-                                 //return "NEWID()";
+                    return null; // NOT SUPPORTED!             
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
-                    //case SystemMethods.NewSequentialId:
-                    //    return "NEWSEQUENTIALID()";
-                    //case SystemMethods.CurrentUTCDateTime:
-                    //    return "GETUTCDATE()";
             }
 
             return null;

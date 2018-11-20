@@ -43,7 +43,7 @@
                         </ul>
                     </div>
 
-                    <div ng-model="vm.selectedUserGroups" umb-set-dirty-on-change>
+                    <div umb-set-dirty-on-change="{{vm.selectedUserGroups}}">
                         <umb-user-group-preview
                             ng-repeat="group in vm.selectedUserGroups"
                             icon="group.icon"
@@ -64,7 +64,7 @@
                             <p style="line-height: 1.6em; margin-bottom: 10px;"><localize key="prompt_unsavedChangesWarning"></localize></p>
                             <umb-button
                                 label-key="prompt_discardChanges"
-                                action="nav.hideDialog();"
+                                action="vm.discardChanges();"
                                 type="button">
                             </umb-button>
                             <umb-button

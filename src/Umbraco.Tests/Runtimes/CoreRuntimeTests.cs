@@ -14,6 +14,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Examine;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -63,14 +64,6 @@ namespace Umbraco.Tests.Runtimes
                 return new TestRuntime(this);
             }
 
-            // the application's logger is created by the application
-            // through GetLogger, that custom application can override
-            protected override ILogger GetLogger()
-            {
-                //return Mock.Of<ILogger>();
-                return new DebugDiagnosticsLogger();
-            }
-
             // don't register anything against AppDomain
             protected override void ConfigureUnhandledException(ILogger logger)
             { }
@@ -80,8 +73,18 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(UmbracoApplicationBase umbracoApplication)
-                : base(umbracoApplication)
-            { }
+                : base()
+            {
+                _umbracoApplication = umbracoApplication;
+            }
+
+            // the application's logger is created by the application
+            // through GetLogger, that custom application can override
+            protected override ILogger GetLogger()
+            {
+                //return Mock.Of<ILogger>();
+                return new DebugDiagnosticsLogger();
+            }
 
             public override void Compose(ServiceContainer container)
             {
@@ -115,6 +118,7 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private MainDom _mainDom;
+            private readonly UmbracoApplicationBase _umbracoApplication;
 
             public override void Boot(ServiceContainer container)
             {
