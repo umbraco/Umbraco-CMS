@@ -293,6 +293,11 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -642,7 +647,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we cannot find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -1205,8 +1210,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="imagecropper">
         <key alias="reset">Reset crop</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
         <key alias="updateEditCrop">Done</key>
