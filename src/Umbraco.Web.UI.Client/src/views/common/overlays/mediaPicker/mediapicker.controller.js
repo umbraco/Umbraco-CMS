@@ -18,10 +18,8 @@ angular.module("umbraco")
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
 
-            console.log('details:',$scope.showDetails);
-
             if ($scope.showDetails) {
-                // hide submit since the "insertion" of the picked media will be done from the details view.
+                // hide submit-button since the "insertion" of the picked media will be done from the details view.
                 $scope.hideSubmitButton = true;
                 $scope.model.hideSubmitButton = true;
             }
