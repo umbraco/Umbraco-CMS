@@ -360,11 +360,11 @@ namespace Umbraco.Examine
             {
                 var isVariant = c.ContentType.VariesByCulture();
 
-                var urlValue = c.GetUrlSegment(urlSegmentProviders); //fixme: variants
+                var urlValue = c.GetUrlSegment(urlSegmentProviders); //Always add invariant urlName
                 var values = new Dictionary<string, object[]>
                 {
                     {"icon", new [] {c.ContentType.Icon}},
-                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //fixme: variants
+                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
                     {"key", new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
@@ -380,11 +380,14 @@ namespace Umbraco.Examine
                     {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
                     {"writerName", new object[] {c.GetWriterProfile(userService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
-                    {"template", new object[] {c.Template?.Id ?? 0}}
+                    {"template", new object[] {c.Template?.Id ?? 0}},
+                    {$"{SpecialFieldPrefix}VariesByCulture", new object[] {0}},
                 };
 
                 if (isVariant)
                 {
+                    values[$"{SpecialFieldPrefix}VariesByCulture"] = new object[] { 1 };
+
                     foreach(var culture in c.AvailableCultures)
                     {
                         var variantUrl = c.GetUrlSegment(urlSegmentProviders, culture);
