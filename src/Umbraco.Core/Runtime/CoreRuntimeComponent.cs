@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using AutoMapper;
 using LightInject;
 using Umbraco.Core.Cache;
@@ -26,6 +25,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Runtime
 {
@@ -35,30 +36,78 @@ namespace Umbraco.Core.Runtime
         {
             base.Compose(composition);
 
+            var container = composition.Container;
+
+            container.RegisterSingleton<IProfiler, LogProfiler>();
+            container.RegisterSingleton<ProfilingLogger>();
+            container.RegisterSingleton<IRuntimeState, RuntimeState>();
+
+            container.RegisterFrom<ConfigurationCompositionRoot>();
+
+            // register caches
+            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
+            // are cloned in and cloned out - no request-based cache here since no web-based context,
+            // will be overriden later or
+            container.RegisterSingleton(_ => new CacheHelper(
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+                new StaticCacheProvider(),
+                NullCacheProvider.Instance,
+                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
+            container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
+
+            // register the plugin manager
+            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
+
+            // register syntax providers - required by database factory
+            container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
+            container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
+            container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
+
+            // register persistence mappers - required by database factory so needs to be done here
+            // means the only place the collection can be modified is in a runtime - afterwards it
+            // has been frozen and it is too late
+            var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
+            ComposeMapperCollection(mapperCollectionBuilder);
+
+            // register database factory - required to check for migrations
+            // will be initialized with syntax providers and a logger, and will try to configure
+            // from the default connection string name, if possible, else will remain non-configured
+            // until properly configured (eg when installing)
+            container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            container.RegisterSingleton(f => f.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+
+            // register the scope provider
+            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
+            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+
+            // register MainDom
+            container.RegisterSingleton<MainDom>();
+
             // register from roots
-            composition.Container.RegisterFrom<RepositoryCompositionRoot>();
-            composition.Container.RegisterFrom<ServicesCompositionRoot>();
-            composition.Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
+            container.RegisterFrom<RepositoryCompositionRoot>();
+            container.RegisterFrom<ServicesCompositionRoot>();
+            container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around
-            composition.Container.Register<DatabaseBuilder>();
+            container.Register<DatabaseBuilder>();
 
             // register filesystems
-            composition.Container.RegisterSingleton<FileSystems>();
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().ScriptsFileSystem, Constants.Composing.FileSystems.ScriptFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().PartialViewsFileSystem, Constants.Composing.FileSystems.PartialViewFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MacroPartialsFileSystem, Constants.Composing.FileSystems.PartialViewMacroFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, Constants.Composing.FileSystems.StylesheetFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, Constants.Composing.FileSystems.MasterpageFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, Constants.Composing.FileSystems.ViewFileSystem);
+            container.RegisterSingleton<FileSystems>();
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().ScriptsFileSystem, Constants.Composing.FileSystems.ScriptFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().PartialViewsFileSystem, Constants.Composing.FileSystems.PartialViewFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MacroPartialsFileSystem, Constants.Composing.FileSystems.PartialViewMacroFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, Constants.Composing.FileSystems.StylesheetFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, Constants.Composing.FileSystems.MasterpageFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, Constants.Composing.FileSystems.ViewFileSystem);
 
             // register manifest parser, will be injected in collection builders where needed
-            composition.Container.RegisterSingleton<ManifestParser>();
+            container.RegisterSingleton<ManifestParser>();
 
             // register our predefined validators
-            composition.Container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
+            container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
                 .Add<RequiredValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedValueValidator>()
@@ -67,13 +116,13 @@ namespace Umbraco.Core.Runtime
                 .Add<DecimalValidator>();
 
             // properties and parameters derive from data editors
-            composition.Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>()
+            container.RegisterCollectionBuilder<DataEditorCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetDataEditors());
-            composition.Container.RegisterSingleton<PropertyEditorCollection>();
-            composition.Container.RegisterSingleton<ParameterEditorCollection>();
+            container.RegisterSingleton<PropertyEditorCollection>();
+            container.RegisterSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar 
-            composition.Container.RegisterSingleton<IServerRegistrar>(f =>
+            container.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
@@ -85,7 +134,7 @@ namespace Umbraco.Core.Runtime
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by either the legacy thing or the db thing in the corresponding
             // components in the web project - fixme - should obsolete the legacy thing
-            composition.Container.RegisterSingleton<IServerMessenger>(factory
+            container.RegisterSingleton<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
@@ -94,32 +143,37 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
-            composition.Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetCacheRefreshers());
 
-            composition.Container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
+            container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
 
-            composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
-            composition.Container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(new PerContainerLifetime());
+            container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(new PerContainerLifetime());
 
-            composition.Container.RegisterSingleton<IShortStringHelper>(factory
+            container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
-            composition.Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
+            container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
 
-            composition.Container.RegisterSingleton<IMigrationBuilder, MigrationBuilder>();
+            container.RegisterSingleton<IMigrationBuilder, MigrationBuilder>();
 
             // by default, register a noop factory
-            composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
+            container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
-            composition.Container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+            container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+        }
+
+        protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)
+        {
+            builder.AddCore();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

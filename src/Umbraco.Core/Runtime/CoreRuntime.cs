@@ -56,8 +56,6 @@ namespace Umbraco.Core.Runtime
             ConfigureUnhandledException(logger);
             ConfigureAssemblyResolve(logger);
 
-            Compose(container);
-
             // prepare essential stuff
 
             var path = GetApplicationRootPath();
@@ -89,7 +87,6 @@ namespace Umbraco.Core.Runtime
                 {
                     Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                    AquireMainDom(container);
                     DetermineRuntimeLevel(container);
                     var componentTypes = ResolveComponentTypes();
 
@@ -103,6 +100,8 @@ namespace Umbraco.Core.Runtime
                         InitializeComponents(components, container);
                         scope.Complete();
                     }
+
+                    AquireMainDom(container);
 
                     _components = components;
                 }
@@ -243,67 +242,6 @@ namespace Umbraco.Core.Runtime
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Composes the runtime.
-        /// </summary>
-        public virtual void Compose(ServiceContainer container)
-        {
-            // compose the very essential things that are needed to bootstrap, before anything else,
-            // and only these things - the rest should be composed in runtime components
-
-            // register basic things
-            container.RegisterSingleton<IProfiler, LogProfiler>();
-            container.RegisterSingleton<ProfilingLogger>();
-            container.RegisterSingleton<IRuntimeState, RuntimeState>();
-
-            container.RegisterFrom<ConfigurationCompositionRoot>();
-
-            // register caches
-            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
-            // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // will be overriden later or
-            container.RegisterSingleton(_ => new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-            container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
-
-            // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
-
-            // register syntax providers - required by database factory
-            container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
-
-            // register persistence mappers - required by database factory so needs to be done here
-            // means the only place the collection can be modified is in a runtime - afterwards it
-            // has been frozen and it is too late
-            var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
-            ComposeMapperCollection(mapperCollectionBuilder);
-
-            // register database factory - required to check for migrations
-            // will be initialized with syntax providers and a logger, and will try to configure
-            // from the default connection string name, if possible, else will remain non-configured
-            // until properly configured (eg when installing)
-            container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            container.RegisterSingleton(f => f.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
-
-            // register the scope provider
-            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
-
-            // register MainDom
-            container.RegisterSingleton<MainDom>();
-        }
-
-        protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)
-        {
-            builder.AddCore();
         }
 
         private void SetRuntimeStateLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)

@@ -16,6 +16,7 @@ using Examine;
 using LightInject;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -23,14 +24,12 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
-using Umbraco.Examine;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionRoots;
@@ -40,8 +39,6 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
-using Umbraco.Web.Media;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -65,6 +62,23 @@ namespace Umbraco.Web.Runtime
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
+
+            var container = composition.Container;
+
+            // replace CoreRuntime's CacheHelper registration
+            container.RegisterSingleton(_ => new CacheHelper(
+                // we need to have the dep clone runtime cache provider to ensure
+                // all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
+                new StaticCacheProvider(),
+                // we need request based cache when running in web-based context
+                new HttpRequestCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    // we need to have the dep clone runtime cache provider to ensure
+                    // all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
+
+            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
             composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
 
@@ -113,7 +127,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             composition.Container.RegisterSingleton<ISectionService, SectionService>();
 
-            composition.Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
+            composition.Container.RegisterSingleton(factory => ExamineManager.Instance);
 
             // IoC setup for LightInject for MVC/WebApi
             // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
