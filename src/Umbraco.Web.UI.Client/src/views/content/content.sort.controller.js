@@ -48,7 +48,9 @@
 
             contentResource.sort(args)
                 .then(function(){
-                    navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true, activate: false });
+                    navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true })
+                        .then(() => navigationService.reloadNode($scope.currentNode));
+
                     vm.saveButtonState = "success";
                 }, function(error) {
                     vm.error = error;
