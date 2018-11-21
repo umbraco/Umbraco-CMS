@@ -155,7 +155,6 @@
     <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Collections\TypeList.cs" />
-    <Compile Include="Components\BootLoader.cs" />
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
     <Compile Include="Components\DisableComponentAttribute.cs" />

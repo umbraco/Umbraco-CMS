@@ -46,6 +46,9 @@ namespace Umbraco.Web.Runtime
                 _webProfiler = new VoidProfiler();
             }
 
+            // throws if not full-trust
+            new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+
             base.Boot(container);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
