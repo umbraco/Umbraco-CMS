@@ -52,8 +52,12 @@ namespace Umbraco.Web.Routing
                 return false;
             }
 
+            // Appening any querystring from the incomming request to the redirect url.
+            url = string.IsNullOrEmpty(contentRequest.Uri.Query) ? url : url + contentRequest.Uri.Query;
+
             LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
                 () => route, () => content.Id, () => url);
+
             contentRequest.SetRedirectPermanent(url);
             return true;
         }
