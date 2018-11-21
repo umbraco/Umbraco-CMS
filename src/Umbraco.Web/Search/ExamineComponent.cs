@@ -27,6 +27,8 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Web.Scheduling;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Search
 {
@@ -43,6 +45,7 @@ namespace Umbraco.Web.Search
         private IScopeProvider _scopeProvider;
         private UrlSegmentProviderCollection _urlSegmentProviders;
         private ServiceContext _services;
+        private BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -55,6 +58,11 @@ namespace Umbraco.Web.Search
             _urlSegmentProviders = urlSegmentProviderCollection;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
+            _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
+                "RebuildIndexesOnStartup",
+                profilingLogger.Logger,
+                //hook into MainDom so that no index building occurs unless on MainDom
+                BackgroundTaskRunner<IBackgroundTask>.MainDomHook.Create(null, null));
 
             //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown
@@ -68,7 +76,7 @@ namespace Umbraco.Web.Search
                 var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
                 return simpleFsLockFactory;
             };
-            
+
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = mainDom.Register(() =>
             {
@@ -121,22 +129,9 @@ namespace Umbraco.Web.Search
             //TODO: need a way to disable rebuilding on startup
 
             logger.Info<ExamineComponent>("Starting initialize async background thread.");
-
-            // make it async in order not to slow down the boot
-            // fixme - should be a proper background task else we cannot stop it!
-            var bg = new Thread(() =>
-            {
-                try
-                {
-                    // rebuilds any empty indexes
-                    RebuildIndexes(true, _examineManager, logger);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
-                }
-            });
-            bg.Start();
+            //do the rebuild on a managed background thread
+            var task = new RebuildOnStartupTask(_examineManager, logger);
+            _rebuildOnStartupRunner.TryAdd(task);
         }
 
         /// <summary>
@@ -223,6 +218,7 @@ namespace Umbraco.Web.Search
             }
         }
 
+        #region Cache refresher updated event handlers
         private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -276,7 +272,7 @@ namespace Umbraco.Web.Search
 
             var mediaService = _services.MediaService;
 
-            foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
+            foreach (var payload in (MediaCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
@@ -333,9 +329,9 @@ namespace Umbraco.Web.Search
 
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
-                        
+
             var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
-           
+
             foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (!changedIds.TryGetValue(payload.ItemType, out var idLists))
@@ -354,11 +350,11 @@ namespace Umbraco.Web.Search
 
             const int pageSize = 500;
 
-            foreach(var ci in changedIds)
+            foreach (var ci in changedIds)
             {
                 if (ci.Value.refreshedIds.Count > 0 || ci.Value.otherIds.Count > 0)
                 {
-                    switch(ci.Key)
+                    switch (ci.Key)
                     {
                         case var itemType when itemType == typeof(IContentType).Name:
                             RefreshContentOfContentTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
@@ -404,7 +400,7 @@ namespace Umbraco.Web.Search
             const int pageSize = 500;
 
             var memberTypes = _services.MemberTypeService.GetAll(memberTypeIds);
-            foreach(var memberType in memberTypes)
+            foreach (var memberType in memberTypes)
             {
                 var page = 0;
                 var total = long.MaxValue;
@@ -500,7 +496,7 @@ namespace Umbraco.Web.Search
 
             var contentService = _services.ContentService;
 
-            foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
+            foreach (var payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
@@ -543,9 +539,9 @@ namespace Umbraco.Web.Search
                         const int pageSize = 500;
                         var page = 0;
                         var total = long.MaxValue;
-                        while(page * pageSize < total)
+                        while (page * pageSize < total)
                         {
-                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, 
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check it's published state without checking every item
                                 ordering: Ordering.By("Path", Direction.Ascending));
 
@@ -578,7 +574,9 @@ namespace Umbraco.Web.Search
                 // BUT ... pretty sure it is! see test "Index_Delete_Index_Item_Ensure_Heirarchy_Removed"
             }
         }
+        #endregion
 
+        #region ReIndex/Delete for entity
         private void ReIndexForContent(IContent content, IContent published)
         {
             if (published != null && content.VersionId == published.VersionId)
@@ -642,9 +640,11 @@ namespace Umbraco.Web.Search
             if (actions != null)
                 actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
             else
-                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);            
+                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);
         }
+        #endregion
 
+        #region Defered Actions
         private class DeferedActions
         {
             private readonly List<DeferedAction> _actions = new List<DeferedAction>();
@@ -686,7 +686,7 @@ namespace Umbraco.Web.Search
             private readonly bool? _supportUnpublished;
 
             public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
-            {                
+            {
                 _examineComponent = examineComponent;
                 _content = content;
                 _supportUnpublished = supportUnpublished;
@@ -799,6 +799,46 @@ namespace Umbraco.Web.Search
                         .Where(x => x.EnableDefaultEventHandler));
             }
         }
+        #endregion
 
+        /// <summary>
+        /// Background task used to rebuild empty indexes on startup
+        /// </summary>
+        private class RebuildOnStartupTask : IBackgroundTask
+        {
+            private readonly IExamineManager _examineManager;
+            private readonly ILogger _logger;
+
+            public RebuildOnStartupTask(IExamineManager examineManager, ILogger logger)
+            {
+                _examineManager = examineManager;
+                _logger = logger;
+            }
+
+            public bool IsAsync => false;
+
+            public void Dispose()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Run()
+            {
+                try
+                {
+                    // rebuilds any empty indexes
+                    RebuildIndexes(true, _examineManager, _logger);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
+                }
+            }
+
+            public Task RunAsync(CancellationToken token)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
