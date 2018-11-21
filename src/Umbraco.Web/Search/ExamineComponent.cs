@@ -74,7 +74,7 @@ namespace Umbraco.Web.Search
             {
                 using (profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
-                    ExamineManager.Instance.Dispose();
+                    _examineManager.Dispose();
                 }
             });
 
@@ -163,7 +163,7 @@ namespace Umbraco.Web.Search
             else
             {
                 //do all of them
-                ExamineManager.Instance.RebuildIndexes();
+                examineManager.RebuildIndexes();
             }
         }
 
@@ -701,7 +701,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, content);
 
-                ExamineManager.Instance.IndexItems(
+                examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
                     examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
                         // only for the specified indexers
@@ -732,7 +732,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, media);
 
-                ExamineManager.Instance.IndexItems(
+                examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
                     examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
                         // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
@@ -762,7 +762,7 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = UmbracoMemberIndexer.GetValueSets(member);
 
-                ExamineManager.Instance.IndexItems(
+                examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
                     examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
                         //ensure that only the providers are flagged to listen execute
@@ -790,7 +790,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {
-                ExamineManager.Instance.DeleteFromIndexes(
+                examineComponent._examineManager.DeleteFromIndexes(
                     id.ToString(CultureInfo.InvariantCulture),
                     examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
                         // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
