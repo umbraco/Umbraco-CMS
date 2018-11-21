@@ -37,10 +37,17 @@ namespace Umbraco.Tests.UmbracoExamine
             IMediaService mediaService = null,
             IMemberService memberService = null,
             IUserService userService = null,
+            ILocalizationService languageService = null,
             IContentTypeService contentTypeService = null,
             IMediaTypeService mediaTypeService = null,
             UmbracoContentIndexerOptions options = null)
         {
+            if (languageService == null)
+            {
+                languageService = Mock.Of<ILocalizationService>(
+                    x => x.GetAllLanguages() == Array.Empty<ILanguage>());
+            }
+
             if (contentService == null)
             {
                 long longTotalRecs;
@@ -179,6 +186,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 contentService,
                 mediaService,
                 userService,
+                languageService,
                 sqlContext,
                 new[] {new DefaultUrlSegmentProvider()},
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),

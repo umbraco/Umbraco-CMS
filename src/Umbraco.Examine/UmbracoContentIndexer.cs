@@ -21,7 +21,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Examine.Config;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
-
+using Examine.LuceneEngine;
 
 namespace Umbraco.Examine
 {
@@ -33,6 +33,7 @@ namespace Umbraco.Examine
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected IUserService UserService { get; }
+        protected ILocalizationService LanguageService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private int? _parentId;
@@ -48,6 +49,7 @@ namespace Umbraco.Examine
             ContentService = Current.Services.ContentService;
             MediaService = Current.Services.MediaService;
             UserService = Current.Services.UserService;
+            LanguageService = Current.Services.LocalizationService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
 
@@ -79,6 +81,7 @@ namespace Umbraco.Examine
             IContentService contentService,
             IMediaService mediaService,
             IUserService userService,
+            ILocalizationService languageService,
             ISqlContext sqlContext,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
@@ -96,6 +99,7 @@ namespace Umbraco.Examine
             ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             UserService = userService ?? throw new ArgumentNullException(nameof(userService));
+            LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
             _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             InitializeQueries(sqlContext);
@@ -227,6 +231,27 @@ namespace Umbraco.Examine
         #region Protected
 
         /// <summary>
+        /// Overridden to ensure that the variant system fields have the right value types
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="indexValueTypesFactory"></param>
+        /// <returns></returns>
+        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        {
+            //fixme: languages are dynamic so although this will work on startup it wont work when languages are edited
+            foreach(var lang in LanguageService.GetAllLanguages())
+            {
+                foreach (var field in UmbracoIndexFields)
+                {
+                    var def = new FieldDefinition($"{field.Name}_{lang.IsoCode.ToLowerInvariant()}", field.Type);
+                    FieldDefinitionCollection.TryAdd(def.Name, def);
+                }
+            }
+
+            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
+        }
+
+        /// <summary>
         /// This is a static query, it's parameters don't change so store statically
         /// </summary>
         private static IQuery<IContent> _publishedQuery;
@@ -317,25 +342,39 @@ namespace Umbraco.Examine
             }
         }
 
+        /// <summary>
+        /// Creates a collection of <see cref="ValueSet"/> for a <see cref="IContent"/> collection
+        /// </summary>
+        /// <param name="urlSegmentProviders"></param>
+        /// <param name="userService"></param>
+        /// <param name="content"></param>
+        /// <returns>Yield returns <see cref="ValueSet"/></returns>
         public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IContent[] content)
         {
+            //TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
+            // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
+            // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
+            // references and then each array is an array of `FieldValue[]` and values are assigned accordingly. Not sure if it will make a difference or not.
+
             foreach (var c in content)
             {
-                var urlValue = c.GetUrlSegment(urlSegmentProviders); // for now, index with invariant culture
+                var isVariant = c.ContentType.VariesByCulture();
+
+                var urlValue = c.GetUrlSegment(urlSegmentProviders); //fixme: variants
                 var values = new Dictionary<string, object[]>
                 {
-                    {"icon", new object[] {c.ContentType.Icon}},
-                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},
+                    {"icon", new [] {c.ContentType.Icon}},
+                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //fixme: variants
                     {"id", new object[] {c.Id}},
                     {"key", new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
                     {"level", new object[] {c.Level}},
                     {"creatorID", new object[] {c.CreatorId}},
                     {"sortOrder", new object[] {c.SortOrder}},
-                    {"createDate", new object[] {c.CreateDate}},
-                    {"updateDate", new object[] {c.UpdateDate}},
-                    {"nodeName", new object[] {c.Name}},
-                    {"urlName", new object[] {urlValue}},
+                    {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
+                    {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
+                    {"nodeName", new object[] {c.Name}},            //Always add invariant nodeName
+                    {"urlName", new object[] {urlValue}},           //Always add invariant urlName
                     {"path", new object[] {c.Path}},
                     {"nodeType", new object[] {c.ContentType.Id}},
                     {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
@@ -344,27 +383,54 @@ namespace Umbraco.Examine
                     {"template", new object[] {c.Template?.Id ?? 0}}
                 };
 
+                if (isVariant)
+                {
+                    foreach(var culture in c.AvailableCultures)
+                    {
+                        var variantUrl = c.GetUrlSegment(urlSegmentProviders, culture);
+                        var lowerCulture = culture.ToLowerInvariant();
+                        values[$"urlName_{lowerCulture}"] = new object[] { variantUrl };
+                        values[$"nodeName_{lowerCulture}"] = new object[] { c.GetCultureName(culture) };
+                        values[$"{PublishedFieldName}_{lowerCulture}"] = new object[] { c.IsCulturePublished(culture) ? 1 : 0 };
+                        values[$"updateDate_{lowerCulture}"] = new object[] { c.GetUpdateDate(culture) };
+                    }
+                }
+
                 foreach (var property in c.Properties)
                 {
-                    //only add the value if its not null or empty (we'll check for string explicitly here too)
-                    //fixme support variants with language id
-                    var val = property.GetValue("", ""); // for now, index the invariant values
-                    switch (val)
+                    if (!property.PropertyType.VariesByCulture())
                     {
-                        case null:
-                            continue;
-                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
-                            values.Add(property.Alias, new[] { val });
-                            break;
-                        default:
-                            values.Add(property.Alias, new[] { val });
-                            break;
+                        AddPropertyValue(null, c, property, values);
+                    }
+                    else
+                    {
+                        foreach (var culture in c.AvailableCultures)
+                            AddPropertyValue(culture.ToLowerInvariant(), c, property, values);
                     }
                 }
 
                 var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
 
                 yield return vs;
+            }
+        }
+
+        private static void AddPropertyValue(string culture, IContent c, Property property, IDictionary<string, object[]> values)
+        {
+            var val = property.GetValue(culture);
+            var cultureSuffix = culture == null ? string.Empty : "_" + culture;
+            switch (val)
+            {
+                //only add the value if its not null or empty (we'll check for string explicitly here too)
+                case null:
+                    return;
+                case string strVal:
+                    if (strVal.IsNullOrWhiteSpace()) return;
+                    values.Add($"{property.Alias}{cultureSuffix}", new[] { val });
+                    break;
+                default:
+                    values.Add($"{property.Alias}{cultureSuffix}", new[] { val });
+                    break;
             }
         }
 

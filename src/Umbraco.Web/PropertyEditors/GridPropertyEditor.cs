@@ -73,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors
                                 e.Document.Add(
                                     new Field(
                                         $"{UmbracoExamineIndexer.RawFieldPrefix}{value.Key}",
-                                        firstVal, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO));
+                                        firstVal, Field.Store.YES, Field.Index.NO, Field.TermVector.NO));
 
                                 //now replace the original value with the combined/cleaned value
                                 e.Document.RemoveField(value.Key);
