@@ -376,12 +376,14 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropDownPropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropPreValueTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTaskTables.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\TablesForScheduledPublishing.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FallbackLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigrationFix.cs" />
@@ -393,6 +395,9 @@
     <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\IContentAppDefinition.cs" />
+    <Compile Include="Models\ContentSchedule.cs" />
+    <Compile Include="Models\ContentScheduleAction.cs" />
+    <Compile Include="Models\ContentScheduleCollection.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\ContentCultureInfos.cs" />
@@ -428,6 +433,7 @@
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
+    <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\DocumentCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\MediaDto.cs" />
@@ -618,9 +624,6 @@
     <Compile Include="Logging\ProfilerExtensions.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
-    <Compile Include="Logging\WebProfiler.cs" />
-    <Compile Include="Logging\WebProfilerComponent.cs" />
-    <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
@@ -1281,7 +1284,6 @@
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
-    <Compile Include="Publishing\ScheduledPublisher.cs" />
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
@@ -1301,6 +1303,7 @@
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
+    <Compile Include="Security\ContentPermissionsHelper.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUmbracoMemberTypeMembershipProvider.cs" />
@@ -1423,8 +1426,6 @@
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
-    <Compile Include="Services\UnpublishResult.cs" />
-    <Compile Include="Services\UnpublishResultType.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Settable.cs" />
     <Compile Include="Components\ManifestWatcherComponent.cs" />
@@ -1471,7 +1472,6 @@
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
-    <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />

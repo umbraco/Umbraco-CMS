@@ -1,80 +1,146 @@
 ﻿namespace Umbraco.Core.Services
 {
-
     /// <summary>
-    /// A value indicating the result of publishing a content item.
+    /// A value indicating the result of publishing or unpublishing a document.
     /// </summary>
     public enum PublishResultType : byte
     {
         // all "ResultType" enums must be byte-based, and declare Failed = 128, and declare
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
-        /// <summary>
-        /// The publishing was successful.
-        /// </summary>
-        Success = 0,
+        #region Success - Publish
 
         /// <summary>
-        /// The item was already published.
+        /// The document was successfully published.
         /// </summary>
-        SuccessAlready = 1,
+        SuccessPublish = 0,
+
+        /// <summary>
+        /// The specified document culture was successfully published.
+        /// </summary>
+        SuccessPublishCulture = 1,
+
+        /// <summary>
+        /// The document was already published.
+        /// </summary>
+        SuccessPublishAlready = 2,
+
+        #endregion
+
+        #region Success - Unpublish
+
+        /// <summary>
+        /// The document was successfully unpublished.
+        /// </summary>
+        SuccessUnpublish = 3,
+
+        /// <summary>
+        /// The document was already unpublished.
+        /// </summary>
+        SuccessUnpublishAlready = 4,
+
+        /// <summary>
+        /// The specified document culture was unpublished, the document item itself remains published.
+        /// </summary>
+        SuccessUnpublishCulture = 5,
+
+        /// <summary>
+        /// The specified document culture was unpublished, and was a mandatory culture, therefore the document itself was unpublished.
+        /// </summary>
+        SuccessUnpublishMandatoryCulture = 6,
+
+        #endregion
+
+        #region Success - Mixed
+
+        /// <summary>
+        /// Specified document cultures were successfully published and unpublished (in the same operation).
+        /// </summary>
+        SuccessMixedCulture = 7,
+
+        #endregion
+
+        #region Failed - Publish
 
         /// <summary>
         /// The operation failed.
         /// </summary>
         /// <remarks>All values above this value indicate a failure.</remarks>
-        Failed = 128,
+        FailedPublish = 128,
 
         /// <summary>
-        /// The content could not be published because it's ancestor path isn't published.
+        /// The document could not be published because its ancestor path is not published.
         /// </summary>
-        FailedPathNotPublished = Failed | 1,
+        FailedPublishPathNotPublished = FailedPublish | 1,
 
         /// <summary>
-        /// The content item was scheduled to be un-published and it has expired so we cannot force it to be
+        /// The document has expired so we cannot force it to be
         /// published again as part of a bulk publish operation.
         /// </summary>
-        FailedHasExpired = Failed | 2,
+        FailedPublishHasExpired = FailedPublish | 2,
 
         /// <summary>
-        /// The content item is scheduled to be released in the future and therefore we cannot force it to
+        /// The document is scheduled to be released in the future and therefore we cannot force it to
         /// be published during a bulk publish operation.
         /// </summary>
-        FailedAwaitingRelease = Failed | 3,
+        FailedPublishAwaitingRelease = FailedPublish | 3,
 
         /// <summary>
-        /// The content item could not be published because it is in the trash.
+        /// A document culture has expired so we cannot force it to be
+        /// published again as part of a bulk publish operation.
         /// </summary>
-        FailedIsTrashed = Failed | 4,
+        FailedPublishCultureHasExpired = FailedPublish | 4,
+
+        /// <summary>
+        /// A document culture is scheduled to be released in the future and therefore we cannot force it to
+        /// be published during a bulk publish operation.
+        /// </summary>
+        FailedPublishCultureAwaitingRelease = FailedPublish | 5,
+
+        /// <summary>
+        /// The document could not be published because it is in the trash.
+        /// </summary>
+        FailedPublishIsTrashed = FailedPublish | 6,
 
         /// <summary>
         /// The publish action has been cancelled by an event handler.
         /// </summary>
-        FailedCancelledByEvent = Failed | 5,
+        FailedPublishCancelledByEvent = FailedPublish | 7,
 
         /// <summary>
-        /// The content item could not be published because it contains invalid data (has not passed validation requirements).
+        /// The document could not be published because it contains invalid data (has not passed validation requirements).
         /// </summary>
-        FailedContentInvalid = Failed | 6,
+        FailedPublishContentInvalid = FailedPublish | 8,
 
         /// <summary>
-        /// Cannot republish a document that hasn't been published.
+        /// The document could not be published because it has no publishing flags or values.
         /// </summary>
-        FailedNoPublishedValues = Failed | 7, // in ContentService.StrategyCanPublish - fixme weird
+        FailedPublishNothingToPublish = FailedPublish | 9, // in ContentService.StrategyCanPublish - fixme weird
 
         /// <summary>
-        /// Some mandatory cultures are missing, or are not valid.
+        /// The document could not be published because some mandatory cultures are missing.
         /// </summary>
-        FailedCannotPublish = Failed | 8, // in ContentController.PublishInternal - fixme // FailedByCulture?
+        FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing 
 
         /// <summary>
-        /// Publishing changes triggered an unpublishing, due to missing mandatory cultures, and unpublishing failed.
+        /// The document could not be published because it has been modified by another user. 
         /// </summary>
-        FailedToUnpublish = Failed | 9, // in ContentService.SavePublishing
+        FailedPublishConcurrencyViolation = FailedPublish | 11,
+
+        #endregion
+
+        #region Failed - Unpublish
 
         /// <summary>
-        /// Some mandatory cultures are missing.
+        /// The document could not be unpublished.
         /// </summary>
-        FailedByCulture = Failed | 10, // in ContentService.SavePublishing
+        FailedUnpublish = FailedPublish | 11, // in ContentService.SavePublishing
+
+        /// <summary>
+        /// The unpublish action has been cancelled by an event handler.
+        /// </summary>
+        FailedUnpublishCancelledByEvent = FailedPublish | 12,
+
+        #endregion
     }
 }

@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
-    /// <summary>
+        /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
     public interface IMediaService : IContentServiceBase
@@ -151,8 +151,9 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        void Move(IMedia media, int parentId, int userId = 0);
-        
+        /// <returns>True if moving succeeded, otherwise False</returns>
+        Attempt<OperationResult> Move(IMedia media, int parentId, int userId = 0);
+
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>

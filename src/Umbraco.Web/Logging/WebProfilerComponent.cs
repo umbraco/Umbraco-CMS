@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Web.Logging
 {
     internal class WebProfilerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {

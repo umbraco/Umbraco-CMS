@@ -123,6 +123,7 @@
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
+    <Compile Include="Models\ContentScheduleTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
+    <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />

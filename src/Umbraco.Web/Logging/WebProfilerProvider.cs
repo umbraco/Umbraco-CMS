@@ -3,7 +3,7 @@ using System.Threading;
 using System.Web;
 using StackExchange.Profiling;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Web.Logging
 {
     /// <summary>
     /// This is a custom MiniProfiler WebRequestProfilerProvider (which is generally the default) that allows

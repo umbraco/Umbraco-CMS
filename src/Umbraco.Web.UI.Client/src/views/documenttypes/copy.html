@@ -45,10 +45,10 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="close()" ng-if="!busy">
+        <a class="btn btn-link" ng-click="close()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
-        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy">
+        <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">
             <localize key="actions_copy">Copy</localize>
         </button>
     </div>

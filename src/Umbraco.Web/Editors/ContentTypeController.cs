@@ -196,20 +196,6 @@ namespace Umbraco.Web.Editors
         
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
-            var storeInContainer = false;
-            var allowUnderDocType = -1;
-            // check if it's a folder
-            if (Services.ContentTypeService.Get(parentId) == null)
-            {
-                storeInContainer = true;
-            } else
-            {
-                // if it's not a container, we'll change the parentid to the root,
-                // and use the parent id as the doc type the collection should be allowed under
-                allowUnderDocType = parentId;
-                parentId = -1;
-            }
-
             // create item doctype
             var itemDocType = new ContentType(parentId);
             itemDocType.Name = collectionItemName;
@@ -247,19 +233,15 @@ namespace Umbraco.Web.Editors
             // save collection doctype
             Services.ContentTypeService.Save(collectionDocType);
 
-            // test if the parent id exist and then allow the collection underneath
-            if (storeInContainer == false && allowUnderDocType != -1)
+            // test if the parent exist and then allow the collection underneath
+            var parentCt = Services.ContentTypeService.Get(parentId);
+            if (parentCt != null)
             {
-                var parentCt = Services.ContentTypeService.Get(allowUnderDocType);
-                if (parentCt != null)
-                {
-                    var allowedCts = parentCt.AllowedContentTypes.ToList();
-                    allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
-                    parentCt.AllowedContentTypes = allowedCts;
-                    Services.ContentTypeService.Save(parentCt);
-                } 
+                var allowedCts = parentCt.AllowedContentTypes.ToList();
+                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
+                parentCt.AllowedContentTypes = allowedCts;
+                Services.ContentTypeService.Save(parentCt);
             }
-
 
             return new CreatedContentTypeCollectionResult
             {

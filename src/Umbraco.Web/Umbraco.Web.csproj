@@ -111,6 +111,9 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Logging\WebProfiler.cs" />
+    <Compile Include="Logging\WebProfilerComponent.cs" />
+    <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
     <Compile Include="Media\Exif\ExifEnums.cs" />
@@ -155,6 +158,7 @@
     <Compile Include="ContentApps\ContentEditorContentAppDefinition.cs" />
     <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
     <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
+    <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
@@ -183,6 +187,7 @@
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
     <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
+    <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
@@ -871,7 +876,6 @@
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
-    <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />

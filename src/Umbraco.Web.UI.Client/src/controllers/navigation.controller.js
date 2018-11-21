@@ -113,16 +113,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         return treeInitPromise.promise;
     }
 
-    //TODO: Remove this, this is not healthy
-    // Put the navigation service on this scope so we can use it's methods/properties in the view.
-    // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
-    //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
-    $scope.nav = navigationService;
-    // TODO: Remove this, this is not healthy
-    // it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
-    // this is going to lead to problems/confusion. I really don't think passing scope's around is very good practice.
-    $rootScope.nav = navigationService;
-
     //set up our scope vars
     $scope.showContextMenuDialog = false;
     $scope.showContextMenu = false;
@@ -147,7 +137,8 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         navigationService.showSearch();
     });
 
-    $scope.selectedId = navigationService.currentId;
+    ////TODO: remove this it's not a thing
+    //$scope.selectedId = navigationService.currentId;
 
     var evts = [];
 
@@ -180,7 +171,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }));
 
-    //Listen for section state changes
+    //Listen for tree state changes
     evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
         if (args.key === "currentRootNode") {
 
@@ -197,15 +188,18 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //Listen for section state changes
     evts.push(eventsService.on("appState.sectionState.changed", function (e, args) {
+
         //section changed
         if (args.key === "currentSection" && $scope.currentSection != args.value) {
-            $scope.currentSection = args.value;
-
-            //load the tree
-            configureTreeAndLanguages();
-            $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey });
-
+            //before loading the main tree we need to ensure that the nav is ready
+            navigationService.waitForNavReady().then(() => {
+                $scope.currentSection = args.value;
+                //load the tree
+                configureTreeAndLanguages();
+                $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey });
+            });
         }
+        
         //show/hide search results
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
@@ -242,7 +236,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         $scope.authenticated = false;
     }));
 
-    //when the application is ready and the user is authorized setup the data
+    //when the application is ready and the user is authorized, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
         init();
     }));
@@ -307,12 +301,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     navInit = true;
                     initNav();
                 }
-                else {
-                    //keep track of the current section, when it changes change the state, and we listen for that event change above
-                    if ($scope.currentSection != $routeParams.section) {
-                        appState.setSectionState("currentSection", $routeParams.section);
-                    }
+
+                //keep track of the current section when it changes
+                if ($scope.currentSection != $routeParams.section) {
+                    appState.setSectionState("currentSection", $routeParams.section);
                 }
+
             }
         });
     }
@@ -373,8 +367,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
                     //the nav is ready, let the app know
                     eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
-                    //finally set the section state
-                    appState.setSectionState("currentSection", $routeParams.section);
+                    
                 }
             });
         });

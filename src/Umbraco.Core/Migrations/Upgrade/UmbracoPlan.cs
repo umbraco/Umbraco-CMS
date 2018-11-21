@@ -142,6 +142,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<DropPreValueTable>("{23275462-446E-44C7-8C2C-3B8C1127B07D}");
             Chain<DropDownPropertyEditorsMigration>("{6B251841-3069-4AD5-8AE9-861F9523E8DA}");
             Chain<TagsMigrationFix>("{EE429F1B-9B26-43CA-89F8-A86017C809A3}");
+            Chain<DropTemplateDesignColumn>("{08919C4B-B431-449C-90EC-2B8445B5C6B1}");
+            Chain<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
 
             //FINAL
 

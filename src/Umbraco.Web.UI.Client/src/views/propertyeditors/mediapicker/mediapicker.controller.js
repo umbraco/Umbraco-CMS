@@ -11,7 +11,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.allowAddMedia = false;
 
         function setupViewModel() {
-            $scope.images = [];
+            $scope.mediaItems = [];
             $scope.ids = [];
 
             $scope.isMultiPicker = multiPicker;
@@ -67,7 +67,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             }
 
-                            $scope.images.push(media);
+                            $scope.mediaItems.push(media);
 
                             if ($scope.model.config.idType === "udi") {
                                 $scope.ids.push(media.udi);
@@ -129,7 +129,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         $scope.remove = function (index) {
-            $scope.images.splice(index, 1);
+            $scope.mediaItems.splice(index, 1);
             $scope.ids.splice(index, 1);
             sync();
         };
@@ -182,7 +182,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                         }
 
-                        $scope.images.push(media);
+                       $scope.mediaItems.push(media);
 
                         if ($scope.model.config.idType === "udi") {
                             $scope.ids.push(media.udi);
@@ -217,7 +217,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                 // watch do all the rest.
                 $timeout(function () {
-                    angular.forEach($scope.images, function (value, key) {
+                    angular.forEach($scope.mediaItems, function(value, key) {
                         r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
                     });
                     $scope.ids = r;

@@ -1,4 +1,5 @@
 ﻿//TODO: Rebuild with new tree format and apis and then remove
+//using umbraco.uicontrols;
 
 //using System;
 //using System.Collections.Generic;
@@ -185,14 +186,16 @@
 //        protected override void CreateChildControls()
 //        {
 //            base.CreateChildControls();
+/*
+			var save =  tabControl.Menu.NewButton();
+            save.Click +=saveMenuImageButton_Click;
+            save.CausesValidation = true;
+            save.Text = ui.Text("save");
+            save.ButtonType = MenuButtonType.Primary;
+            save.ID = "save";
+            save.ValidationGroup = "RelationType";*/
 
-//            var relationTypeTabPage = this.tabControl.NewTabPage("Relation Type");
-//            relationTypeTabPage.Controls.Add(this.idPane);
-//            relationTypeTabPage.Controls.Add(this.nameAliasPane);
-//            relationTypeTabPage.Controls.Add(this.directionPane);
-//            relationTypeTabPage.Controls.Add(this.objectTypePane);
-
-//            var saveMenuImageButton =  tabControl.Menu.NewButton();
+//            var relationsTabPage = this.tabControl.NewTabPage("Relations");
 //            saveMenuImageButton.ToolTip = "save relation type";
 //            saveMenuImageButton.Click +=saveMenuImageButton_Click;
 //            saveMenuImageButton.CausesValidation = true;

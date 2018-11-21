@@ -16,10 +16,11 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="request"></param>
         /// <param name="key"></param>
+        /// <param name="valueIfNotFound"></param>
         /// <returns></returns>
-        public static string CleanForXss(this HttpRequest request, string key)
+        public static string CleanForXss(this HttpRequest request, string key, string valueIfNotFound = "")
         {
-            var item = request.GetItemAsString(key);
+            var item = request.GetItemAsString(key, valueIfNotFound);
             return item.CleanForXss();
         }
 
