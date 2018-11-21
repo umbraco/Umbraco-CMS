@@ -63,65 +63,56 @@ namespace Umbraco.Core.Components
         {
             using (_proflog.DebugDuration<BootLoader>("Preparing component types.", "Prepared component types."))
             {
-                return PrepareComponentTypes2(componentTypes, level);
-            }
-        }
+                // create a list, remove those that cannot be enabled due to runtime level
+                var componentTypeList = componentTypes
+                    .Where(x =>
+                    {
+                        // use the min level specified by the attribute if any
+                        // otherwise, user components have Run min level, anything else is Unknown (always run)
+                        var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
+                        var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
+                        return level >= minLevel;
+                    })
+                    .ToList();
 
-        private IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes, RuntimeLevel level)
-        {
-            // create a list, remove those that cannot be enabled due to runtime level
-            var componentTypeList = componentTypes
-                .Where(x =>
+                // cannot remove that one - ever
+                if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
+                    componentTypeList.Add(typeof(UmbracoCoreComponent));
+
+                // enable or disable components
+                EnableDisableComponents(componentTypeList);
+
+                // sort the components according to their dependencies
+                var requirements = componentTypeList.ToDictionary(key => key, _ => (List<Type>)null);
+                foreach (var type in componentTypeList)
                 {
-                    // use the min level specified by the attribute if any
-                    // otherwise, user components have Run min level, anything else is Unknown (always run)
-                    var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
-                    var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
-                    return level >= minLevel;
-                })
-                .ToList();
+                    GatherRequirementsFromRequireAttribute(type, componentTypeList, requirements);
+                    GatherRequirementsFromRequiredAttribute(type, componentTypeList, requirements);
+                }
 
-            // cannot remove that one - ever
-            if (componentTypeList.Contains(typeof(UmbracoCoreComponent)) == false)
-                componentTypeList.Add(typeof(UmbracoCoreComponent));
+                // only for debugging, this is verbose
+                //_logger.Debug<BootLoader>(GetComponentsReport(requirements));
 
-            // enable or disable components
-            EnableDisableComponents(componentTypeList);
+                // sort components
+                var graph = new TopoGraph<Type, KeyValuePair<Type, List<Type>>>(kvp => kvp.Key, kvp => kvp.Value);
+                graph.AddItems(requirements);
+                try
+                {
+                    var sortedComponentTypes = graph.GetSortedItems().Select(x => x.Key).ToList();
+                    // bit verbose but should help for troubleshooting
+                    _logger.Debug<BootLoader>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
 
-            // sort the components according to their dependencies
-            var requirements = new Dictionary<Type, List<Type>>();
-            foreach (var type in componentTypeList) requirements[type] = null;
-            foreach (var type in componentTypeList)
-            {
-                GatherRequirementsFromRequireAttribute(type, componentTypeList, requirements);
-                GatherRequirementsFromRequiredAttribute(type, componentTypeList, requirements);
+                    return sortedComponentTypes;
+                }
+                catch (Exception e)
+                {
+                    // in case of an error, force-dump everything to log
+                    _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
+                    _logger.Error<BootLoader>(e, "Failed to sort compontents.");
+                    throw;
+                }
+
             }
-
-            // only for debugging, this is verbose
-            //_logger.Debug<BootLoader>(GetComponentsReport(requirements));
-
-            // sort components
-            var graph = new TopoGraph<Type, KeyValuePair<Type, List<Type>>>(kvp => kvp.Key, kvp => kvp.Value);
-            graph.AddItems(requirements);
-            List<Type> sortedComponentTypes;
-            try
-            {
-                sortedComponentTypes = graph.GetSortedItems().Select(x => x.Key).ToList();
-            }
-            catch (Exception e)
-            {
-                // in case of an error, force-dump everything to log
-                _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
-                _logger.Error<BootLoader>(e, "Failed to sort compontents.");
-                throw;
-            }
-
-            // bit verbose but should help for troubleshooting
-            var text = "Ordered Components: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComponentTypes) + Environment.NewLine;
-            Console.WriteLine(text);
-            _logger.Debug<BootLoader>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
-
-            return sortedComponentTypes;
         }
 
         private static string GetComponentsReport(Dictionary<Type, List<Type>> requirements)
