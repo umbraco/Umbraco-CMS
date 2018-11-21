@@ -463,7 +463,7 @@ Opens an overlay to show a custom YSOD. </br>
                  scope.model.closeButtonLabel = localizationService.localize("general_close");
              }
              if (!scope.model.submitButtonLabelKey && !scope.model.submitButtonLabel) {
-                 scope.model.submitButtonLabel = localizationService.localize("general_submit");
+                 scope.model.submitButtonLabel = localizationService.localize("general_continue");
              }
          }
 
