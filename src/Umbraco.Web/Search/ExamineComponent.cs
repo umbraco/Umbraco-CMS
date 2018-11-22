@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
-using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -19,19 +17,20 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
 {
+
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>
@@ -43,26 +42,29 @@ namespace Umbraco.Web.Search
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
         private IScopeProvider _scopeProvider;
-        private UrlSegmentProviderCollection _urlSegmentProviders;
         private ServiceContext _services;
-        private BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
+        private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
+        private static readonly object _rebuildLocker = new object();
+        private IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
+        public override void Compose(Composition composition)
+        {
+            base.Compose(composition);
+
+            composition.Container.RegisterSingleton<IUmbracoIndexesBuilder, UmbracoIndexesBuilder>();
+        }
+
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             _services = services;
-            _urlSegmentProviders = urlSegmentProviderCollection;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
-            _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
-                "RebuildIndexesOnStartup",
-                profilingLogger.Logger,
-                //hook into MainDom so that no index building occurs unless on MainDom
-                BackgroundTaskRunner<IBackgroundTask>.MainDomHook.Create(null, null));
+            _urlSegmentProviders = urlSegmentProviders;
 
             //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown
@@ -96,6 +98,12 @@ namespace Umbraco.Web.Search
                 return; //exit, do not continue
             }
 
+            //create the indexes and register them with the manager
+            foreach(var index in indexBuilder.Create())
+            {
+                _examineManager.AddIndexer(index.Key, index.Value);
+            }
+
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
             var registeredIndexers = examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
@@ -117,50 +125,40 @@ namespace Umbraco.Web.Search
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
-            RebuildIndexesOnStartup(profilingLogger.Logger);
+            RebuildIndexes(examineManager, profilingLogger.Logger, true, 5000);
         }
+        
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
         /// </summary>
         /// <param name="logger"></param>
-        private void RebuildIndexesOnStartup(ILogger logger)
+        public static void RebuildIndexes(IExamineManager examineManager, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
             //TODO: need a way to disable rebuilding on startup
 
-            logger.Info<ExamineComponent>("Starting initialize async background thread.");
-            //do the rebuild on a managed background thread
-            var task = new RebuildOnStartupTask(_examineManager, logger);
-            _rebuildOnStartupRunner.TryAdd(task);
-        }
-
-        /// <summary>
-        /// Used to rebuild indexes on startup or cold boot
-        /// </summary>
-        /// <param name="onlyEmptyIndexes"></param>
-        /// <param name="examineManager"></param>
-        /// <param name="logger"></param>
-        internal static void RebuildIndexes(bool onlyEmptyIndexes, IExamineManager examineManager, ILogger logger)
-        {
-            //do not attempt to do this if this has been disabled since we are not the main dom.
-            //this can be called during a cold boot
-            if (_disableExamineIndexing) return;
-
-            EnsureUnlocked(logger, examineManager);
-
-            if (onlyEmptyIndexes)
+            lock(_rebuildLocker)
             {
-                foreach (var indexer in examineManager.IndexProviders.Values.Where(x => x.IsIndexNew()))
+                if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
                 {
-                    indexer.RebuildIndex();
+                    logger.Warn<ExamineComponent>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
+                    return;
                 }
-            }
-            else
-            {
-                //do all of them
-                examineManager.RebuildIndexes();
+
+                logger.Info<ExamineComponent>("Starting initialize async background thread.");
+                //do the rebuild on a managed background thread
+                var task = new RebuildOnStartupTask(examineManager, logger, onlyEmptyIndexes, waitMilliseconds);
+
+                _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
+                    "RebuildIndexesOnStartup",
+                    //new BackgroundTaskRunnerOptions{ LongRunning= true }, //fixme, this flag doesn't have any affect anymore
+                    logger);
+
+                _rebuildOnStartupRunner.TryAdd(task);
             }
         }
+
+        
 
         /// <summary>
         /// Must be called to each index is unlocked before any indexing occurs
@@ -808,11 +806,15 @@ namespace Umbraco.Web.Search
         {
             private readonly IExamineManager _examineManager;
             private readonly ILogger _logger;
+            private readonly bool _onlyEmptyIndexes;
+            private readonly int _waitMilliseconds;
 
-            public RebuildOnStartupTask(IExamineManager examineManager, ILogger logger)
+            public RebuildOnStartupTask(IExamineManager examineManager, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 _examineManager = examineManager;
                 _logger = logger;
+                _onlyEmptyIndexes = onlyEmptyIndexes;
+                _waitMilliseconds = waitMilliseconds;
             }
 
             public bool IsAsync => false;
@@ -826,8 +828,8 @@ namespace Umbraco.Web.Search
             {
                 try
                 {
-                    // rebuilds any empty indexes
-                    RebuildIndexes(true, _examineManager, _logger);
+                    // rebuilds indexes
+                    RebuildIndexes();
                 }
                 catch (Exception ex)
                 {
@@ -838,6 +840,35 @@ namespace Umbraco.Web.Search
             public Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Used to rebuild indexes on startup or cold boot
+            /// </summary>
+            /// <param name="onlyEmptyIndexes"></param>
+            private void RebuildIndexes()
+            {
+                //do not attempt to do this if this has been disabled since we are not the main dom.
+                //this can be called during a cold boot
+                if (_disableExamineIndexing) return;
+
+                if (_waitMilliseconds > 0)
+                    Thread.Sleep(_waitMilliseconds);
+
+                EnsureUnlocked(_logger, _examineManager);
+
+                if (_onlyEmptyIndexes)
+                {
+                    foreach (var indexer in _examineManager.IndexProviders.Values.Where(x => x.IsIndexNew()))
+                    {
+                        indexer.RebuildIndex();
+                    }
+                }
+                else
+                {
+                    //do all of them
+                    _examineManager.RebuildIndexes();
+                }
             }
         }
     }

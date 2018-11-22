@@ -87,7 +87,7 @@ namespace Umbraco.Web.Components
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
-                            () => ExamineComponent.RebuildIndexes(false, _examineManager, _logger)
+                            () => ExamineComponent.RebuildIndexes(_examineManager, _logger, false, 5000)
                         }
                     });
             });

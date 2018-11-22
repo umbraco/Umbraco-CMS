@@ -78,10 +78,9 @@ namespace Umbraco.Web
                 if (_tried == false) return;
                 _tried = false;
 
-                // fixme - could we fork this on a background thread?
                 //TODO: when resuming do we always want a full rebuild of all indexes?
-                // fixme - can we inject IExamineManager somehow?
-                ExamineComponent.RebuildIndexes(false, ExamineManager.Instance, Current.Logger);
+                // fixme - can we inject these somehow?
+                ExamineComponent.RebuildIndexes(ExamineManager.Instance, Current.Logger, false);
             }
         }
 

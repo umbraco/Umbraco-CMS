@@ -197,16 +197,11 @@ namespace Umbraco.Tests.UmbracoExamine
             return i;
         }
 
-        public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
-        {
-            return new LuceneSearcher("testSearcher", luceneDir, new StandardAnalyzer(Version.LUCENE_29));
-        }
-
-        public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
-        {
-            var i = new MultiIndexSearcher("testSearcher", new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
-            return i;
-        }
+        //public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
+        //{
+        //    var i = new MultiIndexSearcher("testSearcher", new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
+        //    return i;
+        //}
 
 
         internal static void IndexingError(object sender, IndexingErrorEventArgs e)

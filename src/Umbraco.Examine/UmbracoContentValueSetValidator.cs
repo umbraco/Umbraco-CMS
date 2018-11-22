@@ -27,6 +27,8 @@ namespace Umbraco.Examine
             if (valueSet.Category == IndexTypes.Content
                 && valueSet.Values.ContainsKey(UmbracoExamineIndexer.PublishedFieldName))
             {
+                //fixme - variants?
+
                 var published = valueSet.Values[UmbracoExamineIndexer.PublishedFieldName] != null && valueSet.Values[UmbracoExamineIndexer.PublishedFieldName][0].Equals(1);
                 //we don't support unpublished and the item is not published return false
                 if (_options.SupportUnpublishedContent == false && published == false)

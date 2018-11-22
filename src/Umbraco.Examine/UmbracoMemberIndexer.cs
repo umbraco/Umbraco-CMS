@@ -50,8 +50,8 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
-            IValueSetValidator validator,
-            IMemberService memberService) :
+            IMemberService memberService,
+            IValueSetValidator validator = null) :
             base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
@@ -64,12 +64,12 @@ namespace Umbraco.Examine
         /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
         {
             var keyDef = new FieldDefinition("__key", FieldDefinitionTypes.Raw);
             FieldDefinitionCollection.TryAdd(keyDef.Name, keyDef);
 
-            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
+            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
 
         /// <inheritdoc />
@@ -149,7 +149,8 @@ namespace Umbraco.Examine
                     {
                         case null:
                             continue;
-                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
+                        case string strVal:
+                            if (strVal.IsNullOrWhiteSpace()) continue;
                             values.Add(property.Alias, new[] { val });
                             break;
                         default:
@@ -182,6 +183,8 @@ namespace Umbraco.Examine
             {
                 if (email.Count > 0)
                 {
+                    //TODO: This shouldn't be here, create an "Email" value type with an appropriate analyzer
+
                     //will be indexed as full text (the default anaylyzer)
                     e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { email[0]?.ToString().Replace(".", " ").Replace("@", " ") };
                 }

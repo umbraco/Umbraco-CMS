@@ -72,6 +72,16 @@ namespace Umbraco.Examine
             });
         }
 
+        /// <summary>
+        /// Create a new <see cref="UmbracoExamineIndexer"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fieldDefinitions"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="defaultAnalyzer"></param>
+        /// <param name="profilingLogger"></param>
+        /// <param name="validator"></param>
+        /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndexer(
             string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
@@ -92,7 +102,7 @@ namespace Umbraco.Examine
         /// Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
         /// for retreival after searching.
         /// </summary>
-        internal static readonly FieldDefinition[] UmbracoIndexFields =
+        public static readonly FieldDefinition[] UmbracoIndexFieldDefinitions =
         {
             new FieldDefinition("parentID", FieldDefinitionTypes.Integer),
             new FieldDefinition("level", FieldDefinitionTypes.Integer),
@@ -125,14 +135,19 @@ namespace Umbraco.Examine
         /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
         {
-            foreach (var field in UmbracoIndexFields)
+            //if config based then ensure the value types else it's assumed these were passed in via ctor
+            if (_configBased)
             {
-                FieldDefinitionCollection.TryAdd(field.Name, field);
+                foreach (var field in UmbracoIndexFieldDefinitions)
+                {
+                    FieldDefinitionCollection.TryAdd(field.Name, field);
+                }
             }
+            
 
-            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
+            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
 
         /// <summary>

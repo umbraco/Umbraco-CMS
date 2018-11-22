@@ -236,19 +236,19 @@ namespace Umbraco.Examine
         /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
         {
             //fixme: languages are dynamic so although this will work on startup it wont work when languages are edited
             foreach(var lang in LanguageService.GetAllLanguages())
             {
-                foreach (var field in UmbracoIndexFields)
+                foreach (var field in UmbracoIndexFieldDefinitions)
                 {
                     var def = new FieldDefinition($"{field.Name}_{lang.IsoCode.ToLowerInvariant()}", field.Type);
                     FieldDefinitionCollection.TryAdd(def.Name, def);
                 }
             }
 
-            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
+            return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
 
         /// <summary>

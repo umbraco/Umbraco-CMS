@@ -9,7 +9,7 @@ using Lucene.Net.Index;
 using Umbraco.Core.Composing;
 using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
-
+using Examine.LuceneEngine;
 
 namespace Umbraco.Examine
 {
@@ -33,28 +33,17 @@ namespace Umbraco.Examine
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="indexPath"></param>
-        /// <param name="analyzer"></param>
-        public UmbracoExamineSearcher(string name, DirectoryInfo indexPath, Analyzer analyzer)
-            : base(name, indexPath, analyzer)
-        {
-            _configBased = false;
-        }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="name"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="analyzer"></param>
-        public UmbracoExamineSearcher(string name, Directory luceneDirectory, Analyzer analyzer)
-            : base(name, luceneDirectory, analyzer)
+        public UmbracoExamineSearcher(string name, Directory luceneDirectory, Analyzer analyzer, FieldValueTypeCollection fieldValueTypeCollection)
+            : base(name, luceneDirectory, analyzer, fieldValueTypeCollection)
         {
             _configBased = false;
         }
 
         /// <inheritdoc />
-        public UmbracoExamineSearcher(string name, IndexWriter writer, Analyzer analyzer) : base(name, writer, analyzer)
+        public UmbracoExamineSearcher(string name, IndexWriter writer, Analyzer analyzer, FieldValueTypeCollection fieldValueTypeCollection)
+            : base(name, writer, analyzer, fieldValueTypeCollection)
         {
             _configBased = false;
         }
