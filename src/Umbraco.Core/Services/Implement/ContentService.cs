@@ -24,9 +24,11 @@ namespace Umbraco.Core.Services.Implement
         private readonly IDocumentRepository _documentRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IAuditRepository _auditRepository;
+        private readonly IContentTypeService _contentTypeService;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IContentPublishingService _contentPublishingService;
         private readonly MediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
@@ -34,17 +36,19 @@ namespace Umbraco.Core.Services.Implement
 
         public ContentService(IScopeProvider provider, ILogger logger,
             IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem,
-            IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
+            IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository, IContentTypeService contentTypeService,
+            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository, IContentPublishingService contentPublishingService)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
             _documentRepository = documentRepository;
             _entityRepository = entityRepository;
             _auditRepository = auditRepository;
+            _contentTypeService = contentTypeService;
             _contentTypeRepository = contentTypeRepository;
             _documentBlueprintRepository = documentBlueprintRepository;
             _languageRepository = languageRepository;
+            _contentPublishingService = contentPublishingService;
         }
 
         #endregion
@@ -308,10 +312,15 @@ namespace Umbraco.Core.Services.Implement
             content.CreatorId = userId;
             content.WriterId = userId;
 
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            var parentContentType = parent != null ? _contentTypeService.Get(parent.ContentTypeId) : null;
+
+            var contentNotificationData = new NotificationData(content, contentType);
+            var parentNotificationData = new NotificationData(parent, parentContentType);
             if (withIdentity)
             {
                 // if saving is cancelled, content remains without an identity
-                var saveEventArgs = new SaveEventArgs<IContent>(content);
+                var saveEventArgs = new SaveEventArgs<NotificationData>(contentNotificationData);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     return;
 
@@ -319,10 +328,10 @@ namespace Umbraco.Core.Services.Implement
 
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(contentNotificationData, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
-            scope.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent));
+            scope.Events.Dispatch(Created, this, new NewEventArgs<NotificationData>(contentNotificationData, false, contentType.Alias, parentNotificationData));
 
             if (withIdentity == false)
                 return;
@@ -763,7 +772,9 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var contentNotificationData = new NotificationData(content, contentType);
+                var saveEventArgs = new SaveEventArgs<NotificationData>(contentNotificationData, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
@@ -777,7 +788,7 @@ namespace Umbraco.Core.Services.Implement
                 content.WriterId = userId;
 
                 //track the cultures that have changed
-                var culturesChanging = content.ContentType.VariesByCulture()
+                var culturesChanging = contentType.VariesByCulture()
                     ? content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                     : null;
                 //TODO: Currently there's no way to change track which variant properties have changed, we only have change
@@ -793,7 +804,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(contentNotificationData, changeType).ToEventArgs());
 
                 if (culturesChanging != null)
                 {
@@ -819,14 +830,16 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IContent>(contentsA, evtMsgs);
+                var notificationDataArray = contentsA.Select(x => new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray();
+
+                var saveEventArgs = new SaveEventArgs<NotificationData>(notificationDataArray, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                var treeChanges = contentsA.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode));
+                var treeChanges = notificationDataArray.Select(x => new TreeChange<NotificationData>(x, TreeChangeTypes.RefreshNode));
 
                 scope.WriteLock(Constants.Locks.ContentTree);
                 foreach (var content in contentsA)
@@ -861,9 +874,10 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
 
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 if (culture.IsNullOrWhiteSpace())
                     throw new NotSupportedException("Invariant culture is not supported by variant content types.");
@@ -881,13 +895,13 @@ namespace Umbraco.Core.Services.Implement
             if (!culture.IsNullOrWhiteSpace() && culture != "*")
             {
                 // publish the invariant values
-                var publishInvariant = content.PublishCulture(null);
+                var publishInvariant = _contentPublishingService.PublishCulture(content, null);
                 if (!publishInvariant)
                     return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
             }
 
             // publish the culture(s)
-            var publishCulture = content.PublishCulture(culture);
+            var publishCulture = _contentPublishingService.PublishCulture(content, culture);
             if (!publishCulture)
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
@@ -895,6 +909,7 @@ namespace Umbraco.Core.Services.Implement
             // what happens next depends on whether the content can be published or not
             return SavePublishing(content, userId, raiseEvents);
         }
+
 
         /// <inheritdoc />
         public PublishResult Unpublish(IContent content, string culture = "*", int userId = 0)
@@ -907,9 +922,11 @@ namespace Umbraco.Core.Services.Implement
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
 
+
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
             // cannot accept invariant (null or empty) culture for variant content type
             // cannot accept a specific culture for invariant content type (but '*' is ok)
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 if (culture == null)
                     throw new NotSupportedException("Invariant culture is not supported by variant content types.");
@@ -925,7 +942,7 @@ namespace Umbraco.Core.Services.Implement
                 return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
 
             // all cultures = unpublish whole
-            if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
+            if (culture == "*" || (!contentType.VariesByCulture() && culture == null))
             {
                 ((Content)content).PublishedState = PublishedState.Unpublishing;
             }
@@ -936,7 +953,7 @@ namespace Umbraco.Core.Services.Implement
                     return new PublishResult(PublishResultType.SuccessUnpublishAlready, evtMsgs, content);
 
                 // unpublish the culture
-                content.UnpublishCulture(culture);
+                _contentPublishingService.UnpublishCulture(content, culture);
             }
 
             // finally, "save publishing"
@@ -970,7 +987,8 @@ namespace Umbraco.Core.Services.Implement
             var publishing = content.PublishedState == PublishedState.Publishing;
             var unpublishing = content.PublishedState == PublishedState.Unpublishing;
 
-            var variesByCulture = content.ContentType.VariesByCulture();
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            var variesByCulture = contentType.VariesByCulture();
 
             //track cultures that are being published, changed, unpublished
             IReadOnlyList<string> culturesPublishing = null;
@@ -984,23 +1002,23 @@ namespace Umbraco.Core.Services.Implement
             var previouslyPublished = content.HasIdentity && content.Published;
 
             // always save
-            var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+            var saveEventArgs = new SaveEventArgs<NotificationData>(new NotificationData(content, contentType), evtMsgs);
             if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
 
             if (publishing)
             {
-                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesUnpublishing = content.GetCulturesUnpublishing(contentType);
                 culturesPublishing = variesByCulture
                         ? content.PublishCultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key).ToList()
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, userId, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs);
+                publishResult = StrategyCanPublish(scope, content, contentType, userId, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs);
                 if (publishResult.Success)
                 {
                     // note: StrategyPublish flips the PublishedState to Publishing!
-                    publishResult = StrategyPublish(scope, content, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
+                    publishResult = StrategyPublish(scope, content, contentType, userId, culturesPublishing, culturesUnpublishing, evtMsgs);
                 }
                 else
                 {
@@ -1037,7 +1055,7 @@ namespace Umbraco.Core.Services.Implement
                     // handling events, business rules, etc
                     // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                     // note: This unpublishes the entire document (not different variants)
-                    unpublishResult = StrategyCanUnpublish(scope, content, userId, evtMsgs);
+                    unpublishResult = StrategyCanUnpublish(scope, content, contentType, userId, evtMsgs);
                     if (unpublishResult.Success)
                         unpublishResult = StrategyUnpublish(scope, content, userId, evtMsgs);
                     else
@@ -1072,13 +1090,15 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
             }
 
+            var notificationData = new NotificationData(content, contentType);
+
             if (unpublishing) // we have tried to unpublish - won't happen in a branch
             {
                 if (unpublishResult.Success) // and succeeded, trigger events
                 {
                     // events and audit
-                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), "Unpublished");
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<NotificationData>(notificationData, false, false), "Unpublished");
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                     if (culturesUnpublishing != null)
                     {
@@ -1097,7 +1117,7 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 // or, failed
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, changeType).ToEventArgs());
                 return new PublishResult(PublishResultType.FailedUnpublish, evtMsgs, content); // bah
             }
 
@@ -1111,8 +1131,8 @@ namespace Umbraco.Core.Services.Implement
                     // invalidate the node/branch
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
                     {
-                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+                        scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, changeType).ToEventArgs());
+                        scope.Events.Dispatch(Published, this, new PublishEventArgs<NotificationData>(notificationData, false, false), "Published");
                     }
 
                     // if was not published and now is... descendants that were 'published' (but
@@ -1120,8 +1140,8 @@ namespace Umbraco.Core.Services.Implement
                     // but back as 'published' nevertheless
                     if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
-                        var descendants = GetPublishedDescendantsLocked(content).ToArray();
-                        scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
+                        var descendants = GetPublishedDescendantsLocked(content).Select(x=>new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray();
+                        scope.Events.Dispatch(Published, this, new PublishEventArgs<NotificationData>(descendants, false, false), "Published");
                     }
 
                     switch (publishResult.Result)
@@ -1174,7 +1194,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // or, failed
-            scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+            scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, changeType).ToEventArgs());
             return publishResult;
         }
 
@@ -1196,7 +1216,10 @@ namespace Umbraco.Core.Services.Implement
                 foreach (var d in _documentRepository.GetContentForRelease(date))
                 {
                     PublishResult result;
-                    if (d.ContentType.VariesByCulture())
+
+                    var documentContentType = _contentTypeService.Get(d.ContentTypeId);
+
+                    if (documentContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
                         var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Release, date)
@@ -1212,7 +1235,7 @@ namespace Umbraco.Core.Services.Implement
 
                             if (d.Trashed) continue; // won't publish
 
-                            publishing &= d.PublishCulture(culture); //set the culture to be published
+                            publishing &= _contentPublishingService.PublishCulture(d, culture); //set the culture to be published
                             if (!publishing) break; // no point continuing
                         }
 
@@ -1247,7 +1270,9 @@ namespace Umbraco.Core.Services.Implement
                 foreach (var d in _documentRepository.GetContentForExpiration(date))
                 {
                     PublishResult result;
-                    if (d.ContentType.VariesByCulture())
+                    var documentContentType = _contentTypeService.Get(d.ContentTypeId);
+
+                    if (documentContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
                         var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Expire, date)
@@ -1260,7 +1285,7 @@ namespace Umbraco.Core.Services.Implement
                             //Clear this schedule for this culture
                             d.ContentSchedule.Clear(c, ContentScheduleAction.Expire, date);
                             //set the culture to be published
-                            d.UnpublishCulture(c);
+                            _contentPublishingService.UnpublishCulture(d, c);
                         }
 
                         if (pendingCultures.Count > 0)
@@ -1292,11 +1317,13 @@ namespace Umbraco.Core.Services.Implement
 
         private bool SaveAndPublishBranch_PublishCultures(IContent c, HashSet<string> culturesToPublish)
         {
+
+            var contentType = _contentTypeService.Get(c.ContentTypeId);
             // variant content type - publish specified cultures
             // invariant content type - publish only the invariant culture
-            return c.ContentType.VariesByCulture()
-                ? culturesToPublish.All(c.PublishCulture)
-                : c.PublishCulture();
+            return contentType.VariesByCulture()
+                ? culturesToPublish.All(x=>_contentPublishingService.PublishCulture(c, x))
+                : _contentPublishingService.PublishCulture(c);
         }
 
         private HashSet<string> SaveAndPublishBranch_ShouldPublish3(ref HashSet<string> cultures, string c, bool published, bool edited, bool isRoot, bool force)
@@ -1335,7 +1362,8 @@ namespace Umbraco.Core.Services.Implement
                 var isRoot = c.Id == content.Id;
                 HashSet<string> culturesToPublish = null;
 
-                if (!c.ContentType.VariesByCulture()) // invariant content type
+                var contentType = _contentTypeService.Get(c.ContentTypeId);
+                if (!contentType.VariesByCulture()) // invariant content type
                     return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
 
                 if (culture != "*") // variant content type, specific culture
@@ -1356,7 +1384,6 @@ namespace Umbraco.Core.Services.Implement
                     ? new HashSet<string> { "*" } // "*" means 'publish all'
                     : null; // null means 'nothing to do'
             }
-
             return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
         }
 
@@ -1368,6 +1395,7 @@ namespace Umbraco.Core.Services.Implement
 
             cultures = cultures ?? Array.Empty<string>();
 
+
             // determines cultures to be published
             // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
             HashSet<string> ShouldPublish(IContent c)
@@ -1375,7 +1403,8 @@ namespace Umbraco.Core.Services.Implement
                 var isRoot = c.Id == content.Id;
                 HashSet<string> culturesToPublish = null;
 
-                if (!c.ContentType.VariesByCulture()) // invariant content type
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                if (!contentType.VariesByCulture()) // invariant content type
                     return SaveAndPublishBranch_ShouldPublish3(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
 
                 // variant content type, specific cultures
@@ -1423,6 +1452,7 @@ namespace Umbraco.Core.Services.Implement
                 if (publishedState == PublishedState.Publishing)
                     throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
 
+                var contentType = _contentTypeService.Get(document.ContentTypeId);
                 // deal with the branch root - if it fails, abort
                 var result = SaveAndPublishBranchOne(scope, document, shouldPublish, publishCultures, true, publishedDocuments, evtMsgs, userId);
                 if (result != null)
@@ -1472,8 +1502,10 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Publish, userId, document.Id, "Branch published");
 
                 // trigger events for the entire branch
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(new NotificationData(document, contentType), TreeChangeTypes.RefreshBranch).ToEventArgs());
+                var publishedDocumentNotificationData = publishedDocuments
+                    .Select(x => new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray();
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<NotificationData>(publishedDocumentNotificationData, false, false), "Published");
 
                 scope.Complete();
             }
@@ -1485,12 +1517,13 @@ namespace Umbraco.Core.Services.Implement
         //  note - 'force' is handled by 'editing'
         // publishValues: a function publishing values (using the appropriate PublishCulture calls)
         private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
-            Func<IContent, HashSet<string>> shouldPublish,
-            Func<IContent, HashSet<string>, bool> publishCultures,
+            Func<IContent,HashSet<string>> shouldPublish,
+            Func<IContent,HashSet<string>, bool> publishCultures,
             bool isRoot,
             ICollection<IContent> publishedDocuments,
             EventMessages evtMsgs, int userId)
         {
+
             var culturesToPublish = shouldPublish(document);
             if (culturesToPublish == null) // null = do not include
                 return null;
@@ -1518,7 +1551,9 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IContent>(content, evtMsgs);
+                var contentType = _contentTypeService.Get(content.Id);
+                var notificationData = new NotificationData(content, contentType);
+                var deleteEventArgs = new DeleteEventArgs<NotificationData>(notificationData, evtMsgs);
                 if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs, nameof(Deleting)))
                 {
                     scope.Complete();
@@ -1531,11 +1566,11 @@ namespace Umbraco.Core.Services.Implement
                 // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
                 if (content.Trashed == false && content.Published)
-                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(Unpublished));
+                    scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<NotificationData>(notificationData, false, false), nameof(Unpublished));
 
                 DeleteLocked(scope, content);
 
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, TreeChangeTypes.Remove).ToEventArgs());
                 Audit(AuditType.Delete, userId, content.Id);
 
                 scope.Complete();
@@ -1548,8 +1583,10 @@ namespace Umbraco.Core.Services.Implement
         {
             void DoDelete(IContent c)
             {
+                var contentType = _contentTypeService.Get(c.ContentTypeId);
+
                 _documentRepository.Delete(c);
-                var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
+                var args = new DeleteEventArgs<NotificationData>(new NotificationData(c, contentType), false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
 
                 // fixme not going to work, do it differently
@@ -1656,9 +1693,11 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
                 var originalPath = content.Path;
-                var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
-                var moveEventArgs = new MoveEventArgs<IContent>(evtMsgs, moveEventInfo);
+                var moveEventInfo = new MoveEventInfo<NotificationData>(notificationData, originalPath, Constants.System.RecycleBinContent);
+                var moveEventArgs = new MoveEventArgs<NotificationData>(evtMsgs, moveEventInfo);
                 if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs, nameof(Trashing)))
                 {
                     scope.Complete();
@@ -1672,10 +1711,15 @@ namespace Umbraco.Core.Services.Implement
                 //{ }
 
                 PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                 var moveInfo = moves
-                    .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                    .Select(x =>
+                    {
+                        var item1ContentType = _contentTypeService.Get(x.Item1.ContentTypeId);
+                        var item1NotificationData = new NotificationData(x.Item1, item1ContentType);
+                        return new MoveEventInfo<NotificationData>(item1NotificationData, x.Item2, x.Item1.ParentId);
+                    })
                     .ToArray();
 
                 moveEventArgs.CanCancel = false;
@@ -1713,14 +1757,16 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
                 scope.WriteLock(Constants.Locks.ContentTree);
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
-                var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
-                var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
+                var moveEventInfo = new MoveEventInfo<NotificationData>(notificationData, content.Path, parentId);
+                var moveEventArgs = new MoveEventArgs<NotificationData>(moveEventInfo);
                 if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
                 {
                     scope.Complete();
@@ -1744,10 +1790,15 @@ namespace Umbraco.Core.Services.Implement
 
                 PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
 
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(notificationData, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                 var moveInfo = moves //changes
-                    .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                    .Select(x =>
+                    {
+                        var item1ContentType = _contentTypeService.Get(x.Item1.ContentTypeId);
+                        var item1NotificationData = new NotificationData(x.Item1, item1ContentType);
+                        return new MoveEventInfo<NotificationData>(item1NotificationData, x.Item2, x.Item1.ParentId);
+                    })
                     .ToArray();
 
                 moveEventArgs.MoveInfoCollection = moveInfo;
@@ -1855,7 +1906,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.CanCancel = false;
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
-                scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<NotificationData>(new NotificationData(x, _contentTypeService.Get(x.ContentTypeId)), TreeChangeTypes.Remove)).ToEventArgs());
                 Audit(AuditType.Delete, 0, Constants.System.RecycleBinContent, "Recycle bin emptied");
 
                 scope.Complete();
@@ -1899,7 +1950,10 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var copyEventArgs = new CopyEventArgs<IContent>(content, copy, true, parentId, relateToOriginal);
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
+                var copyNotificationData = new NotificationData(copy, contentType);
+                var copyEventArgs = new CopyEventArgs<NotificationData>(notificationData, copyNotificationData, true, parentId, relateToOriginal);
                 if (scope.Events.DispatchCancelable(Copying, this, copyEventArgs))
                 {
                     scope.Complete();
@@ -1955,7 +2009,11 @@ namespace Umbraco.Core.Services.Implement
                             var descendantCopy = descendant.DeepCloneWithResetIdentities();
                             descendantCopy.ParentId = parentId;
 
-                            if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
+                            var descendantContentType = _contentTypeService.Get(descendant.ContentTypeId);
+                            var descendantNotificationData = new NotificationData(descendant, descendantContentType);
+                            var descendantCopyNotificationData = new NotificationData(descendantCopy, descendantContentType);
+
+                            if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<NotificationData>(descendantNotificationData, descendantCopyNotificationData, parentId)))
                                 continue;
 
                             // a copy is not published (but not really unpublishing either)
@@ -1978,9 +2036,14 @@ namespace Umbraco.Core.Services.Implement
                 // - tags should be handled by the content repository
                 // - a copy is unpublished and therefore has no impact on tags in DB
 
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<NotificationData>(copyNotificationData, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
-                    scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
+                {
+                    var item1NotificationData = new NotificationData(x.Item1, _contentTypeService.Get(x.Item1.ContentTypeId));
+                    var item2NotificationData = new NotificationData(x.Item2, _contentTypeService.Get(x.Item2.ContentTypeId));
+                    scope.Events.Dispatch(Copied, this, new CopyEventArgs<NotificationData>(item1NotificationData, item2NotificationData, false, x.Item2.ParentId, relateToOriginal));
+                }
+
                 Audit(AuditType.Copy, userId, content.Id);
 
                 scope.Complete();
@@ -1999,7 +2062,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var sendToPublishEventArgs = new SendToPublishEventArgs<IContent>(content);
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
+                var sendToPublishEventArgs = new SendToPublishEventArgs<NotificationData>(notificationData);
                 if (scope.Events.DispatchCancelable(SendingToPublish, this, sendToPublishEventArgs))
                 {
                     scope.Complete();
@@ -2007,7 +2072,7 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 //track the cultures changing for auditing
-                var culturesChanging = content.ContentType.VariesByCulture()
+                var culturesChanging = contentType.VariesByCulture()
                     ? string.Join(",", content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key))
                     : null;
 
@@ -2098,7 +2163,8 @@ namespace Umbraco.Core.Services.Implement
 
         private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
-            var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
+            var notificationData = itemsA.Select(x=>new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray();
+            var saveEventArgs = new SaveEventArgs<NotificationData>(notificationData);
             if (raiseEvents)
             {
                 //raise cancelable sorting event
@@ -2145,10 +2211,10 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Sorted, this, saveEventArgs, nameof(Sorted));
             }
 
-            scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
+            scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<NotificationData>(new NotificationData(x, _contentTypeService.Get(x.ContentTypeId)), TreeChangeTypes.RefreshNode)).ToEventArgs());
 
             if (raiseEvents && published.Any())
-                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<NotificationData>(published.Select(x=>new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray(), false, false), "Published");
 
             Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
             return OperationResult.Succeed(evtMsgs);
@@ -2209,12 +2275,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleting;
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<NotificationData>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleted;
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<NotificationData>> Deleted;
 
         /// <summary>
         /// Occurs before Delete Versions
@@ -2229,22 +2295,22 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Sorting
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorting;
+        public static event TypedEventHandler<IContentService, SaveEventArgs<NotificationData>> Sorting;
 
         /// <summary>
         /// Occurs after Sorting
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorted;
+        public static event TypedEventHandler<IContentService, SaveEventArgs<NotificationData>> Sorted;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saving;
+        public static event TypedEventHandler<IContentService, SaveEventArgs<NotificationData>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
+        public static event TypedEventHandler<IContentService, SaveEventArgs<NotificationData>> Saved;
 
         /// <summary>
         /// Occurs after Create
@@ -2253,57 +2319,57 @@ namespace Umbraco.Core.Services.Implement
         /// Please note that the Content object has been created, but might not have been saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
-        public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
+        public static event TypedEventHandler<IContentService, NewEventArgs<NotificationData>> Created;
 
         /// <summary>
         /// Occurs before Copy
         /// </summary>
-        public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copying;
+        public static event TypedEventHandler<IContentService, CopyEventArgs<NotificationData>> Copying;
 
         /// <summary>
         /// Occurs after Copy
         /// </summary>
-        public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copied;
+        public static event TypedEventHandler<IContentService, CopyEventArgs<NotificationData>> Copied;
 
         /// <summary>
         /// Occurs before Content is moved to Recycle Bin
         /// </summary>
-        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashing;
+        public static event TypedEventHandler<IContentService, MoveEventArgs<NotificationData>> Trashing;
 
         /// <summary>
         /// Occurs after Content is moved to Recycle Bin
         /// </summary>
-        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashed;
+        public static event TypedEventHandler<IContentService, MoveEventArgs<NotificationData>> Trashed;
 
         /// <summary>
         /// Occurs before Move
         /// </summary>
-        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moving;
+        public static event TypedEventHandler<IContentService, MoveEventArgs<NotificationData>> Moving;
 
         /// <summary>
         /// Occurs after Move
         /// </summary>
-        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moved;
+        public static event TypedEventHandler<IContentService, MoveEventArgs<NotificationData>> Moved;
 
         /// <summary>
         /// Occurs before Rollback
         /// </summary>
-        public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RollingBack;
+        public static event TypedEventHandler<IContentService, RollbackEventArgs<NotificationData>> RollingBack;
 
         /// <summary>
         /// Occurs after Rollback
         /// </summary>
-        public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RolledBack;
+        public static event TypedEventHandler<IContentService, RollbackEventArgs<NotificationData>> RolledBack;
 
         /// <summary>
         /// Occurs before Send to Publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SendingToPublish;
+        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<NotificationData>> SendingToPublish;
 
         /// <summary>
         /// Occurs after Send to Publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
+        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<NotificationData>> SentToPublish;
 
         /// <summary>
         /// Occurs before the Recycle Bin is emptied
@@ -2318,37 +2384,37 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Publishing;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<NotificationData>> Publishing;
 
         /// <summary>
         /// Occurs after publish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Published;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<NotificationData>> Published;
 
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Unpublishing;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<NotificationData>> Unpublishing;
 
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Unpublished;
+        public static event TypedEventHandler<IContentService, PublishEventArgs<NotificationData>> Unpublished;
 
         /// <summary>
         /// Occurs after change.
         /// </summary>
-        internal static event TypedEventHandler<IContentService, TreeChange<IContent>.EventArgs> TreeChanged;
+        internal static event TypedEventHandler<IContentService, TreeChange<NotificationData>.EventArgs> TreeChanged;
 
         /// <summary>
         /// Occurs after a blueprint has been saved.
         /// </summary>
-        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> SavedBlueprint;
+        public static event TypedEventHandler<IContentService, SaveEventArgs<NotificationData>> SavedBlueprint;
 
         /// <summary>
         /// Occurs after a blueprint has been deleted.
         /// </summary>
-        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> DeletedBlueprint;
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<NotificationData>> DeletedBlueprint;
 
         #endregion
 
@@ -2363,16 +2429,17 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="checkPath"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
-        private PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing, EventMessages evtMsgs)
+        private PublishResult StrategyCanPublish(IScope scope, IContent content, IContentType contentType, int userId, bool checkPath, IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing, EventMessages evtMsgs)
         {
             // raise Publishing event
-            if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            var notificationData = new NotificationData(content, contentType);
+            if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<NotificationData>(notificationData, evtMsgs)))
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
-            var variesByCulture = content.ContentType.VariesByCulture();
+            var variesByCulture = contentType.VariesByCulture();
 
             //First check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
             // be changed to Unpublished and any culture currently published will not be visible.
@@ -2405,7 +2472,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 // ensure that the document status is correct
                 // note: culture will be string.Empty for invariant
-                switch (content.GetStatus(culture))
+                switch (content.GetStatus(contentType, culture))
                 {
                     case ContentStatus.Expired:
                         if (!variesByCulture)
@@ -2458,7 +2525,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>
         /// It is assumed that all publishing checks have passed before calling this method like <see cref="StrategyCanPublish"/>
         /// </remarks>
-        private PublishResult StrategyPublish(IScope scope, IContent content, int userId,
+        private PublishResult StrategyPublish(IScope scope, IContent content, IContentType contentType, int userId,
             IReadOnlyList<string> culturesPublishing, IReadOnlyList<string> culturesUnpublishing,
             EventMessages evtMsgs)
         {
@@ -2467,7 +2534,7 @@ namespace Umbraco.Core.Services.Implement
             ((Content)content).PublishedState = PublishedState.Publishing;
 
             //if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 if (content.Published && culturesUnpublishing.Count == 0 && culturesPublishing.Count == 0)
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
@@ -2502,10 +2569,10 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="evtMsgs"></param>
         /// <returns></returns>
-        private PublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        private PublishResult StrategyCanUnpublish(IScope scope, IContent content, IContentType contentType, int userId, EventMessages evtMsgs)
         {
             // raise Unpublishing event
-            if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<NotificationData>(new NotificationData(content, contentType), evtMsgs)))
             {
                 Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
                 return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
@@ -2573,7 +2640,7 @@ namespace Umbraco.Core.Services.Implement
             // The main problem with this is that for every content item being deleted, events are raised...
             // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
-            var changes = new List<TreeChange<IContent>>();
+            var changes = new List<TreeChange<NotificationData>>();
             var moves = new List<Tuple<IContent, string>>();
             var contentTypeIdsA = contentTypeIds.ToArray();
 
@@ -2588,7 +2655,7 @@ namespace Umbraco.Core.Services.Implement
                 var query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
                 var contents = _documentRepository.Get(query).ToArray();
 
-                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents), nameof(Deleting)))
+                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<NotificationData>(contents.Select(x=>new NotificationData(x, _contentTypeService.Get(x.ContentTypeId)))), nameof(Deleting)))
                 {
                     scope.Complete();
                     return;
@@ -2598,11 +2665,14 @@ namespace Umbraco.Core.Services.Implement
                 // a content of the deleted type, to the recycle bin (and then delete it...)
                 foreach (var content in contents.OrderByDescending(x => x.ParentId))
                 {
+
+                    var contentContentType = _contentTypeService.Get(content.ContentTypeId);
+                    var notificationData = new NotificationData(content, contentContentType);
                     // if it's not trashed yet, and published, we should unpublish
                     // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
                     if (content.Trashed == false && content.Published)
-                        scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(Unpublished));
+                        scope.Events.Dispatch(Unpublished, this, new PublishEventArgs<NotificationData>(notificationData, false, false), nameof(Unpublished));
 
                     // if current content has children, move them to trash
                     var c = content;
@@ -2612,20 +2682,25 @@ namespace Umbraco.Core.Services.Implement
                     {
                         // see MoveToRecycleBin
                         PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
-                        changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
+                        changes.Add(new TreeChange<NotificationData>(notificationData, TreeChangeTypes.RefreshBranch));
                     }
 
                     // delete content
                     // triggers the deleted event (and handles the files)
                     DeleteLocked(scope, content);
-                    changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
+                    changes.Add(new TreeChange<NotificationData>(notificationData, TreeChangeTypes.Remove));
                 }
 
                 var moveInfos = moves
-                    .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
+                    .Select(x =>
+                    {
+                        var item1ContentType = _contentTypeService.Get(x.Item1.ContentTypeId);
+                        var item1NotificationData = new NotificationData(x.Item1, item1ContentType);
+                        return new MoveEventInfo<NotificationData>(item1NotificationData, x.Item2, x.Item1.ParentId);
+                    })
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), nameof(Trashed));
+                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<NotificationData>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
                 Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete content of type {string.Join(",", contentTypeIdsA)}");
@@ -2723,7 +2798,9 @@ namespace Umbraco.Core.Services.Implement
 
                 _documentBlueprintRepository.Save(content);
 
-                scope.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
+                scope.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<NotificationData>(notificationData), "SavedBlueprint");
 
                 scope.Complete();
             }
@@ -2735,7 +2812,10 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 _documentBlueprintRepository.Delete(content);
-                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), nameof(DeletedBlueprint));
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var notificationData = new NotificationData(content, contentType);
+
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<NotificationData>(notificationData), nameof(DeletedBlueprint));
                 scope.Complete();
             }
         }
@@ -2744,7 +2824,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
-            var contentType = blueprint.ContentType;
+            var contentType = _contentTypeService.Get(blueprint.ContentTypeId);
             var content = new Content(name, -1, contentType);
             content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
@@ -2796,7 +2876,8 @@ namespace Umbraco.Core.Services.Implement
                     _documentBlueprintRepository.Delete(blueprint);
                 }
 
-                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(blueprints), nameof(DeletedBlueprint));
+                var notificationData = blueprints.Select(x=>new NotificationData(x, _contentTypeService.Get(x.ContentTypeId))).ToArray();
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<NotificationData>(notificationData), nameof(DeletedBlueprint));
                 scope.Complete();
             }
         }
@@ -2831,7 +2912,8 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
+                var contentType = _contentTypeService.Get(content.ContentTypeId);
+                var rollbackEventArgs = new RollbackEventArgs<NotificationData>(new NotificationData(content, contentType));
 
                 //Emit RollingBack event aka before
                 if (scope.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))

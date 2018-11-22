@@ -26,12 +26,12 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the current status of the Content
         /// </summary>
-        public static ContentStatus GetStatus(this IContent content, string culture = null)
+        public static ContentStatus GetStatus(this IContent content,  IContentType contentType, string culture = null)
         {
             if (content.Trashed)
                 return ContentStatus.Trashed;
 
-            if (!content.ContentType.VariesByCulture())
+            if (!contentType.VariesByCulture())
                 culture = string.Empty;
             else if (culture.IsNullOrWhiteSpace())
                 throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
@@ -54,9 +54,9 @@ namespace Umbraco.Core
         /// Gets the cultures that have been flagged for unpublishing.
         /// </summary>
         /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
-        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content, IContentType contentType)
         {
-            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
+            if (!content.Published || !contentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
                 return Array.Empty<string>();
 
             var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);

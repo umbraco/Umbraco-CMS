@@ -1408,14 +1408,14 @@ namespace Umbraco.Tests.Services
             IContent content = new Content("content", -1, contentType);
             content.SetCultureName("content-fr", langFr.IsoCode);
             content.SetCultureName("content-gb", langGB.IsoCode);
-            content.PublishCulture(langGB.IsoCode);
-            content.PublishCulture(langFr.IsoCode);
+            ServiceContext.ContentPublishingService.PublishCulture(content,langGB.IsoCode);
+            ServiceContext.ContentPublishingService.PublishCulture(content,langFr.IsoCode);
             var published = ServiceContext.ContentService.SavePublishing(content);
             Assert.IsTrue(published.Success);
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
-            content.UnpublishCulture(langFr.IsoCode); //unpublish non-mandatory lang
+            ServiceContext.ContentPublishingService.UnpublishCulture(content,langFr.IsoCode); //unpublish non-mandatory lang
             var unpublished = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that french was unpublished
             var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
@@ -1424,7 +1424,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             content.SetCultureName("content-en", langGB.IsoCode);
-            content.UnpublishCulture(langGB.IsoCode); //unpublish mandatory lang
+            ServiceContext.ContentPublishingService.UnpublishCulture(content, langGB.IsoCode); //unpublish mandatory lang
             unpublished = ServiceContext.ContentService.SavePublishing(content);
             //audit log will only show that english was published
             var logs = ServiceContext.AuditService.GetLogs(content.Id).ToList();
@@ -1573,15 +1573,15 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("name-fr", langFr.IsoCode);
             content.SetCultureName("name-da", langDa.IsoCode);
 
-            content.PublishCulture(langFr.IsoCode);
+            ServiceContext.ContentPublishingService.PublishCulture(content, langFr.IsoCode);
             var result = ServiceContext.ContentService.SavePublishing(content);
             Assert.IsTrue(result.Success);
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
             Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
-            content.UnpublishCulture(langFr.IsoCode);
-            content.PublishCulture(langDa.IsoCode);
+            ServiceContext.ContentPublishingService.UnpublishCulture(content, langFr.IsoCode);
+            ServiceContext.ContentPublishingService.PublishCulture(content, langDa.IsoCode);
 
             result = ServiceContext.ContentService.SavePublishing(content);
             Assert.IsTrue(result.Success);

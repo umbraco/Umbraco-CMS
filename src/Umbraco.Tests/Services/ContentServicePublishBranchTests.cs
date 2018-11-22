@@ -264,8 +264,9 @@ namespace Umbraco.Tests.Services
             vRoot.SetValue("vp", "changed.es", "es");
             ServiceContext.ContentService.Save(vRoot); // now root has drafts in all cultures
 
-            iv1.PublishCulture("de");
-            iv1.PublishCulture("ru");
+
+            ServiceContext.ContentPublishingService.PublishCulture(iv1, "de");
+            ServiceContext.ContentPublishingService.PublishCulture(iv1, "ru");
             ServiceContext.ContentService.SavePublishing(iv1); // now iv1 de and ru are published
 
             iv1.SetValue("ip", "changed");
@@ -345,9 +346,9 @@ namespace Umbraco.Tests.Services
             iv11.SetValue("vp", "iv11.es", "es");
             ServiceContext.ContentService.Save(iv11);
 
-            iv11.PublishCulture("de");
+            ServiceContext.ContentPublishingService.PublishCulture(iv11, "de");
             iv11.SetCultureName("iv11.ru", "ru");
-            iv11.PublishCulture("ru");
+            ServiceContext.ContentPublishingService.PublishCulture(iv11, "ru");
             ServiceContext.ContentService.SavePublishing(iv11);
 
             Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));

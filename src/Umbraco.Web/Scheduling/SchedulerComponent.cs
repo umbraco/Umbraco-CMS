@@ -119,7 +119,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger);
+            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _contentPublishingService, _logger);
             _publishingRunner.TryAdd(task);
             return task;
         }

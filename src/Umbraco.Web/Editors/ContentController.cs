@@ -39,6 +39,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Editors
@@ -58,17 +59,19 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentPublishingService _contentPublishingService;
+        private readonly ITemplateRepository _templateRepository;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
 
         public object Domains { get; private set; }
 
-        public ContentController(IPublishedSnapshotService publishedSnapshotService, IContentTypeService contentTypeService, IContentPublishingService contentPublishingService, PropertyEditorCollection propertyEditors)
+        public ContentController(IPublishedSnapshotService publishedSnapshotService, IContentTypeService contentTypeService, IContentPublishingService contentPublishingService, ITemplateRepository templateRepository, PropertyEditorCollection propertyEditors)
         {
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             _publishedSnapshotService = publishedSnapshotService;
             _contentTypeService = contentTypeService;
             _contentPublishingService = contentPublishingService;
+            _templateRepository = templateRepository;
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
@@ -876,7 +879,8 @@ namespace Umbraco.Web.Editors
         /// <param name="globalNotifications"></param>
         private bool SaveSchedule(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
         {
-            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
+            var contentType = _contentTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+            if (!contentType.VariesByCulture())
                 return SaveScheduleInvariant(contentItem, globalNotifications);
             else
                 return SaveScheduleVariant(contentItem);
@@ -1097,7 +1101,8 @@ namespace Umbraco.Web.Editors
         private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force,
                 out bool wasCancelled, out string[] successfulCultures)
         {
-            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
+            var contentType = _contentTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+            if (!contentType.VariesByCulture())
             {
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
@@ -1792,7 +1797,7 @@ namespace Umbraco.Web.Editors
 
             //only set the template if it didn't change
             var templateChanged = (contentSave.PersistedContent.TemplateId == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentSave.PersistedContent.TemplateId != null && contentSave.PersistedContent.TemplateId != contentSave.TemplateId)
+                                                        || (contentSave.PersistedContent.TemplateId != null && _templateRepository.Get(contentSave.PersistedContent.TemplateId.Value).Alias != contentSave.TemplateAlias)
                                                         || (contentSave.PersistedContent.TemplateId != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
             if (templateChanged)
             {

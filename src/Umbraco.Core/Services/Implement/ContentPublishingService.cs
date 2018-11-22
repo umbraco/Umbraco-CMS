@@ -15,11 +15,16 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public virtual bool PublishCulture(IContent content, string culture = "*")
+       public bool PublishCulture(IContent content, string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
-            ThrowIfCultureNotSupportedByContentType(content, culture);
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            if (!contentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{contentType.Alias}\" with variation \"{contentType.Variations}\".");
 
             // the values we want to publish should be valid
             if (content.ValidateProperties(culture).Any())
@@ -64,11 +69,14 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public virtual void UnpublishCulture(IContent content, string culture = "*")
+        public void UnpublishCulture(IContent content, string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
-            ThrowIfCultureNotSupportedByContentType(content, culture);
+            var contentType = _contentTypeService.Get(content.ContentTypeId);
+            // the variation should be supported by the content type properties
+            if (!contentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{contentType.Alias}\" with variation \"{contentType.Variations}\".");
 
             if (culture == "*") // all cultures
                 ClearPublishInfos(content);
@@ -106,10 +114,10 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.PublishInfos == null) return;
             content.PublishInfos.Remove(culture);
-            if (content.PublishInfos.Count == 0)
-            {
-                content.PublishInfos = null;
-            }
+            if (content.PublishInfos.Count == 0) content.PublishInfos = null;
+
+            // set the culture to be dirty - it's been modified
+            content.TouchCultureInfo(culture);
         }
 
 

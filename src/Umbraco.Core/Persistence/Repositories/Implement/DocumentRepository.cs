@@ -278,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.TemplateId = contentType.DefaultTemplate?.Id;
 
             // sanitize names
-            SanitizeNames(content, publishing);
+            SanitizeNames(content, contentType, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -445,7 +445,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // there are tons of things at the end of the methods, that can only work with a true Content
             // and basically, the repository requires a Content, not an IContent
             var content = (Content)entity;
-
+            var contentType = _contentTypeRepository.Get(content.ContentTypeId);
             // check if we need to make any database changes at all
             if ((content.PublishedState == PublishedState.Published || content.PublishedState == PublishedState.Unpublished)
                     && !content.IsEntityDirty() && !content.IsAnyUserPropertyDirty())
@@ -469,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // sanitize names
-            SanitizeNames(content, publishing);
+            SanitizeNames(content, contentType, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing && content.PublishName != content.Name)
                 edited = true;
 
-            var contentType = _contentTypeRepository.Get(content.ContentTypeId);
+
             if (contentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
@@ -1124,7 +1124,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // get template
                 if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-                    content.Template = _templateRepository.Get(dto.DocumentVersionDto.TemplateId.Value);
+                    content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
 
                 // get properties - indexed by version id
@@ -1329,7 +1329,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Utilities
 
-        private void SanitizeNames(Content content, bool publishing)
+        private void SanitizeNames(Content content, IContentType contentType, bool publishing)
         {
             // a content item *must* have an invariant name, and invariant published name
             // else we just cannot write the invariant rows (node, content version...) to the database
@@ -1337,7 +1337,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // ensure that we have an invariant name
             // invariant content = must be there already, else throw
             // variant content = update with default culture or anything really
-            EnsureInvariantNameExists(content);
+            EnsureInvariantNameExists(content, contentType);
 
             // ensure that that invariant name is unique
             EnsureInvariantNameIsUnique(content);
@@ -1346,12 +1346,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // ensure that each culture has a unique node name
             // no published name = not published
             // else, it needs to be unique
-            EnsureVariantNamesAreUnique(content, publishing);
+            EnsureVariantNamesAreUnique(content, contentType, publishing);
         }
 
-        private void EnsureInvariantNameExists(Content content)
+        private void EnsureInvariantNameExists(Content content, IContentType contentType)
         {
-            if (content.ContentType.VariesByCulture())
+            if (contentType.VariesByCulture())
             {
                 // content varies by culture
                 // then it must have at least a variant name, else it makes no sense
@@ -1394,9 +1394,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                                  x.NodeId != SqlTemplate.Arg<int>("id"))
             .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
 
-        private void EnsureVariantNamesAreUnique(Content content, bool publishing)
+        private void EnsureVariantNamesAreUnique(Content content, IContentType contentType, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
+            if (!EnsureUniqueNaming || !contentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
 
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);

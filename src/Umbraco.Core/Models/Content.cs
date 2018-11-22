@@ -99,6 +99,7 @@ namespace Umbraco.Core.Models
             set => _publishInfos = value;
         }
 
+
         /// <inheritdoc />
         [DoNotClone]
         public ContentScheduleCollection ContentSchedule
@@ -284,6 +285,11 @@ namespace Umbraco.Core.Models
 
             // set the culture to be dirty - it's been modified
             TouchCultureInfo(culture);
+        }
+
+        public new void TouchCultureInfo(string culture)
+        {
+            base.TouchCultureInfo(culture);
         }
 
         // sets a publish edited
