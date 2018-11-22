@@ -205,6 +205,14 @@
             "start": start,
             "step": step,
             "tooltips": tooltips,
+            "format": {
+                to: function (value) {
+                    return Math.round(value);
+                },
+                from: function (value) {
+                    return Math.round(value);
+                }
+            },
             "range": {
                 "min": min,
                 "max": max
