@@ -157,18 +157,7 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public static void RegisterSingleton<TImplementation>(this IServiceRegistry container)
         {
-            var registration = container.GetAvailableService<TImplementation>();
-            if (registration == null)
-            {
-                container.Register<TImplementation>(new PerContainerLifetime());
-            }
-            else
-            {
-                if (registration.Lifetime is PerContainerLifetime == false)
-                    throw new InvalidOperationException("Existing registration lifetime is not PerContainer.");
-                UpdateRegistration(registration, typeof(TImplementation), null);
-            }
-
+            container.RegisterSingleton<TImplementation, TImplementation>();
         }
 
         /// <summary>

@@ -44,6 +44,14 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
+            // ensure we have some essential directories
+            // every other component can then initialize safely
+            IOHelper.EnsurePathExists("~/App_Data");
+            IOHelper.EnsurePathExists(SystemDirectories.Media);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
+
             container.ConfigureUmbracoCore(); // also sets Current.Container
 
             // register the essential stuff,

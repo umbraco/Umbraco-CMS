@@ -319,11 +319,13 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
+    <Compile Include="IO\FileSystemsComponent.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\LoggingComponent.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
@@ -427,6 +429,7 @@
     <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
+    <Compile Include="Persistence\PersistanceComponent.cs" />
     <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
