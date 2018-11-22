@@ -19,6 +19,20 @@ using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Examine
 {
+    public class HtmlValueType : IndexValueTypeBase
+    {
+        public HtmlValueType(string fieldName, bool store = true) : base(fieldName, store)
+        {
+        }
+
+        protected override void AddSingleValue(Document doc, object value)
+        {
+            //TODO: Make this happen so we can properly analyze/tokenize html, maybe we only need an analyzer though
+
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
