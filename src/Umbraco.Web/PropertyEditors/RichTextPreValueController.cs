@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         private static volatile bool _init;
         private static readonly object Locker = new object();
-        private static readonly Dictionary<string, RichTextEditorCommand> Commands = new Dictionary<string,RichTextEditorCommand>();
+        private static readonly Dictionary<string, RichTextEditorCommand> Commands = new Dictionary<string, RichTextEditorCommand>();
         private static readonly Dictionary<string, RichTextEditorPlugin> Plugins = new Dictionary<string, RichTextEditorPlugin>();
         private static readonly Dictionary<string, string> ConfigOptions = new Dictionary<string, string>();
 
@@ -26,12 +27,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             EnsureInit();
 
-            RichTextEditorConfiguration config = new RichTextEditorConfiguration();
-            config.Plugins = Plugins.Values;
-            config.Commands = Commands.Values;
-            config.ValidElements = _validElements;
-            config.InvalidElements = _invalidElements;
-            config.CustomConfig = ConfigOptions;
+            var config = new RichTextEditorConfiguration
+            {
+                Plugins = Plugins.Values,
+                Commands = Commands.Values,
+                ValidElements = _validElements,
+                InvalidElements = _invalidElements,
+                CustomConfig = ConfigOptions
+            };
 
             return config;
         }
@@ -51,28 +54,18 @@ namespace Umbraco.Web.PropertyEditors
 
                         foreach (XmlNode n in xd.DocumentElement.SelectNodes("//command"))
                         {
-                            var alias = n.SelectSingleNode("./umbracoAlias").FirstChild.Value.ToLower();
-
-                            bool isStyle = false;
-                            if (n.Attributes.GetNamedItem("isStyle") != null)
-                                isStyle = bool.Parse(n.Attributes.GetNamedItem("isStyle").Value);
+                            var alias = n.AttributeValue<string>("alias").ToLower();
 
                             if (!Commands.ContainsKey(alias))
                                 Commands.Add(
-                                         alias,
-                                         new RichTextEditorCommand()
-                                         {
-                                             IsStylePicker = isStyle,
-                                             Name = n.SelectSingleNode("./name") != null ? n.SelectSingleNode("./name").FirstChild.Value : alias,
-                                             Icon = n.SelectSingleNode("./icon").FirstChild.Value,
-                                             Command = n.SelectSingleNode("./tinyMceCommand").FirstChild.Value,
-                                             Alias = alias,
-                                             UserInterface = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("userInterface").Value,
-                                             FrontEndCommand = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("frontendCommand").Value,
-                                             Value = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("value").Value,
-                                             Priority = int.Parse(n.SelectSingleNode("./priority").FirstChild.Value)
-                                         }
-                                   );
+                                    alias,
+                                    new RichTextEditorCommand()
+                                    {
+                                        Name = n.AttributeValue<string>("name") ?? alias,
+                                        Alias = alias,
+                                        Mode = Enum<RichTextEditorCommandMode>.Parse(n.AttributeValue<string>("mode"), true)
+                                    }
+                                );
                         }
 
 
@@ -80,16 +73,12 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             if (!Plugins.ContainsKey(n.FirstChild.Value))
                             {
-                                bool useOnFrontend = false;
-                                if (n.Attributes.GetNamedItem("loadOnFrontend") != null)
-                                    useOnFrontend = bool.Parse(n.Attributes.GetNamedItem("loadOnFrontend").Value);
 
                                 Plugins.Add(
                                     n.FirstChild.Value.ToLower(),
                                     new RichTextEditorPlugin()
                                     {
                                         Name = n.FirstChild.Value,
-                                        UseOnFrontend = useOnFrontend
                                     });
                             }
                         }

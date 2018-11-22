@@ -6,7 +6,7 @@
  * @description
  * Some angular helper/extension methods
  */
-function angularHelper($log, $q) {
+function angularHelper($q) {
     return {
 
         /**
