@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Deploy
+namespace Umbraco.Core.Deploy
 {
     public class Difference
     {

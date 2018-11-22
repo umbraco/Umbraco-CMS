@@ -1,68 +1,96 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.UI;
-using Umbraco.Core.Cache;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
+using umbraco.BusinessLogic;
+using umbraco.DataLayer;
 
 namespace Umbraco.Web.UI.Controls
 {
     /// <summary>
-    /// A control that exposes the helpful Umbraco context objects
-    /// </summary>
-    public abstract class UmbracoControl : Control
-    {
-        private UrlHelper _url;
+	/// A control that exposes the helpful Umbraco context objects
+	/// </summary>
+	public abstract class UmbracoControl : Control
+	{
 
-        protected UmbracoControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        protected UmbracoControl(UmbracoContext umbracoContext)
         {
-            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
-
-            // fixme inject somehow
-            Logger = Current.Logger;
-            ProfilingLogger = Current.ProfilingLogger;
-            Services = Current.Services;
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            UmbracoContext = umbracoContext;
+            Umbraco = new UmbracoHelper(umbracoContext);
         }
 
         /// <summary>
-        /// Empty constructor, uses Singleton to resolve the UmbracoContext.
+        /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected UmbracoControl()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
-        { }
+            : this(UmbracoContext.Current)
+        {
+        }
 
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco { get; }
+        public UmbracoHelper Umbraco { get; private set; }
 
         /// <summary>
-        /// Gets the logger.
+        /// Returns an ILogger
         /// </summary>
-        public ILogger Logger { get; }
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
 
         /// <summary>
-        /// Gets the profiling logger.
+        /// Returns a ProfilingLogger
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
+
+        public UmbracoContext UmbracoContext { get; private set; }
+
+		protected ApplicationContext ApplicationContext
+		{
+			get { return UmbracoContext.Application; }
+		}
+		protected DatabaseContext DatabaseContext
+		{
+			get { return ApplicationContext.DatabaseContext; }
+		}
+		protected ServiceContext Services
+		{
+			get { return ApplicationContext.Services; }
+		}
+
+        private UrlHelper _url;
+        /// <summary>
+        /// Returns a UrlHelper
+        /// </summary>
+        /// <remarks>
+        /// This URL helper is created without any route data and an empty request context
+        /// </remarks>
+        public UrlHelper Url
+        {
+            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
+        }
 
         /// <summary>
-        /// Gets the Umbraco context.
+        /// Unused, please do not use
         /// </summary>
-        public UmbracoContext UmbracoContext { get; }
-
-        /// <summary>
-        /// Gets the services context.
-        /// </summary>
-        protected ServiceContext Services { get; }
-
-        /// <summary>
-        /// Gets a Url helper.
-        /// </summary>
-        /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
-        public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
-    }
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+		protected ISqlHelper SqlHelper
+		{
+			get { return Application.SqlHelper; }
+		}
+	}
 }

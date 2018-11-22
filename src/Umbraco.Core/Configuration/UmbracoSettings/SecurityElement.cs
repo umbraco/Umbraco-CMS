@@ -41,7 +41,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("authCookieName")]
         internal InnerTextConfigurationElement<string> AuthCookieName
         {
-            get { return GetOptionalTextElement("authCookieName", "UMB_UCONTEXT"); }
+            get { return GetOptionalTextElement("authCookieName", Constants.Web.AuthCookieName); }
         }
 
         [ConfigurationProperty("authCookieDomain")]

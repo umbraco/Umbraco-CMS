@@ -14,7 +14,8 @@ function valRegex() {
 
             var flags = "";
             var regex;
-            
+            var eventBindings = [];
+
             attrs.$observe("valRegexFlags", function (newVal) {
                 if (newVal) {
                     flags = newVal;
@@ -38,15 +39,11 @@ function valRegex() {
                 }
             });
 
-            //An ngModel is supplied, assign a render function which is called when the model is changed
-            var oldRender = ctrl.$render;
-            ctrl.$render = function () {
-                patternValidator(ctrl.$viewValue);
-                //call any previously set render method
-                if (oldRender) {
-                    oldRender();
+            eventBindings.push(scope.$watch('ngModel', function(newValue, oldValue){
+                if(newValue && newValue !== oldValue) {
+                    patternValidator(newValue);
                 }
-            };
+            }));
 
             var patternValidator = function (viewValue) {
                 if (regex) {
@@ -67,6 +64,13 @@ function valRegex() {
                     }
                 }
             };
+
+            scope.$on('$destroy', function(){
+              // unbind watchers
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
+            });
 
         }
     };

@@ -1,25 +1,25 @@
 ﻿using System;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class MemberGroupFactory
+    internal class MemberGroupFactory 
     {
+        
+        private readonly Guid _nodeObjectTypeId;
 
-        private static readonly Guid _nodeObjectTypeId;
-
-         static MemberGroupFactory()
+        public MemberGroupFactory()
         {
-            _nodeObjectTypeId = Constants.ObjectTypes.MemberGroup;
+            _nodeObjectTypeId = new Guid(Constants.ObjectTypes.MemberGroup);
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public static IMemberGroup BuildEntity(NodeDto dto)
+        public IMemberGroup BuildEntity(NodeDto dto)
         {
             var group = new MemberGroup();
-
+            
             try
             {
                 group.DisableChangeTracking();
@@ -29,7 +29,8 @@ namespace Umbraco.Core.Persistence.Factories
                 group.Key = dto.UniqueId;
                 group.Name = dto.Text;
 
-                // reset dirty initial properties (U4-1946)
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
                 group.ResetDirtyProperties(false);
                 return group;
             }
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static NodeDto BuildDto(IMemberGroup entity)
+        public NodeDto BuildDto(IMemberGroup entity)
         {
             var dto = new NodeDto
             {

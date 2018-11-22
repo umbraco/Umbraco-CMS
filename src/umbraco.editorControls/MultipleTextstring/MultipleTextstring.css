@@ -1,0 +1,33 @@
+﻿.MultipleTextstring
+{
+	float: left;
+	padding-bottom: 5px;
+}
+.MultipleTextstring .textstring-row
+{
+	clear: both;
+	float: left;
+	margin-bottom: 5px;
+	width: 451px;
+}
+.MultipleTextstring .textstring-row .textstring-row-field
+{
+	float: left;
+	width: 435px;
+}
+.MultipleTextstring .textstring-row .textstring-row-sort
+{
+	float: right;
+	cursor: move;
+	padding-top: 2px;
+	height: 18px;
+	width: 16px;
+}
+.MultipleTextstring .textstring-row-placeholder
+{
+	clear: both;
+	float: left;
+	background-color: #FFEE99;
+	margin-bottom: 5px;
+	width: 451px;
+}

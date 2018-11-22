@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration
+namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// This is used to supply optional/default values when using InnerTextConfigurationElement

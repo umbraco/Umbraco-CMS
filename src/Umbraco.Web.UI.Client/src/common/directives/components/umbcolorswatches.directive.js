@@ -34,7 +34,9 @@ Use this directive to generate color swatches to pick from.
             }
             
             scope.setColor = function (color) {
+                //scope.selectedColor({color: color });
                 scope.selectedColor = color;
+
                 if (scope.onSelect) {
                     scope.onSelect(color);
                 }

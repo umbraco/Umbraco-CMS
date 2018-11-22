@@ -106,7 +106,7 @@ namespace Umbraco.Core.Persistence
             // detect 14, 13, 12, 11
             for (var i = 14; i > 10; i--)
             {
-                var exe = Path.Combine(programFiles, $@"Microsoft SQL Server\{i}0\Tools\Binn\SqlLocalDB.exe");
+                var exe = Path.Combine(programFiles, string.Format(@"Microsoft SQL Server\{0}0\Tools\Binn\SqlLocalDB.exe", i));
                 if (File.Exists(exe) == false) continue;
                 _version = i;
                 _exe = exe;
@@ -126,7 +126,8 @@ namespace Umbraco.Core.Persistence
         public string[] GetInstances()
         {
             EnsureAvailable();
-            var rc = ExecuteSqlLocalDb("i", out var output, out var error); // info
+            string output, error;
+            var rc = ExecuteSqlLocalDb("i", out output, out error); // info
             if (rc != 0 || error != string.Empty) return null;
             return output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
         }
@@ -153,7 +154,8 @@ namespace Umbraco.Core.Persistence
         public bool CreateInstance(string instanceName)
         {
             EnsureAvailable();
-            return ExecuteSqlLocalDb($"c \"{instanceName}\"", out _, out var error) == 0 && error == string.Empty;
+            string output, error;
+            return ExecuteSqlLocalDb(string.Format("c \"{0}\"", instanceName), out output, out error) == 0 && error == string.Empty;
         }
 
         /// <summary>
@@ -174,8 +176,9 @@ namespace Umbraco.Core.Persistence
             instance.DropDatabases(); // else the files remain
 
             // -i force NOWAIT, -k kills
-            return ExecuteSqlLocalDb($"p \"{instanceName}\" -i", out _, out var error) == 0 && error == string.Empty
-                   && ExecuteSqlLocalDb($"d \"{instanceName}\"", out _, out error) == 0 && error == string.Empty;
+            string output, error;
+            return ExecuteSqlLocalDb(string.Format("p \"{0}\" -i", instanceName), out output, out error) == 0 && error == string.Empty
+                   && ExecuteSqlLocalDb(string.Format("d \"{0}\"", instanceName), out output, out error) == 0 && error == string.Empty;
         }
 
         /// <summary>
@@ -193,7 +196,8 @@ namespace Umbraco.Core.Persistence
             if (InstanceExists(instanceName) == false) return true;
 
             // -i force NOWAIT, -k kills
-            return ExecuteSqlLocalDb($"p \"{instanceName}\" -i", out _, out var error) == 0 && error == string.Empty;
+            string output, error;
+            return ExecuteSqlLocalDb(string.Format("p \"{0}\" -i", instanceName), out output, out error) == 0 && error == string.Empty;
         }
 
         /// <summary>
@@ -209,7 +213,8 @@ namespace Umbraco.Core.Persistence
         {
             EnsureAvailable();
             if (InstanceExists(instanceName) == false) return false;
-            return ExecuteSqlLocalDb($"s \"{instanceName}\"", out _, out var error) == 0 && error == string.Empty;
+            string output, error;
+            return ExecuteSqlLocalDb(string.Format("s \"{0}\"", instanceName), out output, out error) == 0 && error == string.Empty;
         }
 
         /// <summary>
@@ -241,7 +246,7 @@ namespace Umbraco.Core.Persistence
             /// <summary>
             /// Gets the name of the instance.
             /// </summary>
-            public string InstanceName { get; }
+            public string InstanceName { get; private set; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Instance"/> class.
@@ -250,7 +255,7 @@ namespace Umbraco.Core.Persistence
             public Instance(string instanceName)
             {
                 InstanceName = instanceName;
-                _masterCstr = $@"Server=(localdb)\{instanceName};Integrated Security=True;";
+                _masterCstr = string.Format(@"Server=(localdb)\{0};Integrated Security=True;", instanceName);
             }
 
             /// <summary>
@@ -263,7 +268,7 @@ namespace Umbraco.Core.Persistence
             /// </remarks>
             public string GetConnectionString(string databaseName)
             {
-                return _masterCstr + $@"Database={databaseName};";
+                return _masterCstr + string.Format(@"Database={0};", databaseName);
             }
 
             /// <summary>
@@ -279,9 +284,10 @@ namespace Umbraco.Core.Persistence
             /// </remarks>
             public string GetAttachedConnectionString(string databaseName, string filesPath)
             {
-                GetDatabaseFiles(databaseName, filesPath, out _, out _, out _, out var mdfFilename, out _);
+                string logName, baseFilename, baseLogFilename, mdfFilename, ldfFilename;
+                GetDatabaseFiles(databaseName, filesPath, out logName, out baseFilename, out baseLogFilename, out mdfFilename, out ldfFilename);
 
-                return _masterCstr + $@"AttachDbFileName='{mdfFilename}';";
+                return _masterCstr + string.Format(@"AttachDbFileName='{0}';", mdfFilename);
             }
 
             /// <summary>
@@ -377,7 +383,8 @@ namespace Umbraco.Core.Persistence
             /// </remarks>
             public bool CreateDatabase(string databaseName, string filesPath)
             {
-                GetDatabaseFiles(databaseName, filesPath, out var logName, out _, out _, out var mdfFilename, out var ldfFilename);
+                string logName, baseFilename, baseLogFilename, mdfFilename, ldfFilename;
+                GetDatabaseFiles(databaseName, filesPath, out logName, out baseFilename, out baseLogFilename, out mdfFilename, out ldfFilename);
 
                 using (var conn = new SqlConnection(_masterCstr))
                 using (var cmd = conn.CreateCommand())
@@ -389,10 +396,13 @@ namespace Umbraco.Core.Persistence
 
                     // cannot use parameters on CREATE DATABASE
                     // ie "CREATE DATABASE @0 ..." does not work
-                    SetCommand(cmd, $@"
-                        CREATE DATABASE {QuotedName(databaseName)}
-                            ON (NAME=N{QuotedName(databaseName, '\'')}, FILENAME={QuotedName(mdfFilename, '\'')})
-                            LOG ON (NAME=N{QuotedName(logName, '\'')}, FILENAME={QuotedName(ldfFilename, '\'')})");
+                    SetCommand(cmd, string.Format(@"
+                        CREATE DATABASE {0} 
+                            ON (NAME=N{1}, FILENAME={2})
+                            LOG ON (NAME=N{3}, FILENAME={4})",
+                        QuotedName(databaseName),
+                        QuotedName(databaseName, '\''), QuotedName(mdfFilename, '\''),
+                        QuotedName(logName, '\''), QuotedName(ldfFilename, '\'')));
 
                     var unused = cmd.ExecuteNonQuery();
                 }
@@ -614,8 +624,9 @@ namespace Umbraco.Core.Persistence
                 {
                     // cannot use parameters on ALTER DATABASE
                     // ie "ALTER DATABASE @0 ..." does not work
-                    SetCommand(cmd, $@"
-                        ALTER DATABASE {QuotedName(databaseName)} SET SINGLE_USER WITH ROLLBACK IMMEDIATE");
+                    SetCommand(cmd, string.Format(@"
+                        ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE",
+                        QuotedName(databaseName)));
 
                     var unused1 = cmd.ExecuteNonQuery();
                 }
@@ -636,8 +647,9 @@ namespace Umbraco.Core.Persistence
 
                 // cannot use parameters on DROP DATABASE
                 // ie "DROP DATABASE @0 ..." does not work
-                SetCommand(cmd, $@"
-                    DROP DATABASE {QuotedName(databaseName)}");
+                SetCommand(cmd, string.Format(@"
+                    DROP DATABASE {0}",
+                    QuotedName(databaseName)));
 
                 var unused2 = cmd.ExecuteNonQuery();
 
@@ -655,7 +667,7 @@ namespace Umbraco.Core.Persistence
             private static string GetLogFilename(string mdfFilename)
             {
                 if (mdfFilename.EndsWith(".mdf") == false)
-                    throw new ArgumentException("Not a valid MDF filename (no .mdf extension).", nameof(mdfFilename));
+                    throw new ArgumentException("Not a valid MDF filename (no .mdf extension).", "mdfFilename");
                 return mdfFilename.Substring(0, mdfFilename.Length - ".mdf".Length) + "_log.ldf";
             }
 
@@ -668,8 +680,9 @@ namespace Umbraco.Core.Persistence
             {
                 // cannot use parameters on ALTER DATABASE
                 // ie "ALTER DATABASE @0 ..." does not work
-                SetCommand(cmd, $@"
-                    ALTER DATABASE {QuotedName(databaseName)} SET SINGLE_USER WITH ROLLBACK IMMEDIATE");
+                SetCommand(cmd, string.Format(@"
+                    ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE",
+                    QuotedName(databaseName)));
 
                 var unused1 = cmd.ExecuteNonQuery();
 
@@ -688,16 +701,19 @@ namespace Umbraco.Core.Persistence
             /// <param name="filesPath">The directory containing database files.</param>
             private static void AttachDatabase(SqlCommand cmd, string databaseName, string filesPath)
             {
-                GetDatabaseFiles(databaseName, filesPath,
-                    out var logName, out _, out _, out var mdfFilename, out var ldfFilename);
+                string logName, baseFilename, baseLogFilename, mdfFilename, ldfFilename;
+                GetDatabaseFiles(databaseName, filesPath, out logName, out baseFilename, out baseLogFilename, out mdfFilename, out ldfFilename);
 
                 // cannot use parameters on CREATE DATABASE
                 // ie "CREATE DATABASE @0 ..." does not work
-                SetCommand(cmd, $@"
-                        CREATE DATABASE {QuotedName(databaseName)}
-                            ON (NAME=N{QuotedName(databaseName, '\'')}, FILENAME={QuotedName(mdfFilename, '\'')})
-                            LOG ON (NAME=N{QuotedName(logName, '\'')}, FILENAME={QuotedName(ldfFilename, '\'')})
-                            FOR ATTACH");
+                SetCommand(cmd, string.Format(@"
+                        CREATE DATABASE {0} 
+                            ON (NAME=N{1}, FILENAME={2})
+                            LOG ON (NAME=N{3}, FILENAME={4})
+                            FOR ATTACH",
+                    QuotedName(databaseName),
+                    QuotedName(databaseName, '\''), QuotedName(mdfFilename, '\''),
+                    QuotedName(logName, '\''), QuotedName(ldfFilename, '\'')));
 
                 var unused = cmd.ExecuteNonQuery();
             }
@@ -790,8 +806,9 @@ namespace Umbraco.Core.Persistence
                       && (sourceExtension == null && targetExtension == null || sourceExtension == targetExtension);
             if (nop && delete == false) return;
 
+            string logName, baseFilename, baseLogFilename, mdfFilename, ldfFilename;
             GetDatabaseFiles(databaseName, filesPath,
-                out _, out _, out _, out var mdfFilename, out var ldfFilename);
+                out logName, out baseFilename, out baseLogFilename, out mdfFilename, out ldfFilename);
 
             if (sourceExtension != null)
             {
@@ -808,8 +825,9 @@ namespace Umbraco.Core.Persistence
             else
             {
                 // copy or copy+delete ie move
+                string targetLogName, targetBaseFilename, targetLogFilename, targetMdfFilename, targetLdfFilename;
                 GetDatabaseFiles(targetDatabaseName ?? databaseName, targetFilesPath ?? filesPath,
-                    out _, out _, out _, out var targetMdfFilename, out var targetLdfFilename);
+                    out targetLogName, out targetBaseFilename, out targetLogFilename, out targetMdfFilename, out targetLdfFilename);
 
                 if (targetExtension != null)
                 {
@@ -844,8 +862,9 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public bool DatabaseFilesExist(string databaseName, string filesPath, string extension = null)
         {
+            string logName, baseFilename, baseLogFilename, mdfFilename, ldfFilename;
             GetDatabaseFiles(databaseName, filesPath,
-                out _, out _, out _, out var mdfFilename, out var ldfFilename);
+                out logName, out baseFilename, out baseLogFilename, out mdfFilename, out ldfFilename);
 
             if (extension != null)
             {

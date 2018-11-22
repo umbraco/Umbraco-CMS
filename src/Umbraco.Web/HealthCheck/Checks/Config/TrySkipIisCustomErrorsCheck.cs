@@ -12,16 +12,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     public class TrySkipIisCustomErrorsCheck : AbstractConfigCheck
     {
         private readonly Version _serverVersion = HttpRuntime.IISVersion;
+        private readonly ILocalizedTextService _textService;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService)
-            : base(textService)
-        { }
+        public TrySkipIisCustomErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        {
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
-        public override string FilePath => "~/Config/umbracoSettings.config";
+        public override string FilePath
+        {
+            get { return "~/Config/umbracoSettings.config"; }
+        }
 
-        public override string XPath => "/settings/web.routing/@trySkipIisCustomErrors";
+        public override string XPath
+        {
+            get { return "/settings/web.routing/@trySkipIisCustomErrors"; }
+        }
 
-        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
+        public override ValueComparisonType ValueComparisonType
+        {
+            get { return ValueComparisonType.ShouldEqual; }
+        }
 
         public override IEnumerable<AcceptableConfiguration> Values
         {
@@ -39,7 +50,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckSuccessMessage",
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckSuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value, _serverVersion.ToString() });
             }
         }
@@ -48,7 +59,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckErrorMessage",
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, _serverVersion.ToString() });
             }
         }
@@ -57,7 +68,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckRectifySuccessMessage",
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckRectifySuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value, _serverVersion.ToString() });
             }
         }

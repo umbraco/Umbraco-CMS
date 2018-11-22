@@ -24,7 +24,7 @@ namespace Umbraco.Core.Security
         internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
-
+            
             var canReset = provider.EnablePasswordReset;
 
             if (userService == null) return canReset;

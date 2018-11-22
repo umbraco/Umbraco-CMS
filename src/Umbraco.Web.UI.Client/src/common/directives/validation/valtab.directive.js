@@ -8,18 +8,18 @@
 **/
 function valTab() {
     return {
-        require: ['^^form', '^^valFormManager'],
+        require: ['^form', '^valFormManager'],
         restrict: "A",
         link: function (scope, element, attr, ctrs) {
 
             var valFormManager = ctrs[1];
-            var tabAlias = scope.tab.alias;                        
+            var tabId = "tab" + scope.tab.id;
             scope.tabHasError = false;            
 
             //listen for form validation changes
             valFormManager.onValidationStatusChanged(function (evt, args) {
                 if (!args.form.$valid) {
-                    var tabContent = element.closest(".umb-editor").find("[data-element='tab-content-" + tabAlias + "']");
+                    var tabContent = element.closest(".umb-panel").find("#" + tabId);
                     //check if the validation messages are contained inside of this tabs 
                     if (tabContent.find(".ng-invalid").length > 0) {
                         scope.tabHasError = true;

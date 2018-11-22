@@ -2,19 +2,17 @@
     * @ngdoc directive
     * @name umbraco.directives.directive:valServerField
     * @restrict A
-    * @description This directive is used to associate a field with a server-side validation response
+    * @description This directive is used to associate a content field (not user defined) with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.
-    *               (For validation of user defined content properties on content/media/members, the valServer directive is used)
     **/
 function valServerField(serverValidationManager) {
     return {
         require: 'ngModel',
         restrict: "A",
-        scope: {},
         link: function (scope, element, attr, ngModel) {
             
             var fieldName = null;
-            var unsubscribe = [];
+            var eventBindings = [];
 
             attr.$observe("valServerField", function (newVal) {
                 if (newVal && fieldName === null) {
@@ -25,7 +23,7 @@ function valServerField(serverValidationManager) {
                     // resubmitted. So once a field is changed that has a server error assigned to it
                     // we need to re-validate it for the server side validator so the user can resubmit
                     // the form. Of course normal client-side validators will continue to execute.
-                    unsubscribe.push(scope.$watch(function() {
+                    eventBindings.push(scope.$watch(function() {
                         return ngModel.$modelValue;
                     }, function(newValue){
                         if (ngModel.$invalid) {
@@ -34,28 +32,32 @@ function valServerField(serverValidationManager) {
                     }));
 
                     //subscribe to the server validation changes
-                    unsubscribe.push(serverValidationManager.subscribe(null,
-                        null,
-                        fieldName,
-                        function(isValid, fieldErrors, allErrors) {
-                            if (!isValid) {
-                                ngModel.$setValidity('valServerField', false);
-                                //assign an error msg property to the current validator
-                                ngModel.errorMsg = fieldErrors[0].errorMsg;
-                            }
-                            else {
-                                ngModel.$setValidity('valServerField', true);
-                                //reset the error message
-                                ngModel.errorMsg = "";
-                            }
-                        }));
+                    serverValidationManager.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
+                        if (!isValid) {
+                            ngModel.$setValidity('valServerField', false);
+                            //assign an error msg property to the current validator
+                            ngModel.errorMsg = fieldErrors[0].errorMsg;
+                        }
+                        else {
+                            ngModel.$setValidity('valServerField', true);
+                            //reset the error message
+                            ngModel.errorMsg = "";
+                        }
+                    });
+
+                    //when the element is disposed we need to unsubscribe!
+                    // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
+                    // but they are a different callback instance than the above.
+                    element.bind('$destroy', function () {
+                        serverValidationManager.unsubscribe(null, fieldName);
+                    });
                 }
             });
 
             scope.$on('$destroy', function(){
               // unbind watchers
-              for(var e in unsubscribe) {
-                unsubscribe[e]();
+              for(var e in eventBindings) {
+                eventBindings[e]();
                }
             });
 

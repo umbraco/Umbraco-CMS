@@ -1,0 +1,139 @@
+<div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
+
+    <div ng-if="vm.viewState === 'list'">
+
+        <div class="flex justify-between items-center">
+            <h3 class="bold">Health Check</h3>
+            <button class="umb-era-button -green" type="button" ng-click="vm.checkAllGroups(vm.groups);">Check All Groups</button>
+        </div>
+
+        <div class="umb-healthcheck-help-text">
+            <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+            You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        </div>
+
+        <div class="umb-healthcheck">
+
+            <div class="umb-air" ng-repeat="group in vm.groups" ng-click="vm.openGroup(group);">
+                <div class="umb-healthcheck-group">
+
+                    <div class="umb-healthcheck-title">{{group.name}}</div>
+
+                    <div class="umb-healthcheck-group__load-container" ng-if="group.loading">
+                        <umb-load-indicator></umb-load-indicator>
+                    </div>
+
+                    <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
+
+                        <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
+                            <i class="icon-check color-green"></i>
+                            {{ group.totalSuccess }}
+                        </div>
+
+                        <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
+                            <i class="icon-alert color-orange"></i>
+                            {{ group.totalWarning }}
+                        </div>
+
+                        <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
+                            <i class="icon-delete color-red"></i>
+                            {{ group.totalError }}
+                        </div>
+
+                        <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
+                            <i class="umb-healthcheck-status-icon icon-info"></i>
+                            {{ group.totalInfo }}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div ng-if="vm.viewState === 'details'">
+
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+
+        <div class="umb-healthcheck-group__details">
+
+            <div class="umb-healthcheck-group__details-group-title">
+                <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedGroup.name }}</div>
+                <button class="umb-era-button -white -text-black" type="button" ng-click="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks);">Check group</button>
+            </div>
+
+            <div class="umb-healthcheck-group__details-checks">
+
+                <div class="umb-healthcheck-group__details-check" ng-repeat="check in vm.selectedGroup.checks">
+
+                    <div class="umb-healthcheck-group__details-check-title">
+                        <div class="umb-healthcheck-group__details-check-name">{{ check.name }}</div>
+                        <div class="umb-healthcheck-group__details-check-description">{{ check.description }}</div>
+                    </div>
+
+                    <div class="umb-healthcheck-group__details-status" ng-repeat="status in check.status">
+
+                        <div class="umb-healthcheck-group__details-status-icon-container">
+                            <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
+                            <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
+                            <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
+                            <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
+                        </div>
+
+                        <div class="umb-healthcheck-group__details-status-content">
+
+                            <div class="umb-healthcheck-group__details-status-text">
+                                <div ng-bind-html="status.message"></div>
+                                <div ng-if="status.description" ng-bind-html="status.description"></div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status-actions" ng-if="status.actions">
+                                <div class="umb-healthcheck-group__details-status-action" ng-repeat="action in status.actions">
+                                    <ng-form name="healthCheckAction">
+
+                                        <div ng-if="action.valueRequired">
+                                            <div><label class="bold">Set new value:</label></div>
+                                            <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="umb-era-button umb-button--s -green"
+                                            ng-class="{ '-inactive': healthCheckAction.providedValue.$invalid}"
+                                            ng-click="vm.executeAction(check, $parent.$index, action);"
+                                            ng-disabled="healthCheckAction.providedValue.$invalid">
+                                            {{action.name}}
+                                        </button>
+
+                                    </ng-form>
+
+                                    <div class="umb-healthcheck-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div ng-show="check.loading">
+                        <div class="umb-healthcheck-group__details-status-overlay"></div>
+                        <umb-load-indicator></umb-load-indicator>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

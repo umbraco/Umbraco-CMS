@@ -2,7 +2,6 @@
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -40,16 +39,16 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            var apps = _treeAliases.Select(x => Current.Services.ApplicationTreeService
+            var apps = _treeAliases.Select(x => ApplicationContext.Current.Services.ApplicationTreeService
                 .GetByAlias(x))
                 .WhereNotNull()
                 .Select(x => x.ApplicationAlias)
                 .Distinct()
                 .ToArray();
 
-            return Current.UmbracoContext.Security.CurrentUser != null
-                   && apps.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
-                       app, Current.UmbracoContext.Security.CurrentUser));
+            return UmbracoContext.Current.Security.CurrentUser != null
+                   && apps.Any(app => UmbracoContext.Current.Security.UserHasSectionAccess(
+                       app, UmbracoContext.Current.Security.CurrentUser));
         }
     }
 }

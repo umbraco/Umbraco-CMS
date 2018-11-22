@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -9,30 +9,39 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    public class SliderValueConverter : PropertyValueConverterBase
+    public class SliderValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         private readonly IDataTypeService _dataTypeService;
 
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public SliderValueConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        {
+        }
+
         public SliderValueConverter(IDataTypeService dataTypeService)
         {
-            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Slider);
+        {
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
+            }
+            return false;
+        }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => IsRangeDataType(propertyType.DataType.Id) ? typeof (Range<decimal>) : typeof (decimal);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null)
+            {
                 return null;
+            }
 
-            if (IsRangeDataType(propertyType.DataType.Id))
+            if (IsRangeDataType(propertyType.DataTypeId))
             {
                 var rangeRawValues = source.ToString().Split(',');
                 var minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();
@@ -40,17 +49,33 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
                 if (minimumAttempt.Success && maximumAttempt.Success)
                 {
-                    return new Range<decimal> { Maximum = maximumAttempt.Result, Minimum = minimumAttempt.Result };
+                    return new Range<decimal>() { Maximum = maximumAttempt.Result, Minimum = minimumAttempt.Result };
                 }
             }
 
             var valueAttempt = source.ToString().TryConvertTo<decimal>();
             if (valueAttempt.Success)
+            {
                 return valueAttempt.Result;
+            }
 
             // Something failed in the conversion of the strings to decimals
             return null;
 
+        }
+
+        public Type GetPropertyValueType(PublishedPropertyType propertyType)
+        {
+            if (IsRangeDataType(propertyType.DataTypeId))
+            {
+                return typeof(Range<decimal>);
+            }
+            return typeof(decimal);
+        }
+
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
+        {
+            return PropertyCacheLevel.Content;
         }
 
         /// <summary>
@@ -67,13 +92,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // GetPreValuesCollectionByDataTypeId is cached at repository level;
             // still, the collection is deep-cloned so this is kinda expensive,
             // better to cache here + trigger refresh in DataTypeCacheRefresher
-            // fixme wtf this should NOT be expensive!
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var dataType = _dataTypeService.GetDataType(id);
-                var configuration = dataType.ConfigurationAs<SliderConfiguration>();
-                return configuration.EnableRange;
+                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
+
+                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
             });
         }
 

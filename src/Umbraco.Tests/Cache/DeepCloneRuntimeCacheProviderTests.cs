@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Web;
@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.Collections;
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Cache
             Assert.IsTrue(original.IsDirty());
 
             var val = _provider.GetCacheItem<TestClass>("test", () => original);
-
+            
             Assert.AreNotEqual(original.CloneId, val.CloneId);
             Assert.IsFalse(val.IsDirty());
         }
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Cache
             return "succ" + i;
         }
 
-        private class TestClass : BeingDirtyBase, IDeepCloneable
+        private class TestClass : TracksChangesEntityBase, IDeepCloneable
         {
             public TestClass()
             {

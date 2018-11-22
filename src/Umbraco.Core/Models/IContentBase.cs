@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Provides a base class for content items.
+    /// Defines the base for a Content object with properties that
+    /// are shared between Content and Media.
     /// </summary>
-    /// <remarks>
-    /// <para>Content items are documents, medias and members.</para>
-    /// <para>Content items have a content type, and properties.</para>
-    /// </remarks>
     public interface IContentBase : IUmbracoEntity
     {
         /// <summary>
@@ -19,75 +16,9 @@ namespace Umbraco.Core.Models
         int ContentTypeId { get; }
 
         /// <summary>
-        /// Gets the identifier of the writer.
+        /// Gets the Guid Id of the Content's Version
         /// </summary>
-        int WriterId { get; set; }
-
-        /// <summary>
-        /// Gets the version identifier.
-        /// </summary>
-        int VersionId { get; }
-
-        /// <summary>
-        /// Sets the name of the content item for a specified culture.
-        /// </summary>
-        /// <remarks>
-        /// <para>When <paramref name="culture"/> is null, sets the invariant
-        /// culture name, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
-        /// <para>When <paramref name="culture"/> is not null, throws if the content
-        /// type does not vary by culture.</para>
-        /// </remarks>
-        void SetCultureName(string value, string culture);
-
-        /// <summary>
-        /// Gets the name of the content item for a specified language.
-        /// </summary>
-        /// <remarks>
-        /// <para>When <paramref name="culture"/> is null, gets the invariant
-        /// culture name, which is the value of the <see cref="TreeEntityBase.Name"/> property.</para>
-        /// <para>When <paramref name="culture"/> is not null, and the content type
-        /// does not vary by culture, returns null.</para>
-        /// </remarks>
-        string GetCultureName(string culture);
-
-        /// <summary>
-        /// Gets culture infos of the content item.
-        /// </summary>
-        /// <remarks>
-        /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
-        /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
-        /// </remarks>
-        IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos { get; }
-
-        /// <summary>
-        /// Gets the available cultures.
-        /// </summary>
-        /// <remarks>
-        /// <para>Cannot contain the invariant culture, which is always available.</para>
-        /// </remarks>
-        IEnumerable<string> AvailableCultures { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether a given culture is available.
-        /// </summary>
-        /// <remarks>
-        /// <para>A culture becomes available whenever the content name for this culture is
-        /// non-null, and it becomes unavailable whenever the content name is null.</para>
-        /// <para>Returns <c>false</c> for the invariant culture, in order to be consistent
-        /// with <seealso cref="AvailableCultures"/>, even though the invariant culture is
-        /// always available.</para>
-        /// <para>Does not support the '*' wildcard (returns false).</para>
-        /// </remarks>
-        bool IsCultureAvailable(string culture);
-
-        /// <summary>
-        /// Gets the date a culture was updated.
-        /// </summary>
-        /// <remarks>
-        /// <para>When <paramref name="culture" /> is <c>null</c>, returns <c>null</c>.</para>
-        /// <para>If the specified culture is not available, returns <c>null</c>.</para>
-        /// </remarks>
-        DateTime? GetUpdateDate(string culture);
+        Guid Version { get; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
@@ -108,42 +39,45 @@ namespace Umbraco.Core.Models
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the content entity has a property with the supplied alias.
+        /// Indicates whether the content object has a property with the supplied alias
         /// </summary>
-        /// <remarks>Indicates that the content entity has a property with the supplied alias, but
-        /// not necessarily that the content has a value for that property. Could be missing.</remarks>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns>True if Property with given alias exists, otherwise False</returns>
         bool HasProperty(string propertyTypeAlias);
 
         /// <summary>
         /// Gets the value of a Property
         /// </summary>
-        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
+        object GetValue(string propertyTypeAlias);
 
         /// <summary>
-        /// Gets the typed value of a Property
+        /// Gets the value of a Property
         /// </summary>
-        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        /// <typeparam name="TPassType">Type of the value to return</typeparam>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
+        TPassType GetValue<TPassType>(string propertyTypeAlias);
 
         /// <summary>
-        /// Sets the (edited) value of a Property
+        /// Sets the <see cref="System.Object"/> value of a Property
         /// </summary>
-        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        void SetValue(string propertyTypeAlias, object value);
 
         /// <summary>
-        /// Copies values from another document.
+        /// Boolean indicating whether the content and its properties are valid
         /// </summary>
-        void CopyFrom(IContent other, string culture = "*");
+        /// <returns>True if content is valid otherwise false</returns>
+        bool IsValid();
 
-        // fixme validate published cultures?
-        
         /// <summary>
-        /// Validates the content item's properties pass variant rules
+        /// Changes the Trashed state of the content object
         /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        Property[] ValidateProperties(string culture = "*");
+        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
+        /// <param name="parentId"> </param>
+        void ChangeTrashedState(bool isTrashed, int parentId = -20);
     }
 }

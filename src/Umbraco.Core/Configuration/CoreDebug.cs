@@ -23,10 +23,9 @@ namespace Umbraco.Core.Configuration
 
         // when true, Scope logs the stack trace for any scope that gets disposed without being completed.
         // this helps troubleshooting rogue scopes that we forget to complete
-        public bool LogUncompletedScopes { get; }
-
+        public bool LogUncompletedScopes { get; private set; }
         // when true, the Logger creates a minidump of w3wp in ~/App_Data/MiniDump whenever it logs
         // an error due to a ThreadAbortException that is due to a timeout.
-        public bool DumpOnTimeoutThreadAbort { get; }
+        public bool DumpOnTimeoutThreadAbort { get; private set; }
     }
 }

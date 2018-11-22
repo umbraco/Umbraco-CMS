@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
@@ -12,7 +13,7 @@ namespace Umbraco.Core.IO
 
         public ViewHelper(IFileSystem viewFileSystem)
         {
-            if (viewFileSystem == null) throw new ArgumentNullException(nameof(viewFileSystem));
+            if (viewFileSystem == null) throw new ArgumentNullException("viewFileSystem");
             _viewFileSystem = viewFileSystem;
         }
 
@@ -21,10 +22,16 @@ namespace Umbraco.Core.IO
             return _viewFileSystem.FileExists(ViewPath(t.Alias));
         }
 
+        [Obsolete("This is only used for legacy purposes and will be removed in future versions")]
+        internal string GetPhysicalFilePath(ITemplate t)
+        {
+            return _viewFileSystem.GetFullPath(ViewPath(t.Alias));
+        }
+
         internal string GetFileContents(ITemplate t)
         {
-            var viewContent = "";
-            var path = ViewPath(t.Alias);
+            string viewContent = "";
+            string path = ViewPath(t.Alias);
 
             if (_viewFileSystem.FileExists(path))
             {
@@ -41,12 +48,12 @@ namespace Umbraco.Core.IO
         public string CreateView(ITemplate t, bool overWrite = false)
         {
             string viewContent;
-            var path = ViewPath(t.Alias);
+            string path = ViewPath(t.Alias);
 
             if (_viewFileSystem.FileExists(path) == false || overWrite)
             {
-                viewContent = SaveTemplateToFile(t);
-            }
+                viewContent = SaveTemplateToFile(t);   
+            }                
             else
             {
                 using (var tr = new StreamReader(_viewFileSystem.OpenFile(path)))
@@ -67,9 +74,10 @@ namespace Umbraco.Core.IO
                 modelNamespaceAlias = "ContentModels";
 
             // either
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
-            content.Append("@inherits Umbraco.Web.Mvc.UmbracoViewPage");
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ModelClass>
+            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.ModelClass>
+            content.Append("@inherits Umbraco.Web.Mvc.UmbracoTemplatePage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");
@@ -134,7 +142,7 @@ namespace Umbraco.Core.IO
 
             if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != t.Alias)
             {
-                //then kill the old file..
+                //then kill the old file.. 
                 var oldFile = ViewPath(currentAlias);
                 if (_viewFileSystem.FileExists(oldFile))
                     _viewFileSystem.DeleteFile(oldFile);
@@ -150,17 +158,31 @@ namespace Umbraco.Core.IO
             return t.Content;
         }
 
+        internal void RemoveViewFile(string alias)
+        {
+            if (string.IsNullOrWhiteSpace(alias) == false)
+            {
+                var file = ViewPath(alias);
+                if (_viewFileSystem.FileExists(file))
+                    _viewFileSystem.DeleteFile(file);
+            }
+        }
+
         public string ViewPath(string alias)
         {
             return _viewFileSystem.GetRelativePath(alias.Replace(" ", "") + ".cshtml");
+
+            //return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
-        private static string EnsureInheritedLayout(ITemplate template)
+        private string EnsureInheritedLayout(ITemplate template)
         {
-            var design = template.Content;
+            string design = template.Content;
 
             if (string.IsNullOrEmpty(design))
+            {
                 design = GetDefaultFileContent(template.MasterTemplateAlias);
+            }
 
             return design;
         }

@@ -5,7 +5,6 @@ using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Caching;
-using Umbraco.Core.Composing;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
 namespace Umbraco.Core.Cache
@@ -37,31 +36,19 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearAllCache()
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 MemoryCache.DisposeIfDisposable();
                 MemoryCache = new MemoryCache("in-memory");
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
             }
         }
 
         public virtual void ClearCacheItem(string key)
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
             }
         }
 
@@ -70,9 +57,8 @@ namespace Umbraco.Core.Cache
             var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 foreach (var key in MemoryCache
                     .Where(x =>
                     {
@@ -89,18 +75,12 @@ namespace Umbraco.Core.Cache
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
             }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
         }
 
         public virtual void ClearCacheObjectTypes<T>()
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 var typeOfT = typeof (T);
                 var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
@@ -120,18 +100,12 @@ namespace Umbraco.Core.Cache
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
             }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
         }
 
         public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 var typeOfT = typeof(T);
                 var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
@@ -152,46 +126,29 @@ namespace Umbraco.Core.Cache
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
             }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
         }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 foreach (var key in MemoryCache
                     .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
             }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 foreach (var key in MemoryCache
                     .Where(x => Regex.IsMatch(x.Key, regexString))
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
             }
         }
 
@@ -202,17 +159,11 @@ namespace Umbraco.Core.Cache
         public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             KeyValuePair<string, object>[] entries;
-            try
+            using (new ReadLock(_locker))
             {
-                _locker.EnterReadLock();
                 entries = MemoryCache
                     .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
                     .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
             }
             return entries
                 .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
@@ -223,17 +174,11 @@ namespace Umbraco.Core.Cache
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
             KeyValuePair<string, object>[] entries;
-            try
+            using (new ReadLock(_locker))
             {
-                _locker.EnterReadLock();
                 entries = MemoryCache
                     .Where(x => Regex.IsMatch(x.Key, regexString))
                     .ToArray(); // evaluate while locked
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
             }
             return entries
                 .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
@@ -244,15 +189,9 @@ namespace Umbraco.Core.Cache
         public object GetCacheItem(string cacheKey)
         {
             Lazy<object> result;
-            try
+            using (new ReadLock(_locker))
             {
-                _locker.EnterReadLock();
                 result = MemoryCache.Get(cacheKey) as Lazy<object>; // null if key not found
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
             }
             return result == null ? null : DictionaryCacheProviderBase.GetSafeLazyValue(result); // return exceptions as null
         }
@@ -285,7 +224,8 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is DictionaryCacheProviderBase.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            var eh = value as DictionaryCacheProviderBase.ExceptionHolder;
+            if (eh != null) throw eh.Exception; // throw once!
             return value;
         }
 

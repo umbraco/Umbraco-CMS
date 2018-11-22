@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Web;
 using Umbraco.Core.Logging;
 
@@ -9,61 +8,64 @@ namespace Umbraco.Core.Manifest
 {
     internal class ManifestWatcher : DisposableObjectSlim
     {
-        private static readonly object Locker = new object();
-        private static volatile bool _isRestarting;
-
         private readonly ILogger _logger;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
+        private static volatile bool _isRestarting = false;
+        private static readonly object Locker = new object();
 
         public ManifestWatcher(ILogger logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            if (logger == null) throw new ArgumentNullException("logger");
+            _logger = logger;
         }
 
         public void Start(params string[] packageFolders)
         {
-            foreach (var packageFolder in packageFolders.Where(IsWatchable))
+            foreach (var packageFolder in packageFolders)
             {
-                // for some reason *.manifest doesn't work
-                var fsw = new FileSystemWatcher(packageFolder, "*package.*")
+                if (Directory.Exists(packageFolder) && File.Exists(Path.Combine(packageFolder, "package.manifest")))
                 {
-                    IncludeSubdirectories = false,
-                    NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                };
-
-                _fws.Add(fsw);
-
-                fsw.Changed += FswChanged;
-                fsw.EnableRaisingEvents = true;
+                    //NOTE: for some reason *.manifest doesn't work!
+                    var fsw = new FileSystemWatcher(packageFolder, "*package.*")
+                    {
+                        IncludeSubdirectories = false,
+                        NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite 
+                    };
+                    _fws.Add(fsw);
+                    fsw.Changed += FswChanged;
+                    fsw.EnableRaisingEvents = true;
+                }
             }
         }
 
-        private static bool IsWatchable(string folder)
+        void FswChanged(object sender, FileSystemEventArgs e)
         {
-            return Directory.Exists(folder) && File.Exists(Path.Combine(folder, "package.manifest"));
-        }
-
-        private void FswChanged(object sender, FileSystemEventArgs e)
-        {
-            if (e.Name.InvariantContains("package.manifest") == false) return;
-
-            // ensure the app is not restarted multiple times for multiple
-            // savings during the same app domain execution - restart once
-            lock (Locker)
+            if (e.Name.InvariantContains("package.manifest"))
             {
-                if (_isRestarting) return;
+                //Ensure the app is not restarted multiple times for multiple saving during the same app domain execution
+                if (_isRestarting == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_isRestarting == false)
+                        {
+                            _isRestarting = true;
 
-                _isRestarting = true;
-                _logger.Info<ManifestWatcher>("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
-                HttpRuntime.UnloadAppDomain();
-                Dispose(); // uh? if the app restarts then this should be disposed anyways?
+                            _logger.Info<ManifestWatcher>("manifest has changed, app pool is restarting (" + e.FullPath + ")");
+                            HttpRuntime.UnloadAppDomain();
+                            Dispose();               
+                        }
+                    }
+                }                
             }
         }
 
         protected override void DisposeResources()
         {
             foreach (var fw in _fws)
+            {
                 fw.Dispose();
+            }
         }
     }
 }

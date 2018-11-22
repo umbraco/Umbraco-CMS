@@ -6,6 +6,7 @@ namespace Umbraco.Core.IO
 {
     public static class FileSystemExtensions
     {
+
         /// <summary>
         /// Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
         /// with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.
@@ -34,6 +35,19 @@ namespace Umbraco.Core.IO
             }
 
             throw new ArgumentException("Retries must be greater than zero");
+        }
+
+        // GetSize has been added to IFileSystem2 but not IFileSystem
+        public static long GetSize(this IFileSystem fs, string path)
+        {
+            var fs2 = fs as IFileSystem2;
+            if (fs2 != null) return fs2.GetSize(path);
+
+            // this is implementing GetSize for IFileSystem, the old way
+            using (var file = fs.OpenFile(path))
+            {
+                return file.Length;
+            }
         }
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)

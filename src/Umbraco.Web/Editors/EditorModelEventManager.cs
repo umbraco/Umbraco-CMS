@@ -1,4 +1,4 @@
-﻿using System.Web.Http.Filters;
+using System.Web.Http.Filters;
 using Umbraco.Core.Events;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -17,25 +17,25 @@ namespace Umbraco.Web.Editors
         private static void OnSendingUserModel(HttpActionExecutedContext sender, EditorModelEventArgs<UserDisplay> e)
         {
             var handler = SendingUserModel;
-            handler?.Invoke(sender, e);
+            if (handler != null) handler(sender, e);
         }
 
         private static void OnSendingContentModel(HttpActionExecutedContext sender, EditorModelEventArgs<ContentItemDisplay> e)
         {
             var handler = SendingContentModel;
-            handler?.Invoke(sender, e);
+            if (handler != null) handler(sender, e);
         }
 
         private static void OnSendingMediaModel(HttpActionExecutedContext sender, EditorModelEventArgs<MediaItemDisplay> e)
         {
             var handler = SendingMediaModel;
-            handler?.Invoke(sender, e);
+            if (handler != null) handler(sender, e);
         }
 
         private static void OnSendingMemberModel(HttpActionExecutedContext sender, EditorModelEventArgs<MemberDisplay> e)
         {
             var handler = SendingMemberModel;
-            handler?.Invoke(sender, e);
+            if (handler != null) handler(sender, e);
         }
 
         /// <summary>
@@ -45,17 +45,30 @@ namespace Umbraco.Web.Editors
         /// <param name="e"></param>
         internal static void EmitEvent(HttpActionExecutedContext sender, EditorModelEventArgs e)
         {
-            if (e.Model is ContentItemDisplay)
+            var contentItemDisplay = e.Model as ContentItemDisplay;
+            if (contentItemDisplay != null)
+            {
                 OnSendingContentModel(sender, new EditorModelEventArgs<ContentItemDisplay>(e));
+            }
 
-            if (e.Model is MediaItemDisplay)
+            var mediaItemDisplay = e.Model as MediaItemDisplay;
+            if (mediaItemDisplay != null)
+            {
                 OnSendingMediaModel(sender, new EditorModelEventArgs<MediaItemDisplay>(e));
+            }
 
-            if (e.Model is MemberDisplay)
+            var memberItemDisplay = e.Model as MemberDisplay;
+            if (memberItemDisplay != null)
+            {
                 OnSendingMemberModel(sender, new EditorModelEventArgs<MemberDisplay>(e));
+            }
 
-            if (e.Model is UserDisplay)
+            var userDisplay = e.Model as UserDisplay;
+            if (userDisplay != null)
+            {
                 OnSendingUserModel(sender, new EditorModelEventArgs<UserDisplay>(e));
+            }
         }
+        
     }
 }

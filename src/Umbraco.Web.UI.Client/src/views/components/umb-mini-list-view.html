@@ -1,8 +1,6 @@
 <div class="umb-minilistview">
 
-    <div class="umb-mini-list-view umb-animated" 
-        ng-class="{'umb-mini-list-view--forward': listViewAnimation === 'in', 'umb-mini-list-view--backwards': listViewAnimation === 'out'}" 
-        ng-repeat="miniListView in miniListViews">
+    <div ng-repeat="miniListView in miniListViews" ng-animate="getMiniListViewAnimation()">
 
         <div class="umb-mini-list-view__title">
             <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}"></i>

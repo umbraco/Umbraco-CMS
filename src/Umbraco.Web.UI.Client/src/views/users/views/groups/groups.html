@@ -68,37 +68,39 @@
         </div>
     </div>
 
-    <table class="table table-hover" ng-if="!vm.loading">
-        <thead>
-            <tr>
-                <th style="width: 20px; padding-right: 5px"></th>
-                <th>Group</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="group in vm.userGroups | filter:vm.filter" 
-                ng-click="vm.goToUserGroup(group)" 
-                ng-class="{'cursor-pointer': group.hasAccess, 'cursor-not-allowed': !group.hasAccess}">
-                
-                <td style="width: 20px; padding-right: 5px">
-                    <input
-                        ng-show="group.hasAccess && group.group.alias !== 'admin' && group.group.alias !== 'translator'"
-                        type="checkbox" 
-                        ng-model="group.selected"
-                        ng-click="vm.selectUserGroup(group, vm.selection, $event)" />
-                </td>
-                <td>
-                    <umb-user-group-preview 
-                        style="border-bottom: none; margin-bottom: 0; padding: 0;"
-                        icon="group.group.icon"
-                        name="group.group.name"
-                        sections="group.group.sections"
-                        content-start-node="group.group.contentStartNode"
-                        media-start-node="group.group.mediaStartNode">
-                    </umb-user-group-preview>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="umb-list" ng-if="!vm.loading" ng-switch="">
+        <div ng-repeat="group in vm.userGroups | filter:vm.filter" ng-switch="group.hasAccess">
+            <div class="umb-list-item umb-list-item--disabled" ng-switch-when="false">
+                <div style="margin-right: 25px;">
+                    <div class="umb-list-checkbox"></div>
+                </div>
+                <umb-user-group-preview style="border-bottom: none; margin-bottom: 0; padding: 0;"
+                                        icon="group.group.icon"
+                                        name="group.group.name"
+                                        sections="group.group.sections"
+                                        content-start-node="group.group.contentStartNode"
+                                        media-start-node="group.group.mediaStartNode">
+                </umb-user-group-preview>
+            </div>
+            <a class="umb-list-item" ng-click="vm.clickUserGroup(group)" ng-class="{'umb-list-item--selected': group.selected}" href="" ng-switch-when="true">
+                <div style="margin-right: 25px;">
+                    <div class="umb-list-checkbox"
+                         ng-hide="group.group.alias === 'admin' || group.group.alias === 'translator'"
+                         ng-class="{'umb-list-checkbox--visible': vm.selection.length > 0}"
+                         ng-click="vm.selectUserGroup(group, vm.selection, $event)" >
+                        <umb-checkmark checked="group.selected"></umb-checkmark>
+                    </div>
+                </div>
+                <umb-user-group-preview
+                    style="border-bottom: none; margin-bottom: 0; padding: 0;"
+                    icon="group.group.icon"
+                    name="group.group.name"
+                    sections="group.group.sections"
+                    content-start-node="group.group.contentStartNode"
+                    media-start-node="group.group.mediaStartNode">
+                </umb-user-group-preview>
+            </a>
+        </div>
+    </div>
 
 </div>

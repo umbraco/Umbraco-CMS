@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Semver;
@@ -14,7 +14,7 @@ namespace Umbraco.Core
 
             if (maxParts >= 4)
             {
-                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);
+                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);    
             }
             if (maxParts == 3)
             {
@@ -27,7 +27,7 @@ namespace Umbraco.Core
         public static Version SubtractRevision(this Version version)
         {
             var parts = new List<int>(new[] {version.Major, version.Minor, version.Build, version.Revision});
-
+            
             //remove all prefixed zero parts
             while (parts[0] <= 0)
             {
@@ -57,12 +57,12 @@ namespace Umbraco.Core
             //subtract 1 from the last non-zero
             parts[lastNonZero] = parts[lastNonZero] - 1;
 
-            //the last non zero is actually the revision so we can just return
+            //the last non zero is actually the revision so we can just return 
             if (lastNonZero == (parts.Count -1))
             {
                 return FromList(parts);
             }
-
+            
             //the last non zero isn't the revision so the remaining zero's need to be replaced with int.max
             for (var i = lastNonZero + 1; i < parts.Count; i++)
             {

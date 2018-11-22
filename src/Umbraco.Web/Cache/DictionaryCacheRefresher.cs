@@ -1,28 +1,30 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 
+
 namespace Umbraco.Web.Cache
 {
+    /// <summary>
+    /// A cache refresher to ensure the dictionary cache is refreshed when dictionary change
+    /// </summary>
     public sealed class DictionaryCacheRefresher : CacheRefresherBase<DictionaryCacheRefresher>
     {
-        public DictionaryCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
-        { }
+        protected override DictionaryCacheRefresher Instance
+        {
+            get { return this; }
+        }
 
-        #region Define
+        public override Guid UniqueIdentifier
+        {
+            get { return new Guid(DistributedCache.DictionaryCacheRefresherId); }
+        }
 
-        protected override DictionaryCacheRefresher This => this;
-
-        public static readonly Guid UniqueId = Guid.Parse("D1D7E227-F817-4816-BFE9-6C39B6152884");
-
-        public override Guid RefresherUniqueId => UniqueId;
-
-        public override string Name => "Dictionary Cache Refresher";
-
-        #endregion
-
-        #region Refresher
+        public override string Name
+        {
+            get { return "Dictionary cache refresher"; }
+        }
 
         public override void Refresh(int id)
         {
@@ -35,7 +37,5 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
             base.Remove(id);
         }
-
-        #endregion
     }
 }

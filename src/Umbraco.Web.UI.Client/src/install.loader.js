@@ -1,13 +1,13 @@
 LazyLoad.js([
     'lib/jquery/jquery.min.js',
-    
-    'lib/angular/angular.js',
-    'lib/angular-cookies/angular-cookies.js',
-    'lib/angular-touch/angular-touch.js',
-    'lib/angular-sanitize/angular-sanitize.js',
-    'lib/angular-messages/angular-messages.js',
+    /* 1.1.5 */
+    'lib/angular/1.1.5/angular.min.js',
+    'lib/angular/1.1.5/angular-cookies.min.js',
+    'lib/angular/1.1.5/angular-mobile.min.js',
+    'lib/angular/1.1.5/angular-mocks.js',
+    'lib/angular/1.1.5/angular-sanitize.min.js',
     'lib/underscore/underscore-min.js',
-    'lib/angular-ui-sortable/sortable.js', 
+    'lib/angular/angular-ui-sortable.js',
     'js/installer.app.js',
     'js/umbraco.directives.js',
     'js/umbraco.installer.js'

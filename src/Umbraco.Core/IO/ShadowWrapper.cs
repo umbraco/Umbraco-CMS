@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.IO
 {
-    internal class ShadowWrapper : IFileSystem
+    internal class ShadowWrapper : IFileSystem2
     {
-        private const string ShadowFsPath = "~/App_Data/TEMP/ShadowFs";
-
-        private readonly Func<bool> _isScoped;
+        private readonly IScopeProviderInternal _scopeProvider;
         private readonly IFileSystem _innerFileSystem;
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, IScopeProviderInternal scopeProvider)
         {
             _innerFileSystem = innerFileSystem;
             _shadowPath = shadowPath;
-            _isScoped = isScoped;
+            _scopeProvider = scopeProvider;
         }
 
         internal void Shadow(Guid id)
@@ -28,7 +27,7 @@ namespace Umbraco.Core.IO
             // on ShadowFileSystemsScope.None - and if None is false then we should be running
             // in a single thread anyways
 
-            var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
+            var virt = "~/App_Data/TEMP/ShadowFs/" + id + "/" + _shadowPath;
             _shadowDir = IOHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
             var tempfs = new PhysicalFileSystem(virt);
@@ -56,7 +55,7 @@ namespace Umbraco.Core.IO
 
                     // shadowPath make be path/to/dir, remove each
                     dir = dir.Replace("/", "\\");
-                    var min = IOHelper.MapPath(ShadowFsPath).Length;
+                    var min = IOHelper.MapPath("~/App_Data/TEMP/ShadowFs").Length;
                     var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
                     while (pos > min)
                     {
@@ -79,7 +78,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                var isScoped = _isScoped();
+                var isScoped = _scopeProvider != null && _scopeProvider.AmbientScope != null && _scopeProvider.AmbientScope.ScopedFileSystems;
 
                 // if the filesystem is created *after* shadowing starts, it won't be shadowing
                 // better not ignore that situation and raised a meaningful (?) exception
@@ -174,14 +173,29 @@ namespace Umbraco.Core.IO
 
         public long GetSize(string path)
         {
-            return FileSystem.GetSize(path);
+            var filesystem = FileSystem; // will be either a ShadowFileSystem OR the actual underlying IFileSystem
+
+            // and the underlying filesystem can be IFileSystem2... or just IFileSystem
+            // figure it out and use the most effective GetSize method
+            var filesystem2 = filesystem as IFileSystem2;
+            return filesystem2 == null ? filesystem.GetSize(path) : filesystem2.GetSize(path);
         }
 
-        public bool CanAddPhysical => FileSystem.CanAddPhysical;
+        public bool CanAddPhysical
+        {
+            get
+            {
+                var fileSystem2 = FileSystem as IFileSystem2;
+                return fileSystem2 != null && fileSystem2.CanAddPhysical;
+            }
+        }
 
         public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
         {
-            FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
+            var fileSystem2 = FileSystem as IFileSystem2;
+            if (fileSystem2 == null)
+                throw new NotSupportedException();
+            fileSystem2.AddFile(path, physicalPath, overrideIfExists, copy);
         }
     }
 }

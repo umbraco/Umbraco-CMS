@@ -46,7 +46,7 @@ function entityResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                        "GetSafeAlias", { value: encodeURIComponent(value), camelCase: camelCase })),
+                       "GetSafeAlias", { value: value, camelCase: camelCase })),
                'Failed to retrieve content type scaffold');
         },
 
@@ -288,19 +288,17 @@ function entityResource($q, $http, umbRequestHelper) {
          * Gets ancestor entities for a given item
          *        
          * 
-         * @param {string} type Object type name
-         * @param {string} culture Culture
+         * @param {string} type Object type name        
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type, culture) {
-            if (culture === undefined) culture = "";
+        getAncestors: function (id, type) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                        [{ id: id }, { type: type }, { culture: culture }])),
+                       [{id: id}, {type: type}])),
                'Failed to retrieve ancestor data for id ' + id);
         },
         

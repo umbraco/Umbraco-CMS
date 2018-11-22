@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Services
 {

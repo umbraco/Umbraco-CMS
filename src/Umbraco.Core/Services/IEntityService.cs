@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
@@ -9,288 +9,283 @@ namespace Umbraco.Core.Services
     public interface IEntityService
     {
         /// <summary>
-        /// Gets an entity.
+        /// Returns true if the entity exists
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get(int id);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(int id, bool full);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get(Guid key);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(Guid key, bool full);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(int id, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(int id, UmbracoObjectTypes objectType, bool full);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        IEntitySlim Get(Guid key, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(Guid key, UmbracoObjectTypes objectType, bool full);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim Get<T>(int id) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get<T>(int id, bool full) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="key">The unique key of the entity.</param>
-        IEntitySlim Get<T>(Guid key) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get<T>(Guid key, bool full) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Determines whether an entity exists.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        bool Exists(int id);
-
-        /// <summary>
-        /// Determines whether an entity exists.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         bool Exists(Guid key);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Returns true if the entity exists
         /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entities.</typeparam>
-        IEnumerable<IEntitySlim> GetAll<T>() where T : IUmbracoEntity;
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Returns the integer id for a given GUID
         /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entities.</typeparam>
-        /// <param name="ids">The identifiers of the entities.</param>
-        /// <remarks>If <paramref name="ids"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll<T>(params int[] ids) where T : IUmbracoEntity;
+        /// <param name="key"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Returns the integer id for a given Udi
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType);
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForUdi(Udi udi);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Returns the GUID for a given integer id
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        /// <param name="ids">The identifiers of the entities.</param>
-        /// <remarks>If <paramref name="ids"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, params int[] ids);
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        IEnumerable<IEntitySlim> GetAll(Guid objectType);
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <param name="key">Unique Id of the object to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        /// <param name="ids">The identifiers of the entities.</param>
-        /// <remarks>If <paramref name="ids"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <param name="id">Id of the object to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get(int id, bool loadBaseType = true);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
         /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entities.</typeparam>
-        /// <param name="keys">The unique identifiers of the entities.</param>
-        /// <remarks>If <paramref name="keys"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll<T>(params Guid[] keys) where T : IUmbracoEntity;
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <param name="key">Unique Id of the object to retrieve</param>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Gets an UmbracoEntity by its Id and UmbracoObjectType, and optionally loads the complete object graph.
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        /// <param name="keys">The unique identifiers of the entities.</param>
-        /// <remarks>If <paramref name="keys"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, Guid[] keys);
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <param name="id">Id of the object to retrieve</param>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the entity to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get(int id, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true);
 
         /// <summary>
-        /// Gets entities of a given object type.
+        /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        /// <param name="keys">The unique identifiers of the entities.</param>
-        /// <remarks>If <paramref name="keys"/> is empty, returns all entities.</remarks>
-        IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
+        /// <param name="key">Unique Id of the object to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
-        /// Gets entities at root.
+        /// Gets an UmbracoEntity by its Id and specified Type. Optionally loads the complete object graph.
         /// </summary>
-        /// <param name="objectType">The object type of the entities.</param>
-        IEnumerable<IEntitySlim> GetRootEntities(UmbracoObjectTypes objectType);
+        /// <returns>
+        /// By default this will load the base type <see cref="IUmbracoEntity"/> with a minimum set of properties.
+        /// </returns>
+        /// <typeparam name="T">Type of the model to retrieve. Must be based on an <see cref="IUmbracoEntity"/></typeparam>
+        /// <param name="id">Id of the object to retrieve</param>
+        /// <param name="loadBaseType">Optional bool to load the complete object graph when set to <c>False</c>.</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity;
 
         /// <summary>
-        /// Gets the parent of an entity.
+        /// Gets the parent of entity by its id
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        IEntitySlim GetParent(int id);
+        /// <param name="id">Id of the entity to retrieve the Parent for</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetParent(int id);
 
         /// <summary>
-        /// Gets the parent of an entity.
+        /// Gets the parent of entity by its id and UmbracoObjectType
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the parent.</param>
-        IEntitySlim GetParent(int id, UmbracoObjectTypes objectType);
+        /// <param name="id">Id of the entity to retrieve the Parent for</param>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the parent to retrieve</param>
+        /// <returns>An <see cref="IUmbracoEntity"/></returns>
+        IUmbracoEntity GetParent(int id, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
-        /// Gets the children of an entity.
+        /// Gets a collection of children by the parents Id
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        IEnumerable<IEntitySlim> GetChildren(int id);
+        /// <param name="parentId">Id of the parent to retrieve children for</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetChildren(int parentId);
 
         /// <summary>
-        /// Gets the children of an entity.
+        /// Gets a collection of children by the parents Id and UmbracoObjectType
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the children.</param>
-        IEnumerable<IEntitySlim> GetChildren(int id, UmbracoObjectTypes objectType);
+        /// <param name="parentId">Id of the parent to retrieve children for</param>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the children to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
-        /// Gets the descendants of an entity.
+        /// Returns a paged collection of children
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        IEnumerable<IEntitySlim> GetDescendants(int id);
-
-        /// <summary>
-        /// Gets the descendants of an entity.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the descendants.</param>
-        IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets children of an entity.
-        /// </summary>
-        IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
+        /// <param name="parentId">The parent id to return children for</param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedChildren(int parentId, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets descendants of an entity.
+        /// Returns a paged collection of descendants
         /// </summary>
-        IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets descendants of entities.
+        /// Returns a paged collection of descendants
         /// </summary>
-        IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets descendants of root.
+        /// Returns a paged collection of descendants from the root
         /// </summary>
-        IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize, out long totalRecords,
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <param name="includeTrashed">true/false to include trashed objects</param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendantsFromRoot(UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "", bool includeTrashed = true);
 
         /// <summary>
-        /// Gets the object type of an entity.
+        /// Gets a collection of descendents by the parents Id
         /// </summary>
+        /// <param name="id">Id of entity to retrieve descendents for</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetDescendents(int id);
+
+        /// <summary>
+        /// Gets a collection of descendents by the parents Id
+        /// </summary>
+        /// <param name="id">Id of entity to retrieve descendents for</param>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the descendents to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetDescendents(int id, UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Gets a collection of the entities at the root, which corresponds to the entities with a Parent Id of -1.
+        /// </summary>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the root entities to retrieve</param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetRootEntities(UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Gets a collection of all <see cref="IUmbracoEntity"/> of a given type.
+        /// </summary>
+        /// <typeparam name="T">Type of the entities to retrieve</typeparam>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetAll<T>(params int[] ids) where T : IUmbracoEntity;
+
+        /// <summary>
+        /// Gets a collection of all <see cref="IUmbracoEntity"/> of a given type.
+        /// </summary>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the entities to return</param>
+        /// <param name="ids"></param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets a collection of all <see cref="IUmbracoEntity"/> of a given type.
+        /// </summary>
+        /// <param name="umbracoObjectType">UmbracoObjectType of the entities to return</param>
+        /// <param name="keys"></param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType, Guid[] keys);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IUmbracoEntity"/>
+        /// </summary>
+        /// <param name="objectTypeId">Guid id of the UmbracoObjectType</param>
+        /// <param name="ids"></param>
+        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+
+        /// <summary>
+        /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
+        /// </summary>
+        /// <param name="id">Id of the entity</param>
+        /// <returns><see cref="UmbracoObjectTypes"/></returns>
         UmbracoObjectTypes GetObjectType(int id);
 
         /// <summary>
-        /// Gets the object type of an entity.
+        /// Gets the UmbracoObjectType from an IUmbracoEntity.
         /// </summary>
-        UmbracoObjectTypes GetObjectType(Guid key);
-
-        /// <summary>
-        /// Gets the object type of an entity.
-        /// </summary>
+        /// <param name="entity"><see cref="IUmbracoEntity"/></param>
+        /// <returns><see cref="UmbracoObjectTypes"/></returns>
         UmbracoObjectTypes GetObjectType(IUmbracoEntity entity);
 
         /// <summary>
-        /// Gets the Clr type of an entity.
+        /// Gets the Type of an entity by its Id
         /// </summary>
+        /// <param name="id">Id of the entity</param>
+        /// <returns>Type of the entity</returns>
         Type GetEntityType(int id);
 
         /// <summary>
-        /// Gets the integer identifier corresponding to a unique Guid identifier.
+        /// Gets the Type of an entity by its <see cref="UmbracoObjectTypes"/>
         /// </summary>
-        Attempt<int> GetId(Guid key, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets the integer identifier corresponding to a Udi.
-        /// </summary>
-        Attempt<int> GetId(Udi udi);
-
-        /// <summary>
-        /// Gets the unique Guid identifier corresponding to an integer identifier.
-        /// </summary>
-        Attempt<Guid> GetKey(int id, UmbracoObjectTypes umbracoObjectType);
-
-        /// <summary>
-        /// Gets paths for entities.
-        /// </summary>
-        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[] ids);
-
-        /// <summary>
-        /// Gets paths for entities.
-        /// </summary>
-        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys);
+        /// <param name="umbracoObjectType"><see cref="UmbracoObjectTypes"/></param>
+        /// <returns>Type of the entity</returns>
+        Type GetEntityType(UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
         /// Reserves an identifier for a key.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +8,7 @@ namespace Umbraco.Web.Mvc
 {
     /// <summary>
     /// A custom ActionMethodSelector which will ensure that the RenderMvcController.Index(RenderModel model) action will be executed
-    /// if the
+    /// if the 
     /// </summary>
     internal class RenderIndexActionSelectorAttribute : ActionMethodSelectorAttribute
     {
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Mvc
             var controllerDesc = ControllerDescCache.GetOrAdd(currType, type => new ReflectedControllerDescriptor(currType));
             var actions = controllerDesc.GetCanonicalActions();
 
-            //If there are more than one Index action for this controller, then
+            //If there are more than one Index action for this controller, then 
             // this base class one should not be matched
             return actions.Count(x => x.ActionName == "Index") <= 1;
         }

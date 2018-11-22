@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Web.Helpers;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -35,7 +34,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="cookieToken"></param>
         /// <param name="headerToken"></param>
         /// <remarks>
-        /// .Net provides us a way to validate one token with another for added security. With the way angular works, this
+        /// .Net provides us a way to validate one token with another for added security. With the way angular works, this 
         /// means that we need to set 2 cookies since angular uses one cookie value to create the header value, then we want to validate
         /// this header value against our original cookie value.
         /// </remarks>
@@ -59,7 +58,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             catch (Exception ex)
             {
-                Current.Logger.Error(typeof(AngularAntiForgeryHelper), ex, "Could not validate XSRF token");
+                LogHelper.Error(typeof(AngularAntiForgeryHelper), "Could not validate XSRF token", ex);
                 return false;
             }
             return true;
@@ -115,6 +114,6 @@ namespace Umbraco.Web.WebApi.Filters
                 cookieToken == null ? null : cookieToken,
                 out failedReason);
         }
-
+        
     }
 }

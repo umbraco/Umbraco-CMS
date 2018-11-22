@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -33,6 +33,6 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             base.OnActionExecuted(actionExecutedContext);
-        }
+        }        
     }
 }

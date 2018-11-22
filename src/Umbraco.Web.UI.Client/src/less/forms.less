@@ -20,7 +20,6 @@ label.control-label, .control-label {
   padding: 0 10px 0 0 !important;
   font-weight: bold;
   color: @black;
-  font-size: 14px;
 }
 
 
@@ -486,7 +485,7 @@ input[type="checkbox"][readonly] {
 
 // Error
 .show-validation.ng-invalid .control-group.error,
-.show-validation.ng-invalid .umb-editor-header__name-wrapper {
+.show-validation.ng-invalid .umb-panel-header-content-wrapper {
     .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 
@@ -495,6 +494,21 @@ input[type="checkbox"][readonly] {
     color: @formErrorText !important;
     border-color: @red-l1 !important;
 }
+
+//disable the glowing border for the umb-content-name
+.show-validation .umb-headline-editor-wrapper input:focus:invalid,
+.show-validation .umb-headline-editor-wrapper textarea:focus:invalid,
+.show-validation .umb-headline-editor-wrapper select:focus:invalid {
+    border:none;
+    color:inherit;
+    border-color:inherit;
+    @shadow:inherit;
+    .box-shadow(@shadow);
+}
+
+.ng-invalid > .umb-headline-editor-wrapper h1{
+  border-bottom: 1px dashed @red; color: @red; cursor: pointer;
+};
 
 // FORM ACTIONS
 // ------------

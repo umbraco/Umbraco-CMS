@@ -1,0 +1,28 @@
+﻿a
+{
+    color: #3C6B96;
+}
+
+.tdDir a
+{
+    color: #3C6B96;
+    padding: 3px;
+    padding-left: 25px;
+    background: url(../../umbraco/images/foldericon.png) no-repeat 2px 2px;
+}
+
+.tdFile a
+{
+    color: #3C6B96;
+    padding: 3px;
+    padding-left: 25px;
+    background: url(../../umbraco/images/file.png) no-repeat 2px 2px;
+}
+
+small a
+{
+    color: #999;
+    padding-left: 3px !Important;
+    background-image: none !Important;
+    text-decoration: none;
+}

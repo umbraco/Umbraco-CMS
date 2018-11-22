@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Sync
 {
-    public class SingleServerRegistrar : IServerRegistrar
+    public class SingleServerRegistrar : IServerRegistrar2
     {
-        private readonly IRuntimeState _runtime;
-        private readonly Lazy<IServerAddress[]> _registrations;
+        private readonly string _umbracoApplicationUrl;
 
-        public IEnumerable<IServerAddress> Registrations => _registrations.Value;
+        public IEnumerable<IServerAddress> Registrations { get; private set; }
 
-        public SingleServerRegistrar(IRuntimeState runtime)
+        public SingleServerRegistrar()
         {
-            _runtime = runtime;
-            _registrations = new Lazy<IServerAddress[]>(() => new[] { new ServerAddressImpl(_runtime.ApplicationUrl.ToString()) });
+            _umbracoApplicationUrl = ApplicationContext.Current.UmbracoApplicationUrl;
+            Registrations = new[] { new ServerAddressImpl(_umbracoApplicationUrl) };
         }
 
         public ServerRole GetCurrentServerRole()
@@ -23,7 +21,7 @@ namespace Umbraco.Core.Sync
 
         public string GetCurrentServerUmbracoApplicationUrl()
         {
-            return _runtime.ApplicationUrl.ToString();
+            return _umbracoApplicationUrl;
         }
 
         private class ServerAddressImpl : IServerAddress
@@ -33,7 +31,7 @@ namespace Umbraco.Core.Sync
                 ServerAddress = serverAddress;
             }
 
-            public string ServerAddress { get; }
+            public string ServerAddress { get; private set; }
         }
     }
 }

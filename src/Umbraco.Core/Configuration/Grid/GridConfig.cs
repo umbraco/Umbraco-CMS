@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 

@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void AuthCookieName()
         {
-            Assert.IsTrue(SettingsSection.Security.AuthCookieName == "UMB_UCONTEXT");
+            Assert.IsTrue(SettingsSection.Security.AuthCookieName == Constants.Web.AuthCookieName);
         }
     }
 }

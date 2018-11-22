@@ -1,522 +1,707 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
+    /// <summary>
+    /// A temporary interface until we are in v8, this is used to return a different result for the same method and this interface gets implemented
+    /// explicitly. These methods will replace the normal ones in IContentService in v8 and this will be removed.
+    /// </summary>
+    public interface IContentServiceOperations
+    {
+        //TODO: Remove this class in v8
+
+        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...        
+
+        /// <summary>
+        /// Saves a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> Save(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IContent"/> objects.
+        /// </summary>        
+        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
+        Attempt<OperationStatus> Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Permanently deletes an <see cref="IContent"/> object.
+        /// </summary>
+        /// <remarks>
+        /// This method will also delete associated media files, child content and possibly associated domains.
+        /// </remarks>
+        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> Delete(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>The published status attempt</returns>
+        Attempt<PublishStatus> Publish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished"></param>
+        /// <returns>The list of statuses for all published items</returns>
+        IEnumerable<Attempt<PublishStatus>> PublishWithChildren(IContent content, int userId = 0, bool includeUnpublished = false);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        Attempt<PublishStatus> SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> MoveToRecycleBin(IContent content, int userId = 0);
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        Attempt<UnPublishStatus> UnPublish(IContent content, int userId = 0);
+    }
+
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
     public interface IContentService : IContentServiceBase
     {
-        #region Blueprints
-
-        /// <summary>
-        /// Gets a blueprint.
-        /// </summary>
+        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds);
         IContent GetBlueprintById(int id);
-
-        /// <summary>
-        /// Gets a blueprint.
-        /// </summary>
         IContent GetBlueprintById(Guid id);
-
-        /// <summary>
-        /// Gets blueprints for a content type.
-        /// </summary>
-        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
-
-        /// <summary>
-        /// Saves a blueprint.
-        /// </summary>
         void SaveBlueprint(IContent content, int userId = 0);
-
-        /// <summary>
-        /// Deletes a blueprint.
-        /// </summary>
         void DeleteBlueprint(IContent content, int userId = 0);
-
-        /// <summary>
-        /// Creates a new content item from a blueprint.
-        /// </summary>
         IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
-
-        /// <summary>
-        /// Deletes blueprints for a content type.
-        /// </summary>
         void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
-
-        /// <summary>
-        /// Deletes blueprints for content types.
-        /// </summary>
         void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
-        #endregion
-
-        #region Get, Count Documents
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table based on the given path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        /// <remarks>
+        /// If -1 is passed, then this will return all content xml entries, otherwise will return all descendents from the path
+        /// </remarks>
+        IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords);
 
         /// <summary>
-        /// Gets a document.
+        /// This builds the Xml document used for the XML cache
         /// </summary>
-        IContent GetById(int id);
+        /// <returns></returns>
+        XmlDocument BuildXmlCache();
 
         /// <summary>
-        /// Gets a document.
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
-        IContent GetById(Guid key);
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
+        void RebuildXmlStructures(params int[] contentTypeIds);
+
+        int CountPublished(string contentTypeAlias = null);
+        int Count(string contentTypeAlias = null);
+        int CountChildren(int parentId, string contentTypeAlias = null);
+        int CountDescendants(int parentId, string contentTypeAlias = null);
 
         /// <summary>
-        /// Gets documents.
+        /// Used to bulk update the permissions set for a content item. This will replace all permissions
+        /// assigned to an entity with a list of user group id & permission pairs.
         /// </summary>
+        /// <param name="permissionSet"></param>
+        void ReplaceContentPermissions(EntityPermissionSet permissionSet);
+
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user group ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="groupIds"></param>
+        void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds);
+
+        /// <summary>
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        EntityPermissionCollection GetPermissionsForEntity(IContent content);
+
+        bool SendToPublication(IContent content, int userId = 0);
+
         IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
-
-        /// <summary>
-        /// Gets documents.
-        /// </summary>
         IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Gets documents at a given level.
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContent(string name, Guid parentId, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Gets an <see cref="IContent"/> object by Id
+        /// </summary>
+        /// <param name="id">Id of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent GetById(int id);
+
+        /// <summary>
+        /// Gets an <see cref="IContent"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent GetById(Guid key);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetContentOfContentType(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Level
+        /// </summary>
+        /// <param name="level">The level to retrieve Content from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetByLevel(int level);
 
         /// <summary>
-        /// Gets the parent of a document.
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
-        IContent GetParent(int id);
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetChildren(int id);
+
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IContent> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets the parent of a document.
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
-        IContent GetParent(IContent content);
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets ancestor documents of a document.
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
-        IEnumerable<IContent> GetAncestors(int id);
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
+
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets ancestor documents of a document.
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
-        IEnumerable<IContent> GetAncestors(IContent content);
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
-        /// Gets all versions of a document.
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
-        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter">Search text filter</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by its Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetVersions(int id);
 
         /// <summary>
-        /// Gets all versions of a document.
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
         /// </summary>
-        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-        IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take);
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
 
         /// <summary>
-        /// Gets top versions of a document.
+        /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
         /// </summary>
-        /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-        IEnumerable<int> GetVersionIds(int id, int topRows);
-
-        /// <summary>
-        /// Gets a version of a document.
-        /// </summary>
-        IContent GetVersion(int versionId);
-
-        /// <summary>
-        /// Gets root-level documents.
-        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetRootContent();
 
         /// <summary>
-        /// Gets documents having an expiration date before (lower than, or equal to) a specified date.
+        /// Gets a collection of <see cref="IContent"/> objects, which has an expiration date greater then today
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        /// <remarks>
-        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
-        /// for which culture(s) have been scheduled.
-        /// </remarks>
-        IEnumerable<IContent> GetContentForExpiration(DateTime date);
+        IEnumerable<IContent> GetContentForExpiration();
 
         /// <summary>
-        /// Gets documents having a release date before (lower than, or equal to) a specified date.
+        /// Gets a collection of <see cref="IContent"/> objects, which has a release date greater then today
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        /// <remarks>
-        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
-        /// for which culture(s) have been scheduled.
-        /// </remarks>
-        IEnumerable<IContent> GetContentForRelease(DateTime date);
+        IEnumerable<IContent> GetContentForRelease();
 
         /// <summary>
-        /// Gets documents in the recycle bin.
+        /// Gets a collection of an <see cref="IContent"/> objects, which resides in the Recycle Bin
         /// </summary>
-        IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetContentInRecycleBin();
 
         /// <summary>
-        /// Gets child documents of a parent.
+        /// Saves a single <see cref="IContent"/> object
         /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Query filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        void Save(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Gets descendant documents of a given parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
-        /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
-        /// <param name="filter">Query filter.</param>
-        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+        /// Saves a collection of <see cref="IContent"/> objects.
+        /// </summary>        
+        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Gets paged documents of a content content
+        /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
         /// </summary>
-        /// <param name="contentTypeId">The page number.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfType(int contentTypeId, int userId = 0);
 
         /// <summary>
-        /// Gets paged documents for specified content types
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
         /// </summary>
-        /// <param name="contentTypeIds">The page number.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeIds">Ids of the <see cref="IContentType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
-        /// Counts documents of a given document type.
+        /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
         /// </summary>
-        int Count(string documentTypeAlias = null);
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void DeleteVersions(int id, DateTime versionDate, int userId = 0);
 
         /// <summary>
-        /// Counts published documents of a given document type.
+        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
         /// </summary>
-        int CountPublished(string documentTypeAlias = null);
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
 
         /// <summary>
-        /// Counts child documents of a given parent, of a given document type.
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
         /// </summary>
-        int CountChildren(int parentId, string documentTypeAlias = null);
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        void MoveToRecycleBin(IContent content, int userId = 0);
 
         /// <summary>
-        /// Counts descendant documents of a given parent, of a given document type.
+        /// Moves an <see cref="IContent"/> object to a new location
         /// </summary>
-        int CountDescendants(int parentId, string documentTypeAlias = null);
-
-        /// <summary>
-        /// Gets a value indicating whether a document has children.
-        /// </summary>
-        bool HasChildren(int id);
-
-        #endregion
-
-        #region Save, Delete Document
-
-        /// <summary>
-        /// Saves a document.
-        /// </summary>
-        OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Saves documents.
-        /// </summary>
-        // fixme why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Deletes a document.
-        /// </summary>
-        /// <remarks>
-        /// <para>This method will also delete associated media files, child content and possibly associated domains.</para>
-        /// <para>This method entirely clears the content from the database.</para>
-        /// </remarks>
-        OperationResult Delete(IContent content, int userId = 0);
-
-        /// <summary>
-        /// Deletes all documents of a given document type.
-        /// </summary>
-        /// <remarks>
-        /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
-        /// <para>This operation is potentially dangerous and expensive.</para>
-        /// </remarks>
-        void DeleteOfType(int documentTypeId, int userId = 0);
-
-        /// <summary>
-        /// Deletes all documents of given document types.
-        /// </summary>
-        /// <remarks>
-        /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
-        /// <para>This operation is potentially dangerous and expensive.</para>
-        /// </remarks>
-        void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
-
-        /// <summary>
-        /// Deletes versions of a document prior to a given date.
-        /// </summary>
-        void DeleteVersions(int id, DateTime date, int userId = 0);
-
-        /// <summary>
-        /// Deletes a version of a document.
-        /// </summary>
-        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0);
-
-        #endregion
-
-        #region Move, Copy, Sort Document
-
-        /// <summary>
-        /// Moves a document under a new parent.
-        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to move</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="userId">Optional Id of the User moving the Content</param>
         void Move(IContent content, int parentId, int userId = 0);
 
         /// <summary>
-        /// Copies a document.
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        void EmptyRecycleBin();
+
+        /// <summary>
+        /// Rollback an <see cref="IContent"/> object to a previous version.
+        /// This will create a new version, which is a copy of all the old data.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/>being rolled back</param>
+        /// <param name="versionId">Id of the version to rollback to</param>
+        /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
+        IContent Rollback(int id, Guid versionId, int userId = 0);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
+        /// </summary>
+        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
+        /// <param name="name">Full or partial name of the children</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetChildrenByName(int parentId, string name);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetDescendants(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetDescendants(IContent content);
+
+        /// <summary>
+        /// Gets a specific version of an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="versionId">Id of the version to retrieve</param>
+        /// <returns>An <see cref="IContent"/> item</returns>
+        IContent GetByVersion(Guid versionId);
+
+        /// <summary>
+        /// Gets the published version of an <see cref="IContent"/> item
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
+        /// <returns>An <see cref="IContent"/> item</returns>
+        IContent GetPublishedVersion(int id);
+
+        /// <summary>
+        /// Gets the published version of a <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <returns>The published version, if any; otherwise, null.</returns>
+        IContent GetPublishedVersion(IContent content);
+
+        /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any children otherwise False</returns>
+        bool HasChildren(int id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any published versions
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any published version otherwise False</returns>
+        bool HasPublishedVersion(int id);
+
+        /// <summary>
+        /// Re-Publishes all Content
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool RePublishAll(int userId = 0);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool Publish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>The published status attempt</returns>
+        Attempt<PublishStatus> PublishWithStatus(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use PublishWithChildrenWithStatus instead, that method will provide more detailed information on the outcome and also allows the includeUnpublished flag")]
+        bool PublishWithChildren(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished"></param>
+        /// <returns>The list of statuses for all published items</returns>
+        IEnumerable<Attempt<PublishStatus>> PublishWithChildrenWithStatus(IContent content, int userId = 0, bool includeUnpublished = false);
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        bool UnPublish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use SaveAndPublishWithStatus instead, that method will provide more detailed information on the outcome")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        Attempt<PublishStatus> SaveAndPublishWithStatus(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Permanently deletes an <see cref="IContent"/> object.
         /// </summary>
         /// <remarks>
-        /// <para>Recursively copies all children.</para>
+        /// This method will also delete associated media files, child content and possibly associated domains.
         /// </remarks>
+        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>        
+        void Delete(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy, which is returned. Recursively copies all children.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
         IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
-        /// Copies a document.
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
         /// </summary>
-        /// <remarks>
-        /// <para>Optionaly recursively copies all children.</para>
-        /// </remarks>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="recursive">A value indicating whether to recursively copy children.</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
         IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
 
         /// <summary>
-        /// Moves a document to the recycle bin.
+        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
         /// </summary>
-        OperationResult MoveToRecycleBin(IContent content, int userId = 0);
+        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
+        /// <returns>True if the Content can be published, otherwise False</returns>
+        bool IsPublishable(IContent content);
 
         /// <summary>
-        /// Empties the recycle bin.
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
         /// </summary>
-        OperationResult EmptyRecycleBin();
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetAncestors(int id);
 
         /// <summary>
-        /// Sorts documents.
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
         /// </summary>
-        OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+        /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetAncestors(IContent content);
 
         /// <summary>
-        /// Sorts documents.
-        /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
-
-        #endregion
-
-        #region Publish Document
-
-        /// <summary>
-        /// Saves and publishes a document.
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <remarks>
-        /// <para>By default, publishes all variations of the document, but it is possible to specify a culture to be published.</para>
-        /// <para>When a culture is being published, it includes all varying values along with all invariant values. For
-        /// anything more complicated, see <see cref="SavePublishing"/>.</para>
-        /// <para>The document is *always* saved, even when publishing fails.</para>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
         /// </remarks>
-        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Saves and publishes a publishing document.
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of node Ids passed in.
         /// </summary>
         /// <remarks>
-        /// <para>A publishing document is a document with values that are being published, i.e.
-        /// that have been published or cleared via <see cref="IContent.PublishCulture"/> and
-        /// <see cref="IContent.UnpublishCulture"/>.</para>
-        /// <para>When one needs to publish or unpublish a single culture, or all cultures, using <see cref="SaveAndPublish"/>
-        /// and <see cref="Unpublish"/> is the way to go. But if one needs to, say, publish two cultures and unpublish a third
-        /// one, in one go, then one needs to invoke <see cref="IContent.PublishCulture"/> and <see cref="IContent.UnpublishCulture"/>
-        /// on the content itself - this prepares the content, but does not commit anything - and then, invoke
-        /// <see cref="SavePublishing"/> to actually commit the changes to the database.</para>
-        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
         /// </remarks>
-        PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
+        /// <param name="ids"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(int[] ids, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Saves and publishes a document branch.
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
         /// </summary>
-        /// <param name="content">The root document.</param>
-        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-        /// <param name="culture">A culture, or "*" for all cultures.</param>
-        /// <param name="userId">The identifier of the user performing the operation.</param>
-        /// <remarks>
-        /// <para>Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
-        /// than one culture, see the other overloads of this method.</para>
-        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
-        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
-        /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        IContent GetParent(int id);
 
         /// <summary>
-        /// Saves and publishes a document branch.
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
         /// </summary>
-        /// <param name="content">The root document.</param>
-        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-        /// <param name="cultures">The cultures to publish.</param>
-        /// <param name="userId">The identifier of the user performing the operation.</param>
-        /// <remarks>
-        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
-        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
-        /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0);
+        /// <param name="content"><see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        IContent GetParent(IContent content);
 
         /// <summary>
-        /// Saves and publishes a document branch.
-        /// </summary>
-        /// <param name="content">The root document.</param>
-        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
-        /// <param name="shouldPublish">A function determining cultures to publish.</param>
-        /// <param name="publishCultures">A function publishing cultures.</param>
-        /// <param name="userId">The identifier of the user performing the operation.</param>
-        /// <remarks>
-        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
-        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
-        /// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
-        /// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
-        /// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
-        /// cultures may trigger an unwanted republish.</para>
-        /// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
-        /// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
-        /// whether the cultures could be published.</para>
-        /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
-            Func<IContent, HashSet<string>> shouldPublish,
-            Func<IContent, HashSet<string>, bool> publishCultures,
-            int userId = 0);
-
-        /// <summary>
-        /// Unpublishes a document.
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
         /// </summary>
         /// <remarks>
-        /// <para>By default, unpublishes the document as a whole, but it is possible to specify a culture to be
-        /// unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-        /// the document as a whole may or may not remain published.</para>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-        /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
         /// </remarks>
-        PublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0);
 
         /// <summary>
-        /// Gets a value indicating whether a document is path-publishable.
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
         /// </summary>
-        /// <remarks>A document is path-publishable when all its ancestors are published.</remarks>
-        bool IsPathPublishable(IContent content);
-
-        /// <summary>
-        /// Gets a value indicating whether a document is path-published.
-        /// </summary>
-        /// <remarks>A document is path-published when all its ancestors, and the document itself, are published.</remarks>
-        bool IsPathPublished(IContent content);
-
-        /// <summary>
-        /// Saves a document and raises the "sent to publication" events.
-        /// </summary>
-        bool SendToPublication(IContent content, int userId = 0);
-
-        /// <summary>
-        /// Publishes and unpublishes scheduled documents.
-        /// </summary>
-        IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
-
-        #endregion
-
-        #region Permissions
-
-        /// <summary>
-        /// Gets permissions assigned to a document.
-        /// </summary>
-        EntityPermissionCollection GetPermissions(IContent content);
-
-        /// <summary>
-        /// Sets the permission of a document.
-        /// </summary>
-        /// <remarks>Replaces all permissions with the new set of permissions.</remarks>
-        void SetPermissions(EntityPermissionSet permissionSet);
-
-        /// <summary>
-        /// Assigns a permission to a document.
-        /// </summary>
-        /// <remarks>Adds the permission to existing permissions.</remarks>
-        void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds);
-
-        #endregion
-
-        #region Create
-
-        /// <summary>
-        /// Creates a document.
-        /// </summary>
-        IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = 0);
-
-        /// <summary>
-        /// Creates a document.
-        /// </summary>
-        IContent Create(string name, int parentId, string documentTypeAlias, int userId = 0);
-
-        /// <summary>
-        /// Creates a document.
-        /// </summary>
-        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = 0);
-
-        /// <summary>
-        /// Creates and saves a document.
-        /// </summary>
-        IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0);
-
-        /// <summary>
-        /// Creates and saves a document.
-        /// </summary>
-        IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
-
-        #endregion
-
-        #region Rollback
-
-        /// <summary>
-        /// Rolls back the content to a specific version.
-        /// </summary>
-        /// <param name="id">The id of the content node.</param>
-        /// <param name="versionId">The version id to roll back to.</param>
-        /// <param name="culture">An optional culture to roll back.</param>
-        /// <param name="userId">The identifier of the user who is performing the roll back.</param>
         /// <remarks>
-        /// <para>When no culture is specified, all cultures are rolled back.</para>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
         /// </remarks>
-        OperationResult Rollback(int id, int versionId, string culture = "*", int userId = 0);
-
-        #endregion
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0);
     }
 }

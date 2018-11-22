@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClientDependency.Core;
 
 namespace Umbraco.Web.PropertyEditors
@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         public ClientDependencyType AssetType { get; private set; }
         public string FilePath { get; private set; }
         public int Priority { get; set; }
-
+        
         /// <summary>
         /// Returns a CDF file reference
         /// </summary>

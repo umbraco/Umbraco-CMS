@@ -2,38 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class PropertyFactory
+    internal class PropertyFactory
     {
-        public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
+        private readonly PropertyType[] _compositionTypeProperties;
+        private readonly Guid _version;
+        private readonly int _id;
+        private readonly DateTime _createDate;
+        private readonly DateTime _updateDate;
+
+        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id)
+        {
+            _compositionTypeProperties = compositionTypeProperties;
+            _version = version;
+            _id = id;
+        }
+
+        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id, DateTime createDate, DateTime updateDate)
+        {
+            _compositionTypeProperties = compositionTypeProperties;
+            _version = version;
+            _id = id;
+            _createDate = createDate;
+            _updateDate = updateDate;
+        }
+
+        public static IEnumerable<Property> BuildEntity(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] compositionTypeProperties, DateTime createDate, DateTime updateDate)
         {
             var properties = new List<Property>();
-            var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>) x);
 
-            foreach (var propertyType in propertyTypes)
+            foreach (var propertyType in compositionTypeProperties)
             {
-                var property = propertyType.CreateProperty();
-
+                var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
+                var property = propertyDataDto == null
+                                   ? propertyType.CreatePropertyFromValue(null)
+                                   : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
+                                                                             propertyDataDto.VersionId.Value,
+                                                                             propertyDataDto.Id);
                 try
                 {
+                    //on initial construction we don't want to have dirty properties tracked
                     property.DisableChangeTracking();
 
-                    // see notes in BuildDtos - we always have edit+published dtos
-
-                    if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
-                    {
-                        foreach (var propDto in propDtos)
-                        {
-                            property.Id = propDto.Id;
-                            property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
-                        }
-                            
-                    }
-
+                    property.CreateDate = createDate;
+                    property.UpdateDate = updateDate;
+                    // http://issues.umbraco.org/issue/U4-1946
                     property.ResetDirtyProperties(false);
                     properties.Add(property);
                 }
@@ -41,111 +57,78 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     property.EnableChangeTracking();
                 }
+
             }
 
             return properties;
         }
 
-        private static PropertyDataDto BuildDto(int versionId, Property property, int? languageId, string segment, object value)
+        [Obsolete("Use the static method instead, there's no reason to allocate one of these classes everytime we want to map values")]
+        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
         {
-            var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
-
-            if (languageId.HasValue)
-                dto.LanguageId = languageId;
-
-            if (segment != null)
-                dto.Segment = segment;
-
-            if (property.ValueStorageType == ValueStorageType.Integer)
-            {
-                if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
-                {
-                    dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
-                }
-                else if (value != null && string.IsNullOrWhiteSpace(value.ToString()) == false && int.TryParse(value.ToString(), out var val))
-                {
-                    dto.IntegerValue = val;
-                }
-            }
-            else if (property.ValueStorageType == ValueStorageType.Decimal && value != null)
-            {
-                if (decimal.TryParse(value.ToString(), out var val))
-                {
-                    dto.DecimalValue = val; // property value should be normalized already
-                }
-            }
-            else if (property.ValueStorageType == ValueStorageType.Date && value != null && string.IsNullOrWhiteSpace(value.ToString()) == false)
-            {
-                if (DateTime.TryParse(value.ToString(), out var date))
-                {
-                    dto.DateValue = date;
-                }
-            }
-            else if (property.ValueStorageType == ValueStorageType.Ntext && value != null)
-            {
-                dto.TextValue = value.ToString();
-            }
-            else if (property.ValueStorageType == ValueStorageType.Nvarchar && value != null)
-            {
-                dto.VarcharValue = value.ToString();
-            }
-
-            return dto;
+            return BuildEntity(dtos, _compositionTypeProperties, _createDate, _updateDate);
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)
+        public IEnumerable<PropertyDataDto> BuildDto(IEnumerable<Property> properties)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
-            edited = false;
-            editedCultures = null; // don't allocate unless necessary
 
             foreach (var property in properties)
             {
-                if (property.PropertyType.IsPublishing)
+                var dto = new PropertyDataDto { NodeId = _id, PropertyTypeId = property.PropertyTypeId, VersionId = _version };
+
+                //Check if property has an Id and set it, so that it can be updated if it already exists
+                if (property.HasIdentity)
                 {
-                    var editingCultures = property.PropertyType.VariesByCulture();
-                    if (editingCultures && editedCultures == null) editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    dto.Id = property.Id;
+                }
 
-                    // publishing = deal with edit and published values
-                    foreach (var propertyValue in property.Values)
+                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
+                {
+                    if (property.Value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
                     {
-                        // deal with published value
-                        if (propertyValue.PublishedValue != null && publishedVersionId > 0)
-                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
-
-                        // deal with edit value
-                        if (propertyValue.EditedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
-
-                        // deal with missing edit value (fix inconsistencies)
-                        else if (propertyValue.PublishedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
-
-                        // use explicit equals here, else object comparison fails at comparing eg strings
-                        var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
-                        edited |= !sameValues;
-
-                        if (editingCultures && // cultures can be edited, ie CultureNeutral is supported
-                            propertyValue.Culture != null && propertyValue.Segment == null && // and value is CultureNeutral
-                            !sameValues) // and edited and published are different
+                        dto.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+                                          ? 0
+                                          : Convert.ToInt32(property.Value);
+                    }
+                    else
+                    {
+                        int val;
+                        if ((property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false) && int.TryParse(property.Value.ToString(), out val))
                         {
-                            editedCultures.Add(propertyValue.Culture); // report culture as edited
+                            dto.Integer = val;
                         }
                     }
                 }
-                else
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && property.Value != null)
                 {
-                    foreach (var propertyValue in property.Values)
+                    decimal val;
+                    if (decimal.TryParse(property.Value.ToString(), out val))
                     {
-                        // not publishing = only deal with edit values
-                        if (propertyValue.EditedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
+                        dto.Decimal = val; // property value should be normalized already
                     }
-                    edited = true;
                 }
-            }
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
+                {
+                    DateTime date;
+                    if (DateTime.TryParse(property.Value.ToString(), out date))
+                    {
+                        dto.Date = date;
+                    }
+                }
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
+                {
+                    dto.Text = property.Value.ToString();
+                }
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && property.Value != null)
+                {
+                    dto.VarChar = property.Value.ToString();
+                }
 
+                propertyDataDtos.Add(dto);
+            }
             return propertyDataDtos;
         }
+
     }
 }

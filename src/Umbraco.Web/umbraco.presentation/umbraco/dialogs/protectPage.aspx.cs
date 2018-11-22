@@ -1,20 +1,20 @@
-﻿using Umbraco.Core.Services;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Windows.Forms.VisualStyles;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using umbraco.cms.businesslogic.member;
+using umbraco.cms.businesslogic.web;
 using umbraco.controls;
-using Umbraco.Core.Models;
+using umbraco.cms.helpers;
+using umbraco.BasePages;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
-using Umbraco.Web;
-using Umbraco.Web.Composing;
-using Umbraco.Web.UI.Pages;
-using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -25,16 +25,14 @@ namespace umbraco.presentation.umbraco.dialogs
     {
         public protectPage()
         {
-            CurrentApp = Constants.Applications.Content.ToString();
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
         }
 
         protected Literal jsShowWindow;
         protected DualSelectbox _memberGroups = new DualSelectbox();
         protected ContentPicker loginPagePicker = new ContentPicker();
         protected ContentPicker errorPagePicker = new ContentPicker();
-
-        private const string MemberIdRuleType = "MemberId"; // moved from Constants-Conventions.cs
-
 
         override protected void OnInit(EventArgs e)
         {
@@ -60,199 +58,54 @@ namespace umbraco.presentation.umbraco.dialogs
             }
         }
 
-        private ProtectionType GetProtectionType(int documentId)
-        {
-            var content = Services.ContentService.GetById(documentId);
-            if (content == null) return ProtectionType.NotProtected;
-
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null) return ProtectionType.NotProtected;
-
-            //legacy states that if it is protected by a member id then it is 'simple'
-            return entry.Rules.Any(x => x.RuleType == MemberIdRuleType)
-                ? ProtectionType.Simple
-                : ProtectionType.Advanced;
-        }
-
-        private enum ProtectionType
-        {
-            NotProtected,
-            Simple,
-            Advanced
-        }
-
-        private int GetErrorPage(string path)
-        {
-            var entry = Services.PublicAccessService.GetEntryForContent(path);
-            if (entry == null) return -1;
-            var entity = Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document, false);
-            return entity.Id;
-        }
-
-        private int GetLoginPage(string path)
-        {
-            var entry = Services.PublicAccessService.GetEntryForContent(path);
-            if (entry == null) return -1;
-            var entity = Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document, false);
-            return entity.Id;
-        }
-
-        private MembershipUser GetAccessingMembershipUser(int documentId)
-        {
-            var content = Services.ContentService.GetById(documentId);
-            if (content == null) return null;
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null) return null;
-            //legacy would throw an exception here if it was not 'simple' and simple means based on a username
-            if (entry.Rules.All(x => x.RuleType != Constants.Conventions.PublicAccess.MemberUsernameRuleType))
-            {
-                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
-            }
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            var usernameRule = entry.Rules.First(x => x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType);
-            return provider.GetUser(usernameRule.RuleValue, false);
-        }
-
-        private bool IsProtectedByMembershipRole(int documentId, string role)
-        {
-            var content = Services.ContentService.GetById(documentId);
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null) return false;
-            return entry.Rules
-                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
-                    && x.RuleValue == role);
-        }
-
-        private void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId)
-        {
-            var content = Current.Services.ContentService.GetById(DocumentId);
-            var loginContent = Services.ContentService.GetById(LoginDocumentId);
-            if (loginContent == null) throw new NullReferenceException("No content item found with id " + LoginDocumentId);
-            var noAccessContent = Services.ContentService.GetById(ErrorDocumentId);
-            if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
-
-            var entry = Services.PublicAccessService.GetEntryForContent(content.Id.ToString());
-            if (entry != null)
-            {
-                if (Simple)
-                {
-                    // if using simple mode, make sure that all existing groups are removed
-                    entry.ClearRules();
-                }
-
-                //ensure the correct ids are applied
-                entry.LoginNodeId = loginContent.Id;
-                entry.NoAccessNodeId = noAccessContent.Id;
-            }
-            else
-            {
-                entry = new PublicAccessEntry(content,
-                    Services.ContentService.GetById(LoginDocumentId),
-                    Services.ContentService.GetById(ErrorDocumentId),
-                    new List<PublicAccessRule>());
-            }
-            Services.PublicAccessService.Save(entry);
-        }
-
-        private void AddMembershipRoleToDocument(int documentId, string role)
-        {
-            //event
-            var content = Current.Services.ContentService.GetById(documentId);
-
-            var entry = Services.PublicAccessService.AddRule(
-                content,
-                Constants.Conventions.PublicAccess.MemberRoleRuleType,
-                role);
-
-            if (entry.Success == false && entry.Result.Entity == null)
-            {
-                throw new Exception("Document is not protected!");
-            }
-        }
-
-        private void AddMembershipUserToDocument(int documentId, string membershipUserName)
-        {
-            //event
-            var content = Current.Services.ContentService.GetById(documentId);
-            var entry = Services.PublicAccessService.AddRule(
-                content,
-                Constants.Conventions.PublicAccess.MemberUsernameRuleType,
-                membershipUserName);
-
-            if (entry.Success == false && entry.Result.Entity == null)
-            {
-                throw new Exception("Document is not protected!");
-            }
-        }
-
-        private void RemoveMembershipRoleFromDocument(int documentId, string role)
-        {
-            var content = Current.Services.ContentService.GetById(documentId);
-            Services.PublicAccessService.RemoveRule(
-                content,
-                Constants.Conventions.PublicAccess.MemberRoleRuleType,
-                role);
-        }
-
-        private void RemoveProtection(int documentId)
-        {
-            var content = Current.Services.ContentService.GetById(documentId);
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry != null)
-            {
-                Services.PublicAccessService.Delete(entry);
-            }
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
             // Check for editing
-            int documentId = int.Parse(Request.GetItemAsString("nodeId"));
-            var content = Current.Services.ContentService.GetById(documentId);
+            int documentId = int.Parse(helper.Request("nodeId"));
+            var documentObject = new Document(documentId);
             jsShowWindow.Text = "";
 
             ph_errorpage.Controls.Add(errorPagePicker);
             ph_loginpage.Controls.Add(loginPagePicker);
 
-            pp_login.Text = Services.TextService.Localize("login");
-            pp_pass.Text = Services.TextService.Localize("password");
-            pp_loginPage.Text = Services.TextService.Localize("paLoginPage");
-            pp_errorPage.Text = Services.TextService.Localize("paErrorPage");
+            pp_login.Text = ui.Text("login");
+            pp_pass.Text = ui.Text("password");
+            pp_loginPage.Text = ui.Text("paLoginPage");
+            pp_errorPage.Text = ui.Text("paErrorPage");
 
-            pane_chooseMode.Text = Services.TextService.Localize("publicAccess/paHowWould");
-            pane_pages.Text = Services.TextService.Localize("publicAccess/paSelectPages");
-            pane_simple.Text = Services.TextService.Localize("publicAccess/paSimple");
-            pane_advanced.Text = Services.TextService.Localize("publicAccess/paAdvanced");
+            pane_chooseMode.Text = ui.Text("publicAccess", "paHowWould", UmbracoUser);
+            pane_pages.Text = ui.Text("publicAccess", "paSelectPages", UmbracoUser);
+            pane_simple.Text = ui.Text("publicAccess", "paSimple", UmbracoUser);
+            pane_advanced.Text = ui.Text("publicAccess", "paAdvanced", UmbracoUser);
 
             if (IsPostBack == false)
             {
-                if (Services.PublicAccessService.IsProtected(documentId.ToString())
-                    && GetProtectionType(documentId) != ProtectionType.NotProtected)
+                if (Access.IsProtected(documentId) && Access.GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;
-                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + Services.TextService.Localize("areyousure") + "')");
+                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "')");
 
                     // Get login and error pages
-                    int errorPage = GetErrorPage(content.Path);
-                    int loginPage = GetLoginPage(content.Path);
+                    int errorPage = Access.GetErrorPage(documentObject.Path);
+                    int loginPage = Access.GetLoginPage(documentObject.Path);
                     try
                     {
-                        var loginPageContent = Current.Services.ContentService.GetById(loginPage);
-                        if (loginPageContent != null)
+                        var loginPageObj = new Document(loginPage);
+                        if (loginPageObj != null)
                         {
                             loginPagePicker.Value = loginPage.ToString(CultureInfo.InvariantCulture);
                         }
-                        var errorPageContent = Current.Services.ContentService.GetById(errorPage);
+                        var errorPageObj = new Document(errorPage);
                         errorPagePicker.Value = errorPage.ToString(CultureInfo.InvariantCulture);
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Error<protectPage>(ex, "An error occurred initializing the protect page editor");
+                        LogHelper.Error<protectPage>("An error occurred initializing the protect page editor", ex);
                     }
 
-                    if (GetProtectionType(documentId) == ProtectionType.Simple)
+                    if (Access.GetProtectionType(documentId) == ProtectionType.Simple)
                     {
-                        MembershipUser m = GetAccessingMembershipUser(documentId);
+                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);
                         if (m != null)
                         {
                             pane_simple.Visible = true;
@@ -265,7 +118,7 @@ namespace umbraco.presentation.umbraco.dialogs
                         }
 
                     }
-                    else if (GetProtectionType(documentId) == ProtectionType.Advanced)
+                    else if (Access.GetProtectionType(documentId) == ProtectionType.Advanced)
                     {
                         pane_simple.Visible = false;
                         pane_advanced.Visible = true;
@@ -295,7 +148,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     if (IsPostBack) continue;
 
                     // first time, initialize selected roles
-                        if (IsProtectedByMembershipRole(documentId, role))
+                    if (Access.IsProtectedByMembershipRole(documentId, role))
                         selectedGroups += role + ",";
                 }
             }
@@ -309,8 +162,9 @@ namespace umbraco.presentation.umbraco.dialogs
             groupsSelector.Controls.Add(_memberGroups);
 
 
-            bt_protect.Text = Services.TextService.Localize("buttons", "select");
-            bt_buttonRemoveProtection.Text = Services.TextService.Localize("paRemoveProtection");
+            bt_selectMode.Text = ui.Text("buttons", "select");
+            bt_protect.Text = ui.Text("save");
+            bt_buttonRemoveProtection.Text = ui.Text("paRemoveProtection");
 
             // Put user code to initialize the page here
         }
@@ -334,8 +188,9 @@ namespace umbraco.presentation.umbraco.dialogs
             //reset
             SimpleLoginNameValidator.IsValid = true;
 
-            var provider = Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-            var pageId = int.Parse(Request.GetItemAsString("nodeId"));
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            int pageId = int.Parse(helper.Request("nodeId"));
 
             if (e.CommandName == "simple")
             {
@@ -354,11 +209,9 @@ namespace umbraco.presentation.umbraco.dialogs
                     else
                     {
                         //if it's the umbraco membership provider, then we need to tell it what member type to create it with
-                        if (Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
-                        //if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
+                        if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                         {
-                            var defm = new MemberType(null, Constants.Conventions.MemberTypes.SystemDefaultProtectType);
-                            Current.Services.MemberTypeService.Save(defm);
+                            MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                         }
                         var castedProvider = provider.AsUmbracoMembershipProvider();
                         MembershipCreateStatus status;
@@ -394,21 +247,21 @@ namespace umbraco.presentation.umbraco.dialogs
                     Roles.AddUserToRole(member.UserName, simpleRoleName);
                 }
 
-                    ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
-                    AddMembershipRoleToDocument(pageId, simpleRoleName);
-                    AddMembershipUserToDocument(pageId, member.UserName);
+                Access.ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                Access.AddMembershipRoleToDocument(pageId, simpleRoleName);
+                Access.AddMembershipUserToDocument(pageId, member.UserName);
             }
             else if (e.CommandName == "advanced")
             {
                 if (cv_errorPage.IsValid && cv_loginPage.IsValid)
                 {
-                    ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                    Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
                     foreach (ListItem li in _memberGroups.Items)
                         if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",", StringComparison.Ordinal) > -1)
-                            AddMembershipRoleToDocument(pageId, li.Value);
+                            Access.AddMembershipRoleToDocument(pageId, li.Value);
                         else
-                            RemoveMembershipRoleFromDocument(pageId, li.Value);
+                            Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
                 else
                 {
@@ -416,13 +269,11 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            var content = Services.ContentService.GetById(pageId);
-            var text = content == null ? "" : content.Name;
-            feedback_text.Text = HttpUtility.HtmlEncode(Services.TextService.Localize("publicAccess/paIsProtected", new[] { text }));
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text));
 
             p_setup.Visible = false;
             p_feedback.Visible = true;
-
+            var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
@@ -432,17 +283,15 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void buttonRemoveProtection_Click(object sender, System.EventArgs e)
         {
-            int pageId = int.Parse(Request.GetItemAsString("nodeId"));
+            int pageId = int.Parse(helper.Request("nodeId"));
             p_setup.Visible = false;
 
-            RemoveProtection(pageId);
+            Access.RemoveProtection(pageId);
 
-            var content = Services.ContentService.GetById(pageId);
-            var text = content == null ? "" : content.Name;
-            feedback_text.Text = HttpUtility.HtmlEncode(Services.TextService.Localize("publicAccess/paIsRemoved", new[] { text }));
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text));
             p_feedback.Visible = true;
 
-
+            var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree
@@ -495,7 +344,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseMode;
+        protected global::umbraco.uicontrols.Pane pane_chooseMode;
 
         /// <summary>
         /// rb_simple control.
@@ -540,7 +389,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.Pane pane_simple;
+        protected global::umbraco.uicontrols.Pane pane_simple;
 
         /// <summary>
         /// PropertyPanel1 control.
@@ -549,7 +398,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
 
         /// <summary>
         /// pp_login control.
@@ -558,7 +407,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_login;
+        protected global::umbraco.uicontrols.PropertyPanel pp_login;
 
         /// <summary>
         /// simpleLogin control.
@@ -576,7 +425,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_pass;
+        protected global::umbraco.uicontrols.PropertyPanel pp_pass;
 
         /// <summary>
         /// simplePassword control.
@@ -594,7 +443,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.Pane pane_advanced;
+        protected global::umbraco.uicontrols.Pane pane_advanced;
 
         /// <summary>
         /// PropertyPanel3 control.
@@ -603,7 +452,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel3;
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel3;
 
         /// <summary>
         /// PropertyPanel2 control.
@@ -612,7 +461,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel2;
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel2;
 
         /// <summary>
         /// groupsSelector control.
@@ -630,7 +479,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.Pane pane_pages;
+        protected global::umbraco.uicontrols.Pane pane_pages;
 
         /// <summary>
         /// pp_loginPage control.
@@ -639,7 +488,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_loginPage;
+        protected global::umbraco.uicontrols.PropertyPanel pp_loginPage;
 
         /// <summary>
         /// ph_loginpage control.
@@ -666,7 +515,7 @@ namespace umbraco.presentation.umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_errorPage;
+        protected global::umbraco.uicontrols.PropertyPanel pp_errorPage;
 
         /// <summary>
         /// ph_errorpage control.

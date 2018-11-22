@@ -6,42 +6,35 @@
       ng-submit="save()"
       val-form-manager>
 
-      <umb-editor-view ng-if="!page.loading">
+      <umb-editor-view ng-if="!page.loading" umb-tabs>
 
          <umb-editor-header
             name="content.name"
+            tabs="content.tabs"
             menu="page.menu"
             hide-icon="true"
             hide-description="true"
             hide-alias="true">
          </umb-editor-header>
 
-         <umb-editor-container class="form-horizontal">
+         <umb-editor-container>
 
-            <div class="umb-expansion-panel" ng-repeat="group in content.tabs track by group.label">
+            <umb-tabs-content view="true" class="form-horizontal">
+                <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
-                    <div>{{ group.label }}</div>
-                    <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}" class="icon-navigation-right">&nbsp;</ins>
-                </div>
-        
-                <div class="umb-expansion-panel__content" ng-show="group.open">
-                    <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
-                        <umb-property-editor model="property"></umb-property-editor>
+                    <umb-property property="property" ng-repeat="property in tab.properties">
+                        <umb-editor model="property"></umb-editor>
                     </umb-property>
-                </div>
-        
-            </div>
+
+                </umb-tab>
+            </umb-tabs-content>
 
          </umb-editor-container>
 
          <umb-editor-footer>
 
             <umb-editor-footer-content-left>
-                <umb-breadcrumbs 
-                  ng-if="ancestors && ancestors.length > 0" 
-                  ancestors="ancestors">
-                </umb-breadcrumbs>
+               <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
             </umb-editor-footer-content-left>
 
 

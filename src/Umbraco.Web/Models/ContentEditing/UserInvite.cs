@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [EmailAddress]
         public string Email { get; set; }
 
-        [DataMember(Name = "username")]
+        [DataMember(Name = "username")]        
         public string Username { get; set; }
 
         [DataMember(Name = "message")]

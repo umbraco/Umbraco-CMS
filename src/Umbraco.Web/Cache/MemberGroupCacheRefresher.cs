@@ -1,35 +1,90 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Web;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
     {
-        public MemberGroupCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
-        { }
+        #region Static helpers
 
-        #region Define
+        /// <summary>
+        /// Converts the json to a JsonPayload object
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        private static JsonPayload[] DeserializeFromJsonPayload(string json)
+        {
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
+            return jsonObject;
+        }
 
-        protected override MemberGroupCacheRefresher This => this;
+        /// <summary>
+        /// Creates the custom Json payload used to refresh cache amongst the servers
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <returns></returns>
+        internal static string SerializeToJsonPayload(params IMemberGroup[] groups)
+        {
+            var items = groups.Select(FromMemberGroup).ToArray();
+            var json = JsonConvert.SerializeObject(items);
+            return json;
+        }
 
-        public static readonly Guid UniqueId = Guid.Parse("187F236B-BD21-4C85-8A7C-29FBA3D6C00C");
+        /// <summary>
+        /// Converts a macro to a jsonPayload object
+        /// </summary>
+        /// <param name="group"></param>
+        /// <returns></returns>
+        private static JsonPayload FromMemberGroup(IMemberGroup group)
+        {
+            if (group == null) return null;
 
-        public override Guid RefresherUniqueId => UniqueId;
-
-        public override string Name => "Member Group Cache Refresher";
+            var payload = new JsonPayload
+            {
+                Id = group.Id,
+                Name = group.Name
+            };
+            return payload;
+        }
 
         #endregion
 
-        #region Refresher
+        #region Sub classes
 
-        public override void Refresh(string json)
+        private class JsonPayload
+        {
+            public string Name { get; set; }
+            public int Id { get; set; }
+        }
+
+        #endregion
+
+        protected override MemberGroupCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
+        public override Guid UniqueIdentifier
+        {
+            get { return new Guid(DistributedCache.MemberGroupCacheRefresherId); }
+        }
+
+        public override string Name
+        {
+            get { return "Clears Member Group Cache"; }
+        }
+
+        public override void Refresh(string jsonPayload)
         {
             ClearCache();
-            base.Refresh(json);
+            base.Refresh(jsonPayload);
         }
 
         public override void Refresh(int id)
@@ -49,35 +104,7 @@ namespace Umbraco.Web.Cache
             // Since we cache by group name, it could be problematic when renaming to
             // previously existing names - see http://issues.umbraco.org/issue/U4-10846.
             // To work around this, just clear all the cache items
-            CacheHelper.IsolatedRuntimeCache.ClearCache<IMemberGroup>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMemberGroup>();
         }
-
-        #endregion
-
-        #region Json
-
-        public class JsonPayload
-        {
-            public JsonPayload(int id, string name)
-            {
-                Id = id;
-                Name = name;
-            }
-
-            public string Name { get; }
-            public int Id { get; }
-        }
-
-        private JsonPayload[] Deserialize(string json)
-        {
-            return JsonConvert.DeserializeObject<JsonPayload[]>(json);
-        }
-
-        internal static string Serialize(params IMemberGroup[] groups)
-        {
-            return JsonConvert.SerializeObject(groups.Select(x => new JsonPayload(x.Id, x.Name)).ToArray());
-        }
-
-        #endregion
     }
 }

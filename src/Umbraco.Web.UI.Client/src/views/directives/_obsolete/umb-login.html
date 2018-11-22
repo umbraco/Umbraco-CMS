@@ -1,0 +1,12 @@
+<div id="login" ng-show="!authenticated" ng-animate="'slide'" ng-cloak>
+    <div class="form">
+        <h1>Happy {{today}}!, log in below</h1>
+        <div class="control-group">
+            <input type="text" ng-model="login" class="input-xlarge" placeholder="Enter your username" />
+        </div>
+        <div class="control-group">
+            <input type="password" ng-model="password" class="input-xlarge" placeholder="Enter your password" />
+        </div>
+        <input type="button" ng-click="signin()" class="btn" value="Login" />
+    </div>
+</div>

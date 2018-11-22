@@ -8,7 +8,7 @@ namespace umbraco.presentation.masterpages
 {
     public partial class _default : MasterPage
     {
-
+        
         protected override void Render(HtmlTextWriter writer)
         {
             // get base output

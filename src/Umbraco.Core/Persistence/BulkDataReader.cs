@@ -17,23 +17,23 @@ namespace Umbraco.Core.Persistence
     /// A base implementation of <see cref="IDataReader"/> that is suitable for <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>.
     /// </summary>
     /// <remarks>
-    ///
+    /// 
     /// Borrowed from Microsoft:
     /// See: https://blogs.msdn.microsoft.com/anthonybloesch/2013/01/23/bulk-loading-data-with-idatareader-and-sqlbulkcopy/
-    ///
+    /// 
     /// This implementation is designed to be very memory efficient requiring few memory resources and to support
     /// rapid transfer of data to SQL Server.
     ///
     /// Subclasses should implement <see cref="BulkDataReader.SchemaName"/>, <see cref="BulkDataReader.TableName"/>,
     /// <see cref="BulkDataReader.AddSchemaTableRows()"/>, <see cref="BulkDataReader.Read()"/>, <see cref="BulkDataReader.GetValue(Int32)"/>.
     /// If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(Boolean)"/>.
-    ///
+    /// 
     /// SD: Alternatively, we could have used a LinqEntityDataReader which is nicer to use but it uses quite a lot of reflection and
     /// I thought this would just be quicker.
     /// Simple example of that: https://github.com/gridsum/DataflowEx/blob/master/Gridsum.DataflowEx/Databases/BulkDataReader.cs
     /// Full example of that: https://github.com/matthewschrager/Repository/blob/master/Repository.EntityFramework/EntityDataReader.cs
     ///  So we know where to find that if we ever need it, these would convert any Linq data source to an IDataReader
-    ///
+    /// 
     /// </remarks>
     internal abstract class BulkDataReader : IDataReader
     {

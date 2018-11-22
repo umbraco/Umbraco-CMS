@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
@@ -19,23 +19,28 @@ namespace Umbraco.Core.Cache
     /// keep as a whole in memory.</para>
     /// </remarks>
     internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
-        where TEntity : class, IEntity
+        where TEntity : class, IAggregateRoot
     {
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
-            : base(cache, scopeAccessor)
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> entityGetId, bool expires)
+            : base(cache)
         {
             _entityGetId = entityGetId;
             _expires = expires;
+        }
+
+        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
+        {
+            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
         }
 
         protected static readonly TId[] EmptyIds = new TId[0]; // const
 
         protected string GetEntityTypeCacheKey()
         {
-            return $"uRepo_{typeof (TEntity).Name}_";
+            return string.Format("uRepo_{0}_", typeof(TEntity).Name);
         }
 
         protected void InsertEntities(TEntity[] entities)
@@ -51,22 +56,20 @@ namespace Umbraco.Core.Cache
             // set to ListCloneBehavior.CloneOnce ie it will clone *once* when inserting,
             // and then will *not* clone when retrieving.
 
-            var key = GetEntityTypeCacheKey();
-
             if (_expires)
             {
-                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
+                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
             }
             else
             {
-                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities));
+                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities));
             }
         }
 
         /// <inheritdoc />
         public override void Create(TEntity entity, Action<TEntity> persistNew)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null) throw new ArgumentNullException("entity");
 
             try
             {
@@ -81,7 +84,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null) throw new ArgumentNullException("entity");
 
             try
             {
@@ -96,7 +99,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null) throw new ArgumentNullException("entity");
 
             try
             {
@@ -117,7 +120,7 @@ namespace Umbraco.Core.Cache
 
             // see note in InsertEntities - what we get here is the original
             // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
-            return (TEntity)entity?.DeepClone();
+            return entity == null ? null : (TEntity) entity.DeepClone();
         }
 
         /// <inheritdoc />
@@ -125,11 +128,11 @@ namespace Umbraco.Core.Cache
         {
             // get all from the cache -- and only the cache, then look for the entity
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
-            var entity = all?.FirstOrDefault(x => _entityGetId(x).Equals(id));
+            var entity = all == null ? null : all.FirstOrDefault(x => _entityGetId(x).Equals(id));
 
             // see note in InsertEntities - what we get here is the original
             // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
-            return (TEntity) entity?.DeepClone();
+            return entity == null ? null : (TEntity)entity.DeepClone();
         }
 
         /// <inheritdoc />
@@ -156,7 +159,7 @@ namespace Umbraco.Core.Cache
         }
 
         // does NOT clone anything, so be nice with the returned values
-        internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
+        private IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // try the cache first
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());

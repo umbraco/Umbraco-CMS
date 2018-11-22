@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents the type's of Umbraco entities that can be resolved from the EntityController
     /// </summary>
     public enum UmbracoEntityTypes
-    {
+    {   
         /// <summary>
         /// Domain
         /// </summary>
@@ -52,7 +52,14 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Member Group
         /// </summary>
         MemberGroup,
-        
+
+        /// <summary>
+        /// Content Item
+        /// </summary>
+        [Obsolete("This is not used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        ContentItem,
+
         /// <summary>
         /// "Media Type
         /// </summary>
@@ -62,10 +69,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Document Type
         /// </summary>
         DocumentType,
-
+        
         /// <summary>
         /// Stylesheet
-        /// </summary>
+        /// </summary>        
         Stylesheet,
 
         /// <summary>

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq.Expressions;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -14,15 +13,20 @@ namespace Umbraco.Core.Persistence.Querying
     /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
     internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
     {
-        private readonly IMapperCollection _mappers;
+        private readonly MappingResolver _mappingResolver;
         private readonly BaseMapper _mapper;
 
-        public ModelToSqlExpressionVisitor(ISqlSyntaxProvider sqlSyntax, IMapperCollection mappers)
+        public ModelToSqlExpressionVisitor(ISqlSyntaxProvider sqlSyntax, MappingResolver mappingResolver)
             : base(sqlSyntax)
         {
-            _mappers = mappers;
-            _mapper = mappers[typeof(T)]; // throws if not found
+            _mapper = mappingResolver.ResolveMapperByType(typeof(T));
+            _mappingResolver = mappingResolver;
         }
+
+        [Obsolete("Use the overload the specifies a SqlSyntaxProvider")]
+        public ModelToSqlExpressionVisitor()
+            : this(SqlSyntaxContext.SqlSyntaxProvider, MappingResolver.Current)
+        { }
 
         protected override string VisitMemberAccess(MemberExpression m)
         {
@@ -33,12 +37,11 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name, true);
                     if (field.IsNullOrWhiteSpace())
-                        throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
+                        throw new InvalidOperationException(string.Format("The mapper returned an empty field for the member name: {0} for type: {1}", m.Member.Name, m.Expression.Type));
                     return field;
                 }
-
                 //already compiled, return
                 return string.Empty;
             }
@@ -48,18 +51,17 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name, true);
                     if (field.IsNullOrWhiteSpace())
-                        throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
+                        throw new InvalidOperationException(string.Format("The mapper returned an empty field for the member name: {0} for type: {1}", m.Member.Name, m.Expression.Type));
                     return field;
                 }
-
                 //already compiled, return
                 return string.Empty;
             }
 
-            if (m.Expression != null
-                && m.Expression.Type != typeof(T)
+            if (m.Expression != null 
+                && m.Expression.Type != typeof(T) 
                 && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type)
                 && EndsWithConstant(m) == false)
             {
@@ -69,10 +71,12 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var subMapper = _mappers[m.Expression.Type]; // throws if not found
-                    var field = subMapper.Map(SqlSyntax, m.Member.Name, true);
+                    var subMapper = _mappingResolver.ResolveMapperByType(m.Expression.Type);
+                    if (subMapper == null)
+                        throw new NullReferenceException("No mapper found for type " + m.Expression.Type);
+                    var field = subMapper.Map(m.Member.Name, true);
                     if (field.IsNullOrWhiteSpace())
-                        throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}");
+                        throw new InvalidOperationException(string.Format("The mapper returned an empty field for the member name: {0} for type: {1}", m.Member.Name, m.Expression.Type));
                     return field;
                 }
                 //already compiled, return
@@ -94,10 +98,10 @@ namespace Umbraco.Core.Persistence.Querying
 
             //don't execute if compiled
             if (Visited == false)
-                return $"@{SqlParameters.Count - 1}";
-
+                return string.Format("@{0}", SqlParameters.Count - 1);
             //already compiled, return
             return string.Empty;
+
         }
 
         /// <summary>
@@ -105,16 +109,16 @@ namespace Umbraco.Core.Persistence.Querying
         /// </summary>
         /// <param name="m"></param>
         /// <returns></returns>
-        private static bool EndsWithConstant(MemberExpression m)
+        private bool EndsWithConstant(MemberExpression m)
         {
             Expression expr = m;
-
+            
             while (expr is MemberExpression)
             {
                 var memberExpr = expr as MemberExpression;
                 expr = memberExpr.Expression;
             }
-
+            
             var constExpr = expr as ConstantExpression;
             return constExpr != null;
         }

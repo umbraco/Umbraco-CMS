@@ -11,7 +11,7 @@
     </div>
 
     <div ng-show="ready">
-        <div ng-bind-html="dashboard.text"></div>
+        <div ng-bind-html-unsafe="dashboard.text"></div>
 
         <div ng-if="dashboard.outOfDateModels">
             <p>Models are <strong>out-of-date</strong>.

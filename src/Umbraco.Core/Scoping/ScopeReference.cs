@@ -8,9 +8,9 @@
     /// chain).</remarks>
     internal class ScopeReference : IDisposeOnRequestEnd // implies IDisposable
     {
-        private readonly ScopeProvider _scopeProvider;
+        private readonly IScopeProviderInternal _scopeProvider;
 
-        public ScopeReference(ScopeProvider scopeProvider)
+        public ScopeReference(IScopeProviderInternal scopeProvider)
         {
             _scopeProvider = scopeProvider;
         }
@@ -19,7 +19,7 @@
         {
             // dispose the entire chain (if any)
             // reset (don't commit by default)
-            Scope scope;
+            IScopeInternal scope;
             while ((scope = _scopeProvider.AmbientScope) != null)
             {
                 scope.Reset();

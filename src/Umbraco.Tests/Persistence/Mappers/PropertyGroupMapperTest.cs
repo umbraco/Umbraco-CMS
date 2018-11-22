@@ -11,10 +11,10 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Arrange
-            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new PropertyGroupMapper().Map(sqlSyntaxProvider, "Id");
+            string column = new PropertyGroupMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[id]"));
@@ -24,10 +24,10 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_SortOrder_Property()
         {
             // Arrange
-            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new PropertyGroupMapper().Map(sqlSyntaxProvider, "SortOrder");
+            string column = new PropertyGroupMapper().Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[sortorder]"));
@@ -37,10 +37,10 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Name_Property()
         {
             // Arrange
-            var sqlSyntaxProvider = new SqlCeSyntaxProvider();
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new PropertyGroupMapper().Map(sqlSyntaxProvider, "Name");
+            string column = new PropertyGroupMapper().Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[text]"));

@@ -11,8 +11,7 @@ function ColorPickerController($scope) {
 
     //map back to the model
     $scope.model.config = config;
-
-    //TODO: This isn't used
+    
     function convertArrayToDictionaryArray(model) {
         //now we need to format the items in the dictionary because we always want to have an array
         var newItems = [];
@@ -23,7 +22,7 @@ function ColorPickerController($scope) {
         return newItems;
     }
 
-    //TODO: This isn't used
+
     function convertObjectToDictionaryArray(model) {
         //now we need to format the items in the dictionary because we always want to have an array
         var newItems = [];
@@ -190,7 +189,7 @@ function ColorPickerController($scope) {
 
     // figures out if a value is trueish enough
     function isTrue(bool) {
-        return !!bool && bool !== "0" && bool.toString().toLowerCase() !== "false";
+        return !!bool && bool !== "0" && angular.lowercase(bool) !== "false";
     }
 }
 

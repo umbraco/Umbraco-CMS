@@ -1,8 +1,11 @@
-﻿using System.Web.Mvc;
+using System.Collections.Generic;
+using System.Web.Mvc;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using umbraco.cms.businesslogic.macro;
+using umbraco.interfaces;
 using System.Linq;
-using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {
@@ -34,7 +37,7 @@ namespace Umbraco.Web.Macros
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
-            return PartialView(_macro.MacroSource, model);
+            return PartialView(_macro.ScriptName, model);
         }
     }
 }

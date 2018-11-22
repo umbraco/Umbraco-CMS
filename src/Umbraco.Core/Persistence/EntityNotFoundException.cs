@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence
 
             if (Id != null)
             {
-                return "Umbraco entity (id: " + Id + ") not found. " + result;
+                return "Umbraco entity (id: " + Id + ") not found. " + result;    
             }
 
             return result;

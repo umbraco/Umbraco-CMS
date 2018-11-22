@@ -1,27 +1,28 @@
-﻿using Umbraco.Core.Services;
-using System;
+﻿using System;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.UI;
-using Umbraco.Web._Legacy.UI;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
-    ///        Summary description for simple.
+    ///		Summary description for simple.
     /// </summary>
     public partial class simple : UmbracoUserControl
     {
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sbmt.Text = Services.TextService.Localize("create");
-            rename.Attributes["placeholder"] = Services.TextService.Localize("name");
+            sbmt.Text = ui.Text("create");
+            rename.Attributes["placeholder"] = ui.Text("name");
 
             // Put user code to initialize the page here
         }
@@ -39,13 +40,13 @@ namespace umbraco.cms.presentation.create.controls
 
                     var returnUrl = LegacyDialogHandler.Create(
                         new HttpContextWrapper(Context),
-                        Security.CurrentUser,
+                        new User(Security.CurrentUser),
                         Request.GetItemAsString("nodeType"),
                             nodeId,
                             rename.Text.Trim(),
                             Request.QueryString.AsEnumerable().ToDictionary(x => x.Key, x => (object)x.Value));
 
-                    ClientTools
+                    BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ReloadActionNode(false, true)
                     .CloseModalWindow();

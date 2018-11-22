@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -7,12 +7,12 @@ namespace Umbraco.Web.HealthCheck
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class HealthCheckNotificationMethodAttribute : Attribute
-    {
+    {        
         public HealthCheckNotificationMethodAttribute(string alias)
         {
             Alias = alias;
         }
 
-        public string Alias { get; }
+        public string Alias { get; private set; }
     }
 }

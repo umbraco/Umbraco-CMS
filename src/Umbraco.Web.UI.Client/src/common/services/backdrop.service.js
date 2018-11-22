@@ -58,11 +58,8 @@
          * 
 		 */
         function close() {
-            args.opacity = null,
-            args.element = null,
-            args.elementPreventClick = false,
-            args.disableEventsOnClick = false,
-            args.show = false
+            args.element = null;
+            args.show = false;
             eventsService.emit("appState.backdrop", args);
         }
 

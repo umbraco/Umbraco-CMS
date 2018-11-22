@@ -1,13 +1,11 @@
 ﻿<div>
-    <ng-form name="sliderTooltipForm">
-        <select ng-model="model.value" required name="tooltip">
-            <option value="show">Show</option>
-            <option value="hide">Hide</option>
-            <option value="always">Always</option>
-        </select>
+    <select ng-model="model.value" required name="tooltip">
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+        <option value="always">Always</option>
+    </select>
 
-        <span ng-messages="sliderTooltipForm.tooltip.$error" show-validation-on-submit >
-            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-        </span>
-    </ng-form>    
+    <span class="help-inline" val-msg-for="tooltip" val-toggle-msg="required">
+        <localize key="general_required">Required</localize>
+    </span>
 </div>

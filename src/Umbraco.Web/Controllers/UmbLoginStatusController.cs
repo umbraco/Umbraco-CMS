@@ -1,5 +1,7 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using System.Web.Security;
+using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
@@ -31,7 +33,7 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-
+            
             return RedirectToCurrentUmbracoPage();
         }
     }

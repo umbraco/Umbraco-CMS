@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Gets a value indicating whether this tab is the generic properties tab.
         /// </summary>
         [IgnoreDataMember]
-        public bool IsGenericProperties => Id == GenericPropertiesGroupId;
+        public bool IsGenericProperties { get { return Id == GenericPropertiesGroupId; } }
 
         /// <summary>
         /// Gets a value indicating whether the property group is inherited through
@@ -49,7 +49,11 @@ namespace Umbraco.Web.Models.ContentEditing
             Properties = new List<TPropertyType>();
         }
 
+        
+
         [DataMember(Name = "properties")]
         public IEnumerable<TPropertyType> Properties { get; set; }
+
+       
     }
 }

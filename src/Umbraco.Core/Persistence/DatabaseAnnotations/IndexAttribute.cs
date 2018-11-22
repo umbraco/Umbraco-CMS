@@ -12,12 +12,12 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         {
             IndexType = indexType;
         }
-
+        
         /// <summary>
         /// Gets or sets the name of the Index
         /// </summary>
         /// <remarks>
-        /// Overrides default naming of indexes:
+        /// Overrides default naming of indexes: 
         /// IX_tableName
         /// </remarks>
         public string Name { get; set; }//Overrides default naming of indexes: IX_tableName

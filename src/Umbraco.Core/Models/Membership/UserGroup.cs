@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
+    public class UserGroup : Entity, IUserGroup, IReadOnlyUserGroup
     {
         private int? _startContentId;
         private int? _startMediaId;
@@ -24,7 +24,6 @@ namespace Umbraco.Core.Models.Membership
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        // ReSharper disable once ClassNeverInstantiated.Local // lazy-instanciated in Ps
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Name);
@@ -63,43 +62,49 @@ namespace Umbraco.Core.Models.Membership
             UserCount = userCount;
             _alias = alias;
             _name = name;
-            _permissions = permissions;
+            _permissions = permissions;            
             _icon = icon;
         }
 
         [DataMember]
         public int? StartMediaId
         {
-            get => _startMediaId;
-            set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector);
+            get { return _startMediaId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
         }
 
         [DataMember]
         public int? StartContentId
         {
-            get => _startContentId;
-            set => SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector);
+            get { return _startContentId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
         }
 
         [DataMember]
         public string Icon
         {
-            get => _icon;
-            set => SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector);
+            get { return _icon; }
+            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
         }
 
         [DataMember]
         public string Alias
         {
-            get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, Ps.Value.AliasSelector);
+            get { return _alias; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(
+                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                    ref _alias,
+                    Ps.Value.AliasSelector);
+            }
         }
 
         [DataMember]
         public string Name
         {
-            get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            get { return _name; }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -111,22 +116,33 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public IEnumerable<string> Permissions
         {
-            get => _permissions;
-            set => SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector, Ps.Value.StringEnumerableComparer);
+            get { return _permissions; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector,
+                    Ps.Value.StringEnumerableComparer);
+            }
         }
 
-        public IEnumerable<string> AllowedSections => _sectionCollection;
+        public IEnumerable<string> AllowedSections
+        {
+            get { return _sectionCollection; }
+        }
 
         public void RemoveAllowedSection(string sectionAlias)
         {
             if (_sectionCollection.Contains(sectionAlias))
+            {
                 _sectionCollection.Remove(sectionAlias);
+            }
         }
 
         public void AddAllowedSection(string sectionAlias)
         {
             if (_sectionCollection.Contains(sectionAlias) == false)
+            {
                 _sectionCollection.Add(sectionAlias);
+            }
         }
 
         public void ClearAllowedSections()
@@ -134,6 +150,6 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection.Clear();
         }
 
-        public int UserCount { get; }
+        public int UserCount { get; private set; }
     }
 }

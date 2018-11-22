@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Tests.Collections
 {
@@ -11,8 +10,8 @@ namespace Umbraco.Tests.Collections
         [Test]
         public void Keeps_Last()
         {
-            var list = new OrderedHashSet<MyClass>(keepOldest: false);
-            var items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            var list = new OrderedHashSet<MyClass>(keepOldest:false);
+            var items = new MyClass[] {new MyClass("test"), new MyClass("test"), new MyClass("test") };
             foreach (var item in items)
             {
                 list.Add(item);
@@ -27,7 +26,7 @@ namespace Umbraco.Tests.Collections
         public void Keeps_First()
         {
             var list = new OrderedHashSet<MyClass>(keepOldest: true);
-            var items = new[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
+            var items = new MyClass[] { new MyClass("test"), new MyClass("test"), new MyClass("test") };
             foreach (var item in items)
             {
                 list.Add(item);
@@ -45,8 +44,8 @@ namespace Umbraco.Tests.Collections
                 Id = Guid.NewGuid();
             }
 
-            public string Name { get; }
-            public Guid Id { get; }
+            public string Name { get; private set; }
+            public Guid Id { get; private set; }
 
             public bool Equals(MyClass other)
             {
@@ -60,7 +59,7 @@ namespace Umbraco.Tests.Collections
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((MyClass)obj);
+                return Equals((MyClass) obj);
             }
 
             public override int GetHashCode()
@@ -75,7 +74,7 @@ namespace Umbraco.Tests.Collections
 
             public static bool operator !=(MyClass left, MyClass right)
             {
-                return Equals(left, right) == false;
+                return !Equals(left, right);
             }
         }
     }

@@ -1,0 +1,50 @@
+<form novalidate name="insertMacroForm" ng-controller="Umbraco.Dialogs.InsertMacroController" val-form-manager>
+    <div class="umb-panel">        
+
+        <div class="umb-panel-footer">
+                <div class="btn-toolbar umb-btn-toolbar pull-right">
+                    <a href class="btn btn-link" ng-click="close()">
+                        <localize key="cancel" />
+                    </a>
+                    <button type="button" ng-click="submitForm()" class="btn btn-primary">
+                        <localize key="buttons_select" />
+                    </button>
+                </div>
+        </div>
+
+        <div class="umb-panel-body no-header umb-scrollable" auto-scale="90" ng-switch="wizardStep">
+            
+            <umb-control-group label="Choose a macro" ng-switch-when="macroSelect">
+                <select class="umb-editor" ng-change="submitForm()" 
+                        name="selectedMacro" 
+                        ng-model="$parent.$parent.selectedMacro" 
+                        ng-options="m as m.name for m in macros" 
+                        required>
+                    <option value=""><localize key="choose" />...</option>
+                </select>
+                <span class="help-inline" val-msg-for="selectedMacro" val-toggle-msg="required"><localize key="required" /></span>
+            </umb-control-group>
+
+
+            <div class="umb-pane" ng-switch-when="paramSelect">
+
+                <h5>{{$parent.$parent.selectedMacro.name}}</h5>
+
+                <ul class="unstyled">
+                    <li ng-repeat="param in $parent.macroParams">
+                        
+                        <ng-form name="parameterForm">
+                            <umb-control-group label="{{param.name}}">
+                                <umb-editor model="param"></umb-editor>
+                            </umb-control-group>
+                        </ng-form>                        
+                        
+                    </li>
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+</form>

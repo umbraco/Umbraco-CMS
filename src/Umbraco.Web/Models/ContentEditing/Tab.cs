@@ -21,12 +21,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
-        /// <summary>
-        /// The expanded state of the tab
-        /// </summary>
-        [DataMember(Name = "open")]
-        public bool Expanded { get; set; } = true;
-
         [DataMember(Name = "properties")]
         public IEnumerable<T> Properties { get; set; }
     }

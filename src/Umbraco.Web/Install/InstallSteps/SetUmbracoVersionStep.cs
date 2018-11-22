@@ -1,13 +1,13 @@
-﻿using System.Web;
+using System;
+using System.Collections.Generic;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
-
+using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -16,45 +16,42 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class SetUmbracoVersionStep : InstallSetupStep<object>
     {
+        private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
-        private readonly InstallHelper _installHelper;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IUserService _userService;
-        private readonly DistributedCache _distributedCache;
 
-        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, DistributedCache distributedCache)
+        public SetUmbracoVersionStep(ApplicationContext applicationContext, HttpContextBase httpContext)
         {
+            _applicationContext = applicationContext;
             _httpContext = httpContext;
-            _installHelper = installHelper;
-            _globalSettings = globalSettings;
-            _userService = userService;
-            _distributedCache = distributedCache;
         }
 
         public override InstallSetupResult Execute(object model)
         {
+            var ih = new InstallHelper(UmbracoContext.Current);
+
             //During a new install we'll log the default user in (which is id = 0).
             // During an upgrade, the user will already need to be logged in in order to run the installer.
 
-            var security = new WebSecurity(_httpContext, _userService, _globalSettings);
+            var security = new WebSecurity(_httpContext, _applicationContext);
             //we do this check here because for upgrades the user will already be logged in, for brand new installs,
             // they will not be logged in, however we cannot check the current installation status because it will tell
             // us that it is in 'upgrade' because we already have a database conn configured and a database.
-            if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
+            if (security.IsAuthenticated() == false && GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
-                security.PerformLogin(-1);
+                security.PerformLogin(0);
             }
 
-            // Some upgrade scripts "may modify the database (cmsContentXml...) tables directly" - not sure
-            // that is still true but the idea is that after an upgrade we want to reset the local published snapshot, on
-            // all LB nodes of course, so we need to use the distributed cache, and refresh everything.
-            _distributedCache.RefreshAllPublishedSnapshot();
+            //This is synonymous with library.RefreshContent() - but we don't want to use library
+            // for anything anymore so welll use the method that it is wrapping. This will just make sure
+            // the correct xml structure exists in the xml cache file. This is required by some upgrade scripts
+            // that may modify the cmsContentXml table directly.
+            DistributedCache.Instance.RefreshAllPageCache();
 
             // Update configurationStatus
-            _globalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
-
-            //reports the ended install
-            _installHelper.InstallStatus(true, "");
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            
+            //reports the ended install            
+            ih.InstallStatus(true, "");
 
             return null;
         }

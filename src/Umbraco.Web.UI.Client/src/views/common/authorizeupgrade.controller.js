@@ -10,7 +10,9 @@
  */
 function AuthorizeUpgradeController($scope, $window) {
     
-    $scope.loginAndRedirect = function (event) {
+    //Add this method to the scope - this method will be called by the login dialog controller when the login is successful
+    // then we'll handle the redirect.
+    $scope.submit = function (event) {
 
         var qry = $window.location.search.trimStart("?").split("&");
         var redir = _.find(qry, function(item) {
@@ -22,7 +24,7 @@ function AuthorizeUpgradeController($scope, $window) {
         else {
             $window.location = "/";
         }
-
+        
     };
 
 }

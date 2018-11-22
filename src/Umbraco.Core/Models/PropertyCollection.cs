@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a collection of property values.
+    /// Represents a Collection of <see cref="Property"/> objects
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
@@ -16,28 +18,24 @@ namespace Umbraco.Core.Models
     {
         private readonly object _addLocker = new object();
         internal Action OnAdd;
-        internal Func<Property, bool> AdditionValidator { get; set; }
+        internal Func<Property, bool> ValidateAdd { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
-        /// </summary>
         internal PropertyCollection()
             : base(StringComparer.InvariantCultureIgnoreCase)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
-        /// </summary>
-        /// <param name="additionValidator">A function validating added properties.</param>
-        internal PropertyCollection(Func<Property, bool> additionValidator)
-            : this()
         {
-            AdditionValidator = additionValidator;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
+        /// Initializes a new instance of the <see cref="PropertyCollection"/> class with a delegate responsible for validating the addition of <see cref="Property"/> instances.
         /// </summary>
+        /// <param name="validationCallback">The validation callback.</param>
+        /// <remarks></remarks>
+        internal PropertyCollection(Func<Property, bool> validationCallback)
+            : this()
+        {
+            ValidateAdd = validationCallback;
+        }
+
         public PropertyCollection(IEnumerable<Property> properties)
             : this()
         {
@@ -45,28 +43,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Replaces all properties, whilst maintaining validation delegates.
+        /// Resets the collection to only contain the <see cref="Property"/> instances referenced in the <paramref name="properties"/> parameter, whilst maintaining
+        /// any validation delegates such as <see cref="ValidateAdd"/>
         /// </summary>
+        /// <param name="properties">The properties.</param>
+        /// <remarks></remarks>
         internal void Reset(IEnumerable<Property> properties)
         {
             Clear();
-            foreach (var property in properties)
-                Add(property);
+            properties.ForEach(Add);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        /// <summary>
-        /// Replaces the property at the specified index with the specified property.
-        /// </summary>
-        protected override void SetItem(int index, Property property)
+        protected override void SetItem(int index, Property item)
         {
-            base.SetItem(index, property);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property, index));
+            base.SetItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
         }
 
-        /// <summary>
-        /// Removes the property at the specified index.
-        /// </summary>
         protected override void RemoveItem(int index)
         {
             var removed = this[index];
@@ -74,68 +68,70 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
-        /// <summary>
-        /// Inserts the specified property at the specified index.
-        /// </summary>
-        protected override void InsertItem(int index, Property property)
+        protected override void InsertItem(int index, Property item)
         {
-            base.InsertItem(index, property);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property));
+            base.InsertItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
-        /// <summary>
-        /// Removes all properties.
-        /// </summary>
         protected override void ClearItems()
         {
             base.ClearItems();
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        /// <summary>
-        /// Adds a property.
-        /// </summary>
-        internal new void Add(Property property)
+        internal new void Add(Property item)
         {
-            lock (_addLocker) // fixme - why are we locking here and not everywhere else?!
+            lock (_addLocker)
             {
-                var key = GetKeyForItem(property);
+                var key = GetKeyForItem(item);
                 if (key != null)
                 {
-                    if (Contains(key))
+                    var exists = this.Contains(key);
+                    if (exists)
                     {
-                        // transfer id and values if ...
-                        var existing = this[key];
+                        //NOTE: Consider checking type before value is set: item.PropertyType.DataTypeId == property.PropertyType.DataTypeId
+                        //Transfer the existing value to the new property
+                        var property = this[key];
+                        if (item.Id == 0 && property.Id != 0)
+                        {
+                            item.Id = property.Id;
+                        }
+                        if (item.Value == null && property.Value != null)
+                        {
+                            item.Value = property.Value;
+                        }
 
-                        if (property.Id == 0 && existing.Id != 0)
-                            property.Id = existing.Id;
-
-                        if (property.Values.Count == 0 && existing.Values.Count > 0)
-                            property.Values = existing.Values.Select(x => x.Clone()).ToList();
-
-                        // replace existing with property and return,
-                        // SetItem invokes OnCollectionChanged (but not OnAdd)
-                        SetItem(IndexOfKey(key), property);
+                        SetItem(IndexOfKey(key), item);
                         return;
                     }
                 }
+                base.Add(item);
+                OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
 
-                base.Add(property);
-
-                OnAdd?.Invoke();
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property));
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             }
         }
 
         /// <summary>
-        /// Gets the index for a specified property alias.
+        /// Determines whether this collection contains a <see cref="Property"/> whose alias matches the specified PropertyType.
         /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType.</param>
+        /// <returns><c>true</c> if the collection contains the specified alias; otherwise, <c>false</c>.</returns>
+        /// <remarks></remarks>
+        public new bool Contains(string propertyTypeAlias)
+        {
+            return base.Contains(propertyTypeAlias);
+        }
+
         public int IndexOfKey(string key)
         {
-            for (var i = 0; i < Count; i++)
+            for (var i = 0; i < this.Count; i++)
             {
                 if (this[i].Alias.InvariantEquals(key))
+                {
                     return i;
+                }
             }
             return -1;
         }
@@ -146,8 +142,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the property with the specified PropertyType.
+        /// Gets the element with the specified PropertyType.
         /// </summary>
+        /// 
+        /// <returns>
+        /// The element with the specified PropertyType. If an element with the specified PropertyType is not found, an exception is thrown.
+        /// </returns>
+        /// <param name="propertyType">The PropertyType of the element to get.</param><exception cref="T:System.ArgumentNullException"><paramref name="propertyType"/> is null.</exception><exception cref="T:System.Collections.Generic.KeyNotFoundException">An element with the specified key does not exist in the collection.</exception>
         internal Property this[PropertyType propertyType]
         {
             get
@@ -156,63 +157,66 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool TryGetValue(string propertyTypeAlias, out Property property)
-        {
-            property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            return property != null;
-        }
-
-        /// <summary>
-        /// Occurs when the collection changes.
-        /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            CollectionChanged?.Invoke(this, args);
+            if (CollectionChanged != null)
+            {
+                CollectionChanged(this, args);
+            }
         }
 
         /// <summary>
-        /// Ensures that the collection contains properties for the specified property types.
+        /// Ensures that the collection contains Properties for the passed in PropertyTypes
         /// </summary>
+        /// <param name="propertyTypes">List of PropertyType</param>
         protected internal void EnsurePropertyTypes(IEnumerable<PropertyType> propertyTypes)
         {
-            if (propertyTypes == null)
-                return;
-
-            foreach (var propertyType in propertyTypes)
-                Add(new Property(propertyType));
+            if (/*!this.Any() &&*/ propertyTypes != null)
+            {
+                foreach (var propertyType in propertyTypes)
+                {
+                    Add(new Property(propertyType));
+                }
+            }
         }
 
         /// <summary>
-        /// Ensures that the collection does not contain properties not in the specified property types.
+        /// Ensures that the collection is cleared from PropertyTypes not in the list of passed in PropertyTypes
         /// </summary>
+        /// <param name="propertyTypes">List of PropertyType</param>
         protected internal void EnsureCleanPropertyTypes(IEnumerable<PropertyType> propertyTypes)
         {
-            if (propertyTypes == null)
-                return;
+            if (propertyTypes != null)
+            {
+                //Remove PropertyTypes that doesn't exist in the list of new PropertyTypes
+                var aliases = this.Select(p => p.Alias).Except(propertyTypes.Select(x => x.Alias)).ToList();
+                foreach (var alias in aliases)
+                {
+                    Remove(alias);
+                }
 
-            var propertyTypesA = propertyTypes.ToArray();
-
-            var thisAliases = this.Select(x => x.Alias);
-            var typeAliases = propertyTypesA.Select(x => x.Alias);
-            var remove = thisAliases.Except(typeAliases).ToArray();
-            foreach (var alias in remove)
-                Remove(alias);
-
-            foreach (var propertyType in propertyTypesA)
-                Add(new Property(propertyType));
+                //Add new PropertyTypes from the list of passed in PropertyTypes
+                foreach (var propertyType in propertyTypes)
+                {
+                    Add(new Property(propertyType));
+                }
+            }
         }
 
         /// <summary>
-        /// Deep clones.
+        /// Create a deep clone of this property collection
         /// </summary>
+        /// <returns></returns>
         public object DeepClone()
         {
-            var clone = new PropertyCollection();
-            foreach (var property in this)
-                clone.Add((Property) property.DeepClone());
-            return clone;
+            var newList = new PropertyCollection();
+            foreach (var p in this)
+            {
+                newList.Add((Property)p.DeepClone());
+            }
+            return newList;
         }
     }
 }

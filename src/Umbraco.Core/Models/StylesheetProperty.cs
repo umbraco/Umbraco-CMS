@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class StylesheetProperty : BeingDirtyBase, IValueObject
+    public class StylesheetProperty : TracksChangesEntityBase, IValueObject
     {
         private string _alias;
         private string _value;

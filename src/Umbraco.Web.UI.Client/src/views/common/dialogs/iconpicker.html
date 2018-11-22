@@ -1,0 +1,57 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.IconPickerController">
+    <div class="umb-panel-header">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="form-search">
+                <i class="icon-search"></i>
+                <input type="text"
+                       style="width: 100%"
+                       ng-model="searchTerm"
+                       class="umb-search-field search-query input-block-level"
+                       localize="placeholder"
+                       placeholder="@placeholders_filter"
+                       no-dirty-check />
+            </div>
+        </div>
+    </div>
+
+    <div class="umb-panel-body with-footer">
+
+        <div class="umb-control-group">
+            <select ng-model="color" class="input-block-level">
+                <option value=""><localize key="colors_black">Black</localize></option>
+                <option value="color-green"><localize key="colors_green">Green</localize></option>
+                <option value="color-yellow"><localize key="colors_yellow">Yellow</localize></option>
+                <option value="color-orange"><localize key="colors_orange">Orange</localize></option>
+                <option value="color-blue"><localize key="colors_blue">Blue</localize></option>
+                <option value="color-red"><localize key="colors_red">Red</localize></option>
+            </select>
+        </div>
+
+        <umb-load-indicator ng-if="loading"></umb-load-indicator>
+
+        <div class="umb-control-group" ng-show="!loading">
+            <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
+                <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
+                    <a href="#" title="{{icon}}" ng-click="submitClass(icon)" prevent-default>
+                        <i class="{{icon}} large"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <umb-empty-state ng-if="filtered.length === 0"
+                         position="center">
+            <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
+        </umb-empty-state>
+    </div>
+
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href ng-click="close()" class="btn btn-link">
+                    <localize key="general_cancel">Cancel</localize>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

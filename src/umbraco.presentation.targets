@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- 
+  ****************************************************
+  VARIABLES 
+  *****************************************************
+  -->
+  
+  <PropertyGroup Condition="$(BuildingInsideVisualStudio) != true">
+    <SolutionRootFolder>$(MSBuildStartupDirectory)\..\src\</SolutionRootFolder>
+    <ConfigEnvironment></ConfigEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(BuildingInsideVisualStudio) == true">
+    <SolutionRootFolder>$(SolutionDir)</SolutionRootFolder>
+    <ConfigEnvironment>$(Computername).</ConfigEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ProjDir>$(ProjectDir)</ProjDir>
+    <ProjOutputDir>$(WebProjectOutputDir)</ProjOutputDir>
+    <WebConfigSource>$(ProjDir)web.Template.$(ConfigEnvironment)$(Configuration).config</WebConfigSource>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="!Exists('$(WebConfigSource)')">
+    <WebConfigSource>$(ProjDir)web.Template.$(Configuration).config</WebConfigSource>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ProjOutputDir)'==''">
+    <ProjOutputDir>$(ProjDir)</ProjOutputDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="!HasTrailingSlash('$(ProjOutputDir)')">
+    <ProjOutputDir>$(ProjOutputDir)\</ProjOutputDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ConfigFiles Include="$(ProjDir)**\*.config" Exclude="$(ProjDir)web.config;$(ProjDir)web.*.config" />
+    <ConfigFiles Include="$(ProjDir)umbraco\config\create\UI.xml"  />
+  </ItemGroup>
+  
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
+    <WebPublishingTasks>$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+  </PropertyGroup>
+
+  <!-- 
+  ****************************************************
+  INCLUDES 
+  *****************************************************
+  -->
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" />
+		
+
+  <!-- 
+  ****************************************************
+  TARGETS 
+  *****************************************************
+  -->
+
+  <Target Name="ResetConfigFiles" Condition="$(ProjDir) != $(ProjOutputDir)" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
+    
+    <PropertyGroup>
+      <OriginalFileName>@(ConfigFiles)</OriginalFileName>
+      <ModifiedFileName>$(OriginalFileName.Replace("%(ConfigFiles.Extension)",".$(Configuration)%(ConfigFiles.Extension)"))</ModifiedFileName>
+      <OutputFileName>$(OriginalFileName.Replace("$(ProjDir)", "$(ProjOutputDir)"))</OutputFileName>
+    </PropertyGroup>
+
+    <Message Text="$(OriginalFileName)" Importance="high" />
+    <Message Text="$(OutputFileName)" Importance="high" />
+
+    <Copy SourceFiles="$(ModifiedFileName)"
+      DestinationFiles="$(OutputFileName)"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false"
+      Condition="Exists('$(ModifiedFileName)')"/>
+
+  </Target>
+  
+</Project>

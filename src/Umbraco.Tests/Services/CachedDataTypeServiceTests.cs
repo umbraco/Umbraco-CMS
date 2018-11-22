@@ -1,21 +1,27 @@
-﻿using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
     /// <summary>
     /// Tests covering the DataTypeService with cache enabled
     /// </summary>
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class CachedDataTypeServiceTests : TestWithSomeContentBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
+    public class CachedDataTypeServiceTests : BaseServiceTest
     {
+        protected override CacheHelper CreateCacheHelper()
+        {
+            return new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
+        }
+
         /// <summary>
         /// This tests validates that with the new scope changes that the underlying cache policies work - in this case it tests that the cache policy
         /// with Count verification works.
@@ -25,13 +31,13 @@ namespace Umbraco.Tests.Services
         {
             var dataTypeService = ServiceContext.DataTypeService;
 
-            IDataType dataType = new DataType(new LabelPropertyEditor(Logger)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
-            dataTypeService.Save(dataType);
+            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.Save(dataTypeDefinition);
 
             //Get all the first time (no cache)
-            var all = dataTypeService.GetAll();
+            var all = dataTypeService.GetAllDataTypeDefinitions();
             //Get all a second time (with cache)
-            all = dataTypeService.GetAll();
+            all = dataTypeService.GetAllDataTypeDefinitions();
 
             Assert.Pass();
         }

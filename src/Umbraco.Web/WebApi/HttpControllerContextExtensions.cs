@@ -34,13 +34,13 @@ namespace Umbraco.Web.WebApi
 
             if (authorizationFilters.Any())
             {
-                var cancelToken = new CancellationToken();
+                var cancelToken = new CancellationToken();           
                 var filterResult = await FilterContinuation(actionContext, cancelToken, authorizationFilters, 0);
                 if (filterResult != null)
                 {
                     //this means that the authorization filter has returned a result - unauthorized so we cannot continue
                     return filterResult;
-                }
+                }                    
             }
             return null;
         }
@@ -60,7 +60,7 @@ namespace Umbraco.Web.WebApi
                     ? Task.FromResult<HttpResponseMessage>(null)
                     : FilterContinuation(actionContext, token, filters, ++index));
         }
-
+  
 
     }
 }

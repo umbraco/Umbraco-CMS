@@ -7,21 +7,19 @@ namespace Umbraco.Web.Models.Trees
     /// A menu item collection for a given tree node
     /// </summary>
     [DataContract(Name = "menuItems", Namespace = "")]
-    public class MenuItemCollection
+    public class MenuItemCollection 
     {
-        public static MenuItemCollection Empty => new MenuItemCollection();
-
         private readonly MenuItemList _menuItems = new MenuItemList();
 
         public MenuItemCollection()
-        {
+        {           
         }
 
         public MenuItemCollection(IEnumerable<MenuItem> items)
         {
             _menuItems = new MenuItemList(items);
         }
-
+        
         /// <summary>
         /// Sets the default menu item alias to be shown when the menu is launched - this is optional and if not set then the menu will just be shown normally.
         /// </summary>
@@ -40,7 +38,7 @@ namespace Umbraco.Web.Models.Trees
             get { return _menuItems; }
         }
 
-
+        
 
     }
 }

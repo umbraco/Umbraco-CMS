@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging
@@ -30,18 +29,16 @@ namespace Umbraco.Core.Packaging
         /// </remarks>
         public static IEnumerable<string> ScanAssembliesForTypeReference<T>(IEnumerable<byte[]> assemblys, out string[] errorReport)
         {
-            // need to wrap in a safe call context in order to prevent whatever Umbraco stores
-            // in the logical call context from flowing to the created app domain (eg, the
-            // UmbracoDatabase is *not* serializable and cannot and should not flow).
+            // beware! when toying with domains, use a safe call context!
             using (new SafeCallContext())
             {
                 var appDomain = GetTempAppDomain();
                 var type = typeof(PackageBinaryInspector);
                 try
                 {
-                    var value = (PackageBinaryInspector)appDomain.CreateInstanceAndUnwrap(
-                           type.Assembly.FullName,
-                           type.FullName);
+                    var value = (PackageBinaryInspector) appDomain.CreateInstanceAndUnwrap(
+                        type.Assembly.FullName,
+                        type.FullName);
                     // do NOT turn PerformScan into static (even if ReSharper says so)!
                     var result = value.PerformScan<T>(assemblys.ToArray(), out errorReport);
                     return result;
@@ -192,7 +189,7 @@ namespace Umbraco.Core.Packaging
                                           assemblyName.Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        Current.Logger.Error<PackageBinaryInspector>(ex, "An error occurred scanning package assembly '{AssemblyName}'", assemblyName.FullName);
+                        LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
             }
@@ -236,7 +233,7 @@ namespace Umbraco.Core.Packaging
                                           a.GetName().Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        Current.Logger.Error<PackageBinaryInspector>(ex, "An error occurred scanning package assembly '{AssemblyName}'", a.GetName().FullName);
+                        LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
 

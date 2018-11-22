@@ -1,0 +1,36 @@
+<form ng-controller="Umbraco.Dialogs.RteEmbedController" val-form-manager>
+    <div class="umb-panel">
+         <div class="umb-panel-body no-header with-footer">
+            <umb-pane>
+                <umb-control-group label="@general_url">
+                    <input id="url" class="umb-editor input-block-level" type="text" ng-model="form.url" ng-keyup="$event.keyCode == 13 ? showPreview() : null" required />
+                    <input type="button" ng-click="showPreview()" class="btn" localize="value" value="@general_retrieve" />
+                </umb-control-group>
+
+                <div ng-show="form.supportsDimensions">    
+                    <umb-control-group label="@general_size">
+                        <input type="text" ng-model="form.width" on-blur="changeSize('width')" style="width:50px"/> x <input type="text" ng-model="form.height" on-blur="changeSize('height')" style="width:50px"/>
+
+                        <label for="constrain" style="display:inline"><localize key="general_constrain">Constrain</localize>:</label> 
+                        <input id="constrain" type="checkbox" ng-model="form.constrain" style="margin-bottom: 10px;"/>
+                    </umb-control-group>
+                </div>
+                
+                <div>
+                    <p ng-bind="form.info"></p>
+                    <div ng-bind-html-unsafe="form.preview"></div>
+                </div>
+            </umb-pane>
+        </div>
+
+        <div class="umb-panel-footer">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+                <a href class="btn btn-link" ng-click="close()">
+                    <localize key="cancel" />
+                </a>
+                
+                <input type="button" ng-click="insert()" class="btn btn-primary" value="Ok" ng-disabled="!form.success" />
+            </div>
+        </div>
+    </div>
+</form>

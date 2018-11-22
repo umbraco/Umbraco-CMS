@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Exceptions;
+using System;
 
 namespace Umbraco.Web.Search
 {
@@ -13,8 +12,8 @@ namespace Umbraco.Web.Search
         /// <param name="methodName"></param>
         public SearchableTreeAttribute(string serviceName, string methodName)
         {
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullOrEmptyException(nameof(serviceName));
-            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentNullOrEmptyException(nameof(methodName));
+            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentException("Value cannot be null or whitespace.", "serviceName");
+            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value cannot be null or whitespace.", "methodName");
             MethodName = methodName;
             ServiceName = serviceName;
         }
@@ -25,12 +24,12 @@ namespace Umbraco.Web.Search
         /// <param name="serviceName"></param>
         public SearchableTreeAttribute(string serviceName)
         {
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullOrEmptyException(nameof(serviceName));
+            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentException("Value cannot be null or whitespace.", "serviceName");
             MethodName = "";
             ServiceName = serviceName;
         }
 
-        public string MethodName { get; }
-        public string ServiceName { get; }
+        public string MethodName { get; private set; }
+        public string ServiceName { get; private set; }
     }
 }

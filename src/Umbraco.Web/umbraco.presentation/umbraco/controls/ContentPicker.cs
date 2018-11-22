@@ -1,15 +1,22 @@
-﻿using System;
-using Umbraco.Web._Legacy.Controls;
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using umbraco.cms.presentation.Trees;
+using umbraco.presentation;
+using umbraco.uicontrols.TreePicker;
 using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.Composing;
 
 namespace umbraco.controls
 {
 
     public class ContentPicker : BaseTreePicker
-    {
+	{
 
         public ContentPicker()
         {
@@ -17,6 +24,18 @@ namespace umbraco.controls
             TreeAlias = "content";
         }
 
+		[Obsolete("Use Value property instead, this simply wraps it.")]
+		public string Text
+		{
+			get
+			{
+                return this.Value;
+			}
+            set
+            {
+                this.Value = value;
+            }
+		}
 
         public string AppAlias { get; set; }
         public string TreeAlias { get; set; }
@@ -33,7 +52,7 @@ namespace umbraco.controls
         {
             get
             {
-                return Current.Services.TextService.Localize("general/choose") + " " + Current.Services.TextService.Localize("sections/" + TreeAlias.ToLower());
+                return ui.GetText("general", "choose") + " " + ui.GetText("sections", TreeAlias.ToLower());
             }
         }
 
@@ -44,17 +63,16 @@ namespace umbraco.controls
             {
                 if (Value != "" && Value != "-1")
                 {
-                    //tempTitle = new cms.businesslogic.CMSNode(int.Parse(Value)).Text;
-                    tempTitle = Current.Services.EntityService.Get(int.Parse(Value)).Name;
+                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(Value)).Text;
                 }
                 else
                 {
-                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? Current.Services.TextService.Localize(TreeAlias) : Current.Services.TextService.Localize(AppAlias));
+                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ui.Text(TreeAlias) : ui.Text(AppAlias));
 
                 }
             }
             catch { }
             return tempTitle;
         }
-    }
+	}
 }

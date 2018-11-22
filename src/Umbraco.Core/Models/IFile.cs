@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// Defines a File
     /// </summary>
     /// <remarks>Used for Scripts, Stylesheets and Templates</remarks>
-    public interface IFile : IEntity
+    public interface IFile : IAggregateRoot
     {
         /// <summary>
         /// Gets the Name of the File including extension
@@ -43,6 +43,8 @@ namespace Umbraco.Core.Models
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         string VirtualPath { get; set; }
-        
+
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
+        bool IsValid();
     }
 }

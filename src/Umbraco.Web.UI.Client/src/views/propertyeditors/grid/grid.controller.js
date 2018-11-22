@@ -2,8 +2,14 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
     function (
         $scope,
+        $http,
+        assetsService,
         localizationService,
+        $rootScope,
+        dialogService,
         gridService,
+        mediaResource,
+        imageHelper,
         $timeout,
         umbRequestHelper,
         angularHelper,
@@ -268,25 +274,21 @@ angular.module("umbraco")
         // Add items overlay menu
         // *********************************************
        $scope.openEditorOverlay = function(event, area, index, key) {
-            var title = "";
-            localizationService.localize("grid_insertControl").then(function(value){
-                title = value;
-                $scope.editorOverlay = {
-                    view: "itempicker",
-                    filter: area.$allowedEditors.length > 15,
-                    title: title,
-                    availableItems: area.$allowedEditors,
-                    event: event,
-                    show: true,
-                    submit: function(model) {
-                      if (model.selectedItem) {
-                        $scope.addControl(model.selectedItem, area, index);
-                        $scope.editorOverlay.show = false;
-                        $scope.editorOverlay = null;
-                      }
-                    }
-                };
-            });
+          $scope.editorOverlay = {
+              view: "itempicker",
+              filter: area.$allowedEditors.length > 15,
+              title: localizationService.localize("grid_insertControl"),
+              availableItems: area.$allowedEditors,
+              event: event,
+              show: true,
+              submit: function (model) {
+                  if (model.selectedItem) {
+                      $scope.addControl(model.selectedItem, area, index);
+                      $scope.editorOverlay.show = false;
+                      $scope.editorOverlay = null;
+                  }
+              }
+          };
        };
 
         // *********************************************
@@ -884,9 +886,7 @@ angular.module("umbraco")
             angular.forEach($scope.availableEditors, function (value, key) {
                 //If no translation is provided, keep using the editor name from the manifest
                 if (localizationService.dictionary.hasOwnProperty("grid_" + value.alias)) {
-                    localizationService.localize("grid_" + value.alias).then(function(v){
-                        value.name = v;
-                    });
+                    value.name = localizationService.localize("grid_" + value.alias);
                 }
             });
 

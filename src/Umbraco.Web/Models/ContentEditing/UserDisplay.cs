@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "availableCultures")]
         public IDictionary<string, string> AvailableCultures { get; set; }
-
+        
         [DataMember(Name = "startContentIds")]
         public IEnumerable<EntityBasic> StartContentIds { get; set; }
 

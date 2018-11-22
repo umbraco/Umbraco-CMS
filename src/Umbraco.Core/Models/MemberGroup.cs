@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -11,34 +11,28 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MemberGroup : EntityBase, IMemberGroup
+    public class MemberGroup : Entity, IMemberGroup
     {
-        private static PropertySelectors _selectors;
-        private IDictionary<string, object> _additionalData;
+        public MemberGroup()
+        {
+            AdditionalData = new Dictionary<string, object>();
+        }
+
         private string _name;
         private int _creatorId;
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private class PropertySelectors
         {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
-            public readonly PropertyInfo CreatorId = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
         }
-
-        /// <inheritdoc />
-        [DataMember]
-        [DoNotClone]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        public bool HasAdditionalData => _additionalData != null;
 
         [DataMember]
         public string Name
         {
-            get => _name;
+            get { return _name; }
             set
             {
                 if (_name != value)
@@ -49,15 +43,16 @@ namespace Umbraco.Core.Models
                     AdditionalData["previousName"] = _name;
                 }
 
-                SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);                
             }
         }
 
-        [DataMember]
         public int CreatorId
         {
-            get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Selectors.CreatorId);
+            get { return _creatorId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
+
+        public IDictionary<string, object> AdditionalData { get; private set; }
     }
 }

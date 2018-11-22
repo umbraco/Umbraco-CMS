@@ -27,13 +27,14 @@
     $scope.create = function () {
       if (formHelper.submitForm({
         scope: $scope,
-        formCtrl: this.blueprintForm
+        formCtrl: this.blueprintForm,
+        statusMessage: "Creating blueprint..."
       })) {
 
         contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.message.name)
           .then(function(data) {
 
-              formHelper.resetForm({ scope: $scope });
+              formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
               navigationService.hideMenu();
             },

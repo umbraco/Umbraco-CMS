@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -6,8 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Entities;
+using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 
@@ -15,26 +15,6 @@ namespace Umbraco.Core.Models.Identity
 {
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private string _email;
-        private string _userName;
-        private int _id;
-        private bool _hasIdentity;
-        private DateTime? _lastLoginDateUtc;
-        private bool _emailConfirmed;
-        private string _name;
-        private int _accessFailedCount;
-        private string _passwordHash;
-        private string _culture;
-        private ObservableCollection<IIdentityUserLogin> _logins;
-        private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
-        private IReadOnlyUserGroup[] _groups;
-        private string[] _allowedSections;
-        private int[] _startMediaIds;
-        private int[] _startContentIds;
-        private DateTime? _lastPasswordChangeDateUtc;
-
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
@@ -44,8 +24,8 @@ namespace Umbraco.Core.Models.Identity
         /// <returns></returns>
         public static BackOfficeIdentityUser CreateNew(string username, string email, string culture)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
-            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", "culture");
 
             var user = new BackOfficeIdentityUser();
             user.DisableChangeTracking();
@@ -66,7 +46,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
+            _culture = Configuration.GlobalSettings.DefaultUILanguage;
             _groups = new IReadOnlyUserGroup[0];
             _roles = new ObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += _roles_CollectionChanged;
@@ -83,7 +63,7 @@ namespace Umbraco.Core.Models.Identity
             _startContentIds = new int[] { };
             _groups = new IReadOnlyUserGroup[] { };
             _allowedSections = new string[] { };
-            _culture = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
+            _culture = Configuration.GlobalSettings.DefaultUILanguage;
             _groups = groups.ToArray();
             _roles = new ObservableCollection<IdentityUserRole<string>>(_groups.Select(x => new IdentityUserRole<string>
             {
@@ -91,19 +71,30 @@ namespace Umbraco.Core.Models.Identity
                 UserId = userId.ToString()
             }));
             _roles.CollectionChanged += _roles_CollectionChanged;
+        }        
+
+        public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager<BackOfficeIdentityUser> manager)
+        {
+            // NOTE the authenticationType must match the umbraco one
+            // defined in CookieAuthenticationOptions.AuthenticationType
+            var userIdentity = await manager.CreateIdentityAsync(this, Constants.Security.BackOfficeAuthenticationType);
+            return userIdentity;
         }
 
         /// <summary>
         /// Returns true if an Id has been set on this object this will be false if the object is new and not peristed to the database
         /// </summary>
-        public bool HasIdentity => _hasIdentity;
+        public bool HasIdentity
+        {
+            get { return _hasIdentity; }
+        }
 
         public int[] CalculatedMediaStartNodeIds { get; internal set; }
         public int[] CalculatedContentStartNodeIds { get; internal set; }
 
         public override int Id
         {
-            get => _id;
+            get { return _id; }
             set
             {
                 _id = value;
@@ -116,8 +107,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string Email
         {
-            get => _email;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector);
+            get { return _email; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
 
         /// <summary>
@@ -125,8 +116,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string UserName
         {
-            get => _userName;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector);
+            get { return _userName; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector); }
         }
 
         /// <summary>
@@ -135,7 +126,7 @@ namespace Umbraco.Core.Models.Identity
         public override DateTime? LastPasswordChangeDateUtc
         {
             get { return _lastPasswordChangeDateUtc; }
-            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
         }
 
         /// <summary>
@@ -143,8 +134,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override DateTime? LastLoginDateUtc
         {
-            get => _lastLoginDateUtc;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector);
+            get { return _lastLoginDateUtc; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector); }
         }
 
         /// <summary>
@@ -152,8 +143,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override bool EmailConfirmed
         {
-            get => _emailConfirmed;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, Ps.Value.EmailConfirmedSelector);
+            get { return _emailConfirmed; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, Ps.Value.EmailConfirmedSelector); }            
         }
 
         /// <summary>
@@ -161,8 +152,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public string Name
         {
-            get => _name;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            get { return _name; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }            
         }
 
         /// <summary>
@@ -170,8 +161,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override int AccessFailedCount
         {
-            get => _accessFailedCount;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, Ps.Value.AccessFailedCountSelector);
+            get { return _accessFailedCount; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, Ps.Value.AccessFailedCountSelector); }
         }
 
         /// <summary>
@@ -179,8 +170,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string PasswordHash
         {
-            get => _passwordHash;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordHash, Ps.Value.PasswordHashSelector);
+            get { return _passwordHash; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _passwordHash, Ps.Value.PasswordHashSelector); }
         }
 
 
@@ -189,11 +180,11 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] StartContentIds
         {
-            get => _startContentIds;
+            get { return _startContentIds; }
             set
             {
                 if (value == null) value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdsSelector, Ps.Value.StartIdsComparer);
+                _tracker.SetPropertyValueAndDetectChanges(value, ref _startContentIds, Ps.Value.StartContentIdsSelector, Ps.Value.StartIdsComparer);
             }
         }
 
@@ -202,17 +193,17 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] StartMediaIds
         {
-            get => _startMediaIds;
+            get { return _startMediaIds; }
             set
             {
                 if (value == null) value = new int[0];
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdsSelector, Ps.Value.StartIdsComparer);
+                _tracker.SetPropertyValueAndDetectChanges(value, ref _startMediaIds, Ps.Value.StartMediaIdsSelector, Ps.Value.StartIdsComparer);
             }
         }
 
         /// <summary>
         /// This is a readonly list of the user's allowed sections which are based on it's user groups
-        /// </summary>
+        /// </summary>        
         public string[] AllowedSections
         {
             get { return _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray()); }
@@ -220,13 +211,13 @@ namespace Umbraco.Core.Models.Identity
 
         public string Culture
         {
-            get => _culture;
-            set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector);
+            get { return _culture; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
         }
 
         public IReadOnlyUserGroup[] Groups
         {
-            get => _groups;
+            get { return _groups; }
             set
             {
                 //so they recalculate
@@ -245,7 +236,7 @@ namespace Umbraco.Core.Models.Identity
                 }
                 _roles.CollectionChanged += _roles_CollectionChanged;
 
-                _beingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, Ps.Value.GroupsSelector, Ps.Value.GroupsComparer);
+                _tracker.SetPropertyValueAndDetectChanges(value, ref _groups, Ps.Value.GroupsSelector, Ps.Value.GroupsComparer);
             }
         }
 
@@ -257,7 +248,7 @@ namespace Umbraco.Core.Models.Identity
             get { return true; }
             set
             {
-                //do nothing
+                //do nothing 
             }
         }
 
@@ -268,7 +259,7 @@ namespace Umbraco.Core.Models.Identity
         {
             get
             {
-                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now;
+                var isLocked = (LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now);
                 return isLocked;
             }
         }
@@ -298,15 +289,15 @@ namespace Umbraco.Core.Models.Identity
                 return _logins;
             }
         }
-
+        
         void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _beingDirty.OnPropertyChanged(Ps.Value.LoginsSelector);
+            _tracker.OnPropertyChanged(Ps.Value.LoginsSelector);
         }
 
         private void _roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            _beingDirty.OnPropertyChanged(Ps.Value.RolesSelector);
+            _tracker.OnPropertyChanged(Ps.Value.RolesSelector);
         }
 
         private readonly ObservableCollection<IdentityUserRole<string>> _roles;
@@ -322,7 +313,7 @@ namespace Umbraco.Core.Models.Identity
         {
             Roles.Add(new IdentityUserRole<string>
             {
-                UserId = Id.ToString(),
+                UserId = this.Id.ToString(),
                 RoleId = role
             });
         }
@@ -330,7 +321,10 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Override Roles because the value of these are the user's group aliases
         /// </summary>
-        public override ICollection<IdentityUserRole<string>> Roles => _roles;
+        public override ICollection<IdentityUserRole<string>> Roles
+        {
+            get { return _roles; }
+        }
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list
@@ -338,84 +332,70 @@ namespace Umbraco.Core.Models.Identity
         /// <param name="callback"></param>
         public void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback)
         {
-            _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
-        }
+            if (callback == null) throw new ArgumentNullException("callback");
+            _getLogins = callback;
+        }        
 
-        #region BeingDirty
+        #region Change tracking
 
-        private readonly BeingDirty _beingDirty = new BeingDirty();
-
-        /// <inheritdoc />
-        public bool IsDirty()
-        {
-            return _beingDirty.IsDirty();
-        }
-
-        /// <inheritdoc />
-        public bool IsPropertyDirty(string propName)
-        {
-            return _beingDirty.IsPropertyDirty(propName);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetDirtyProperties()
-        {
-            return _beingDirty.GetDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public void ResetDirtyProperties()
-        {
-            _beingDirty.ResetDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public bool WasDirty()
-        {
-            return _beingDirty.WasDirty();
-        }
-
-        /// <inheritdoc />
-        public bool WasPropertyDirty(string propertyName)
-        {
-            return _beingDirty.WasPropertyDirty(propertyName);
-        }
-
-        /// <inheritdoc />
-        public void ResetWereDirtyProperties()
-        {
-            _beingDirty.ResetWereDirtyProperties();
-        }
-
-        /// <inheritdoc />
-        public void ResetDirtyProperties(bool rememberDirty)
-        {
-            _beingDirty.ResetDirtyProperties(rememberDirty);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetWereDirtyProperties()
-            => _beingDirty.GetWereDirtyProperties();
-
-        /// <summary>
-        /// Disables change tracking.
-        /// </summary>
         public void DisableChangeTracking()
         {
-            _beingDirty.DisableChangeTracking();
+            _tracker.DisableChangeTracking();
+        }
+
+        public void EnableChangeTracking()
+        {
+            _tracker.EnableChangeTracking();
         }
 
         /// <summary>
-        /// Enables change tracking.
+        /// Since this class only has change tracking turned on for Email/Username this will return true if either of those have changed
         /// </summary>
-        public void EnableChangeTracking()
+        /// <returns></returns>
+        public bool IsDirty()
         {
-            _beingDirty.EnableChangeTracking();
+            return _tracker.IsDirty();
         }
 
-        #endregion
+        /// <summary>
+        /// Returns true if the specified property is dirty
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <returns></returns>
+        public bool IsPropertyDirty(string propName)
+        {
+            return _tracker.IsPropertyDirty(propName);
+        }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
+        /// <summary>
+        /// Resets dirty properties
+        /// </summary>
+        void ICanBeDirty.ResetDirtyProperties()
+        {
+            _tracker.ResetDirtyProperties();
+        }
+
+        bool IRememberBeingDirty.WasDirty()
+        {
+            return _tracker.WasDirty();
+        }
+
+        bool IRememberBeingDirty.WasPropertyDirty(string propertyName)
+        {
+            return _tracker.WasPropertyDirty(propertyName);
+        }
+
+        void IRememberBeingDirty.ForgetPreviouslyDirtyProperties()
+        {
+            _tracker.ForgetPreviouslyDirtyProperties();
+        }
+
+        public void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        {
+            _tracker.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+        }
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
         private class PropertySelectors
         {
             public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
@@ -442,6 +422,42 @@ namespace Umbraco.Core.Models.Identity
                 groups => groups.GetHashCode());
 
         }
-        
+
+        private readonly ChangeTracker _tracker = new ChangeTracker();
+        private string _email;
+        private string _userName;
+        private int _id;
+        private bool _hasIdentity = false;
+        private DateTime? _lastLoginDateUtc;
+        private DateTime? _lastPasswordChangeDateUtc;
+        private bool _emailConfirmed;
+        private string _name;
+        private int _accessFailedCount;
+        private string _passwordHash;
+        private string _culture;
+        private ObservableCollection<IIdentityUserLogin> _logins;
+        private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
+        private IReadOnlyUserGroup[] _groups;
+        private string[] _allowedSections;
+        private int[] _startMediaIds;
+        private int[] _startContentIds;
+
+        /// <summary>
+        /// internal class used to track changes for properties that have it enabled
+        /// </summary>        
+        private class ChangeTracker : TracksChangesEntityBase
+        {
+            /// <summary>
+            /// Make this public so that it's usable
+            /// </summary>
+            /// <param name="propertyInfo"></param>
+            public new void OnPropertyChanged(PropertyInfo propertyInfo)
+            {
+                base.OnPropertyChanged(propertyInfo);
+            }
+        } 
+        #endregion
+
+
     }
 }

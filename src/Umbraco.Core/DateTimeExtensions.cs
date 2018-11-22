@@ -44,7 +44,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Calculates the number of minutes from a date time, on a rolling daily basis (so if
+        /// Calculates the number of minutes from a date time, on a rolling daily basis (so if 
         /// date time is before the time, calculate onto next day)
         /// </summary>
         /// <param name="fromDateTime">Date to start from</param>

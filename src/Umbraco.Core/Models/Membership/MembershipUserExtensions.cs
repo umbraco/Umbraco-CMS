@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.Security;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
@@ -39,7 +38,7 @@ namespace Umbraco.Core.Models.Membership
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
                            ? MembershipScenario.CustomProviderWithUmbracoLink
                            : MembershipScenario.StandaloneCustomProvider;

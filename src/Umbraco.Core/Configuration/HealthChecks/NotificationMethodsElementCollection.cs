@@ -17,7 +17,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         {
             return ((NotificationMethodElement)(element)).Alias;
         }
-
+        
         IEnumerator<KeyValuePair<string, INotificationMethod>> IEnumerable<KeyValuePair<string, INotificationMethod>>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)

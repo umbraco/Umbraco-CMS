@@ -5,12 +5,12 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>
+    internal class PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination> : ValueResolver<TSource, IEnumerable<PropertyGroupDisplay<TPropertyTypeDestination>>>
         where TSource : ContentTypeSave<TPropertyTypeSource>
-        where TPropertyTypeDestination : PropertyTypeDisplay
+        where TPropertyTypeDestination : PropertyTypeDisplay 
         where TPropertyTypeSource : PropertyTypeBasic
     {
-        public IEnumerable<PropertyGroupDisplay<TPropertyTypeDestination>> Resolve(TSource source)
+        protected override IEnumerable<PropertyGroupDisplay<TPropertyTypeDestination>> ResolveCore(TSource source)
         {
             return source.Groups.Select(Mapper.Map<PropertyGroupDisplay<TPropertyTypeDestination>>);
         }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models
@@ -13,14 +12,14 @@ namespace Umbraco.Web.Models
     {
         public LocalPackageInstallModel()
         {
-            UploadedFiles = new List<ContentPropertyFile>();
+            UploadedFiles = new List<ContentItemFile>();
             Notifications = new List<Notification>();
         }
-
-        public List<ContentPropertyFile> UploadedFiles { get; }
-
+        
+        public List<ContentItemFile> UploadedFiles { get; private set; }
+        
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; }
+        public List<Notification> Notifications { get; private set; }
 
         /// <summary>
         /// A flag to determine if this package is compatible to be installed
@@ -54,6 +53,9 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "containsMacroConflict")]
         public bool ContainsMacroConflict { get; set; }
+
+        [DataMember(Name = "containsLegacyPropertyEditors")]
+        public bool ContainsLegacyPropertyEditors { get; set; }
 
         [DataMember(Name = "containsBinaryFileErrors")]
         public bool ContainsBinaryFileErrors { get; set; }

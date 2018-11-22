@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Http.Filters;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -17,6 +17,6 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        ActionResult Index(ContentModel model);
+        ActionResult Index(RenderModel model);
     }
 }

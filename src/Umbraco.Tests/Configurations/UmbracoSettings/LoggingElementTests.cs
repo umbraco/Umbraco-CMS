@@ -7,11 +7,21 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class LoggingElementTests : UmbracoSettingsTests
     {
         [Test]
+        public virtual void ExternalLoggerConfigured()
+        {
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == true);
+        }
+
+        [Test]
         public void EnableLogging()
         {
             Assert.IsTrue(SettingsSection.Logging.EnableLogging == true);
         }
-
+        [Test]
+        public void EnableAsyncLogging()
+        {
+            Assert.IsTrue(SettingsSection.Logging.EnableAsyncLogging == true);
+        }
         [Test]
         public virtual void DisabledLogTypes()
         {
@@ -19,7 +29,21 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(0).LogTypeAlias == "[alias-of-log-type-in-lowercase]");
             Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(1).LogTypeAlias == "anotherlogalias");
         }
-
+        [Test]
+        public virtual void ExternalLogger_Assembly()
+        {
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerAssembly == "~/bin/assemblyFileName.dll");
+        }
+        [Test]
+        public virtual void ExternalLogger_Type()
+        {
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerType == "fully.qualified.namespace.and.type");
+        }
+        [Test]
+        public virtual void ExternalLogger_LogAuditTrail()
+        {
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerEnableAuditTrail == false);
+        }
         [Test]
         public void AutoCleanLogs()
         {

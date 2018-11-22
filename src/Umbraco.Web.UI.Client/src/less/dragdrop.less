@@ -1,0 +1,37 @@
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+li.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.umb-sort li{
+	  display: block;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid @gray-7;
+    background: @gray-10;
+}
+
+.umb-sort .placeholder {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.umb-sort .placeholder:before {
+  position: absolute;
+	content: "";
+	width: 0;
+	height: 0;
+	margin-top: -5px;
+	left: -5px;
+	top: -4px;
+	border: 5px solid transparent;
+	border-left-color: @red;
+	border-right: none;
+}

@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -16,62 +16,56 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public sealed class AdminTokenAuthorizeAttribute : AuthorizeAttribute
     {
-        // see note in HttpInstallAuthorizeAttribute
-        private readonly IUserService _userService;
-        private readonly IRuntimeState _runtimeState;
-        private readonly ILogger _logger;
-
-        private IUserService UserService => _userService ?? Current.Services.UserService;
-
-        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
-
-        private ILogger Logger => _logger ?? Current.Logger;
+        private readonly ApplicationContext _applicationContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="runtimeState"></param>
-        public AdminTokenAuthorizeAttribute(IUserService userService, IRuntimeState runtimeState)
+        /// <param name="appContext"></param>
+        public AdminTokenAuthorizeAttribute(ApplicationContext appContext)
         {
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            _userService = userService;
-            _runtimeState = runtimeState;
+            if (appContext == null) throw new ArgumentNullException("appContext");
+            _applicationContext = appContext;
         }
 
         public AdminTokenAuthorizeAttribute()
-        { }
+        {
+        }
+
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
 
         public const string AuthorizationType = "AToken";
 
         /// <summary>
         /// Used to return the full value that needs to go in the Authorization header
         /// </summary>
-        /// <param name="userService"></param>
+        /// <param name="appContext"></param>
         /// <returns></returns>
-        public static string GetAuthHeaderTokenVal(IUserService userService)
+        public static string GetAuthHeaderTokenVal(ApplicationContext appContext)
         {
-            return $"{AuthorizationType} {GetAuthHeaderVal(userService)}";
+            return string.Format("{0} {1}", AuthorizationType, GetAuthHeaderVal(appContext));
         }
 
-        public static AuthenticationHeaderValue GetAuthenticationHeaderValue(IUserService userService)
+        public static AuthenticationHeaderValue GetAuthenticationHeaderValue(ApplicationContext appContext)
         {
-            return new AuthenticationHeaderValue(AuthorizationType, GetAuthHeaderVal(userService));
+            return new AuthenticationHeaderValue(AuthorizationType, GetAuthHeaderVal(appContext));
         }
 
-        private static string GetAuthHeaderVal(IUserService userService)
+        private static string GetAuthHeaderVal(ApplicationContext appContext)
         {
-            var admin = userService.GetUserById(Core.Constants.Security.SuperUserId);
+            var admin = appContext.Services.UserService.GetUserById(0);
 
-            var token = $"{admin.Email}u____u{admin.Username}u____u{admin.RawPasswordValue}";
+            var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
             var encrypted = token.EncryptWithMachineKey();
             var bytes = Encoding.UTF8.GetBytes(encrypted);
             var base64 = Convert.ToBase64String(bytes);
-            return $"val=\"{base64}\"";
+            return string.Format("val=\"{0}\"", base64);
         }
-
+        
         /// <summary>
         /// Ensures that the user must be in the Administrator or the Install role
         /// </summary>
@@ -79,12 +73,14 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
 
-            // we need to that the app is configured and that a user is logged in
-            if (RuntimeState.Level != RuntimeLevel.Run) return false;
+            var appContext = GetApplicationContext();
 
-            // need the auth header
+            //we need to that the app is configured and that a user is logged in
+            if (appContext.IsConfigured == false) return false;
+
+            //need the auth header
             if (httpContext.Request.Headers["Authorization"] == null || httpContext.Request.Headers["Authorization"].IsNullOrWhiteSpace()) return false;
 
             var header = httpContext.Request.Headers["Authorization"];
@@ -94,7 +90,7 @@ namespace Umbraco.Web.Mvc
             if (keyVal.Count != 1) return false;
             if (keyVal[0].Groups.Count != 2) return false;
 
-            var admin = UserService.GetUserById(Core.Constants.Security.SuperUserId);
+            var admin = appContext.Services.UserService.GetUserById(0);
             if (admin == null) return false;
 
             try
@@ -119,7 +115,7 @@ namespace Umbraco.Web.Mvc
             }
             catch (Exception ex)
             {
-                Logger.Error<AdminTokenAuthorizeAttribute>(ex, "Failed to format passed in token value");
+                LogHelper.Error<AdminTokenAuthorizeAttribute>("Failed to format passed in token value", ex);
                 return false;
             }
         }

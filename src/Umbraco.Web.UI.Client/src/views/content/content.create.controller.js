@@ -13,8 +13,6 @@ function contentCreateController($scope,
   $location,
   navigationService,
   blueprintConfig) {
-  
-  var mainCulture = $routeParams.mculture ? $routeParams.mculture : null;
 
   function initialize() {
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
@@ -31,13 +29,9 @@ function contentCreateController($scope,
   }
 
   function createBlank(docType) {
-      $location
-          .path("/content/content/edit/" + $scope.currentNode.id)
-          .search("doctype", docType.alias)
-          .search("create", "true")
-          /* when we create a new node we want to make sure it uses the same 
-          language as what is selected in the tree */
-          .search("cculture", mainCulture);
+    $location
+      .path("/content/content/edit/" + $scope.currentNode.id)
+      .search("doctype=" + docType.alias + "&create=true");
     close();
   }
 
@@ -59,15 +53,9 @@ function contentCreateController($scope,
   function createFromBlueprint(blueprintId) {
     $location
       .path("/content/content/edit/" + $scope.currentNode.id)
-          .search("doctype", $scope.docType.alias)
-          .search("create", "true")
-          .search("blueprintId", blueprintId);
+      .search("doctype=" + $scope.docType.alias + "&create=true&blueprintId=" + blueprintId);
     close();
   }
-
-  $scope.closeDialog = function(showMenu) {
-    navigationService.hideDialog(showMenu);
-  };
 
   $scope.createBlank = createBlank;
   $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;

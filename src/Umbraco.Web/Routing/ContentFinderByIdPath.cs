@@ -1,68 +1,65 @@
-﻿using Umbraco.Core.Logging;
+using System;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
-using System.Globalization;
 
 namespace Umbraco.Web.Routing
 {
-    /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
-    /// </summary>
-    /// <remarks>
-    /// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
-    /// </remarks>
-    public class ContentFinderByIdPath : IContentFinder
+	/// <summary>
+	/// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
+	/// </summary>
+	/// <remarks>
+	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
+	/// </remarks>
+	public class ContentFinderByIdPath : IContentFinder
     {
-        private readonly ILogger _logger;
-        private readonly IWebRoutingSection _webRoutingSection;
-        
-        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger)
-        {
-            _webRoutingSection = webRoutingSection ?? throw new System.ArgumentNullException(nameof(webRoutingSection));
-            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
-        }
+	    private readonly IWebRoutingSection _webRoutingSection;
 
-        /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
-        /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
-        /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedRequest frequest)
+	    public ContentFinderByIdPath()
+            : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
+	    {
+	        
+	    }
+
+	    public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
+	    {
+	        _webRoutingSection = webRoutingSection;
+	    }
+
+	    /// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		public bool TryFindContent(PublishedContentRequest docRequest)
         {
 
-            if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
+            if (docRequest.RoutingContext.UmbracoContext != null && docRequest.RoutingContext.UmbracoContext.InPreviewMode == false
                 && _webRoutingSection.DisableFindContentByIdPath)
                 return false;
 
             IPublishedContent node = null;
-            var path = frequest.Uri.GetAbsolutePathDecoded();
+			var path = docRequest.Uri.GetAbsolutePathDecoded();
 
             var nodeId = -1;
-            if (path != "/") // no id if "/"
+			if (path != "/") // no id if "/"
             {
-                var noSlashPath = path.Substring(1);
+				var noSlashPath = path.Substring(1);
 
-                if (int.TryParse(noSlashPath, out nodeId) == false)
+                if (!Int32.TryParse(noSlashPath, out nodeId))
                     nodeId = -1;
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
-                    node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
+					LogHelper.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
+                    node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
-                        //if we have a node, check if we have a culture in the query string
-                        if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("culture"))
-                        {
-                            //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(frequest.UmbracoContext.HttpContext.Request.QueryString["culture"]);
-                        }
-
-                        frequest.PublishedContent = node;
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+						docRequest.PublishedContent = node;
+						LogHelper.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContent.Id);
                     }
                     else
                     {
@@ -72,7 +69,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-                _logger.Debug<ContentFinderByIdPath>("Not a node id");
+				LogHelper.Debug<ContentFinderByIdPath>("Not a node id");
 
             return node != null;
         }

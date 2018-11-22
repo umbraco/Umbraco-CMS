@@ -3,31 +3,30 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-    public class ScopeFileSystemsTests : TestWithDatabaseBase
+    [DatabaseTestBehavior(DatabaseBehavior.EmptyDbFilePerTest)]
+    public class ScopeFileSystemsTests : BaseDatabaseFactoryTest
     {
-        public override void SetUp()
+        [SetUp]
+        public override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
 
             SafeCallContext.Clear();
             ClearFiles();
         }
 
+        [TearDown]
         public override void TearDown()
         {
             base.TearDown();
             SafeCallContext.Clear();
-            ShadowFileSystems.ResetId();
             ClearFiles();
         }
 
@@ -43,11 +42,11 @@ namespace Umbraco.Tests.Scoping
         public void CreateMediaTest(bool complete)
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.FileSystems.MediaFileSystem;
+            var mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
-            var scopeProvider = ScopeProvider;
+            var scopeProvider = ApplicationContext.ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -62,12 +61,12 @@ namespace Umbraco.Tests.Scoping
 
             if (complete)
             {
-                Assert.IsTrue(Current.FileSystems.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(FileSystemProviderManager.Current.MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
             }
             else
             {
-                Assert.IsFalse(Current.FileSystems.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsFalse(FileSystemProviderManager.Current.MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
         }
@@ -76,9 +75,9 @@ namespace Umbraco.Tests.Scoping
         public void MultiThread()
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.FileSystems.MediaFileSystem;
+            var mediaFileSystem = FileSystemProviderManager.Current.MediaFileSystem;
 
-            var scopeProvider = ScopeProvider;
+            var scopeProvider = ApplicationContext.ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -104,7 +103,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SingleShadow()
         {
-            var scopeProvider = ScopeProvider;
+            var scopeProvider = ApplicationContext.ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (new SafeCallContext()) // not nesting!
@@ -128,7 +127,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SingleShadowEvenDetached()
         {
-            var scopeProvider = ScopeProvider;
+            var scopeProvider = ApplicationContext.ScopeProvider as IScopeProviderInternal;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (new SafeCallContext()) // not nesting!

@@ -39,9 +39,9 @@ namespace Umbraco.Web.WebApi
 
             var effectiveEncoding = SelectCharacterEncoding(content == null ? null : content.Headers);
 
-            using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding,
+            using (var streamWriter = new StreamWriter(writeStream, effectiveEncoding, 
                 //we are only writing a few chars so we don't need to allocate a large buffer
-                128,
+                128, 
                 //this is important! We don't want to close the stream, the base class is in charge of stream management, we just want to write to it.
                 leaveOpen:true))
             {

@@ -215,7 +215,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }, { responseType: 'text' }),
+                    }),
                 promise);
         },
 
@@ -237,7 +237,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }, { responseType: 'text' }),
+                    }),
                 promise);
         },
 

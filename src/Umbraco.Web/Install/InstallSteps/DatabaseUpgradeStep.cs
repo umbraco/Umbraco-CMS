@@ -1,9 +1,10 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -12,35 +13,31 @@ namespace Umbraco.Web.Install.InstallSteps
         "DatabaseUpgrade", 12, "")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
-        private readonly DatabaseBuilder _databaseBuilder;
-        private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
-
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
+        private readonly ApplicationContext _applicationContext;
+        
+        public DatabaseUpgradeStep(ApplicationContext applicationContext)
         {
-            _databaseBuilder = databaseBuilder;
-            _runtime = runtime;
-            _logger = logger;
+            _applicationContext = applicationContext;
         }
 
         public override InstallSetupResult Execute(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();            
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)
             {
-                _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
+                LogHelper.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _databaseBuilder.UpgradeSchemaAndData();
+                var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData(_applicationContext.Services.MigrationEntryService);
 
                 if (result.Success == false)
                 {
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
 
-                DatabaseInstallStep.HandleConnectionStrings(_logger);
+                DatabaseInstallStep.HandleConnectionStrings();
             }
 
             return null;
@@ -49,8 +46,10 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(object model)
         {
             //if it's properly configured (i.e. the versions match) then no upgrade necessary
-            if (_runtime.Level == RuntimeLevel.Run)
+            if (_applicationContext.IsConfigured)
+            {
                 return false;
+            }
 
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the previous one completed - because it has stored some information we need
@@ -58,13 +57,13 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 return false;
             }
-
+            
             var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
-            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
+            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
             {
                 //Since a connection string was present we verify whether this is an upgrade or an empty db
-                var result = _databaseBuilder.ValidateDatabaseSchema();
+                var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
 
                 var determinedVersion = result.DetermineInstalledVersion();
                 if (determinedVersion.Equals(new Version(0, 0, 0)))

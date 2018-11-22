@@ -7,7 +7,7 @@
  * A utility class used to streamline how forms are developed, to ensure that validation is check and displayed consistently and to ensure that the correct events
  * fire when they need to.
  */
-function formHelper(angularHelper, serverValidationManager, notificationsService, overlayService) {
+function formHelper(angularHelper, serverValidationManager, $timeout, notificationsService, dialogService, localizationService) {
     return {
 
         /**
@@ -40,12 +40,20 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             else {
                 currentForm = args.formCtrl;
             }
+            //if no statusPropertyName is set we'll default to formStatus.
+            if (!args.statusPropertyName) {
+                args.statusPropertyName = "formStatus";
+            }
+            //if no statusTimeout is set, we'll  default to 2500 ms
+            if (!args.statusTimeout) {
+                args.statusTimeout = 2500;
+            }
             
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
-            if (!args.skipValidation) {
+            if (!args.skipValidation) {                
                 if (currentForm.$invalid) {
                     return false;
                 }
@@ -54,6 +62,16 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //reset the server validations
             serverValidationManager.reset();
             
+            //check if a form status should be set on the scope
+            if (args.statusMessage) {
+                args.scope[args.statusPropertyName] = args.statusMessage;
+
+                //clear the message after the timeout
+                $timeout(function () {
+                    args.scope[args.statusPropertyName] = undefined;
+                }, args.statusTimeout);
+            }
+
             return true;
         },
         
@@ -64,7 +82,8 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @function
          *
          * @description
-         * Called by controllers when a form has been successfully submitted, this ensures the correct events are raised.
+         * Called by controllers when a form has been successfully submitted. the correct events execute 
+         * and that the notifications are displayed if there are any.
          * 
          * @param {object} args An object containing arguments for form submission
          */
@@ -76,6 +95,15 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 throw "args.scope cannot be null";
             }
             
+            //if no statusPropertyName is set we'll default to formStatus.
+            if (!args.statusPropertyName) {
+                args.statusPropertyName = "formStatus";
+            }
+            //clear the status
+            args.scope[args.statusPropertyName] = null;
+
+            this.showNotifications(args);            
+
             args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },
 
@@ -116,10 +144,10 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     this.handleServerValidation(err.data.ModelState);
 
                     //execute all server validation events and subscribers
-                    serverValidationManager.notifyAndClearAllSubscriptions();                    
+                    serverValidationManager.executeAndClearAllSubscriptions();                    
                 }
                 else {
-                    overlayService.ysod(err);
+                    dialogService.ysodDialog(err);
                 }
             }
             
@@ -145,15 +173,15 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 // that each property is a User Developer property editor.
                 // The way that Content Type Editor ModelState is created is simply based on the ASP.Net validation data-annotations 
                 // system. 
-                // So, to do this there's some special ModelState syntax we need to know about.
-                // For Content Properties, which are user defined, we know that they will exist with a prefixed
-                // ModelState of "_Properties.", so if we detect this, then we know it's for a content Property.
+                // So, to do this (since we need to support backwards compat), we need to hack a little bit. For Content Properties,
+                // which are user defined, we know that they will exist with a prefixed ModelState of "_Properties.", so if we detect
+                // this, then we know it's a Property.
 
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
                 // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 3 parts for content properties since all model errors for properties are prefixed with "_Properties"
-                //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
+                //There will always be at least 2 parts for properties since all model errors for properties are prefixed with "Properties"
+                //If it is not prefixed with "Properties" that means the error is for a field of the object directly.
 
                 var parts = e.split(".");
 
@@ -163,23 +191,14 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
 
                     var propertyAlias = parts[1];
 
-                    var culture = null;
+                    //if it contains 2 '.' then we will wire it up to a property's field
                     if (parts.length > 2) {
-                        culture = parts[2];
-                        //special check in case the string is formatted this way
-                        if (culture === "null") {
-                            culture = null;
-                        }
-                    }
-
-                    //if it contains 3 '.' then we will wire it up to a property's html field
-                    if (parts.length > 3) {
                         //add an error with a reference to the field for which the validation belongs too
-                        serverValidationManager.addPropertyError(propertyAlias, culture, parts[3], modelState[e][0]);
+                        serverValidationManager.addPropertyError(propertyAlias, parts[2], modelState[e][0]);
                     }
                     else {
-                        //add a generic error for the property, no reference to a specific html field
-                        serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
+                        //add a generic error for the property, no reference to a specific field
+                        serverValidationManager.addPropertyError(propertyAlias, "", modelState[e][0]);
                     }
 
                 }
@@ -189,6 +208,9 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                     // Groups[0].Properties[2].Alias
                     serverValidationManager.addFieldError(e, modelState[e][0]);
                 }
+
+                //add to notifications
+                notificationsService.error("Validation", modelState[e][0]);
 
             }
         }

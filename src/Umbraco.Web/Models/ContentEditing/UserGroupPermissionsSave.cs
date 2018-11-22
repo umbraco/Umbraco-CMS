@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// A dictionary of permissions to assign, the key is the user group id
         /// </summary>
         [DataMember(Name = "permissions")]
-        public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }
+        public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }        
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

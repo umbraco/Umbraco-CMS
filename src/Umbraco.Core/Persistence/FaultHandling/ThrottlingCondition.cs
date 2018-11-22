@@ -50,8 +50,8 @@ namespace Umbraco.Core.Persistence.FaultHandling
         None = 0,
 
         /// <summary>
-        /// Corresponds to a Soft throttling type. Soft throttling is applied when machine resources such as, CPU, IO, storage, and worker threads exceed
-        /// predefined safety thresholds despite the load balancer’s best efforts.
+        /// Corresponds to a Soft throttling type. Soft throttling is applied when machine resources such as, CPU, IO, storage, and worker threads exceed 
+        /// predefined safety thresholds despite the load balancer’s best efforts. 
         /// </summary>
         Soft = 1,
 
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnDataSpace
         {
-            get { return throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalDatabaseSpace); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.PhysicalDatabaseSpace).Count() > 0; }
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnLogSpace
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalLogSpace); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.PhysicalLogSpace).Count() > 0; }
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnLogWrite
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.LogWriteIoDelay); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.LogWriteIoDelay).Count() > 0; }
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnDataRead
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.DataReadIoDelay); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.DataReadIoDelay).Count() > 0; }
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnCpu
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.Cpu); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.Cpu).Count() > 0; }
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnDatabaseSize
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.DatabaseSize); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.DatabaseSize).Count() > 0; }
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
         /// </summary>
         public bool IsThrottledOnWorkerThreads
         {
-            get { return this.throttledResources.Any(x => x.Item1 == ThrottledResourceType.WorkerThreads); }
+            get { return this.throttledResources.Where(x => x.Item1 == ThrottledResourceType.WorkerThreads).Count() > 0; }
         }
 
         /// <summary>

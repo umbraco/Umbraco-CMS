@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
@@ -10,7 +10,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the content types that compose this content type.
         /// </summary>
-        //fixme: we should be storing key references, not the object else we are caching way too much
         IEnumerable<IContentTypeComposition> ContentTypeComposition { get; set;  }
 
         /// <summary>
@@ -45,13 +44,13 @@ namespace Umbraco.Core.Models
         bool ContentTypeCompositionExists(string alias);
 
         /// <summary>
-        /// Gets a list of ContentType aliases from the current composition
+        /// Gets a list of ContentType aliases from the current composition 
         /// </summary>
         /// <returns>An enumerable list of string aliases</returns>
         IEnumerable<string> CompositionAliases();
 
         /// <summary>
-        /// Gets a list of ContentType Ids from the current composition
+        /// Gets a list of ContentType Ids from the current composition 
         /// </summary>
         /// <returns>An enumerable list of integer ids</returns>
         IEnumerable<int> CompositionIds();

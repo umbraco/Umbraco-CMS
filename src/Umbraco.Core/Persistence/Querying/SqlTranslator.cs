@@ -1,5 +1,4 @@
 ﻿using System;
-using NPoco;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -9,16 +8,21 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     internal class SqlTranslator<T>
     {
-        private readonly Sql<ISqlContext> _sql;
+        private readonly Sql _sql;
 
-        public SqlTranslator(Sql<ISqlContext> sql, IQuery<T> query)
+        public SqlTranslator(Sql sql, IQuery<T> query)
         {
-            _sql = sql ?? throw new ArgumentNullException(nameof(sql));
+            if (sql == null)
+                throw new Exception("Sql cannot be null");
+
+            _sql = sql;
             foreach (var clause in query.GetWhereClauses())
+            {
                 _sql.Where(clause.Item1, clause.Item2);
+            }
         }
 
-        public Sql<ISqlContext> Translate()
+        public Sql Translate()
         {
             return _sql;
         }

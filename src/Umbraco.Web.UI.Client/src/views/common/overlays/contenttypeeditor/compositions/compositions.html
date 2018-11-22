@@ -1,0 +1,58 @@
+<div ng-controller="Umbraco.Overlays.CompositionsOverlay as vm">
+
+    <div class="umb-control-group">
+        <div class="form-search">
+            <i class="icon-search"></i>
+            <input type="text"
+                   style="width: 100%"
+                   ng-model="searchTerm"
+                   class="umb-search-field search-query input-block-level"
+                   localize="placeholder"
+                   placeholder="@placeholders_filter"
+                   umb-auto-focus
+                   no-dirty-check />
+        </div>
+    </div>
+
+    <div class="umb-control-group">
+        <localize key="contentTypeEditor_compositionsDescription"></localize>
+    </div>
+
+    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
+                     position="center">
+        <localize key="contentTypeEditor_noAvailableCompositions"></localize>
+    </umb-empty-state>
+    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
+        <localize key="contentTypeEditor_compositionInUse"></localize>
+    </umb-empty-state>
+    <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
+        <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
+        <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
+        <ul class="umb-checkbox-list">
+            <li class="umb-checkbox-list__item" ng-repeat="contentTypeEntity in model.whereCompositionUsed"><a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)"><i class="{{contentTypeEntity.contentType.icon}}"></i>&nbsp;{{contentTypeEntity.contentType.name}}</a></li>
+        </ul>
+    </div>
+    <ul class="umb-checkbox-list">
+        <li class="umb-checkbox-list__item"
+            ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm"
+            ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
+
+            <div class="umb-checkbox-list__item-checkbox"
+                 ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
+                <input type="checkbox"
+                       id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
+                       checklist-model="model.compositeContentTypes"
+                       checklist-value="compositeContentType.contentType.alias"
+                       ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
+                       ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
+            </div>
+
+            <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
+                <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
+                {{ compositeContentType.contentType.name }}
+                <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
+            </label>
+
+        </li>
+    </ul>
+</div>

@@ -7,24 +7,19 @@
           val-form-manager>
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
+                menu="vm.page.menu" 
                 name="vm.content.name"
                 name-locked="vm.page.nameLocked"
                 hide-icon="true"
                 hide-description="true"
-                hide-alias="true"
-                on-back="vm.back()"
-                show-back-button="vm.showBackButton">
+                hide-alias="true">
             </umb-editor-header>
             
             <umb-editor-container class="form-horizontal">
-                <umb-box>
-                    <umb-box-content>
-                        <p ng-bind-html="vm.description"></p>
-                        <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
-                            <textarea ng-model="translation.translation"></textarea>
-                        </umb-property>
-                    </umb-box-content>
-                </umb-box>
+                <p  ng-bind-html="vm.description"></p>
+                <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
+                    <textarea ng-model="translation.translation"></textarea>
+                </umb-property>
             </umb-editor-container>
             
             <umb-editor-footer>

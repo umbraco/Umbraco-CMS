@@ -2,10 +2,10 @@
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
-
+    
     public class QueryResultModel
     {
-
+        
         public string QueryExpression { get; set; }
         public IEnumerable<TemplateQueryResult> SampleResults { get; set; }
         public int ResultCount { get; set; }

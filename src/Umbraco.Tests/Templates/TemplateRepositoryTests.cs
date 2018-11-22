@@ -1,43 +1,37 @@
 ﻿using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Tests.Templates
 {
     [TestFixture]
     public class TemplateRepositoryTests
     {
+        private readonly Mock<IScopeUnitOfWork> _unitOfWorkMock = new Mock<IScopeUnitOfWork>();
         private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
+        private TemplateRepository _templateRepository;
         private readonly Mock<IFileSystem> _viewFileSystemMock = new Mock<IFileSystem>();
         private readonly Mock<IFileSystem> _masterpageFileSystemMock = new Mock<IFileSystem>();
-        private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<ITemplatesSection>();
-        private TemplateRepository _templateRepository;
-
-        private readonly TestObjects TestObjects = new TestObjects(null);
+        private readonly Mock<ITemplatesSection> _templateConfigMock = new Mock<Core.Configuration.UmbracoSettings.ITemplatesSection>();
 
         [SetUp]
         public void Setup()
         {
-            var logger = Mock.Of<ILogger>();
-
-            var accessorMock = new Mock<IScopeAccessor>();
-            var scopeMock = new Mock<IScope>();
-            var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
-            scopeMock.Setup(x => x.Database).Returns(database);
-            accessorMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
-
-            _templateRepository = new TemplateRepository(accessorMock.Object, _cacheMock.Object, logger, _templateConfigMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object);
+            var loggerMock = new Mock<ILogger>();
+            var sqlSyntaxMock = new Mock<ISqlSyntaxProvider>();
+            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, sqlSyntaxMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object);
 
         }
 

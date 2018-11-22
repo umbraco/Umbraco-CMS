@@ -10,20 +10,20 @@ namespace Umbraco.Web.Mvc
     public class HtmlTagWrapper : IHtmlTagWrapper, IHtmlString
     {
         public HtmlTagWrapper Parent;
+    	
+		private readonly List<IHtmlTagWrapper> _children;
+    	public IEnumerable<IHtmlTagWrapper> Children
+    	{
+    		get { return _children; }
+    	}
 
-        private readonly List<IHtmlTagWrapper> _children;
-        public IEnumerable<IHtmlTagWrapper> Children
-        {
-            get { return _children; }
-        }
+    	private List<KeyValuePair<string, string>> _attributes;
+    	public IEnumerable<KeyValuePair<string, string>> Attributes
+    	{
+    		get { return _attributes; }
+    	}
 
-        private List<KeyValuePair<string, string>> _attributes;
-        public IEnumerable<KeyValuePair<string, string>> Attributes
-        {
-            get { return _attributes; }
-        }
-
-        public void ReflectAttributesFromAnonymousType(List<KeyValuePair<string, string>> newAttributes)
+    	public void ReflectAttributesFromAnonymousType(List<KeyValuePair<string, string>> newAttributes)
         {
             List<KeyValuePair<string, string>> mergedAttributes =
              newAttributes
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Mvc
              .Select(g => new KeyValuePair<string, string>(g.Key, string.Join(" ", g.ToArray())))
              .ToList();
 
-            _attributes = mergedAttributes;
+			_attributes = mergedAttributes;
         }
         public void ReflectAttributesFromAnonymousType(object anonymousAttributes)
         {
@@ -59,9 +59,9 @@ namespace Umbraco.Web.Mvc
         public HtmlTagWrapper(string tag)
         {
             this.Tag = tag;
-            this._children = new List<IHtmlTagWrapper>();
+			this._children = new List<IHtmlTagWrapper>();
             this.CssClasses = new List<string>();
-            this._attributes = new List<KeyValuePair<string, string>>();
+			this._attributes = new List<KeyValuePair<string, string>>();
             this.Visible = true;
         }
         public HtmlString Write()
@@ -150,44 +150,44 @@ namespace Umbraco.Web.Mvc
             if (!string.IsNullOrWhiteSpace(value))
             {
                 var newAttributes = new List<KeyValuePair<string, string>> {new KeyValuePair<string, string>(name, value)};
-                this.ReflectAttributesFromAnonymousType(newAttributes);
+            	this.ReflectAttributesFromAnonymousType(newAttributes);
             }
             else
             {
                 var existingKey = this._attributes.Find(item => item.Key == name);
-                _attributes.Remove(existingKey);
+				_attributes.Remove(existingKey);
             }
             return this;
         }
 
         public HtmlTagWrapper AddChild(IHtmlTagWrapper newChild)
         {
-            _children.Add(newChild);
+			_children.Add(newChild);
             return this;
         }
         public HtmlTagWrapper AddChildren(params IHtmlTagWrapper[] collection)
         {
-            _children.AddRange(collection);
+			_children.AddRange(collection);
             return this;
         }
         public HtmlTagWrapper AddChild(string text)
         {
-            _children.Add(new HtmlTagWrapperTextNode(text));
+			_children.Add(new HtmlTagWrapperTextNode(text));
             return this;
         }
         public HtmlTagWrapper AddChildAt(int index, IHtmlTagWrapper newChild)
         {
-            _children.Insert(index, newChild);
+			_children.Insert(index, newChild);
             return this;
         }
         public HtmlTagWrapper AddChildAt(int index, string text)
         {
-            _children.Insert(index, new HtmlTagWrapperTextNode(text));
+			_children.Insert(index, new HtmlTagWrapperTextNode(text));
             return this;
         }
         public HtmlTagWrapper AddChildrenAt(int index, params IHtmlTagWrapper[] collection)
         {
-            _children.InsertRange(index, collection);
+			_children.InsertRange(index, collection);
             return this;
         }
         public HtmlTagWrapper RemoveChildAt(int index)

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class LoggingElement : UmbracoConfigurationElement, ILoggingSection
     {
-
+        
         [ConfigurationProperty("autoCleanLogs")]
         internal InnerTextConfigurationElement<bool> AutoCleanLogs
         {
@@ -63,6 +63,21 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        string ILoggingSection.ExternalLoggerAssembly
+        {
+            get { return ExternalLogger.Assembly; }
+        }
+
+        string ILoggingSection.ExternalLoggerType
+        {
+            get { return ExternalLogger.Type; }
+        }
+
+        bool ILoggingSection.ExternalLoggerEnableAuditTrail
+        {
+            get { return ExternalLogger.LogAuditTrail; }
+        }
+
         bool ILoggingSection.AutoCleanLogs
         {
             get { return AutoCleanLogs; }
@@ -71,6 +86,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool ILoggingSection.EnableLogging
         {
             get { return EnableLogging; }
+        }
+
+        bool ILoggingSection.EnableAsyncLogging
+        {
+            get { return EnableAsyncLogging; }
         }
 
         int ILoggingSection.CleaningMiliseconds

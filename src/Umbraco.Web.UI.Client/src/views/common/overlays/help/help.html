@@ -1,0 +1,50 @@
+<div ng-controller="Umbraco.Overlays.HelpController">
+
+    <div class="umb-control-group">
+        <h5><localize key="help_helpTopicsFor">Help topics for</localize>: {{sectionName}}</h5>
+        <ul class="unstyled list-icons" ng-show="topics">
+            <li ng-repeat="topic in topics">
+                <i class="icon icon-help-alt"></i>
+
+                <a target="_blank" href="{{topic.link}}?utm_source=core&utm_medium=help&utm_content=topic-link&utm_campaign=our" title="{{topic.title}}">
+                     {{topic.title}}
+                </a>
+                <small class="umb-detail">{{topic.description}}</small>
+            </li>
+        </ul>
+        <ul class="unstyled list-icons">
+            <li>
+                <i class="icon icon-favorite"></i>
+                <a target="_blank" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
+                     <localize key="help_goTo">go to</localize> our.umbraco.com
+                </a>
+                <small class="umb-detail">
+                    <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
+                </small>
+            </li>
+        </ul>
+    </div>
+
+    <div class="umb-control-group">
+        <h5><localize key="help_videoChaptersFor">Video chapters for</localize>: {{sectionName}}</h5>
+        <ul class="thumbnails" ng-show="videos">
+            <li class="span2" ng-repeat="video in videos">
+                <div class="thumbnail" style="margin-right: 20px">
+                    <a target="_blank" href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" title="{{video.title}}">
+                        <img ng-src="{{video.thumbnail}}?width=120" alt="{{video.title}}">
+                    </a>
+                </div>
+            </li>
+        </ul>
+        <ul class="unstyled list-icons">
+            <li>
+                <i class="icon icon-tv-old"></i>
+                <a target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                    <localize key="help_goTo">go to</localize> umbraco.tv
+                </a>
+                <small class="umb-detail"><localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize></small>
+            </li>
+        </ul>
+    </div>
+
+</div>

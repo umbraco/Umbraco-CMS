@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;

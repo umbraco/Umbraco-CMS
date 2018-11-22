@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, appState, navigationService, dataTypeResource, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
+function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
 
     //setup scope vars
     $scope.page = {};
@@ -98,7 +98,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.notifyAndClearAllSubscriptions();
+                serverValidationManager.executeAndClearAllSubscriptions();
 
                 navigationService.syncTree({ tree: "datatypes", path: data.path }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
@@ -139,14 +139,14 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
 
     $scope.save = function() {
 
-        if (formHelper.submitForm({ scope: $scope })) {
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
 
             $scope.page.saveButtonState = "busy";
 
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

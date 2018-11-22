@@ -1,0 +1,65 @@
+<div ng-controller="Umbraco.Overlays.UserGroupPickerController as vm">
+
+    <umb-load-indicator ng-if="vm.loading">
+    </umb-load-indicator>
+
+    <div ng-if="!vm.loading">
+
+        <div class="form-search" style="margin-bottom: 15px;">
+            <i class="icon-search"></i>
+            <input type="text"
+                   ng-model="searchTerm"
+                   class="umb-search-field search-query input-block-level -full-width-input"
+                   localize="placeholder"
+                   placeholder="@placeholders_filter"
+                   umb-auto-focus
+                   no-dirty-check />
+        </div>
+
+        <div class="umb-user-group-picker-list">
+
+            <a href="" class="umb-user-group-picker-list-item" ng-repeat="userGroup in vm.userGroups | filter:searchTerm" ng-click="vm.selectUserGroup(userGroup)">
+
+                <div class="umb-user-group-picker-list-item__icon">
+                    <i ng-if="!userGroup.selected" class="{{userGroup.icon}}"></i>
+                    <umb-checkmark ng-if="userGroup.selected" checked="userGroup.selected" size="xs"></umb-checkmark>
+                </div>
+
+                <div>
+                    <div class="umb-user-group-picker-list-item__name">{{ userGroup.name }}</div>
+
+                    <div class="umb-user-group-picker-list-item__permission" ng-if="userGroup.sections">
+                        <span>
+                            <span class="bold"><localize key="main_sections">Sections</localize>:</span>
+                            <span ng-repeat="section in userGroup.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
+                        </span>
+                    </div>
+
+                    <div class="umb-user-group-picker-list-item__permission">
+                        <span>
+                            <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
+                            <span ng-if="!userGroup.contentStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                            <span ng-if="userGroup.contentStartNode">{{ userGroup.contentStartNode.name }}</span>
+                        </span>
+                    </div>
+
+                    <div class="umb-user-group-picker-list-item__permission">
+                        <span>
+                            <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
+                            <span ng-if="!userGroup.mediaStartNode"><localize key="user_noStartNode">No start node selected</localize></span>
+                            <span ng-if="userGroup.mediaStartNode">{{ userGroup.mediaStartNode.name }}</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <umb-empty-state ng-if="vm.userGroups.length === 0"
+                         position="center">
+            No user groups have been added
+        </umb-empty-state>
+
+    </div>
+
+</div>

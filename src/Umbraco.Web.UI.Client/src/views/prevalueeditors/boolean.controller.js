@@ -4,7 +4,7 @@
         function updateToggleValue() {
             $scope.toggleValue = false;
 
-            if ($scope.model && Object.toBoolean($scope.model.value)) {
+            if ($scope.model && $scope.model.value && ($scope.model.value.toString() === "1" || angular.lowercase($scope.model.value) === "true")) {
                 $scope.toggleValue = true;
             }
         }
@@ -16,7 +16,7 @@
         updateToggleValue();
 
         $scope.toggle = function(){
-            if (Object.toBoolean($scope.model.value)) {
+            if($scope.model.value === 1 || $scope.model.value === "1"){
                 $scope.model.value = "0";
                 updateToggleValue();
 

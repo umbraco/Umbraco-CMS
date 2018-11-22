@@ -1,133 +1,47 @@
-﻿using System;
+using System;
+using System.Linq;
 
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// Implements <see cref="ILogger"/> on top of <see cref="System.Diagnostics"/>.
+    /// Implements <see cref="ILogger"/> on top of System.Diagnostics.Debug.
     /// </summary>
+    /// <remarks>Useful for tests.</remarks>
     public class DebugDiagnosticsLogger : ILogger
     {
-        public bool IsEnabled(Type reporting, LogLevel level)
-            => true;
-
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string message)
+        public void Error(Type callingType, string message, Exception exception)
         {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, callingType.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception)
+        public void Warn(Type callingType, string message, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(string.Format(message, formatItems.Select(x => x()).ToArray()), callingType.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, string message)
+        public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(string.Format(message + Environment.NewLine + e, formatItems.Select(x => x()).ToArray()), callingType.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void Info(Type callingType, Func<string> generateMessage)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(generateMessage(), callingType.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
+            System.Diagnostics.Debug.WriteLine(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()), type.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception, string message)
+        public void Debug(Type callingType, Func<string> generateMessage)
         {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(generateMessage(), callingType.ToString());
         }
 
-        /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception)
+        public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Error(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message);
-        }
-
-        /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string message, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(message, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string message, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(message + Environment.NewLine + exception, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Info(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()), type.ToString());
         }
     }
 }

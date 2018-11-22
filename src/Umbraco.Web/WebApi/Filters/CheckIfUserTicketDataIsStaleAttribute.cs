@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,8 +6,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -37,7 +35,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             //we need new tokens and append the custom header if changes have been made
             if (actionExecutedContext.ActionContext.Request.Properties.ContainsKey(typeof(CheckIfUserTicketDataIsStaleAttribute).Name))
-            {
+            {                
                 var tokenFilter = new SetAngularAntiForgeryTokensAttribute();
                 tokenFilter.OnActionExecuted(actionExecutedContext);
 
@@ -67,35 +65,35 @@ namespace Umbraco.Web.WebApi.Filters
             var userId = identity.Id.TryConvertTo<int>();
             if (userId == false) return;
 
-            var user = Current.Services.UserService.GetUserById(userId.Result);
+            var user = ApplicationContext.Current.Services.UserService.GetUserById(userId.Result);
             if (user == null) return;
-
+            
             //a list of checks to execute, if any of them pass then we resync
             var checks = new Func<bool>[]
             {
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, UmbracoConfig.For.GlobalSettings());
+                    var culture = UserExtensions.GetUserCulture(user, ApplicationContext.Current.Services.TextService);
                     return culture != null && culture.ToString() != identity.Culture;
-                },
+                }, 
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
                 () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
                 () =>
                 {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
+                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
                     return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
                 },
                 () =>
                 {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
+                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, ApplicationContext.Current.Services.EntityService);
                     return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
                 }
             };
 
             if (checks.Any(check => check()))
             {
-                await ReSync(user, actionContext);
+                await ReSync(user, actionContext);              
             }
         }
 
@@ -119,7 +117,7 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.SetPrincipalForRequest(owinCtx.Result.Request.User);
 
                 //flag that we've made changes
-                actionContext.Request.Properties[typeof(CheckIfUserTicketDataIsStaleAttribute).Name] = true;
+                actionContext.Request.Properties[typeof(CheckIfUserTicketDataIsStaleAttribute).Name] = true;                
             }
         }
     }

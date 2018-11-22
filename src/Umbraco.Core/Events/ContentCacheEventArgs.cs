@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Events
+namespace Umbraco.Core.Events
 {
-    public class ContentCacheEventArgs : System.ComponentModel.CancelEventArgs { }
+	public class ContentCacheEventArgs : System.ComponentModel.CancelEventArgs { }
 }

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
     [DebuggerDisplay("Tree - {Title} ({ApplicationAlias})")]
     public class ApplicationTree
     {
-        private static readonly ConcurrentDictionary<string, Type> ResolvedTypes = new ConcurrentDictionary<string, Type>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
         /// </summary>
         public ApplicationTree() { }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
@@ -28,15 +26,14 @@ namespace Umbraco.Core.Models
         /// <param name="type">The tree type.</param>
         public ApplicationTree(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
         {
-            Initialize = initialize;
-            SortOrder = sortOrder;
-            ApplicationAlias = applicationAlias;
-            Alias = alias;
-            Title = title;
-            IconClosed = iconClosed;
-            IconOpened = iconOpened;
-            Type = type;
-            
+            this.Initialize = initialize;
+            this.SortOrder = sortOrder;
+            this.ApplicationAlias = applicationAlias;
+            this.Alias = alias;
+            this.Title = title;
+            this.IconClosed = iconClosed;
+            this.IconOpened = iconOpened;
+            this.Type = type;
         }
 
         /// <summary>
@@ -55,13 +52,13 @@ namespace Umbraco.Core.Models
         /// Gets the application alias.
         /// </summary>
         /// <value>The application alias.</value>
-        public string ApplicationAlias { get; }
+        public string ApplicationAlias { get; private set; }
 
         /// <summary>
         /// Gets the tree alias.
         /// </summary>
         /// <value>The alias.</value>
-        public string Alias { get; }
+        public string Alias { get; private set; }
 
         /// <summary>
         /// Gets or sets the tree title.
@@ -87,42 +84,19 @@ namespace Umbraco.Core.Models
         /// <value>The type.</value>
         public string Type { get; set; }
 
-        /// <summary>
-        /// Returns the localized root node display name
-        /// </summary>
-        /// <param name="textService"></param>
-        /// <returns></returns>
-        public string GetRootNodeDisplayName(ILocalizedTextService textService)
-        {
-            var label = $"[{Alias}]";
-
-            // try to look up a the localized tree header matching the tree alias
-            var localizedLabel = textService.Localize("treeHeaders/" + Alias);
-
-            // if the localizedLabel returns [alias] then return the title attribute from the trees.config file, if it's defined
-            if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (string.IsNullOrEmpty(Title) == false)
-                    label = Title;
-            }
-            else
-            {
-                // the localizedLabel translated into something that's not just [alias], so use the translation
-                label = localizedLabel;
-            }
-
-            return label;
-        }
-
         private Type _runtimeType;
-
+        
         /// <summary>
         /// Returns the CLR type based on it's assembly name stored in the config
         /// </summary>
         /// <returns></returns>
         public Type GetRuntimeType()
         {
-            return _runtimeType ?? (_runtimeType = System.Type.GetType(Type));
+            if (_runtimeType != null)
+                return _runtimeType;
+
+            _runtimeType = TryGetType(Type);
+            return _runtimeType;
         }
 
         /// <summary>
@@ -143,18 +117,21 @@ namespace Umbraco.Core.Models
                     }
 
                     //we need to implement a bit of a hack here due to some trees being renamed and backwards compat
-                    var parts = type.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length != 2)
-                        throw new InvalidOperationException("Could not resolve type");
-                    if (parts[1].Trim() != "Umbraco.Web" || parts[0].StartsWith("Umbraco.Web.Trees") == false || parts[0].EndsWith("Controller"))
-                        throw new InvalidOperationException("Could not resolve type");
+                    var parts = type.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                    {
+                        if (parts[1].Trim() == "umbraco" && parts[0].StartsWith("Umbraco.Web.Trees") && parts[0].EndsWith("Controller") == false)
+                        {
+                            //if it's one of our controllers but it's not suffixed with "Controller" then add it and try again
+                            var tempType = parts[0] + "Controller, umbraco";
 
-                    //if it's one of our controllers but it's not suffixed with "Controller" then add it and try again
-                    var tempType = parts[0] + "Controller, Umbraco.Web";
-
-                    result = System.Type.GetType(tempType);
-                    if (result != null)
-                        return result;
+                            result = System.Type.GetType(tempType);
+                            if (result != null)
+                            {
+                                return result;
+                            }
+                        }
+                    }
 
                     throw new InvalidOperationException("Could not resolve type");
                 });
@@ -162,9 +139,10 @@ namespace Umbraco.Core.Models
             catch (InvalidOperationException)
             {
                 //swallow, this is our own exception, couldn't find the type
-                // fixme bad use of exceptions here!
                 return null;
             }
         }
+
+        private static readonly ConcurrentDictionary<string, Type> ResolvedTypes = new ConcurrentDictionary<string, Type>();
     }
 }

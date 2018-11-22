@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -46,6 +45,7 @@ namespace Umbraco.Web.HealthCheck
         /// </summary>
         [DataMember(Name = "actionParameters")]
         public Dictionary<string, object> ActionParameters { get; set; }
+
 
         /// <summary>
         /// The name of the action - this is used to name the fix button

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -23,14 +23,14 @@ namespace Umbraco.Web.Mvc
             var controllerFactory = factory as MasterControllerFactory;
             if (controllerFactory != null)
             {
-                return controllerFactory.GetControllerTypeInternal(requestContext, controllerName);
+                return controllerFactory.GetControllerTypeInternal(requestContext, controllerName);                
             }
 
             //we have no choice but to instantiate the controller
             var instance = factory.CreateController(requestContext, controllerName);
             if (instance != null)
             {
-                return instance.GetType();
+                return instance.GetType();            
             }
             return null;
         }

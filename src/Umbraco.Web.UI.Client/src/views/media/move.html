@@ -27,11 +27,10 @@
 			    <div ng-hide="miniListView">
 				    <umb-tree
 					    section="media"
-				            hideheader="{{treeModel.hideHeader}}"
+				        hideheader="{{treeModel.hideHeader}}"
 					    hideoptions="true"
 					    isdialog="true"
-					    api="dialogTreeApi"
-                                            on-init="onTreeInit()"
+					    eventhandler="dialogTreeEventHandler"
 					    enablelistviewexpand="true"
 					    enablecheckboxes="true">
 				    </umb-tree>
@@ -50,7 +49,7 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-	    <a class="btn btn-link" ng-click="close()" ng-show="!busy"><localize key="general_cancel">Cancel</localize></a>
+	    <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy"><localize key="general_cancel">Cancel</localize></a>
 	    <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target"><localize key="actions_move">Move</localize></button>
     </div>
 </div>

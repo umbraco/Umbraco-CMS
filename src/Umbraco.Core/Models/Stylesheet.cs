@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.IO;
 using Umbraco.Core.Strings.Css;
 
 namespace Umbraco.Core.Models
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Models
         { }
 
         internal Stylesheet(string path, Func<File, string> getFileContent)
-            : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
+            : base(path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
         }
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Models
 
         private void InitializeProperties()
         {
-            //if the value is already created, we need to be created and update the collection according to
+            //if the value is already created, we need to be created and update the collection according to 
             //what is now in the content
             if (_properties != null && _properties.IsValueCreated)
             {
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Models
                     var prop = new StylesheetProperty(stylesheetRule.Name, stylesheetRule.Selector, stylesheetRule.Styles);
                     prop.PropertyChanged += Property_PropertyChanged;
                     _properties.Value.Add(prop);
-                }
+                }               
             }
 
             //we haven't read the properties yet so create the lazy delegate
@@ -115,8 +116,8 @@ namespace Umbraco.Core.Models
         /// Returns a list of umbraco back office enabled stylesheet properties
         /// </summary>
         /// <remarks>
-        /// An umbraco back office enabled stylesheet property has a special prefix, for example:
-        ///
+        /// An umbraco back office enabled stylesheet property has a special prefix, for example: 
+        /// 
         /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
         [IgnoreDataMember]
@@ -136,7 +137,7 @@ namespace Umbraco.Core.Models
                 throw new DuplicateNameException("The property with the name " + property.Name + " already exists in the collection");
             }
 
-            //now we need to serialize out the new property collection over-top of the string Content.
+            //now we need to serialize out the new property collection over-top of the string Content. 
             Content = StylesheetHelper.AppendRule(Content, new StylesheetRule
             {
                 Name = property.Name,
@@ -159,7 +160,7 @@ namespace Umbraco.Core.Models
                 Content = StylesheetHelper.ReplaceRule(Content, name, null);
             }
         }
-
+  
         /// <summary>
         /// Indicates whether the current entity has an identity, which in this case is a path/name.
         /// </summary>

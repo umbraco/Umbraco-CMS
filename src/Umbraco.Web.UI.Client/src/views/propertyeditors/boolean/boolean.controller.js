@@ -5,11 +5,11 @@ function booleanEditorController($scope) {
             value: false
         };
 
-        if ($scope.model.config && $scope.model.config.default && Object.toBoolean($scope.model.config.default) && $scope.model && !$scope.model.value) {
+        if ($scope.model.config && $scope.model.config.default && $scope.model.config.default.toString() === "1" && $scope.model && !$scope.model.value) {
             $scope.renderModel.value = true;
         }
 
-        if ($scope.model && $scope.model.value && Object.toBoolean($scope.model.value)) {
+        if ($scope.model && $scope.model.value && ($scope.model.value.toString() === "1" || angular.lowercase($scope.model.value) === "true")) {
             $scope.renderModel.value = true;
         }
     }

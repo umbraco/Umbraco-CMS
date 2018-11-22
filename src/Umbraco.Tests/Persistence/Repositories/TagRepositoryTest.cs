@@ -1,38 +1,63 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
+
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class TagRepositoryTest : TestWithDatabaseBase
+    public class TagRepositoryTest : BaseDatabaseFactoryTest
     {
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
+
+        private TagRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        {
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return tagRepository;
+        }
+
         [Test]
         public void Can_Perform_Add_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
+                var tag = new Tag()
+                    {
+                        Group = "Test",
+                        Text = "Test"
+                    };
 
-                var tag = new Tag
-                {
-                    Group = "Test",
-                    Text = "Test"
-                };
+                // Act
+                repository.AddOrUpdate(tag);
+                unitOfWork.Commit();
 
-                repository.Save(tag);
-
+                // Assert
                 Assert.That(tag.HasIdentity, Is.True);
             }
         }
@@ -40,932 +65,987 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
+                var tag = new Tag()
+                    {
+                        Group = "Test",
+                        Text = "Test"
+                    };
 
-                var tag = new Tag
-                {
-                    Group = "Test",
-                    Text = "Test"
-                };
+                // Act
+                repository.AddOrUpdate(tag);
+                unitOfWork.Commit();
 
-                repository.Save(tag);
+                var tag2 = new Tag()
+                    {
+                        Group = "Test",
+                        Text = "Test2"
+                    };
+                repository.AddOrUpdate(tag2);
+                unitOfWork.Commit();
 
-                var tag2 = new Tag
-                {
-                    Group = "Test",
-                    Text = "Test2"
-                };
-
-                repository.Save(tag2);
-
+                // Assert
                 Assert.That(tag.HasIdentity, Is.True);
                 Assert.That(tag2.HasIdentity, Is.True);
                 Assert.AreNotEqual(tag.Id, tag2.Id);
             }
+
         }
 
         [Test]
         public void Can_Create_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
-                // create data to relate to
+                //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                            }, false);
 
-                Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
+                    Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
+                }
             }
         }
 
         [Test]
         public void Can_Append_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                            }, false);
 
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"},
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"},
+                            }, false);
 
-                Assert.AreEqual(4, repository.GetTagsForEntity(content.Id).Count());
+                    Assert.AreEqual(4, repository.GetTagsForEntity(content.Id).Count());
+                }
             }
         }
 
         [Test]
         public void Can_Replace_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                            }, false);
 
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"},
-                    }, true);
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"},
+                            }, true);
 
-                var result = repository.GetTagsForEntity(content.Id).ToArray();
-                Assert.AreEqual(2, result.Length);
-                Assert.AreEqual("tag3", result[0].Text);
-                Assert.AreEqual("tag4", result[1].Text);
+                    var result = repository.GetTagsForEntity(content.Id);
+                    Assert.AreEqual(2, result.Count());
+                    Assert.AreEqual("tag3", result.ElementAt(0).Text);
+                    Assert.AreEqual("tag4", result.ElementAt(1).Text);
+                }
             }
         }
 
         [Test]
         public void Can_Merge_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                            }, false);
 
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                            }, false);
 
-                var result = repository.GetTagsForEntity(content.Id);
-                Assert.AreEqual(3, result.Count());
+                    var result = repository.GetTagsForEntity(content.Id);
+                    Assert.AreEqual(3, result.Count());                    
+                }
             }
         }
 
         [Test]
         public void Can_Clear_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                            }, false);
 
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    Enumerable.Empty<ITag>(), true);
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        Enumerable.Empty<ITag>(), true);                    
 
-                var result = repository.GetTagsForEntity(content.Id);
-                Assert.AreEqual(0, result.Count());
+                    var result = repository.GetTagsForEntity(content.Id);
+                    Assert.AreEqual(0, result.Count());
+                }
             }
         }
 
         [Test]
         public void Can_Remove_Specific_Tags_From_Property()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content);
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                repository.Remove(
-                    content.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    });
+                    repository.RemoveTagsFromProperty(
+                        content.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"}                             
+                            });
 
-                var result = repository.GetTagsForEntity(content.Id).ToArray();
-                Assert.AreEqual(2, result.Length);
-                Assert.AreEqual("tag1", result[0].Text);
-                Assert.AreEqual("tag4", result[1].Text);
+                    var result = repository.GetTagsForEntity(content.Id);
+                    Assert.AreEqual(2, result.Count());
+                    Assert.AreEqual("tag1", result.ElementAt(0).Text);
+                    Assert.AreEqual("tag4", result.ElementAt(1).Text);
+                }
             }
         }
 
         [Test]
         public void Can_Get_Tags_For_Content_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    content2.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
 
-                var result = repository.GetTagsForEntity(content2.Id);
-                Assert.AreEqual(2, result.Count());
+                    var result = repository.GetTagsForEntity(content2.Id);
+                    Assert.AreEqual(2, result.Count());
+
+                }
             }
         }
 
         [Test]
         public void Can_Get_Tags_For_Content_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    content2.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
-
-                //get by key
-                var result = repository.GetTagsForEntity(content2.Key);
-                Assert.AreEqual(2, result.Count());
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
+                    
+                    //get by key
+                    var result = repository.GetTagsForEntity(content2.Key);
+                    Assert.AreEqual(2, result.Count());
+                }
             }
         }
 
         [Test]
         public void Can_Get_All()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                var result = repository.GetMany();
-                Assert.AreEqual(4, result.Count());
+                    var result = repository.GetAll();
+                    Assert.AreEqual(4, result.Count());
+                }
             }
         }
 
         [Test]
         public void Can_Get_All_With_Ids()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                var tags = new[]
+                using (var repository = CreateRepository(unitOfWork))
                 {
-                    new Tag {Text = "tag1", Group = "test"},
-                    new Tag {Text = "tag2", Group = "test"},
-                    new Tag {Text = "tag3", Group = "test"},
-                    new Tag {Text = "tag4", Group = "test"}
-                };
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    tags, false);
+                    var tags = new[]
+                    {
+                        new Tag {Text = "tag1", Group = "test"},
+                        new Tag {Text = "tag2", Group = "test"},
+                        new Tag {Text = "tag3", Group = "test"},
+                        new Tag {Text = "tag4", Group = "test"}
+                    };
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        tags, false);
 
-                //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
-                //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
-                var all = repository.GetMany().ToArray();
+                    //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
+                    //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
+                    var all = repository.GetAll().ToArray();
 
-                var result = repository.GetMany(all[0].Id, all[1].Id, all[2].Id);
-                Assert.AreEqual(3, result.Count());
+                    var result = repository.GetAll(new[] { all[0].Id, all[1].Id, all[2].Id });
+                    Assert.AreEqual(3, result.Count());
+                }
             }
         }
 
         [Test]
         public void Can_Get_Tags_For_Content_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test1"}
+                            }, false);
 
-                repository.Assign(
-                    content2.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
 
-                var result = repository.GetTagsForEntity(content1.Id, "test1");
-                Assert.AreEqual(2, result.Count());
+                    var result = repository.GetTagsForEntity(content1.Id, "test1");
+                    Assert.AreEqual(2, result.Count());
+                }
             }
         }
 
         [Test]
         public void Can_Get_Tags_For_Property_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);                
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
 
-                var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
-                Assert.AreEqual(4, result1.Length);
-                Assert.AreEqual(2, result2.Length);
+                    var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
+                    var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
+                    Assert.AreEqual(4, result1.Count());
+                    Assert.AreEqual(2, result2.Count());
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tags_For_Property_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
 
-                var result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias).ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
-                Assert.AreEqual(4, result1.Length);
-                Assert.AreEqual(2, result2.Length);
+                    var result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias).ToArray();
+                    var result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
+                    Assert.AreEqual(4, result1.Count());
+                    Assert.AreEqual(2, result2.Count());
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tags_For_Property_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test1"}
+                            }, false);
 
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
 
-                var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias, "test1").ToArray();
-                var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1").ToArray();
+                    var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias, "test1").ToArray();
+                    var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1").ToArray();
 
-                Assert.AreEqual(2, result1.Length);
-                Assert.AreEqual(1, result2.Length);
+                    Assert.AreEqual(2, result1.Count());
+                    Assert.AreEqual(1, result2.Count());
+
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tags_For_Entity_Type()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
-
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.Save(mediaType);
-
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.Save(media1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    media1.Id,
-                    mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test1"}
+                            }, false);
 
-                var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
-                var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
-                var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
+                    var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
+                    var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
+                    var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
-                Assert.AreEqual(3, result1.Length);
-                Assert.AreEqual(2, result2.Length);
-                Assert.AreEqual(4, result3.Length);
+                    Assert.AreEqual(3, result1.Count());
+                    Assert.AreEqual(2, result2.Count());
+                    Assert.AreEqual(4, result3.Count());
 
-                Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
-                Assert.AreEqual(2, result3.Single(x => x.Text == "tag1").NodeCount);
-                Assert.AreEqual(1, result3.Single(x => x.Text == "tag4").NodeCount);
+                    Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
+                    Assert.AreEqual(2, result3.Single(x => x.Text == "tag1").NodeCount);
+                    Assert.AreEqual(1, result3.Single(x => x.Text == "tag4").NodeCount);
+
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
-
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.Save(mediaType);
-
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.Save(media1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
+                
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test1"}
+                            }, false);
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"},
-                        new Tag {Text = "tag4", Group = "test1"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
 
-                repository.Assign(
-                    media1.Id,
-                    mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content,  "test1").ToArray();
+                    var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
 
-                var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content,  "test1").ToArray();
-                var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
+                    Assert.AreEqual(2, result1.Count());
+                    Assert.AreEqual(1, result2.Count());
 
-                Assert.AreEqual(2, result1.Length);
-                Assert.AreEqual(1, result2.Length);
+                }
             }
+
         }
 
         [Test]
         public void Cascade_Deletes_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                        {
-                            new Tag {Text = "tag1", Group = "test"},
-                            new Tag {Text = "tag2", Group = "test"},
-                            new Tag {Text = "tag3", Group = "test"},
-                            new Tag {Text = "tag4", Group = "test"}
-                        }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+                    
+                    contentRepository.Delete(content1);
 
-                contentRepository.Delete(content1);
+                    unitOfWork.Commit();
 
-                Assert.AreEqual(0, scope.Database.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                    new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
+                    Assert.AreEqual(0, DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                        new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.Save(mediaType);
-
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.Save(media1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    content2.Id,
-                    contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
 
-                repository.Assign(
-                    media1.Id,
-                    mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
 
-                var contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
-                //there are two content items tagged against the 'test' group
-                Assert.AreEqual(2, contentTestIds.Length);
-                //there are a total of two property types tagged against the 'test' group
-                Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 2 tags tagged against the 'test' group
-                Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+                    var contentTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test").ToArray();
+                    //there are two content items tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.Count());
+                    //there are a total of two property types tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 2 tags tagged against the 'test' group
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var contentTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
-                //there are two content items tagged against the 'test1' group
-                Assert.AreEqual(2, contentTest1Ids.Length);
-                //there are a total of two property types tagged against the 'test1' group
-                Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags tagged against the 'test1' group
-                Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+                    var contentTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, "test1").ToArray();
+                    //there are two content items tagged against the 'test1' group
+                    Assert.AreEqual(2, contentTest1Ids.Count());
+                    //there are a total of two property types tagged against the 'test1' group
+                    Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags tagged against the 'test1' group
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
-                Assert.AreEqual(1, mediaTestIds.Count());
+                    var mediaTestIds = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test");
+                    Assert.AreEqual(1, mediaTestIds.Count());
 
-                var mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
-                Assert.AreEqual(1, mediaTest1Ids.Count());
+                    var mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
+                    Assert.AreEqual(1, mediaTest1Ids.Count());
+                }
             }
+
         }
 
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            using (var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository))
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
-
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content1);
-
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.Save(content2);
-
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.Save(mediaType);
-
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.Save(media1);
+                mediaRepository.AddOrUpdate(media1);
+                unitOfWork.Commit();
 
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                                new Tag {Text = "tag3", Group = "test"}
+                            }, false);
 
-                var repository = CreateRepository(provider);
-                repository.Assign(
-                    content1.Id,
-                    contentType.PropertyTypes.First().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                        new Tag {Text = "tag3", Group = "test"}
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"},
+                            }, false);
 
-                repository.Assign(
-                    content2.Id,
-                    contentType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"},
-                    }, false);
+                    repository.AssignTagsToProperty(
+                        media1.Id,
+                        mediaType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test1"}
+                            }, false);
 
-                repository.Assign(
-                    media1.Id,
-                    mediaType.PropertyTypes.Last().Id,
-                    new[]
-                    {
-                        new Tag {Text = "tag1", Group = "test"},
-                        new Tag {Text = "tag2", Group = "test1"}
-                    }, false);
+                    var contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
+                    //there are two content items tagged against the 'tag1' tag
+                    Assert.AreEqual(2, contentTestIds.Count());
+                    //there are a total of two property types tagged against the 'tag1' tag
+                    Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags since we're only looking against one tag
+                    Assert.AreEqual(1, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var contentTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").ToArray();
-                //there are two content items tagged against the 'tag1' tag
-                Assert.AreEqual(2, contentTestIds.Length);
-                //there are a total of two property types tagged against the 'tag1' tag
-                Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags since we're only looking against one tag
-                Assert.AreEqual(1, contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
+                    var contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
+                    //there are 1 content items tagged against the 'tag3' tag
+                    Assert.AreEqual(1, contentTest1Ids.Count());
+                    //there are a total of two property types tagged against the 'tag3' tag
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
+                    //there are a total of 1 tags since we're only looking against one tag
+                    Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
 
-                var contentTest1Ids = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag3").ToArray();
-                //there are 1 content items tagged against the 'tag3' tag
-                Assert.AreEqual(1, contentTest1Ids.Length);
-                //there are a total of two property types tagged against the 'tag3' tag
-                Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
-                //there are a total of 1 tags since we're only looking against one tag
-                Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct().Count());
-
-                var mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
-                Assert.AreEqual(1, mediaTestIds.Count());
+                    var mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
+                    Assert.AreEqual(1, mediaTestIds.Count());
+                    
+                }
             }
+
         }
 
-        private TagRepository CreateRepository(IScopeProvider provider)
+        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            return new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-        }
-
-        private DocumentRepository CreateContentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
-        {
-            var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
-        private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
+        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
         {
-            var accessor = (IScopeAccessor) provider;
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            mediaTypeRepository = new MediaTypeRepository(accessor, DisabledCache, Logger);
-            var repository = new MediaRepository(accessor, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            var repository = new MediaRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

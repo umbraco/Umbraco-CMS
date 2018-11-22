@@ -1,416 +1,410 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
-    /// Represents a property type.
+    /// Defines the type of a <see cref="Property"/> object
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
-    public class PropertyType : EntityBase, IEquatable<PropertyType>
+    public class PropertyType : Entity, IEquatable<PropertyType>
     {
-        private static PropertySelectors _selectors;
-
-        private readonly bool _forceValueStorageType;
+        private readonly bool _isExplicitDbType;
         private string _name;
         private string _alias;
         private string _description;
-        private int _dataTypeId;
+        private int _dataTypeDefinitionId;
         private Lazy<int> _propertyGroupId;
         private string _propertyEditorAlias;
-        private ValueStorageType _valueStorageType;
+        private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
+        private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
-        private ContentVariation _variations;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyType"/> class.
-        /// </summary>
-        public PropertyType(IDataType dataType)
+        public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
-            if (dataType == null) throw new ArgumentNullException(nameof(dataType));
+            if (dataTypeDefinition == null) throw new ArgumentNullException("dataTypeDefinition");
 
-            if(dataType.HasIdentity)
-                _dataTypeId = dataType.Id;
+            if(dataTypeDefinition.HasIdentity)
+                _dataTypeDefinitionId = dataTypeDefinition.Id;
 
-            _propertyEditorAlias = dataType.EditorAlias;
-            _valueStorageType = dataType.DatabaseType;
-            _variations = ContentVariation.Nothing;
+            _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
+            _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
+        }
+
+        public PropertyType(IDataTypeDefinition dataTypeDefinition, string propertyTypeAlias)
+            : this(dataTypeDefinition)
+        {
+            _alias = GetAlias(propertyTypeAlias);
+        }
+
+        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
+            : this(propertyEditorAlias, dataTypeDatabaseType, false)
+        {
+        }
+
+        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, string propertyTypeAlias)
+            : this(propertyEditorAlias, dataTypeDatabaseType, false, propertyTypeAlias)
+        {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
         /// </summary>
-        public PropertyType(IDataType dataType, string propertyTypeAlias)
-            : this(dataType)
+        /// <param name="propertyEditorAlias"></param>
+        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="isExplicitDbType"></param>
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType)
         {
-            _alias = SanitizeAlias(propertyTypeAlias);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyType"/> class.
-        /// </summary>
-        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
-            : this(propertyEditorAlias, valueStorageType, false)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyType"/> class.
-        /// </summary>
-        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
-            : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyType"/> class.
-        /// </summary>
-        /// <remarks>Set <paramref name="forceValueStorageType"/> to true to force the value storage type. Values assigned to
-        /// the property, eg from the underlying datatype, will be ignored.</remarks>
-        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
-        {
+            _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
-            _valueStorageType = valueStorageType;
-            _forceValueStorageType = forceValueStorageType;
-            _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
-            _variations = ContentVariation.Nothing;
+            _dataTypeDatabaseType = dataTypeDatabaseType;
         }
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+        /// <summary>
+        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
+        /// </summary>
+        /// <param name="propertyEditorAlias"></param>
+        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="isExplicitDbType"></param>
+        /// <param name="propertyTypeAlias"></param>
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType, string propertyTypeAlias)
+        {
+            _isExplicitDbType = isExplicitDbType;
+            _propertyEditorAlias = propertyEditorAlias;
+            _dataTypeDatabaseType = dataTypeDatabaseType;
+            _alias = GetAlias(propertyTypeAlias);
+        }
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private class PropertySelectors
         {
-            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
-            public readonly PropertyInfo Alias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
-            public readonly PropertyInfo Description = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-            public readonly PropertyInfo DataTypeId = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
-            public readonly PropertyInfo PropertyEditorAlias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-            public readonly PropertyInfo ValueStorageType = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
-            public readonly PropertyInfo Mandatory = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
-            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
-            public readonly PropertyInfo ValidationRegExp = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-            public readonly PropertyInfo PropertyGroupId = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
-            public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<PropertyType, ContentVariation>(x => x.Variations);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
+            public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
+            public readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
+            public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
+            public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
+            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+            public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
+            public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+            public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
         }
 
         /// <summary>
-        /// Gets a value indicating whether the content type, owning this property type, is publishing.
-        /// </summary>
-        public bool IsPublishing { get; internal set; }
-
-        /// <summary>
-        /// Gets of sets the name of the property type.
+        /// Gets of Sets the Name of the PropertyType
         /// </summary>
         [DataMember]
         public string Name
         {
-            get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
+            get { return _name; }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
-        /// Gets of sets the alias of the property type.
+        /// Gets of Sets the Alias of the PropertyType
         /// </summary>
         [DataMember]
         public string Alias
         {
-            get => _alias;
-            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, Selectors.Alias);
+            get { return _alias; }
+            set { SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
-        /// Gets of sets the description of the property type.
+        /// Gets of Sets the Description for the PropertyType
         /// </summary>
         [DataMember]
         public string Description
         {
-            get => _description;
-            set => SetPropertyValueAndDetectChanges(value, ref _description, Selectors.Description);
+            get { return _description; }
+            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
         }
 
         /// <summary>
-        /// Gets or sets the identifier of the datatype for this property type.
+        /// Gets of Sets the Id of the DataType (Definition), which the PropertyType is "wrapping"
         /// </summary>
+        /// <remarks>This is actually the Id of the <see cref="IDataTypeDefinition"/></remarks>
         [DataMember]
-        public int DataTypeId
+        public int DataTypeDefinitionId
         {
-            get => _dataTypeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Selectors.DataTypeId);
+            get { return _dataTypeDefinitionId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector); }
         }
 
-        /// <summary>
-        /// Gets or sets the alias of the property editor for this property type.
-        /// </summary>
         [DataMember]
         public string PropertyEditorAlias
         {
-            get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Selectors.PropertyEditorAlias);
+            get { return _propertyEditorAlias; }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector); }
         }
 
         /// <summary>
-        /// Gets or sets the database type for storing value for this property type.
+        /// Gets of Sets the Id of the DataType control
         /// </summary>
-        [DataMember]
-        internal ValueStorageType ValueStorageType
+        /// <remarks>This is the Id of the actual DataType control</remarks>
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead. This method will return a generated GUID for any property editor alias not explicitly mapped to a legacy ID")]
+        public Guid DataTypeId
         {
-            get => _valueStorageType;
+            get
+            {
+                return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(
+                    _propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
+            }
             set
             {
-                if (_forceValueStorageType) return; // ignore changes
-                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Selectors.ValueStorageType);
+                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
+                PropertyEditorAlias = alias;
             }
         }
 
         /// <summary>
-        /// Gets or sets the identifier of the property group this property type belongs to.
+        /// Gets or Sets the DatabaseType for which the DataType's value is saved as
+        /// </summary>
+        [DataMember]
+        internal DataTypeDatabaseType DataTypeDatabaseType
+        {
+            get { return _dataTypeDatabaseType; }
+            set
+            {
+                //don't allow setting this if an explicit declaration has been made in the ctor
+                if (_isExplicitDbType) return;
+
+                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);                
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the identifier of the PropertyGroup this PropertyType belongs to.
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {
-            get => _propertyGroupId;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Selectors.PropertyGroupId);
+            get { return _propertyGroupId; }
+            set { SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector); }
         }
 
         /// <summary>
-        /// Gets of sets a value indicating whether a value for this property type is required.
+        /// Gets of Sets the Boolean indicating whether a value for this PropertyType is required
         /// </summary>
         [DataMember]
         public bool Mandatory
         {
-            get => _mandatory;
-            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Selectors.Mandatory);
+            get { return _mandatory; }
+            set { SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector); }
         }
 
         /// <summary>
-        /// Gets of sets the sort order of the property type.
+        /// Gets of Sets the Help text for the current PropertyType
+        /// </summary>
+        [DataMember]
+        [Obsolete("Not used anywhere, will be removed in future versions")]
+        public string HelpText
+        {
+            get { return _helpText; }
+            set { SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector); }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Sort order of the PropertyType, which is used for sorting within a group
         /// </summary>
         [DataMember]
         public int SortOrder
         {
-            get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
+            get { return _sortOrder; }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
-        /// Gets or sets the regular expression validating the property values.
+        /// Gets or Sets the RegEx for validation of legacy DataTypes
         /// </summary>
         [DataMember]
         public string ValidationRegExp
         {
-            get => _validationRegExp;
-            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Selectors.ValidationRegExp);
+            get { return _validationRegExp; }
+            set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
         }
 
-        /// <summary>
-        /// Gets or sets the content variation of the property type.
-        /// </summary>
-        public ContentVariation Variations
-        {
-            get => _variations;
-            set => SetPropertyValueAndDetectChanges(value, ref _variations, Selectors.VaryBy);
-        }
-
-        /// <summary>
-        /// Determines whether the property type supports a combination of culture and segment.
-        /// </summary>
-        /// <param name="culture">The culture.</param>
-        /// <param name="segment">The segment.</param>
-        /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
-        public bool SupportsVariation(string culture, string segment, bool wildcards = false)
-        {
-            // exact validation: cannot accept a 'null' culture if the property type varies
-            //  by culture, and likewise for segment
-            // wildcard validation: can accept a '*' culture or segment
-            return Variations.ValidateVariation(culture, segment, true, wildcards, false);
-        }
-
-        /// <summary>
-        /// Creates a new property of this property type.
-        /// </summary>
-        public Property CreateProperty()
-        {
-            return new Property(this);
-        }
-
-        /// <summary>
-        /// Determines whether a value is of the expected type for this property type.
-        /// </summary>
-        /// <remarks>
-        /// <para>If the value is of the expected type, it can be directly assigned to the property.
-        /// Otherwise, some conversion is required.</para>
-        /// </remarks>
-        public bool IsOfExpectedPropertyType(object value)
-        {
-            // null values are assumed to be ok
-            if (value == null)
-                return true;
-
-            // check if the type of the value matches the type from the DataType/PropertyEditor
-            // then it can be directly assigned, anything else requires conversion
-            var valueType = value.GetType();
-            switch (ValueStorageType)
-            {
-                case ValueStorageType.Integer:
-                    return valueType == typeof(int);
-                case ValueStorageType.Decimal:
-                    return valueType == typeof(decimal);
-                case ValueStorageType.Date:
-                    return valueType == typeof(DateTime);
-                case ValueStorageType.Nvarchar:
-                    return valueType == typeof(string);
-                case ValueStorageType.Ntext:
-                    return valueType == typeof(string);
-                default:
-                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
-            }
-        }
-
-        /// <summary>
-        /// Determines whether a value can be assigned to a property.
-        /// </summary>
-        public bool IsValueAssignable(object value) => TryConvertAssignedValue(value, false, out _);
-
-        /// <summary>
-        /// Converts a value assigned to a property.
-        /// </summary>
-        /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual Clr type
-        /// expected by the property (eg an integer if the property values are integers).</para>
-        /// <para>Throws if the value cannot be converted.</para>
-        /// </remarks>
-        public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
-
-        /// <summary>
-        /// Tries to convert a value assigned to a property.
-        /// </summary>
-        /// <remarks>
-        /// <para></para>
-        /// </remarks>
-        public bool TryConvertAssignedValue(object value, out object converted) => TryConvertAssignedValue(value, false, out converted);
-
-        private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
-        {
-            var isOfExpectedType = IsOfExpectedPropertyType(value);
-            if (isOfExpectedType)
-            {
-                converted = value;
-                return true;
-            }
-
-            // isOfExpectedType is true if value is null - so if false, value is *not* null
-            // "garbage-in", accept what we can & convert
-            // throw only if conversion is not possible
-
-            var s = value.ToString();
-            converted = null;
-
-            switch (ValueStorageType)
-            {
-                case ValueStorageType.Nvarchar:
-                case ValueStorageType.Ntext:
-                {
-                    converted = s;
-                    return true;
-                }
-
-                case ValueStorageType.Integer:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convInt = value.TryConvertTo<int>();
-                    if (convInt)
-                    {
-                        converted = convInt.Result;
-                        return true;
-                    }
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(int), Alias);
-                    return false;
-
-                case ValueStorageType.Decimal:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal)
-                    {
-                        // need to normalize the value (change the scaling factor and remove trailing zeroes)
-                        // because the underlying database is going to mess with the scaling factor anyways.
-                        converted = convDecimal.Result.Normalize();
-                        return true;
-                    }
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(decimal), Alias);
-                    return false;
-
-                case ValueStorageType.Date:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime)
-                    {
-                        converted = convDateTime.Result;
-                        return true;
-                    }
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(DateTime), Alias);
-                    return false;
-
-                default:
-                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
-            }
-        }
-
-        private static void ThrowTypeException(object value, Type expected, string alias)
-        {
-            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
-        }
-
-
-        //fixme - this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
-        /// <summary>
-        /// Determines whether a value is valid for this property type.
-        /// </summary>
-        internal bool IsPropertyValueValid(object value)
-        {
-            var editor = Current.PropertyEditors[_propertyEditorAlias]; // fixme inject?
-            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // fixme inject?
-            var valueEditor = editor.GetValueEditor(configuration);
-            return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
-        }
-
-        /// <summary>
-        /// Sanitizes a property type alias.
-        /// </summary>
-        private static string SanitizeAlias(string value)
+        private string GetAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
             // which is used internally
 
             return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
-                ? value
-                : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
+                        ? value
+                        : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Create a new Property object from a "raw" database value.
+        /// </summary>
+        /// <remarks>Can be used for the "old" values where no serialization type exists</remarks>
+        /// <param name="value"></param>
+        /// <param name="version"> </param>
+        /// <param name="id"> </param>
+        /// <returns></returns>
+        internal Property CreatePropertyFromRawValue(object value, Guid version, int id)
+        {
+            return new Property(id, version, this, value);
+        }
+
+        /// <summary>
+        /// Create a new Property object from a "raw" database value.
+        /// In some cases the value will need to be deserialized.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="serializationType"> </param>
+        /// <returns></returns>
+        internal Property CreatePropertyFromRawValue(object value, string serializationType)
+        {
+            //The value from the db needs to be deserialized and then added to the property
+            //if its not a simple type (Integer, Date, Nvarchar, Ntext)
+            /*if (DataTypeDatabaseType == DataTypeDatabaseType.Object)
+            {
+                Type type = Type.GetType(serializationType);
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(value.ToString()));
+                var objValue = _service.FromStream(stream, type);
+                return new Property(this, objValue);
+            }*/
+
+            return new Property(this, value);
+        }
+
+        /// <summary>
+        /// Create a new Property object that conforms to the Type of the DataType
+        /// and can be validated according to DataType validation / Mandatory-check.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public Property CreatePropertyFromValue(object value)
+        {
+            //Note that validation will occur when setting the value on the Property
+            return new Property(this, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the value is of the expected type
+        /// for the property, and can be assigned to the property "as is".
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>True if the value is of the expected type for the property,
+        /// and can be assigned to the property "as is". Otherwise, false, to indicate
+        /// that some conversion is required.</returns>
+        public bool IsPropertyTypeValid(object value)
+        {
+            // null values are assumed to be ok
+            if (value == null)
+                return true;
+
+            // check if the type of the value matches the type from the DataType/PropertyEditor
+            var valueType = value.GetType();
+
+            //TODO Add PropertyEditor Type validation when its relevant to introduce
+            /*bool isEditorModel = value is IEditorModel;
+            if (isEditorModel && DataTypeControlId != Guid.Empty)
+            {
+                //Find PropertyEditor by Id
+                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
+
+                if (propertyEditor == null)
+                    return false;//Throw exception instead?
+
+                //Get the generic parameter of the PropertyEditor and check it against the type of the passed in (object) value
+                Type argument = propertyEditor.GetType().BaseType.GetGenericArguments()[0];
+                return argument == type;
+            }*/
+
+            if (PropertyEditorAlias.IsNullOrWhiteSpace() == false) // fixme - always true?
+            {
+                // simple validation using the DatabaseType from the DataTypeDefinition
+                // and the Type of the passed in value
+                switch (DataTypeDatabaseType)
+                {
+                    // fixme breaking!
+                    case DataTypeDatabaseType.Integer:
+                        return valueType == typeof(int);
+                    case DataTypeDatabaseType.Decimal:
+                        return valueType == typeof(decimal);
+                    case DataTypeDatabaseType.Date:
+                        return valueType == typeof(DateTime);
+                    case DataTypeDatabaseType.Nvarchar:
+                        return valueType == typeof(string);
+                    case DataTypeDatabaseType.Ntext:
+                        return valueType == typeof(string);
+                }
+            }
+
+            // fixme - never reached + makes no sense?
+            // fallback for simple value types when no Control Id or Database Type is set
+            if (valueType.IsPrimitive || value is string)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Validates the Value from a Property according to the validation settings
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>True if valid, otherwise false</returns>
+        public bool IsPropertyValueValid(object value)
+        {
+            //If the Property is mandatory and value is null or empty, return false as the validation failed
+            if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))
+                return false;
+
+            //Check against Regular Expression for Legacy DataTypes - Validation exists and value is not null:
+            if(string.IsNullOrEmpty(ValidationRegExp) == false && (value != null && string.IsNullOrEmpty(value.ToString()) == false))
+            {
+                try
+                {
+                    var regexPattern = new Regex(ValidationRegExp);
+                    return regexPattern.IsMatch(value.ToString());
+                }
+                catch
+                {
+                         throw new Exception(string .Format("Invalid validation expression on property {0}",this.Alias));
+                }
+
+            }
+
+            //TODO: We must ensure that the property value can actually be saved based on the specified database type
+
+            //TODO Add PropertyEditor validation when its relevant to introduce
+            /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
+            {
+                //Find PropertyEditor by Id
+                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
+
+                //TODO Get the validation from the PropertyEditor if a validation attribute exists
+                //Will probably need to reflect the PropertyEditor in order to apply the validation
+            }*/
+
+            return true;
+        }
+
         public bool Equals(PropertyType other)
         {
-            return other != null && (base.Equals(other) || Alias.InvariantEquals(other.Alias));
+            if (base.Equals(other)) return true;
+
+            //Check whether the PropertyType's properties are equal.
+            return Alias.InvariantEquals(other.Alias);
         }
 
-        /// <inheritdoc />
         public override int GetHashCode()
         {
             //Get hash code for the Name field if it is not null.
@@ -423,18 +417,22 @@ namespace Umbraco.Core.Models
             return baseHash ^ hashAlias;
         }
 
-        /// <inheritdoc />
-        protected override void PerformDeepClone(object clone)
+        public override object DeepClone()
         {
-            base.PerformDeepClone(clone);
-
-            var clonedEntity = (PropertyType)clone;
-            
+            var clone = (PropertyType)base.DeepClone();
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
-                clonedEntity._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);
+                clone._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);
             }
+            //this shouldn't really be needed since we're not tracking
+            clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
+            return clone;
         }
     }
 }

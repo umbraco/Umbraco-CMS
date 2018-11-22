@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,16 +9,18 @@ using System.Web.Http;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
-using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-
+using umbraco;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -27,6 +30,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Content,
         Constants.Applications.Media,
         Constants.Applications.Members)]
+    [LegacyBaseTree(typeof(loadMembers))]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
@@ -83,7 +87,7 @@ namespace Umbraco.Web.Trees
                     "icon-user",
                     false,
                     "",
-                    Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
+                    Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.MemberGuid), member.Key));
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
                 node.AdditionalData.Add("isContainer", true);
@@ -126,7 +130,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", false,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, ui.Text("member", "allMembers"), "icon-users", false,
                             queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
@@ -152,39 +156,40 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // root actions
+                // root actions      
                 if (_provider.IsUmbracoMembershipProvider())
                 {
                     //set default
-                    menu.DefaultMenuAlias = ActionNew.ActionAlias;
+                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                     //Create the normal create action
-                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
                 }
                 else
                 {
                     //Create a custom create action - this does not launch a dialog, it just navigates to the create screen
                     // we'll create it based on the ActionNew so it maintains the same icon properties, name, etc...
-                    var createMenuItem = new MenuItem(ActionNew.ActionAlias, Services.TextService)
-                    {
-                        Icon = "add",
-                        OpensDialog = true
-                    };
+                    var createMenuItem = new MenuItem(ActionNew.Instance);
                     //we want to go to this route: /member/member/edit/-1?create=true
                     createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
                     menu.Items.Add(createMenuItem);
                 }
 
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
             if (Security.CurrentUser.HasAccessToSensitiveData())
             {
-                menu.Items.Add(new ExportMember(Services.TextService));
+                menu.Items.Add(new ExportMember
+                {
+                    Name = Services.TextService.Localize("actions/export"),
+                    Icon = "download-alt",
+                    Alias = "export"
+                });
             }
 
 

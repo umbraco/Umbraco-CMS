@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.WebApi
+namespace Umbraco.Web.WebApi
 {
     internal class WebApiVersionCheck
     {

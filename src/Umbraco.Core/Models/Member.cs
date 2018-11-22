@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -18,7 +14,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Member : ContentBase, IMember
     {
-        private IDictionary<string, object> _additionalData;
         private IMemberType _contentType;
         private readonly string _contentTypeAlias;
         private string _username;
@@ -33,8 +28,10 @@ namespace Umbraco.Core.Models
         public Member(IMemberType contentType)
             : base("", -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            Mandate.ParameterNotNull(contentType, "contentType");
+
             _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -49,12 +46,13 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         public Member(string name, IMemberType contentType)
-            : base(name, -1, contentType, new PropertyCollection())
+            : this(contentType)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            Mandate.ParameterNotNull(contentType, "contentType");
+            Mandate.ParameterNotNullOrEmpty(name, "name");
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
             IsApproved = true;
 
             //this cannot be null but can be empty
@@ -70,18 +68,19 @@ namespace Umbraco.Core.Models
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="contentType"></param>
-        public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
+        public Member(string name, string email, string username, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentNullOrEmptyException(nameof(email));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
+            Mandate.ParameterNotNull(contentType, "contentType");
+            Mandate.ParameterNotNullOrEmpty(name, "name");
+            Mandate.ParameterNotNullOrEmpty(email, "email");
+            Mandate.ParameterNotNullOrEmpty(username, "username");
 
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
             _email = email;
             _username = username;
-            IsApproved = isApproved;
+            IsApproved = true;
 
             //this cannot be null but can be empty
             _rawPasswordValue = "";
@@ -100,9 +99,10 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            _contentTypeAlias = contentType.Alias;
+            Mandate.ParameterNotNull(contentType, "contentType");
 
+            _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -123,8 +123,10 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            Mandate.ParameterNotNull(contentType, "contentType");
+
             _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
             _email = email;
             _username = username;
             _rawPasswordValue = rawPasswordValue;
@@ -208,9 +210,9 @@ namespace Umbraco.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordQuestion, "PasswordQuestion", default(string));
                 if (a.Success == false) return a.Result;
 
-                return Properties[Constants.Conventions.Member.PasswordQuestion].GetValue() == null
+                return Properties[Constants.Conventions.Member.PasswordQuestion].Value == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.PasswordQuestion].GetValue().ToString();
+                    : Properties[Constants.Conventions.Member.PasswordQuestion].Value.ToString();
             }
             set
             {
@@ -218,7 +220,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.PasswordQuestion,
                     "PasswordQuestion") == false) return;
 
-                Properties[Constants.Conventions.Member.PasswordQuestion].SetValue(value);
+                Properties[Constants.Conventions.Member.PasswordQuestion].Value = value;
             }
         }
 
@@ -228,7 +230,7 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// For security reasons this value should be encrypted, the encryption process is handled by the memberhip provider
         /// Alias: umbracoMemberPasswordRetrievalAnswer
-        ///
+        /// 
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -239,9 +241,9 @@ namespace Umbraco.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordAnswer, "PasswordAnswer", default(string));
                 if (a.Success == false) return a.Result;
 
-                return Properties[Constants.Conventions.Member.PasswordAnswer].GetValue() == null
+                return Properties[Constants.Conventions.Member.PasswordAnswer].Value == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.PasswordAnswer].GetValue().ToString();
+                    : Properties[Constants.Conventions.Member.PasswordAnswer].Value.ToString();
             }
             set
             {
@@ -249,7 +251,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.PasswordAnswer,
                     "PasswordAnswer") == false) return;
 
-                Properties[Constants.Conventions.Member.PasswordAnswer].SetValue(value);
+                Properties[Constants.Conventions.Member.PasswordAnswer].Value = value;
             }
         }
 
@@ -268,9 +270,9 @@ namespace Umbraco.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, "Comments", default(string));
                 if (a.Success == false) return a.Result;
 
-                return Properties[Constants.Conventions.Member.Comments].GetValue() == null
+                return Properties[Constants.Conventions.Member.Comments].Value == null
                     ? string.Empty
-                    : Properties[Constants.Conventions.Member.Comments].GetValue().ToString();
+                    : Properties[Constants.Conventions.Member.Comments].Value.ToString();
             }
             set
             {
@@ -278,7 +280,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.Comments,
                     "Comments") == false) return;
 
-                Properties[Constants.Conventions.Member.Comments].SetValue(value);
+                Properties[Constants.Conventions.Member.Comments].Value = value;
             }
         }
 
@@ -294,12 +296,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved",
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved", 
                     //This is the default value if the prop is not found
                     true);
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.IsApproved].GetValue() == null) return true;
-                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].GetValue().TryConvertTo<bool>();
+                if (Properties[Constants.Conventions.Member.IsApproved].Value == null) return true;
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -313,7 +315,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.IsApproved,
                     "IsApproved") == false) return;
 
-                Properties[Constants.Conventions.Member.IsApproved].SetValue(value);
+                Properties[Constants.Conventions.Member.IsApproved].Value = value;
             }
         }
 
@@ -331,8 +333,8 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, "IsLockedOut", false);
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.IsLockedOut].GetValue() == null) return false;
-                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].GetValue().TryConvertTo<bool>();
+                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null) return false;
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -346,7 +348,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.IsLockedOut,
                     "IsLockedOut") == false) return;
 
-                Properties[Constants.Conventions.Member.IsLockedOut].SetValue(value);
+                Properties[Constants.Conventions.Member.IsLockedOut].Value = value;
             }
         }
 
@@ -364,8 +366,8 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, "LastLoginDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLoginDate].GetValue() == null) return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].GetValue().TryConvertTo<DateTime>();
+                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null) return default(DateTime);
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -379,7 +381,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.LastLoginDate,
                     "LastLoginDate") == false) return;
 
-                Properties[Constants.Conventions.Member.LastLoginDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastLoginDate].Value = value;
             }
         }
 
@@ -397,8 +399,8 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, "LastPasswordChangeDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue() == null) return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue().TryConvertTo<DateTime>();
+                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null) return default(DateTime);
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -412,7 +414,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.LastPasswordChangeDate,
                     "LastPasswordChangeDate") == false) return;
 
-                Properties[Constants.Conventions.Member.LastPasswordChangeDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value = value;
             }
         }
 
@@ -430,8 +432,8 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, "LastLockoutDate", default(DateTime));
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].GetValue() == null) return default(DateTime);
-                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].GetValue().TryConvertTo<DateTime>();
+                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null) return default(DateTime);
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -445,7 +447,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.LastLockoutDate,
                     "LastLockoutDate") == false) return;
 
-                Properties[Constants.Conventions.Member.LastLockoutDate].SetValue(value);
+                Properties[Constants.Conventions.Member.LastLockoutDate].Value = value;
             }
         }
 
@@ -464,8 +466,8 @@ namespace Umbraco.Core.Models
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, "FailedPasswordAttempts", 0);
                 if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue() == null) return default(int);
-                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue().TryConvertTo<int>();
+                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null) return default(int);
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
                 if (tryConvert.Success)
                 {
                     return tryConvert.Result;
@@ -479,7 +481,7 @@ namespace Umbraco.Core.Models
                     Constants.Conventions.Member.FailedPasswordAttempts,
                     "FailedPasswordAttempts") == false) return;
 
-                Properties[Constants.Conventions.Member.FailedPasswordAttempts].SetValue(value);
+                Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value = value;
             }
         }
 
@@ -496,7 +498,7 @@ namespace Umbraco.Core.Models
         /// User key from the Provider.
         /// </summary>
         /// <remarks>
-        /// When using standard umbraco provider this key will
+        /// When using standard umbraco provider this key will 
         /// correspond to the guid UniqueId/Key.
         /// Otherwise it will the one available from the asp.net
         /// membership provider.
@@ -511,7 +513,7 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
-
+      
         /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
@@ -533,7 +535,12 @@ namespace Umbraco.Core.Models
             get { return _contentType; }
         }
 
-        /* Internal experiment - only used for mapping queries.
+        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
+        {
+            throw new NotSupportedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
+        }
+
+        /* Internal experiment - only used for mapping queries. 
          * Adding these to have first level properties instead of the Properties collection.
          */
         [IgnoreDataMember]
@@ -551,71 +558,86 @@ namespace Umbraco.Core.Models
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
-            void DoLog(string logPropertyAlias, string logPropertyName)
-            {
-                Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
-                                            "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
-                                            "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
-                                                logPropertyName,
-                                                typeof(Member),
-                                                logPropertyAlias);
-            }
+            Action doLog = () => LogHelper.Warn<Member>(
+                        "Trying to access the '"
+                        + propertyName
+                        + "' property on "
+                        + typeof(Member)
+                        + " but the "
+                        + propertyAlias
+                        + " property does not exist on the member type so a default value is returned. Ensure that you have a property type with alias: "
+                        + propertyAlias
+                        + " configured on your member type in order to use the '"
+                        + propertyName
+                        + "' property on the model correctly.");     
 
-            // if the property doesn't exist,
+            //if the property doesn't exist, then do the logging and return a failure
             if (Properties.Contains(propertyAlias) == false)
             {
-                // put a warn in the log if this entity has been persisted
-                // then return a failure
+                //we'll put a warn in the log if this entity has been persisted
                 if (HasIdentity)
-                    DoLog(propertyAlias, propertyName);
+                {
+                    doLog();
+                }
+                return Attempt<T>.Fail(defaultVal);
+            }
+
+            //if the property doesn't have an identity but we do, then do logging and return failure
+            var prop = Properties.Single(x => x.Alias == propertyAlias);
+            if (prop.HasIdentity == false && HasIdentity)
+            {
+                doLog();
                 return Attempt<T>.Fail(defaultVal);
             }
 
             return Attempt<T>.Succeed();
         }
 
-        private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
+        private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyname)
         {
-            void DoLog(string logPropertyAlias, string logPropertyName)
-            {
-                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
-                                            "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
-                                                logPropertyName,
-                                                typeof(Member),
-                                                logPropertyAlias);
-            }
+            Action doLog = () => LogHelper.Warn<Member>("An attempt was made to set a value on the property '"
+                        + propertyname
+                        + "' on type "
+                        + typeof(Member)
+                        + " but the property type "
+                        + propertyAlias
+                        + " does not exist on the member type, ensure that this property type exists so that setting this property works correctly.");
 
-            // if the property doesn't exist,
+            //if the property doesn't exist, then do the logging and return a failure
             if (Properties.Contains(propertyAlias) == false)
             {
-                // put a warn in the log if this entity has been persisted
-                // then return a failure
                 if (HasIdentity)
-                    DoLog(propertyAlias, propertyName);
+                {
+                    doLog();
+                }
+                return false;
+            }
+
+            //if the property doesn't have an identity but we do, then do logging and return failure
+            var prop = Properties.Single(x => x.Alias == propertyAlias);
+            if (prop.HasIdentity == false && HasIdentity)
+            {
+                doLog();
                 return false;
             }
 
             return true;
         }
 
-        protected override void PerformDeepClone(object clone)
+        public override object DeepClone()
         {
-            base.PerformDeepClone(clone);
-
-            var clonedEntity = (Member)clone;
-
+            var clone = (Member)base.DeepClone();
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually clone this since it's not settable
-            clonedEntity._contentType = (IMemberType)ContentType.DeepClone();
-            
+            clone._contentType = (IMemberType)ContentType.DeepClone();
+            //this shouldn't really be needed since we're not tracking
+            clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
+
+            return clone;
+
         }
-
-        /// <inheritdoc />
-        [DataMember]
-        [DoNotClone]
-        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        public bool HasAdditionalData => _additionalData != null;
     }
 }

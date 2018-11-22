@@ -143,29 +143,15 @@ namespace Umbraco.Core.IO
         /// <see cref="DateTimeOffset"/>.
         /// </returns>
         DateTimeOffset GetCreated(string path);
+    }
 
-        /// <summary>
-        /// Gets the size of a file.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>The size (in bytes) of the file.</returns>
+    // this should be part of IFileSystem but we don't want to change the interface
+    public interface IFileSystem2 : IFileSystem
+    {
         long GetSize(string path);
 
-        /// <summary>
-        /// Gets a value indicating whether the filesystem can add/copy
-        /// a file which is on a physical filesystem.
-        /// </summary>
-        /// <remarks>In other words, whether the filesystem can copy/move a file
-        /// that is on local disk, in a fast and efficient way.</remarks>
         bool CanAddPhysical { get; }
 
-        /// <summary>
-        /// Adds a file which is on a physical filesystem.
-        /// </summary>
-        /// <param name="path">The path to the file.</param>
-        /// <param name="physicalPath">The absolute physical path to the source file.</param>
-        /// <param name="overrideIfExists">A value indicating what to do if the file already exists.</param>
-        /// <param name="copy">A value indicating whether to move (default) or copy.</param>
         void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false);
 
         // TODO: implement these

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Engines;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Benchmarks
@@ -14,9 +12,9 @@ namespace Umbraco.Tests.Benchmarks
         private static readonly string Date = "Saturday 10, November 2012";
 
         [Benchmark(Description = "List<string> to IEnumerable<string>")]
-        public IList<string> TryConvertToEnumerable()
+        public IEnumerable<string> TryConvertToEnumerable()
         {
-            return List.TryConvertTo<IEnumerable<string>>().Result.ToList();
+            return List.TryConvertTo<IEnumerable<string>>().Result;
         }
 
         [Benchmark(Description = "Int to Double")]

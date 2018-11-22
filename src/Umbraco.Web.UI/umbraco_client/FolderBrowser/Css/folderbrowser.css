@@ -1,0 +1,274 @@
+﻿.umbFolderBrowser {
+
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0; 
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: transparent url(../../modal/modalBackground.gif);
+    z-index: 9999;
+    display: none;
+}
+
+.upload-panel {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    margin: -200px 0 0 -200px;
+    border: solid 5px #ccc;
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+}
+
+.upload-panel h1 {
+    color: #ccc;
+}
+
+.upload-panel p {
+    color: #aaa;
+}
+
+.upload-panel .queued,
+.upload-panel .queued li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.upload-panel .queued {
+    display: block;
+    margin: 20px 0;
+    height: 220px;
+    overflow: auto;
+    overflow-y: scroll;
+}
+
+.upload-panel .queued li {
+    display: block;
+    background: transparent url(../../../umbraco/images/umbraco/mediaFile.gif) left center no-repeat;
+    padding: 2px 0 2px 20px;
+}
+
+.upload-panel .queued li .label {
+    display: inline-block;
+    width: 145px;
+    margin: 0 5px 0 0;
+    border: solid 1px #e0e0e0;
+    height: 1.5em;
+    vertical-align: middle;
+}
+
+.upload-panel .queued li span.progress {
+    display: inline-block;
+    width: 180px;
+    border: solid 1px #e0e0e0;
+    overflow: hidden;
+    height: 1.5em;
+    vertical-align: middle;
+}
+
+.upload-panel .queued li span.progress span {
+    display: inline-block;
+    background: #6c3;
+    overflow: hidden;
+    height: 1.5em;
+}
+
+.upload-panel .queued li span.progress span.canceled,
+.upload-panel .queued li span.progress span.error {
+    background: #f33;
+}
+
+.upload-panel .queued li img {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.upload-panel .buttons {
+    text-align: right;
+}
+
+.upload-panel .buttons span {
+    display: block;
+    float: left;
+}
+
+.umbFolderBrowser .breadcrumb {
+    margin: 20px 20px 15px;
+    padding: 0 0 10px;
+    background: none !Important;
+}
+
+.umbFolderBrowser .breadcrumb li {
+    display: inline;
+    padding: 0 5px 0 0;
+    margin: 0;
+}
+
+.umbFolderBrowser .breadcrumb li:after {
+    content: '>';
+}
+
+.umbFolderBrowser .breadcrumb li:last-child:after,
+.umbFolderBrowser .breadcrumb li:first-child:after {
+    content: '';
+}
+
+.umbFolderBrowser .breadcrumb li a {
+    margin-right: 5px;
+}
+
+.umbFolderBrowser .thumb-sizer {
+    position: absolute;
+    top: 18px;
+    right: 270px;
+    border-right: solid 1px #ccc;
+    padding-right: 15px;
+    display: none;
+}
+
+.umbFolderBrowser .thumb-sizer input,
+.umbFolderBrowser .thumb-sizer img {
+    vertical-align: baseline;
+}
+
+.umbFolderBrowser .filter {
+    position: absolute;
+    top: 30px;
+    right: 80px;
+}
+
+.umbFolderBrowser .filter input {
+    border: solid 1px #ccc;
+    padding: 0 3px;
+    width: 194px;
+}
+
+.umbFolderBrowser .throbber {
+    margin: 0 20px;
+}
+
+.umbFolderBrowser .items {
+    margin: 5px 15px;
+    padding: 0;
+}
+
+.umbFolderBrowser .items li {
+    display: inline-block;
+    list-style:  none;
+    float:  left;
+}
+
+.umbFolderBrowser .items li div {
+    display: inline-block;
+    position: relative;
+    list-style: none;
+    margin: 5px;
+    padding: 0;
+    background: #f5f5f5;
+    text-align: center;
+    border: solid 1px #ccc;
+    width: 120px;
+    height: 150px;
+    float: left;
+    -moz-box-shadow: 2px 2px 2px #e0e0e0;
+    -webkit-box-shadow: 2px 2px 2px #e0e0e0;
+    box-shadow: 2px 2px 2px #e0e0e0;
+    cursor: pointer;
+}
+
+.umbFolderBrowser .items.medium li div {
+    width: 95px;
+    height: 125px;
+}
+
+.umbFolderBrowser .items.small li div {
+    width: 70px;
+    height: 100px;
+}
+
+.umbFolderBrowser .img {
+    display: block;
+    background: #e0e0e0;
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.umbFolderBrowser .items.medium .img {
+    width: 75px;
+    height: 75px;
+}
+
+.umbFolderBrowser .items.small .img {
+    width: 50px;
+    height: 50px;
+}
+
+.umbFolderBrowser .img:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.umbFolderBrowser .img img {
+    display:inline;
+    display:inline-table;
+    display:inline-block;
+    vertical-align: middle;
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.umbFolderBrowser .items.medium .img img {
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.umbFolderBrowser .items.small .img img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+.umbFolderBrowser li span {
+    display: block;
+    white-space: nowrap;
+    margin: 0 5px;
+    overflow: hidden;
+}
+
+.umbFolderBrowser .items li.selected div {
+    background: #D5EFFC;
+	border-color: #99DEFD;
+}
+
+.umbFolderBrowser .items li.selected .img {
+    background: #99DEFD;
+}
+
+.umbFolderBrowser .items.ui-sortable-dragging li.selected {
+    display: none !important;
+}
+
+.umbFolderBrowser .items.ui-sortable-dragging li.ui-sortable-helper,
+.umbFolderBrowser .items.ui-sortable-dragging li.ui-sortable-placeholder {
+    display: inline-block !important;
+}
+
+.umbFolderBrowser .items li.ui-sortable-helper div {
+    border: dotted 5px #99DEFD;
+}
+
+.umbFolderBrowser .items li.ui-sortable-helper span {
+    display: none !important;
+}

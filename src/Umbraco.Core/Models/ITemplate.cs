@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -28,6 +28,13 @@ namespace Umbraco.Core.Models
         /// returns the master template alias
         /// </summary>
         string MasterTemplateAlias { get; }
+
+        /// <summary>
+        /// Returns the <see cref="RenderingEngine"/> that corresponds to the template file
+        /// </summary>
+        /// <returns><see cref="RenderingEngine"/></returns>
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions, use the IFileSystem DetermineRenderingEngine method instead")]
+        RenderingEngine GetTypeOfRenderingEngine();
 
         /// <summary>
         /// Set the mastertemplate

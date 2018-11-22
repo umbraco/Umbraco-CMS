@@ -8,26 +8,25 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
-
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, null, sortOrder:3)]
+    [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, null, sortOrder:1)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");
-
+            if (intId == false) throw new InvalidOperationException("Id must be an integer");        
+            
             var nodes = new TreeNodeCollection();
 
             //Folders first
@@ -36,7 +35,7 @@ namespace Umbraco.Web.Trees
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
-                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
+                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataTypeGuid, id, queryStrings, "icon-folder", dt.HasChildren());
                        node.Path = dt.Path;
                        node.NodeType = "container";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -87,13 +86,12 @@ namespace Umbraco.Web.Trees
         {
             return new[]
             {
-                Constants.DataTypes.DefaultContentListView,
-                Constants.DataTypes.DefaultMediaListView,
-                Constants.DataTypes.DefaultMembersListView
-
+                Constants.System.DefaultContentListViewDataTypeId,
+                Constants.System.DefaultMediaListViewDataTypeId,
+                Constants.System.DefaultMembersListViewDataTypeId
             };
         }
-
+        
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
@@ -101,11 +99,11 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create
-                menu.DefaultMenuAlias = ActionNew.ActionAlias;
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                // root actions              
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), hasSeparator: true);
                 return menu;
             }
 
@@ -113,38 +111,38 @@ namespace Umbraco.Web.Trees
             if (container != null)
             {
                 //set the default to create
-                menu.DefaultMenuAlias = ActionNew.ActionAlias;
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
 
                 menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
                 {
                     Icon = "icon icon-edit"
                 });
 
-                if (container.HasChildren == false)
-                { 
+                if (container.HasChildren() == false)
                     //can delete data type
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
-                }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
+
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), hasSeparator: true);
+
             }
             else
             {
                 var nonDeletableSystemDataTypeIds = GetNonDeletableSystemDataTypeIds();
 
                 if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id)) == false)
-                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
 
-                menu.Items.Add<ActionMove>(Services.TextService, hasSeparator: true, opensDialog: true);
+                menu.Items.Add<ActionMove>(Services.TextService.Localize($"actions/{ActionMove.Instance.Alias}"), hasSeparator: true);
             }
-
+            
             return menu;
         }
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

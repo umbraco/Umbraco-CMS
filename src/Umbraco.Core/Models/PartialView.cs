@@ -10,6 +10,11 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PartialView : File, IPartialView
     {
+        [Obsolete("Use the ctor that explicitely sets the view type.")]
+        public PartialView(string path)
+            : this(PartialViewType.PartialView, path, null)
+        { }
+
         public PartialView(PartialViewType viewType, string path)
             : this(viewType, path, null)
         { }

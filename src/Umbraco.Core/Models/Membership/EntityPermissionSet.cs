@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents an entity -> user group & permission key value pair collection
-    /// </summary>
+    /// </summary>    
     public class EntityPermissionSet
     {
         private static readonly Lazy<EntityPermissionSet> EmptyInstance = new Lazy<EntityPermissionSet>(() => new EntityPermissionSet(-1, new EntityPermissionCollection()));

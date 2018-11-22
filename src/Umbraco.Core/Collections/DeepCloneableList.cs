@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Collections
 {
@@ -13,12 +15,12 @@ namespace Umbraco.Core.Collections
     internal class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
         private readonly ListCloneBehavior _listCloneBehavior;
-
+        
         public DeepCloneableList(ListCloneBehavior listCloneBehavior)
         {
             _listCloneBehavior = listCloneBehavior;
         }
-
+        
         public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior) : base(collection)
         {
             _listCloneBehavior = listCloneBehavior;
@@ -92,25 +94,24 @@ namespace Umbraco.Core.Collections
             return this.OfType<IRememberBeingDirty>().Any(x => x.WasDirty());
         }
 
-        /// <inheritdoc />
-        /// <remarks>Always return false, the list has no properties that can be dirty.</remarks>
+        /// <summary>
+        /// Always returns false, the list has no properties we need to report
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <returns></returns>
         public bool IsPropertyDirty(string propName)
         {
             return false;
         }
 
-        /// <inheritdoc />
-        /// <remarks>Always return false, the list has no properties that can be dirty.</remarks>
+        /// <summary>
+        /// Always returns false, the list has no properties we need to report
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
         public bool WasPropertyDirty(string propertyName)
         {
             return false;
-        }
-
-        /// <inheritdoc />
-        /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
-        public IEnumerable<string> GetDirtyProperties()
-        {
-            return Enumerable.Empty<string>();
         }
 
         public void ResetDirtyProperties()
@@ -121,26 +122,20 @@ namespace Umbraco.Core.Collections
             }
         }
 
-        public void ResetWereDirtyProperties()
+        public void ForgetPreviouslyDirtyProperties()
         {
             foreach (var dc in this.OfType<IRememberBeingDirty>())
             {
-                dc.ResetWereDirtyProperties();
+                dc.ForgetPreviouslyDirtyProperties();
             }
         }
 
-        public void ResetDirtyProperties(bool rememberDirty)
+        public void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             foreach (var dc in this.OfType<IRememberBeingDirty>())
             {
-                dc.ResetDirtyProperties(rememberDirty);
+                dc.ResetDirtyProperties(rememberPreviouslyChangedProperties);
             }
-        }
-
-        /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
-        public IEnumerable<string> GetWereDirtyProperties()
-        {
-            return Enumerable.Empty<string>();
         }
     }
 }

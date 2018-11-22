@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="umbraco.cms.presentation.Trees.BaseTree">
+    <Position X="3.5" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\BaseTree.cs</FileName>
+      <HashCode>AABUAABAAAQSAQAIAAAAQAAABRBgBEUBWDIAAMKAAyI=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.596" />
+  </Class>
+  <Class Name="umbraco.cms.presentation.Trees.BaseContentTree">
+    <Position X="7.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\BaseContentTree.cs</FileName>
+      <HashCode>ACAAAAAIBICAgAIIEAEAAAAAAAAAAAAAgBQAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.loadContent">
+    <Position X="10" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\loadContent.cs</FileName>
+      <HashCode>AAAAAAAAAQAABAAIAAQAAAAAAABAAAABABAAAEAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.loadMedia">
+    <Position X="4" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\loadMedia.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAABAAAABABAAAEAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.cms.presentation.Trees.FileSystemTree">
+    <Position X="7.25" Y="6" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\FileSystemTree.cs</FileName>
+      <HashCode>AAABAAAAAAAAABAAAAAAAAAAAAAAEAABABBAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.loadXslt">
+    <Position X="10" Y="6" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\loadXslt.cs</FileName>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAEAABAABAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.loadPython">
+    <Position X="7.25" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\loadPython.cs</FileName>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAEAABAABAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.cms.presentation.Trees.ContentRecycleBin">
+    <Position X="10" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\ContentRecycleBin.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAIEAAAAAAAAABAAAABAAIAAEAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.cms.presentation.Trees.LegacyTree">
+    <Position X="0.75" Y="3" Width="2" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\LegacyTree.cs</FileName>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAABACAAAAABABAAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="umbraco.cms.presentation.Trees.NullTree">
+    <Position X="0.75" Y="5.5" Width="2" />
+    <TypeIdentifier>
+      <FileName>umbraco\Trees\NullTree.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAABABAAAAAAAAI=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="umbraco.interfaces.ITree">
+    <Position X="0.75" Y="0.5" Width="2" />
+    <TypeIdentifier />
+  </Interface>
+</ClassDiagram>

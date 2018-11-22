@@ -1,9 +1,9 @@
 ﻿using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class RelationFactory
+    internal class RelationFactory 
     {
         private readonly IRelationType _relationType;
 
@@ -27,7 +27,8 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.Id = dto.Id;
                 entity.UpdateDate = dto.Datetime;
 
-                // reset dirty initial properties (U4-1946)
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
                 entity.ResetDirtyProperties(false);
                 return entity;
             }

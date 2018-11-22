@@ -1,26 +1,26 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.Testing;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class PropertyGroupTests : UmbracoTestBase
+    public class PropertyGroupTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()
         {
             var pg = new PropertyGroup(
-                new PropertyTypeCollection(false, new[]
+                new PropertyTypeCollection(new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
-                        DataTypeId = 5,
+                        DataTypeDefinitionId = 5,
                         PropertyEditorAlias = "propTest",
                         Description = "testing",
                         Key = Guid.NewGuid(),
@@ -30,13 +30,13 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        ValueStorageType = ValueStorageType.Nvarchar
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
-                        DataTypeId = 6,
+                        DataTypeDefinitionId = 6,
                         PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        ValueStorageType = ValueStorageType.Nvarchar
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     }
                 }))
             {
@@ -91,13 +91,13 @@ namespace Umbraco.Tests.Models
             var ss = new SerializationService(new JsonNetSerializer());
 
             var pg = new PropertyGroup(
-                new PropertyTypeCollection(false, new[]
+                new PropertyTypeCollection(new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
-                        DataTypeId = 5,
+                        DataTypeDefinitionId = 5,
                         PropertyEditorAlias = "propTest",
                         Description = "testing",
                         Key = Guid.NewGuid(),
@@ -107,13 +107,13 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        ValueStorageType = ValueStorageType.Nvarchar
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor2", ValueStorageType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor2", DataTypeDatabaseType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
-                        DataTypeId = 6,
+                        DataTypeDefinitionId = 6,
                         PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        ValueStorageType = ValueStorageType.Nvarchar
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     }
                 }))
             {

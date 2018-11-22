@@ -1,47 +1,41 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
 {
-    [TestFixture, Ignore("fixme - ignored test")]
+    [TestFixture, NUnit.Framework.Ignore]
     public class ConnectionRetryTest
     {
         [Test]
-        public void Cant_Connect_To_SqlDatabase_With_Invalid_User()
+        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_With_Invalid_User()
         {
+            // Arrange
+            const string providerName = Constants.DatabaseProviders.SqlServer;
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
-            const string providerName = Constants.DbProviderNames.SqlServer;
-            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)) };
-            var factory = new UmbracoDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), Mock.Of<IMapperCollection>());
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
+            var database = factory.CreateDatabase();
 
-            using (var database = factory.CreateDatabase())
-            {
-                Assert.Throws<SqlException>(
-                    () => database.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
-            }
+            //Act
+            Assert.Throws<SqlException>(
+                () => database.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
         }
 
         [Test]
-        public void Cant_Connect_To_SqlDatabase_Because_Of_Network()
+        public void PetaPocoConnection_Cant_Connect_To_SqlDatabase_Because_Of_Network()
         {
+            // Arrange
+            const string providerName = Constants.DatabaseProviders.SqlServer;
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
-            const string providerName = Constants.DbProviderNames.SqlServer;
-            var sqlSyntax = new[] { new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)) };
-            var factory = new UmbracoDatabaseFactory(connectionString, providerName, sqlSyntax, Mock.Of<ILogger>(), Mock.Of<IMapperCollection>());
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
+            var database = factory.CreateDatabase();
 
-            using (var database = factory.CreateDatabase())
-            {
-                Assert.Throws<SqlException>(
+            //Act
+            Assert.Throws<SqlException>(
                 () => database.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
-            }
         }
     }
 }

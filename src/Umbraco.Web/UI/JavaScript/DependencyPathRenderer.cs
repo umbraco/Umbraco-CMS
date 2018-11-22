@@ -35,7 +35,7 @@ namespace Umbraco.Web.UI.JavaScript
             jsOutput = jsOutput.Replace("&amp;", "&");
             cssOutput = cssOutput.Replace("&amp;", "&");
         }
-
+        
         protected override string RenderSingleJsFile(string js, IDictionary<string, string> htmlAttributes)
         {
             return js + Delimiter;

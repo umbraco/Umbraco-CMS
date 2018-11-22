@@ -12,5 +12,8 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [DataMember(Name = "useOnFrontend")]
+        public bool UseOnFrontend { get; set; }
     }
 }

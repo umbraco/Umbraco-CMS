@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -18,9 +18,9 @@ namespace Umbraco.Web.Install.Models
 
         [DataMember(Name = "installId")]
         public Guid InstallId { get; private set; }
-
+        
         [DataMember(Name = "steps")]
-        public IEnumerable<InstallSetupStep> Steps { get; set; }
+        public IEnumerable<InstallSetupStep> Steps { get; set; } 
 
     }
 }

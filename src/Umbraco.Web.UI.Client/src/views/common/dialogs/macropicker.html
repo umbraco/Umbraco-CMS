@@ -1,0 +1,38 @@
+	<div class="umb-panel" ng-controller="Umbraco.Dialogs.MacroPickerController">
+	
+	<div class="umb-panel-body no-header with-footer umb-scrollable" ng-switch on="dialogMode">
+		<div class="umb-control-group">
+			<div ng-switch-when="list" ng-swicth-default class="tab-content form-horizontal umb-el-wrap">
+					<ul class="nav nav-tabs nav-stacked">	
+						<li ng-repeat="macro in macros">
+							<a href="#" ng-click="configureMacro(macro)" prevent-default>
+								{{macro.name}}
+							</a>
+						</li>
+					</ul>	
+			</div>
+
+			<div ng-switch-when="configure" class="tab-content form umb-el-wrap">
+					
+					<h5>{{dialogData.macro.name}}</h5>
+
+					<div class="umb-pane" ng-repeat="model in dialogData.macro.properties">
+							    <label class="control-label" ng-hide="model.hideLabel" for="{{model.alias}}">{{model.label}}
+					            </label>    
+
+					            <div class="controls" 
+					                ng-include="model.editorView">
+					            </div>
+					</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="umb-panel-footer">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar">
+	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	        </div>
+		</div>
+	</div>
+</div>

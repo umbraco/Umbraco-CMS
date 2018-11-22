@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Permissions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Events
 {
@@ -97,14 +98,14 @@ namespace Umbraco.Core.Events
 
         public bool Equals(CancellableObjectEventArgs<T> other)
         {
-            if (other is null) return false;
+            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && EqualityComparer<T>.Default.Equals(EventObject, other.EventObject);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((CancellableObjectEventArgs<T>)obj);
@@ -154,7 +155,7 @@ namespace Umbraco.Core.Events
 
         public bool Equals(CancellableEnumerableObjectEventArgs<T> other)
         {
-            if (other is null) return false;
+            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return EventObject.SequenceEqual(other.EventObject);
@@ -162,7 +163,7 @@ namespace Umbraco.Core.Events
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((CancellableEnumerableObjectEventArgs<T>)obj);

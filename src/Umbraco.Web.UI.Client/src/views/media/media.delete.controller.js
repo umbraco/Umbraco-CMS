@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService) {
+function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
 
     $scope.performDelete = function() {
 
@@ -53,9 +53,14 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                overlayService.ysod(err);
+                dialogService.ysodDialog(err);
             }
 
+            if (err.data && angular.isArray(err.data.notifications)) {
+                for (var i = 0; i < err.data.notifications.length; i++) {
+                    notificationsService.showNotification(err.data.notifications[i]);
+                }
+            }
         });
     };
 

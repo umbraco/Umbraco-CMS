@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Web.HealthCheck.Checks.Config
 {
     public class ConfigurationServiceResult
     {

@@ -1,0 +1,57 @@
+@inherits System.Web.Mvc.WebViewPage
+<div ng-controller="Umbraco.canvasdesigner.background">
+
+    <div class="box-slider">
+        <div colorpicker ng-model="item.values.color"></div>
+    </div>
+
+    <div class="box-slider">
+        <div class="imagePickerPreview" ng-click="open(item.values)" style="background-image:{{ item.values.imageorpattern }}">
+            <i ng-if="item.values.imageorpattern == ''" class="icon icon-picture"></i>
+            <i ng-if="item.values.imageorpattern != ''" class="icon icon-delete" ng-click="item.values.imageorpattern = ''"></i>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/ng-template" id="mediaPickerModal.html">
+
+    <div ng-controller="canvasdesigner.mediaPickerModal">
+
+        <div class="modal-header bodyCanvasdesignerImagePicker ng-scope">
+            <ul class="breadcrumb">
+                <li ng-if="startNodeId == -1">
+                    <a href="" ng-click="gotoFolder()">Media</a>
+                </li>
+
+                <!-- ngRepeat: item in path -->
+                <li ng-repeat="item in currentPath" class="ng-scope">
+                    / <a ng-if="currentFolder.id == item.id" href="" ng-class="{disabled:currentFolder.id == item.id}">{{ item.name }}</a>
+                    <a ng-if="currentFolder.id != item.id" ng-click="gotoFolder(item)">{{ item.name }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="modal-body bodyCanvasdesignerImagePicker">
+            <ul class="canvasdesignerImagePicker">
+                <li>
+                    <ul class="media-items">
+                        <li ng-repeat="child in currentFolder.children | orderBy:'isFolder':true">
+                            <div ng-if="!child.isFolder" class="media-preview" ng-class="{selected:selectedMedia.id == child.id}" ng-click="selectMedia(child)" style="background-image: url({{ child.thumbnail }})"></div>
+                            <div ng-if="child.isFolder" class="media-preview" ng-click="selectMedia(child)">
+                                <i class="icon icon-folder folder"><p class="folder-name">{{child.name}}</p></i>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="right">
+            <a class="btn" href="#" ng-click="cancelAndClose()">Cancel</a>
+            <a class="btn btn-success" href="#" ng-click="submitAndClose()">Done</a>
+        </div>
+
+    </div>
+
+</script>

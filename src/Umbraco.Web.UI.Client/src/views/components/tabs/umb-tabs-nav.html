@@ -1,14 +1,5 @@
-<ul class="umb-tabs-nav">
-    <li class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
-        <a ng-href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
-    </li>
-
-    <li data-element="tab-expand" class="umb-tab umb-tab--expand" ng-class="{ 'open': vm.showTray }" ng-show="vm.needTray">
-        <a ng-href="" ng-click="vm.toggleTray()"><i></i><i></i><i></i></a>
-        <umb-dropdown class="umb-tabs-tray" ng-if="vm.showTray" on-close="vm.hideTray()">
-            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tabs-tray-item--active': tab.active}">
-                <a ng-href="" href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
-            </umb-dropdown-item>
-        </umb-dropdown>
-    </li>
+<ul class="nav nav-tabs umb-nav-tabs">
+  <li data-element="tab-{{tab.alias}}" ng-class="{'tab-error': tabHasError}" ng-repeat="tab in model" val-tab>
+    <a data-toggle="tab" href="#tab{{tab.id}}{{idSuffix}}">{{ tab.label }}</a>
+  </li>
 </ul>

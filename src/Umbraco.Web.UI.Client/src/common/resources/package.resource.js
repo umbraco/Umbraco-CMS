@@ -104,52 +104,52 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Int} the ID assigned to the saved package manifest
          *
          */ 
-        import: function (umbPackage) {
+        import: function (package) {
            
             return umbRequestHelper.resourcePromise(
                 $http.post(
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
-                      "Import"), umbPackage),
+                      "Import"), package),
               'Failed to install package. Error during the step "Import" ');
         }, 
 
-        installFiles: function (umbPackage) {
+        installFiles: function (package) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
-                      "InstallFiles"), umbPackage),
+                      "InstallFiles"), package),
               'Failed to install package. Error during the step "InstallFiles" ');
         }, 
 
-        checkRestart: function (umbPackage) {
+        checkRestart: function (package) {
 
           return umbRequestHelper.resourcePromise(
             $http.post(
               umbRequestHelper.getApiUrl(
                 "packageInstallApiBaseUrl",
-                "CheckRestart"), umbPackage),
+                "CheckRestart"), package),
             'Failed to install package. Error during the step "CheckRestart" ');
         }, 
 
-        installData: function (umbPackage) {
+        installData: function (package) {
            
             return umbRequestHelper.resourcePromise(
                 $http.post(
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
-                      "InstallData"), umbPackage),
+                      "InstallData"), package),
               'Failed to install package. Error during the step "InstallData" ');
         }, 
 
-        cleanUp: function (umbPackage) {
+        cleanUp: function (package) {
            
             return umbRequestHelper.resourcePromise(
                 $http.post(
                   umbRequestHelper.getApiUrl(
                       "packageInstallApiBaseUrl",
-                      "CleanUp"), umbPackage),
+                      "CleanUp"), package),
               'Failed to install package. Error during the step "CleanUp" ');
         }
     };

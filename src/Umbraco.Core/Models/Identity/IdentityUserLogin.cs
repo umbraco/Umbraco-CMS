@@ -1,13 +1,13 @@
-﻿using System;
-using Umbraco.Core.Models.Entities;
+using System;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Identity
 {
     /// <summary>
     /// Entity type for a user's login (i.e. facebook, google)
-    ///
+    /// 
     /// </summary>
-    public class IdentityUserLogin : EntityBase, IIdentityUserLogin
+    public class IdentityUserLogin : Entity, IIdentityUserLogin
     {
         public IdentityUserLogin(string loginProvider, string providerKey, int userId)
         {
@@ -27,19 +27,19 @@ namespace Umbraco.Core.Models.Identity
 
         /// <summary>
         /// The login provider for the login (i.e. facebook, google)
-        ///
+        /// 
         /// </summary>
         public string LoginProvider { get; set; }
 
         /// <summary>
         /// Key representing the login for the provider
-        ///
+        /// 
         /// </summary>
         public string ProviderKey { get; set; }
 
         /// <summary>
         /// User Id for the user who owns this login
-        ///
+        /// 
         /// </summary>
         public int UserId { get; set; }
     }

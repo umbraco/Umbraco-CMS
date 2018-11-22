@@ -9,7 +9,7 @@
       <Value Profile="(Default)">http://update.umbraco.org/checkforupgrade.asmx</Value>
     </Setting>
     <Setting Name="test" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Something</Value>
+      <Value Profile="(Default)">Somthing</Value>
     </Setting>
     <Setting Name="umbraco_org_umbraco_our_Repository" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://our.umbraco.com/umbraco/webservices/api/repository.asmx</Value>

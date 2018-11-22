@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -11,11 +11,21 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Consent))]
     public sealed class ConsentMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance
+            = new ConcurrentDictionary<string, DtoMapModel>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsentMapper"/> class.
+        /// </summary>
+        public ConsentMapper()
+        {
+            // note: why the base ctor does not invoke BuildMap is a mystery to me
+            BuildMap();
+        }
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        protected override void BuildMap()
+        internal override void BuildMap()
         {
             CacheMap<Consent, ConsentDto>(entity => entity.Id, dto => dto.Id);
             CacheMap<Consent, ConsentDto>(entity => entity.Current, dto => dto.Current);

@@ -7,9 +7,7 @@ angular.module("umbraco.directives")
     .directive('umbProperty', function (umbPropEditorHelper, userService) {
         return {
             scope: {
-                property: "=",
-                showInherit: "<",
-                inheritsFrom: "<"
+                property: "="
             },
             transclude: true,
             restrict: 'E',

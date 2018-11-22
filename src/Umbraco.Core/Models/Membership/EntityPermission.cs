@@ -37,7 +37,7 @@ namespace Umbraco.Core.Models.Membership
         /// <remarks>
         /// This will be the case when looking up entity permissions and falling back to the default permissions
         /// </remarks>
-        public bool IsDefaultPermissions { get; private set; }
+        public bool IsDefaultPermissions { get; private set; }        
 
         public bool Equals(EntityPermission other)
         {

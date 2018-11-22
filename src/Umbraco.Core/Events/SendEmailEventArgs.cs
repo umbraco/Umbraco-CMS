@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Mail;
 
 namespace Umbraco.Core.Events
@@ -10,6 +10,6 @@ namespace Umbraco.Core.Events
         public SendEmailEventArgs(MailMessage message)
         {
             Message = message;
-        }
+        }        
     }
 }

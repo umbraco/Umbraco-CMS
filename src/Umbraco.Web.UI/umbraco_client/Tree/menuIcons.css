@@ -1,0 +1,115 @@
+﻿.menuSpr
+{
+	float: left;
+	background-image: url(sprites.png);
+	background-position: -7px -8px;	
+	margin-top: 1px;
+	width: 17px;
+	height: 16px;
+	margin: 1px 13px 1px 0px;
+}
+
+.sprNew
+{
+	background-position: -7px -339px;
+}
+.sprCreateFolder
+{
+	background-position: -7px -108px;
+}
+.sprSendToTranslate
+{
+	background-position: -7px -636px;
+}
+.sprBinEmpty
+{
+	background-position: -7px -42px;
+}
+.sprTranslate
+{
+	background-position: -7px -636px;
+}
+.sprSave
+{
+	background-position: -7px -603px;
+}
+.sprImportDocumentType
+{
+	background-position: -7px -273px;
+}
+.sprExportDocumentType
+{
+	background-position: -7px -240px;
+}
+.sprAudit
+{
+	background-position: -7px -6px;
+}
+.sprPackage2
+{
+	background-position: -7px -405px;
+}
+.sprDelete
+{
+	background-position: -7px -174px;
+}
+.sprMove
+{
+	background-position: -7px -141px;
+}
+.sprCopy
+{
+	background-position: -7px -75px;
+}
+.sprSort
+{
+	background-position: -7px -670px;
+}
+.sprPermission
+{
+	background-position: -7px -438px;
+}
+.sprProtect
+{
+	background-position: -7px -471px;
+}
+.sprRollback
+{
+	background-position: -7px -570px;
+}
+.sprRefresh
+{
+	background-position: -7px -537px;
+}
+.sprNotify
+{
+	background-position: -7px -372px;
+}
+.sprUpdate
+{
+	background-position: -7px -603px;
+}
+.sprPublish
+{
+	background-position: -7px -504px;
+}
+.sprToPublish
+{
+	background-position: -7px -504px;
+}
+.sprLogout
+{
+	background-position: -7px -306px;
+}
+.sprDomain
+{
+	background-position: -7px -207px;
+}
+.sprLiveEdit
+{
+	background-position: -7px -706px;
+}
+.sprChangeDocType
+{
+	background-position: -12px -741px;
+} 

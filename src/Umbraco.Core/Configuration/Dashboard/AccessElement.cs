@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration.Dashboard
     {
         public AccessElement()
         {
-
+            
         }
 
         public AccessElement(XElement rawXml)

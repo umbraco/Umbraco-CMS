@@ -1,0 +1,14 @@
+<div class="umb-panel-header">
+    <div class="row-fluid">
+
+    	<div ng-transclude></div>
+
+    	<ul ng-show="showTabs" class="nav nav-tabs umb-nav-tabs span12 -padding-left">
+
+            <li ng-class="{'tab-error': tabHasError}" ng-repeat="tab in visibleTabs" val-tab>
+    	        <a href="#tab{{tab.id}}" data-toggle="tab">{{ tab.label }}</a>
+    	    </li>
+
+    	</ul>
+    </div>
+</div>

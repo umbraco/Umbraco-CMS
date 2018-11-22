@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -50,7 +50,7 @@ namespace Umbraco.Web.WebApi.Filters
                 var actionContext = actionExecutedContext.ActionContext;
                 if (actionContext.ActionArguments[_userIdParameter] == null)
                 {
-                    throw new InvalidOperationException("No argument found for the current action with the name: " + _userIdParameter);
+                    throw new InvalidOperationException("No argument found for the current action with the name: " + _userIdParameter);                    
                 }
 
                 var user = UmbracoContext.Current.Security.CurrentUser;

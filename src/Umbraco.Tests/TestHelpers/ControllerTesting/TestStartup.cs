@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         }
 
         public void Configuration(IAppBuilder app)
-        {
+        {            
             var httpConfig = new HttpConfiguration();
 
             //TODO: Enable this if you can't see the errors produced
@@ -37,14 +37,14 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             httpConfig.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             // Add in a simple exception tracer so we can see what is causing the 500 Internal Server Error
-            httpConfig.Services.Add(typeof (IExceptionLogger), new TraceExceptionLogger());
+            httpConfig.Services.Add(typeof(IExceptionLogger), new TraceExceptionLogger());
 
-            httpConfig.Services.Replace(typeof (IAssembliesResolver), new SpecificAssemblyResolver(new[] { typeof (UsersController).Assembly }));
-            httpConfig.Services.Replace(typeof (IHttpControllerActivator), new TestControllerActivator(_controllerFactory));
-            httpConfig.Services.Replace(typeof (IHttpControllerSelector), new NamespaceHttpControllerSelector(httpConfig));
-
+            httpConfig.Services.Replace(typeof(IAssembliesResolver), new SpecificAssemblyResolver(new[] { typeof(UsersController).Assembly }));
+            httpConfig.Services.Replace(typeof(IHttpControllerActivator), new TestControllerActivator(_controllerFactory));
+            httpConfig.Services.Replace(typeof(IHttpControllerSelector), new NamespaceHttpControllerSelector(httpConfig));
+            
             //auth everything
-            app.AuthenticateEverything();
+            app.AuthenticateEverything();            
 
             _initialize(httpConfig);
 

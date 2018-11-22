@@ -9,53 +9,40 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentServicePerformanceTest : TestWithDatabaseBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, NUnit.Framework.Ignore]
+    public class ContentServicePerformanceTest : BaseDatabaseFactoryTest
     {
-        public override void SetUp()
+        [SetUp]
+        public override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
             CreateTestData();
         }
 
-        protected override void Compose()
+        protected override void FreezeResolution()
         {
-            base.Compose();
-            Container.Register<IProfiler, TestProfiler>();
-        }
+            ProfilerResolver.Current = new ProfilerResolver(new TestProfiler());
 
-        [Test]
-        public void Profiler()
-        {
-            Assert.IsInstanceOf<TestProfiler>(Current.Profiler);
-        }
-
-        private static ProfilingLogger GetTestProfilingLogger()
-        {
-            var logger = new DebugDiagnosticsLogger();
-            var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
+            base.FreezeResolution();
         }
 
         [Test]
         public void Retrieving_All_Content_In_Site()
         {
             //NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
-            // the old way takes 143795ms, the new above way takes:
-            // 14249ms
+            // the old way takes 143795ms, the new above way takes: 
+            // 14249ms 
             //
             // ... NOPE, made some new changes, it is now....
             // 5290ms  !!!!!!
@@ -98,25 +85,25 @@ namespace Umbraco.Tests.Services
             }
 
             var total = new List<IContent>();
-
-            using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
+            using (DisposableTimer.TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
             {
                 TestProfiler.Enable();
                 total.AddRange(ServiceContext.ContentService.GetRootContent());
                 foreach (var content in total.ToArray())
                 {
-                    total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                    total.AddRange(ServiceContext.ContentService.GetDescendants(content));
                 }
                 TestProfiler.Disable();
-                Current.Logger.Info<ContentServicePerformanceTest>("Returned {Total} items", total.Count);
+                LogHelper.Info<ContentServicePerformanceTest>("Returned " + total.Count + " items");
             }
+
         }
 
         [Test]
         public void Creating_100_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
 
             // Act
@@ -135,7 +122,7 @@ namespace Umbraco.Tests.Services
         public void Creating_1000_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
 
             // Act
@@ -154,22 +141,21 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-                var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
 
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>()))
+            {
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetMany();
+                var contents = repository.GetAll();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -183,26 +169,24 @@ namespace Umbraco.Tests.Services
 
         }
 
-        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
+        [Test, NUnit.Framework.Ignore]
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>()))
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-                var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
-
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetMany();
+                var contents = repository.GetAll();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -218,24 +202,24 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>()))
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-                var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
-                var contents = repository.GetMany();
+                var contents = repository.GetAll();
 
                 Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetMany();
+                var contentsCached = repository.GetAll();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -248,28 +232,27 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
+        [Test, NUnit.Framework.Ignore]
         public void Getting_1000_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>()))
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-                var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
-                var contents = repository.GetMany();
+                var contents = repository.GetAll();
 
                 Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetMany();
+                var contentsCached = repository.GetAll();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 

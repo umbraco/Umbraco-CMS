@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class AuditServiceTests : TestWithDatabaseBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    public class AuditServiceTests : BaseServiceTest
     {
         [Test]
         public void CanCrudAuditEntry()
         {
+            // fixme - why isn't this set by the test base class?
+            Database.Mapper = new PetaPocoMapper();
+
             var yesterday = DateTime.UtcNow.AddDays(-1);
             var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             Assert.AreEqual(123, entry.PerformingUserId);

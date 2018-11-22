@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+
     [DataContract(Name = "auditLog", Namespace = "")]
     public class AuditLog
     {
@@ -21,16 +25,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "timestamp")]
         public DateTime Timestamp { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         [DataMember(Name = "logType")]
-        public string LogType { get; set; }
-
-        [DataMember(Name = "entityType")]
-        public string EntityType { get; set; }
+        public AuditType LogType { get; set; }
 
         [DataMember(Name = "comment")]
         public string Comment { get; set; }
-
-        [DataMember(Name = "parameters")]
-        public string Parameters { get; set; }
     }
 }

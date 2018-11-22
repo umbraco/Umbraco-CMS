@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.TextStringController",
-    function () {
+    function ($scope, $rootScope, $timeout, dialogService) {
 
         
 

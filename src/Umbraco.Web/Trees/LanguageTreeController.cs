@@ -1,4 +1,16 @@
+using System;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Net.Http.Formatting;
+using System.Web.Services.Description;
+using umbraco;
+using umbraco.BusinessLogic.Actions;
+using umbraco.cms.presentation;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using umbraco.presentation.actions;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -7,38 +19,93 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Languages)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, null, sortOrder: 11)]
+    [LegacyBaseTree(typeof(loadLanguages))]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Languages, null, sortOrder: 4)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
     public class LanguageTreeController : TreeController
     {
+        /// <summary>
+        /// The method called to render the contents of the tree structure
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings">
+        /// All of the query string parameters passed from jsTree
+        /// </param>
+        /// <remarks>
+        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// to the back end to be used in the query for model data.
+        /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            //We don't have any child nodes & only use the root node to load a custom UI
-            return new TreeNodeCollection();
-        }
+            var nodes = new TreeNodeCollection();
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
-        {
-            //We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
-            return null;
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                var languages = Services.LocalizationService.GetAllLanguages();
+                foreach (var language in languages)
+                {
+                    string displayName;
+                    try
+                    {
+                        displayName = language.CultureInfo.DisplayName;
+                    }
+                    catch (CultureNotFoundException ex)
+                    {
+                        Logger.Error<LanguageTreeController>(string.Format("Could not find the specified culture: '{0}'. Please make sure this culture is installed on your machine.", language.IsoCode), ex);
+                        displayName = "Unknown Locale (" + language.IsoCode + ")";
+                    }
+                    nodes.Add(CreateTreeNode(
+                            language.Id.ToString(CultureInfo.InvariantCulture), "-1", queryStrings, displayName, "icon-flag-alt", false,
+                            //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
+                            "/" + queryStrings.GetValue<string>("application") + "/framed/" +
+                            Uri.EscapeDataString("settings/editLanguage.aspx?id=" + language.Id)));
+                }
+            }
+
+            return nodes;
         }
 
         /// <summary>
-        /// Helper method to create a root model for a tree
+        /// Returns the menu structure for the node
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var root = base.CreateRootNode(queryStrings);
+            var menu = new MenuItemCollection();
+            
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                //Create the normal create action
+                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
+                    //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                    //use the legacy format
+                    .ConvertLegacyMenuItem(null, "initlanguages", queryStrings.GetValue<string>("application"));
+               
+                //refresh action
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
-            //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Languages}/overview";
-            root.Icon = "icon-globe";
-            root.HasChildren = false;
-            root.MenuUrl = null;
+                return menu;
+            }
 
-            return root;
+            var lang = Services.LocalizationService.GetLanguageById(int.Parse(id));
+            if (lang == null) return new MenuItemCollection();
+
+            //add delete option for all languages
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias))
+                //Since we haven't implemented anything for languages in angular, this needs to be converted to 
+                //use the legacy format
+                .ConvertLegacyMenuItem(new UmbracoEntity
+                {
+                    Id = lang.Id,
+                    Level = 1,
+                    ParentId = -1,
+                    Name = lang.CultureInfo.DisplayName                    
+                }, "language", queryStrings.GetValue<string>("application"));
+
+            return menu;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services
 {

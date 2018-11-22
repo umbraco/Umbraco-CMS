@@ -1,7 +1,8 @@
 angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
     function ($scope, relationResource, mediaResource, navigationService, appState, treeService, localizationService) {
+		var dialogOptions = $scope.dialogOptions;
 
-		var node = $scope.currentNode;
+		var node = dialogOptions.currentNode;
 
 		$scope.error = null;
 	    $scope.success = false;
@@ -81,9 +82,4 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
 					$scope.error = err;
 				});
 		};
-
-		$scope.close = function() {
-			navigationService.hideDialog();
-		};
-
 	});

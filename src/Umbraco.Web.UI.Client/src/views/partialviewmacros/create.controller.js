@@ -1,10 +1,11 @@
 (function () {
     "use strict";
 
-    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, appState) {
+    function PartialViewMacrosCreateController($scope, codefileResource, macroResource, $location, navigationService, formHelper, localizationService, appState) {
 
         var vm = this;
-        var node = $scope.currentNode;
+        var node = $scope.dialogOptions.currentNode;
+        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
         vm.snippets = [];
         vm.createFolderError = "";
@@ -19,7 +20,6 @@
         vm.createFileWithoutMacro = createFileWithoutMacro;
         vm.showCreateFromSnippet = showCreateFromSnippet;
         vm.createFileFromSnippet = createFileFromSnippet;
-        vm.close = close;
 
         function onInit() {
             codefileResource.getSnippets('partialViewMacros')
@@ -33,7 +33,7 @@
         }
 
         function createFolder(form) {
-            if (formHelper.submitForm({ scope: $scope, formCtrl: form })) {
+            if (formHelper.submitForm({ scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder })) {
 
                 codefileResource.createContainer("partialViewMacros", node.id, vm.folderName).then(function (saved) {
 
@@ -46,7 +46,9 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({
+                        scope: $scope
+                    });
 
                     var section = appState.getSectionState("currentSection");
 
@@ -54,32 +56,29 @@
 
                     vm.createFolderError = err;
 
+                    //show any notifications
+                    formHelper.showNotifications(err.data);    
                 });
             }
         }
 
         function createFile() {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true");
+            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         }
 
         function createFileWithoutMacro() {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
+            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
             navigationService.hideMenu();
         }
 
         function createFileFromSnippet(snippet) {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
+            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
             navigationService.hideMenu();
         }
 
         function showCreateFromSnippet() {
             vm.showSnippets = true;
-        }
-
-        function close() {
-            const showMenu = true;
-            navigationService.hideDialog(showMenu);
         }
 
         onInit();

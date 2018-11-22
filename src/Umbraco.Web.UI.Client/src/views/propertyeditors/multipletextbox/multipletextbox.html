@@ -1,8 +1,8 @@
-<div class="umb-property-editor umb-multiple-textbox" ng-controller="Umbraco.PropertyEditors.MultipleTextBoxController">
+<div class="umb-editor umb-multiple-textbox" ng-controller="Umbraco.PropertyEditors.MultipleTextBoxController">
 
   <div ui-sortable="sortableOptions" ng-model="model.value">
     <div class="flex flex-wrap textbox-wrapper" ng-repeat="item in model.value">
-      <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-property-editor umb-textstring textstring"
+      <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-editor umb-textstring textstring"
              ng-keyup="addRemoveOnKeyDown($event, $index)" focus-when="{{item.hasFocus}}"/>
       <i class="icon icon-navigation handle" localize="title" title="@general_move"></i>
 

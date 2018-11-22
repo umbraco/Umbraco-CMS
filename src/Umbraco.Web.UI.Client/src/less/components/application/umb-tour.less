@@ -1,13 +1,13 @@
 .umb-tour__loader {
     background: @white;
-    z-index: @zindexTourModal;
+    z-index: 10000;
     position: fixed;
     height: 5px;
 }
 
 .umb-tour__pulse {
     position: fixed;
-    z-index: @zindexTourModal;
+    z-index: 10000;
     display: none;
     background: transparent;
     box-shadow: 0 0 0 @green inset;
@@ -31,7 +31,7 @@
     position: fixed;
     background: @white;
     border-radius: @baseBorderRadius;
-    z-index: @zindexTourModal;
+    z-index: 10000;
     width: 320px;
     max-width: 100%;
     box-sizing: border-box;
@@ -99,9 +99,4 @@
     margin-bottom: 15px;
     font-size: 14px;
     line-height: 1.6em;
-}
-
-// we need to make sure the tour is on top of everything else
-.umb-tour-is-visible .umb-backdrop {
-    z-index: @zindexTourBackdrop;
 }

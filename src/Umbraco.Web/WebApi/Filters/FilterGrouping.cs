@@ -8,7 +8,7 @@ using System.Web.Http.Filters;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Quickly split filters into different types
+    /// Quickly split filters into different types 
     /// </summary>
     internal class FilterGrouping
     {

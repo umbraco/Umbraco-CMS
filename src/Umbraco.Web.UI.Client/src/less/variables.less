@@ -191,12 +191,8 @@
 
 // Scaffolding
 // -------------------------
-@appHeaderHeight:       55px;
-@bodyBackground:        @gray-10;
+@bodyBackground:        @white;
 @textColor:             @gray-2;
-
-@editorHeaderHeight:    70px;
-@editorFooterHeight:    50px;
 
 
 // Links
@@ -242,10 +238,10 @@
 
 // Tables
 // -------------------------
-@tableBackground:                   @white; // overall background-color
+@tableBackground:                   transparent; // overall background-color
 @tableBackgroundAccent:             @gray-10; // for striping
 @tableBackgroundHover:              @gray-10; // for hover
-@tableBorder:                       @gray-9; // table and cell border
+@tableBorder:                       @gray-8; // table and cell border
 
 // Buttons
 // -------------------------
@@ -294,8 +290,7 @@
 // Dropdowns
 // -------------------------
 @dropdownBackground:            @white;
-@dropdownBorder:                none;
-@dropdownBorderRadius:          @baseBorderRadius;
+@dropdownBorder:                @gray-8;
 @dropdownDividerTop:            @gray-8;
 @dropdownDividerBottom:         @white;
 
@@ -319,8 +314,6 @@
 // -------------------------
 // Used for a bird's eye view of components dependent on the z-axis
 // Try to avoid customizing these :)
-@zIndexEditor:             100;
-@zIndexTree:               100;
 @zindexDropdown:          1000;
 @zindexPopover:           1010;
 @zindexTooltip:           1030;
@@ -330,10 +323,6 @@
 
 @zindexUmbOverlay:        7500;
 @zindexOverlayBackdrop:   2000;
-
-// these are used for the tour which should be on top of everything else
-@zindexTourBackdrop:      9999;
-@zindexTourModal:        10000;
 
 // Sticky bar has a z-index of "500", which is set from javascript in directive
 // so set z-index of cropper should be lower to be behind sticky bar.

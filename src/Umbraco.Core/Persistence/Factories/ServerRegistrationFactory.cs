@@ -1,19 +1,20 @@
 ﻿using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class ServerRegistrationFactory
+    internal class ServerRegistrationFactory 
     {
-        public static ServerRegistration BuildEntity(ServerRegistrationDto dto)
+        public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
             var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsMaster);
-            // reset dirty initial properties (U4-1946)
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
             model.ResetDirtyProperties(false);
             return model;
         }
 
-        public static ServerRegistrationDto BuildDto(IServerRegistration entity)
+        public ServerRegistrationDto BuildDto(IServerRegistration entity)
         {
             var dto = new ServerRegistrationDto
             {

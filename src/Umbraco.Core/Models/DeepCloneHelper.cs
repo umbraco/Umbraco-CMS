@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models
 {
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Models
 
             public PropertyInfo PropertyInfo { get; private set; }
             public bool IsDeepCloneable { get; set; }
-            public Type GenericListType { get; set; }
+            public Type GenericListType { get; set; }           
             public bool IsList
             {
                 get { return GenericListType != null; }
@@ -40,7 +39,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="input"></param>
         /// <param name="output"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
         public static void DeepCloneRefProperties(IDeepCloneable input, IDeepCloneable output)
         {
             var inputType = input.GetType();
@@ -68,7 +67,7 @@ namespace Umbraco.Core.Models
                         {
                             return null;
                         }
-
+                        
 
                         if (TypeHelper.IsTypeAssignableFrom<IDeepCloneable>(propertyInfo.PropertyType))
                         {
@@ -157,7 +156,7 @@ namespace Umbraco.Core.Models
                         }
                         else if (o is string || o.GetType().IsValueType)
                         {
-                            //check if the item is a value type or a string, then we can just use it
+                            //check if the item is a value type or a string, then we can just use it                         
                             newList.Add(o);
                         }
                         else

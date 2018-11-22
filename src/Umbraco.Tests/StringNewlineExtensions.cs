@@ -23,21 +23,7 @@
         {
             if (string.IsNullOrEmpty(text)) return text;
             text = text.Replace("\r", ""); // remove CR
-            text = text.Replace("\n", "\r\n"); // add CRLF everywhere
-            return text;
-        }
-
-        /// <summary>
-        /// Replaces Cr/Lf by a single space.
-        /// </summary>
-        /// <param name="text">The text to filter.</param>
-        /// <returns>The filtered text.</returns>
-        public static string NoCrLf(this string text)
-        {
-            if (string.IsNullOrEmpty(text)) return text;
-            text = text.Replace("\r\n", " "); // remove CRLF
-            text = text.Replace("\r", " "); // remove CR
-            text = text.Replace("\n", " "); // remove LF
+            text = text.Replace("\n", "\r\n"); // add CR everywhere
             return text;
         }
     }

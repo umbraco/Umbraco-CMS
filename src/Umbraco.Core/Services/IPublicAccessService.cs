@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Core.Models;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         /// <param name="content"></param>
         /// <returns>Returns null if no entry is found</returns>
         PublicAccessEntry GetEntryForContent(IContent content);
-
+        
         /// <summary>
         /// Gets the entry defined for the content item based on a content path
         /// </summary>
@@ -43,6 +43,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<PublicAccessEntry> IsProtected(string contentPath);
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use AddRule instead, this method will be removed in future versions")]
+        Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string ruleValue);
+
         /// <summary>
         /// Adds a rule if the entry doesn't already exist
         /// </summary>
@@ -50,7 +54,7 @@ namespace Umbraco.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        Attempt<OperationResult<OperationResultType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue);
+        Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue);
 
         /// <summary>
         /// Removes a rule
@@ -58,19 +62,19 @@ namespace Umbraco.Core.Services
         /// <param name="content"></param>
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
-        Attempt<OperationResult> RemoveRule(IContent content, string ruleType, string ruleValue);
+        Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue);
 
         /// <summary>
         /// Saves the entry
         /// </summary>
         /// <param name="entry"></param>
-        Attempt<OperationResult> Save(PublicAccessEntry entry);
+        Attempt<OperationStatus> Save(PublicAccessEntry entry);
 
         /// <summary>
         /// Deletes the entry and all associated rules
         /// </summary>
         /// <param name="entry"></param>
-        Attempt<OperationResult> Delete(PublicAccessEntry entry);
+        Attempt<OperationStatus> Delete(PublicAccessEntry entry);
 
     }
 }

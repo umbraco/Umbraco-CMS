@@ -1,0 +1,210 @@
+﻿/* Standard clearfix */
+.clearfix:after
+{
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.clearfix
+{
+    display: inline-block;
+}
+
+.multiNodePicker .item ul.rightNode
+{
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: inherit !important;
+}
+.multiNodePicker .item ul.rightNode li
+{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: icon;
+    font-family: Arial,Lucida Grande;
+    font-size: 12px;
+    min-height: 20px;
+}
+.multiNodePicker .item ul.rightNode li a
+{
+    background-repeat: no-repeat !important;
+    border: 0 none;
+    color: #2F2F2F;
+    height: 18px;
+    line-height: 18px;
+    padding: 0 0 0 18px;
+    text-decoration: none;
+}
+.multiNodePicker .item ul.rightNode li a div
+{
+    cursor: move;
+    overflow: hidden;
+    height: 20px;
+    width: 240px;
+}
+.multiNodePicker .item.thumb-item ul.rightNode li a div
+{
+    height: 40px;
+    width: 190px;
+}
+.multiNodePicker .item a
+{
+    float: left;
+}
+.multiNodePicker .item a.close
+{
+    color: red;
+    margin: 0;
+    padding: 0px;
+    background: transparent url('/umbraco/images/delete.gif') no-repeat 0px 3px;
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    right: 0px;
+    top: 2px;
+    z-index: 200;
+}
+.multiNodePicker .item
+{
+    width: 298px;
+    height: 21px;
+    border: 1px dotted #DCD;
+    overflow: hidden;
+    background-color: #FFF;
+    margin-bottom: 3px;
+}
+.multiNodePicker .item.thumb-item
+{
+    height: 50px;
+}
+
+.multiNodePicker .item:hover
+{
+    background-color: #F6F6FA;
+}
+
+.multiNodePicker .item .inner
+{
+    float: left;
+    padding: 2px 0px 0px 2px;
+    width: 278px;
+    cursor: move;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.multiNodePicker .item.thumb-item .inner
+{
+    width: 224px;
+}
+
+.multiNodePicker a.info
+{
+    width: 18px;
+    height: 18px;
+    background: transparent url('/umbraco/images/information.png') no-repeat 1px 2px;
+    float: left;
+}
+
+/* tooltip */
+#MNTPTooltip, .tooltip
+{
+    background: url('/umbraco_client/propertypane/images/propertyBackground.gif') repeat-x scroll center top #FFFFFF;
+    display: none;
+    border: 2px solid #999;
+    width: 200px;
+    height: 70px;
+    padding: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    position: absolute;
+    z-index: 5000;
+    -moz-box-shadow: 2px 2px 11px #999;
+    -webkit-box-shadow: 2px 2px 11px #999;
+}
+#MNTPTooltip div.throbber, .tooltip div.throbber
+{
+    width: 16px;
+    height: 16px;
+    background: transparent url('/umbraco/images/throbber.gif') no-repeat top left;
+    display: none;
+}
+#MNTPTooltip div.tooltipInfo, .tooltip div.tooltipInfo
+{
+    font-family: Trebuchet MS,Lucida Grande,verdana,arial;
+    font-size: 11px;
+    overflow: hidden;
+}
+#MNTPTooltip div.tooltipInfo p, .tooltip div.tooltipInfo p
+{
+    margin: 3px 0px 3px 0px;
+}
+#MNTPTooltip div.tooltipInfo h5, .tooltip div.tooltipInfo h5
+{
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+}
+#MNTPTooltip div.tooltipInfo a, .tooltip div.tooltipInfo a
+{
+    float: right;
+    font-size: 10px;
+    display: block;
+}
+
+.multiNodePicker .left.propertypane
+{
+    width: 300px;
+    float: left;
+    clear: left;
+    margin-right: 10px;
+    height: 210px;
+}
+.multiNodePicker .right.propertypane
+{
+    width: 300px;
+    float: left;
+    clear: right;
+    padding: 3px;
+}
+.multiNodePicker .header
+{
+    width: 618px;
+}
+
+.uc-treenode-noclick > a > div
+{
+    color: #CC8888;
+}
+.tree.tree-umbraco li.uc-treenode-noclick > a:hover
+{
+    text-decoration: none;
+}
+
+.multiNodePicker .treeContainer
+{
+    overflow: auto;
+    height: 200px;
+    position: relative;
+}
+
+.multiNodePicker .imageViewer
+{
+    width: 50px;
+    height: 50px;
+    border-right: 1px dotted #DCD;
+    margin-right: 2px;
+    float: left;
+}
+.multiNodePicker .imageViewer img
+{
+    width: 50px;
+    height: 50px;
+}

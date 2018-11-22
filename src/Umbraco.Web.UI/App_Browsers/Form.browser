@@ -1,0 +1,10 @@
+<browsers>
+
+  <browser refID="Default">
+    <controlAdapters>
+      <adapter controlType="System.Web.UI.HtmlControls.HtmlForm"
+               adapterType="umbraco.presentation.urlRewriter.FormRewriterControlAdapter" />
+    </controlAdapters>
+  </browser>
+
+</browsers>

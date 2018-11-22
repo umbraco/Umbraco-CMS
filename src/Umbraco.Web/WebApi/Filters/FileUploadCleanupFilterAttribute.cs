@@ -7,7 +7,6 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;
 
@@ -66,7 +65,7 @@ namespace Umbraco.Web.WebApi.Filters
                             }
                             catch (System.Exception ex)
                             {
-                                Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
+                                LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
                             }
                         }
                     }
@@ -76,29 +75,29 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 if (actionExecutedContext == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
+                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
+                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request.Content == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
+                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
                     return;
                 }
 
                 ObjectContent objectContent;
-
+                
                 try
                 {
                     objectContent = actionExecutedContext.Response.Content as ObjectContent;
                 }
                 catch (System.Exception ex)
                 {
-                    Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not acquire actionExecutedContext.Response.Content");
+                    LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not acquire actionExecutedContext.Response.Content", ex);
                     return;
                 }
 
@@ -121,7 +120,7 @@ namespace Umbraco.Web.WebApi.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    Current.Logger.Debug<FileUploadCleanupFilterAttribute>("Removing temp file {FileName}", f.TempFilePath);
+                                    LogHelper.Debug<FileUploadCleanupFilterAttribute>("Removing temp file " + f.TempFilePath);
 
                                     try
                                     {
@@ -129,7 +128,7 @@ namespace Umbraco.Web.WebApi.Filters
                                     }
                                     catch (System.Exception ex)
                                     {
-                                        Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
+                                        LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
                                     }
 
                                     //clear out the temp path so it's not returned in the response
@@ -137,23 +136,23 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 else
                                 {
-                                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");
+                                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");   
                                 }
                             }
                         }
                         else
                         {
-                            Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");
-                        }
+                            LogHelper.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");   
+                        }                        
                     }
                     else
                     {
-                        Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
+                        LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is " + objectContent.Value.GetType());
                     }
                 }
                 else
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
+                    LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is " + actionExecutedContext.Request.Content.GetType());
                 }
             }
 
@@ -171,13 +170,13 @@ namespace Umbraco.Web.WebApi.Filters
                         }
                         catch (System.Exception ex)
                         {
-                            Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", file);
+                            LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + file, ex);
                         }
                     }
                 }
 
             }
-
+            
         }
     }
 }

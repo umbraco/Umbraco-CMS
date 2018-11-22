@@ -1,8 +1,7 @@
 namespace Umbraco.Core.Configuration
 {
-    public enum LocalTempStorage
+    internal enum LocalTempStorage
     {
-        Unknown = 0,
         Default,
         AspNetTemp,
         EnvironmentTemp

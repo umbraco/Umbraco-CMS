@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// The value editor for the file upload property editor.
     /// </summary>
-    internal class FileUploadPropertyValueEditor : DataValueEditor
+    internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
     {
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, MediaFileSystem mediaFileSystem)
-            : base(attribute)
+        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem)
+            : base(wrapped)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileSystem = mediaFileSystem;
         }
 
         /// <summary>
@@ -41,80 +42,99 @@ namespace Umbraco.Web.PropertyEditors
         /// Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
         /// folders would NOT work, etc.</para>
         /// </remarks>
-        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
-            var currentPath = currentValue as string;
-            if (!currentPath.IsNullOrWhiteSpace())
-                currentPath = _mediaFileSystem.GetRelativePath(currentPath);
+            currentValue = currentValue ?? string.Empty;
 
-            string editorFile = null;
-            if (editorValue.Value != null)
+            // at that point,
+            // currentValue is either empty or "/media/path/to/img.jpg"
+            // editorValue.Value is { "clearFiles": true } or { "selectedFiles": "img1.jpg,img2.jpg" }
+            // comparing them makes little sense
+
+            // check the editorValue value to see whether we need to clear files
+            var editorJsonValue = editorValue.Value as JObject;
+            var clears = editorJsonValue != null && editorJsonValue["clearFiles"] != null && editorJsonValue["clearFiles"].Value<bool>();
+            var uploads = editorValue.AdditionalData.ContainsKey("files") && editorValue.AdditionalData["files"] is IEnumerable<ContentItemFile>;
+
+            // nothing = no changes, return what we have already (leave existing files intact)
+            if (clears == false && uploads == false)
+                return currentValue;
+
+            // get the current file paths
+            var currentPaths = currentValue.ToString()
+                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => _mediaFileSystem.GetRelativePath(x)) // get the fs-relative path
+                .ToArray();
+
+            // if clearing, remove these files and return
+            if (clears)
             {
-                editorFile = editorValue.Value as string;
+                foreach (var pathToRemove in currentPaths)
+                    _mediaFileSystem.DeleteFile(pathToRemove, true);
+                return string.Empty; // no more files
             }
 
             // ensure we have the required guids
-            var cuid = editorValue.ContentKey;
-            if (cuid == Guid.Empty) throw new Exception("Invalid content key.");
-            var puid = editorValue.PropertyTypeKey;
-            if (puid == Guid.Empty) throw new Exception("Invalid property type key.");
+            if (editorValue.AdditionalData.ContainsKey("cuid") == false // for the content item
+                || editorValue.AdditionalData.ContainsKey("puid") == false) // and the property type
+                throw new Exception("Missing cuid/puid additional data.");
+            var cuido = editorValue.AdditionalData["cuid"];
+            var puido = editorValue.AdditionalData["puid"];
+            if ((cuido is Guid) == false || (puido is Guid) == false)
+                throw new Exception("Invalid cuid/puid additional data.");
+            var cuid = (Guid) cuido;
+            var puid = (Guid) puido;
+            if (cuid == Guid.Empty || puid == Guid.Empty)
+                throw new Exception("Invalid cuid/puid additional data.");
 
-            var uploads = editorValue.Files;
-            if (uploads == null) throw new Exception("Invalid files.");
-            var file = uploads.Length > 0 ? uploads[0] : null;
+            // process the files
+            var files = ((IEnumerable<ContentItemFile>) editorValue.AdditionalData["files"]).ToArray();
 
-            if (file == null) // not uploading a file
+            var newPaths = new List<string>();
+            const int maxLength = 1; // we only process ONE file
+            for (var i = 0; i < maxLength /*files.Length*/; i++)
             {
-                // if editorFile is empty then either there was nothing to begin with,
-                // or it has been cleared and we need to remove the file - else the
-                // value is unchanged.
-                if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
+                var file = files[i];
+
+                // skip invalid files
+                if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
+                    continue;
+
+                // get the filepath
+                // in case we are using the old path scheme, try to re-use numbers (bah...)
+                var reuse = i < currentPaths.Length ? currentPaths[i] : null; // this would be WRONG with many files
+                var filepath = _mediaFileSystem.GetMediaPath(file.FileName, reuse, cuid, puid); // fs-relative path
+
+                using (var filestream = File.OpenRead(file.TempFilePath))
                 {
-                    _mediaFileSystem.DeleteFile(currentPath);
-                    return null; // clear
+                    _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
+
+                    var ext = _mediaFileSystem.GetExtension(filepath);
+                    if (_mediaFileSystem.IsImageFile(ext) && ext != ".svg")
+                    {
+                        var preValues = editorValue.PreValues.FormatAsDictionary();
+                        var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
+                        using (var image = Image.FromStream(filestream))
+                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
+                    }
+
+                    // all related properties (auto-fill) are managed by FileUploadPropertyEditor
+                    // when the content is saved (through event handlers)
+
+                    newPaths.Add(filepath);
                 }
-
-                return currentValue; // unchanged
             }
-
-            // process the file
-            var filepath = editorFile == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
 
             // remove all temp files
-            foreach (var f in uploads)
-                File.Delete(f.TempFilePath);
+            foreach (var file in files)
+                File.Delete(file.TempFilePath);
 
-            // remove current file if replaced
-            if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                _mediaFileSystem.DeleteFile(currentPath);
+            // remove files that are not there anymore
+            foreach (var pathToRemove in currentPaths.Except(newPaths))
+                _mediaFileSystem.DeleteFile(pathToRemove, true);
 
-            // update json and return
-            if (editorFile == null) return null;
-            return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
 
-            
-        }
-
-        private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
-        {
-            // process the file
-            // no file, invalid file, reject change
-            if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
-                return null;
-
-            // get the filepath
-            // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
-
-            using (var filestream = File.OpenRead(file.TempFilePath))
-            {
-                //TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
-                // since we'd need to be able to return values for other properties from these methods
-
-                _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
-            }
-
-            return filepath;
+            return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));
         }
     }
 }

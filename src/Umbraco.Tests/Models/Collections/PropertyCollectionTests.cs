@@ -3,21 +3,21 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models.Collections
 {
     [TestFixture]
-    public class PropertyCollectionTests : UmbracoTestBase
+    public class PropertyCollectionTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Property_Adds_Case_Insensitive_Compare()
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "Test")));
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "test")));
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "Test")));
 
             Assert.AreEqual(1, collection.Count);
         }
@@ -27,8 +27,8 @@ namespace Umbraco.Tests.Models.Collections
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
-
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "test")));
+            
             Assert.IsTrue(collection.Contains("Test"));
         }
 
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Models.Collections
 
             var first = collection.FirstOrDefault();
             var second = collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test"));
-
+            
             Assert.That(first, Is.Null);
             Assert.That(first == null, Is.True);
             Assert.That(second == null, Is.True);
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Models.Collections
         public void PropertyTypeCollection_Returns_Null_On_FirstOrDefault_When_Empty()
         {
             var list = new List<PropertyType>();
-            var collection = new PropertyTypeCollection(false, list);
+            var collection = new PropertyTypeCollection(list);
 
             Assert.That(collection.FirstOrDefault(), Is.Null);
             Assert.That(collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test")) == null, Is.True);

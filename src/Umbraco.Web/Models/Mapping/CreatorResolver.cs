@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
@@ -10,18 +9,11 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Maps the Creator for content
     /// </summary>
-    internal class CreatorResolver
+    internal class CreatorResolver : ValueResolver<IContent, UserProfile>
     {
-        private readonly IUserService _userService;
-
-        public CreatorResolver(IUserService userService)
+        protected override UserProfile ResolveCore(IContent source)
         {
-            _userService = userService;
-        }
-
-        public UserProfile Resolve(IContent source)
-        {
-            return Mapper.Map<IProfile, UserProfile>(source.GetWriterProfile(_userService));
+            return Mapper.Map<IProfile, UserProfile>(source.GetWriterProfile());
         }
     }
 }

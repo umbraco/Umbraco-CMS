@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -12,12 +12,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IAuditService : IService
     {
-        void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null);
-        
-        IEnumerable<IAuditItem> GetLogs(int objectId);
-        IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
-        IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
-        void CleanLogs(int maximumAgeOfLogsInMinutes);
+        void Add(AuditType type, string comment, int userId, int objectId);
 
         /// <summary>
         /// Returns paged items in the audit trail for a given entity

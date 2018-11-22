@@ -1,21 +1,20 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTypeTests : UmbracoTestBase
+    public class ContentTypeTests : BaseUmbracoConfigurationTest
     {
-
+       
 
         [Test]
         public void Can_Deep_Clone_Content_Type_Sort()
@@ -47,14 +46,14 @@ namespace Umbraco.Tests.Models
             }
             //add a property type without a property group
             contentType.PropertyTypeCollection.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "title2") { Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+                new PropertyType("test", DataTypeDatabaseType.Ntext, "title2") { Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
 
-            contentType.AllowedTemplates = new[] { new Template("Name", "name") { Id = 200 }, new Template("Name2", "name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string) "Test Template", (string) "testTemplate")
+            contentType.SetDefaultTemplate(new Template("-1,2,3,4", "Test Template", "testTemplate")
             {
                 Id = 88
             });
@@ -72,7 +71,7 @@ namespace Umbraco.Tests.Models
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 
-            var clone = (ContentType)contentType.DeepCloneWithResetIdentities("newAlias");
+            var clone = (ContentType)contentType.Clone("newAlias");
 
             Assert.AreEqual("newAlias", clone.Alias);
             Assert.AreNotEqual("newAlias", contentType.Alias);
@@ -93,14 +92,7 @@ namespace Umbraco.Tests.Models
             }
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
-        {
-            var logger = new DebugDiagnosticsLogger();
-            var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
-        }
-
-        [Ignore("fixme - ignored test")]
+        [Ignore]
         [Test]
         public void Can_Deep_Clone_Content_Type_Perf_Test()
         {
@@ -117,12 +109,12 @@ namespace Umbraco.Tests.Models
             {
                 group.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string) "Name", (string) "name") { Id = 200 }, new Template((string) "Name2", (string) "name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string) "Test Template", (string) "testTemplate")
+            contentType.SetDefaultTemplate(new Template("-1,2,3,4", "Test Template", "testTemplate")
             {
                 Id = 88
             });
@@ -137,16 +129,17 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            var proflog = GetTestProfilingLogger();
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
-            using (proflog.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
+            using (DisposableTimer.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
             {
-                for (var j = 0; j < 1000; j++)
+                for (int j = 0; j < 1000; j++)
                 {
-                    using (proflog.DebugDuration<ContentTypeTests>("Cloning content type"))
+                    using (DisposableTimer.DebugDuration<ContentTypeTests>("Cloning content type"))
                     {
                         var clone = (ContentType)contentType.DeepClone();
-                    }
+                    }                    
                 }
             }
         }
@@ -157,7 +150,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
             contentType.Id = 99;
-
+            
             var i = 200;
             foreach (var propertyType in contentType.PropertyTypes)
             {
@@ -167,15 +160,15 @@ namespace Umbraco.Tests.Models
             {
                 group.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string) "Name", (string) "name") { Id = 200 }, new Template((string) "Name2", (string) "name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] {new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2")};
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string) "Test Template", (string) "testTemplate")
+            contentType.SetDefaultTemplate(new Template("-1,2,3,4", "Test Template", "testTemplate")
             {
                 Id = 88
-            });
+            });            
             contentType.Description = "test";
             contentType.Icon = "icon";
             contentType.IsContainer = true;
@@ -183,9 +176,12 @@ namespace Umbraco.Tests.Models
             contentType.Key = Guid.NewGuid();
             contentType.Level = 3;
             contentType.Path = "-1,4,10";
-            contentType.SortOrder = 5;
+            contentType.SortOrder = 5;            
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
+
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (ContentType)contentType.DeepClone();
@@ -194,6 +190,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
+            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.AllowedTemplates.Count(), contentType.AllowedTemplates.Count());
             for (var index = 0; index < contentType.AllowedTemplates.Count(); index++)
             {
@@ -230,7 +227,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
             Assert.AreEqual(clone.Icon, contentType.Icon);
             Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
-
+            
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
@@ -243,7 +240,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
-            clone.AddPropertyType(new PropertyType("test", ValueStorageType.Nvarchar, "blah"));
+            clone.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Nvarchar, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
             clone.AddPropertyGroup("hello");
@@ -264,12 +261,12 @@ namespace Umbraco.Tests.Models
             {
                 propertyType.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string) "Name", (string) "name") { Id = 200 }, new Template((string) "Name2", (string) "name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string) "Test Template", (string) "testTemplate")
+            contentType.SetDefaultTemplate(new Template("-1,2,3,4", "Test Template", "testTemplate")
             {
                 Id = 88
             });
@@ -283,6 +280,9 @@ namespace Umbraco.Tests.Models
             contentType.SortOrder = 5;
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
+
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Models
             }
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
-            contentType.CreatorId = 22;
+            contentType.CreatorId = 22;            
             contentType.Description = "test";
             contentType.Icon = "icon";
             contentType.IsContainer = true;
@@ -315,6 +315,9 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
+
             // Act
             var clone = (MediaType)contentType.DeepClone();
 
@@ -322,6 +325,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
+            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
@@ -382,6 +386,9 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
+
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json);
@@ -414,6 +421,8 @@ namespace Umbraco.Tests.Models
             contentType.UpdateDate = DateTime.Now;
             contentType.SetMemberCanEditProperty("title", true);
             contentType.SetMemberCanViewProperty("bodyText", true);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (MemberType)contentType.DeepClone();
@@ -422,6 +431,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
+            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
@@ -484,6 +494,8 @@ namespace Umbraco.Tests.Models
             contentType.UpdateDate = DateTime.Now;
             contentType.SetMemberCanEditProperty("title", true);
             contentType.SetMemberCanViewProperty("bodyText", true);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();

@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    public interface IDictionaryItem : IEntity, IRememberBeingDirty
+    public interface IDictionaryItem : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or Sets the Parent Id of the Dictionary Item

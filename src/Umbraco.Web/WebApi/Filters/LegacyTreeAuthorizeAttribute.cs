@@ -1,7 +1,6 @@
 ﻿using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -15,7 +14,7 @@ namespace Umbraco.Web.WebApi.Filters
                 var treeRequest = httpContext.Result.Request.QueryString["treeType"];
                 if (treeRequest.IsNullOrWhiteSpace()) return false;
 
-                var tree = Current.Services.ApplicationTreeService.GetByAlias(treeRequest);
+                var tree = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(treeRequest);
                 if (tree == null) return false;
 
                 return UmbracoContext.Current.Security.CurrentUser != null
@@ -23,7 +22,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             return false;
 
-
+            
         }
     }
 }

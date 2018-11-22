@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Events
         /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(bool canCancel, EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
-            : base(default, canCancel, eventMessages)
+            : base(default(TEntity), canCancel, eventMessages)
         {
             if (moveInfo.FirstOrDefault() == null)
             {
@@ -27,6 +27,7 @@ namespace Umbraco.Core.Events
             MoveInfoCollection = moveInfo;
             //assign the legacy props
             EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
         }
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Umbraco.Core.Events
         /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
-            : base(default, eventMessages)
+            : base(default(TEntity), eventMessages)
         {
             if (moveInfo.FirstOrDefault() == null)
             {
@@ -47,6 +48,7 @@ namespace Umbraco.Core.Events
             MoveInfoCollection = moveInfo;
             //assign the legacy props
             EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
         }
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace Umbraco.Core.Events
         /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(bool canCancel, params MoveEventInfo<TEntity>[] moveInfo)
-            : base(default, canCancel)
+            : base(default(TEntity), canCancel)
         {
             if (moveInfo.FirstOrDefault() == null)
             {
@@ -67,6 +69,7 @@ namespace Umbraco.Core.Events
             MoveInfoCollection = moveInfo;
             //assign the legacy props
             EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
         }
 
         /// <summary>
@@ -76,7 +79,7 @@ namespace Umbraco.Core.Events
         /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>
         public MoveEventArgs(params MoveEventInfo<TEntity>[] moveInfo)
-            : base(default)
+            : base(default(TEntity))
         {
             if (moveInfo.FirstOrDefault() == null)
             {
@@ -86,8 +89,22 @@ namespace Umbraco.Core.Events
             MoveInfoCollection = moveInfo;
             //assign the legacy props
             EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
         }
 
+        [Obsolete("Use the overload that specifies the MoveEventInfo object")]
+        public MoveEventArgs(TEntity eventObject, bool canCancel, int parentId)
+            : base(eventObject, canCancel)
+        {
+            ParentId = parentId;
+        }
+
+        [Obsolete("Use the overload that specifies the MoveEventInfo object")]
+        public MoveEventArgs(TEntity eventObject, int parentId)
+            : base(eventObject)
+        {
+            ParentId = parentId;
+        }
 
         /// <summary>
         /// Gets all MoveEventInfo objects used to create the object
@@ -103,23 +120,39 @@ namespace Umbraco.Core.Events
                     throw new InvalidOperationException("MoveInfoCollection must have at least one item");
                 }
 
-                _moveInfoCollection = value;
+                _moveInfoCollection = value;                
 
-                //assign the legacy props
+                //assign the legacy props                
                 EventObject = first.Entity;
+                ParentId = first.NewParentId;                
             }
         }
 
+        /// <summary>
+        /// The entity being moved
+        /// </summary>
+        [Obsolete("Retrieve the entity object from the MoveInfoCollection property instead")]
+        public TEntity Entity
+        {
+            get { return EventObject; }
+        }
+
+        /// <summary>
+        /// Gets the Id of the object's new parent
+        /// </summary>
+        [Obsolete("Retrieve the ParentId from the MoveInfoCollection property instead")]
+        public int ParentId { get; private set; }
+
         public bool Equals(MoveEventArgs<TEntity> other)
         {
-            if (other is null) return false;
+            if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && MoveInfoCollection.Equals(other.MoveInfoCollection);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((MoveEventArgs<TEntity>) obj);

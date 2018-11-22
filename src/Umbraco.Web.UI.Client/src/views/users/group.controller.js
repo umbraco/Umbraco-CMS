@@ -1,16 +1,16 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
 
         var vm = this;
-        var contentPickerOpen = false;
+        var localizeSaving = localizationService.localize("general_saving");
+
 
         vm.page = {};        
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
-        vm.showBackButton = true;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -78,6 +78,7 @@
             vm.page.saveButtonState = "busy";
 
             contentEditingHelper.contentEditorPerformSave({
+                statusMessage: localizeSaving,
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
@@ -104,27 +105,32 @@
         }
 
         function openSectionPicker() {
-            var oldSelection = angular.copy(vm.userGroup.sections);
-            var sectionPicker = {
+            vm.sectionPicker = {
+                view: "sectionpicker",
                 selection: vm.userGroup.sections,
+                closeButtonLabel: vm.labels.cancel,
+                show: true,
                 submit: function (model) {
-                    editorService.close();
+                    vm.sectionPicker.show = false;
+                    vm.sectionPicker = null;
                 },
-                close: function () {
-                    vm.userGroup.sections = oldSelection;
-                    editorService.close();
+                close: function (oldModel) {
+                    if (oldModel.selection) {
+                        vm.userGroup.sections = oldModel.selection;
+                    }
+                    vm.sectionPicker.show = false;
+                    vm.sectionPicker = null;
                 }
             };
-            editorService.sectionPicker(sectionPicker);
         }
 
         function openContentPicker() {
-            var contentPicker = {
+            vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                section: "content",
-                treeAlias: "content",
+                view: "contentpicker",
                 hideSubmitButton: true,
                 hideHeader: false,
+                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.contentStartNode = model.selection[0];
@@ -133,23 +139,26 @@
                             vm.userGroup.contentStartNode.icon = "icon-folder";
                         }
                     }
-                    editorService.close();
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 },
-                close: function () {
-                    editorService.close();
+                close: function (oldModel) {
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 }
             };
-            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            var mediaPicker = {
+            vm.contentPicker = {
                 title: vm.labels.selectMediaStartNode,
+                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
                 hideSubmitButton: true,
                 hideHeader: false,
+                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.mediaStartNode = model.selection[0];
@@ -158,28 +167,30 @@
                             vm.userGroup.mediaStartNode.icon = "icon-folder";
                         }
                     }
-                    editorService.close();
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 },
-                close: function () {
-                    editorService.close();
+                close: function (oldModel) {
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 }
             };
-            editorService.treePicker(mediaPicker);
         }
 
         function openUserPicker() {
-            var oldSelection = angular.copy(vm.userGroup.users);
-            var userPicker = {
+            vm.userPicker = {
+                view: "userpicker",
                 selection: vm.userGroup.users,
-                submit: function () {
-                    editorService.close();
+                show: true,
+                submit: function (model) {
+                    vm.userPicker.show = false;
+                    vm.userPicker = null;
                 },
-                close: function () {
-                    vm.userGroup.users = oldSelection;
-                    editorService.close();
+                close: function (oldModel) {
+                    vm.userPicker.show = false;
+                    vm.userPicker = null;
                 }
             };
-            editorService.userPicker(userPicker);
         }
 
         /**
@@ -205,11 +216,11 @@
         }
 
         function openGranularPermissionsPicker() {
-            var contentPicker = {
+            vm.contentPicker = {
                 title: vm.labels.selectNode,
-                section: "content",
-                treeAlias: "content",
+                view: "contentpicker",
                 hideSubmitButton: true,
+                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         var node = model.selection[0];
@@ -221,12 +232,11 @@
                         setPermissionsForNode(node);
                     }
                 },
-                close: function () {
-                    editorService.close();
+                close: function (oldModel) {
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 }
             };
-            editorService.treePicker(contentPicker);
-            contentPickerOpen = true;
         }
 
         function setPermissionsForNode(node) {
@@ -237,7 +247,9 @@
             }
 
             vm.nodePermissions = {
+                view: "nodepermissions",
                 node: node,
+                show: true,
                 submit: function (model) {
 
                     if (model && model.node && model.node.permissions) {
@@ -257,21 +269,20 @@
                         }
                     }
 
-                    editorService.close();
-
-                    if(contentPickerOpen) {
-                        editorService.close();
-                        contentPickerOpen = false;
+                    // close node permisssions overlay
+                    vm.nodePermissions.show = false;
+                    vm.nodePermissions = null;
+                    // close content picker overlay
+                    if(vm.contentPicker) {
+                        vm.contentPicker.show = false;
+                        vm.contentPicker = null;
                     }
-
                 },
-                close: function () {
-                    editorService.close();
+                close: function (oldModel) {
+                    vm.nodePermissions.show = false;
+                    vm.nodePermissions = null;
                 }
             };
-
-            editorService.nodePermissions(vm.nodePermissions);
-
         }
 
         function removeSelectedItem(index, selection) {

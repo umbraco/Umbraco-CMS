@@ -7,9 +7,8 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^^umbProperty'],
+        require: ['ngModel', '?^umbProperty'],
         restrict: "A",
-        scope: {},
         link: function (scope, element, attr, ctrls) {
 
             var modelCtrl = ctrls[0];
@@ -19,20 +18,7 @@ function valServer(serverValidationManager) {
                 return;
             }
 
-            var currentProperty = umbPropCtrl.property;
-            var currentCulture = currentProperty.culture;
             var watcher = null;
-            var unsubscribe = [];
-
-            //default to 'value' if nothing is set
-            var fieldName = "value";
-            if (attr.valServer) {
-                fieldName = scope.$eval(attr.valServer);
-                if (!fieldName) {
-                    //eval returned nothing so just use the string
-                    fieldName = attr.valServer;
-                }
-            }
 
             //Need to watch the value model for it to change, previously we had  subscribed to 
             //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
@@ -54,8 +40,6 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
-                            //clear the server validation entry
-                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
                             stopWatch();
                         }
                     }, true);
@@ -68,31 +52,41 @@ function valServer(serverValidationManager) {
                     watcher = null;
                 }
             }
+
+            var currentProperty = umbPropCtrl.property;
+
+            //default to 'value' if nothing is set
+            var fieldName = "value";
+            if (attr.valServer) {
+                fieldName = scope.$eval(attr.valServer);
+                if (!fieldName) {
+                    //eval returned nothing so just use the string
+                    fieldName = attr.valServer;
+                }
+            }            
             
             //subscribe to the server validation changes
-            unsubscribe.push(serverValidationManager.subscribe(currentProperty.alias,
-                currentCulture,
-                fieldName,
-                function(isValid, propertyErrors, allErrors) {
-                    if (!isValid) {
-                        modelCtrl.$setValidity('valServer', false);
-                        //assign an error msg property to the current validator
-                        modelCtrl.errorMsg = propertyErrors[0].errorMsg;
-                        startWatch();
-                    }
-                    else {
-                        modelCtrl.$setValidity('valServer', true);
-                        //reset the error message
-                        modelCtrl.errorMsg = "";
-                        stopWatch();
-                    }
-                }));
-
-            scope.$on('$destroy', function () {
-                stopWatch();
-                for (var u in unsubscribe) {
-                    unsubscribe[u]();
+            serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
+                if (!isValid) {
+                    modelCtrl.$setValidity('valServer', false);
+                    //assign an error msg property to the current validator
+                    modelCtrl.errorMsg = propertyErrors[0].errorMsg;
+                    startWatch();
                 }
+                else {
+                    modelCtrl.$setValidity('valServer', true);
+                    //reset the error message
+                    modelCtrl.errorMsg = "";
+                    stopWatch();
+                }
+            });
+            
+            //when the element is disposed we need to unsubscribe!
+            // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
+            // but they are a different callback instance than the above.
+            element.bind('$destroy', function () {
+                stopWatch();
+                serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
             });
         }
     };

@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-    function ($scope, gridService) {
+    function ($scope, $http, assetsService, $rootScope, dialogService, mediaResource, gridService, imageHelper, $timeout) {
 
         var emptyModel = {
             styles:[
@@ -189,7 +189,7 @@ angular.module("umbraco")
             if(toggle){
                 collection = [];
             }else{
-                collection = null;
+                delete collection;
             }
         };
 

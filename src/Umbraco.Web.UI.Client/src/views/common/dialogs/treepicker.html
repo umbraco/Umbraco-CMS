@@ -1,0 +1,60 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
+    <div class="umb-panel-header">
+        <div class="umb-el-wrap umb-panel-buttons">
+            
+            <umb-tree-search-box hide-search-callback="hideSearch"
+                                 search-callback="onSearchResults"
+                                 search-from-id="{{searchInfo.searchFromId}}"
+                                 search-from-name="{{searchInfo.searchFromName}}"
+                                 show-search="{{searchInfo.showSearch}}"
+                                 section="{{section}}">
+            </umb-tree-search-box>
+
+        </div>        
+    </div>
+    <div class="umb-panel-body with-footer">
+        
+        <div class="tab-content umb-control-group">
+            
+            <umb-tree-search-results 
+                ng-if="searchInfo.showSearch"                                     
+                results="searchInfo.results"
+                select-result-callback="selectResult">
+            </umb-tree-search-results>
+
+            <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+                <umb-tree section="{{section}}"
+                          treealias="{{treeAlias}}"
+                          hideheader="{{hideHeader}}"
+                          hideoptions="true"
+                          isdialog="true"
+                          customtreeparams="{{customTreeParams}}"
+                          eventhandler="dialogTreeEventHandler"
+                          enablelistviewsearch="true"
+                          enablecheckboxes="{{multiPicker}}">
+                </umb-tree>
+            </div>
+        </div>
+    </div>
+
+    <div class="umb-panel-footer">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar pull-right">
+
+                <a href ng-click="close()" class="btn btn-link">
+                    <localize key="general_cancel">Cancel</localize>
+                </a>
+
+                <button
+                    class="btn btn-primary"
+                    ng-if="dialogOptions.multiPicker"
+                    ng-click="multiSubmit(dialogData.selection)">
+                    <localize key="buttons_select">Select</localize>
+                    ({{dialogData.selection.length}})
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+</div>

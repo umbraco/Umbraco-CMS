@@ -1,0 +1,33 @@
+ .editorIcon, .editorIconOver,.editorIconDown, .editorIconOn, .editorIconDisabled, .editorDropDown, .editorIconSplit {
+ 	margin:2px;
+ 	
+ }
+ 
+.tinymceMenuBar table {
+		margin: 1px 0 0 6px;
+		_margin-top: 2px;
+	}
+
+
+ .editorIconOver, .editorIconDown, .editorIconOn{
+	cursor: hand;
+	margin: 1px;
+	background: #EAEAEA;
+	border: 1px solid #CAC9C9 !Important;
+	}
+	
+
+
+.editorIconDisabled {
+	/*
+	IE ONLY !!!
+	*/
+	Filter: Alpha(Opacity=30);
+	}
+			
+.editorDropDown {
+	font-family: verdana, arial;
+	font-size: 10px;
+	width: 80px;
+	color: #666699;
+	}

@@ -17,7 +17,7 @@ namespace Umbraco.Core.Configuration.Dashboard
         {
             get { return (AreasElement)this["areas"]; }
         }
-
+        
         [ConfigurationProperty("access")]
         public AccessElement Access
         {
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Configuration.Dashboard
 
         IEnumerable<IDashboardTab> ISection.Tabs
         {
-            get { return TabCollection; }
+            get { return TabCollection; }            
         }
 
         IEnumerable<string> ISection.Areas

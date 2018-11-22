@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using umbraco;
@@ -15,13 +15,17 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         public override InstallSetupResult Execute(object model)
         {
-            // validate file permissions
-            Dictionary<string, IEnumerable<string>> report;
-            var permissionsOk = FilePermissionHelper.RunFilePermissionTestSuite(out report);
+            //first validate file permissions
+            var permissionsOk = true;
+            Dictionary<string, List<string>> reportParts;
+
+            permissionsOk = FilePermissionHelper.RunFilePermissionTestSuite(out reportParts);
 
             if (permissionsOk == false)
-                throw new InstallException("Permission check failed", "permissionsreport", new { errors = report });
-
+            {
+                throw new InstallException("Permission check failed", "permissionsreport", new { errors = reportParts });    
+            }
+            
             return null;
         }
 

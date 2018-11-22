@@ -4,9 +4,11 @@ var app = angular.module('umbraco', [
 	'umbraco.resources',
 	'umbraco.services',
 	'umbraco.mocks',
-	'umbraco.interceptors',
-
-    'ngRoute',
+	'umbraco.security',
     'ngCookies',
-    'LocalStorageModule'
+    'LocalStorageModule' 
 ]);
+
+/* For Angular 1.2: we need to load in Routing separately
+	    'ngRoute'
+*/

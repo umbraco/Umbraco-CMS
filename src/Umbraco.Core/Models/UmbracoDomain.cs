@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class UmbracoDomain : EntityBase, IDomain
+    public class UmbracoDomain : Entity, IDomain
     {
         public UmbracoDomain(string domainName)
         {

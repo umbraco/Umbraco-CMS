@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -17,22 +15,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// This ensures that the grid config is merged in with the front-end value
     /// </summary>
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
+    [PropertyValueType(typeof(JToken))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class GridValueConverter : JsonValueConverter
     {
-        public GridValueConverter(PropertyEditorCollection propertyEditors)
-            : base(propertyEditors)
-        { }
-
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Grid);
+        {
+            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.GridAlias);
+        }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (JToken);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -48,13 +40,14 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
                     //TODO: Change all singleton access to use ctor injection in v8!!!
                     //TODO: That would mean that property value converters would need to be request lifespan, hrm....
+                    bool isDebug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
                     var gridConfig = UmbracoConfig.For.GridConfig(
-                        Current.ProfilingLogger.Logger,
-                        Current.ApplicationCache.RuntimeCache,
+                        ApplicationContext.Current.ProfilingLogger.Logger,
+                        ApplicationContext.Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
-                        Current.RuntimeState.Debug);
-
+                        isDebug);
+                    
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())
                     {
@@ -100,7 +93,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<GridValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    LogHelper.Error<GridValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 

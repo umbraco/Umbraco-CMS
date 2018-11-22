@@ -94,53 +94,51 @@
 (function () {
     'use strict';
 
-    function umbClipboardDirective($timeout, assetsService, $parse) {
+    function umbClipboardDirective($timeout, assetsService) {
 
         function link(scope, element, attrs, ctrl) {
 
             var clipboard;
             var target = element[0];
-
+            
             assetsService.loadJs("lib/clipboard/clipboard.min.js", scope)
                 .then(function () {
 
-
-                    if (attrs.umbClipboardTarget) {
-                        target.setAttribute("data-clipboard-target", attrs.umbClipboardTarget);
+                    if(scope.umbClipboardTarget) {
+                        target.setAttribute("data-clipboard-target", scope.umbClipboardTarget);
                     }
 
-                    if (attrs.umbClipboardAction) {
-                        target.setAttribute("data-clipboard-action", attrs.umbClipboardAction);
+                    if(scope.umbClipboardAction) {
+                        target.setAttribute("data-clipboard-action", scope.umbClipboardAction);
                     }
 
-                    if (attrs.umbClipboardText) {
-                        target.setAttribute("data-clipboard-text", attrs.umbClipboardText);
+                    if(scope.umbClipboardText) {
+                        target.setAttribute("data-clipboard-text", scope.umbClipboardText);
                     }
 
-                    clipboard = new ClipboardJS(target);
+                    clipboard = new Clipboard(target);
 
-                    var expressionHandlerSuccess = $parse(attrs.umbClipboardSuccess);
                     clipboard.on('success', function (e) {
                         e.clearSelection();
-                        if (attrs.umbClipboardSuccess) {
-
-                            expressionHandlerSuccess(scope, { msg: "success" });
+                        if (scope.umbClipboardSuccess) {
+                            scope.$apply(function () {
+                                scope.umbClipboardSuccess({ e: e });
+                            });
                         }
-
                     });
 
-                    var expressionHandlerError = $parse(attrs.umbClipboardError);
                     clipboard.on('error', function (e) {
-                        if (attrs.umbClipboardError) {
-
-                            expressionHandlerError(scope, { msg: "error" });
+                        if (scope.umbClipboardError) {
+                            scope.$apply(function () {
+                                scope.umbClipboardError({ e: e });
+                            });
                         }
                     });
 
                 });
 
             // clean up
-            scope.$on('$destroy', function () {
+            scope.$on('$destroy', function(){
                 clipboard.destroy();
             });
 
@@ -150,6 +148,13 @@
 
         var directive = {
             restrict: 'A',
+            scope: {
+                umbClipboardSuccess: '&?',
+                umbClipboardError: '&?',
+                umbClipboardTarget: "@?",
+                umbClipboardAction: "@?",
+                umbClipboardText: "=?"
+            },
             link: link
         };
 

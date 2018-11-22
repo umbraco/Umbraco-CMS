@@ -1,10 +1,13 @@
-﻿namespace Umbraco.Web
+namespace Umbraco.Web
 {
     /// <summary>
-    /// Provides access to UmbracoContext.
+    /// Used to retrieve the Umbraco context
     /// </summary>
+    /// <remarks>
+    /// NOTE: This has a singleton lifespan
+    /// </remarks>    
     public interface IUmbracoContextAccessor
     {
-        UmbracoContext UmbracoContext { get; set;  }
+        UmbracoContext Value { get; }
     }
 }

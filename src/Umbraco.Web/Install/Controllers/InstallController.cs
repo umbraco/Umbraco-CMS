@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Security;
-using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.Web.Install.Controllers
 {
@@ -16,36 +17,37 @@ namespace Umbraco.Web.Install.Controllers
     /// <remarks>
     /// NOTE: All views must have their full paths as we do not have a custom view engine for the installation views!
     /// </remarks>
-    [InstallAuthorize]
+    [InstallAuthorizeAttribute]
     public class InstallController : Controller
     {
         private readonly UmbracoContext _umbracoContext;
-        private readonly InstallHelper _installHelper;
-        private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
 
-        public InstallController(UmbracoContext umbracoContext, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings)
-        {
-            _umbracoContext = umbracoContext;
-            _installHelper = installHelper;
-            _runtime = runtime;
-            _logger = logger;
-            _globalSettings = globalSettings;
-        }
+		public InstallController()
+			: this(UmbracoContext.Current)
+		{
+			
+		}
+
+        public InstallController(UmbracoContext umbracoContext)
+		{
+			_umbracoContext = umbracoContext;
+		}
+
 
         [HttpGet]
         public ActionResult Index()
         {
-            if (_runtime.Level == RuntimeLevel.Run)
-                return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));
+            if (ApplicationContext.Current.IsConfigured)
+            {
+                return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));   
+            }
 
-            if (_runtime.Level == RuntimeLevel.Upgrade)
+            if (ApplicationContext.Current.IsUpgrading)
             {
                 // Update ClientDependency version
-                var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
+                var clientDependencyConfig = new ClientDependencyConfiguration(_umbracoContext.Application.ProfilingLogger.Logger);
                 var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                    UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+                    UmbracoVersion.GetSemanticVersion(), DateTime.UtcNow, "yyyyMMdd");
                 // Delete ClientDependency temp directories to make sure we get fresh caches
                 var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
 
@@ -58,17 +60,20 @@ namespace Umbraco.Web.Install.Controllers
                         return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
                 }
             }
+       
 
-            // gen the install base url
+            //gen the install base url
             ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup");
-
-            // get the base umbraco folder
+            
+            //get the base umbraco folder
             ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            _installHelper.InstallStatus(false, "");
+            InstallHelper ih = new InstallHelper(_umbracoContext);
+            ih.InstallStatus(false, "");
 
-            // always ensure full path (see NOTE in the class remarks)
-            return View(_globalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
+            //always ensure full path (see NOTE in the class remarks)
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
         }
+
     }
 }

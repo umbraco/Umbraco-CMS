@@ -5,8 +5,6 @@ using System.Linq;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-    // fixme imported from 7.6 needs better explaination of what it is
-
     /// <summary>
     /// The published content enumerable, this model is to allow ToString to be overriden for value converters to support legacy requests for string values
     /// </summary>
@@ -25,7 +23,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </param>
         public PublishedContentEnumerable(IEnumerable<IPublishedContent> publishedContent)
         {
-            _items = publishedContent ?? throw new ArgumentNullException(nameof(publishedContent));
+            if (publishedContent == null) throw new ArgumentNullException("publishedContent");
+            _items = publishedContent;
         }
 
         /// <summary>

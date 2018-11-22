@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -10,9 +12,21 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
+        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
+        // otherwise that would fail because there is no public constructor.
+        public UserMapper()
+        {
+            BuildMap();
+        }
 
-        protected override void BuildMap()
+        #region Overrides of BaseMapper
+
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
+
+        internal override void BuildMap()
         {
             CacheMap<User, UserDto>(src => src.Id, dto => dto.Id);
             CacheMap<User, UserDto>(src => src.Email, dto => dto.Email);
@@ -20,7 +34,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.RawPasswordValue, dto => dto.Password);
             CacheMap<User, UserDto>(src => src.Name, dto => dto.UserName);
             //NOTE: This column in the db is *not* used!
-            //CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);
+            //CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);         
             CacheMap<User, UserDto>(src => src.IsApproved, dto => dto.Disabled);
             CacheMap<User, UserDto>(src => src.IsLockedOut, dto => dto.NoConsole);
             CacheMap<User, UserDto>(src => src.Language, dto => dto.UserLanguage);
@@ -31,5 +45,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.LastPasswordChangeDate, dto => dto.LastPasswordChangeDate);
             CacheMap<User, UserDto>(src => src.SecurityStamp, dto => dto.SecurityStampToken);
         }
+
+        #endregion
     }
 }

@@ -19,16 +19,13 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         if (!$scope.model.value.maxImageSize && $scope.model.value.maxImageSize != 0) {
             $scope.model.value.maxImageSize = cfg.maxImageSize;
         }
-        if (!$scope.model.value.mode) {
-            $scope.model.value.mode = "classic";
-        }
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
 
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
-                var icon = getFontIcon(obj.alias);
+                var icon = getFontIcon(obj.frontEndCommand);
                 return angular.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom
@@ -49,17 +46,17 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         };
 
         $scope.selectCommand = function(command){
-            var index = $scope.model.value.toolbar.indexOf(command.alias);
+            var index = $scope.model.value.toolbar.indexOf(command.frontEndCommand);
 
             if(command.selected && index === -1){
-                $scope.model.value.toolbar.push(command.alias);
+                $scope.model.value.toolbar.push(command.frontEndCommand);
             }else if(index >= 0){
                 $scope.model.value.toolbar.splice(index, 1);
             }
         };
 
         $scope.selectStylesheet = function (css) {
-
+            
             var index = $scope.model.value.stylesheets.indexOf(css.name);
 
             if(css.selected && index === -1){
@@ -68,13 +65,13 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };
-
+        
         // map properties for specific commands
         function getFontIcon(alias) {
             var icon = { name: alias, isCustom: false };
 
             switch (alias) {
-                case "ace":
+                case "codemirror":
                     icon.name = "code";
                     icon.isCustom = false;
                     break;
@@ -110,8 +107,8 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
-            $scope.model.value.toolbar = _.pluck(commands, "alias");
-
+            $scope.model.value.toolbar = _.pluck(commands, "frontEndCommand");
+            
         });
 
         // when the scope is destroyed we need to unsubscribe

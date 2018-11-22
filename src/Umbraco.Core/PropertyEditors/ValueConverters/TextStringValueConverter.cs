@@ -1,28 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
         private static readonly string[] PropertyTypeAliases =
         {
-            Constants.PropertyEditors.Aliases.TextBox,
-            Constants.PropertyEditors.Aliases.TextArea
+            Constants.PropertyEditors.TextboxAlias,
+            Constants.PropertyEditors.TextboxMultipleAlias
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => PropertyTypeAliases.Contains(propertyType.EditorAlias);
+        {
+            return PropertyTypeAliases.Contains(propertyType.PropertyEditorAlias);
+        }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (string);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a string is: string
             // in the database a string is: string
@@ -30,16 +30,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return source;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return inter ?? string.Empty;
+            return source ?? string.Empty;
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return inter;
+            return source;
         }
     }
 }

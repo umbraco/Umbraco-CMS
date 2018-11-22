@@ -1,19 +1,11 @@
-<div class="umb-layout-selector" ng-show="vm.showLayoutSelector">
+<div class="umb-layout-selector" ng-show="showLayoutSelector">
 
-   <div class="umb-layout-selector__active-layout" ng-click="vm.toggleLayoutDropdown()">
-      <i class="{{ vm.activeLayout.icon }}"></i>
+   <div class="umb-layout-selector__active-layout" ng-click="toggleLayoutDropdown()">
+      <i class="{{ activeLayout.icon }}"></i>
    </div>
 
-   <div ng-if="vm.layoutDropDownIsOpen"
-        class="umb-layout-selector__dropdown shadow-depth-3 animated -half-second fadeIn"
-        on-outside-click="vm.closeLayoutDropdown()">
-
-       <div ng-repeat="layout in vm.layouts | filter:{selected:true} track by layout.name"
-            class="umb-layout-selector__dropdown-item"
-            ng-click="vm.pickLayout(layout)"
-            ng-class="{'-active': layout.active }"
-            ng-attr-title="{{layout.name}}">
-
+   <div ng-if="layoutDropDownIsOpen" class="umb-layout-selector__dropdown shadow-depth-3 animated -half-second fadeIn" on-outside-click="closeLayoutDropdown()">
+       <div ng-repeat="layout in layouts | filter:{selected:true}" class="umb-layout-selector__dropdown-item" ng-click="pickLayout(layout)" ng-class="{'-active': layout.active }" ng-attr-title="{{layout.name}}">
            <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></i>
        </div>
 

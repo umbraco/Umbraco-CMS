@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Deploy
+namespace Umbraco.Core.Deploy
 {
     /// <summary>
     /// Represent the state of an artifact being deployed.

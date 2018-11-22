@@ -21,6 +21,13 @@ function MediaEmptyRecycleBinController($scope, mediaResource, treeService, navi
             $scope.busy = false;
             $scope.currentNode.loading = false;
 
+            //show any notifications
+            if (angular.isArray(result.notifications)) {
+                for (var i = 0; i < result.notifications.length; i++) {
+                    notificationsService.showNotification(result.notifications[i]);
+                }
+            }
+
             treeService.removeChildNodes($scope.currentNode);
             navigationService.hideMenu();
 

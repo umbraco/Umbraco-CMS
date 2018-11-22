@@ -26,7 +26,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 				Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostValidateDatabaseConnection",
 				model ).then( function( response ) {
 					
-					if ( response.data === true ) {
+					if ( response.data === "true" ) {
 						installerService.forward();	
 					}
 					else {

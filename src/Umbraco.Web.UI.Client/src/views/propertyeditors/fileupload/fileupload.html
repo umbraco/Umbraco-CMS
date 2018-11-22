@@ -1,7 +1,38 @@
-﻿<div ng-controller="Umbraco.PropertyEditors.FileUploadController">
-    <umb-property-file-upload culture="{{model.culture}}"
-                              property-alias="{{model.alias}}"
-                              value="model.value"
-                              on-files-selected="fileChanged(value)">
-    </umb-property-file-upload>
+﻿<div class="umb-editor umb-fileupload" ng-controller="Umbraco.PropertyEditors.FileUploadController">
+    
+    <div ng-show="persistedFiles.length > 0">
+        <ul class="thumbnails">
+            <li class="span4 thumbnail" ng-repeat="file in persistedFiles">
+                <a href="{{file.file}}" target="_blank" ng-switch on="file.isImage">
+                    <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}" />
+                    <img ng-src="{{file.file}}" ng-switch-when="false" ng-if="file.extension == 'svg'" alt="{{file.file}}" />
+                    <span class="file-icon-wrap" ng-if="!file.isImage && file.extension != 'svg'">
+                        <span class="file-icon">
+                            <i class="icon icon-document"></i>
+                            <span>.{{file.extension}}</span>
+                        </span>
+                    </span>
+                    <span ng-switch-default>{{file.file}}</span>
+                </a>
+            </li>
+        </ul>
+
+        <input type="checkbox" id="clearFiles-{{model.id}}" name="clearFiles" ng-model="clearFiles" />
+            <label for="clearFiles-{{model.id}}" class="inline" style="font-size: 13px; vertical-align: top;">
+                <localize key="content_uploadClear">Clear files</localize>
+            </label>
+        <hr/>
+    </div>
+
+    <div ng-hide="clearFiles">
+        <div class="file-uploader">
+            <umb-single-file-upload rebuild="rebuildInput"></umb-single-file-upload>
+        </div>
+        <ul ng-show="files.length > 0">
+            <li ng-repeat="file in files">{{file.file.name}}</li>
+        </ul>
+    </div>
+
+    <input type="hidden" name="fileCount" ng-model="files.length" val-property-validator="validateMandatory" no-dirty-check />
+
 </div>

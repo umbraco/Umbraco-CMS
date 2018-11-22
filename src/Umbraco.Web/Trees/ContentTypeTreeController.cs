@@ -1,34 +1,28 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
+using AutoMapper;
+using umbraco;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [CoreTree]
+    [LegacyBaseTree(typeof(loadNodeTypes))]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var root = base.CreateRootNode(queryStrings);
-            //check if there are any types
-            root.HasChildren = Services.ContentTypeService.GetAll().Any();
-            return root;
-        }
-
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
@@ -41,7 +35,7 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -57,10 +51,10 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
-                        // need this check to keep supporting sites where childs have already been created.
-                        var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, "icon-item-arrangement", hasChildren);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentTypeGuid, id, queryStrings, "icon-item-arrangement",
+                            //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
+                            //We need this check to keep supporting sites where childs have already been created.
+                            dt.HasChildren());
 
                         node.Path = dt.Path;
                         return node;
@@ -78,18 +72,18 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create
-                menu.DefaultMenuAlias = ActionNew.ActionAlias;
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                // root actions
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("importDocumentType", Services.TextService)
+                // root actions              
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
                 {
-                    Icon = "page-up",
-                    SeperatorBefore = true,
-                    OpensDialog = true
-                });
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
-
+                    Id = int.Parse(id),
+                    Level = 1,
+                    ParentId = Constants.System.Root,
+                    Name = ""
+                }, "documenttypes", "settings");
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }
 
@@ -97,46 +91,49 @@ namespace Umbraco.Web.Trees
             if (container != null)
             {
                 //set the default to create
-                menu.DefaultMenuAlias = ActionNew.ActionAlias;
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService)
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
                 {
                     Icon = "icon icon-edit"
                 });
 
-                if (container.HasChildren == false)
+                if (container.HasChildren() == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 }
-                menu.Items.Add(new RefreshNode(Services.TextService, true));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+                
             }
             else
             {
-                var ct = Services.ContentTypeService.Get(int.Parse(id));
-                var parent = ct == null ? null : Services.ContentTypeService.Get(ct.ParentId);
+                var ct = Services.ContentTypeService.GetContentType(int.Parse(id));
+                var parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
 
                 if (enableInheritedDocumentTypes)
                 {
-                    menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
                 }
                 //no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
                 }
-                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("export", Services.TextService)
+                menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
+                menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
                 {
-                    Icon = "download-alt",
-                    SeperatorBefore = true,
-                    OpensDialog = true
-                });
-                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                    Id = int.Parse(id),
+                    Level = 1,
+                    ParentId = Constants.System.Root,
+                    Name = ""
+                }, "documenttypes", "settings");
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 if (enableInheritedDocumentTypes)
-                    menu.Items.Add(new RefreshNode(Services.TextService, true));
+                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }
 
             return menu;
@@ -144,7 +141,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

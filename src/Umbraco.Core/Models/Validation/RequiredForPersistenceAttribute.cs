@@ -1,31 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.Validation
 {
     /// <summary>
-    /// Specifies that a data field value is required in order to persist an object.
+    /// A custom validation attribute which adds additional metadata to the property to indicate that 
+    /// the value is required to be persisted.
     /// </summary>
     /// <remarks>
-    /// <para>There are two levels of validation in Umbraco. (1) value validation is performed by <see cref="IValueValidator"/>
-    /// instances; it can prevent a content item from being published, but not from being saved. (2) required validation
-    /// of properties marked with <see cref="RequiredForPersistenceAttribute"/>; it does prevent an object from being saved
-    /// and is used for properties that are absolutely mandatory, such as the name of a content item.</para>
+    /// In Umbraco, we persist content even if it is invalid, however there are some properties that are absolutely required
+    /// in order to be persisted such as the Name of the content item. This attribute is re-usable to check for these types of
+    /// properties over any sort of model.
     /// </remarks>
     public class RequiredForPersistenceAttribute : RequiredAttribute
     {
-        /// <summary>
-        /// Determines whether an object has all required values for persistence.
-        /// </summary>
-        internal static bool HasRequiredValuesForPersistence(object model)
-        {
-            return model.GetType().GetProperties().All(x =>
-            {
-                var a = x.GetCustomAttribute<RequiredForPersistenceAttribute>();
-                return a == null || a.IsValid(x.GetValue(model));
-            });
-        }
     }
 }

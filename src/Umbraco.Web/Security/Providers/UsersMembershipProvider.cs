@@ -10,28 +10,25 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
     /// <summary>
-    /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)
+    /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
     public class UsersMembershipProvider : UmbracoMembershipProvider<IMembershipUserService, IUser>, IUsersMembershipProvider
     {
 
         public UsersMembershipProvider()
-            : this(Current.Services.UserService, Current.Services.MemberTypeService)
+            : this(ApplicationContext.Current.Services.UserService)
         {
         }
 
-        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService)
             : base(memberService)
         {
-            _memberTypeService = memberTypeService;
         }
 
-        private readonly IMemberTypeService _memberTypeService;
         private string _defaultMemberTypeAlias = "writer";
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
@@ -73,7 +70,7 @@ namespace Umbraco.Web.Security.Providers
             base.Initialize(name, config);
 
             if (config == null) { throw new ArgumentNullException("config"); }
-
+            
             _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
             _enablePasswordReset = config.GetValue("enablePasswordReset", false);
 
@@ -89,7 +86,7 @@ namespace Umbraco.Web.Security.Providers
                 }
             }
             if (_hasDefaultMember == false && config["defaultUserGroupAlias"] != null)
-            {
+            {                
                 if (config["defaultUserGroupAlias"].IsNullOrWhiteSpace() == false)
                 {
                     _defaultMemberTypeAlias = config["defaultUserGroupAlias"];
@@ -108,7 +105,7 @@ namespace Umbraco.Web.Security.Providers
                     {
                         if (_hasDefaultMember == false)
                         {
-                            _defaultMemberTypeAlias = _memberTypeService.GetDefault();
+                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
                                 throw new ProviderException("No default user group alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
@@ -120,7 +117,7 @@ namespace Umbraco.Web.Security.Providers
                 return _defaultMemberTypeAlias;
             }
         }
-
+        
         /// <summary>
         /// Overridden in order to call the BackOfficeUserManager.UnlockUser method in order to raise the user audit events
         /// </summary>
@@ -136,7 +133,7 @@ namespace Umbraco.Web.Security.Providers
                 if (userManager != null)
                 {
                     userManager.RaiseAccountUnlockedEvent(member.Id);
-                }
+                }   
             }
             return result;
         }
@@ -169,7 +166,7 @@ namespace Umbraco.Web.Security.Providers
                 {
                     //we have successfully logged in, if the failed password attempts was modified it means it was reset
                     if (result.Member.WasPropertyDirty("FailedPasswordAttempts"))
-                    {
+                    {                        
                         userManager.RaiseResetAccessFailedCountEvent(result.Member.Id);
                     }
                 }

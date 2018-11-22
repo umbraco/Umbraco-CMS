@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public interface IRelation : IEntity, IRememberBeingDirty
+    public interface IRelation : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
     {
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         /// Gets or sets the name of the PrimaryKey.
         /// </summary>
         /// <remarks>
-        /// Overrides the default naming of a PrimaryKey constraint:
+        /// Overrides the default naming of a PrimaryKey constraint: 
         /// PK_tableName
         /// </remarks>
         public string Name { get; set; }

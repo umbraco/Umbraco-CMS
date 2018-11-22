@@ -1,51 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    /// <summary>
-    /// Represents a datatype model for editing.
-    /// </summary>
     [DataContract(Name = "dataType", Namespace = "")]
     public class DataTypeSave : EntityBasic
     {
         /// <summary>
-        /// Gets or sets the action to perform.
+        /// The action to perform when saving this data type
         /// </summary>
         /// <remarks>
-        /// Some values (publish) are illegal here.
+        /// If either of the Publish actions are specified an exception will be thrown.
         /// </remarks>
         [DataMember(Name = "action", IsRequired = true)]
         [Required]
         public ContentSaveAction Action { get; set; }
 
-        /// <summary>
-        /// Gets or sets the datatype editor.
-        /// </summary>
         [DataMember(Name = "selectedEditor", IsRequired = true)]
         [Required]
-        public string EditorAlias { get; set; }
+        public string SelectedEditor { get; set; }
 
-        /// <summary>
-        /// Gets or sets the datatype configuration fields.
-        /// </summary>
         [DataMember(Name = "preValues")]
-        public IEnumerable<DataTypeConfigurationFieldSave> ConfigurationFields { get; set; }
+        public IEnumerable<PreValueFieldSave> PreValues { get; set; }
 
         /// <summary>
-        /// Gets or sets the persisted data type.
+        /// The real persisted data type
         /// </summary>
         [IgnoreDataMember]
-        internal IDataType PersistedDataType { get; set; }
+        internal IDataTypeDefinition PersistedDataType { get; set; }
 
         /// <summary>
-        /// Gets or sets the property editor.
+        /// The PropertyEditor assigned
         /// </summary>
         [IgnoreDataMember]
-        internal IDataEditor PropertyEditor { get; set; }
+        internal PropertyEditor PropertyEditor { get; set; }
 
     }
 }

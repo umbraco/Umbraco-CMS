@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Web.Security;
 
 namespace Umbraco.Core.Security
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Security
 
 
         public abstract string DefaultMemberTypeAlias { get; }
-
+        
         /// <summary>
         /// Adds a new membership user to the data source.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Security
                 status = valStatus;
                 return null;
             }
-
+            
             return PerformCreateUser(memberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
         }
 

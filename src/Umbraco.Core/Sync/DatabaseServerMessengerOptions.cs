@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Sync
-{
+{   
     /// <summary>
     /// Provides options to the <see cref="DatabaseServerMessenger"/>.
     /// </summary>

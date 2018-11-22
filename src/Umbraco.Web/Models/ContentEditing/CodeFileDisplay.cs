@@ -29,8 +29,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Path represents the path used by the backoffice tree
         /// For files stored on disk, this is a urlencoded, comma seperated
         /// path to the file, always starting with -1.
-        ///
-        /// -1,Partials,Parials%2FFolder,Partials%2FFolder%2FFile.cshtml
+        /// 
+        /// -1,Partials,Parials%2FFolder,Partials%2FFolder%2FFile.cshtml 
         /// </summary>
         [DataMember(Name = "path")]
         [ReadOnly(true)]
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Models.ContentEditing
             if (Name.ContainsAny(illegalChars))
             {
                 yield return new ValidationResult(
-                    "The file name cannot contain illegal characters",
+                    "The file name cannot contain illegal characters", 
                     new[] { "Name" });
             }
             else if (System.IO.Path.GetFileNameWithoutExtension(Name).IsNullOrWhiteSpace())

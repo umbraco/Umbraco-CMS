@@ -1,25 +1,41 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryService) {
 
         var currentUser = null;
         var lastUserId = null;
+        var loginDialog = null;
 
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
 
         function openLoginDialog(isTimedOut) {
-            //broadcast a global event that the user is no longer logged in
-            const args = { isTimedOut: isTimedOut };
-            eventsService.emit("app.notAuthenticated", args);
+            if (!loginDialog) {
+                loginDialog = dialogService.open({
+
+                    //very special flag which means that global events cannot close this dialog
+                    manualClose: true,
+
+                    template: 'views/common/dialogs/login.html',
+                    modalClass: "login-overlay",
+                    animation: "slide",
+                    show: true,
+                    callback: onLoginDialogClose,
+                    dialogData: {
+                        isTimedOut: isTimedOut
+                    }
+                });
+            }
         }
 
-        function retryRequestQueue(success) {
+        function onLoginDialogClose(success) {
+            loginDialog = null;
+
             if (success) {
-                requestRetryQueue.retryAll(currentUser.name);
+                securityRetryQueue.retryAll(currentUser.name);
             }
             else {
-                requestRetryQueue.cancelAll();
+                securityRetryQueue.cancelAll();
                 $location.path('/');
             }
         }
@@ -134,6 +150,29 @@ angular.module('umbraco.services')
             }
         }
 
+        function getMomentLocales(locales, supportedLocales) {
+            
+            var localeUrls = [];
+            var locales = locales.split(',');
+            for (var i = 0; i < locales.length; i++) {
+                var locale = locales[i].toString().toLowerCase();
+                if (locale !== 'en-us') {
+
+                    if (supportedLocales.indexOf(locale + '.js') > -1) {
+                        localeUrls.push('lib/moment/' + locale + '.js');
+                    }
+                    if (locale.indexOf('-') > -1) {
+                        var majorLocale = locale.split('-')[0] + '.js';
+                        if (supportedLocales.indexOf(majorLocale) > -1) {
+                            localeUrls.push('lib/moment/' + majorLocale);
+                        }
+                    }
+                }
+            }
+
+            return localeUrls;
+        }
+
         /** resets all user data, broadcasts the notAuthenticated event and shows the login dialog */
         function userAuthExpired(isLogout) {
             //store the last user id and clear the user
@@ -148,28 +187,25 @@ angular.module('umbraco.services')
             lastServerTimeoutSet = null;
             currentUser = null;
 
+            //broadcast a global event that the user is no longer logged in
+            eventsService.emit("app.notAuthenticated");
+
             openLoginDialog(isLogout === undefined ? true : !isLogout);
         }
 
         // Register a handler for when an item is added to the retry queue
-        requestRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
-            if (requestRetryQueue.hasMore()) {
+        securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
+            if (securityRetryQueue.hasMore()) {
                 userAuthExpired();
             }
         });
 
-        return {
+        var services = {
 
             /** Internal method to display the login dialog */
             _showLoginDialog: function () {
                 openLoginDialog();
             },
-
-            /** Internal method to retry all request after sucessfull login */
-            _retryRequestQueue: function(success) {
-                retryRequestQueue(success)
-            },
-
             /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
             isAuthenticated: function () {
                 //if we've got a current user then just return true
@@ -233,9 +269,10 @@ angular.module('umbraco.services')
 
             /** Returns the current user object in a promise  */
             getCurrentUser: function (args) {
-                
+                var deferred = $q.defer();
+
                 if (!currentUser) {
-                    return authResource.getCurrentUser()
+                    authResource.getCurrentUser()
                         .then(function (data) {
 
                             var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
@@ -247,15 +284,48 @@ angular.module('umbraco.services')
 
                             setCurrentUser(data);
 
-                            return $q.when(currentUser);
+                            deferred.resolve(currentUser);
                         }, function () {
                             //it failed, so they are not logged in
-                            return $q.reject(currentUser);
+                            deferred.reject();
                         });
 
                 }
                 else {
-                    return $q.when(currentUser);
+                    deferred.resolve(currentUser);
+                }
+
+                return deferred.promise;
+            },
+
+            /** Loads the Moment.js Locale for the current user. */
+            loadMomentLocaleForCurrentUser: function () {
+
+                var promises = {
+                    currentUser: this.getCurrentUser(),
+                    supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
+                }
+
+                return $q.all(promises).then(function (values) {
+                    return services.loadLocales(values.currentUser.locale, values.supportedLocales);
+                });
+
+            },
+
+            /** Loads specific Moment.js Locales. */
+            loadLocales: function (locales, supportedLocales) {
+                
+                var localeUrls = getMomentLocales(locales, supportedLocales);
+
+                if (localeUrls.length >= 1) {
+                    return assetsService.load(localeUrls, $rootScope);
+                }
+                else {
+                    //return a noop promise
+                    var deferred = $q.defer();
+                    var promise = deferred.promise;
+                    deferred.resolve(true);
+                    return promise;
                 }
             },
 
@@ -265,4 +335,5 @@ angular.module('umbraco.services')
             }
         };
 
+        return services;
     });

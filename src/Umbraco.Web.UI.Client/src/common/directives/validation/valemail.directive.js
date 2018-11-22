@@ -10,32 +10,36 @@ function valEmail(valEmailExpression) {
         require: 'ngModel',
         restrict: "A",
         link: function (scope, elm, attrs, ctrl) {
-
-            function patternValidator(viewValue) {
+            
+            var patternValidator = function (viewValue) {
                 //NOTE: we don't validate on empty values, use required validator for that
                 if (!viewValue || valEmailExpression.EMAIL_REGEXP.test(viewValue)) {
+                    // it is valid
+                    ctrl.$setValidity('valEmail', true);
                     //assign a message to the validator
                     ctrl.errorMsg = "";
-                    return true;
+                    return viewValue;
                 }
                 else {
+                    // it is invalid, return undefined (no model update)
+                    ctrl.$setValidity('valEmail', false);
                     //assign a message to the validator
                     ctrl.errorMsg = "Invalid email";
-                    return false;
+                    return undefined;
                 }
             };
 
-            //if there is an attribute: type="email" then we need to remove the built in validator
-            // this isn't totally required but it gives us the ability to completely control the validation syntax so we don't
-            // run into old problems like http://issues.umbraco.org/issue/U4-8445
+            //if there is an attribute: type="email" then we need to remove those formatters and parsers
             if (attrs.type === "email") {
-                ctrl.$validators = {};
+                //we need to remove the existing parsers = the default angular one which is created by
+                // type="email", but this has a regex issue, so we'll remove that and add our custom one
+                ctrl.$parsers.pop();
+                //we also need to remove the existing formatter - the default angular one will not render
+                // what it thinks is an invalid email address, so it will just be blank
+                ctrl.$formatters.pop();
             }
-
-            ctrl.$validators.valEmail = function(modelValue, viewValue) {
-                return patternValidator(viewValue);
-            };
-
+            
+            ctrl.$parsers.push(patternValidator);
         }
     };
 }

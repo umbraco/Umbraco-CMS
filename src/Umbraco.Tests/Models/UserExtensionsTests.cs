@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -25,14 +26,14 @@ namespace Umbraco.Tests.Models
         public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath, bool outcome)
         {
             var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { startNodeId });
+            userMock.Setup(u => u.StartContentIds).Returns(new[]{ startNodeId });
             var user = userMock.Object;
             var content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
 
             var esmock = new Mock<IEntityService>();
             esmock
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns<UmbracoObjectTypes, int[]>((type, ids) => new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
+                .Returns<UmbracoObjectTypes, int[]>((type, ids) => new [] { new EntityPath { Id = startNodeId, Path = startNodePath } });
 
             Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object));
         }
@@ -84,7 +85,7 @@ namespace Umbraco.Tests.Models
             var esmock = new Mock<IEntityService>();
             esmock
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns<UmbracoObjectTypes, int[]>((type, ids) => paths.Where(x => ids.Contains(x.Key)).Select(x => new TreeEntityPath { Id = x.Key, Path = x.Value }));
+                .Returns<UmbracoObjectTypes, int[]>((type, ids) => paths.Where(x => ids.Contains(x.Key)).Select(x => new EntityPath { Id = x.Key, Path = x.Value }));
 
             var comma = new[] { ',' };
 

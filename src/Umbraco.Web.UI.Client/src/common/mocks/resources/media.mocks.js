@@ -52,20 +52,6 @@ angular.module('umbraco.mocks').
                     { alias: "umbracoFile", label: "File", description:"Some file", view: "rte", value: "/media/1234/random.jpg" }
                 ]
             }
-            ],
-            apps: [
-                {
-                    alias: "content",
-                    name: "Content",
-                    icon: "icon-document",
-                    view: "views/media/apps/content/content.html"
-                },
-                {
-                    alias: "info",
-                    name: "Info",
-                    icon: "icon-info",
-                    view: "views/media/apps/info/info.html"
-                }
             ]
         };
 

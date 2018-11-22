@@ -2,7 +2,7 @@
 <language alias="zh_tw" intName="Chinese (Taiwan)" localName="中文（正體，台灣）" lcid="0404" culture="zh-TW">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">管理主機名稱</key>
@@ -67,6 +67,7 @@
   <area alias="buttons">
     <key alias="clearSelection">清除選擇</key>
     <key alias="select">選擇</key>
+    <key alias="selectCurrentFolder">選擇目前資料夾</key>
     <key alias="somethingElse">做別的事情</key>
     <key alias="bold">粗體</key>
     <key alias="deindent">取消段落縮進</key>
@@ -95,6 +96,7 @@
     <key alias="styleChoose">選擇樣式</key>
     <key alias="styleShow">顯示樣式</key>
     <key alias="tableInsert">插入表格</key>
+    <key alias="generateModels">產生模組</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">要更改所選節點的文檔類型，先在列表中選擇合適的文檔類型。</key>
@@ -159,7 +161,7 @@
     <key alias="titleOptional">標題（可選）</key>
     <key alias="altTextOptional">其他說明文字（可選）</key>
     <key alias="type">類型</key>
-    <key alias="unpublish">取消發佈</key>
+    <key alias="unPublish">取消發佈</key>
     <key alias="updateDate">最近編輯</key>
     <key alias="updateDateDesc" version="7.0">本文件修改時間</key>
     <key alias="uploadClear">移除文件</key>
@@ -169,11 +171,14 @@
     <key alias="childItems" version="7.0">子項目</key>
     <key alias="target" version="7.0">目標</key>
     <key alias="scheduledPublishServerTime">預計發表的時間（伺服器端）</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">點選以便上傳</key>
+    <key alias="dropFilesHere">拖曳檔案至此...</key>
+    <key alias="urls">媒體連結</key>
     <key alias="orClickHereToUpload">或按這裡選擇檔案</key>
+    <key alias="onlyAllowedFiles">只允許檔案類型為</key>
     <key alias="maxFileSize">檔案大小上限為</key>
   </area>
   <area alias="member">
@@ -273,10 +278,13 @@
     <key alias="thumbnailimageclickfororiginal">點擊圖片查看完整大小</key>
     <key alias="treepicker">拾取項</key>
     <key alias="viewCacheItem">查看緩存項</key>
+    <key alias="createFolder">新增資料夾...</key>
     <key alias="relateToOriginalLabel">與原本相關</key>
     <key alias="theFriendliestCommunity">最友善的社群</key>
     <key alias="linkToPage">頁面連結</key>
     <key alias="openInNewWindow">打開此連結文檔至新視窗或標籤頁</key>
+    <key alias="openInFullBody">打開此連結文檔至全新視窗</key>
+    <key alias="openInParentFrame">打開此連結文檔在原本視窗中</key>
     <key alias="linkToMedia">媒體連結</key>
     <key alias="selectMedia">選擇媒體</key>
     <key alias="selectIcon">選擇圖示</key>
@@ -299,7 +307,7 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
-      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言
+      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言      
    ]]></key>
     <key alias="displayName">語言名稱</key>
   </area>
@@ -317,13 +325,20 @@
     <key alias="email">輸入您的電子郵件</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">允許放置於根節點</key>
+    <key alias="allowAtRootDesc" version="7.2">只有勾選「允許放置於根節點」的內容種類可以放在內容樹或媒體樹的最頂端</key>
     <key alias="allowedchildnodetypes">允許子項節點類型</key>
+    <key alias="contenttypecompositions">文檔種類集合</key>
     <key alias="create">創建</key>
     <key alias="deletetab">刪除選項卡</key>
     <key alias="description">描述</key>
     <key alias="newtab">新建選項卡</key>
     <key alias="tab">選項卡</key>
     <key alias="thumbnail">縮略圖</key>
+    <key alias="hasListView">允許清單檢視</key>
+    <key alias="hasListViewDesc" version="7.2">允許內容項目顯示成可以排列及搜尋的清單，子項目不會被顯示</key>
+    <key alias="currentListView" version="7.2">目前清單檢視</key>
+    <key alias="currentListViewDesc" version="7.2">作用中的清單檢視資料類別</key>
     <key alias="createListView" version="7.2">新增自訂清單檢視</key>
     <key alias="removeListView" version="7.2">移除自訂清單檢視</key>
   </area>
@@ -361,14 +376,23 @@
     <key alias="filePermissionsError">許可權有問題，訪問指定文檔或資料夾失敗！</key>
     <key alias="macroErrorLoadingPartialView">讀取片段視圖腳本錯誤（檔案：%0%）</key>
     <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
+    <key alias="macroErrorLoadingCustomControl">讀取使用者控制項 %0% 錯誤（組件：%0%，類別：%1%）</key>
+    <key alias="macroErrorLoadingMacroEngineScript">讀取巨集引擎腳本錯誤（檔案：%0%）</key>
+    <key alias="macroErrorParsingXSLTFile">分析XSLT檔案錯誤：%0%</key>
+    <key alias="macroErrorReadingXSLTFile">讀取XSLT檔案錯誤：%0%</key>
     <key alias="missingTitle">請輸入標題</key>
     <key alias="missingType">請選擇類型</key>
     <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>
+    <key alias="pythonErrorHeader">python腳本錯誤</key>
+    <key alias="pythonErrorText">python腳本未保存，因為包含錯誤。</key>
     <key alias="startNodeDoesNotExists">預設打開頁面不存在，請聯繫管理員</key>
     <key alias="stylesMustMarkBeforeSelect">請先選擇內容，再設置樣式。</key>
     <key alias="stylesNoStylesOnPage">沒有可用的樣式</key>
     <key alias="tableColMergeLeft">請把游標放在您要合併的兩個儲存格中的左邊儲存格</key>
     <key alias="tableSplitNotSplittable">非合併儲存格不能分離。</key>
+    <key alias="xsltErrorHeader">XSLT源碼出錯</key>
+    <key alias="xsltErrorText">XSLT未保存，因為包含錯誤。</key>
+    <key alias="missingPropertyEditorErrorMessage">這是此屬性所使用的資料類別設定錯誤，請檢查資料類別</key>
   </area>
   <area alias="general">
     <key alias="about">關於</key>
@@ -427,6 +451,7 @@
     <key alias="macro">巨集</key>
     <key alias="mandatory">必要</key>
     <key alias="move">移動</key>
+    <key alias="more">更多</key>
     <key alias="name">名稱</key>
     <key alias="new">新的</key>
     <key alias="next">下一步</key>
@@ -484,7 +509,12 @@
     <key alias="selected">選取的</key>
   </area>
   <area alias="colors">
+    <key alias="black">黑</key>
+    <key alias="green">綠</key>
+    <key alias="yellow">黃</key>
+    <key alias="orange">橘</key>
     <key alias="blue">藍</key>
+    <key alias="red">紅</key>
   </area>
   <area alias="shortcuts">
     <key alias="addTab">增加標籤頁</key>
@@ -523,7 +553,7 @@
               <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
               <p>
               點選<strong>重試</strong>按鈕當上述步驟完成。<br />
-              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
         若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
@@ -672,7 +702,7 @@
 
       這是一封自動產生的信件來通知您 %1% 工作
       已經在頁面 %2% 上由使用者 %3% 執行完成
-
+      
 
       請移至下列網址編輯： http://%4%/#/content/content/edit/%5%
 
@@ -841,8 +871,12 @@
     <key alias="users">用戶</key>
     <key alias="help" version="7.0">說明</key>
     <key alias="forms">表單</key>
+    <key alias="analytics">統計</key>
   </area>
   <area alias="help">
+    <key alias="goTo">移至</key>
+    <key alias="helpTopicsFor">說明主題為</key>
+    <key alias="videoChaptersFor">影片主題為</key>
     <key alias="theBestUmbracoVideoTutorials">最好的Umbraco影片教學</key>
   </area>
   <area alias="settings">
@@ -862,6 +896,8 @@
     <key alias="contentTypeUses">該文檔類型使用</key>
     <key alias="asAContentMasterType">作為主控文件類型. 主控文件類型的標籤只能在主控文件類型裡修改。</key>
     <key alias="noPropertiesDefinedOnTab">沒有欄位設置在該標籤頁</key>
+    <key alias="masterDocumentType">主文檔類別</key>
+    <key alias="createMatchingTemplate">新增對應範本</key>
     <key alias="addIcon">增加圖示</key>
   </area>
   <area alias="sort">
@@ -915,15 +951,29 @@
     <key alias="languageSaved">語言已保存</key>
     <key alias="mediaTypeSavedHeader">媒體類別已儲存</key>
     <key alias="memberTypeSavedHeader">會員類別已儲存</key>
+    <key alias="pythonErrorHeader">Python腳本未保存</key>
+    <key alias="pythonErrorText">Python腳本因為錯誤未能保存</key>
+    <key alias="pythonSavedHeader">Python已保存</key>
+    <key alias="pythonSavedText">Python腳本無錯誤</key>
     <key alias="templateErrorHeader">範本未保存</key>
     <key alias="templateErrorText">範本別名相同</key>
     <key alias="templateSavedHeader">範本已保存</key>
     <key alias="templateSavedText">範本保存，無錯誤。</key>
+    <key alias="xsltErrorHeader">XSLT未保存</key>
+    <key alias="xsltErrorText">XSLT有錯誤</key>
+    <key alias="xsltPermissionErrorText">XSLT無法保存，請檢查許可權。</key>
+    <key alias="xsltSavedHeader">XSLT已保存</key>
+    <key alias="xsltSavedText">XSLT無錯誤</key>
     <key alias="contentUnpublished">內容已取消發佈</key>
     <key alias="partialViewSavedHeader">片段視圖已保存</key>
     <key alias="partialViewSavedText">片段視圖保存，無錯誤。</key>
     <key alias="partialViewErrorHeader">片段視圖未保存</key>
     <key alias="partialViewErrorText">片段視圖因為錯誤未能保存</key>
+    <key alias="scriptSavedHeader">腳本視圖已儲存</key>
+    <key alias="scriptSavedText">腳本視圖已儲存，沒有任何錯誤！</key>
+    <key alias="scriptErrorHeader">腳本視圖未儲存</key>
+    <key alias="scriptErrorText">儲存檔案時發生錯誤</key>
+    <key alias="cssErrorText">儲存檔案時發生錯誤</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">使用CSS語法，如：h1、.redHeader、.blueTex。</key>
@@ -945,8 +995,12 @@
     <key alias="template">範本</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">選擇內容類別</key>
     <key alias="chooseLayout">選擇排列方式</key>
     <key alias="addRows">新增一行</key>
@@ -973,6 +1027,7 @@
     <key alias="settingsDetails">調整設定編輯器可以改變的項目</key>
     <key alias="styles">樣式</key>
     <key alias="stylesDetails">調整樣式編輯器可以改變的項目</key>
+    <key alias="settingDialogDetails">當JSON格式正確時設定才可以儲存</key>
     <key alias="allowAllEditors">允許所有編輯器</key>
     <key alias="allowAllRowConfigurations">允許所有行設定</key>
     <key alias="setAsDefault">定為預設</key>
@@ -983,6 +1038,8 @@
   <area alias="contentTypeEditor">
     <key alias="compositions">組合</key>
     <key alias="noTabs">您沒有增加任何選項卡</key>
+    <key alias="addNewTab">增加新的選項卡</key>
+    <key alias="addAnotherTab">增加另外的選項卡</key>
     <key alias="inheritedFrom">繼承的表格</key>
     <key alias="addProperty">增加屬性</key>
     <key alias="requiredLabel">必要標籤</key>
@@ -992,6 +1049,7 @@
     <key alias="allowedTemplatesDescription">選擇哪些範本編輯器可以使用於此類別的內容</key>
     <key alias="allowAsRootHeading">允許為根項目</key>
     <key alias="allowAsRootDescription">允許編輯器新增此類別的內容為根項目</key>
+    <key alias="allowAsRootCheckbox">是的 - 允許此類別內容為根項目</key>
     <key alias="childNodesHeading">允許子節點種類</key>
     <key alias="childNodesDescription">允許某些特定種類能夠成為此種類內容的子項目</key>
     <key alias="chooseChildNode">選擇子節點</key>
@@ -1017,6 +1075,7 @@
     <key alias="andAllDocuments">以及所有使用此種類的文件項目</key>
     <key alias="andAllMediaItems">以及所有使用此種類的媒體項目</key>
     <key alias="andAllMembers">以及所有使用此種類的會員項目</key>
+    <key alias="thisEditorUpdateSettings">使用此編輯器將會套用新設定</key>
     <key alias="memberCanEdit">會員可以編輯</key>
     <key alias="showOnMemberProfile">顯示於會員資料</key>
   </area>
@@ -1049,7 +1108,15 @@
     <key alias="withTime">是，含時間，分隔符號為： </key>
   </area>
   <area alias="translation">
+    <key alias="assignedTasks">標記為您的任務</key>
+    <key alias="assignedTasksHelp"><![CDATA[ 此清單顯示這些翻譯任務是<strong>指派給您</strong>。請按「翻譯詳情」或頁面名稱觀看包含回應的詳細檢視畫面。
+    您也可以將此頁面下載成為XML格式檔案，請按「下載XML」按鈕。<br/>
+    若想要關閉翻譯任務，請至細節頁面點選「結束」按鈕。
+    ]]></key>
+    <key alias="closeTask">關閉任務</key>
     <key alias="details">翻譯詳情</key>
+    <key alias="downloadAllAsXml">將翻譯任務下載為XML</key>
+    <key alias="downloadTaskAsXml">下載 XML</key>
     <key alias="DownloadXmlDTD">下載 XML DTD</key>
     <key alias="fields">欄位</key>
     <key alias="includeSubpages">包含子頁</key>
@@ -1057,7 +1124,7 @@
       哈嘍 %0%
 
       這是一封自動產生的郵件通知您文檔 %1%
-      已經被 %2 要求翻譯成 %5%
+      已經被 %2 要求翻譯成 %5% 
 
       請移至此網址來編輯： http://%3%/translation/details.aspx?id=%4%
 
@@ -1069,9 +1136,18 @@
 
       Umbraco機器人 謹上
     ]]></key>
+    <key alias="mailSubject">[%0%]翻譯任務：%1%</key>
     <key alias="noTranslators">沒有翻譯員，請創建翻譯員角色的用戶。</key>
+    <key alias="ownedTasks">您創建的任務</key>
+    <key alias="ownedTasksHelp"><![CDATA[ 本清單顯示<strong>由您創建</strong>的頁面。要瀏覽包含回應的詳細檢視畫面，
+    點選「詳情」或頁面名稱。您可以下載此頁面成為XML格式檔案，請點選「下載XML」連結。
+    若要關閉翻譯任務，請至詳情檢視並點選「關閉」按鈕。
+    ]]></key>
     <key alias="pageHasBeenSendToTranslation">頁面'%0%'已經發送給翻譯</key>
+    <key alias="noLanguageSelected">請選擇本內容應該被翻譯成的語言</key>
     <key alias="sendToTranslate">發送頁面'%0%'以便翻譯</key>
+    <key alias="taskAssignedBy">分配者</key>
+    <key alias="taskOpened">任務開啟</key>
     <key alias="totalWords">總字數</key>
     <key alias="translateTo">翻譯到</key>
     <key alias="translationDone">翻譯完成。</key>
@@ -1102,6 +1178,7 @@
     <key alias="relationTypes">相關類型</key>
     <key alias="packager">擴展包</key>
     <key alias="packages">擴展包</key>
+    <key alias="python">Python文件</key>
     <key alias="repositories">從線上程式庫安裝</key>
     <key alias="runway">安裝Runway</key>
     <key alias="runwayModules">Runway模組</key>
@@ -1109,6 +1186,8 @@
     <key alias="scripts">腳本</key>
     <key alias="stylesheets">樣式表</key>
     <key alias="templates">範本</key>
+    <key alias="xslt">XSLT文件</key>
+    <key alias="analytics">統計</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">有可用更新</key>
@@ -1153,6 +1232,7 @@
     <key alias="username">用戶名</key>
     <key alias="userPermissions">用戶許可權</key>
     <key alias="writer">撰稿人</key>
+    <key alias="translator">翻譯者</key>
     <key alias="change">改變</key>
     <key alias="yourProfile" version="7.0">您的個人檔案</key>
     <key alias="yourHistory" version="7.0">您的歷程記錄</key>

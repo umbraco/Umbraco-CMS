@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using System.IO;
+using System.Xml;
+using System.Text.RegularExpressions;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Composing;
+using umbraco.cms.businesslogic.web;
+using umbraco.cms.businesslogic;
 
 namespace umbraco
 {
@@ -19,7 +25,7 @@ namespace umbraco
     /// The codebehind class for the main default.aspx page that does the webforms rendering in Umbraco
     /// </summary>
     /// <remarks>
-    /// We would move this to the UI project but there is a public API property and some protected properties which people may be using so
+    /// We would move this to the UI project but there is a public API property and some protected properties which people may be using so 
     /// we cannot move it.
     /// </remarks>
     public class UmbracoDefault : Page
@@ -32,63 +38,60 @@ namespace umbraco
         }
 
         private page _upage;
-        private PublishedRequest _frequest;
+        private PublishedContentRequest _docRequest;
+        bool _validateRequest = true;
 
         /// <summary>
         /// To turn off request validation set this to false before the PageLoad event. This equivalent to the validateRequest page directive
         /// and has nothing to do with "normal" validation controls. Default value is true.
         /// </summary>
-        public bool ValidateRequest { get; set; } = true;
+        public bool ValidateRequest
+        {
+            get { return _validateRequest; }
+            set { _validateRequest = value; }
+        }
 
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("PreInit"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
                 Page.Trace.IsEnabled &= GlobalSettings.DebugMode && string.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]) == false;
 
                 // get the document request and the page
-                _frequest = UmbracoContext.Current.PublishedRequest;
-                _upage = _frequest.UmbracoPage;
+                _docRequest = UmbracoContext.Current.PublishedContentRequest;
+                _upage = _docRequest.UmbracoPage;
 
-                var args = new RequestInitEventArgs()
+                //we need to check this for backwards compatibility in case people still arent' using master pages
+                if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
                 {
-                    Page = _upage,
-                    PageId = _upage.PageID,
-                    Context = Context
-                };
-                FireBeforeRequestInit(args);
+                    var args = new RequestInitEventArgs()
+                    {
+                        Page = _upage,
+                        PageId = _upage.PageID,
+                        Context = Context
+                    };
+                    FireBeforeRequestInit(args);
 
-                //if we are cancelling then return and don't proceed
-                if (args.Cancel) return;
+                    //if we are cancelling then return and don't proceed
+                    if (args.Cancel) return;
 
-                var template = Current.Services.FileService.GetTemplate(_upage.Template);
-                if (template != null)
-                {
-                    var alias = template.MasterTemplateAlias;
-                    var file = alias.Replace(" ", "") + ".master";
-                    var path = SystemDirectories.Masterpages + "/" + file;
+                    this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
+                    // reset the friendly path so it's used by forms, etc.			
+                    Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
 
-                    if (File.Exists(IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path))))
-                        this.MasterPageFile = path;
-                    else
-                        this.MasterPageFile = SystemDirectories.Umbraco + "/masterPages/default.master";
+                    //fire the init finished event
+                    FireAfterRequestInit(args);
                 }
-
-                // reset the friendly path so it's used by forms, etc.
-                Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
-
-                //fire the init finished event
-                FireAfterRequestInit(args);
             }
         }
 
         protected override void OnInit(EventArgs e)
         {
-            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Init"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Init"))
             {
                 base.OnInit(e);
 
@@ -103,15 +106,42 @@ namespace umbraco
                 var ctx = new ControllerContext(new HttpContextWrapper(Context), new RouteData(), new TempDataController());
                 provider.LoadTempData(ctx);
 
+                //This is only here for legacy if people arent' using master pages... 
+                //TODO: We need to test that this still works!! Or do we ??
+                if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
+                {
+                    var args = new RequestInitEventArgs()
+                                   {
+                                       Page = _upage,
+                                       PageId = _upage.PageID,
+                                       Context = Context
+                                   };
+                    FireBeforeRequestInit(args);
+
+                    //if we are cancelling then return and don't proceed
+                    if (args.Cancel) return;
+
+                    var pageHolder = new umbraco.layoutControls.umbracoPageHolder
+                                         {
+                                             ID = "umbPageHolder"
+                                         };
+                    Page.Controls.Add(pageHolder);
+                    _upage.RenderPage(_upage.Template);
+                    var umbPageHolder = (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
+                    umbPageHolder.Populate(_upage);
+
+                    //fire the init finished event
+                    FireAfterRequestInit(args);
+                }
             }
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Load"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
-
+                
                 if (ValidateRequest)
                     Request.ValidateInput();
             }
@@ -119,7 +149,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (Current.ProfilingLogger.DebugDuration<UmbracoDefault>("Render"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering
@@ -128,12 +158,12 @@ namespace umbraco
                 string text = sw.ToString();
 
                 // filter / parse internal links - although this should be done elsewhere!
-                text = TemplateUtilities.ParseInternalLinks(text, UmbracoContext.Current.UrlProvider);
+                text = TemplateUtilities.ParseInternalLinks(text);
 
                 // filter / add preview banner
                 if (UmbracoContext.Current.InPreviewMode)
                 {
-                    Current.Logger.Debug<UmbracoDefault>("Umbraco is running in preview mode.");
+                    LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", true);
 
                     if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
                     {
@@ -141,8 +171,9 @@ namespace umbraco
                         if (pos > -1)
                         {
                             string htmlBadge =
-                                string.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
+                                String.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
                                               IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                              IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                               Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
 
                             text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);

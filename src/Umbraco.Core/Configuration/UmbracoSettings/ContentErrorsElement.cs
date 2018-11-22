@@ -5,7 +5,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentErrorsElement : RawXmlConfigurationElement
     {
-
+        
         public IEnumerable<IContentErrorPage> Error404Collection
         {
             get
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 if (RawXml != null)
                 {
                     var e404 = RawXml.Elements("error404").First();
-                    var ePages = e404.Elements("errorPage").ToArray();
+                    var ePages = e404.Elements("errorPage").ToArray();                    
                     if (ePages.Any())
                     {
                         //there are multiple
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                         {
                             RawValue = e404.Value
                         });
-                    }
+                    }                    
                 }
                 return result;
             }

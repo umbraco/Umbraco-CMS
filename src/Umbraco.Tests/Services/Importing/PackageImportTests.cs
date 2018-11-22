@@ -1,57 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Testing;
-using LightInject;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services.Importing
 {
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class PackageImportTests : TestWithSomeContentBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
+    public class PackageImportTests : BaseServiceTest
     {
-        [HideFromTypeFinder]
-        public class Editor1 : DataEditor
+        [SetUp]
+        public override void Initialize()
         {
-            public Editor1(ILogger logger)
-                : base(logger)
-            {
-                Alias = "7e062c13-7c41-4ad9-b389-41d88aeef87c";
-            }
+            base.Initialize();
         }
 
-        [HideFromTypeFinder]
-        public class Editor2 : DataEditor
+        [TearDown]
+        public override void TearDown()
         {
-            public Editor2(ILogger logger)
-                : base(logger)
-            {
-                Alias = "d15e1281-e456-4b24-aa86-1dda3e4299d5";
-            }
-        }
-
-        protected override void Compose()
-        {
-            base.Compose();
-
-            // the packages that are used by these tests reference totally bogus property
-            // editors that must exist - so they are defined here - and in order not to
-            // pollute everything, they are ignored by the type finder and explicitely
-            // added to the editors collection
-
-            Container.GetInstance<DataEditorCollectionBuilder>()
-                .Add<Editor1>()
-                .Add<Editor2>();
+            base.TearDown();
         }
 
         [Test]
@@ -87,8 +59,8 @@ namespace Umbraco.Tests.Services.Importing
             var uBlogsyBasePage = contentTypes.First(x => x.Alias == "uBlogsyBasePage");
             Assert.That(uBlogsyBasePage.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
             Assert.That(uBlogsyBasePage.PropertyTypes.Count(), Is.EqualTo(7));
-            Assert.That(uBlogsyBasePage.PropertyGroups.Count, Is.EqualTo(3));
-            Assert.That(uBlogsyBasePage.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups.Count(), Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups["Content"].PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(uBlogsyBasePage.PropertyGroups["SEO"].PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(uBlogsyBasePage.PropertyGroups["Navigation"].PropertyTypes.Count(), Is.EqualTo(1));
             Assert.That(uBlogsyBasePage.CompositionPropertyTypes.Count(), Is.EqualTo(12));
@@ -120,10 +92,9 @@ namespace Umbraco.Tests.Services.Importing
 
             // Assert
             var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
-            using (var scope = ScopeProvider.CreateScope())
             foreach (var propertyType in mRBasePage.PropertyTypes)
             {
-                var propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                var propertyTypeDto = this.DatabaseContext.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
                 Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
             }
         }
@@ -176,20 +147,15 @@ namespace Umbraco.Tests.Services.Importing
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("Templates").First();
             var packagingService = ServiceContext.PackagingService;
-            var init = ServiceContext.FileService.GetTemplates().Count();
 
             // Act
             var templates = packagingService.ImportTemplates(element);
             var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
-            var allTemplates = ServiceContext.FileService.GetTemplates();
 
             // Assert
             Assert.That(templates, Is.Not.Null);
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
-
-            Assert.AreEqual(init + numberOfTemplates, allTemplates.Count());
-            Assert.IsTrue(allTemplates.All(x => x.Content.Contains("UmbracoViewPage")));
         }
 
         [Test]
@@ -327,7 +293,11 @@ namespace Umbraco.Tests.Services.Importing
             AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
         }
 
-
+        [Test]
+        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Legacy_Property_Editor_Ids()
+        {
+            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package_LegacyIds);
+        }
 
         private void AssertCheckBoxListTests(string strXml)
         {
@@ -346,22 +316,22 @@ namespace Umbraco.Tests.Services.Importing
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
-            string configuration;
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
-                configuration = dtos.Single().Configuration;
-            }
+            var database = ApplicationContext.DatabaseContext.Database;
+            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
+            int preValueId;
+            int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
+            var preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
-            Assert.AreEqual(Constants.PropertyEditors.Aliases.CheckBoxList, dataTypeDefinitions.First().EditorAlias);
+            Assert.AreEqual(Constants.PropertyEditors.CheckBoxListAlias, dataTypeDefinitions.First().PropertyEditorAlias);
             Assert.That(contents, Is.Not.Null);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
-            Assert.AreEqual("{\"items\":[{\"id\":59,\"value\":\"test\"},{\"id\":60,\"value\":\"test3\"},{\"id\":61,\"value\":\"test2\"}]}", configuration);
+            Assert.That(preValueKey, Is.Not.Null);
+            Assert.That(preValueKey.Value, Is.EqualTo("test3"));
         }
 
         [Test]
@@ -455,9 +425,6 @@ namespace Umbraco.Tests.Services.Importing
             var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
             var packagingService = ServiceContext.PackagingService;
             var fileService = ServiceContext.FileService;
-
-            // kill default test data
-            fileService.DeleteTemplate("Textpage");
 
             // Act
             var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
@@ -628,7 +595,7 @@ namespace Umbraco.Tests.Services.Importing
 
             // Assert
             Assert.That(macros.Any(), Is.True);
-            Assert.That(macros.First().Properties.Values.Any(), Is.True);
+            Assert.That(macros.First().Properties.Any(), Is.True);
 
             var allMacros = ServiceContext.MacroService.GetAll().ToList();
             foreach (var macro in macros)

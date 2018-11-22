@@ -8,24 +8,27 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Gets the tree node url for the content or media
     /// </summary>
-    internal class ContentTreeNodeUrlResolver<TSource, TController> : IValueResolver<TSource, object, string>
+    internal class ContentTreeNodeUrlResolver<TSource, TController> : IValueResolver
         where TSource : IContentBase
         where TController : ContentTreeControllerBase
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public ContentTreeNodeUrlResolver(IUmbracoContextAccessor umbracoContextAccessor)
+        public ResolutionResult Resolve(ResolutionResult source)
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            return source.New(ResolveCore(source, (TSource)source.Value), typeof(string));
         }
 
-        public string Resolve(TSource source, object destination, string destMember, ResolutionContext context)
+        private string ResolveCore(ResolutionResult res, TSource source)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (umbracoContext == null) return null;
-
-            var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
-            return urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+            var umbCtx = res.Context.GetUmbracoContext();
+            //map the tree node url
+            if (umbCtx != null)
+            {
+                var urlHelper = new UrlHelper(umbCtx.HttpContext.Request.RequestContext);
+                var url = urlHelper.GetUmbracoApiService<TController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+                return url;
+            }
+            return null;
         }
     }
 }

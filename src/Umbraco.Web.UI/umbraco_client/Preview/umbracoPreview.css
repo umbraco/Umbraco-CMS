@@ -1,0 +1,4 @@
+﻿#umbracoPreviewBadge
+{
+    position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background-image: url(previewModeBadge.png) no-repeat;
+}

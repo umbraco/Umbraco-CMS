@@ -1,7 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -14,18 +13,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// Since this is a default (umbraco) converter it will be ignored if another converter found conflicts with this one.
     /// </remarks>
     [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(JToken))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class JsonValueConverter : PropertyValueConverterBase
     {
-        private readonly PropertyEditorCollection _propertyEditors;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JsonValueConverter"/> class.
-        /// </summary>
-        public JsonValueConverter(PropertyEditorCollection propertyEditors)
-        {
-            _propertyEditors = propertyEditors;
-        }
-
         /// <summary>
         /// It is a converter for any value type that is "JSON"
         /// </summary>
@@ -33,17 +24,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// <returns></returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return _propertyEditors.TryGet(propertyType.EditorAlias, out var editor)
-                   && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json);
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(propertyType.PropertyEditorAlias);
+            if (propertyEditor == null) return false;
+            return propertyEditor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json);
         }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (JToken);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
@@ -57,10 +43,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<JsonValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    LogHelper.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);                    
                 }
             }
-
+            
             //it's not json, just return the string
             return sourceString;
         }

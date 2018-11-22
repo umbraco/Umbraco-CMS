@@ -19,7 +19,7 @@ namespace Umbraco.Web.Features
         /// <summary>
         /// Gets the disabled controllers.
         /// </summary>
-        public TypeList<UmbracoApiControllerBase> Controllers { get; }
+        public TypeList<UmbracoApiControllerBase> Controllers { get; private set; }
 
         /// <summary>
         /// Disables the device preview feature of previewing.

@@ -30,7 +30,7 @@
     <div class="umb-list-view-settings__settings form-horizontal" ng-if="editDataTypeSettings" ng-class="{'-open': editDataTypeSettings}">
 
         <umb-property property="preValue" ng-repeat="preValue in dataType.preValues">
-            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+            <umb-editor model="preValue" is-pre-value="true"></umb-editor>
         </umb-property>
 
         <button type="button" class="btn" ng-click="toggleEditListViewDataTypeSettings()"><localize key="general_close">Close</localize></button>

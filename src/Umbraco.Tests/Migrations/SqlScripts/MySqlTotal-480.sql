@@ -550,6 +550,7 @@ INSERT INTO umbracoAppTree (appAlias, treeAlias, treeSilent, treeInitialize, tre
 	('developer', 'macros', 0, 1, 2, 'Macros', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMacros'),
 	('developer', 'xslt', 0, 1, 5, 'XSLT Files', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadXslt'),
 	
+	('developer', 'packager', 0, 1, 3, 'Packages', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadPackager'),
 	('developer', 'packagerPackages', 0, 0, 1, 'Packager Packages', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadPackages'),
 	
 	('media', 'media', 0, 1, 0, 'Medier', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMedia'),
