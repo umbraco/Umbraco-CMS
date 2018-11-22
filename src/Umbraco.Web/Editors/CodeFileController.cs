@@ -252,7 +252,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case Core.Constants.Trees.Stylesheets:
                     codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
-                    codeFileDisplay.VirtualPath = SystemDirectories.StyleSheets;
+                    codeFileDisplay.VirtualPath = SystemDirectories.Css;
                     break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
