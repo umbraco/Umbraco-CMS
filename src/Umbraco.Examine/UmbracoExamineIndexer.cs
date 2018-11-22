@@ -121,6 +121,8 @@ namespace Umbraco.Examine
             new FieldDefinition("urlName", FieldDefinitionTypes.InvariantCultureIgnoreCase),
             new FieldDefinition("path", FieldDefinitionTypes.Raw),
 
+            new FieldDefinition("email", FieldDefinitionTypes.EmailAddress),
+
             new FieldDefinition(PublishedFieldName, FieldDefinitionTypes.Raw),
             new FieldDefinition(NodeKeyFieldName, FieldDefinitionTypes.Raw),
             new FieldDefinition(IndexPathFieldName, FieldDefinitionTypes.Raw),

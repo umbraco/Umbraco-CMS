@@ -179,17 +179,6 @@ namespace Umbraco.Examine
                 e.IndexItem.ValueSet.Values["__key"] = key;
             }
 
-            if (e.IndexItem.ValueSet.Values.TryGetValue("email", out var email) && e.IndexItem.ValueSet.Values.ContainsKey("_searchEmail") == false)
-            {
-                if (email.Count > 0)
-                {
-                    //TODO: This shouldn't be here, create an "Email" value type with an appropriate analyzer
-
-                    //will be indexed as full text (the default anaylyzer)
-                    e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { email[0]?.ToString().Replace(".", " ").Replace("@", " ") };
-                }
-                
-            }
         }
 
     }
