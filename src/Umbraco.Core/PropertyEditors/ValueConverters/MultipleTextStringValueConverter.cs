@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(IEnumerable<string>))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
-        }
+            => Constants.PropertyEditors.Aliases.MultipleTextstring.Equals(propertyType.EditorAlias);
+
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => typeof (IEnumerable<string>);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
 
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // data is (both in database and xml):
             // <keyFeatureList>
@@ -31,15 +31,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             //    </values>
             // </keyFeatureList>
 
-            var sourceString = source != null ? source.ToString() : null;
+            var sourceString = source?.ToString();
             if (string.IsNullOrWhiteSpace(sourceString)) return Enumerable.Empty<string>();
 
             //SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string
             // as xml in the database, it's always been new line delimited. Will ask Stephen about this.
-            // In the meantime, we'll do this xml check, see if it parses and if not just continue with 
+            // In the meantime, we'll do this xml check, see if it parses and if not just continue with
             // splitting by newline
             //
-            //   RS: SD/Stephan Please consider post before deciding to remove 
+            //   RS: SD/Stephan Please consider post before deciding to remove
             //// https://our.umbraco.com/forum/contributing-to-umbraco-cms/76989-keep-the-xml-values-in-the-multipletextstringvalueconverter
             var values = new List<string>();
             var pos = sourceString.IndexOf("<value>", StringComparison.Ordinal);
@@ -51,23 +51,20 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 values.Add(value);
                 pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
             }
-            
-            // Fall back on normal behaviour
-            if (values.Any() == false)
-            {
-                return sourceString.Split(NewLineDelimiters, StringSplitOptions.None);
-            }
 
-            return values.ToArray();
+            // fall back on normal behaviour
+            return values.Any() == false
+                ? sourceString.Split(NewLineDelimiters, StringSplitOptions.None)
+                : values.ToArray();
         }
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             var d = new XmlDocument();
             var e = d.CreateElement("values");
             d.AppendChild(e);
 
-            var values = (IEnumerable<string>) source;
+            var values = (IEnumerable<string>) inter;
             foreach (var value in values)
             {
                 var ee = d.CreateElement("value");

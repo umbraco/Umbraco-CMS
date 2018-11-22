@@ -1,6 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="UserControlProxy.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Dashboard.UserControlProxy" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web.UI.JavaScript" Assembly="umbraco" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -12,13 +12,7 @@
    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="assets/css/umbraco.css" PathNameAlias="UmbracoRoot" />
     
    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
-   <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="1" />
    <umb:JsInclude ID="JsInclude4" runat="server" FilePath="lib/jquery-migrate/jquery-migrate.min.js" PathNameAlias="UmbracoRoot" Priority="1" />
-   <umb:JsInclude ID="JsInclude6" runat="server" FilePath="ui/base2.js" PathNameAlias="UmbracoClient" Priority="1" />
-   <umb:JsInclude ID="JsInclude11" runat="server" FilePath="UI/knockout.js" PathNameAlias="UmbracoClient" Priority="3" />
-   <umb:JsInclude ID="JsInclude12" runat="server" FilePath="UI/knockout.mapping.js" PathNameAlias="UmbracoClient" Priority="4" />
- 
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
 
 </head>
 <body style="overflow: scroll">

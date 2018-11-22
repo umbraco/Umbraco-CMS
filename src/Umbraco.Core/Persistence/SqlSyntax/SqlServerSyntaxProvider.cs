@@ -1,84 +1,186 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server.
     /// </summary>
-    [SqlSyntaxProvider(Constants.DatabaseProviders.SqlServer)]
+    [SqlSyntaxProvider(Constants.DbProviderNames.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        /// <summary>
-        /// Gets/sets the version of the current SQL server instance
-        /// </summary>
-        internal SqlServerVersionName GetVersionName(Database database)
+        // IUmbracoDatabaseFactory to be lazily injected
+        public SqlServerSyntaxProvider(Lazy<IScopeProvider> lazyScopeProvider)
         {
-            if (_versionName.HasValue)
-                return _versionName.Value;
+            _serverVersion = new Lazy<ServerVersionInfo>(() =>
+            {
+                var scopeProvider = lazyScopeProvider.Value;
+                if (scopeProvider == null)
+                    throw new InvalidOperationException("Failed to determine Sql Server version (no scope provider).");
+                using (var scope = scopeProvider.CreateScope())
+                {
+                    var version = DetermineVersion(scope.Database);
+                    scope.Complete();
+                    return version;
+                }
+            });
+        }
+
+        private readonly Lazy<ServerVersionInfo> _serverVersion;
+
+        internal ServerVersionInfo ServerVersion => _serverVersion.Value;
+
+        internal enum VersionName
+        {
+            Invalid = -1,
+            Unknown = 0,
+            V7 = 1,
+            V2000 = 2,
+            V2005 = 3,
+            V2008 = 4,
+            V2012 = 5,
+            V2014 = 6,
+            V2016 = 7,
+            V2017 = 8,
+            Other = 99
+        }
+
+        internal enum EngineEdition
+        {
+            Unknown = 0,
+            Desktop = 1,
+            Standard = 2,
+            Enterprise = 3,
+            Express = 4,
+            Azure = 5
+        }
+
+        internal class ServerVersionInfo
+        {
+            public string Edition { get; set; }
+            public string InstanceName { get; set; }
+            public string ProductVersion { get; set; }
+            public VersionName ProductVersionName { get; private set; }
+            public EngineEdition EngineEdition { get; set; }
+            public bool IsAzure => EngineEdition == EngineEdition.Azure;
+            public string MachineName { get; set; }
+            public string ProductLevel { get; set; }
+
+            public void Initialize()
+            {
+                ProductVersionName = MapProductVersion(ProductVersion);
+            }
+        }
+
+        private static VersionName MapProductVersion(string productVersion)
+        {
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            switch (firstPart)
+            {
+                case "??":
+                    return VersionName.Invalid;
+                case "14":
+                    return VersionName.V2017;
+                case "13":
+                    return VersionName.V2016;
+                case "12":
+                    return VersionName.V2014;
+                case "11":
+                    return VersionName.V2012;
+                case "10":
+                    return VersionName.V2008;
+                case "9":
+                    return VersionName.V2005;
+                case "8":
+                    return VersionName.V2000;
+                case "7":
+                    return VersionName.V7;
+                default:
+                    return VersionName.Other;
+            }
+        }
+
+        private static ServerVersionInfo DetermineVersion(IUmbracoDatabase database)
+        {
+            // Edition: "Express Edition", "Windows Azure SQL Database..."
+            // EngineEdition: 1/Desktop 2/Standard 3/Enterprise 4/Express 5/Azure
+            // ProductLevel: RTM, SPx, CTP...
+
+            const string sql = @"select
+    SERVERPROPERTY('Edition') Edition,
+    SERVERPROPERTY('EditionID') EditionId,
+    SERVERPROPERTY('InstanceName') InstanceName,
+    SERVERPROPERTY('ProductVersion') ProductVersion,
+    SERVERPROPERTY('BuildClrVersion') BuildClrVersion,
+    SERVERPROPERTY('EngineEdition') EngineEdition,
+    SERVERPROPERTY('IsClustered') IsClustered,
+    SERVERPROPERTY('MachineName') MachineName,
+    SERVERPROPERTY('ResourceLastUpdateDateTime') ResourceLastUpdateDateTime,
+    SERVERPROPERTY('ProductLevel') ProductLevel;";
 
             try
             {
-                var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
-                var firstPart = version.Split('.')[0];
-                switch (firstPart)
-                {
-                    case "13":
-                        _versionName = SqlServerVersionName.V2016;
-                        break;
-                    case "12":
-                        _versionName = SqlServerVersionName.V2014;
-                        break;
-                    case "11":
-                        _versionName = SqlServerVersionName.V2012;
-                        break;
-                    case "10":
-                        _versionName = SqlServerVersionName.V2008;
-                        break;
-                    case "9":
-                        _versionName = SqlServerVersionName.V2005;
-                        break;
-                    case "8":
-                        _versionName = SqlServerVersionName.V2000;
-                        break;
-                    case "7":
-                        _versionName = SqlServerVersionName.V7;
-                        break;
-                    default:
-                        _versionName = SqlServerVersionName.Other;
-                        break;
-                }
+                var version = database.Fetch<ServerVersionInfo>(sql).First();
+                version.Initialize();
+                return version;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                _versionName = SqlServerVersionName.Invalid;
+                // can't ignore, really
+                throw new Exception("Failed to determine Sql Server version (see inner exception).", e);
             }
-
-            return _versionName.Value;
         }
 
-        private SqlServerVersionName? _versionName;
+        internal static VersionName GetVersionName(string connectionString, string providerName)
+        {
+            var factory = DbProviderFactories.GetFactory(providerName);
+            var connection = factory.CreateConnection();
+
+            if (connection == null)
+                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
+
+            connection.ConnectionString = connectionString;
+            using (connection)
+            {
+                try
+                {
+                    connection.Open();
+                    var command = connection.CreateCommand();
+                    command.CommandText = "SELECT SERVERPROPERTY('ProductVersion');";
+                    var productVersion = command.ExecuteScalar().ToString();
+                    connection.Close();
+                    return MapProductVersion(productVersion);
+                }
+                catch
+                {
+                    return VersionName.Unknown;
+                }
+            }
+        }
 
         /// <summary>
         /// SQL Server stores default values assigned to columns as constraints, it also stores them with named values, this is the only
         /// server type that does this, therefore this method doesn't exist on any other syntax provider
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(Database db)
+        public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TableName = t.Name, ColumnName = c.Name, dc.Name, dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id INNER JOIN sys.schemas as s on t.[schema_id] = s.[schema_id] WHERE s.name = (SELECT SCHEMA_NAME())");
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return
@@ -89,7 +191,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -98,7 +200,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -107,15 +209,15 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
                     @"select T.name as TABLE_NAME, I.name as INDEX_NAME, AC.Name as COLUMN_NAME,
 CASE WHEN I.is_unique_constraint = 1 OR  I.is_unique = 1 THEN 1 ELSE 0 END AS [UNIQUE]
-from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id] 
-   inner join sys.index_columns as IC on IC.[object_id] = I.[object_id] and IC.[index_id] = I.[index_id] 
-   inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id] 
+from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id]
+   inner join sys.index_columns as IC on IC.[object_id] = I.[object_id] and IC.[index_id] = I.[index_id]
+   inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id]
    inner join sys.schemas as S on T.[schema_id] = S.[schema_id]
 WHERE S.name = (SELECT SCHEMA_NAME()) AND I.is_primary_key = 0
 order by T.name, I.name");
@@ -124,7 +226,7 @@ order by T.name, I.name");
 
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
                 db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())",
@@ -148,9 +250,9 @@ order by T.name, I.name");
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
-        public override Sql SelectTop(Sql sql, int top)
+        public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+            return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
 
         private static string GetIdentityString(ColumnDefinition column)
@@ -175,14 +277,10 @@ order by T.name, I.name");
             return null;
         }
 
-        public override string DeleteDefaultConstraint
-        {
-            get { return "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]"; }
-        }
+        public override string DeleteDefaultConstraint => "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]";
 
+        public override string DropIndex => "DROP INDEX {0} ON {1}";
 
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
-
-        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
+        public override string RenameColumn => "sp_rename '{0}.{1}', '{2}', 'COLUMN'";
     }
 }

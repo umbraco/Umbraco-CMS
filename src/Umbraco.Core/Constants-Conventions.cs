@@ -4,150 +4,131 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-   
     public static partial class Constants
-	{
-		/// <summary>
-		/// Defines the identifiers for property-type alias conventions that are used within the Umbraco core.
-		/// </summary>
-		public static class Conventions
-		{
-		    internal static class PermissionCategories
-		    {
-		        public const string ContentCategory = "content";
-		        public const string AdministrationCategory = "administration";
-		        public const string StructureCategory = "structure";
-		        public const string OtherCategory = "other";
-		    }
+    {
+        /// <summary>
+        /// Defines the identifiers for property-type alias conventions that are used within the Umbraco core.
+        /// </summary>
+        public static class Conventions
+        {
+            internal static class PermissionCategories
+            {
+                public const string ContentCategory = "content";
+                public const string AdministrationCategory = "administration";
+                public const string StructureCategory = "structure";
+                public const string OtherCategory = "other";
+            }
 
-		    public static class PublicAccess
-		    {
-                public const string MemberUsernameRuleType = "MemberUsername";               
+            public static class PublicAccess
+            {
+                public const string MemberUsernameRuleType = "MemberUsername";
                 public const string MemberRoleRuleType = "MemberRole";
+            }
 
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberIdRuleType = "MemberId";
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberGroupIdRuleType = "MemberGroupId";
-		    }
 
-		    public static class Localization
-		    {
+            public static class DataTypes
+            {
+                public const string ListViewPrefix = "List View - ";
+            }
+
+            /// <summary>
+            /// Constants for Umbraco Content property aliases.
+            /// </summary>
+            public static class Content
+            {
                 /// <summary>
-                /// The root id for all top level dictionary items
+                /// Property alias for the Content's Url (internal) redirect.
                 /// </summary>
-                [Obsolete("There is no dictionary root item id anymore, it is simply null")]
-                public const string DictionaryItemRootId = "41c7638d-f529-4bff-853e-59a0c2fb1bde";
-		    }
+                public const string InternalRedirectId = "umbracoInternalRedirectId";
 
-		    public static class DataTypes
-		    {
-		        public const string ListViewPrefix = "List View - ";
-		    }
+                /// <summary>
+                /// Property alias for the Content's navigational hide, (not actually used in core code).
+                /// </summary>
+                public const string NaviHide = "umbracoNaviHide";
 
-		    public static class PropertyGroups
-		    {
-		        public const string ListViewGroupName = "umbContainerView";
-		    }
+                /// <summary>
+                /// Property alias for the Content's Url redirect.
+                /// </summary>
+                public const string Redirect = "umbracoRedirect";
 
-			/// <summary>
-			/// Constants for Umbraco Content property aliases.
-			/// </summary>
-			public static class Content
-			{
-				/// <summary>
-				/// Property alias for the Content's Url (internal) redirect.
-				/// </summary>
-				public const string InternalRedirectId = "umbracoInternalRedirectId";
+                /// <summary>
+                /// Property alias for the Content's Url alias.
+                /// </summary>
+                public const string UrlAlias = "umbracoUrlAlias";
 
-				/// <summary>
-				/// Property alias for the Content's navigational hide, (not actually used in core code).
-				/// </summary>
-				public const string NaviHide = "umbracoNaviHide";
+                /// <summary>
+                /// Property alias for the Content's Url name.
+                /// </summary>
+                public const string UrlName = "umbracoUrlName";
+            }
 
-				/// <summary>
-				/// Property alias for the Content's Url redirect.
-				/// </summary>
-				public const string Redirect = "umbracoRedirect";
+            /// <summary>
+            /// Constants for Umbraco Media property aliases.
+            /// </summary>
+            public static class Media
+            {
+                /// <summary>
+                /// Property alias for the Media's file name.
+                /// </summary>
+                public const string File = "umbracoFile";
 
-				/// <summary>
-				/// Property alias for the Content's Url alias.
-				/// </summary>
-				public const string UrlAlias = "umbracoUrlAlias";
+                /// <summary>
+                /// Property alias for the Media's width.
+                /// </summary>
+                public const string Width = "umbracoWidth";
 
-				/// <summary>
-				/// Property alias for the Content's Url name.
-				/// </summary>
-				public const string UrlName = "umbracoUrlName";
-			}
+                /// <summary>
+                /// Property alias for the Media's height.
+                /// </summary>
+                public const string Height = "umbracoHeight";
 
-			/// <summary>
-			/// Constants for Umbraco Media property aliases.
-			/// </summary>
-			public static class Media
-			{
-				/// <summary>
-				/// Property alias for the Media's file name.
-				/// </summary>
-				public const string File = "umbracoFile";
+                /// <summary>
+                /// Property alias for the Media's file size (in bytes).
+                /// </summary>
+                public const string Bytes = "umbracoBytes";
 
-				/// <summary>
-				/// Property alias for the Media's width.
-				/// </summary>
-				public const string Width = "umbracoWidth";
-
-				/// <summary>
-				/// Property alias for the Media's height.
-				/// </summary>
-				public const string Height = "umbracoHeight";
-
-				/// <summary>
-				/// Property alias for the Media's file size (in bytes).
-				/// </summary>
-				public const string Bytes = "umbracoBytes";
-
-				/// <summary>
-				/// Property alias for the Media's file extension.
-				/// </summary>
-				public const string Extension = "umbracoExtension";
+                /// <summary>
+                /// Property alias for the Media's file extension.
+                /// </summary>
+                public const string Extension = "umbracoExtension";
 
 				/// <summary>
 				/// The default height/width of an image file if the size can't be determined from the metadata
 				/// </summary>
 				public const int DefaultSize = 200;
-			}
+            }
 
-			/// <summary>
-			/// Defines the alias identifiers for Umbraco media types.
-			/// </summary>
-			public static class MediaTypes
-			{
-				/// <summary>
-				/// MediaType alias for a file.
-				/// </summary>
-				public const string File = "File";
-
-				/// <summary>
-				/// MediaType alias for a folder.
+            /// <summary>
+            /// Defines the alias identifiers for Umbraco media types.
+            /// </summary>
+            public static class MediaTypes
+            {
+                /// <summary>
+                /// MediaType alias for a file.
                 /// </summary>
-				public const string Folder = "Folder";
+                public const string File = "File";
 
-				/// <summary>
-				/// MediaType alias for an image.
-				/// </summary>
-				public const string Image = "Image";
+                /// <summary>
+                /// MediaType alias for a folder.
+                /// </summary>
+                public const string Folder = "Folder";
+
+                /// <summary>
+                /// MediaType alias for an image.
+                /// </summary>
+                public const string Image = "Image";
 
                 /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
                 /// </summary>
-			    public const string AutoSelect = "umbracoAutoSelect";
-			}
-            
-		    /// <summary>
-		    /// Constants for Umbraco Member property aliases.
-		    /// </summary>		    
-		    public static class Member
-		    {
+                public const string AutoSelect = "umbracoAutoSelect";
+            }
+
+            /// <summary>
+            /// Constants for Umbraco Member property aliases.
+            /// </summary>
+            public static class Member
+            {
                 /// <summary>
                 /// if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 /// </summary>
@@ -225,103 +206,103 @@ namespace Umbraco.Core
                 /// </summary>
                 internal const string StandardPropertiesGroupName = "Membership";
 
-		        public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
-		        {
-		            return new Dictionary<string, PropertyType>
-		                {
-		                    {
-		                        Comments,
-		                        new PropertyType(PropertyEditors.TextboxMultipleAlias, DataTypeDatabaseType.Ntext, true, Comments)
-		                            {
-		                                Name = CommentsLabel
-		                            }
-		                    },
-		                    {
-		                        FailedPasswordAttempts,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer, true, FailedPasswordAttempts)
-		                            {
-		                                Name = FailedPasswordAttemptsLabel
-		                            }
-		                    },
-		                    {
-		                        IsApproved,
-		                        new PropertyType(PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, true, IsApproved)
-		                            {
-		                                Name = IsApprovedLabel
-		                            }
-		                    },
-		                    {
-		                        IsLockedOut,
-		                        new PropertyType(PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, true, IsLockedOut)
-		                            {
-		                                Name = IsLockedOutLabel
-		                            }
-		                    },
-		                    {
-		                        LastLockoutDate,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, true, LastLockoutDate)
-		                            {
-		                                Name = LastLockoutDateLabel
-		                            }
-		                    },
-		                    {
-		                        LastLoginDate,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, true, LastLoginDate)
-		                            {
-		                                Name = LastLoginDateLabel
-		                            }
-		                    },
-		                    {
-		                        LastPasswordChangeDate,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, true, LastPasswordChangeDate)
-		                            {
-		                                Name = LastPasswordChangeDateLabel
-		                            }
-		                    },
-		                    {
-		                        PasswordAnswer,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar, true, PasswordAnswer)
-		                            {
-		                                Name = PasswordAnswerLabel
-		                            }
-		                    },
-		                    {
-		                        PasswordQuestion,
-		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar, true, PasswordQuestion)
-		                            {
-		                                Name = PasswordQuestionLabel
-		                            }
-		                    }
-		                };
-		        } 
-		    }
+                public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
+                {
+                    return new Dictionary<string, PropertyType>
+                        {
+                            {
+                                Comments,
+                                new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
+                                    {
+                                        Name = CommentsLabel
+                                    }
+                            },
+                            {
+                                FailedPasswordAttempts,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer, true, FailedPasswordAttempts)
+                                    {
+                                        Name = FailedPasswordAttemptsLabel
+                                    }
+                            },
+                            {
+                                IsApproved,
+                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
+                                    {
+                                        Name = IsApprovedLabel
+                                    }
+                            },
+                            {
+                                IsLockedOut,
+                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
+                                    {
+                                        Name = IsLockedOutLabel
+                                    }
+                            },
+                            {
+                                LastLockoutDate,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLockoutDate)
+                                    {
+                                        Name = LastLockoutDateLabel
+                                    }
+                            },
+                            {
+                                LastLoginDate,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLoginDate)
+                                    {
+                                        Name = LastLoginDateLabel
+                                    }
+                            },
+                            {
+                                LastPasswordChangeDate,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastPasswordChangeDate)
+                                    {
+                                        Name = LastPasswordChangeDateLabel
+                                    }
+                            },
+                            {
+                                PasswordAnswer,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordAnswer)
+                                    {
+                                        Name = PasswordAnswerLabel
+                                    }
+                            },
+                            {
+                                PasswordQuestion,
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordQuestion)
+                                    {
+                                        Name = PasswordQuestionLabel
+                                    }
+                            }
+                        };
+                }
+            }
 
-			/// <summary>
-			/// Defines the alias identifiers for Umbraco member types.
-			/// </summary>
-			public static class MemberTypes
-			{
-				/// <summary>
-				/// MemberType alias for default member type.
-				/// </summary>
-				public const string DefaultAlias = "Member";
+            /// <summary>
+            /// Defines the alias identifiers for Umbraco member types.
+            /// </summary>
+            public static class MemberTypes
+            {
+                /// <summary>
+                /// MemberType alias for default member type.
+                /// </summary>
+                public const string DefaultAlias = "Member";
 
                 public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
 
-			    public const string AllMembersListId = "all-members";
-			}
+                public const string AllMembersListId = "all-members";
+            }
 
-			/// <summary>
-			/// Constants for Umbraco URLs/Querystrings.
-			/// </summary>
-			public static class Url
-			{
-				/// <summary>
-				/// Querystring parameter name used for Umbraco's alternative template functionality.
-				/// </summary>
-				public const string AltTemplate = "altTemplate";
-			}
-            
+            /// <summary>
+            /// Constants for Umbraco URLs/Querystrings.
+            /// </summary>
+            public static class Url
+            {
+                /// <summary>
+                /// Querystring parameter name used for Umbraco's alternative template functionality.
+                /// </summary>
+                public const string AltTemplate = "altTemplate";
+            }
+
             /// <summary>
             /// Defines the alias identifiers for built-in Umbraco relation types.
             /// </summary>
@@ -331,7 +312,7 @@ namespace Umbraco.Core
                 /// ContentType name for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyName = "Relate Document On Copy";
-                
+
                 /// <summary>
                 /// ContentType alias for default relation type "Relate Document On Copy".
                 /// </summary>
@@ -357,6 +338,6 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }
-		}
-	}
+        }
+    }
 }

@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models
         [Required]
         [DataMember(Name = "password", IsRequired = true)]
         public string Password { get; set; }
-        
+
         [Required]
         [DataMember(Name = "resetCode", IsRequired = true)]
         public string ResetCode { get; set; }

@@ -110,77 +110,72 @@
 **/
 
 (function () {
-   'use strict';
+    'use strict';
 
-   function TableDirective(iconHelper) {
+    function TableController(iconHelper) {
 
-      function link(scope, el, attr, ctrl) {
+        var vm = this;
 
-         scope.clickItem = function (item, $event) {
-            if (scope.onClick) {
-               scope.onClick(item);
-               $event.stopPropagation();
+        vm.clickItem = function (item, $event) {
+            if (vm.onClick) {
+                vm.onClick({ item: item});
+                $event.stopPropagation();
             }
-         };
+        };
 
-         scope.selectItem = function (item, $index, $event) {
-            if (scope.onSelect) {
-               scope.onSelect(item, $index, $event);
-               $event.stopPropagation();
+        vm.selectItem = function (item, $index, $event) {
+            if (vm.onSelect) {
+                vm.onSelect({ item: item, $index: $index, $event: $event });
+                $event.stopPropagation();
             }
-         };
+        };
 
-         scope.selectAll = function ($event) {
-            if (scope.onSelectAll) {
-               scope.onSelectAll($event);
+        vm.selectAll = function ($event) {
+            if (vm.onSelectAll) {
+                vm.onSelectAll({ $event: $event});
             }
-         };
+        };
 
-         scope.isSelectedAll = function () {
-            if (scope.onSelectedAll && scope.items && scope.items.length > 0) {
-               return scope.onSelectedAll();
+        vm.isSelectedAll = function () {
+            if (vm.onSelectedAll && vm.items && vm.items.length > 0) {
+                return vm.onSelectedAll();
             }
-         };
+        };
 
-         scope.isSortDirection = function (col, direction) {
-            if (scope.onSortingDirection) {
-               return scope.onSortingDirection(col, direction);
+        vm.isSortDirection = function (col, direction) {
+            if (vm.onSortingDirection) {
+                return vm.onSortingDirection({ col: col, direction: direction });
             }
-         };
+        };
 
-         scope.sort = function (field, allow, isSystem) {
-            if (scope.onSort) {
-               scope.onSort(field, allow, isSystem);
+        vm.sort = function (field, allow, isSystem) {
+            if (vm.onSort) {
+                vm.onSort({ field: field, allow: allow, isSystem: isSystem  });
             }
-         };
+        };
 
-         scope.getIcon = function (entry) {
-             return iconHelper.convertFromLegacyIcon(entry.icon);
-         };
+        vm.getIcon = function (entry) {
+            return iconHelper.convertFromLegacyIcon(entry.icon);
+        };
+    }
 
-      }
-
-      var directive = {
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/umb-table.html',
-         scope: {
-            items: '=',
-            itemProperties: '=',
-            allowSelectAll: '=',
-            onSelect: '=',
-            onClick: '=',
-            onSelectAll: '=',
-            onSelectedAll: '=',
-            onSortingDirection: '=',
-            onSort: '='
-         },
-         link: link
-      };
-
-      return directive;
-   }
-
-   angular.module('umbraco.directives').directive('umbTable', TableDirective);
+    angular
+        .module('umbraco.directives')
+        .component('umbTable', {
+            templateUrl: 'views/components/umb-table.html',
+            controller: TableController,
+            controllerAs: 'vm',
+            bindings: {
+                items: '<',
+                itemProperties: '<',
+                allowSelectAll: '<',
+                onSelect: '&',
+                onClick: '&',
+                onSelectAll: '&',
+                onSelectedAll: '&',
+                onSortingDirection: '&',
+                onSort: '&'
+            }
+        });
 
 })();

@@ -1,33 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
     internal interface IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
-        // note:
-        // at the moment each repository instance creates its corresponding cache policy instance
-        // we could reduce allocations by using static cache policy instances but then we would need
-        // to modify all methods here to pass the repository and cache eg:
-        //
-        // TEntity Get(TRepository repository, IRuntimeCacheProvider cache, TId id);
-        //
-        // it is not *that* complicated but then RepositoryBase needs to have a TRepository generic
-        // type parameter and it all becomes convoluted - keeping it simple for the time being.
-
-        /// <summary>
-        /// Creates a scoped version of this cache policy.
-        /// </summary>
-        /// <param name="runtimeCache">The global isolated runtime cache for this policy.</param>
-        /// <param name="scope">The scope.</param>
-        /// <remarks>When a policy is scoped, it means that it has been created with a scoped
-        /// isolated runtime cache, and now it needs to be wrapped into something that can apply
-        /// changes to the global isolated runtime cache.</remarks>
-        IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
-
         /// <summary>
         /// Gets an entity from the cache, else from the repository.
         /// </summary>

@@ -18,7 +18,7 @@
   <cc1:Pane ID="pane_insert" runat="server">
     <cc1:PropertyPanel runat="server">
             <p>
-                <%= umbraco.ui.Text("defaultdialogs", "templateContentAreaHelp")%>
+                <%= Services.TextService.Localize("defaultdialogs/templateContentAreaHelp")%>
             </p>
     </cc1:PropertyPanel>
 
@@ -28,7 +28,7 @@
   </cc1:Pane>
    
   <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-            <a class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
-            <input type="button" onclick="insertCode(); return false;" Class="btn btn-primary" value="<%= umbraco.ui.Text("insert") %>" />
+            <a class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%=Services.TextService.Localize("general/cancel")%></a>
+            <input type="button" onclick="insertCode(); return false;" Class="btn btn-primary" value="<%= Services.TextService.Localize("insert") %>" />
   </cc1:Pane>
 </asp:Content>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -49,6 +49,38 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; set; }
 
         /// <summary>
+        /// Gets or sets the content variation of the content type.
+        /// </summary>
+        ContentVariation Variations { get; set; }
+
+        /// <summary>
+        /// Validates that a combination of culture and segment is valid for the content type.
+        /// </summary>
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>The combination must match the content type variation exactly. For instance, if the content type varies by culture,
+        /// then an invariant culture would be invalid.</para>
+        /// </remarks>
+        bool SupportsVariation(string culture, string segment, bool wildcards = false);
+
+        /// <summary>
+        /// Validates that a combination of culture and segment is valid for the content type properties.
+        /// </summary>
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>The combination must be valid for properties of the content type. For instance, if the content type varies by culture,
+        /// then an invariant culture is valid, because some properties may be invariant. On the other hand, if the content type is invariant,
+        /// then a variant culture is invalid, because no property could possibly vary by culture.</para>
+        /// </remarks>
+        bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false);
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }
@@ -79,12 +111,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         void RemovePropertyGroup(string propertyGroupName);
-
-        /// <summary>
-        /// Sets the ParentId from the lazy integer id
-        /// </summary>
-        /// <param name="id">Id of the Parent</param>
-        void SetLazyParentId(Lazy<int> id);
 
         /// <summary>
         /// Checks whether a PropertyType with a given alias already exists

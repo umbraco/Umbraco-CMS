@@ -1,91 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests
+    public class DefaultShortStringHelperTests : UmbracoTestBase
     {
         private DefaultShortStringHelper _helper;
 
-        [SetUp]
-        public void Initialize()
+        public override void SetUp()
         {
-
-            // NOTE: it is not possible to configure the helper once it has been assigned
-            // to the resolver and resolution has frozen. but, obviously, it is possible
-            // to configure filters and then to alter these filters after resolution has
-            // frozen. beware, nothing is thread-safe in-there!
+            base.SetUp();
 
             // NOTE pre-filters runs _before_ Recode takes place
             // so there still may be utf8 chars even though you want ascii
 
-            _helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.FileName, new DefaultShortStringHelper.Config
+            _helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.FileName, new DefaultShortStringHelperConfig.Config
                 {
                     //PreFilter = ClearFileChars, // done in IsTerm
                     IsTerm = (c, leading) => (char.IsLetterOrDigit(c) || c == '_') && DefaultShortStringHelper.IsValidFileNameChar(c),
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
                     Separator = '-'
                 })
-                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = StripQuotes,
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
                     Separator = '-'
                 })
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                .WithConfig("fr-FR", CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = FilterFrenchElisions,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : (char.IsLetterOrDigit(c) || c == '_'),
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
                     Separator = '-'
                 })
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = StripQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                     StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
                 })
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, new DefaultShortStringHelper.Config
+                .WithConfig("fr-FR", CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = WhiteQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                     StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
                 })
-                .WithConfig(CleanStringType.ConvertCase, new DefaultShortStringHelper.Config
+                .WithConfig(CleanStringType.ConvertCase, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = null,
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
                     StringType = CleanStringType.Ascii,
                     BreakTermsOnUpper = true
-                });
+                }));
 
-            ShortStringHelperResolver.Reset();
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
-            Resolution.Freeze();
+            // fixme - move to a "compose" thing?
+            Container.RegisterSingleton<IShortStringHelper>(f => _helper);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            ShortStringHelperResolver.Reset();
-        }
-
-        static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static string FilterFrenchElisions(string s)
         {
@@ -105,42 +94,26 @@ namespace Umbraco.Tests.Strings
         }
 
         [Test]
-        public void U4_4055_4056()
-        {
-            var settings = SettingsForTests.GenerateMockSettings();
-            var contentMock = Mock.Get(settings.RequestHandler);
-            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
-
-            const string input = "publishedVersion";
-
-            Assert.AreEqual("PublishedVersion", input.ConvertCase(StringAliasCaseType.PascalCase)); // obsolete, use the one below
-            Assert.AreEqual("PublishedVersion", input.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase | CleanStringType.Ascii)); // role, case and code
-        }
-
-        [Test]
         public void U4_4056()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
-            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig(); // unicode
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)); // unicode
             var output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii, // ascii
                     Separator = '-'
-                });
+                }));
             output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
         }
@@ -148,7 +121,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void U4_4056_TryAscii()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
@@ -157,17 +130,17 @@ namespace Umbraco.Tests.Strings
             const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
             const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";
 
-            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig(); // unicode
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)); // unicode
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
             Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.LowerCase | CleanStringType.TryAscii, // try ascii
                     Separator = '-'
-                });
+                }));
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
             Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
         }
@@ -175,103 +148,103 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringUnderscoreInTerm()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is accepted within terms
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is not accepted within terms
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
         }
 
         [Test]
         public void CleanStringLeadingChars()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // letters and digits are valid leading chars
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // only letters are valid leading chars
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault()).WithDefaultConfig();
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings()));
             Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
         }
 
         [Test]
         public void CleanStringTermOnUpper()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     // uppercase letter means new term
                     BreakTermsOnUpper = true,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     // uppercase letter is part of term
                     BreakTermsOnUpper = false,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("fooBar", helper.CleanString("fooBar", CleanStringType.Alias));
         }
 
         [Test]
         public void CleanStringAcronymOnNonUpper()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     // non-uppercase letter means cut acronym
                     CutAcronymOnNonUpper = true,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     // non-uppercase letter means word
                     CutAcronymOnNonUpper = false,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*BARRnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BARnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -281,27 +254,27 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringGreedyAcronyms()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = true,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*BARR*nil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BAR*nil", helper.CleanString("foo BARnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BA*nil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = false,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
             Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
@@ -311,12 +284,12 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringWhiteSpace()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo", helper.CleanString("   foo   ", CleanStringType.Alias));
             Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
         }
@@ -324,47 +297,47 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSeparator()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = ' '
-                });
+                }));
             Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged
-                });
+                }));
             Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '文'
-                });
+                }));
             Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
         }
 
         [Test]
         public void CleanStringSymbols()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
             // FIXME but for a filename we want to keep them!
@@ -413,21 +386,21 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringEncoding()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
             Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
                     Separator = '*'
-                });
+                }));
             Assert.AreEqual("", helper.CleanString("中文测试", CleanStringType.Alias));
             Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
         }
@@ -435,13 +408,12 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringDefaultConfig()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.RequestHandler);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            SettingsForTests.ConfigureSettings(settings);
 
-            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig();
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings));
 
             const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
 
@@ -462,12 +434,12 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringCasing()
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = ' '
-                });
+                }));
 
             // BBB is an acronym
             // E is a word (too short to be an acronym)
@@ -616,38 +588,9 @@ namespace Umbraco.Tests.Strings
         #endregion
         public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
         {
-            var cinfo = culture == null ? CultureInfo.InvariantCulture : new CultureInfo(culture);
-
             // picks the proper config per culture
             // and overrides some stringType params (ascii...)
-            var output = _helper.CleanString(input, stringType, cinfo);
-            Assert.AreEqual(expected, output);
-        }
-
-        [Test] // can't do cases with an IDictionary
-        public void ReplaceManyWithCharMap()
-        {
-            const string input = "télévisiön tzvâr ßup &nbsp; pof";
-            const string expected = "television tzvar ssup   pof";
-            IDictionary<string, string> replacements = new Dictionary<string, string>
-                {
-                    { "é", "e" },
-                    { "ö", "o" },
-                    { "â", "a" },
-                    { "ß", "ss" },
-                    { "&nbsp;", " " },
-                };
-            var output = _helper.ReplaceMany(input, replacements);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
-        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
-        #endregion
-        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
-        {
-            var output = _helper.ReplaceMany(input, toReplace.ToArray(), replacement);
+            var output = _helper.CleanString(input, stringType, culture);
             Assert.AreEqual(expected, output);
         }
 

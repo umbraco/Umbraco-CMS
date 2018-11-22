@@ -103,7 +103,10 @@ Use this directive to render a button with a dropdown of alternative actions.
             subButtons: "=",
             state: "=?",
             direction: "@?",
-            float: "@?"
+            float: "@?",
+            buttonStyle: "@?",
+            size: "@?",
+            icon: "@?"
          }
       };
 

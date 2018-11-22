@@ -1,58 +1,59 @@
-<div class="umb-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController" ng-switch="isNew">
+<div class="umb-property-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController" ng-switch="isNew">
 
    <div class="row-fluid" ng-switch-when="true">
 
    </div>
 
    <div class="row-fluid" ng-switch-when="false">
-
+       
        <umb-editor-sub-header>
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
 
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
-                       <a class="btn" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
+                       <a class="btn btn-success" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </a>
                    </div>
 
                    <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints">
-                       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                       <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-href="">
                            <span ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)">
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                            </span>
-                           <span class="caret"></span>
+                           <span class="caret" ng-click="page.createDropdownOpen = !page.createDropdownOpen"></span>
                        </a>
 
-                       <ul class="dropdown-menu">
-                           <li ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints">
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                           <umb-dropdown-item ng-repeat="(key, value) in listViewAllowedTypes[0].blueprints track by key">
                                <a ng-click="createFromBlueprint(entityType, listViewAllowedTypes[0].blueprints.alias, key)">
-                                   <i class="{{listViewAllowedTypes[0].icon}}"></i>
-                                   {{value}}
+                                   <i class="{{::listViewAllowedTypes[0].icon}}"></i>
+                                   {{::value}}
                                </a>
-                           </li>
-                       </ul>
+                           </umb-dropdown-item>
+                       </umb-dropdown>
                    </div>
 
                    <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints">
-                       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                       <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="page.createDropdownOpen = !page.createDropdownOpen">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
-                       <ul class="dropdown-menu">
-                           <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
-                               <a href="" ng-click="createBlank(entityType,contentType.alias)" prevent-default>
-                                   <i class="{{contentType.icon}}"></i>
-                                   {{contentType.name}} <span ng-show="contentType.blueprints && contentType.blueprints.length != 0" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+
+                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                           <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
+                               <a ng-click="createBlank(entityType,contentType.alias)" prevent-default ng-href="">
+                                   <i class="{{::contentType.icon}}"></i>
+                                   {{::contentType.name}} <span ng-show="contentType.blueprints && contentType.blueprints.length != 0" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </a>
-                               <a href="" ng-repeat="(key, value) in contentType.blueprints" ng-click="createFromBlueprint(entityType,contentType.alias , key)" prevent-default>
-                                   &nbsp;&nbsp;<i class="{{contentType.icon}}"></i>
-                                   {{value}}
+                               <a href="" ng-repeat="(key, value) in contentType.blueprints track by key" ng-click="createFromBlueprint(entityType,contentType.alias , key)" prevent-default>
+                                   &nbsp;&nbsp;<i class="{{::contentType.icon}}"></i>
+                                   {{::value}}
                                </a>
-                           </li>
-                       </ul>
+                           </umb-dropdown-item>
+                       </umb-dropdown>
                    </div>
 
                    <ul class="umb-actions umb-actions-child">
@@ -77,23 +78,19 @@
 
                    </ul>
 
-
-
                </umb-editor-sub-header-section>
 
-
-
-
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-                   <umb-button type="button"
-                               label="Clear selection"
-                               label-key="buttons_clearSelection"
-                               action="clearSelection()"
-                               disabled="actionInProgress">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
+                   <umb-button
+                       type="button"
+                       label="Clear selection"
+                       label-key="buttons_clearSelection"
+                       action="clearSelection()"
+                       disabled="actionInProgress">
                    </umb-button>
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
                    <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} <localize key="general_of">of</localize> {{ listViewResultSet.items.length }} <localize key="general_selected">selected</localize></strong>
                    <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
@@ -107,19 +104,19 @@
 
            <umb-editor-sub-header-content-right>
 
-               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
 
                    <umb-layout-selector
-                       ng-if="options.layout.layouts"
+                       ng-show="options.layout.layouts"
                        layouts="options.layout.layouts"
                        active-layout="options.layout.activeLayout"
-                       on-layout-select="selectLayout">
+                       on-layout-select="selectLayout(layout)">
                    </umb-layout-selector>
 
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
-                   <form class="form-search -no-margin-bottom pull-right" novalidate>
+               <umb-editor-sub-header-section ng-show="(selection.length == 0)">
+                   <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                        <div class="inner-addon left-addon">
                            <i class="icon icon-search" ng-click="enterSearch($event)"></i>
                            <input
@@ -133,64 +130,73 @@
                                prevent-enter-submit
                                no-dirty-check>
                        </div>
-                   </form>
+                   </ng-form>
                </umb-editor-sub-header-section>
 
-               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-show="(selection.length > 0)">
 
                    <umb-button
                        ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Publish"
+                       button-style="outline"
                        label-key="actions_publish"
                        icon="icon-globe"
                        action="publish()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Unpublish"
+                       button-style="outline"
                        label-key="actions_unpublish"
                        icon="icon-block"
                        action="unpublish()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Copy"
+                       button-style="outline"
                        label-key="actions_copy"
                        icon="icon-documents"
                        action="copy()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
+                       style="margin-right: 5px;"
                        type="button"
-                       button-style="link"
-                       label="Move"
+                       button-style="outline"
                        label-key="actions_move"
                        icon="icon-enter"
                        action="move()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                    <umb-button
                        ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
-                       button-style="link"
-                       label="Delete"
+                       button-style="outline"
                        label-key="actions_delete"
                        icon="icon-trash"
                        action="delete()"
-                       disabled="actionInProgress">
+                       disabled="actionInProgress"
+                       size="xs"
+                       add-ellipsis="true">
                    </umb-button>
 
                </umb-editor-sub-header-section>
@@ -207,14 +213,14 @@
          selection="selection"
          options="options"
          entity-type="{{entityType}}"
-         on-get-content="getContent">
+         on-get-content="getContent(contentId)">
       </umb-list-view-layout>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <div class="flex justify-center">
           <umb-pagination
-             ng-if="listViewResultSet.totalPages"
+             ng-show="listViewResultSet.totalPages"
              page-number="options.pageNumber"
              total-pages="listViewResultSet.totalPages"
              on-next="next"
@@ -224,20 +230,6 @@
       </div>
 
     </div>
-
-    <umb-overlay
-      ng-if="moveDialog.show"
-      model="moveDialog"
-      position="right"
-      view="moveDialog.view">
-    </umb-overlay>
-
-    <umb-overlay
-      ng-if="copyDialog.show"
-      model="copyDialog"
-      position="right"
-      view="copyDialog.view">
-    </umb-overlay>
 
     <umb-overlay
         ng-if="ysodOverlay.show"

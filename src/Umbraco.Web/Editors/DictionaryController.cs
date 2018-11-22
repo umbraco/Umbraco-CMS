@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
             {
                 var message = Services.TextService.Localize(
                      "dictionaryItem/changeKeyError",
-                     Security.CurrentUser.GetUserCulture(Services.TextService),
+                     Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 return Request.CreateNotificationValidationErrorResponse(message);
             }
@@ -90,9 +90,9 @@ namespace Umbraco.Web.Editors
 
                 return Request.CreateResponse(HttpStatusCode.OK, item.Id);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.Error(GetType(), "Error creating dictionary", exception);
+                Logger.Error(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
                 return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Editors
             if (dictionaryItem == null)
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
 
-            var userCulture = Security.CurrentUser.GetUserCulture(Services.TextService);
+            var userCulture = Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings);
 
             if (dictionary.NameIsDirty)
             {
@@ -175,9 +175,9 @@ namespace Umbraco.Web.Editors
 
                 return model;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error(GetType(), "Error saving dictionary", e);
+                Logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
             }
         }

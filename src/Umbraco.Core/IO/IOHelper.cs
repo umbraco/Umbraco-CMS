@@ -6,14 +6,13 @@ using System.IO;
 using System.Configuration;
 using System.Linq;
 using System.Web;
-using System.Text.RegularExpressions;
 using System.Web.Hosting;
-using Umbraco.Core.Configuration;
+using System.IO.Compression;
 
 namespace Umbraco.Core.IO
 {
-	public static class IOHelper
-	{
+    public static class IOHelper
+    {
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
         /// </summary>
@@ -23,25 +22,23 @@ namespace Umbraco.Core.IO
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
-        private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
-	    public static bool IsHosted
-	    {
-	        get
-	        {
-	            return ForceNotHosted == false && (HttpContext.Current != null || HostingEnvironment.IsHosted);
-            }
-	    }
+	    public static bool IsHosted => !ForceNotHosted && (HttpContext.Current != null || HostingEnvironment.IsHosted);
 
-        public static char DirSepChar
+        public static char DirSepChar => Path.DirectorySeparatorChar;
+
+        internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
         {
-            get
-            {
-                return Path.DirectorySeparatorChar;
-            }
+            // Unzip
+            var tempDir = unPackDirectory;
+            Directory.CreateDirectory(tempDir);
+            ZipFile.ExtractToDirectory(zipFilePath, unPackDirectory);
+            if (deleteZipFile)
+                File.Delete(zipFilePath);
         }
 
         //helper to try and match the old path to a new virtual one
@@ -58,10 +55,16 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
+        public static string ResolveVirtualUrl(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+            return path.StartsWith("~/") ? ResolveUrl(path) : path;
+        }
+
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {
-             if (virtualPath.StartsWith("~"))
+            if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
@@ -85,33 +88,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-	    [Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
-        internal static string ResolveUrlsFromTextString(string text)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
-            {
-				using (DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
-				{
-					// find all relative urls (ie. urls that contain ~)
-					var tags = ResolveUrlPattern.Matches(text);
-
-					foreach (Match tag in tags)
-					{
-						string url = "";
-						if (tag.Groups[1].Success)
-							url = tag.Groups[1].Value;
-
-						if (String.IsNullOrEmpty(url) == false)
-						{
-							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-							text = text.Replace(url, resolvedUrl);
-						}
-					}
-				}
-            }
-            return text;
-        }
-
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
@@ -123,8 +99,8 @@ namespace Umbraco.Core.IO
             {
                 return path;
             }
-			// Check that we even have an HttpContext! otherwise things will fail anyways
-			// http://umbraco.codeplex.com/workitem/30946
+            // Check that we even have an HttpContext! otherwise things will fail anyways
+            // http://umbraco.codeplex.com/workitem/30946
 
             if (useHttpContext && HttpContext.Current != null)
             {
@@ -135,11 +111,11 @@ namespace Umbraco.Core.IO
                     return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
 
-        	var root = GetRootDirectorySafe();
-        	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
-        	var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
+            var root = GetRootDirectorySafe();
+            var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+            var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
-        	return retval;
+            return retval;
         }
 
         public static string MapPath(string path)
@@ -147,12 +123,17 @@ namespace Umbraco.Core.IO
             return MapPath(path, true);
         }
 
-        //use a tilde character instead of the complete path
-		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+        public static string MapPathIfVirtual(string path)
         {
-            string retval = ConfigurationManager.AppSettings[settingsKey];
+            return path.StartsWith("~/") ? MapPath(path) : path;
+        }
 
-            if (String.IsNullOrEmpty(retval))
+        //use a tilde character instead of the complete path
+        internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+        {
+            var retval = ConfigurationManager.AppSettings[settingsKey];
+
+            if (string.IsNullOrEmpty(retval))
                 retval = standardPath;
 
             return retval.TrimEnd('/');
@@ -229,20 +210,6 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Validates that the current filepath matches one of several directories where the user is allowed to edit a file.
-        /// </summary>
-        /// <param name="filePath">The filepath to validate.</param>
-        /// <param name="validDirs">The valid directories.</param>
-        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
-        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
-        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
-        {
-            if (VerifyEditPath(filePath, validDirs) == false)
-           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-            return true;
-        }
-
-        /// <summary>
         /// Verifies that the current filepath has one of several authorized extensions.
         /// </summary>
         /// <param name="filePath">The filepath to validate.</param>
@@ -292,10 +259,10 @@ namespace Umbraco.Core.IO
                 return _rootDir;
             }
 
-			var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-			var uri = new Uri(codeBase);
-			var path = uri.LocalPath;
-        	var baseDirectory = Path.GetDirectoryName(path);
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
             if (String.IsNullOrEmpty(baseDirectory))
                 throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
 
@@ -339,9 +306,9 @@ namespace Umbraco.Core.IO
         /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
         /// <param name="rootPath"></param>
         internal static void SetRootDirectory(string rootPath)
-	    {
+        {
             _rootDir = rootPath;
-	    }
+        }
 
         /// <summary>
         /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
@@ -354,24 +321,22 @@ namespace Umbraco.Core.IO
             return filePath.ToSafeFileName();
         }
 
-	    public static void EnsurePathExists(string path)
-	    {
-	        var absolutePath = IOHelper.MapPath(path);
-	        if (Directory.Exists(absolutePath) == false)
-	            Directory.CreateDirectory(absolutePath);
-	    }
+        public static void EnsurePathExists(string path)
+        {
+            var absolutePath = MapPath(path);
+            if (Directory.Exists(absolutePath) == false)
+                Directory.CreateDirectory(absolutePath);
+        }
 
-	    public static void EnsureFileExists(string path, string contents)
-	    {
-	        var absolutePath = IOHelper.MapPath(path);
-	        if (File.Exists(absolutePath) == false)
-	        {
-                using (var writer = File.CreateText(absolutePath))
-                {
-                    writer.Write(contents);
-                }
-	        }
+        public static void EnsureFileExists(string path, string contents)
+        {
+            var absolutePath = IOHelper.MapPath(path);
+            if (File.Exists(absolutePath)) return;
 
+            using (var writer = File.CreateText(absolutePath))
+            {
+                writer.Write(contents);
+            }
         }
 
         /// <summary>
@@ -383,9 +348,9 @@ namespace Umbraco.Core.IO
         internal static bool IsFullPath(this string path)
         {
             return string.IsNullOrWhiteSpace(path) == false
-                && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
-                && Path.IsPathRooted(path)
-                && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+                   && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
+                   && Path.IsPathRooted(path)
+                   && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
         }
 
         /// <summary>

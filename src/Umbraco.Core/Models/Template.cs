@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -48,12 +39,6 @@ namespace Umbraco.Core.Models
             _masterTemplateId = new Lazy<int>(() => -1);
         }
 
-        [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
-        public Template(string path, string name, string alias)
-            : this(name, alias)
-        {            
-        }
-
         [DataMember]
         public Lazy<int> MasterTemplateId
         {
@@ -86,13 +71,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         public bool IsMasterTemplate { get; internal set; }
 
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions, use the IFileSystem DetermineRenderingEngine method instead")]
-        public RenderingEngine GetTypeOfRenderingEngine()
-        {
-            //Hack! TODO: Remove this method entirely
-            return ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(this);
-        }
-
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
             if (masterTemplate == null)
@@ -105,7 +83,7 @@ namespace Umbraco.Core.Models
                 MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
                 MasterTemplateAlias = masterTemplate.Alias;
             }
-           
+
         }
 
         protected override void DeepCloneNameAndAlias(File clone)

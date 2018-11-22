@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         [System.Web.Http.HttpGet]
         public IEnumerable<object> GetContentTypes()
         {
-            return Services.ContentTypeService.GetAllContentTypes()
+            return Services.ContentTypeService.GetAll()
                 .OrderBy(x => x.SortOrder)
                 .Select(x => new
                 {

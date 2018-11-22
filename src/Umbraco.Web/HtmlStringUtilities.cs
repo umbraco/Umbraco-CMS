@@ -11,11 +11,8 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Utility class for working with strings and HTML in views
+    /// Provides utility methods for UmbracoHelper for working with strings and html in views.
     /// </summary>
-    /// <remarks>
-    /// The UmbracoHelper uses this class for it's string methods
-    /// </remarks>
     public sealed class HtmlStringUtilities
     {
         /// <summary>
@@ -23,16 +20,16 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
-        public string ReplaceLineBreaksForHtml(string text)
+        public HtmlString ReplaceLineBreaksForHtml(string text)
         {
-            return text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />");
+            return new HtmlString(text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />"));
         }
 
         public HtmlString StripHtmlTags(string html, params string[] tags)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml("<p>" + html + "</p>");
-            
+
             var targets = new List<HtmlNode>();
 
             var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
@@ -61,29 +58,36 @@ namespace Umbraco.Web
             return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml.Replace("  ", " "));
         }
 
-        internal string Join<TIgnore>(string seperator, params object[] args)
+        internal string Join(string separator, params object[] args)
         {
-            var results = args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)).ToList();
-            return string.Join(seperator, results);
+            var results = args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .Where(x => string.IsNullOrWhiteSpace(x) == false);
+            return string.Join(separator, results);
         }
 
-        internal string Concatenate<TIgnore>(params object[] args)
+        internal string Concatenate(params object[] args)
         {
-            var result = new StringBuilder();
-            foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
+            var sb = new StringBuilder();
+            foreach (var arg in args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .Where(x => string.IsNullOrWhiteSpace(x) == false))
             {
-                result.Append(sArg);
+                sb.Append(arg);
             }
-            return result.ToString();
+            return sb.ToString();
         }
 
-        internal string Coalesce<TIgnore>(params object[] args)
+        internal string Coalesce(params object[] args)
         {
-            foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
-            {
-                return sArg;
-            }
-            return string.Empty;
+            var arg = args
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .FirstOrDefault(x => string.IsNullOrWhiteSpace(x) == false);
+
+            return arg ?? string.Empty;
         }
 
         public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)

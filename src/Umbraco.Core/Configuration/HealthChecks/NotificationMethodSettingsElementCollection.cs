@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         protected override object GetElementKey(ConfigurationElement element)
         {
             return ((NotificationMethodSettingsElement)(element)).Key;
-        }        
+        }
 
         IEnumerator<KeyValuePair<string, INotificationMethodSettings>> IEnumerable<KeyValuePair<string, INotificationMethodSettings>>.GetEnumerator()
         {

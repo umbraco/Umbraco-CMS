@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Rdbms;
+using System.Text.RegularExpressions;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -17,22 +18,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetWildcardPlaceholder();
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType);
+        string GetConcat(params string[] args);
 
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);
-        bool DoesTableExist(Database db, string tableName);
+        bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
         string GetSpecialDbType(SpecialDbTypes dbTypes);
         string CreateTable { get; }
@@ -53,9 +44,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string TruncateTable { get; }
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
-
-        [Obsolete("This is never used, use the Format(ForeignKeyDefinition) instead")]
-        string CreateForeignKeyConstraint { get; }
+        
         string DeleteDefaultConstraint { get; }
         string FormatDateTime(DateTime date, bool includeTime = true);
         string Format(TableDefinition table);
@@ -65,21 +54,32 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatPrimaryKey(TableDefinition table);
         string GetQuotedValue(string value);
         string Format(ColumnDefinition column);
+        string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
         string Format(IndexDefinition index);
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
-        Sql SelectTop(Sql sql, int top);
+
+        /// <summary>
+        /// Gets a regex matching aliased fields.
+        /// </summary>
+        /// <remarks>
+        /// <para>Matches "(table.column) AS (alias)" where table, column and alias are properly escaped.</para>
+        /// </remarks>
+        Regex AliasRegex { get; }
+
+        Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
+
         bool SupportsClustered();
         bool SupportsIdentityInsert();
-        bool? SupportsCaseInsensitiveQueries(Database db);
-        
+        bool? SupportsCaseInsensitiveQueries(IDatabase db);
+
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
 
-        IEnumerable<string> GetTablesInSchema(Database db);
-        IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
+        IEnumerable<string> GetTablesInSchema(IDatabase db);
+        IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
 
         /// <summary>
         /// Returns all constraints defined in the database (Primary keys, foreign keys, unique constraints...) (does not include indexes)
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// <returns>
         /// A Tuple containing: TableName, ConstraintName
         /// </returns>
-        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);
+        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db);
 
         /// <summary>
         /// Returns all constraints defined in the database (Primary keys, foreign keys, unique constraints...) (does not include indexes)
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// <returns>
         /// A Tuple containing: TableName, ColumnName, ConstraintName
         /// </returns>
-        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
+        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db);
 
         /// <summary>
         /// Returns all defined Indexes in the database excluding primary keys
@@ -106,6 +106,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// <returns>
         /// A Tuple containing: TableName, IndexName, ColumnName, IsUnique
         /// </returns>
-        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
     }
 }

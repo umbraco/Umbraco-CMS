@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Net;
 using System.Net.Http;
@@ -18,16 +18,20 @@ namespace Umbraco.Web.Scheduling
     internal class ScheduledTasks : RecurringTaskBase
     {
         private static HttpClient _httpClient;
-        private readonly ApplicationContext _appContext;
+        private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _proflog;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
 
         public ScheduledTasks(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            ApplicationContext appContext, IUmbracoSettingsSection settings)
+            IRuntimeState runtime, IUmbracoSettingsSection settings, ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _appContext = appContext;
+            _runtime = runtime;
             _settings = settings;
+            _logger = logger;
+            _proflog = proflog;
         }
 
         private async Task ProcessTasksAsync(CancellationToken token)
@@ -55,7 +59,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     var taskResult = await GetTaskByHttpAync(t.Url, token);
                     if (t.Log)
-                        LogHelper.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
+                        _logger.Info<ScheduledTasks>("{TaskAlias} has been called with response: {TaskResult}", t.Alias, taskResult);
                 }
             }
         }
@@ -63,11 +67,11 @@ namespace Umbraco.Web.Scheduling
         private async Task<bool> GetTaskByHttpAync(string url, CancellationToken token)
         {
             if (_httpClient == null)
-                _httpClient = new HttpClient();
-
-            if (Uri.TryCreate(_appContext.UmbracoApplicationUrl, UriKind.Absolute, out var baseUri))
-                _httpClient.BaseAddress = baseUri;
-
+                _httpClient = new HttpClient
+                {
+                    BaseAddress = _runtime.ApplicationUrl
+                };
+            
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             //TODO: pass custom the authorization header, currently these aren't really secured!
@@ -80,50 +84,46 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                LogHelper.Error<ScheduledTasks>("An error occurred calling web task for url: " + url, ex);
+                    _logger.Error<ScheduledTasks>(ex, "An error occurred calling web task for url: {Url}", url);
+
             }
             return false;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            if (_appContext == null) return true; // repeat...
-
-            switch (_appContext.GetCurrentServerRole())
+            switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
-                    LogHelper.Debug<ScheduledTasks>("Does not run on replica servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<ScheduledTasks>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    LogHelper.Debug<ScheduledTasks>("Does not run on servers with unknown role.");
+                    _logger.Debug<ScheduledTasks>("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_appContext.MainDom.IsMainDom == false)
+            if (_runtime.IsMainDom == false)
             {
-                LogHelper.Debug<ScheduledTasks>("Does not run if not MainDom.");
+                _logger.Debug<ScheduledTasks>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
-            using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
+            using (_proflog.DebugDuration<ScheduledTasks>("Scheduled tasks executing", "Scheduled tasks complete"))
             {
                 try
                 {
                     await ProcessTasksAsync(token);
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    LogHelper.Error<ScheduledTasks>("Error executing scheduled task", ee);
+                    _logger.Error<ScheduledTasks>(ex, "Error executing scheduled task");
                 }
             }
 
             return true; // repeat
         }
 
-        public override bool IsAsync
-        {
-            get { return true; }
-        }
+        public override bool IsAsync => true;
     }
 }

@@ -1,348 +1,130 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
-  <Import Project="..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" />
+<Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{4C4C194C-B5E4-4991-8F87-4373E24CC19F}</ProjectGuid>
-    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <AssemblyKeyContainerName>
-    </AssemblyKeyContainerName>
-    <AssemblyName>Umbraco.Web.UI</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-    <DefaultClientScript>JScript</DefaultClientScript>
-    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-    <DefaultTargetSchema>IE50</DefaultTargetSchema>
-    <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
+    <AssemblyName>Umbraco.Web.UI</AssemblyName>
     <RootNamespace>Umbraco.Web.UI</RootNamespace>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <OldToolsVersion>4.0</OldToolsVersion>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>
-    </IISExpressSSLPort>
+    <IISExpressSSLPort>44319</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <UseGlobalApplicationHostFile />
-    <Use64BitIISExpress />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
+    <TargetFrameworkProfile />
+    <!-- 
+      for some weird reason, and because Web.config is created only during BeforeBuild,
+      the web.config configuration file would not be picked, and the build system would
+      try to use a traditional app.config, thus missing all the binding redirects.
+      
+      this ensures that the build system things that the config file is web.config.
+      
+      (see FindAppConfigFile target in detailed build output)
+    -->
+    <AppConfig>Web.config</AppConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
-    <FileAlignment>4096</FileAlignment>
-    <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>false</Optimize>
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <IntermediateOutputPath>..\bin\Debug\</IntermediateOutputPath>
     <PackageAsSingleFile>true</PackageAsSingleFile>
     <DesktopBuildPackageLocation>..\Package\Umbraco.Web.UI.zip</DesktopBuildPackageLocation>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Umbraco.Web.UI.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
-    <FileAlignment>4096</FileAlignment>
-    <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>true</Optimize>
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
     <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Umbraco.Web.UI.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <IntermediateOutputPath>..\bin\Release\</IntermediateOutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
-      <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>UmbracoExamine</Name>
-    </ProjectReference>
-    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.7\lib\net45\ClientDependency.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="ClientDependency.Core.Mvc, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency-Mvc5.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
-      <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageProcessor, Version=2.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.2.5.6\lib\net45\ImageProcessor.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageProcessor.Web, Version=4.8.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.Web.4.8.7\lib\net45\ImageProcessor.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Core">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.0.0\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.2.2\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Owin">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
-    <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\SqlServerCE.4.0.0.1\lib\System.Data.SqlServerCe.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\SqlServerCE.4.0.0.1\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.ComponentModel" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=1.0.21.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.1.0.21\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Web">
-      <Name>System.Web</Name>
-    </Reference>
-    <Reference Include="System.Web.Abstractions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Extensions.Design" />
-    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Services">
-      <Name>System.Web.Services</Name>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
-    <ProjectReference Include="..\SQLCE4Umbraco\SqlCE4Umbraco.csproj">
-      <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
-      <Name>SqlCE4Umbraco</Name>
-    </ProjectReference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Umbraco\Translation\" />
+    <Folder Include="Views\MacroPartials\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
+    <PackageReference Include="ClientDependency" Version="1.9.7" />
+    <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
+    <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
+    <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.9.0" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <!-- development dependency -->
+    </PackageReference>
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
+    <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
+    <PackageReference Include="MySql.Data" Version="6.10.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Umbraco.ModelsBuilder.Ui">
+      <Version>8.0.0-alpha.24</Version>
+    </PackageReference>
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
-      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
-      <Name>umbraco.editorControls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
-      <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
-      <Name>umbraco.MacroEngines</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Name>umbraco.businesslogic</Name>
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
-      <Name>umbraco.cms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
-      <Name>umbraco.datalayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Name>umbraco.interfaces</Name>
-      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+      <Name>Umbraco.Examine</Name>
+      <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
-      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.providers\umbraco.providers.csproj">
-      <Project>{D7636876-0756-43CB-A192-138C6F0D5E42}</Project>
-      <Name>umbraco.providers</Name>
-    </ProjectReference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.10.102, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.10\lib\Umbraco.ModelsBuilder.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -368,13 +150,6 @@
     </Compile>
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
       <DependentUpon>UserControlProxy.aspx</DependentUpon>
@@ -404,28 +179,6 @@
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
-      <DependentUpon>EditMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
-      <DependentUpon>EditMacro.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\Publish.aspx.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\Publish.aspx.designer.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -444,34 +197,6 @@
     </Compile>
     <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Search\QuickSearch.ascx.cs">
-      <DependentUpon>QuickSearch.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
-      <DependentUpon>QuickSearch.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.designer.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\TreeInit.aspx.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
@@ -501,9 +226,7 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
-    <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -514,34 +237,20 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
-    <Content Include="Umbraco\Xslt\Web.config">
-      <SubType>
-      </SubType>
-    </Content>
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
-    <Content Include="Config\BackOfficeTours\getting-started.json" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
-    </None>
-    <Content Include="Config\BaseRestExtensions.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Config\BaseRestExtensions.Release.config">
-      <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
     <Content Include="Config\imageprocessor\security.config" />
     <Content Include="Config\imageprocessor\processing.config" />
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\log4net.Release.config">
-      <DependentUpon>log4net.config</DependentUpon>
-    </None>
     <None Include="Config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
@@ -555,6 +264,12 @@
       <DependentUpon>HealthChecks.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Config\serilog.user.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Config\serilog.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -585,140 +300,40 @@
     </None>
     <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Global.asax" />
-    <Content Include="Umbraco\Config\Lang\en_us.xml" />
+    <Content Include="Umbraco\Config\Lang\en_us.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />
     <Content Include="Umbraco\Config\Lang\pl.xml" />
     <Content Include="Umbraco\Config\Lang\pt.xml" />
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
-    <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\Refresh.gif" />
     <Content Include="Umbraco\Developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
-    <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
-    <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
-    <Content Include="Umbraco_Client\Application\Extensions.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
-    <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
-    <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
-    <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
-    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
-    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
-    <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
-    <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
-    <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
-    <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
-    <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
-    <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
-    <Content Include="Umbraco_Client\Editors\EditXslt.css" />
-    <Content Include="Umbraco_Client\Editors\EditXslt.js" />
-    <Content Include="Umbraco_Client\Editors\DirectoryBrowser.css" />
-    <Content Include="Umbraco_Client\Editors\EditMacro.css" />
-    <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
-    <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
-    <Content Include="Umbraco_Client\Editors\EditView.js" />
-    <Content Include="Umbraco_Client\FileUploader\Js\jquery.fileUploader.js" />
-    <Content Include="Umbraco_Client\FolderBrowser\Css\folderbrowser.css" />
-    <Content Include="Umbraco_Client\FolderBrowser\Js\folderbrowser.js" />
-    <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
-    <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
-    <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
-    <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
-    <Content Include="Umbraco_Client\MaskedInput\jquery.maskedinput-1.3.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_hover.png" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_downarrow.png" />
-    <Content Include="Umbraco_Client\Splitbutton\splitbutton.css" />
-    <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco\Members\MemberSearch.ascx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.idle-timer.js" />
-    <Content Include="Umbraco_Client\MacroContainer\macroContainer.css" />
-    <Content Include="Umbraco_Client\Ui\base2.js" />
-    <Content Include="Umbraco_Client\Ui\jquery.alphanumeric.js" />
-    <Content Include="Umbraco_Client\Ui\jquery.tooltip.min.js" />
-    <Content Include="Umbraco_Client\Ui\json2.js" />
-    <Content Include="Umbraco_Client\Ui\knockout.js" />
-    <Content Include="Umbraco_Client\Ui\knockout.mapping.js" />
     <Content Include="Umbraco\endPreview.aspx" />
-    <Content Include="Umbraco_Client\Application\HistoryManager.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.ba-bbq.min.js" />
-    <Content Include="Umbraco_Client\Preview\previewModeBadge.png" />
-    <Content Include="Umbraco_Client\Preview\umbracoPreview.css" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\arrows.png" />
-    <Content Include="Umbraco_Client\Ui\dd.css" />
-    <Content Include="Umbraco_Client\Ui\dd_arrow.gif" />
-    <Content Include="Umbraco_Client\Ui\jquery.dd.js" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Breadcrumb.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Clean.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesAsThumbnails.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByDateAndLimit.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByDocumentType.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByLevel.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesFromAChangableSource.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListThumbnailsFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListWholeStructureFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\NavigationPrototype.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\RelatedLinks.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\RSSFeed.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Sitemap.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\TablePrototype.xslt" />
-    <Content Include="Umbraco\Dialogs\Preview.aspx" />
-    <Content Include="Umbraco_Client\DateTimePicker\Images\calSprite.png" />
-    <Content Include="Umbraco_Client\DateTimePicker\Images\ui-icons_666666_256x240.png" />
-    <Content Include="Umbraco_Client\DateTimePicker\Images\ui-icons_999999_256x240.png" />
-    <Content Include="Umbraco_Client\DateTimePicker\umbDateTimePicker.js" />
-    <Content Include="Umbraco\Controls\ProgressBar.ascx" />
-    <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
-    <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
-    <Content Include="Umbraco_Client\Tree\sprites.png" />
-    <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
-    <Content Include="Umbraco\Js\UmbracoSpeechBubbleInit.js" />
-    <Content Include="Umbraco\Search\QuickSearch.ascx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.noconflict-invoke.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\VerticalAlign.js" />
-    <Content Include="Umbraco_Client\Application\UrlEncoder.js" />
-    <Content Include="Umbraco_Client\CodeArea\UmbracoEditor.js" />
-    <Content Include="Umbraco_Client\Tree\UmbracoContext.js" />
-    <Content Include="Umbraco_Client\Tree\jquery.tree.checkbox.js" />
-    <Content Include="Umbraco_Client\Tree\jquery.tree.contextmenu.js" />
-    <Content Include="Umbraco_Client\Tree\jquery.tree.js" />
-    <Content Include="Umbraco_Client\Tree\jquery.tree.metadata.js" />
-    <Content Include="Umbraco_Client\Tree\Themes\Default\dot_for_ie.gif" />
-    <Content Include="Umbraco_Client\Tree\Themes\Default\icons.png" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\icons.png" />
     <Content Include="default.aspx" />
-    <Content Include="Umbraco\Actions\delete.aspx" />
-    <Content Include="Umbraco\Actions\editContent.aspx" />
-    <Content Include="Umbraco\Actions\preview.aspx" />
-    <Content Include="Umbraco\Actions\publish.aspx" />
-    <Content Include="Umbraco\Config\Lang\da.xml" />
+    <Content Include="Umbraco\Config\Lang\da.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
     <Content Include="Umbraco\Config\Lang\fr.xml" />
@@ -726,61 +341,15 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco\Webservices\MacroContainerService.asmx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
-    <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
-    <Content Include="Umbraco_Client\Tree\menuIcons.css" />
-    <Content Include="Umbraco_Client\Tree\Themes\Default\style.css" />
-    <Content Include="Umbraco_Client\Tree\Themes\Default\throbber.gif" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\check_0.png" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\check_1.png" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\check_2.png" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\style.css" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\throbber.gif" />
-    <Content Include="Umbraco\Developer\Xslt\xsltVisualize.aspx" />
-    <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
-    <Content Include="Umbraco\Dialogs\search.aspx" />
-    <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco_Client\Tree\treeIcons.css" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\contextMenuBg.gif" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery-fieldselection.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoUtils.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
-    <Content Include="Umbraco_Client\Tree\NodeDefinition.js" />
-    <Content Include="Umbraco_Client\Tree\UmbracoTree.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
-    <Content Include="Umbraco\Webservices\TreeClientService.asmx" />
-    <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
-    <Content Include="Umbraco_Client\Ui\jQueryWresize.js" />
-    <Content Include="Umbraco\Search\quickSearch.js" />
-    <Content Include="Umbraco\Members\search.aspx" />
-    <Content Include="Umbraco\Translation\details.aspx" />
-    <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
-    <Content Include="Umbraco_Client\Modal\modalGradiant.gif" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.autocomplete.js" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
-    <Content Include="Umbraco\Dialogs\create.aspx" />
-    <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
-    <Content Include="Umbraco\Dialogs\publish.aspx" />
-    <Content Include="Umbraco\Dialogs\rollBack.aspx" />
-    <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
-    <Content Include="Umbraco\Dialogs\treePicker.aspx" />
-    <Content Include="Umbraco\Dialogs\umbracoField.aspx" />
-    <Content Include="Umbraco\Dialogs\viewAuditTrail.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Umbraco\Js\UmbracoSpeechBubble.js" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
-    <Content Include="Umbraco\Js\umbracoUpgradeChecker.js" />
-    <Content Include="Umbraco\Members\ViewMembers.aspx" />
-    <Content Include="Umbraco\Plugins\Tinymce3\tinymce3tinymceCompress.aspx" />
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
@@ -804,9 +373,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\Empty %28ForUseWithCustomViews%29.cshtml">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Breadcrumb.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
@@ -824,7 +390,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
-    <Content Include="Umbraco\Translation\translationTasks.dtd" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -841,19 +406,8 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
-    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
     <Content Include="Umbraco\Views\Preview\Index.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
-    <Content Include="Umbraco\Views\Preview\web.config" />
+    <Content Include="Umbraco\Views\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -865,132 +419,16 @@
     </None>
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
-    <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Xslt\searchResult.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\RelatedLinks.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\RSSFeed.xslt" />
-    <Content Include="Umbraco_Client\Images\progressbar.gif" />
-    <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
-    <Content Include="Umbraco\Translation\default.aspx" />
-    <Content Include="Umbraco\Translation\preview.aspx" />
-    <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="Umbraco\Create\simple.ascx" />
-    <Content Include="Umbraco\Create\xslt.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
-    <Content Include="Umbraco\Developer\Xslt\xsltChooseExtension.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\newVersion_overlay.png" />
-    <Content Include="Umbraco_Client\Tree\Themes\Umbraco\protect_overlay.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
-    <Content Include="Umbraco\Js\xmlextras.js" />
-    <Content Include="Umbraco\Js\xmlRequest.js" />
-    <Content Include="Umbraco\macroResultWrapper.aspx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="Umbraco\Members\EditMemberGroup.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\ping.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\publishStatus.aspx" />
-    <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Settings\editLanguage.aspx" />
-    <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
-    <Content Include="Umbraco\Dialogs\sort.aspx" />
-    <Content Include="Umbraco\tree.aspx" />
-    <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\Webservices\ajax.js" />
-    <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="Umbraco\Webservices\CMSNode.asmx" />
-    <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
-    <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
-    <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco\Webservices\progressStatus.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="Umbraco\Webservices\publication.asmx" />
-    <Content Include="Umbraco\Webservices\wsdl.xslt" />
-    <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
-    <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
-    <Content Include="Umbraco\Xslt\sqlNodeHierachy.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Breadcrumb.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Clean.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesAsThumbnails.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByDateAndLimit.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByDocumentType.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByLevel.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesFromAChangableSource.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListThumbnailsFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListWholeStructureFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\NavigationPrototype.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Sitemap.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\TablePrototype.xslt" />
-    <Content Include="Umbraco_Client\CodeArea\javascript.js" />
-    <Content Include="Umbraco_Client\CodeArea\styles.css" />
-    <Content Include="Umbraco_Client\Datepicker\Aqua\theme.css" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbg.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbgdown.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\split.gif" />
-    <Content Include="Umbraco_Client\Menuicon\style.css" />
-    <Content Include="Umbraco_Client\Modal\modal.js" />
-    <Content Include="Umbraco_Client\Modal\style.css" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_boxfooter_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_boxfooter_statusBar_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_boxfooter_statusBar_h2_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_boxhead_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\Images\panel_boxhead_h2_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\javascript.js" />
-    <Content Include="Umbraco_Client\Panel\style.css" />
-    <Content Include="Umbraco_Client\ProgressBar\Images\container_left.gif" />
-    <Content Include="Umbraco_Client\ProgressBar\Images\container_right.gif" />
-    <Content Include="Umbraco_Client\ProgressBar\Images\indicator.gif" />
-    <Content Include="Umbraco_Client\ProgressBar\javascript.js" />
-    <Content Include="Umbraco_Client\ProgressBar\style.css" />
-    <Content Include="Umbraco_Client\Propertypane\Images\propertyBackground.gif" />
-    <Content Include="Umbraco_Client\Propertypane\style.css" />
-    <Content Include="Umbraco_Client\Scrollingmenu\javascript.js" />
-    <Content Include="Umbraco_Client\Scrollingmenu\style.css" />
-    <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
-    <Content Include="Umbraco_Client\Tablesorting\tableFilterUtill.js" />
-    <Content Include="Umbraco_Client\Tablesorting\tableFilter.js" />
-    <Content Include="Umbraco_Client\Tabview\Images\background.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\bg.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\footer_bg.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\footer_statusBar_bg.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\footer_statusBar_h2_bg.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\left_both.gif" />
-    <Content Include="Umbraco_Client\Tabview\Images\right_both.gif" />
-    <Content Include="Umbraco_Client\Tabview\javascript.js" />
-    <Content Include="Umbraco_Client\Tabview\oldstyle.css" />
-    <Content Include="Umbraco_Client\Tabview\style.css" />
-    <Content Include="Umbraco_Client\Ui\default.css" />
-    <Content Include="Umbraco_Client\Ui\default.js" />
-    <Content Include="Umbraco_Client\Ui\jquery.js" />
-    <Content Include="Umbraco_Client\Ui\jqueryui.js" />
-    <Content Include="App_Browsers\w3cvalidator.browser" />
-    <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
-    <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
-    <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
@@ -1004,18 +442,11 @@
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
+    <Content Include="Config\BackOfficeTours\getting-started.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Views\MacroPartials\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
-  </ItemGroup>
+  <!-- determine VSToolsPath -->
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
@@ -1023,24 +454,33 @@
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0</VSToolsPath>
   </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- determine WebPublishingTasks -->
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
-xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
+  <!-- get TransformXml task from WebPublishingtasks -->
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
+  <!-- get NuGet packages directory -->
+  <PropertyGroup>
+    <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
+  </PropertyGroup>
+  <!-- import targets -->
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- web project -->
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7130</DevelopmentServerPort>
+          <DevelopmentServerPort>8000</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7130</IISUrl>
+          <IISUrl>http://localhost:8000</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -1050,54 +490,71 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="$(MSBuildProjectDirectory)\..\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
-  <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(VSWherePath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll" Condition="'$(VSWherePath)' != ''" />
   <Target Name="BeforeBuild">
-    <Message Text="WebPublishingTasks: $(WebPublishingTasks)" Importance="high" />
-    <Message Text="VSWherePath: $(VSWherePath)" Importance="high" />
+    <Message Text="-BeforeBuild-" Importance="high" />
+    <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
+    <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
+    <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
+    <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
     <!-- Create web.config file from Template if it doesn't exist -->
+    <Message Text="Copy Web.Template.config to Web.config" Importance="high" Condition="!Exists('$(ProjectDir)Web.config')" />
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
     <!-- Transform the local Web.config file in Visual Studio -->
+    <Message Text="Transform Web.config with web.Template.$(Configuration).config into Web.$(Configuration).config.transformed (this is Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) == true" />
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
+    <Message Text="Transform Web.Template.config with web.Template.$(Configuration).config into Web.$(Configuration).config.transformed (this is not Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) != true" />
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
+    <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
-    <!-- Only runs if the Belle build folder doesn't yet exist -->
-    <Message Text="Skipping BelleBuild because UmbracoBuild is '$(UmbracoBuild)', " Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Running BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib does not exist" Importance="High" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib')" />
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
-    <Message Text="Skipping BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib exists or UmbracoBuild is not set" Importance="High" Condition="Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+    <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
+    <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip Belle because $(ProjectDir)Umbraco\lib exists." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />
+    <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+  </Target>
+  <!-- clean Belle when cleaning and rebuilding, but only in Visual Studio -->
+  <Target Name="CleanBelle" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+    <Message Text="-CleanBelle-" Importance="high" />
+    <Message Text="Nothing to clean, as $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib')" />
+    <Message Text="Not cleaning (found src/preserve.belle)." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib') and Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Remove $(ProjectDir)Umbraco\lib." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')" />
+    <ItemGroup>
+      <BelleLib Include="$(ProjectDir)Umbraco\lib" />
+    </ItemGroup>
+    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')" />
   </Target>
   <Target Name="AfterBuild">
+    <Message Text="-AfterBuild-" Importance="high" />
+    <Message Text="Copy Web.$(Configuration).config.transformed over to Web.config (this is Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) == true" />
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
   </Target>
-  <Target Name="BelleBuild" BeforeTargets="Rebuild" Condition="'$(UmbracoBuild)' == ''">
-    <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $env:PSModulePath = \&quot;$pwd\build\Modules\;$env:PSModulePath\&quot; ; Import-Module Umbraco.Build -Force -DisableNameChecking ; build-umbraco compile-belle }&quot;" />
+  <Target Name="BelleBuild">
+    <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd\build\build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />
   </Target>
-  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+  <Target Name="ResetConfigFiles" Condition="'$(WebProjectOutputDir)' != ''" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
+    <ItemGroup>
+      <!-- every *.config (recursive) files xcept web[.*].config -->
+      <!-- beware! includes any rogue git-ignored or temp config file -->
+      <ConfigFiles Include="$(ProjectDir)**\*.config" Exclude="$(ProjectDir)web.config;$(ProjectDir)web.*.config" />
+      <!-- and the UI file -->
+      <ConfigFiles Include="$(ProjectDir)umbraco\config\create\UI.xml" />
+    </ItemGroup>
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <!-- the original file eg src/.../umbracoSettings.config -->
+      <OriginalFileName>@(ConfigFiles)</OriginalFileName>
+      <!-- the configuration version of the original file eg src/.../umbracoSettings.Release.config -->
+      <ModifiedFileName>$(OriginalFileName.Replace("%(ConfigFiles.Extension)",".$(Configuration)%(ConfigFiles.Extension)"))</ModifiedFileName>
+      <!-- the target file eg webapp/.../umbracoSettings.config -->
+      <OutputFileName>$(OriginalFileName.Replace("$(ProjectDir)", "$(WebProjectOutputDir)"))</OutputFileName>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <!--
+      for each whatever.config file,
+      if there is a whatever.(Release|Debug).config file,
+      copy it over as whatever.config
+    -->
+    <Message Text="ConfigFile: $(OriginalFileName) -&gt; $(OutputFileName)" Importance="high" Condition="Exists('$(ModifiedFileName)')" />
+    <Copy SourceFiles="$(ModifiedFileName)" DestinationFiles="$(OutputFileName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="Exists('$(ModifiedFileName)')" />
   </Target>
 </Project>

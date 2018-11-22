@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         }
 
         /// <summary>
-        /// Gets a value from a given configuration file with the given XPath  
+        /// Gets a value from a given configuration file with the given XPath
         /// </summary>
         public ConfigurationServiceResult GetConfigurationValue()
         {
@@ -55,19 +56,19 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     Result = string.Format(xmlNode.Value ?? xmlNode.InnerText)
                 };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                LogHelper.Error<ConfigurationService>("Error trying to get configuration value", exception);
+                Current.Logger.Error<ConfigurationService>(ex, "Error trying to get configuration value");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
                 };
             }
         }
 
         /// <summary>
-        /// Updates a value in a given configuration file with the given XPath  
+        /// Updates a value in a given configuration file with the given XPath
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -101,13 +102,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 xmlDocument.Save(_configFilePath);
                 return new ConfigurationServiceResult { Success = true };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                LogHelper.Error<ConfigurationService>("Error trying to update configuration", exception);
+                Current.Logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { exception.Message })
+                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
                 };
             }
         }

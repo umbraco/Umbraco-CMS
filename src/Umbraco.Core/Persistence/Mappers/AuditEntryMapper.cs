@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -11,21 +11,11 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(AuditEntry))]
     public sealed class AuditEntryMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance
-            = new ConcurrentDictionary<string, DtoMapModel>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuditEntryMapper"/> class.
-        /// </summary>
-        public AuditEntryMapper()
-        {
-            // note: why the base ctor does not invoke BuildMap is a mystery to me
-            BuildMap();
-        }
+        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.Id, dto => dto.Id);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingUserId, dto => dto.PerformingUserId);

@@ -9,7 +9,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService) {
+    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -23,7 +23,8 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
-        vm.toggle = toggle;
+        vm.toggleAllowAsRoot = toggleAllowAsRoot;
+        vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
 
         /* ---------- INIT ---------- */
 
@@ -31,7 +32,9 @@
 
         function init() {
 
-            childNodeSelectorOverlayTitle = localizationService.localize("contentTypeEditor_chooseChildNode");
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
+                childNodeSelectorOverlayTitle = value;
+            });
 
             contentTypeResource.getAll().then(function(contentTypes){
 
@@ -51,20 +54,25 @@
         }
 
         function addChild($event) {
-            vm.childNodeSelectorOverlay = {
+            var childNodeSelectorOverlay = {
                 view: "itempicker",
                 title: childNodeSelectorOverlayTitle,
                 availableItems: vm.contentTypes,
                 selectedItems: vm.selectedChildren,
+                position: "target",
                 event: $event,
-                show: true,
                 submit: function(model) {
                     vm.selectedChildren.push(model.selectedItem);
                     $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    vm.childNodeSelectorOverlay.show = false;
-                    vm.childNodeSelectorOverlay = null;
+                    overlayService.close();
+                },
+                close: function() {
+                    overlayService.close();
                 }
             };
+
+            overlayService.open(childNodeSelectorOverlay);
+
         }
 
         function removeChild(selectedChild, index) {
@@ -79,13 +87,22 @@
         /**
          * Toggle the $scope.model.allowAsRoot value to either true or false
          */
-        function toggle(){
+        function toggleAllowAsRoot(){
             if($scope.model.allowAsRoot){
                 $scope.model.allowAsRoot = false;
                 return;
             }
 
             $scope.model.allowAsRoot = true;
+        }
+
+        function toggleAllowCultureVariants() {
+            if ($scope.model.allowCultureVariant) {
+                $scope.model.allowCultureVariant = false;
+                return;
+            }
+
+            $scope.model.allowCultureVariant = true;
         }
 
     }

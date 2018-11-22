@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Macros;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Tests.Macros
 {
@@ -334,7 +335,7 @@ test"" /> -->
 //<h1>asdfasdf</h1>
 //<div class='umb-macro-holder Map mceNonEditable' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
 //<!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
-//asdfasdf 
+//asdfasdf
 //asdfas
 //<span>asdfasdfasdf</span>
 //<p>asdfasdf</p>
@@ -350,7 +351,7 @@ test"" /> -->
 <h1>asdfasdf</h1>
 <div class='umb-macro-holder mceNonEditable' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
 <!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
-asdfasdf 
+asdfasdf
 asdfas
 <span>asdfasdfasdf</span>
 <p>asdfasdf</p>
@@ -383,7 +384,7 @@ asdfsdf
 <h1>asdfasdf</h1>
 <div att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
 <!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
-asdfasdf 
+asdfasdf
 asdfas
 <span>asdfasdfasdf</span>
 <p>asdfasdf</p>
@@ -431,6 +432,6 @@ asdfsdf
 
             Assert.AreEqual(@"<?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" />", result);
         }
-    
+
     }
 }

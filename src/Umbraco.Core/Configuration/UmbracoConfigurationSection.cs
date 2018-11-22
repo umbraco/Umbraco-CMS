@@ -7,7 +7,7 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public interface IUmbracoConfigurationSection
     {
-        
+
     }
 
     /// <summary>

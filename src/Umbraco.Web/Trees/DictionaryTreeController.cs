@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http.Formatting;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
+
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
+    
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -21,7 +23,7 @@ namespace Umbraco.Web.Trees
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
-            var section = Constants.Applications.Settings;
+            var section = Constants.Applications.Translation;
             if (queryStrings["application"] != null)
                 section = queryStrings["application"];
 
@@ -94,14 +96,12 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
             if (id != Constants.System.Root.ToInvariantString())
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(
-                    $"actions/{ActionDelete.Instance.Alias}"), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
-                $"actions/{ActionRefresh.Instance.Alias}"), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {
@@ -13,78 +13,69 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="payload">The notification content.</param>
-        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload);
+        void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload);
 
         /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="jsonPayload">The notification content.</param>
-        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload);
+        void PerformRefresh(ICacheRefresher refresher, string jsonPayload);
 
         /// <summary>
         /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the invalidated items.</typeparam>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getNumericId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The invalidated items.</param>
-        void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
         /// Notifies the distributed cache of specifieds item invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the invalidated items.</typeparam>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getGuidId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The invalidated items.</param>
-        void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
+        void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
 
         /// <summary>
         /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
         /// <typeparam name="T">The type of the removed items.</typeparam>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="getNumericId">A function returning the unique identifier of items.</param>
         /// <param name="instances">The removed items.</param>
-        void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
         /// Notifies all servers of specified items removal, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="numericIds">The unique identifiers of the removed items.</param>
-        void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
+        void PerformRemove(ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
         /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="numericIds">The unique identifiers of the invalidated items.</param>
-        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
+        void PerformRefresh(ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
         /// Notifies all servers of specified items invalidation, for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="guidIds">The unique identifiers of the invalidated items.</param>
-        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds);
+        void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds);
 
         /// <summary>
         /// Notifies all servers of a global invalidation for a specified <see cref="ICacheRefresher"/>.
         /// </summary>
-        /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
-        void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher);
+        void PerformRefreshAll(ICacheRefresher refresher);
     }
 }

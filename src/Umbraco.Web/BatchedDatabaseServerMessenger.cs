@@ -1,16 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
-using umbraco.interfaces;
 using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web
 {
@@ -22,109 +23,28 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
-        private readonly ApplicationContext _appContext;
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
 
-        public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(appContext, enableDistCalls, options)
+        public BatchedDatabaseServerMessenger(
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, ProfilingLogger proflog, IGlobalSettings globalSettings,
+            bool enableDistCalls, DatabaseServerMessengerOptions options)
+            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, enableDistCalls, options)
         {
-            _appContext = appContext;
-            Scheduler.Initializing += Scheduler_Initializing;
+            _databaseFactory = databaseFactory;
         }
 
-        /// <summary>
-        /// Occurs when the scheduler initializes all scheduling activity when the app is ready
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Scheduler_Initializing(object sender, List<IBackgroundTask> e)
-        {
-            //if the current resolver is 'this' then we will start the scheduling
-            var isMessenger = ServerMessengerResolver.HasCurrent && ReferenceEquals(ServerMessengerResolver.Current.Messenger, this);
-
-            if (isMessenger)
-            {
-                //start the background task runner for processing instructions
-                const int delayMilliseconds = 60000;
-                var instructionProcessingRunner = new BackgroundTaskRunner<IBackgroundTask>("InstructionProcessing", ApplicationContext.ProfilingLogger.Logger);
-                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, _appContext.ScopeProvider, ApplicationContext.ProfilingLogger.Logger, delayMilliseconds, Options.ThrottleSeconds * 1000);
-                instructionProcessingRunner.TryAdd(instructionProcessingTask);
-                e.Add(instructionProcessingTask);
-            }
-        }
-
-
-        // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
-        // with default "ShouldExecute", so that method will run if app IsConfigured and database
-        // context IsDatabaseConfigured - we still want to check CanConnect though to be safe
+        // invoked by DatabaseServerRegistrarAndMessengerComponent
         internal void Startup()
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
 
-            if (ApplicationContext.DatabaseContext.CanConnect == false)
+            if (_databaseFactory.CanConnect == false)
             {
-                ApplicationContext.ProfilingLogger.Logger.Warn<BatchedDatabaseServerMessenger>(
-                    "Cannot connect to the database, distributed calls will not be enabled for this server.");
+                Logger.Warn<BatchedDatabaseServerMessenger>("Cannot connect to the database, distributed calls will not be enabled for this server.");
             }
             else
             {
                 Boot();
-            }
-        }
-
-        /// <summary>
-        /// This will process cache instructions on a background thread and will run every 5 seconds (or whatever is defined in the <see cref="DatabaseServerMessengerOptions.ThrottleSeconds"/>)
-        /// </summary>
-        private class InstructionProcessing : RecurringTaskBase
-        {
-            private readonly DatabaseServerMessenger _messenger;
-            private readonly IScopeProvider _scopeProvider;
-            private readonly ILogger _logger;
-
-            public InstructionProcessing(IBackgroundTaskRunner<RecurringTaskBase> runner,
-                DatabaseServerMessenger messenger,
-                IScopeProvider scopeProvider,
-                ILogger logger,
-                int delayMilliseconds, int periodMilliseconds)
-                : base(runner, delayMilliseconds, periodMilliseconds)
-            {
-                _messenger = messenger;
-                _scopeProvider = scopeProvider;
-                _logger = logger;
-            }
-
-            public override bool PerformRun()
-            {
-                try
-                {
-                    TryPerformRun();
-                }
-                catch (Exception e)
-                {
-                    _logger.Error<InstructionProcessing>("Failed (will repeat).", e);
-                }
-
-                //return true to repeat
-                return true;
-            }
-
-            private void TryPerformRun()
-            {
-                // beware!
-                // DatabaseServerMessenger uses _appContext.DatabaseContext.Database without creating
-                // scopes, and since we are running in a background task, there will be no ambient
-                // scope (as would be the case within a web request), and so we would end up creating
-                // (and leaking) a NoScope instance, which is bad - better make sure we have a true
-                // scope here! - see U4-11207
-                using (var scope = _scopeProvider.CreateScope())
-                {
-                    _messenger.Sync();
-                    scope.Complete();
-                }
-            }
-
-            public override bool IsAsync
-            {
-                get { return false; }
             }
         }
 
@@ -134,15 +54,15 @@ namespace Umbraco.Web
             FlushBatch();
         }
 
-        protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            var idsA = ids == null ? null : ids.ToArray();
+            var idsA = ids?.ToArray();
 
             Type arrayType;
             if (GetArrayType(idsA, out arrayType) == false)
-                throw new ArgumentException("All items must be of the same type, either int or Guid.", "ids");
+                throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
-            BatchMessage(servers, refresher, messageType, idsA, arrayType, json);
+            BatchMessage(refresher, messageType, idsA, arrayType, json);
         }
 
         public void FlushBatch()
@@ -154,7 +74,7 @@ namespace Umbraco.Web
             batch.Clear();
 
             //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
-            using (var scope = _appContext.ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
                 {
@@ -162,6 +82,7 @@ namespace Umbraco.Web
                 }
                 scope.Complete();
             }
+
         }
 
         private void WriteInstructions(IScope scope, IEnumerable<RefreshInstruction> instructions)
@@ -200,7 +121,6 @@ namespace Umbraco.Web
         }
 
         protected void BatchMessage(
-            IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType messageType,
             IEnumerable<object> ids = null,
@@ -214,7 +134,7 @@ namespace Umbraco.Web
             if (batch == null)
             {
                 //only write the json blob with a maximum count of the MaxProcessingInstructionCount
-                using (var scope = _appContext.ScopeProvider.CreateScope())
+                using (var scope = ScopeProvider.CreateScope())
                 {
                     foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
                     {
@@ -225,8 +145,9 @@ namespace Umbraco.Web
             }
             else
             {
-                batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
+                batch.Add(new RefreshInstructionEnvelope(refresher, instructions));
             }
+
         }
     }
 }

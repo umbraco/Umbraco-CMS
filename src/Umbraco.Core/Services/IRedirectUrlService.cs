@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public interface IRedirectUrlService : IService
     {
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services
         /// <param name="total">The total count of redirect urls.</param>
         /// <returns>The redirect urls.</returns>
         IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total);
-        
+
         /// <summary>
         /// Searches for all redirect urls that contain a given search term in their URL property.
         /// </summary>

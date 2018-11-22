@@ -7,9 +7,9 @@ using Umbraco.Core;
 namespace Umbraco.Web
 {
     /// <summary>
-	/// Extension methods for the HttpRequest and HttpRequestBase objects
-	/// </summary>
-	public static class HttpRequestExtensions
+    /// Extension methods for the HttpRequest and HttpRequestBase objects
+    /// </summary>
+    public static class HttpRequestExtensions
     {
         /// <summary>
         /// Extracts the value from the query string and cleans it to prevent xss attacks.
@@ -17,7 +17,7 @@ namespace Umbraco.Web
         /// <param name="request"></param>
         /// <param name="key"></param>
         /// <param name="valueIfNotFound"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public static string CleanForXss(this HttpRequest request, string key, string valueIfNotFound = "")
         {
             var item = request.GetItemAsString(key, valueIfNotFound);
@@ -61,7 +61,7 @@ namespace Umbraco.Web
             var val = request[key];
             var whitespaceCheck = !val.IsNullOrWhiteSpace() ? val : string.Empty;
             if (whitespaceCheck.IsNullOrWhiteSpace())
-                return (T)typeof(T).GetDefaultValue();
+                return (T) typeof (T).GetDefaultValue();
             var attempt = val.TryConvertTo<T>();
             if (attempt.Success)
                 return attempt.Result;

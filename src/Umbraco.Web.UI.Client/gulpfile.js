@@ -6,20 +6,22 @@ var wrap = require("gulp-wrap-js");
 var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
+var babel = require("gulp-babel");
 var runSequence = require('run-sequence');
-const imagemin = require('gulp-imagemin');
+var imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 // js
-const eslint = require('gulp-eslint');
+var eslint = require('gulp-eslint');
 
 //Less + css
 var postcss = require('gulp-postcss');
 var less = require('gulp-less');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
+var cleanCss = require("gulp-clean-css");
 
 // Documentation
 var gulpDocs = require('gulp-ngdocs');
@@ -31,34 +33,35 @@ var karmaServer = require('karma').Server;
 Helper functions
 ***************************************************************/
 function processJs(files, out) {
-    
-    return gulp.src(files)
-     // check for js errors
-     .pipe(eslint())
-     // outputs the lint results to the console
-     .pipe(eslint.format())
-     // sort files in stream by path or any custom sort comparator
-     .pipe(sort())
-     .pipe(concat(out))
-     .pipe(wrap('(function(){\n%= body %\n})();'))
-     .pipe(gulp.dest(root + targets.js));
 
-     console.log(out + " compiled");
+    return gulp.src(files)
+        // check for js errors
+        .pipe(eslint())
+        // outputs the lint results to the console
+        .pipe(eslint.format())
+        // sort files in stream by path or any custom sort comparator
+        .pipe(babel())
+        .pipe(sort())
+        .pipe(concat(out))
+        .pipe(wrap('(function(){\n%= body %\n})();'))
+        .pipe(gulp.dest(root + targets.js));
+
+        console.log(out + " compiled");
 }
 
 function processLess(files, out) {
-
     var processors = [
          autoprefixer,
-         cssnano({zindex: false}),
+         cssnano({zindex: false})
     ];
 
     return gulp.src(files)
         .pipe(less())
+        .pipe(cleanCss())
         .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(root + targets.css));
-    
+
     console.log(out + " compiled");
 }
 
@@ -67,7 +70,7 @@ Paths and destinations
 Each group is iterated automatically in the setup tasks below
 ***************************************************************/
 var sources = {
-    
+
     //less files used by backoffice and preview
     //processed in the less task
     less: {
@@ -80,14 +83,14 @@ var sources = {
     //js files for backoffie
     //processed in the js task
     js: {
-        preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
+        preview: { files: ["src/preview/**/*.js"], out: "umbraco.preview.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
         controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
         resources: { files: ["src/common/resources/**/*.js"], out: "umbraco.resources.js" },
         services: { files: ["src/common/services/**/*.js"], out: "umbraco.services.js" },
-        security: { files: ["src/common/security/**/*.js"], out: "umbraco.security.js" }
+        security: { files: ["src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
     },
 
     //selectors for copying all views into the build
@@ -103,8 +106,7 @@ var sources = {
         less: "./src/less/**/*.less",
         js: "./src/*.js",
         lib: "./lib/**/*",
-        bower: "./lib-bower/**/*",
-        assets: "./src/assets/**"    
+        assets: "./src/assets/**"
     }
 };
 
@@ -124,7 +126,7 @@ var targets = {
 
  // Build - build the files ready for production
 gulp.task('build', function(cb) {
-    runSequence(["dependencies", "js", "less", "views"], "test:unit", cb);
+    runSequence(["dependencies", "js", "less", "views"], cb);
 });
 
 // Dev - build the files ready for development and start watchers
@@ -138,82 +140,242 @@ gulp.task('docserve', function(cb) {
 });
 
 /**************************
- * Task processes and copies all dependencies, either installed by bower, npm or stored locally in the project
+ * Task processes and copies all dependencies, either installed by npm or stored locally in the project
  **************************/
-gulp.task('dependencies', function () { 
-
-    //bower component specific copy rules
-    //this is to patch the sometimes wonky rules these libs are distrbuted under
+gulp.task('dependencies', function () {
 
     //as we do multiple things in this task, we merge the multiple streams
     var stream = new MergeStream();
 
-    //Tinymce
-    stream.add(
-        gulp.src(["./bower_components/tinymce/plugins/**",
-            "./bower_components/tinymce/themes/**"],
-            { base: "./bower_components/tinymce/" })
-            .pipe(gulp.dest(root + targets.lib + "/tinymce"))
-    );
+    // Pick the dependencies we need from each package
+    // so we don't just ship with a lot of files that aren't needed
+    const nodeModules = [
+        {
+            "name": "ace-builds",
+            "src":  [
+                "./node_modules/ace-builds/src-min-noconflict/ace.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-searchbox.js",
+                "./node_modules/ace-builds/src-min-noconflict/ext-settings_menu.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
+                "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
+            ],
+            "base": "./node_modules/ace-builds"
+        },
+        {
+            "name": "angular",
+            "src":  ["./node_modules/angular/angular.js"],
+            "base": "./node_modules/angular"
+        },
+        {
+            "name": "angular-cookies",
+            "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
+            "base": "./node_modules/angular-cookies"
+        },
+        {
+            "name": "angular-dynamic-locale",
+            "src":  [
+                "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js",
+                "./node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js.map"
+            ],
+            "base": "./node_modules/angular-dynamic-locale/dist"
+        },
+        {
+            "name": "angular-sanitize",
+            "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
+            "base": "./node_modules/angular-sanitize"
+        },
+        {
+            "name": "angular-touch",
+            "src":  ["./node_modules/angular-touch/angular-touch.js"],
+            "base": "./node_modules/angular-touch"
+        },
+        {
+            "name": "angular-ui-sortable",
+            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.js"],
+            "base": "./node_modules/angular-ui-sortable/dist"
+        },
+        {
+            "name": "angular-route",
+            "src":  ["./node_modules/angular-route/angular-route.js"],
+            "base": "./node_modules/angular-route"
+        },
+        {
+            "name": "angular-animate",
+            "src":  ["./node_modules/angular-animate/angular-animate.js"],
+            "base": "./node_modules/angular-animate"
+        },
+        {
+            "name": "angular-i18n",
+            "src":  [
+                "./node_modules/angular-i18n/angular-i18n.js",
+                "./node_modules/angular-i18n/angular-locale_*.js"
+            ],
+            "base": "./node_modules/angular-i18n"
+        },
+        {
+            "name": "angular-local-storage",
+            "src":  [
+                "./node_modules/angular-local-storage/dist/angular-local-storage.min.js",
+                "./node_modules/angular-local-storage/dist/angular-local-storage.min.js.map"
+            ],
+            "base": "./node_modules/angular-local-storage/dist"
+        },
+        {
+            "name": "angular-messages",
+            "src":  ["./node_modules/angular-messages/angular-messages.js"],
+            "base": "./node_modules/angular-messages"
+        },
+        {
+            "name": "angular-mocks",
+            "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
+            "base": "./node_modules/angular-mocks"
+        },
+        {
+            "name": "animejs",
+            "src":  ["./node_modules/animejs/anime.min.js"],
+            "base": "./node_modules/animejs"
+        },
+        {
+            "name": "bootstrap-social",
+            "src":  ["./node_modules/bootstrap-social/bootstrap-social.css"],
+            "base": "./node_modules/bootstrap-social"
+        },
+        {
+            "name": "clipboard",
+            "src":  ["./node_modules/clipboard/dist/clipboard.min.js"],
+            "base": "./node_modules/clipboard/dist"
+        },
+        {
+            "name": "jsdiff",
+            "src":  ["./node_modules/diff/dist/diff.min.js"],
+            "base": "./node_modules/diff/dist"
+        },
+        {
+            "name": "flatpickr",
+            "src":  [
+                "./node_modules/flatpickr/dist/flatpickr.js",
+                "./node_modules/flatpickr/dist/flatpickr.css"
+            ],
+            "base": "./node_modules/flatpickr/dist"
+        },
+        {
+            "name": "font-awesome",
+            "src":  [
+                "./node_modules/font-awesome/fonts/*",
+                "./node_modules/font-awesome/css/font-awesome.min.css"
+            ],
+            "base": "./node_modules/font-awesome"
+        },
+        {
+            "name": "jquery",
+            "src":  [
+                "./node_modules/jquery/dist/jquery.min.js",
+                "./node_modules/jquery/dist/jquery.min.map"
+            ],
+            "base": "./node_modules/jquery/dist"
+        },
+        {
+            "name": "jquery-migrate",
+            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.min.js"],
+            "base": "./node_modules/jquery-migrate/dist"
+        },
+        {
+            "name": "jquery-ui",
+            "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
+            "base": "./node_modules/jquery-ui-dist"
+        },
+        {
+            "name": "jquery-validate",
+            "src":  ["./node_modules/jquery-validation/dist/jquery.validate.min.js"],
+            "base": "./node_modules/jquery-validation/dist"
+        },
+        {
+            "name": "jquery-validation-unobtrusive",
+            "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
+            "base": "./node_modules/jquery-validation-unobtrusive/dist"
+        },
+        {
+            "name": "lazyload-js",
+            "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
+            "base": "./node_modules/lazyload-js"
+        },
+        // TODO: We can optimize here:
+        // we don't have to ship with the moment-with-locales libraries
+        // we lazyload the user locale
+        {
+            "name": "moment",
+            "src":  [
+                "./node_modules/moment/min/moment.min.js",
+                "./node_modules/moment/min/moment-with-locales.js",
+                "./node_modules/moment/min/moment-with-locales.min.js"
+            ],
+            "base": "./node_modules/moment/min"
+        },
+        {
+            "name": "moment",
+            "src":  [
+                "./node_modules/moment/locale/*.js"
+            ],
+            "base": "./node_modules/moment/locale"
+        },
+        {
+            "name": "ng-file-upload",
+            "src":  ["./node_modules/ng-file-upload/dist/ng-file-upload.min.js"],
+            "base": "./node_modules/ng-file-upload/dist"
+        },
+        {
+            "name": "signalr",
+            "src":  ["./node_modules/signalr/jquery.signalR.js"],
+            "base": "./node_modules/signalr"
+        },
+        {
+            "name": "tinymce",
+            "src":  [
+                "./node_modules/tinymce/tinymce.min.js",
+                "./node_modules/tinymce/plugins/**",
+                "./node_modules/tinymce/skins/**",
+                "./node_modules/tinymce/themes/**"
+            ],
+            "base": "./node_modules/tinymce"
+        },
+        {
+            "name": "typeahead.js",
+            "src":  ["./node_modules/typeahead.js/dist/typeahead.bundle.min.js"],
+            "base": "./node_modules/typeahead.js/dist"
+        },
+        {
+            "name": "underscore",
+            "src":  ["node_modules/underscore/underscore-min.js"],
+            "base": "./node_modules/underscore"
+        }
+    ];
 
-    //font-awesome
-    stream.add(
-        gulp.src(["./bower_components/font-awesome/fonts/*",
-            "./bower_components/font-awesome/css/font-awesome.min.css"],
-            { base: "./bower_components/font-awesome/" })
-            .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
-    );
-    
-    // ace Editor
-    stream.add(
-        gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-searchbox.js",
-            "bower_components/ace-builds/src-min-noconflict/ext-settings_menu.js",
-            "bower_components/ace-builds/src-min-noconflict/snippets/text.js",
-            "bower_components/ace-builds/src-min-noconflict/snippets/javascript.js",
-            "bower_components/ace-builds/src-min-noconflict/theme-chrome.js",
-            "bower_components/ace-builds/src-min-noconflict/mode-razor.js",
-            "bower_components/ace-builds/src-min-noconflict/mode-javascript.js",
-            "bower_components/ace-builds/src-min-noconflict/worker-javascript.js"],
-            { base: "./bower_components/ace-builds/" })
-            .pipe(gulp.dest(root + targets.lib + "/ace-builds"))
-    );
+    // add streams for node modules
+    nodeModules.forEach(module => {
+        stream.add(
+            gulp.src(module.src,
+                { base: module.base })
+                .pipe(gulp.dest(root + targets.lib + "/" + module.name))
+        );
+    });
 
-    // code mirror
-    stream.add(
-        gulp.src([
-            "bower_components/codemirror/lib/codemirror.js",
-            "bower_components/codemirror/lib/codemirror.css",
-
-            "bower_components/codemirror/mode/css/*",
-            "bower_components/codemirror/mode/javascript/*",
-            "bower_components/codemirror/mode/xml/*",
-            "bower_components/codemirror/mode/htmlmixed/*",
-
-            "bower_components/codemirror/addon/search/*",
-            "bower_components/codemirror/addon/edit/*",
-            "bower_components/codemirror/addon/selection/*",
-            "bower_components/codemirror/addon/dialog/*"],
-            { base: "./bower_components/codemirror/" })
-            .pipe(gulp.dest(root + targets.lib + "/codemirror"))
-    );
-
-    //copy over libs which are not on bower (/lib) and 
-    //libraries that have been managed by bower-installer (/lib-bower)
+    //copy over libs which are not on npm (/lib)
     stream.add(
          gulp.src(sources.globs.lib)
             .pipe(gulp.dest(root + targets.lib))
         );
 
-    stream.add(
-         gulp.src(sources.globs.bower)
-            .pipe(gulp.dest(root + targets.lib))
-        );
-
-    //Copies all static assets into /root / assets folder 
+    //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    stream.add( 
+    stream.add(
             gulp.src(sources.globs.assets)
 				.pipe(imagemin([
                     imagemin.gifsicle({interlaced: true}),
@@ -231,20 +393,20 @@ gulp.task('dependencies', function () {
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less combiler client side
-    stream.add( 
+    stream.add(
             gulp.src("src/canvasdesigner/editors/*.less")
                 .pipe(gulp.dest(root + targets.assets + "/less"))
         );
-		
+
 	// Todo: check if we need these fileSize
-    stream.add( 
+    stream.add(
             gulp.src("src/views/propertyeditors/grid/config/*.*")
                 .pipe(gulp.dest(root + targets.views + "/propertyeditors/grid/config"))
-        );		
-    stream.add( 
+        );
+    stream.add(
             gulp.src("src/views/dashboard/default/*.jpg")
                 .pipe(gulp.dest(root + targets.views + "/dashboard/default"))
-        );		
+        );
 
     return stream;
 });
@@ -253,8 +415,8 @@ gulp.task('dependencies', function () {
 /**************************
  * Copies all angular JS files into their seperate umbraco.*.js file
  **************************/
-gulp.task('js', function () { 
-  
+gulp.task('js', function () {
+
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
 
@@ -271,7 +433,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('less', function () {
-    
+
     var stream = new MergeStream();
 
     _.forEach(sources.less, function (group) {
@@ -294,9 +456,9 @@ gulp.task('views', function () {
             gulp.src(group.files)
                 .pipe( gulp.dest(root + targets.views + group.folder) )
         );
-    
+
     });
-   
+
     return stream;
 });
 
@@ -311,13 +473,13 @@ gulp.task('watch', function () {
 
         if(group.watch !== false){
 
-            stream.add( 
+            stream.add(
 
                 watch(group.files, { ignoreInitial: true, interval: watchInterval }, function (file) {
 
                     console.info(file.path + " has changed, added to:  " + group.out);
                     processJs(group.files, group.out);
-                
+
                 })
 
             );
@@ -326,7 +488,7 @@ gulp.task('watch', function () {
 
     });
 
-    stream.add( 
+    stream.add(
         //watch all less files and trigger the less task
         watch(sources.globs.less, { ignoreInitial: true, interval: watchInterval }, function () {
             gulp.run(['less']);
@@ -334,13 +496,13 @@ gulp.task('watch', function () {
     );
 
     //watch all views - copy single file changes
-    stream.add( 
+    stream.add(
         watch(sources.globs.views, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.views))
     );
 
     //watch all app js files that will not be merged - copy single file changes
-    stream.add( 
+    stream.add(
         watch(sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.js))
     );
@@ -385,7 +547,7 @@ gulp.task('connect:docs', function (cb) {
 });
 
 gulp.task('open:docs', function (cb) {
-    
+
     var options = {
         uri: 'http://localhost:8880/index.html'
     };

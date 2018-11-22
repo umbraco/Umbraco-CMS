@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Defines the the User Profile interface
-    /// </summary>   
+    /// </summary>
     public interface IProfile
     {
         int Id { get; }

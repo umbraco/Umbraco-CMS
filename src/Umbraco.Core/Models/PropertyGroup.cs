@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -14,23 +13,24 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}")]
-    public class PropertyGroup : Entity, IEquatable<PropertyGroup>
+    public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private string _name;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
-        public PropertyGroup() : this(new PropertyTypeCollection())
-        {
-        }
+        public PropertyGroup(bool isPublishing)
+            : this(new PropertyTypeCollection(isPublishing))
+        { }
 
         public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
         {
             PropertyTypes = propertyTypeCollection;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, string>(x => x.Name);
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, PropertyTypeCollection>(x => x.PropertyTypes);
         }
 
-        void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
         }
@@ -49,8 +49,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
         }
 
         /// <summary>
@@ -59,27 +59,30 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int SortOrder
         {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
         }
 
         /// <summary>
         /// Gets or sets a collection of PropertyTypes for this PropertyGroup
         /// </summary>
+        /// <remarks>
+        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// </remarks>
         [DataMember]
+        [DoNotClone]
         public PropertyTypeCollection PropertyTypes
         {
-            get { return _propertyTypes; }
+            get => _propertyTypes;
             set
             {
                 _propertyTypes = value;
 
-                //since we're adding this collection to this group, we need to ensure that all the lazy values are set.
+                // since we're adding this collection to this group,
+                // we need to ensure that all the lazy values are set.
                 foreach (var propertyType in _propertyTypes)
-                {
-                    propertyType.PropertyGroupId = new Lazy<int>(() => this.Id);
-                }
-                
+                    propertyType.PropertyGroupId = new Lazy<int>(() => Id);
+
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
         }
@@ -87,22 +90,28 @@ namespace Umbraco.Core.Models
         public bool Equals(PropertyGroup other)
         {
             if (base.Equals(other)) return true;
-
-            //Check whether the PropertyGroup's properties are equal. 
-            return Name.InvariantEquals(other.Name);
+            return other != null && Name.InvariantEquals(other.Name);
         }
 
         public override int GetHashCode()
         {
-            //Get hash code for the Name field if it is not null. 
-            int baseHash = base.GetHashCode();
-
-            //Get hash code for the Alias field. 
-            int nameHash = Name.ToLowerInvariant().GetHashCode();
-
-            //Calculate the hash code for the product. 
+            var baseHash = base.GetHashCode();
+            var nameHash = Name.ToLowerInvariant().GetHashCode();
             return baseHash ^ nameHash;
         }
 
+        protected override void PerformDeepClone(object clone)
+        {
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (PropertyGroup)clone;
+
+            if (clonedEntity._propertyTypes != null)
+            {
+                clonedEntity._propertyTypes.CollectionChanged -= PropertyTypesChanged;             //clear this event handler if any
+                clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
+                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
+            }
+        }
     }
 }

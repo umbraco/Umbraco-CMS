@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function ValRequireComponentDirective() {
+  function valRequireComponentDirective() {
 
     function link(scope, el, attr, ngModel) {
 
@@ -33,6 +33,6 @@
     return directive;
   }
 
-  angular.module('umbraco.directives').directive('valRequireComponent', ValRequireComponentDirective);
+    angular.module('umbraco.directives').directive('valRequireComponent', valRequireComponentDirective);
 
 })();

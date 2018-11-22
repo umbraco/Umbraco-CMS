@@ -1,32 +1,23 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-
     /// <summary>
-    /// Legacy content property editor that stores Integer Ids
+    /// Content property editor that stores UDI
     /// </summary>
-    [Obsolete("This editor is obsolete, use ContentPickerPropertyEditor2 instead which stores UDI")]
-    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "(Obsolete) Content Picker", PropertyEditorValueTypes.Integer, "contentpicker", IsParameterEditor = true, Group = "Pickers", IsDeprecated = true)]
-    public class ContentPickerPropertyEditor : ContentPicker2PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.ContentPicker, EditorType.PropertyValue | EditorType.MacroParameter, "Content Picker", "contentpicker", ValueType = ValueTypes.String, Group = "Pickers")]
+    public class ContentPickerPropertyEditor : DataEditor
     {
-        public ContentPickerPropertyEditor()
-        {
-            InternalPreValues["idType"] = "int";
-        }
+        public ContentPickerPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        /// <summary>
-        /// overridden to change the pre-value picker to use INT ids
-        /// </summary>
-        /// <returns></returns>
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override IConfigurationEditor CreateConfigurationEditor()
         {
-            var preValEditor = base.CreatePreValueEditor();
-            preValEditor.Fields.Single(x => x.Key == "startNodeId").Config["idType"] = "int";
-            return preValEditor;
+            return new ContentPickerConfigurationEditor();
         }
     }
 }

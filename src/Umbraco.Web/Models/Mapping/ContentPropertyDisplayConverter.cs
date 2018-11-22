@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Linq;
 using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -13,35 +18,35 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService)
-            : base(dataTypeService)
+        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, logger, propertyEditors)
         {
             _textService = textService;
         }
-        public override ContentPropertyDisplay Convert(ResolutionContext context)
+        public override ContentPropertyDisplay Convert(Property originalProp, ContentPropertyDisplay dest, ResolutionContext context)
         {
-            var display = base.Convert(context);
+            var display = base.Convert(originalProp, dest, context);
 
-            var originalProperty = context.SourceValue as Property;
-            if (originalProperty == null)
-                throw new InvalidOperationException("Source value is not a property.");
+            var config = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
-            var dataTypeService = DataTypeService;
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProperty.PropertyType.DataTypeDefinitionId);
+            // fixme - IDataValueEditor configuration - general issue
+            // GetValueEditor() returns a non-configured IDataValueEditor
+            // - for richtext and nested, configuration determines HideLabel, so we need to configure the value editor
+            // - could configuration also determines ValueType, everywhere?
+            // - does it make any sense to use a IDataValueEditor without configuring it?
 
-            //configure the editor for display with the pre-values
-            var valEditor = display.PropertyEditor.ValueEditor;
-            valEditor.ConfigureForDisplay(preVals);
+            // configure the editor for display with configuration
+            var valEditor = display.PropertyEditor.GetValueEditor(config);
 
             //set the display properties after mapping
-            display.Alias = originalProperty.Alias;
-            display.Description = originalProperty.PropertyType.Description;
-            display.Label = originalProperty.PropertyType.Name;
+            display.Alias = originalProp.Alias;
+            display.Description = originalProp.PropertyType.Description;
+            display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
 
             //add the validation information
-            display.Validation.Mandatory = originalProperty.PropertyType.Mandatory;
-            display.Validation.Pattern = originalProperty.PropertyType.ValidationRegExp;
+            display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
+            display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
 
             if (display.PropertyEditor == null)
             {
@@ -53,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.PreValueEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
+                display.Config = display.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
                 display.View = valEditor.View;
             }
 

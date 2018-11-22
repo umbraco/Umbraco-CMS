@@ -1,163 +1,155 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Text;
+using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.SqlSyntax;
-
-#if DEBUG_DATABASES
-using System.Threading;
-#endif
+using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
     /// <summary>
-    /// Represents the Umbraco implementation of the PetaPoco Database object
+    /// Extends NPoco Database for Umbraco.
     /// </summary>
     /// <remarks>
-    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we
-    /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
-    /// this object instead of the base PetaPoco database object.
+    /// <para>Is used everywhere in place of the original NPoco Database object, and provides additional features
+    /// such as profiling, retry policies, logging, etc.</para>
+    /// <para>Is never created directly but obtained from the <see cref="UmbracoDatabaseFactory"/>.</para>
     /// </remarks>
-    public class UmbracoDatabase : Database
+    public class UmbracoDatabase : Database, IUmbracoDatabase
     {
-        private readonly ILogger _logger;
-        private readonly Guid _instanceId = Guid.NewGuid();
-        private bool _enableCount;
-#if DEBUG_DATABASES
-        private int _spid = -1;
-#endif
+        // Umbraco's default isolation level is RepeatableRead
+        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
 
-        internal DefaultDatabaseFactory DatabaseFactory = null;
+        private readonly ILogger _logger;
+        private readonly RetryPolicy _connectionRetryPolicy;
+        private readonly RetryPolicy _commandRetryPolicy;
+        private readonly Guid _instanceGuid = Guid.NewGuid();
+
+        #region Ctor
 
         /// <summary>
-        /// Used for testing
+        /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
-        internal Guid InstanceId
+        /// <remarks>
+        /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
+        /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
+        /// </remarks>
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+            : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
         {
-            get { return _instanceId; }
+            SqlContext = sqlContext;
+
+            _logger = logger;
+            _connectionRetryPolicy = connectionRetryPolicy;
+            _commandRetryPolicy = commandRetryPolicy;
+
+            EnableSqlTrace = EnableSqlTraceDefault;
         }
 
-        public string InstanceSid
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
+        /// </summary>
+        /// <remarks>Internal for unit tests only.</remarks>
+        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger)
+            : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
+        {
+            SqlContext = sqlContext;
+            _logger = logger;
+
+            EnableSqlTrace = EnableSqlTraceDefault;
+        }
+
+        #endregion
+
+        /// <inheritdoc />
+        public ISqlContext SqlContext { get; }
+
+        #region Testing, Debugging and Troubleshooting
+
+        private bool _enableCount;
+
+#if DEBUG_DATABASES
+        private int _spid = -1;
+        private const bool EnableSqlTraceDefault = true;
+#else
+        private string _instanceId;
+        private const bool EnableSqlTraceDefault = false;
+#endif
+
+        /// <inheritdoc />
+        public string InstanceId
         {
             get
             {
 #if DEBUG_DATABASES
-                return _instanceId.ToString("N").Substring(0, 8) + ":" + _spid;
+                return _instanceGuid.ToString("N").Substring(0, 8) + ':' + _spid;
 #else
-                return _instanceId.ToString("N").Substring(0, 8);
+                return _instanceId ?? (_instanceId = _instanceGuid.ToString("N").Substring(0, 8));
 #endif
             }
         }
 
-        /// <summary>
-        /// Generally used for testing, will output all SQL statements executed to the logger
-        /// </summary>
-        internal bool EnableSqlTrace { get; set; }
-
+        /// <inheritdoc />
         public bool InTransaction { get; private set; }
 
-        public override void OnBeginTransaction()
+        protected override void OnBeginTransaction()
         {
             base.OnBeginTransaction();
             InTransaction = true;
         }
 
-        public override void OnEndTransaction()
+        protected override void OnAbortTransaction()
         {
-            base.OnEndTransaction();
             InTransaction = false;
+            base.OnAbortTransaction();
         }
 
-#if DEBUG_DATABASES
-        private const bool EnableSqlTraceDefault = true;
-#else
-        private const bool EnableSqlTraceDefault = false;
-#endif
-
-        /// <summary>
-        /// Used for testing
-        /// </summary>
-        internal void EnableSqlCount()
+        protected override void OnCompleteTransaction()
         {
-            _enableCount = true;
+            InTransaction = false;
+            base.OnCompleteTransaction();
         }
 
         /// <summary>
-        /// Used for testing
+        /// Gets or sets a value indicating whether to log all executed Sql statements.
         /// </summary>
-        internal void DisableSqlCount()
+        internal bool EnableSqlTrace { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to count all executed Sql statements.
+        /// </summary>
+        internal bool EnableSqlCount
         {
-            _enableCount = false;
-            SqlCount = 0;
+            get => _enableCount;
+            set
+            {
+                _enableCount = value;
+                if (_enableCount == false)
+                    SqlCount = 0;
+            }
         }
 
         /// <summary>
-        /// Used for testing
+        /// Gets the count of all executed Sql statements.
         /// </summary>
         internal int SqlCount { get; private set; }
 
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(IDbConnection connection)
-            : this(connection, LoggerResolver.Current.Logger)
-        {
-        }
+        #endregion
 
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionString, string providerName)
-            : this(connectionString, providerName, LoggerResolver.Current.Logger)
-        {
-        }
+        #region OnSomething
 
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionString, DbProviderFactory provider)
-            : this(connectionString, provider, LoggerResolver.Current.Logger)
-        {
-        }
+        // fixme.poco - has new interceptors to replace OnSomething?
 
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
-        public UmbracoDatabase(string connectionStringName)
-            : this(connectionStringName, LoggerResolver.Current.Logger)
+        protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
-        }
-
-        public UmbracoDatabase(IDbConnection connection, ILogger logger)
-            : base(connection)
-        {
-            _logger = logger;
-            EnableSqlTrace = EnableSqlTraceDefault;
-        }
-
-        public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
-            : base(connectionString, providerName)
-        {
-            _logger = logger;
-            EnableSqlTrace = EnableSqlTraceDefault;
-        }
-
-        public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
-            : base(connectionString, provider)
-        {
-            _logger = logger;
-            EnableSqlTrace = EnableSqlTraceDefault;
-        }
-
-        public UmbracoDatabase(string connectionStringName, ILogger logger)
-            : base(connectionStringName)
-        {
-            _logger = logger;
-            EnableSqlTrace = EnableSqlTraceDefault;
-        }
-
-        public override IDbConnection OnConnectionOpened(IDbConnection connection)
-        {
-            // propagate timeout if none yet
+            if (connection == null) throw new ArgumentNullException(nameof(connection));
 
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
-
-            if (DatabaseType == DBType.MySql)
+            if (DatabaseType.IsMySql())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -165,7 +157,7 @@ namespace Umbraco.Core.Persistence
                     _spid = Convert.ToInt32(command.ExecuteScalar());
                 }
             }
-            else if (DatabaseType == DBType.SqlServer)
+            else if (DatabaseType.IsSqlServer())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -181,98 +173,89 @@ namespace Umbraco.Core.Persistence
 #endif
 
             // wrap the connection with a profiling connection that tracks timings
-            return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
+            connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
+
+            // wrap the connection with a retrying connection
+            if (_connectionRetryPolicy != null || _commandRetryPolicy != null)
+                connection = new RetryDbConnection(connection, _connectionRetryPolicy, _commandRetryPolicy);
+
+            return connection;
         }
 
 #if DEBUG_DATABASES
-        public override void OnConnectionClosing(IDbConnection conn)
+        protected override void OnConnectionClosing(DbConnection conn)
         {
             _spid = -1;
+            base.OnConnectionClosing(conn);
         }
 #endif
 
-        public override void OnException(Exception x)
+        protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>("Exception (" + InstanceSid + ").", x);
-            base.OnException(x);
+            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
+            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
+            if (EnableSqlTrace == false)
+                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+            base.OnException(ex);
         }
 
-        public override void OnExecutingCommand(IDbCommand cmd)
+        private DbCommand _cmd;
+
+        protected override void OnExecutingCommand(DbCommand cmd)
         {
             // if no timeout is specified, and the connection has a longer timeout, use it
             if (OneTimeCommandTimeout == 0 && CommandTimeout == 0 && cmd.Connection.ConnectionTimeout > 30)
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-            {
-                var sb = new StringBuilder();
-#if DEBUG_DATABASES
-                sb.Append(InstanceSid);
-                sb.Append(": ");
-#endif
-                sb.Append(cmd.CommandText);
-                foreach (DbParameter p in cmd.Parameters)
-                {
-                    sb.Append(" - ");
-                    sb.Append(p.Value);
-                }
-
-                _logger.Debug<UmbracoDatabase>(sb.ToString().Replace("{", "{{").Replace("}", "}}"));
-            }
+                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // fixme these escapes should be builtin
 
 #if DEBUG_DATABASES
-            // ensures the database does not have an open reader, for debugging
-            DatabaseDebugHelper.SetCommand(cmd, InstanceSid + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
+            // detects whether the command is already in use (eg still has an open reader...)
+            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + System.Threading.Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
 #endif
 
+            _cmd = cmd;
             base.OnExecutingCommand(cmd);
         }
 
-        public override void OnExecutedCommand(IDbCommand cmd)
+        private string CommandToString(DbCommand cmd)
+        {
+            return CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).ToArray());
+        }
+
+        private string CommandToString(string sql, object[] args)
+        {
+            var sb = new StringBuilder();
+#if DEBUG_DATABASES
+                sb.Append(InstanceId);
+                sb.Append(": ");
+#endif
+            sb.Append(sql);
+            if (args.Length > 0)
+                sb.Append(" --");
+            var i = 0;
+            foreach (var arg in args)
+            {
+                sb.Append(" @");
+                sb.Append(i++);
+                sb.Append(":");
+                sb.Append(arg);
+            }
+
+            return sb.ToString();
+        }
+
+        protected override void OnExecutedCommand(DbCommand cmd)
         {
             if (_enableCount)
-            {
                 SqlCount++;
-            }
+
             base.OnExecutedCommand(cmd);
         }
 
-        /// <summary>
-        /// We are overriding this in the case that we are using SQL Server 2012+ so we can make paging more efficient than the default PetaPoco paging
-        /// see: http://issues.umbraco.org/issue/U4-8837
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="sqlSelectRemoved"></param>
-        /// <param name="sqlOrderBy"></param>
-        /// <param name="args"></param>
-        /// <param name="sqlPage"></param>
-        /// <param name="databaseType"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        internal override void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
-        {
-            if (databaseType == DBType.SqlServer)
-            {
-                //we need to check it's version to see what kind of paging format we can use
-                //TODO: This is a hack, but we don't have access to the SqlSyntaxProvider here, we can in v8 but not now otherwise
-                // this would be a breaking change.
-                var sqlServerSyntax = SqlSyntaxContext.SqlSyntaxProvider as SqlServerSyntaxProvider;
-                if (sqlServerSyntax != null)
-                {
-                    if ((int) sqlServerSyntax.GetVersionName(this) >= (int) SqlServerVersionName.V2012)
-                    {
-                        //we can use the good paging! to do that we are going to change the databaseType to SQLCE since
-                        //it also uses the good paging syntax.
-                        base.BuildSqlDbSpecificPagingQuery(DBType.SqlServerCE, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
-                        return;
-                    }
-                }
-            }
-
-            //use the defaults
-            base.BuildSqlDbSpecificPagingQuery(databaseType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
-        }
+        #endregion
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using Umbraco.Web.Security;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
@@ -14,7 +10,7 @@ namespace Umbraco.Web.WebApi
     /// to just authenticated members, and optionally of a particular type and/or group
     /// </summary>
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
-    {        
+    {
         private readonly UmbracoContext _umbracoContext;
 
         private UmbracoContext GetUmbracoContext()

@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
@@ -11,17 +11,35 @@ namespace Umbraco.Core.Cache
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TId">The type of the identifier.</typeparam>
     internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
-        protected RepositoryCachePolicyBase(IRuntimeCacheProvider cache)
+        private readonly IRuntimeCacheProvider _globalCache;
+        private readonly IScopeAccessor _scopeAccessor;
+
+        protected RepositoryCachePolicyBase(IRuntimeCacheProvider globalCache, IScopeAccessor scopeAccessor)
         {
-            if (cache == null) throw new ArgumentNullException("cache");            
-            Cache = cache;
+            _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
+            _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         }
 
-        public abstract IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
-
-        protected IRuntimeCacheProvider Cache { get; private set; }
+        protected IRuntimeCacheProvider Cache
+        {
+            get
+            {
+                var ambientScope = _scopeAccessor.AmbientScope;
+                switch (ambientScope.RepositoryCacheMode)
+                {
+                    case RepositoryCacheMode.Default:
+                        return _globalCache;
+                    case RepositoryCacheMode.Scoped:
+                        return ambientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                    case RepositoryCacheMode.None:
+                        return NullCacheProvider.Instance;
+                    default:
+                        throw new NotSupportedException($"Repository cache mode {ambientScope.RepositoryCacheMode} is not supported.");
+                }
+            }
+        }
 
         /// <inheritdoc />
         public abstract TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
@@ -46,6 +64,5 @@ namespace Umbraco.Core.Cache
 
         /// <inheritdoc />
         public abstract void ClearAll();
-
     }
 }

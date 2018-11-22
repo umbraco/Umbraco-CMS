@@ -22,8 +22,6 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
     }
 
-
-
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
 
@@ -36,8 +34,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             dtp.datetimepicker("hide");
         }
     };
-    $(document).bind("click", $scope.hidePicker);
-
+    
     //here we declare a special method which will be called whenever the value has changed from the server
     //this is instead of doing a watch on the model.value = faster
     $scope.model.onValueChanged = function (newVal, oldVal) {
@@ -54,7 +51,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         }
     };
     
-    //handles the date changing via the api
+    //handles the date changing via the date picker
     function applyDate(e) {
         angularHelper.safeApply($scope, function() {
             // when a date is changed, update the model
@@ -84,7 +81,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             var elementData = $element.find("div:first").data().DateTimePicker;
             if ($scope.model.config.pickTime) {
                 //check if we are supposed to offset the time
-                if ($scope.model.value && $scope.model.config.offsetTime === "1" && Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
+                if ($scope.model.value && Object.toBoolean($scope.model.config.offsetTime) && Umbraco.Sys.ServerVariables.application.serverTimeOffset !== undefined) {
                     $scope.model.value = dateHelper.convertToServerStringTime(elementData.getDate(), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
                     $scope.serverTime = dateHelper.convertToServerStringTime(elementData.getDate(), Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
                 }
@@ -101,7 +98,28 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         }
     }
 
-    var picker = null;
+    /** Sets the value of the date picker control adn associated viewModel objects based on the model value */
+    function setDatePickerVal(element) {
+        if ($scope.model.value) {
+            var dateVal;
+            //check if we are supposed to offset the time
+            if ($scope.model.value && Object.toBoolean($scope.model.config.offsetTime) && $scope.serverTimeNeedsOffsetting) {
+                //get the local time offset from the server
+                dateVal = dateHelper.convertToLocalMomentTime($scope.model.value, Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+                $scope.serverTime = dateHelper.convertToServerStringTime(dateVal, Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
+            }
+            else {
+                //create a normal moment , no offset required
+                var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
+            }
+
+            element.datetimepicker("setValue", dateVal);
+            $scope.datetimePickerValue = dateVal.format($scope.model.config.format);
+        }
+        else {
+            $scope.clearDate();
+        }
+    }
 
     $scope.clearDate = function() {
         $scope.hasDatetimePickerValue = false;
@@ -145,7 +163,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
 			    var element = $element.find("div:first");
 
-				// Open the datepicker and add a changeDate eventlistener
+				// Create the datepicker and add a changeDate eventlistener
 			    element
 			        .datetimepicker(angular.extend({ useCurrent: true }, $scope.model.config))
 			        .on("dp.change", applyDate)
@@ -154,58 +172,39 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			            $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
 			        });
 
-			    if ($scope.hasDatetimePickerValue) {
-			        var dateVal;
-			        //check if we are supposed to offset the time
-			        if ($scope.model.value && $scope.model.config.offsetTime === "1" && $scope.serverTimeNeedsOffsetting) {
-			            //get the local time offset from the server
-			            dateVal = dateHelper.convertToLocalMomentTime($scope.model.value, Umbraco.Sys.ServerVariables.application.serverTimeOffset);
-			            $scope.serverTime = dateHelper.convertToServerStringTime(dateVal, Umbraco.Sys.ServerVariables.application.serverTimeOffset, "YYYY-MM-DD HH:mm:ss Z");
-			        }
-			        else {
-                        //create a normal moment , no offset required
-			            var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
-			        }
+                $(document).bind("click", $scope.hidePicker);
 
-			        element.datetimepicker("setValue", dateVal);
-			        $scope.datetimePickerValue = dateVal.format($scope.model.config.format);
-			    }
-
+                setDatePickerVal(element);
+			    
 			    element.find("input").bind("blur", function() {
 			        //we need to force an apply here
 			        $scope.$apply();
-			    });
+                });
+
+                $scope.$watch("model.value", function(newVal, oldVal) {
+                    if (newVal !== oldVal) {
+                        $scope.hasDatetimePickerValue = newVal ? true : false;
+                        setDatePickerVal(element);
+                    }
+                });
+
+                var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+                    setModelValue();
+                });
 
 				//Ensure to remove the event handler when this instance is destroyted
 			    $scope.$on('$destroy', function () {
 			        element.find("input").unbind("blur");
-					element.datetimepicker("destroy");
+                    element.datetimepicker("destroy");
+                    unsubscribe();
+			        $(document).unbind("click", $scope.hidePicker);
 			    });
-
-
-			    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-			        setModelValue();
-			    });
-			    //unbind doc click event!
-			    $scope.$on('$destroy', function () {
-			        unsubscribe();
-			    });
-
 
 			});
         });
         
     });
-
-    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-        setModelValue();
-    });
-
-    //unbind doc click event!
-    $scope.$on('$destroy', function () {
-        $(document).unbind("click", $scope.hidePicker);
-        unsubscribe();
-    });
+    
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.DatepickerController", dateTimePickerController);

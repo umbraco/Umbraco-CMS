@@ -1,10 +1,8 @@
-using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
@@ -13,39 +11,48 @@ namespace Umbraco.Web.Scheduling
 {
     internal class HealthCheckNotifier : RecurringTaskBase
     {
-        private readonly ApplicationContext _appContext;
-        private readonly IHealthCheckResolver _healthCheckResolver;
+        private readonly IRuntimeState _runtimeState;
+        private readonly HealthCheckCollection _healthChecks;
+        private readonly HealthCheckNotificationMethodCollection _notifications;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _proflog;
 
-        public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
-            ApplicationContext appContext)
+        public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+            HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
+            IRuntimeState runtimeState,
+            ILogger logger, ProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
-            _appContext = appContext;
-            _healthCheckResolver = HealthCheckResolver.Current;
+            _healthChecks = healthChecks;
+            _notifications = notifications;
+            _runtimeState = runtimeState;
+            _logger = logger;
+            _proflog = proflog;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            if (_appContext == null) return true; // repeat...
+            if (_runtimeState.Level != RuntimeLevel.Run)
+                return true; // repeat...
 
-            switch (_appContext.GetCurrentServerRole())
+            switch (_runtimeState.ServerRole)
             {
-                case ServerRole.Slave:
-                    LogHelper.Debug<HealthCheckNotifier>("Does not run on replica servers.");
+                case ServerRole.Replica:
+                    _logger.Debug<HealthCheckNotifier>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    LogHelper.Debug<HealthCheckNotifier>("Does not run on servers with unknown role.");
+                    _logger.Debug<HealthCheckNotifier>("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
-            if (_appContext.MainDom.IsMainDom == false)
+            if (_runtimeState.IsMainDom == false)
             {
-                LogHelper.Debug<HealthCheckNotifier>("Does not run if not MainDom.");
+                _logger.Debug<HealthCheckNotifier>("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
-            using (_appContext.ProfilingLogger.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
+            using (_proflog.DebugDuration<KeepAlive>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = UmbracoConfig.For.HealthCheck();
 
@@ -58,26 +65,20 @@ namespace Umbraco.Web.Scheduling
                     .Distinct()
                     .ToArray();
 
-                var checks = _healthCheckResolver.HealthChecks
+                var checks = _healthChecks
                     .Where(x => disabledCheckIds.Contains(x.Id) == false);
 
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
                 // Send using registered notification methods that are enabled
-                var registeredNotificationMethods = HealthCheckNotificationMethodResolver.Current.NotificationMethods.Where(x => x.Enabled);
-                foreach (var notificationMethod in registeredNotificationMethods)
-                {
-                    await notificationMethod.SendAsync(results);
-                }
+                foreach (var notificationMethod in _notifications.Where(x => x.Enabled))
+                    await notificationMethod.SendAsync(results, token);
             }
 
             return true; // repeat
         }
 
-        public override bool IsAsync
-        {
-            get { return true; }
-        }
+        public override bool IsAsync => true;
     }
 }

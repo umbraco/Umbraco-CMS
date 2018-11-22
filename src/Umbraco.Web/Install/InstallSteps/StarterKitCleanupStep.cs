@@ -1,25 +1,15 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Web;
-using umbraco;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall, 
+    [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        private readonly ApplicationContext _applicationContext;
-
-        public StarterKitCleanupStep(ApplicationContext applicationContext)
-        {
-            _applicationContext = applicationContext;
-        }
-
         public override InstallSetupResult Execute(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
@@ -28,7 +18,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
             CleanupInstallation(manifestId, packageFile);
-            
+
             return null;
         }
 
@@ -39,7 +29,9 @@ namespace Umbraco.Web.Install.InstallSteps
             installer.LoadConfig(packageFile);
             installer.InstallCleanUp(manifestId, packageFile);
 
-            library.RefreshContent();
+            // library.RefreshContent is obsolete, would need to RefreshAll... snapshot,
+            // but it should be managed automatically by services and caches!
+            //DistributedCache.Instance.RefreshAll...();
         }
 
         public override bool RequiresExecution(object model)

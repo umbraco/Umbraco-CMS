@@ -27,12 +27,13 @@
             vm.saveState = "busy";
             vm.saveError = false;
             vm.saveSuccces = false;
-            var selectedString = "";
+            var selectedString = [];
             angular.forEach(notifyOptions, function (option) {
-                if (option.checked === true && option.notifyCode) {
-                    selectedString += option.notifyCode;
-                }
+                    if (option.checked === true && option.notifyCode) {
+                        selectedString.push(option.notifyCode);
+                    }
             })
+
             contentResource.setNotifySettingsById($scope.currentNode.id, selectedString).then(function () {
                 vm.saveState = "success";
                 vm.saveSuccces = true;

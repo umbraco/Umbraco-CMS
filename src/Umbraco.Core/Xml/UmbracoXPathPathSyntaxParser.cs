@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Xml
 {
     /// <summary>
-    /// This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into 
+    /// This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into
     /// a real XPath statement
     /// </summary>
     internal class UmbracoXPathPathSyntaxParser
@@ -24,21 +25,21 @@ namespace Umbraco.Core.Xml
         /// <param name="publishedContentExists">The callback to return whether a published node exists based on Id</param>
         /// <returns></returns>
         public static string ParseXPathQuery(
-            string xpathExpression, 
-            int? nodeContextId, 
+            string xpathExpression,
+            int? nodeContextId,
             Func<int, IEnumerable<string>> getPath,
             Func<int, bool> publishedContentExists)
         {
 
-            //TODO: This should probably support some of the old syntax and token replacements, currently 
+            //TODO: This should probably support some of the old syntax and token replacements, currently
             // it does not, there is a ticket raised here about it: http://issues.umbraco.org/issue/U4-6364
-            // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I beleive they were 
-            // allowed 'inline', not just at the beginning... whether or not we want to support that is up 
+            // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I beleive they were
+            // allowed 'inline', not just at the beginning... whether or not we want to support that is up
             // for discussion.
 
-            Mandate.ParameterNotNullOrEmpty(xpathExpression, "xpathExpression");
-            Mandate.ParameterNotNull(getPath, "getPath");
-            Mandate.ParameterNotNull(publishedContentExists, "publishedContentExists");
+            if (string.IsNullOrWhiteSpace(xpathExpression)) throw new ArgumentNullOrEmptyException(nameof(xpathExpression));
+            if (getPath == null) throw new ArgumentNullException(nameof(getPath));
+            if (publishedContentExists == null) throw new ArgumentNullException(nameof(publishedContentExists));
 
             //no need to parse it
             if (xpathExpression.StartsWith("$") == false)

@@ -1,57 +1,29 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.IntegerAlias, "Numeric", "integer", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.IntegerAlternative)]
-    public class IntegerPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents an integer property and parameter editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.Integer, EditorType.PropertyValue | EditorType.MacroParameter, "Numeric", "integer", ValueType = ValueTypes.Integer)]
+    public class IntegerPropertyEditor : DataEditor
     {
-        /// <summary>
-        /// Overridden to ensure that the value is validated
-        /// </summary>
-        /// <returns></returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        public IntegerPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
+
+        /// <inheritdoc />
+        protected override IDataValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
-            editor.Validators.Add(new IntegerValidator());
+            editor.Validators.Add(new IntegerValidator()); // ensure the value is validated
             return editor;
         }
-        
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new IntegerPreValueEditor();
-        }
 
-        /// <summary>
-        /// A custom pre-value editor class to deal with the legacy way that the pre-value data is stored.
-        /// </summary>
-        internal class IntegerPreValueEditor : PreValueEditor
-        {
-            public IntegerPreValueEditor()
-            {
-                //create the fields
-                Fields.Add(new PreValueField(new IntegerValidator())
-                {
-                    Description = "Enter the minimum amount of number to be entered",
-                    Key = "min",
-                    View = "number",
-                    Name = "Minimum"
-                });
-                Fields.Add(new PreValueField(new IntegerValidator())
-                {
-                    Description = "Enter the intervals amount between each step of number to be entered",
-                    Key = "step",
-                    View = "number",
-                    Name = "Step Size"
-                });
-                Fields.Add(new PreValueField(new IntegerValidator())
-                {
-                    Description = "Enter the maximum amount of number to be entered",
-                    Key = "max",
-                    View = "number",
-                    Name = "Maximum"
-                });
-            }
-        }
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new IntegerConfigurationEditor();
     }
 }

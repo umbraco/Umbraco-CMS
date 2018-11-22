@@ -2,7 +2,7 @@
   <div ng-repeat="property in tab.properties" style="position: relative;">
 
     <umb-property property="property" ng-class="{'umb-nested-content--not-supported': property.notSupported}">
-      <umb-editor model="property"></umb-editor>
+      <umb-property-editor model="property"></umb-property-editor>
     </umb-property>
 
     <div ng-if="property.notSupported" class="umb-nested-content-overlay"></div>

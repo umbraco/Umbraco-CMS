@@ -1,0 +1,77 @@
+<div ng-controller="Umbraco.Overlays.PublishDescendantsController as vm">
+
+    <div ng-if="vm.variants.length === 1">
+        <div style="margin-bottom: 15px;">
+            <p><localize key="{{vm.labels.help.key}}" tokens="vm.labels.help.tokens"></localize></p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input type="checkbox"
+                       ng-model="model.includeUnpublished"
+                       style="margin-right: 8px;" />
+                <localize key="content_includeUnpublished"></localize>
+            </label>
+        </div>
+
+    </div>
+
+    <div ng-if="vm.variants.length > 1">
+
+        <div style="margin-bottom: 15px;">
+            <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input type="checkbox"
+                       ng-model="model.includeUnpublished"
+                       style="margin-right: 8px;" />
+                <localize key="content_includeUnpublished"></localize>
+            </label>
+        </div>
+
+        <div class="bold" style="margin-bottom: 5px;">
+            <localize key="treeHeaders_languages"></localize>
+        </div>
+
+        <div class="umb-list umb-list--condensed">
+
+            <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.variants">
+                <ng-form name="publishVariantSelectorForm">
+                    <div class="flex">
+                        <input id="{{variant.htmlId}}"
+                               name="publishVariantSelector"
+                               type="checkbox"
+                               ng-model="variant.publish"
+                               ng-change="vm.changeSelection(variant)"
+                               style="margin-right: 8px;"
+                               val-server-field="{{variant.htmlId}}" />
+                        <div>
+                            <label for="{{variant.htmlId}}" style="margin-bottom: 0;">
+                                <span>{{ variant.language.name }}</span>
+                            </label>
+
+                            <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                            </div>
+
+                            <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                                <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
+                            </div>
+
+                            <div ng-repeat="notification in variant.notifications">
+                                <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </ng-form>
+            </div>
+        </div>
+
+    </div>
+
+</div>

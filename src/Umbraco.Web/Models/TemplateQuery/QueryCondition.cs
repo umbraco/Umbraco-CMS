@@ -2,7 +2,7 @@
 {
     public class QueryCondition
     {
-        
+
         public PropertyModel Property { get; set; }
         public OperathorTerm Term { get; set; }
         public string ConstraintValue { get; set; }
@@ -11,7 +11,7 @@
 
     internal static class QueryConditionExtensions
     {
-        
+
         public static string BuildTokenizedCondition(this QueryCondition condition, int token)
         {
             return condition.BuildConditionString(string.Empty, token);
@@ -24,7 +24,7 @@
 
         private static string BuildConditionString(this QueryCondition condition, string prefix, int token = -1)
         {
-            
+
 
 
             var operand = string.Empty;
@@ -87,7 +87,7 @@
 
             if (string.IsNullOrEmpty(value) == false)
                 return value;
-            
+
 
 
             return string.Format("{0}{1}{2}{3}", prefix, condition.Property.Alias, operand, constraintValue);

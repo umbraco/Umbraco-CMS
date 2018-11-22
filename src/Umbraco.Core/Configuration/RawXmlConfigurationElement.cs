@@ -1,4 +1,4 @@
-using System.Configuration;
+﻿using System.Configuration;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration
     {
         protected RawXmlConfigurationElement()
         {
-            
+
         }
 
         protected RawXmlConfigurationElement(XElement rawXml)

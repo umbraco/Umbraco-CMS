@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -12,8 +12,8 @@ namespace Umbraco.Core.Configuration
     {
         public override CommaDelimitedStringCollection Value
         {
-            get 
-            { 
+            get
+            {
                 var converter = new CommaDelimitedStringCollectionConverter();
                 return (CommaDelimitedStringCollection) converter.ConvertFrom(RawValue);
             }

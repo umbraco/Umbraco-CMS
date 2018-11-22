@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Consent : Entity, IConsent
+    internal class Consent : EntityBase, IConsent
     {
         private static PropertySelectors _selector;
 

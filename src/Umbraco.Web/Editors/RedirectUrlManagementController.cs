@@ -3,8 +3,8 @@ using System.Web.Http;
 using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using AutoMapper;
-using umbraco.businesslogic.Exceptions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -19,6 +19,12 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
+        private readonly ILogger _logger;
+
+        public RedirectUrlManagementController(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Returns true/false of whether redirect tracking is enabled or not
@@ -95,8 +101,8 @@ namespace Umbraco.Web.Editors
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
-                LogHelper.Debug<RedirectUrlManagementController>(errorMessage);
-                throw new UserAuthorizationException(errorMessage);
+                _logger.Debug<RedirectUrlManagementController>(errorMessage);
+                throw new SecurityException(errorMessage);
             }
 
             var httpContext = TryGetHttpContext();
@@ -106,20 +112,20 @@ namespace Umbraco.Web.Editors
             var action = disable ? "disable" : "enable";
 
             if (File.Exists(configFilePath) == false)
-                return BadRequest(string.Format("Couldn't {0} URL Tracker, the umbracoSettings.config file does not exist.", action));
+                return BadRequest($"Couldn't {action} URL Tracker, the umbracoSettings.config file does not exist.");
 
             var umbracoConfig = new XmlDocument { PreserveWhitespace = true };
             umbracoConfig.Load(configFilePath);
 
             var webRoutingElement = umbracoConfig.SelectSingleNode("//web.routing") as XmlElement;
             if (webRoutingElement == null)
-                return BadRequest(string.Format("Couldn't {0} URL Tracker, the web.routing element was not found in umbracoSettings.config.", action));
+                return BadRequest($"Couldn't {action} URL Tracker, the web.routing element was not found in umbracoSettings.config.");
 
             // note: this adds the attribute if it does not exist
             webRoutingElement.SetAttribute("disableRedirectUrlTracking", disable.ToString().ToLowerInvariant());
             umbracoConfig.Save(configFilePath);
 
-            return Ok(string.Format("URL tracker is now {0}d", action));
+            return Ok($"URL tracker is now {action}d.");
         }
     }
 }

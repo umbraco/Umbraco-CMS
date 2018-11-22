@@ -1,91 +1,114 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Data.Common;
 using System.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations
 {
     [TestFixture]
     public class AlterMigrationTests
     {
+        private ILogger _logger;
+        private ISqlSyntaxProvider _sqlSyntax;
+        private IUmbracoDatabase _database;
+
+        [SetUp]
+        public void Setup()
+        {
+            _logger = Mock.Of<ILogger>();
+            _sqlSyntax = new SqlCeSyntaxProvider();
+
+            var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
+            var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
+            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, _logger);
+        }
+
         [Test]
         public void Drop_Foreign_Key()
         {
             // Arrange
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
-            var stub = new DropForeignKeyMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
+            var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
-            stub.GetUpExpressions(context);
+            stub.Migrate();
+
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
 
             // Assert
-            Assert.That(context.Expressions.Count(), Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
 
         }
 
         [Test]
         public void CreateColumn()
         {
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
-            var migration = new CreateColumnMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
+            var migration = new CreateColumnMigration(context);
 
-            migration.GetUpExpressions(context);
+            migration.Migrate();
 
-            Assert.That(context.Expressions.Count, Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
-        [Migration("1.0.0", 0, "Test")]
         public class CreateColumnMigration : MigrationBase
         {
-            public CreateColumnMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-                : base(sqlSyntax, logger)
+            public CreateColumnMigration(IMigrationContext context)
+                : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
-                Alter.Table("bar").AddColumn("foo").AsGuid();
+                Alter.Table("bar").AddColumn("foo").AsGuid().Do();
             }
-
-            public override void Down()
-            { }
         }
 
         [Test]
         public void AlterColumn()
         {
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
-            var migration = new AlterColumnMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
+            var migration = new AlterColumnMigration(context);
 
-            migration.GetUpExpressions(context);
+            migration.Migrate();
 
-            Assert.That(context.Expressions.Count, Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
-        [Migration("1.0.0", 0, "Test")]
         public class AlterColumnMigration : MigrationBase
         {
-            public AlterColumnMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-                : base(sqlSyntax, logger)
+            public AlterColumnMigration(IMigrationContext context)
+                : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // bad/good syntax...
                 //Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
-                Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable();
+                Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
             }
-
-            public override void Down()
-            { }
         }
 
         [NUnit.Framework.Ignore("this doesn't actually test anything")]
@@ -93,19 +116,20 @@ namespace Umbraco.Tests.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
-            var stub = new AlterUserTableMigrationStub(new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
+            var stub = new AlterUserTableMigrationStub(context);
 
             // Act
-            stub.GetUpExpressions(context);
+            stub.Migrate();
 
             // Assert
-            Assert.That(context.Expressions.Any(), Is.True);
+            Assert.That(database.Operations.Any(), Is.True);
 
             //Console output
-            Debug.Print("Number of expressions in context: {0}", context.Expressions.Count);
+            Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
             Debug.Print("");
-            foreach (var expression in context.Expressions)
+            foreach (var expression in database.Operations)
             {
                 Debug.Print(expression.ToString());
             }

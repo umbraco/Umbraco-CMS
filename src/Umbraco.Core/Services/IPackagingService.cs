@@ -8,15 +8,6 @@ namespace Umbraco.Core.Services
     public interface IPackagingService : IService
     {
         /// <summary>
-        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
-        /// </summary>
-        /// <param name="packageId"></param>
-        /// <param name="umbracoVersion"></param>
-        /// <param name="userId">The current user id performing the operation</param>
-        /// <returns></returns>
-        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
-
-        /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
@@ -46,13 +37,13 @@ namespace Umbraco.Core.Services
         IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
+        /// Imports and saves package xml as <see cref="IDataType"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
@@ -130,7 +121,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
         XElement Export(ILanguage language, bool raiseEvents = true);
-        
+
         /// <summary>
         /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
         /// </summary>
@@ -155,15 +146,15 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinitions">List of data types to export</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
-        XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, bool raiseEvents = true);
+        XElement Export(IEnumerable<IDataType> dataTypeDefinitions, bool raiseEvents = true);
 
         /// <summary>
         /// Exports a single Data Type
         /// </summary>
-        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <param name="dataType">Data type to export</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
-        XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true);
+        XElement Export(IDataType dataType, bool raiseEvents = true);
 
         /// <summary>
         /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
@@ -196,5 +187,14 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
         XElement Export(IMacro macro, bool raiseEvents = true);
+
+        /// <summary>
+        /// This will fetch an Umbraco package file from the package repository and return the relative file path to the downloaded package file
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="umbracoVersion"></param>
+        /// <param name="userId">The current user id performing the operation</param>
+        /// <returns></returns>
+        string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId);
     }
 }

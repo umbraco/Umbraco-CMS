@@ -1,31 +1,24 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.TrueFalseAlias, "Checkbox", PropertyEditorValueTypes.Integer, "boolean", IsParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
-    public class TrueFalsePropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a checkbox property and parameter editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "Checkbox", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
+    public class TrueFalsePropertyEditor : DataEditor
     {
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new TrueFalsePreValueEditor();
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
+        /// </summary>
+        public TrueFalsePropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        internal class TrueFalsePreValueEditor : PreValueEditor
-        {
-            [PreValueField("default", "Default Value", "boolean")]
-            public string Default { get; set; }
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TrueFalseConfigurationEditor();
 
-            public TrueFalsePreValueEditor()
-            {
-                Fields.Add(new PreValueField()
-                {
-                    Description = "Write a label text",
-                    Key = "labelOn",
-                    Name = "Label",
-                    View = "textstring"
-                });
-            }
-        }
     }
 }

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
@@ -18,32 +18,26 @@ namespace Umbraco.Core.Cache
     /// <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
     /// </remarks>
     internal class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
 
-        public DefaultRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
-            : base(cache)
+        public DefaultRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
+            : base(cache, scopeAccessor)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            _options = options;
-        }
-
-        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
-        {
-            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         protected string GetEntityCacheKey(object id)
         {
-            if (id == null) throw new ArgumentNullException("id");
+            if (id == null) throw new ArgumentNullException(nameof(id));
             return GetEntityTypeCacheKey() + id;
         }
 
         protected string GetEntityTypeCacheKey()
         {
-            return string.Format("uRepo_{0}_", typeof(TEntity).Name);
+            return $"uRepo_{typeof (TEntity).Name}_";
         }
 
         protected virtual void InsertEntity(string cacheKey, TEntity entity)
@@ -74,7 +68,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void Create(TEntity entity, Action<TEntity> persistNew)
         {
-            if (entity == null) throw new ArgumentNullException("entity");
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
 
             try
             {
@@ -106,7 +100,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
-            if (entity == null) throw new ArgumentNullException("entity");
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
 
             try
             {
@@ -138,7 +132,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
-            if (entity == null) throw new ArgumentNullException("entity");
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
 
             try
             {
@@ -244,7 +238,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void ClearAll()
         {
-            Cache.ClearAllCache();
+            Cache.ClearCacheByKeySearch(GetEntityTypeCacheKey());
         }
     }
 }

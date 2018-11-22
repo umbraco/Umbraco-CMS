@@ -3,184 +3,113 @@
 
 ul.sections {
 	margin: 0;
-	display: block;
-	background: @purple;
-	height: 100%;
-	width: 80px;
-    border-right: 1px solid @purple-d1;
+	display: flex;
+	margin-left: -20px;
 }
 
-ul.sections li {
-	display: block;
-	border-left: 4px @purple solid;
-	-webkit-transition: all .3s linear;
-	-moz-transition: all .3s linear;
-	transition: all .3s linear;
+ul.sections>li {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0 20px;
+	position: relative;
 }
 
-ul.sections li [class^="icon-"], 
-ul.sections li [class*=" icon-"],
-ul.sections li img.icon-section {
-	font-size: 30px;
-    display: inline-block;
-	margin: 1px 0 0 0;
-	color: @purple-l2;
-	-webkit-transition: all .3s linear;
-	-moz-transition: all .3s linear;
-	transition: all .3s linear;
-
-    &, &:before {
-        line-height: 20px !important; /* set line-height to ensure all icons use same line-height */
-    }
-}
-
-ul.sections:hover li [class^="icon-"], 
-ul.sections:hover li [class*=" icon-"],
-ul.sections:hover li img.icon-section {
+ul.sections>li>a {
 	color: @white;
-}
-
-ul.sections li a {
-	display: block;
+	height: @appHeaderHeight;
+    display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
 	text-decoration: none;
-	text-align: center;
-	color: @white;
-	padding: 20px 4px 4px 0;
-	border-bottom: 1px solid @purple-d1;
+	outline: none;
+	cursor: pointer;
+}
+
+ul.sections>li>a .section__name {
+	opacity: 0.6;
+	transition: opacity .1s linear;
+}
+
+ul.sections>li>a::after {
+	content: "";
+	height: 4px;
 	width: 100%;
-	height: 100%;
-	margin: 0 0 0 -4px;
-    cursor: pointer; // make sure IE10 displays pointer cursor for expand and help sections. 
-}
-
-ul.sections a span {
-	font-size: 11px;
-	line-height: 1.4em;
+	background-color: @turquoise;
+	position: absolute;
+	bottom: -4px;
+	border-radius: 3px 3px 0 0;
 	opacity: 0;
-	-webkit-transition: all .3s linear;
-	-moz-transition: all .3s linear;
-	transition: all .3s linear;
-	display: block;
+	padding: 0 2px;
+	transition: all .2s linear;
 }
 
-ul.sections:hover a span {
-	opacity: 1
+ul.sections>li.current>a::after {
+	opacity: 1;
+	bottom: 0;
 }
 
-
-// Avatar, Section & Help icons
-// -------------------------
-
-ul.sections li.avatar {
-	height: 75px;
-	padding: 22px 0 2px 0;
-	text-align: center;
-	border-bottom: 1px solid @purple-d1;
-}
-
-ul.sections li.avatar a {
-	padding: 0;
-	border: none
-}
-
-ul.sections li.avatar a div {
-	border-radius: 50%;
-	width: 30px;
-    margin:0 auto;
-}
-
-ul.sections li.avatar a span {
+ul.sections>li.current>a .section__name,
+ul.sections>li>a:hover .section__name,
+ul.sections>li>a:focus .section__name {
 	opacity: 1;
 }
 
-.faded ul.sections li {
-	opacity: 0.4
-}
 
-ul.sections li.current {
-	background-color: @purple-d1;
-}
 
-ul.sections li.current, 
-ul.sections li:hover {
-    border-left: 4px @turquoise-d1 solid;
-}
+/* Sections tray */
 
-ul.sections li.avatar.current, 
-ul.sections li.avatar:hover {
-	border-left: 4px @purple solid;
-}
-
-ul.sections li.current a{
-    padding-left: 0px;
-}
-
-ul.sections li.current [class^="icon-"], 
-ul.sections li.current [class*=" icon-"],
-ul.sections li.current img.icon-section {
-	color: @white;
-}
-
-ul.sections li.help {	
-	margin: 0;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	display: block;
-	width: calc(100% - 5px); //subtract 4px orange border + 1px border-right for sections
-}
-
-ul.sections li.help a {
-	border-bottom: none;
-}
-
-@media (max-width: 500px) {
-    ul.sections li [class^="icon-"],
-    ul.sections li [class*=" icon-"] {
-        font-size: 25px;
-    }
-    ul.sections li:not(.avatar) a {
-        padding-top: 12px;
-        padding-bottom: 6px;
-
-        .icon, .icon-section {
-            display: inline-block;
-            padding-left: 2px;
-        }
-    }
-    ul.sections a span {
-        display:none;
-    }
-}
-
-// Section slide-out tray for additional apps
-// -------------------------
-li.expand a, li.expand{border: none !important;}
-
-li.expand {
-    > a > i.icon {
-        transition: all .3s linear;
-    }
-
-    &.open > a > i.icon {
-        transform: rotate(180deg);
-    }
+ul.sections>li.expand i {
+	height: 5px;
+    width: 5px;
+    border-radius: 50%;
+    background: #fff;
+    display: inline-block;
+    margin: 0 5px 0 0;
+    opacity: 0.6;
 }
 
 ul.sections-tray {
-	padding-top: 99px;
-	width: 80px;
+	position: absolute;
+	top: @appHeaderHeight;
+	left: 0;
+	margin: 0;
+    list-style: none;
+	background: @purple;
+	z-index: 10000;
+	border-radius: 0 0 3px 3px;
+}
 
-    & > li:first-child > a {
-        border-top: 1px solid @purple-d1;
-    }
+ul.sections-tray>li>a {
+	padding: 8px 24px;
+	color: @white;
+	text-decoration: none;
+	display: block;
+	position: relative;
+}
 
-    & > li {
-        // 5px (instead of 4px) because of vertical border
-        border-left-width: 5px;
-        
-        &.current, &:hover {
-            border-left-width: 5px;
-        }
-    }
+ul.sections-tray>li>a::after {
+	content: "";
+	width: 4px;
+	height: 100%;
+	background-color: @turquoise;
+	position: absolute;
+	border-radius: 0 3px 3px 0;
+	opacity: 0;
+	transition: all .2s linear;
+	top: 0;
+	left: 0;
+}
+
+ul.sections-tray>li.current>a::after {
+	opacity: 1;
+}
+
+ul.sections-tray>li>a .section__name {
+	opacity: 0.6;
+}
+
+ul.sections-tray>li>a:hover	.section__name {
+	opacity: 1;
 }

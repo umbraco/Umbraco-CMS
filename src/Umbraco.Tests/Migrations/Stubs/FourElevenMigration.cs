@@ -1,26 +1,17 @@
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("4.11.0", 0, "Test")]
     public class FourElevenMigration : MigrationBase
     {
-        public FourElevenMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public FourElevenMigration(IMigrationContext context)
+            : base(context)
+        { }
 
-        public override void Up()
+
+        public override void Migrate()
         {
             Alter.Table("umbracoUser").AddColumn("companyPhone").AsString(255);
         }
-
-        public override void Down()
-        {
-            Alter.Table("umbracoUser").AlterColumn("regularPhone").AsString(255);
-        }
-
-        
     }
 }

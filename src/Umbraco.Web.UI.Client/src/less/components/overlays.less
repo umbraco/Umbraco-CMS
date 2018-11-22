@@ -4,7 +4,7 @@
     background: @white;
     z-index: @zindexUmbOverlay;
     animation: fadeIn 0.2s;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
 }
 
 .umb-overlay__form {
@@ -76,18 +76,32 @@
 .umb-overlay.umb-overlay-center {
     position: absolute;
     width: 600px;
-    height: 500px;
-    top: 10px;
+    height: auto;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, 0);
+    transform: translate(-50%, -50%);
+    border-radius: @baseBorderRadius;
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-header {
-    text-align: center;
+    border: none;
+    background: transparent;
+    padding: 20px 20px 0 20px;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay__form {
+    max-height: 80vh;
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-container {
     padding: 20px;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY TARGET ---------- */
@@ -95,20 +109,30 @@
     width: 400px;
     height: 400px;
     box-sizing: border-box;
+    border-radius: @baseBorderRadius;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-header {
+    border: none;
+    background: transparent;
+    padding: 20px 20px 0 20px;
     text-align: center;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-container {
-    padding: 10px;
+    padding: 20px;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */
 .umb-overlay.umb-overlay-right {
     width: 500px;
-    top: 0;
+    top: @appHeaderHeight;
     right: 0;
     bottom: 0;
     border: none;
@@ -125,10 +149,16 @@
     padding: 20px;
 }
 
+// reset the top position to 0 because we are in a asbolute container and want to 
+// overlay to go all the way to the top
+.umb-editors .umb-overlay.umb-overlay-right {
+    top: 0;
+}
+
 /* ---------- OVERLAY LEFT ---------- */
 .umb-overlay.umb-overlay-left {
     width: 500px;
-    top: 0;
+    top: @appHeaderHeight;
     left: 0;
     bottom: 0;
     border: none;

@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function GridSelector($location) {
+    function GridSelector($location, overlayService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -33,25 +33,26 @@
             };
 
             scope.openItemPicker = function ($event) {
-                scope.dialogModel = {
+                var dialogModel = {
                     view: "itempicker",
                     title: "Choose " + scope.itemLabel,
                     availableItems: scope.availableItems,
                     selectedItems: scope.selectedItems,
+                    position: "target",
                     event: $event,
-                    show: true,
                     submit: function (model) {
                         scope.selectedItems.push(model.selectedItem);
-
                         // if no default item - set item as default
                         if (scope.defaultItem === null) {
                             scope.setAsDefaultItem(model.selectedItem);
                         }
-
-                        scope.dialogModel.show = false;
-                        scope.dialogModel = null;
+                        overlayService.close();
+                    },
+                    close: function() {
+                      overlayService.close();
                     }
                 };
+                overlayService.open(dialogModel);
             };
 
             scope.openTemplate = function (selectedItem) {

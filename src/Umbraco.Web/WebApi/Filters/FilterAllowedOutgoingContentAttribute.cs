@@ -3,17 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Web.Actions;
+
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// This inspects the result of the action that returns a collection of content and removes 
+    /// This inspects the result of the action that returns a collection of content and removes
     /// any item that the current user doesn't have access to
     /// </summary>
     internal sealed class FilterAllowedOutgoingContentAttribute : FilterAllowedOutgoingMediaAttribute
@@ -22,40 +23,37 @@ namespace Umbraco.Web.WebApi.Filters
         private readonly IEntityService _entityService;
         private readonly char _permissionToCheck;
 
-        public FilterAllowedOutgoingContentAttribute(Type outgoingType) 
-            : this(outgoingType, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType)
+            : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
         {
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
-            : this(outgoingType, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
+            : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
         {
             _permissionToCheck = permissionToCheck;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
-            : this(outgoingType, propertyName, ApplicationContext.Current.Services.UserService, ApplicationContext.Current.Services.EntityService)
+            : this(outgoingType, propertyName, Current.Services.UserService, Current.Services.EntityService)
         {
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
-
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService)
             : base(outgoingType)
         {
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (entityService == null) throw new ArgumentNullException("entityService");
-            _userService = userService;
-            _entityService = entityService;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck, IUserService userService, IEntityService entityService)
             : base(outgoingType)
         {
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (entityService == null) throw new ArgumentNullException("entityService");
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _userService = userService;
             _entityService = entityService;
             _permissionToCheck = permissionToCheck;
@@ -64,13 +62,12 @@ namespace Umbraco.Web.WebApi.Filters
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName, IUserService userService, IEntityService entityService)
             : base(outgoingType, propertyName)
         {
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (entityService == null) throw new ArgumentNullException("entityService");
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _userService = userService;
             _entityService = entityService;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
-
 
         protected override void FilterItems(IUser user, IList items)
         {

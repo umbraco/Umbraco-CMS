@@ -1,4 +1,4 @@
-﻿<div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
+﻿<div class="umb-property-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
     <div class="control-group">
 
         <select ng-model="selectedField" ng-change="changeField()" val-highlight="{{hasError}}">
@@ -36,7 +36,9 @@
                     <td>
                         <ng-form name="headerForm" ng-if="!val.isSystem">
                             <input type="text" name="header" ng-model="val.header" required />
-                            <span class="help-inline" val-msg-for="header" val-toggle-msg="required">Required</span>
+                            <span ng-messages="headerForm.header.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required">Required</span>
+                            </span>
                         </ng-form>
                         
                         <span ng-if="val.isSystem">

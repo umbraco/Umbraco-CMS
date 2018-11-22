@@ -57,6 +57,7 @@
 
 // Application wide styles (refactor is WIP)
 @import "application/grid.less";
+@import "rte.less";
 @import "application/shadows.less";
 @import "application/animations.less";
 
@@ -72,27 +73,41 @@
 @import "sections.less";
 @import "helveticons.less";
 @import "main.less";
-@import "tree.less";
-@import "listview.less";
+@import "listview.less"; 
 @import "gridview.less";
 @import "footer.less";
-@import "dragdrop.less";
 @import "dashboards.less";
 
 @import "forms/umb-validation-label.less";
 
 // Umbraco Components
+@import "components/application/umb-app-header.less";
+@import "components/application/umb-app-content.less";
 @import "components/application/umb-tour.less";
 @import "components/application/umb-backdrop.less";
+@import "components/application/umb-search.less";
 @import "components/application/umb-drawer.less";
+@import "components/application/umb-language-picker.less";
+@import "components/application/umb-dashboard.less";
+
+@import "components/html/umb-expansion-panel.less";
+@import "components/html/umb-alert.less";
+
+@import "components/tree/umb-tree.less";
+@import "components/tree/umb-tree-root.less";
+@import "components/tree/umb-actions.less";
+@import "components/tree/umb-tree-item.less";
+
 
 @import "components/editor.less";
 @import "components/overlays.less";
 @import "components/card.less";
+@import "components/editor/umb-editor.less";
 @import "components/umb-sub-views.less";
 @import "components/umb-editor-navigation.less";
 @import "components/umb-editor-sub-views.less";
 @import "components/editor/subheader/umb-editor-sub-header.less";
+@import "components/umb-flatpickr.less";
 @import "components/umb-grid-selector.less";
 @import "components/umb-child-selector.less";
 @import "components/umb-group-builder.less";
@@ -136,10 +151,10 @@
 @import "components/umb-box.less";
 @import "components/umb-number-badge.less";
 @import "components/umb-progress-circle.less";
+@import "components/umb-stylesheet.less";
 
 @import "components/buttons/umb-button.less";
 @import "components/buttons/umb-button-group.less";
-@import "components/buttons/umb-era-button.less";
 @import "components/buttons/umb-toggle.less";
 
 @import "components/notifications/umb-notifications.less";
@@ -158,12 +173,14 @@
 
 // Utilities
 @import "utilities/layout/_display.less";
+@import "utilities/theme/_opacity.less";
 @import "utilities/typography/_text-decoration.less";
 @import "utilities/typography/_white-space.less";
 @import "utilities/_flexbox.less";
 @import "utilities/_spacing.less";
 @import "utilities/_text-align.less";
 @import "utilities/_width.less";
+@import "utilities/_cursor.less";
 
 //page specific styles
 @import "pages/document-type-editor.less";

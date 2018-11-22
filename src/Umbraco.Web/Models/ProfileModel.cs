@@ -2,16 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Xml;
-using System.Xml.Linq;
-using umbraco.cms.businesslogic.member;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
@@ -32,19 +25,14 @@ namespace Umbraco.Web.Models
         private ProfileModel(bool doLookup)
         {
             MemberProperties = new List<UmbracoProperty>();
-            if (doLookup && UmbracoContext.Current != null)
+            if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(UmbracoContext.Current);
+                var helper = new MembershipHelper(Current.UmbracoContext);
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
-            }   
+            }
         }
 
-        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateProfileModel or the static ProfileModel.CreateModel() to create an empty model.")]
-        public ProfileModel()
-            :this(true)
-        {
-        }
 
         [Required]
         [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
@@ -58,7 +46,7 @@ namespace Umbraco.Web.Models
 
         /// <summary>
         /// The member's member type alias
-        /// </summary>        
+        /// </summary>
         [ReadOnly(true)]
         public string MemberTypeAlias { get; set; }
 

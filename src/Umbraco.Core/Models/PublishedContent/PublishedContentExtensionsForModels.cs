@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -17,29 +18,22 @@ namespace Umbraco.Core.Models.PublishedContent
             if (content == null)
                 return null;
 
-            if (PublishedContentModelFactoryResolver.Current.HasValue == false)
-                return content;
+            // in order to provide a nice, "fluent" experience, this extension method
+            // needs to access Current, which is not always initialized in tests - not
+            // very elegant, but works
+            if (!Current.HasContainer) return content;
 
             // get model
             // if factory returns nothing, throw
-            // if factory just returns what it got, return
-            var model = PublishedContentModelFactoryResolver.Current.Factory.CreateModel(content);
+            var model = Current.PublishedModelFactory.CreateModel(content);
             if (model == null)
-                throw new Exception("IPublishedContentFactory returned null.");
-            if (ReferenceEquals(model, content))
-                return content;
+                throw new Exception("Factory returned null.");
 
-            // at the moment, other parts of our code assume that all models will
-            // somehow implement IPublishedContentExtended and not just be IPublishedContent,
-            // so we'd better check this here to fail as soon as we can.
-            //
-            // see also PublishedContentExtended.Extend
+            // if factory returns a different type, throw
+            if (!(model is IPublishedContent publishedContent))
+                throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
 
-            var extended = model as IPublishedContentExtended;
-            if (extended == null)
-                throw new Exception("IPublishedContentFactory created an object that does not implement IPublishedContentModelExtended.");
-
-            return model;
+            return publishedContent;
         }
     }
 }

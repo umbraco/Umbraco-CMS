@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MemberType.CreateController
+ * @name Umbraco.Editors.MemberTypes.CreateController
  * @function
  *
  * @description
@@ -13,9 +13,8 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
-
+    var node = $scope.currentNode;
+    var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -24,8 +23,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm,
-            statusMessage: localizeCreateFolder
+            formCtrl: this.createFolderForm
         })) {
             memberTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -34,8 +32,6 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
                 navigationService.syncTree({ tree: "membertypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
-
-                var section = appState.getSectionState("currentSection");
 
             }, function(err) {
 
@@ -46,7 +42,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
     $scope.createMemberType = function() {
         $location.search('create', null);
-        $location.path("/settings/membertypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/membertypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }

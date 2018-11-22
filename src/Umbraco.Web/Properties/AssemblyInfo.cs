@@ -1,53 +1,41 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security;
 
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
-[assembly: AssemblyTitle("umbraco.presentation")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Umbraco.Web")]
+[assembly: AssemblyDescription("Umbraco Web")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Umbraco CMS")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("ce9d3539-299e-40d3-b605-42ac423e24fa")]
 
-//This is required so that Medium trust works and this is because of this class:
-// umbraco.presentation.templateControls.ItemDesigner since this class cannot inherit from
-// the System.Web.UI.Design.ControlDesigner in partial trust (or something along those lines)
-// if we remove this class then we won't need to do this.
-[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
+// Umbraco Cms
+[assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
-[assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-[assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("umbraco.webservices")]
-[assembly: InternalsVisibleTo("Concorde.Sync")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
+
+[assembly: InternalsVisibleTo("Umbraco.VisualStudio")] // fixme - what is this?
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")] // fixme - why?
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")] // fixme - why?
+
+// Allow this to be mocked in our unit tests
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// Umbraco Deploy
 [assembly: InternalsVisibleTo("Umbraco.Deploy")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
-[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
-[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
-[assembly: InternalsVisibleTo("Umbraco.Headless")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
+// Umbraco Forms
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
+// Umbraco Headless
+[assembly: InternalsVisibleTo("Umbraco.Headless")]
 
-//allow custom unit-testing code to access internals through custom adapters
-[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]          // backwards compat.
-[assembly: InternalsVisibleTo("Umbraco.UnitTesting.Adapter")]   // new, more imperative name
+// code analysis
+// IDE1006 is broken, wants _value syntax for consts, etc - and it's even confusing ppl at MS, kill it
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "~_~")]

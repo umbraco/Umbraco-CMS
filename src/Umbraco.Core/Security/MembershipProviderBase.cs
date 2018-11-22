@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Providers can override this setting, by default this is false which means that the provider will 
+        /// Providers can override this setting, by default this is false which means that the provider will
         /// authenticate the username + password when ChangePassword is called. This property exists purely for
         /// backwards compatibility.
         /// </summary>
@@ -230,12 +231,12 @@ namespace Umbraco.Core.Security
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
         /// <exception cref="T:System.ArgumentNullException">The name of the provider is null.</exception>
-        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call 
-        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider 
+        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call
+        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider
         /// has already been initialized.</exception>
         /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
-        {            
+        {
             // Initialize base provider class
             base.Initialize(name, config);
 
@@ -280,10 +281,10 @@ namespace Umbraco.Core.Security
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
             {
                 var ex = new ProviderException("Provider can not retrieve a hashed password");
-                LogHelper.Error<MembershipProviderBase>("Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true", ex);
+                Current.Logger.Error<MembershipProviderBase>(ex, "Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true");
                 throw ex;
             }
-            
+
             _customHashAlgorithmType = config.GetValue("hashAlgorithmType", string.Empty);
         }
 
@@ -310,7 +311,7 @@ namespace Umbraco.Core.Security
             AlphanumericChars,
             Strength
         }
-        
+
         /// <summary>
         /// Processes a request to update the password for a membership user.
         /// </summary>
@@ -322,7 +323,7 @@ namespace Umbraco.Core.Security
         /// </returns>
         /// <remarks>
         /// Checks to ensure the AllowManuallyChangingPassword rule is adhered to
-        /// </remarks>       
+        /// </remarks>
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
             string rawPasswordValue = string.Empty;
@@ -351,11 +352,10 @@ namespace Umbraco.Core.Security
             //Special cases to allow changing password without validating existing credentials
             // * the member is new and doesn't have a password set
             // * during installation to set the admin password
+            var installing = Current.RuntimeState.Level == RuntimeLevel.Install;
             if (AllowManuallyChangingPassword == false
                 && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
-                    || (ApplicationContext.Current != null
-                        && ApplicationContext.Current.IsConfigured == false
-                        && oldPassword == "default")))
+                    || (installing && oldPassword == "default")))
             {
                 return PerformChangePassword(username, oldPassword, newPassword);
             }
@@ -398,7 +398,7 @@ namespace Umbraco.Core.Security
             {
                 throw new NotSupportedException("Updating the password Question and Answer is not available if requiresQuestionAndAnswer is not set in web.config");
             }
-            
+
             if (AllowManuallyChangingPassword == false)
             {
                 if (ValidateUser(username, password) == false)
@@ -548,9 +548,9 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            var userService = ApplicationContext.Current == null ? null : ApplicationContext.Current.Services.UserService;
+            var userService = Current.Services.UserService;
 
-            var canReset = this.CanResetPassword(userService);                
+            var canReset = this.CanResetPassword(userService);
 
             if (canReset == false)
             {
@@ -592,7 +592,7 @@ namespace Umbraco.Core.Security
                 {
                     return Attempt.Fail(PasswordValidityError.Strength);
                 }
-                
+
             }
 
             if (password.Length < minLength)
@@ -602,7 +602,7 @@ namespace Umbraco.Core.Security
 
             return Attempt.Succeed(PasswordValidityError.Ok);
         }
-        
+
         /// <summary>
         /// Gets the name of the default app.
         /// </summary>
@@ -668,7 +668,7 @@ namespace Umbraco.Core.Security
             {
                 return pass;
             }
-            
+
             if (PasswordFormat == MembershipPasswordFormat.Hashed)
             {
                 //the better way, we use salt per member
@@ -835,13 +835,13 @@ namespace Umbraco.Core.Security
                 case MembershipPasswordFormat.Hashed:
                     var saltLen = GenerateSalt();
                     salt = storedString.Substring(0, saltLen.Length);
-                    return storedString.Substring(saltLen.Length);      
-                case MembershipPasswordFormat.Clear:                    
+                    return storedString.Substring(saltLen.Length);
+                case MembershipPasswordFormat.Clear:
                 case MembershipPasswordFormat.Encrypted:
                 default:
                    salt = string.Empty;
                     return storedString;
-                     
+
             }
         }
 
@@ -865,9 +865,9 @@ namespace Umbraco.Core.Security
                             //the legacy salt was actually the password :(
                             Key = Encoding.Unicode.GetBytes(password)
                         };
-                }               
+                }
             }
-          
+
             //get the algorithm by name
 
             if (_customHashAlgorithmType.IsNullOrWhiteSpace())

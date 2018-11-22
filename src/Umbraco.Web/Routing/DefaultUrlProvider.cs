@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Web.PublishedCache;
-using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,54 +14,40 @@ namespace Umbraco.Web.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly IRequestHandlerSection _requestSettings;
+        private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
-        [Obsolete("Use the ctor that specifies the IRequestHandlerSection")]
-        public DefaultUrlProvider()
-            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler)
-        {            
-        }
-
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
         {
             _requestSettings = requestSettings;
+            _logger = logger;
+            _globalSettings = globalSettings;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         #region GetUrl
 
-        /// <summary>
-        /// Gets the nice url of a published content.
-        /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <param name="mode">The url mode.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
-        /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
-        /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        /// <inheritdoc />
+        public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
         {
-            if (!current.IsAbsoluteUri)
-                throw new ArgumentException("Current url must be absolute.", "current");
+            if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
             // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(id);
+            var route = umbracoContext.ContentCache.GetRouteById(content.Id, culture);
 
-            return GetUrlFromRoute(route, umbracoContext, id, current, mode);
+            return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
+                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -73,7 +55,7 @@ namespace Umbraco.Web.Routing
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
+                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the url from domainUri (maybe null) and path
             return AssembleUrl(domainUri, path, current, mode).ToString();
@@ -96,27 +78,40 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(id);
+            var node = umbracoContext.ContentCache.GetById(id);
+            if (node == null) return Enumerable.Empty<string>();
 
-            if (string.IsNullOrWhiteSpace(route))
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
+
+            // look for domains, walking up the tree
+            var n = node;
+            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            while (domainUris == null && n != null) // n is null at root
             {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
-                return null;
+                n = n.Parent; // move to parent node
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: true);
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            // no domains = exit
+            if (domainUris ==null)
+                return Enumerable.Empty<string>();
 
-            // extract domainUri and path
-            // route is /<path> or <domainRootId>/<path>
-            var pos = route.IndexOf('/');
-            var path = pos == 0 ? route : route.Substring(pos);
-            var domainUris = pos == 0 ? null : domainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
+            var result = new List<string>();
+            foreach (var d in domainUris)
+            {
+                //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
+                var route = umbracoContext.ContentCache.GetRouteById(id, d?.Culture?.Name);
+                if (route == null) continue;
 
-            // assemble the alternate urls from domainUris (maybe empty) and path
-            return AssembleUrls(domainUris, path).Select(uri => uri.ToString());
+                //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
+                var pos = route.IndexOf('/');
+                var path = pos == 0 ? route : route.Substring(pos);
+
+                var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
+                uri = UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
+                result.Add(uri.ToString());
+            }
+            return result;
         }
 
         #endregion
@@ -158,6 +153,7 @@ namespace Umbraco.Web.Routing
             {
                 if (mode == UrlProviderMode.Auto)
                 {
+                    //this check is a little tricky, we can't just compare domains
                     if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
                         mode = UrlProviderMode.Relative;
                     else
@@ -179,29 +175,13 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return UriUtility.UriFromUmbraco(uri);
+            return UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 
         string CombinePaths(string path1, string path2)
         {
             string path = path1.TrimEnd('/') + path2;
             return path == "/" ? path : path.TrimEnd('/');
-        }
-
-        // always build absolute urls unless we really cannot
-        IEnumerable<Uri> AssembleUrls(IEnumerable<DomainAndUri> domainUris, string path)
-        {
-            // no domain == no "other" url
-            if (domainUris == null)
-                return Enumerable.Empty<Uri>();
-
-            // if no domain was found and then we have no "other" url
-            // else return absolute urls, ignoring vdir at that point
-            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)));
-
-            // UriFromUmbraco will handle vdir
-            // meaning it will add vdir into domain urls too!
-            return uris.Select(UriUtility.UriFromUmbraco);
         }
 
         #endregion

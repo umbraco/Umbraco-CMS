@@ -29,7 +29,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 {
                     return _defaultUrlReplacing;
                 }
-                
+
                 //here we need to check if this element is defined, if it is not then we'll setup the defaults
                 var prop = Properties["urlReplacing"];
                 var urls = this[prop] as ConfigurationElement;
@@ -42,11 +42,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
                     return _defaultUrlReplacing;
                 }
-                
+
                 return (UrlReplacingElement)this["urlReplacing"];
             }
         }
-        
+
         internal static CharCollection GetDefaultCharReplacements()
         {
             var dictionary = new Dictionary<char, string>()

@@ -5,13 +5,6 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
-    /// <summary>
-    /// Provides a base class for latched background tasks.
-    /// </summary>
-    /// <remarks>Implement by overriding Run or RunAsync and then IsAsync accordingly,
-    /// depending on whether the task is implemented as a sync or async method, and then
-    /// optionnally overriding RunsOnShutdown, to indicate whether the latched task should run
-    /// immediately on shutdown, or just be abandonned (default).</remarks>
     public abstract class LatchedBackgroundTaskBase : DisposableObjectSlim, ILatchedBackgroundTask
     {
         private TaskCompletionSource<bool> _latch;
@@ -42,15 +35,9 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         public abstract bool IsAsync { get; }
 
-        public Task Latch
-        {
-            get { return _latch.Task; }
-        }
+        public Task Latch => _latch.Task;
 
-        public bool IsLatched
-        {
-            get { return _latch.Task.IsCompleted == false; }
-        }
+        public bool IsLatched => _latch.Task.IsCompleted == false;
 
         protected void Release()
         {
@@ -62,7 +49,7 @@ namespace Umbraco.Web.Scheduling
             _latch = new TaskCompletionSource<bool>();
         }
 
-        public virtual bool RunsOnShutdown { get { return false; } }
+        public virtual bool RunsOnShutdown => false;
 
         // the task is going to be disposed after execution,
         // unless it is latched again, thus indicating it wants to

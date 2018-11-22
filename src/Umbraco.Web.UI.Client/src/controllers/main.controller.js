@@ -8,50 +8,42 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService) {
+function MainController($scope, $location, appState, treeService, notificationsService, userService, historyService, updateChecker, assetsService, eventsService, tmhDynamicLocale, localStorageService, editorService, overlayService) {
 
     //the null is important because we do an explicit bool check on this in the view
-    //the avatar is by default the umbraco logo    
     $scope.authenticated = null;
-    $scope.avatar = [
-        { value: "assets/img/application/logo.png" },
-        { value: "assets/img/application/logo@2x.png" },
-        { value: "assets/img/application/logo@3x.png" }
-    ];
     $scope.touchDevice = appState.getGlobalState("touchDevice");
-
-
+    $scope.editors = [];
+    $scope.overlay = {};
+    $scope.drawer = {};
+    $scope.search = {};
+    $scope.login = {};
+    
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
     };
 
-    $scope.closeDialogs = function (event) {
-        //only close dialogs if non-link and non-buttons are clicked
-        var el = event.target.nodeName;
-        var els = ["INPUT", "A", "BUTTON"];
+    $scope.closeSearch = function() {
+        appState.setSearchState("show", false);
+    };
 
-        if (els.indexOf(el) >= 0) { return; }
+    $scope.showLoginScreen = function(isTimedOut) {
+        $scope.login.isTimedOut = isTimedOut;
+        $scope.login.show = true;
+    };
 
-        var parents = $(event.target).parents("a,button");
-        if (parents.length > 0) {
-            return;
-        }
-
-        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        var nav = $(event.target).parents("#dialog");
-        if (nav.length === 1) {
-            return;
-        }
-
-        eventsService.emit("app.closeDialogs", event);
+    $scope.hideLoginScreen = function() {
+        $scope.login.show = false;
     };
 
     var evts = [];
-
+    
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function () {
+    evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
+        const isTimedOut = data && data.isTimedOut ? true : false;
+        $scope.showLoginScreen(isTimedOut);
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {
@@ -61,15 +53,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             //Load locale file
             if ($scope.user.locale) {
                 tmhDynamicLocale.set($scope.user.locale);
-            }
-
-            if ($scope.user.avatars) {
-                $scope.avatar = [];
-                if (angular.isArray($scope.user.avatars)) {
-                    for (var i = 0; i < $scope.user.avatars.length; i++) {
-                        $scope.avatar.push({ value: $scope.user.avatars[i] });
-                    }
-                }
             }
         });
     }));
@@ -101,6 +84,8 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             $location.path("/").search("");
             historyService.removeAll();
             treeService.clearCache();
+            editorService.closeAll();
+            overlayService.close();
 
             //if the user changed, clearout local storage too - could contain sensitive data
             localStorageService.clearAll();
@@ -116,16 +101,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             tmhDynamicLocale.set($scope.user.locale);
         }
 
-        if ($scope.user.avatars) {
-
-            $scope.avatar = [];
-            if (angular.isArray($scope.user.avatars)) {
-                for (var i = 0; i < $scope.user.avatars.length; i++) {
-                    $scope.avatar.push({ value: $scope.user.avatars[i] });
-                }
-            }
-
-        }
     }));
 
     evts.push(eventsService.on("app.ysod", function (name, error) {
@@ -136,8 +111,15 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         };
     }));
 
+    // events for search
+    evts.push(eventsService.on("appState.searchState.changed", function (e, args) {
+        if (args.key === "show") {
+            $scope.search.show = args.value;
+        }
+    }));
+
+    // events for drawer
     // manage the help dialog by subscribing to the showHelp appState
-    $scope.drawer = {};
     evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
         // set view
         if (args.key === "view") {
@@ -153,6 +135,12 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         }
     }));
 
+    // events for overlays
+    evts.push(eventsService.on("appState.overlay", function (name, args) {
+        $scope.overlay = args;
+    }));
+    
+    // events for tours
     evts.push(eventsService.on("appState.tour.start", function (name, args) {
         $scope.tour = args;
         $scope.tour.show = true;
@@ -166,8 +154,18 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.tour = null;
     }));
 
+    // events for backdrop
     evts.push(eventsService.on("appState.backdrop", function (name, args) {
         $scope.backdrop = args;
+    }));
+
+    // event for infinite editors
+    evts.push(eventsService.on("appState.editors.add", function (name, args) {
+        $scope.editors = args.editors;
+    }));
+
+    evts.push(eventsService.on("appState.editors.remove", function (name, args) {
+        $scope.editors = args.editors;
     }));
 
     //ensure to unregister from all events!
@@ -184,5 +182,5 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 angular.module('umbraco').controller("Umbraco.MainController", MainController).
     config(function (tmhDynamicLocaleProvider) {
         //Set url for locale files
-        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular/1.1.5/i18n/angular-locale_{{locale}}.js');
+        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale}}.js');
     });

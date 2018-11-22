@@ -11,36 +11,27 @@
             name-locked="true">
         </umb-editor-header>
         <umb-editor-container>
-            <div>
-                <div class="umb-table" ng-if="vm.items">
-                    <div class="umb-table-head">
-                        <div class="umb-table-row">                            
-                            <div class="umb-table-cell umb-table__name not-fixed">
-                                <span><localize key="general_name">Name</localize></span>                                
-                            </div>
-                            <div class="umb-table-cell" ng-repeat="column in vm.items[0].translations">
-                             
-                                    <span ng-bind="column.displayName"></span>
-                                    
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="umb-table-body">
-                    <div class="umb-table-row"
-                         ng-repeat="item in vm.items">                        
-                        <div class="umb-table-cell umb-table__name not-fixed">
-                            <a title="{{ item.name }}" class="umb-table-body__link" prevent-default
-                               ng-click="vm.clickItem(item.id)"
-                               ng-bind="item.name" style="padding-left:{{item.level*10}}px">
-                            </a>
-                        </div>
-                        <div class="umb-table-cell" ng-repeat="column in item.translations">
-                            <i class="{{column.hasTranslation ? 'icon-check color-green' : 'icon-alert color-red'}}"></i>                            
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+            <table class="table table-hover" ng-if="vm.items">
+                <thead>
+                    <tr>
+                        <th><localize key="general_name">Name</localize></th>
+                        <th ng-repeat="column in vm.items[0].translations">{{column.displayName}}</th>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in vm.items track by item.id" ng-click="vm.clickItem(item.id)" style="cursor: pointer;">
+                        <td>
+                            <span class="bold" ng-style="item.style">{{item.name}}</span>
+                        </td>
+                        <td ng-repeat="column in item.translations">
+                            <i ng-if="column.hasTranslation" class="icon-check color-green"></i>
+                            <i ng-if="!column.hasTranslation" class="icon-alert color-red"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+                
         </umb-editor-container>
     </umb-editor-view>
 </div>

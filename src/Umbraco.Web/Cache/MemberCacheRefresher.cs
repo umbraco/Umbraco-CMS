@@ -1,39 +1,36 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core.Persistence.Repositories;
-using umbraco.interfaces;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// A cache refresher to ensure member cache is updated when members change
-    /// </summary>
-    /// <remarks>
-    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
-    /// </remarks>
-    public class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
+    public sealed class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
+        private readonly IdkMap _idkMap;
 
-        protected override MemberCacheRefresher Instance
+        public MemberCacheRefresher(CacheHelper cacheHelper, IdkMap idkMap)
+            : base(cacheHelper)
         {
-            get { return this; }
+            _idkMap = idkMap;
         }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return new Guid(DistributedCache.MemberCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Clears Member Cache"; }
-        }
-        
+        protected override MemberCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Member Cache Refresher";
+
+        #endregion
+
+        #region Refresher
+
         public override void Refresh(int id)
         {
             ClearCache(id);
@@ -60,17 +57,23 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+            _idkMap.ClearCache(id);
+            CacheHelper.ClearPartialViewCache();
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.
-                ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberLibraryCacheKey, id));
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.
-                ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id));
-
-            var memberCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMember>();
+            var memberCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMember>();
             if (memberCache)
-                memberCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMember>(id));
+                memberCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMember>(id));
         }
+
+        #endregion
+
+        #region Indirect
+
+        public static void RefreshMemberTypes(CacheHelper cacheHelper)
+        {
+            cacheHelper.IsolatedRuntimeCache.ClearCache<IMember>();
+        }
+
+        #endregion
     }
 }

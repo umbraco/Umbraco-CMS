@@ -1,21 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Linq;
+using System.Web.Http.ModelBinding;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {
-    internal abstract class EditorValidator<T> : IEditorValidator
+    /// <summary>
+    /// Provides a method to validate an object using <see cref="IEditorValidator"/> validation.
+    /// </summary>
+    internal static class EditorValidator
     {
-        public Type ModelType
+        /// <summary>
+        /// Validates an object.
+        /// </summary>
+        public static void Validate(ModelStateDictionary modelState, object model)
         {
-            get { return typeof (T); }
-        }
+            var modelType = model.GetType();
 
-        protected abstract IEnumerable<ValidationResult> PerformValidate(T model);
+            var validationResults = Current.EditorValidators // fixme inject
+                .Where(x => x.ModelType == modelType)
+                .SelectMany(x => x.Validate(model))
+                .Where(x => !string.IsNullOrWhiteSpace(x.ErrorMessage) && x.MemberNames.Any());
 
-        public IEnumerable<ValidationResult> Validate(object model)
-        {
-            return PerformValidate((T) model);
+            foreach (var r in validationResults)
+            foreach (var m in r.MemberNames)
+                modelState.AddModelError(m, r.ErrorMessage);
         }
     }
 }

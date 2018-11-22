@@ -40,12 +40,12 @@ namespace Umbraco.Web.Editors
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            var version = UmbracoVersion.SemanticVersion.ToSemanticString();
 
             var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
-            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
+            var content = ApplicationCache.RuntimeCache.GetCacheItem<JObject>(key);
             var result = new JObject();
             if (content != null)
             {
@@ -61,14 +61,14 @@ namespace Umbraco.Web.Editors
                     content = JObject.Parse(json);
                     result = content;
 
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
+                    ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
-                    LogHelper.Debug<DashboardController>(string.Format("Error getting dashboard content from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from '{Url}'", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
+                    ApplicationCache.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
                 }
             }
 
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
 
-            var content = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(key);
+            var content = ApplicationCache.RuntimeCache.GetCacheItem<string>(key);
             var result = string.Empty;
 
             if (content != null)
@@ -99,14 +99,14 @@ namespace Umbraco.Web.Editors
                     result = content;
 
                     //save server content for 30 mins
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
+                        ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
                 }
                 catch (HttpRequestException ex)
                 {
-                    LogHelper.Debug<DashboardController>(string.Format("Error getting dashboard CSS from '{0}': {1}\n{2}", url, ex.Message, ex.InnerException));
+                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from '{Url}'", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
-                    ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
+                    ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
                 }
             }
 

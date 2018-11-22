@@ -12,6 +12,9 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        public const bool IsPublishingConst = false;
+
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
         private string _alias;
 
@@ -30,8 +33,20 @@ namespace Umbraco.Core.Models
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <inheritdoc />
+        public override bool IsPublishing => IsPublishingConst;
 
+        public override ContentVariation Variations
+        {
+            // note: although technically possible, variations on members don't make much sense
+            // and therefore are disabled - they are fully supported at service level, though,
+            // but not at published snapshot level.
+
+            get => base.Variations;
+            set => throw new NotSupportedException("Variations are not supported on members.");
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
@@ -43,7 +58,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public override string Alias
         {
-            get { return _alias; }
+            get => _alias;
             set
             {
                 //NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
@@ -76,12 +91,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanEditProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsEditable;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
         }
 
         /// <summary>
@@ -91,14 +101,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanViewProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsVisible;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsVisible;
         }
-
         /// <summary>
         /// Gets a boolean indicating whether a Property is marked as storing sensitive values on the Members profile.
         /// </summary>
@@ -106,12 +110,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool IsSensitiveProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsSensitive;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsSensitive;
         }
 
         /// <summary>
@@ -121,8 +120,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanEditProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsEditable = value;
             }
@@ -140,8 +138,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanViewProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsVisible = value;
             }
@@ -159,8 +156,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetIsSensitiveProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsSensitive = value;
             }

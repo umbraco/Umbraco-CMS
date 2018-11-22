@@ -1,177 +1,184 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentExtensionsTests : BaseUmbracoConfigurationTest
+    public class ContentExtensionsTests : UmbracoTestBase
     {
+        #region Others
 
         [Test]
-        public void Should_Persist_Values_When_Saving_After_Publishing_But_No_Data_Changed()
+        public void DirtyProperty_Reset_Clears_SavedPublishedState()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
-            content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Published);
-            content.ResetDirtyProperties(false);
-
-            //no version will be created if no data is changed
-            content.Properties.First().Value = "hello world";
-
-            content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsTrue(content.RequiresSaving());
+            content.PublishedState = PublishedState.Publishing;
+            Assert.IsFalse(content.Published);
+            content.ResetDirtyProperties(false); // resets
+            Assert.AreEqual(PublishedState.Unpublished, content.PublishedState);
+            Assert.IsFalse(content.Published);
         }
 
         [Test]
-        public void Should_Not_Persist_Values_When_Saving_After_Publishing_But_No_Data_Changed()
+        public void DirtyProperty_OnlyIfActuallyChanged_Content()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
-            content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Published);
-            content.ResetDirtyProperties(false);
+            // if you assign a content property with its value it is not dirty
+            // if you assign it with another value then back, it is dirty
 
-            content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsFalse(content.RequiresSaving());
+            content.ResetDirtyProperties(false);
+            Assert.IsFalse(content.IsPropertyDirty("Published"));
+            content.Published = true;
+            Assert.IsTrue(content.IsPropertyDirty("Published"));
+            content.ResetDirtyProperties(false);
+            Assert.IsFalse(content.IsPropertyDirty("Published"));
+            content.Published = true;
+            Assert.IsFalse(content.IsPropertyDirty("Published"));
+            content.Published = false;
+            content.Published = true;
+            Assert.IsTrue(content.IsPropertyDirty("Published"));
         }
 
         [Test]
-        public void Should_Create_New_Version_When_Publishing()
+        public void DirtyProperty_OnlyIfActuallyChanged_User()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+            var prop = content.Properties.First();
 
+            // if you assign a user property with its value it is not dirty
+            // if you assign it with another value then back, it is dirty
+
+            prop.SetValue("A");
             content.ResetDirtyProperties(false);
-            
-            content.ChangePublishedState(PublishedState.Published);
-            Assert.IsTrue(content.ShouldCreateNewVersion());
+            Assert.IsFalse(prop.IsDirty());
+            prop.SetValue("B");
+            Assert.IsTrue(prop.IsDirty());
+            content.ResetDirtyProperties(false);
+            Assert.IsFalse(prop.IsDirty());
+            prop.SetValue("B");
+            Assert.IsFalse(prop.IsDirty());
+            prop.SetValue("A");
+            prop.SetValue("B");
+            Assert.IsTrue(prop.IsDirty());
         }
 
         [Test]
-        public void Should_Create_New_Version_When_Saving_After_Publishing()
+        public void DirtyProperty_UpdateDate()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+            var prop = content.Properties.First();
 
             content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Published);
-            content.ResetDirtyProperties(false);
+            var d = content.UpdateDate;
+            prop.SetValue("A");
+            Assert.IsTrue(content.IsAnyUserPropertyDirty());
+            Assert.IsFalse(content.IsEntityDirty());
+            Assert.AreEqual(d, content.UpdateDate);
 
-            //no version will be created if no data is changed
-            content.Properties.First().Value = "hello world";
+            content.UpdateDate = DateTime.Now;
+            Assert.IsTrue(content.IsEntityDirty());
+            Assert.AreNotEqual(d, content.UpdateDate);
 
-            content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsTrue(content.ShouldCreateNewVersion());
+            // so... changing UpdateDate would count as a content property being changed
+            // however in ContentRepository.PersistUpdatedItem, we change UpdateDate AFTER
+            // we've tested for RequiresSaving & RequiresNewVersion so it's OK
         }
 
         [Test]
-        public void Should_Create_New_Version_When_Language_Changed()
+        public void DirtyProperty_WasDirty_ContentProperty()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
             content.ResetDirtyProperties(false);
-
-            content.Language = "en-AU";
-            Assert.IsTrue(content.ShouldCreateNewVersion(PublishedState.Unpublished));
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.Published = false;
+            content.Published = true;
+            Assert.IsTrue(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.ResetDirtyProperties(false);
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.Published = false;
+            content.Published = true;
+            content.ResetDirtyProperties(true); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsTrue(content.WasDirty());
+            content.Published = false;
+            content.Published = true;
+            content.ResetDirtyProperties(); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsTrue(content.WasDirty());
         }
 
         [Test]
-        public void Should_Create_New_Version_When_Any_Property_Value_Changed_And_Its_Already_Published()
+        public void DirtyProperty_WasDirty_ContentSortOrder()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
             content.ResetDirtyProperties(false);
-
-            content.Properties.First().Value = "hello world";
-            Assert.IsTrue(content.ShouldCreateNewVersion(PublishedState.Published));
-        }
-        
-        [Test]
-        public void Should_Not_Create_New_Version_When_Published_Status_Not_Changed()
-        {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.SortOrder = 0;
+            content.SortOrder = 1;
+            Assert.IsTrue(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
             content.ResetDirtyProperties(false);
-
-            Assert.IsFalse(content.ShouldCreateNewVersion(PublishedState.Unpublished));
-        }
-
-        [Test]
-        public void Should_Not_Create_New_Version_When_Not_Published_And_Property_Changed()
-        {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            content.ResetDirtyProperties(false);
-
-            content.Properties.First().Value = "hello world";
-            Assert.IsFalse(content.ShouldCreateNewVersion(PublishedState.Unpublished));
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.SortOrder = 0;
+            content.SortOrder = 1;
+            content.ResetDirtyProperties(true); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsTrue(content.WasDirty());
+            content.SortOrder = 0;
+            content.SortOrder = 1;
+            content.ResetDirtyProperties(); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsTrue(content.WasDirty());
         }
 
         [Test]
-        public void Should_Clear_Published_Flag_When_Newly_Published_Version()
+        public void DirtyProperty_WasDirty_UserProperty()
         {
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
+            var prop = content.Properties.First();
             content.ResetDirtyProperties(false);
-
-            content.ChangePublishedState(PublishedState.Published);
-            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            prop.SetValue("a");
+            prop.SetValue("b");
+            Assert.IsTrue(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            content.ResetDirtyProperties(false);
+            Assert.IsFalse(content.IsDirty());
+            Assert.IsFalse(content.WasDirty());
+            prop.SetValue("a");
+            prop.SetValue("b");
+            content.ResetDirtyProperties(true); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
+            Assert.IsTrue(content.WasDirty()); // now it is!
+            prop.SetValue("a");
+            prop.SetValue("b");
+            content.ResetDirtyProperties(); // what PersistUpdatedItem does
+            Assert.IsFalse(content.IsDirty());
+            //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
+            Assert.IsTrue(content.WasDirty()); // now it is!
         }
 
-        [Test]
-        public void Should_Not_Clear_Published_Flag_When_Saving_Version()
-        {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Published);
-            content.ResetDirtyProperties(false);
-
-            content.ChangePublishedState(PublishedState.Saved);
-            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
-        }
-
-        [Test]
-        public void Should_Clear_Published_Flag_When_Unpublishing_From_Published()
-        {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Published);
-            content.ResetDirtyProperties(false);
-
-            content.ChangePublishedState(PublishedState.Unpublished);
-            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
-        }
-
-        [Test]
-        public void Should_Not_Clear_Published_Flag_When_Unpublishing_From_Saved()
-        {
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
-
-            content.ResetDirtyProperties(false);
-            content.ChangePublishedState(PublishedState.Saved);
-            content.ResetDirtyProperties(false);
-
-            content.ChangePublishedState(PublishedState.Unpublished);
-            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
-        }
-
-
-
+        #endregion
     }
 }

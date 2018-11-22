@@ -1,29 +1,49 @@
+#
+# Umbraco Cms Git Ignore
+#
+
+# common files
 *.obj
 *.pdb
 *.user
 *.aps
 *.pch
 *.vspscc
+*.orig
+*.suo
+*.vs10x
+*.ndproj
+
+# common directories
 .DS_Store
 ._.DS_Store
-[Bb]in
+.vs/
+/local/
+
+# build directories
+[Bb]in/
 [Db]ebug*/
-obj/
 [Rr]elease*/
+obj/
+
+# tools
 _ReSharper*/
 _NCrunch_*/
 *.ncrunchsolution
 *.ncrunchsolution.user
 *.ncrunchproject
 *.crunchsolution.cache
+tools/NDepend/
+
+
+
+
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
-*.suo
 [sS]ource
 [sS]andbox
 umbraco.config
-*.vs10x
 App_Data/TEMP/*
 [Uu]mbraco/[Pp]resentation/[Uu]mbraco/[Pp]lugins/*
 [Uu]mbraco/[Pp]resentation/[Uu]ser[Cc]ontrols/*
@@ -46,12 +66,11 @@ src/Umbraco.Web.UI/Web.*.config.transformed
 
 umbraco/presentation/umbraco/plugins/uComponents/uComponentsInstaller.ascx
 umbraco/presentation/packages/uComponents/MultiNodePicker/CustomTreeService.asmx
-*.ncrunchsolution
+
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
-src/Umbraco.Web.UI/Config/ClientDependency.config
-*.orig
+src/Umbraco.Web.UI/[Cc]onfig/ClientDependency.config
 src/Umbraco.Tests/config/404handlers.config
 src/Umbraco.Web.UI/[Vv]iews/*.cshtml
 src/Umbraco.Web.UI/[Vv]iews/*.vbhtml
@@ -68,18 +87,15 @@ lib-bower
 
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/umbraco.*
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/*.loader.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/init.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
-
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.panel.js
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.palettes.js
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.loader.js
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.front.js
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/tuning.config.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/canvasdesigner.*.js
 
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
@@ -89,56 +105,54 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Aa]ssets/*
 src/Umbraco.Web.UI.Client/[Bb]uild/*
 src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
+
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-tools/NDepend/
 
 src/Umbraco.Web.UI/App_Plugins/*
 src/*.psess
 src/*.vspx
-src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js.*
+
 NDependOut/*
-*.ndproj
 QueryResult.htm
-*.ndproj
-src/Umbraco.Web.UI/[Uu]mbraco/[Aa]ssets/*
-src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
-src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.html
-src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
 
 src/Umbraco.Web.UI/[Cc]onfig/appSettings.config
 src/Umbraco.Web.UI/[Cc]onfig/connectionStrings.config
-src/Umbraco.Web.UI/umbraco/plugins/*
-src/Umbraco.Web.UI/umbraco/js/init.js
+src/Umbraco.Web.UI/[Uu]mbraco/plugins/*
 build/ApiDocs/*
 build/ApiDocs/Output/*
 src/Umbraco.Web.UI.Client/bower_components/*
-/src/Umbraco.Web.UI/Umbraco/preview
-/src/Umbraco.Web.UI/Umbraco/preview.old
+/src/Umbraco.Web.UI/[Uu]mbraco/preview
+/src/Umbraco.Web.UI/[Uu]mbraco/preview.old
+
+# ignore rule for clearing out Belle (avoid rebuilding all the time)
+preserve.belle
 
 #Ignore Rule for output of generated documentation files from Grunt docserve
 src/Umbraco.Web.UI.Client/docs/api
 src/*.boltdata/
-/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.loader.js
-/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.palettes.js
-/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.panel.js
-/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.config.js
-/src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.front.js
 src/umbraco.sln.ide/*
 src/.vs/
-src/Umbraco.Web.UI/umbraco/js/install.loader.js
-src/Umbraco.Tests/media
+
+src/Umbraco.Web.UI/[Jj]s/*
+src/Umbraco.Tests/[Mm]edia
 tools/docfx/*
 apidocs/_site/*
+src/*/project.lock.json
+src/.idea/*
+
 apidocs/api/*
 build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
-.vs/
 src/packages/
 src/PrecompiledWeb/*
 
-
+# build
 build.out/
 build.tmp/
-build/Modules/*/temp/
-/src/.idea/*
+build/hooks/
+build/temp/
+
+
+
+# eof

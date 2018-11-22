@@ -7,25 +7,27 @@ using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
+using ScopeProviderStatic = Umbraco.Core.Scoping.ScopeProvider;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.EmptyDbFilePerTest)]
-    public class ScopeTests : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
+    public class ScopeTests : TestWithDatabaseBase
     {
         // setup
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
-            Assert.IsNull(DatabaseContext.ScopeProvider.AmbientScope); // gone
+            Assert.IsNull(ScopeProvider.AmbientScope); // gone
         }
 
         [Test]
         public void SimpleCreateScope()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SimpleCreateScopeContext()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -59,9 +61,9 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SimpleCreateScopeDatabase()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
-            UmbracoDatabase database;
+            IUmbracoDatabase database;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -80,7 +82,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScope()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -102,11 +104,11 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedMigrateScope()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
             var httpContextItems = new Hashtable();
-            ScopeProvider.HttpContextItemsGetter = () => httpContextItems;
+            ScopeProviderStatic.HttpContextItemsGetter = () => httpContextItems;
             try
             {
                 using (var scope = scopeProvider.CreateScope())
@@ -114,7 +116,7 @@ namespace Umbraco.Tests.Scoping
                     Assert.IsInstanceOf<Scope>(scope);
                     Assert.IsNotNull(scopeProvider.AmbientScope);
                     Assert.AreSame(scope, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, httpContextItems[ScopeProvider.ScopeItemKey]);
+                    Assert.AreSame(scope, httpContextItems[ScopeProviderStatic.ScopeItemKey]);
 
                     // only if Core.DEBUG_SCOPES are defined
                     //Assert.IsEmpty(scopeProvider.CallContextObjects);
@@ -127,8 +129,8 @@ namespace Umbraco.Tests.Scoping
                         Assert.AreSame(scope, ((Scope) nested).ParentScope);
 
                         // it's moved over to call context
-                        Assert.IsNull(httpContextItems[ScopeProvider.ScopeItemKey]);
-                        var callContextKey = CallContext.LogicalGetData(ScopeProvider.ScopeItemKey).AsGuid();
+                        Assert.IsNull(httpContextItems[ScopeProviderStatic.ScopeItemKey]);
+                        var callContextKey = CallContext.LogicalGetData(ScopeProviderStatic.ScopeItemKey).AsGuid();
                         Assert.AreNotEqual(Guid.Empty, callContextKey);
 
                         // only if Core.DEBUG_SCOPES are defined
@@ -137,20 +139,20 @@ namespace Umbraco.Tests.Scoping
                     }
 
                     // it's naturally back in http context
-                    Assert.AreSame(scope, httpContextItems[ScopeProvider.ScopeItemKey]);
+                    Assert.AreSame(scope, httpContextItems[ScopeProviderStatic.ScopeItemKey]);
                 }
                 Assert.IsNull(scopeProvider.AmbientScope);
             }
             finally
             {
-                ScopeProvider.HttpContextItemsGetter = null;
+                ScopeProviderStatic.HttpContextItemsGetter = null;
             }
         }
 
         [Test]
         public void NestedCreateScopeContext()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -160,7 +162,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
                 Assert.IsNotNull(scopeProvider.AmbientContext);
 
-                ScopeContext context;
+                IScopeContext context;
                 using (var nested = scopeProvider.CreateScope())
                 {
                     Assert.IsInstanceOf<Scope>(nested);
@@ -183,7 +185,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScopeInnerException()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
             bool? scopeCompleted = null;
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -222,9 +224,9 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedCreateScopeDatabase()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
-            UmbracoDatabase database;
+            IUmbracoDatabase database;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())
@@ -250,149 +252,15 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
-        public void SimpleNoScope()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            using (var scope = scopeProvider.GetAmbientOrNoScope())
-            {
-                Assert.IsInstanceOf<NoScope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-            }
-            Assert.IsNull(scopeProvider.AmbientScope);
-        }
-
-        [Test]
-        public void SimpleNoScopeDatabase()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            UmbracoDatabase database;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            using (var scope = scopeProvider.GetAmbientOrNoScope())
-            {
-                Assert.IsInstanceOf<NoScope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-                database = scope.Database; // populates scope's database
-                Assert.IsNotNull(database);
-                Assert.IsNull(database.Connection); // no transaction
-            }
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(database.Connection); // still
-        }
-
-        [Test]
-        public void NestedNoScope()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            var scope = scopeProvider.GetAmbientOrNoScope();
-            Assert.IsInstanceOf<NoScope>(scope);
-            Assert.IsNotNull(scopeProvider.AmbientScope);
-            Assert.AreSame(scope, scopeProvider.AmbientScope);
-
-            using (var nested = scopeProvider.CreateScope())
-            {
-                Assert.IsInstanceOf<Scope>(nested);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(nested, scopeProvider.AmbientScope);
-
-                // nested does not have a parent
-                Assert.IsNull(((Scope) nested).ParentScope);
-            }
-
-            // and when nested is gone, scope is gone
-            Assert.IsNull(scopeProvider.AmbientScope);
-        }
-
-        [Test]
-        public void NestedNoScopeDatabase()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            var scope = scopeProvider.GetAmbientOrNoScope();
-            Assert.IsInstanceOf<NoScope>(scope);
-            Assert.IsNotNull(scopeProvider.AmbientScope);
-            Assert.AreSame(scope, scopeProvider.AmbientScope);
-            var database = scope.Database;
-            Assert.IsNotNull(database);
-            Assert.IsNull(database.Connection); // no transaction
-
-            using (var nested = scopeProvider.CreateScope())
-            {
-                Assert.IsInstanceOf<Scope>(nested);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(nested, scopeProvider.AmbientScope);
-                var nestedDatabase = nested.Database; // causes transaction
-                Assert.AreSame(database, nestedDatabase); // stolen
-                Assert.IsNotNull(database.Connection); // no more
-
-                // nested does not have a parent
-                Assert.IsNull(((Scope) nested).ParentScope);
-            }
-
-            // and when nested is gone, scope is gone
-            Assert.IsNull(scopeProvider.AmbientScope);
-            Assert.IsNull(database.Connection); // poof gone
-        }
-
-        [Test]
-        public void NestedNoScopeFail()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            var scope = scopeProvider.GetAmbientOrNoScope();
-            Assert.IsInstanceOf<NoScope>(scope);
-            Assert.IsNotNull(scopeProvider.AmbientScope);
-            Assert.AreSame(scope, scopeProvider.AmbientScope);
-            var database = scope.Database;
-            Assert.IsNotNull(database);
-            Assert.IsNull(database.Connection); // no transaction
-            database.BeginTransaction();
-            Assert.IsNotNull(database.Connection); // now there is one
-
-            Assert.Throws<Exception>(() =>
-            {
-                // could not steal the database
-                /*var nested =*/
-                scopeProvider.CreateScope();
-            });
-
-            // cleanup
-            database.CompleteTransaction();
-        }
-
-        [Test]
-        public void NoScopeNested()
-        {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-            using (var scope = scopeProvider.CreateScope())
-            {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-
-                // AmbientOrNoScope returns the ambient scope
-                Assert.AreSame(scope, scopeProvider.GetAmbientOrNoScope());
-            }
-        }
-
-        [Test]
         public void Transaction()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var noScope = scopeProvider.GetAmbientOrNoScope();
-            var database = noScope.Database;
-            database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+            var scopeProvider = ScopeProvider;
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                scope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+                scope.Complete();
+            }
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -423,10 +291,13 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionInnerFail()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var noScope = scopeProvider.GetAmbientOrNoScope();
-            var database = noScope.Database;
-            database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+            var scopeProvider = ScopeProvider;
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                scope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+                scope.Complete();
+            }
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -459,10 +330,13 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionOuterFail()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var noScope = scopeProvider.GetAmbientOrNoScope();
-            var database = noScope.Database;
-            database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+            var scopeProvider = ScopeProvider;
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                scope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+                scope.Complete();
+            }
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -494,10 +368,13 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void NestedTransactionComplete()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
-            var noScope = scopeProvider.GetAmbientOrNoScope();
-            var database = noScope.Database;
-            database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+            var scopeProvider = ScopeProvider;
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                scope.Database.Execute("CREATE TABLE tmp (id INT, name NVARCHAR(64))");
+                scope.Complete();
+            }
 
             using (var scope = scopeProvider.CreateScope())
             {
@@ -530,7 +407,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void CallContextScope1()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
             using (var scope = scopeProvider.CreateScope())
             {
                 Assert.IsNotNull(scopeProvider.AmbientScope);
@@ -561,11 +438,11 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void CallContextScope2()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
             var httpContextItems = new Hashtable();
-            ScopeProvider.HttpContextItemsGetter = () => httpContextItems;
+            ScopeProviderStatic.HttpContextItemsGetter = () => httpContextItems;
             try
             {
                 using (var scope = scopeProvider.CreateScope())
@@ -575,7 +452,7 @@ namespace Umbraco.Tests.Scoping
                     using (new SafeCallContext())
                     {
                         // pretend it's another thread
-                        ScopeProvider.HttpContextItemsGetter = null;
+                        ScopeProviderStatic.HttpContextItemsGetter = null;
 
                         Assert.IsNull(scopeProvider.AmbientScope);
                         Assert.IsNull(scopeProvider.AmbientContext);
@@ -591,7 +468,7 @@ namespace Umbraco.Tests.Scoping
                         Assert.IsNull(scopeProvider.AmbientContext);
 
                         // back to original thread
-                        ScopeProvider.HttpContextItemsGetter = () => httpContextItems;
+                        ScopeProviderStatic.HttpContextItemsGetter = () => httpContextItems;
                     }
                     Assert.IsNotNull(scopeProvider.AmbientScope);
                     Assert.AreSame(scope, scopeProvider.AmbientScope);
@@ -602,14 +479,14 @@ namespace Umbraco.Tests.Scoping
             }
             finally
             {
-                ScopeProvider.HttpContextItemsGetter = null;
+                ScopeProviderStatic.HttpContextItemsGetter = null;
             }
         }
 
         [Test]
         public void ScopeReference()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
             var scope = scopeProvider.CreateScope();
             var nested = scopeProvider.CreateScope();
             Assert.IsNotNull(scopeProvider.AmbientScope);
@@ -630,7 +507,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void ScopeContextEnlist(bool complete)
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
             IScope ambientScope = null;
@@ -660,7 +537,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void ScopeContextEnlistAgain(bool complete)
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
             Exception exception = null;
@@ -697,7 +574,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void ScopeContextException()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             bool? completed = null;
 
@@ -738,7 +615,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void DetachableScope()
         {
-            var scopeProvider = DatabaseContext.ScopeProvider;
+            var scopeProvider = ScopeProvider;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())

@@ -15,7 +15,7 @@ namespace Umbraco.Web.WebApi
     /// </summary>
     /// <remarks>
     /// Important to note that the <see cref="UnhandledExceptionLogger"/> will only be called if the controller has an ExceptionFilter applied
-    /// to it, so to kill two birds with one stone, this class inherits from ExceptionFilterAttribute purely to force webapi to use the 
+    /// to it, so to kill two birds with one stone, this class inherits from ExceptionFilterAttribute purely to force webapi to use the
     /// IExceptionLogger (strange)
     /// </remarks>
     public class UnhandedExceptionLoggerConfigurationAttribute : ExceptionFilterAttribute, IControllerConfiguration
@@ -24,6 +24,6 @@ namespace Umbraco.Web.WebApi
         {
             controllerSettings.Services.Add(typeof(IExceptionLogger), new UnhandledExceptionLogger());
         }
-        
+
     }
 }

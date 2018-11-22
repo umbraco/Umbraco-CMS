@@ -1,368 +1,253 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+<Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <AssemblyKeyContainerName>
-    </AssemblyKeyContainerName>
-    <AssemblyName>umbraco</AssemblyName>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-    <DefaultClientScript>JScript</DefaultClientScript>
-    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-    <DefaultTargetSchema>IE50</DefaultTargetSchema>
-    <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
+    <AssemblyName>Umbraco.Web</AssemblyName>
     <RootNamespace>Umbraco.Web</RootNamespace>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <OldToolsVersion>4.0</OldToolsVersion>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <LangVersion>latest</LangVersion>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug\</OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
-    <FileAlignment>4096</FileAlignment>
-    <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>false</Optimize>
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
     <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\umbraco.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <FileAlignment>4096</FileAlignment>
-    <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>true</Optimize>
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
     <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Umbraco.Web.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
-      <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>UmbracoExamine</Name>
-    </ProjectReference>
-    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.7\lib\net45\ClientDependency.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
-      <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="MarkdownSharp, Version=1.14.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Markdown.1.14.7\lib\net45\MarkdownSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
-      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
-    <Reference Include="System.Drawing">
-      <Name>System.Drawing</Name>
-    </Reference>
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Dataflow.4.7.0\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Abstractions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Extensions.Design" />
-    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Services">
-      <Name>System.Web.Services</Name>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <ProjectReference Include="..\SQLCE4Umbraco\SqlCE4Umbraco.csproj">
-      <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
-      <Name>SqlCE4Umbraco</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="ClientDependency" Version="1.9.7" />
+    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
+    <PackageReference Include="Examine" Version="1.0.0-beta025" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
+    <PackageReference Include="ImageProcessor">
+      <Version>2.6.2.25</Version>
+    </PackageReference>
+    <PackageReference Include="LightInject" Version="5.1.2" />
+    <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+    <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
+    <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
+    <PackageReference Include="Markdown" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
+    <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="Semver" Version="2.0.4" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Name>umbraco.businesslogic</Name>
-      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
-      <Name>umbraco.cms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
-      <Name>umbraco.datalayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
-      <Name>umbraco.interfaces</Name>
-      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.providers\umbraco.providers.csproj">
-      <Project>{D7636876-0756-43CB-A192-138C6F0D5E42}</Project>
-      <Name>umbraco.providers</Name>
+    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+      <Name>Umbraco.Examine</Name>
+      <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- no globbing for now, painful -->
+    <!--
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;**\*.aspx.cs;**\*.ascx.cs;**\*.designer.cs" />
+    -->
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ApplicationContextExtensions.cs" />
+    <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
-    <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
-    <Compile Include="Cache\ApplicationCacheRefresher.cs" />
-    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
-    <Compile Include="Cache\CacheRefresherEventHandler.cs" />
-    <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
-    <Compile Include="Cache\DataTypeCacheRefresher.cs" />
-    <Compile Include="Cache\DictionaryCacheRefresher.cs" />
-    <Compile Include="Cache\DistributedCache.cs" />
-    <Compile Include="Cache\DistributedCacheExtensions.cs" />
-    <Compile Include="Cache\DomainCacheRefresher.cs" />
-    <Compile Include="Cache\LanguageCacheRefresher.cs" />
-    <Compile Include="Cache\MacroCacheRefresher.cs" />
-    <Compile Include="Cache\MediaCacheRefresher.cs" />
-    <Compile Include="Cache\MemberCacheRefresher.cs" />
-    <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
-    <Compile Include="Cache\PageCacheRefresher.cs" />
-    <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
-    <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
+    <Compile Include="AspNetHttpContextAccessor.cs" />
+    <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
-    <Compile Include="Cache\StylesheetCacheRefresher.cs" />
-    <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
-    <Compile Include="Cache\TemplateCacheRefresher.cs" />
-    <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
-    <Compile Include="Cache\UserCacheRefresher.cs" />
-    <Compile Include="Editors\PreviewController.cs" />
+    <Compile Include="Components\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Logging\WebProfiler.cs" />
+    <Compile Include="Logging\WebProfilerComponent.cs" />
+    <Compile Include="Logging\WebProfilerProvider.cs" />
+    <Compile Include="Media\Exif\BitConverterEx.cs" />
+    <Compile Include="Media\Exif\ExifBitConverter.cs" />
+    <Compile Include="Media\Exif\ExifEnums.cs" />
+    <Compile Include="Media\Exif\ExifExceptions.cs" />
+    <Compile Include="Media\Exif\ExifExtendedProperty.cs" />
+    <Compile Include="Media\Exif\ExifFileTypeDescriptor.cs" />
+    <Compile Include="Media\Exif\ExifInterOperability.cs" />
+    <Compile Include="Media\Exif\ExifProperty.cs" />
+    <Compile Include="Media\Exif\ExifPropertyCollection.cs" />
+    <Compile Include="Media\Exif\ExifPropertyFactory.cs" />
+    <Compile Include="Media\Exif\ExifTag.cs" />
+    <Compile Include="Media\Exif\ExifTagFactory.cs" />
+    <Compile Include="Media\Exif\IFD.cs" />
+    <Compile Include="Media\Exif\ImageFile.cs" />
+    <Compile Include="Media\Exif\ImageFileDirectory.cs" />
+    <Compile Include="Media\Exif\ImageFileDirectoryEntry.cs" />
+    <Compile Include="Media\Exif\ImageFileFormat.cs" />
+    <Compile Include="Media\Exif\JFIFEnums.cs" />
+    <Compile Include="Media\Exif\JFIFExtendedProperty.cs" />
+    <Compile Include="Media\Exif\JFIFThumbnail.cs" />
+    <Compile Include="Media\Exif\JPEGExceptions.cs" />
+    <Compile Include="Media\Exif\JPEGFile.cs" />
+    <Compile Include="Media\Exif\JPEGMarker.cs" />
+    <Compile Include="Media\Exif\JPEGSection.cs" />
+    <Compile Include="Media\Exif\MathEx.cs" />
+    <Compile Include="Media\Exif\SvgFile.cs" />
+    <Compile Include="Media\Exif\TIFFFile.cs" />
+    <Compile Include="Media\Exif\TIFFHeader.cs" />
+    <Compile Include="Media\Exif\TIFFStrip.cs" />
+    <Compile Include="Media\Exif\Utility.cs" />
+    <Compile Include="Media\ImageHelper.cs" />
+    <Compile Include="Media\TypeDetector\JpegDetector.cs" />
+    <Compile Include="Media\TypeDetector\RasterizedTypeDetector.cs" />
+    <Compile Include="Media\TypeDetector\SvgDetector.cs" />
+    <Compile Include="Media\TypeDetector\TIFFDetector.cs" />
+    <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Models\ContentEditing\RollbackVersion.cs" />
+    <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
+    <Compile Include="Models\Mapping\MappingOperationOptionsExtensions.cs" />
+    <Compile Include="ContentApps\ContentAppDefinitionCollection.cs" />
+    <Compile Include="ContentApps\ContentAppDefinitionCollectionBuilder.cs" />
+    <Compile Include="ContentApps\ContentEditorContentAppDefinition.cs" />
+    <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
+    <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
+    <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
+    <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
+    <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
+    <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
+    <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
+    <Compile Include="Security\IBackOfficeUserManagerMarker.cs" />
+    <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
+    <Compile Include="Security\IdentityAuditEventArgs.cs" />
+    <Compile Include="Composing\CompositionRoots\InstallerCompositionRoot.cs" />
+    <Compile Include="CompositionExtensions.cs" />
+    <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
-    <Compile Include="Features\DisabledFeatures.cs" />
-    <Compile Include="Editors\BackOfficeNotificationsController.cs" />
-    <Compile Include="Editors\DictionaryController.cs" />
+    <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="ImageProcessorLogger.cs" />
+    <Compile Include="Macros\MacroTagParser.cs" />
+    <Compile Include="Models\ContentEditing\ContentDomainsAndCulture.cs" />
+    <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
+    <Compile Include="Models\Mapping\ContentSavedStateResolver.cs" />
+    <Compile Include="OwinExtensions.cs" />
+    <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
+    <Compile Include="Security\BackOfficeSignInManager.cs" />
+    <Compile Include="Security\BackOfficeUserManager.cs" />
+    <Compile Include="Security\SessionIdValidator.cs" />
+    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
+    <Compile Include="UI\JavaScript\ClientDependencyConfiguration.cs" />
+    <Compile Include="Editors\Binders\BlueprintItemBinder.cs" />
+    <Compile Include="UmbracoApplicationBase.cs" />
+    <Compile Include="WebApi\HttpActionContextExtensions.cs" />
+    <Compile Include="Models\ContentEditing\IContentSave.cs" />
+    <Compile Include="WebApi\TrimModelBinder.cs" />
+    <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
+    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
-    <Compile Include="Editors\EditorValidationResolver.cs" />
-    <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Editors\EditorValidatorCollection.cs" />
+    <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
+    <Compile Include="Editors\EditorValidatorOfT.cs" />
+    <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
+    <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
-    <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
+    <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
+    <Compile Include="Editors\LanguageController.cs" />
+    <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
+    <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
-    <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
-    <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
-    <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
-    <Compile Include="Models\BackOfficeTourFilter.cs" />
-    <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
-    <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
-    <Compile Include="Models\ContentEditing\NotifySetting.cs" />
-    <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
-    <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
-    <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
-    <Compile Include="Models\Trees\ExportMember.cs" />
-    <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />
-    <Compile Include="TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
-    <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
-    <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
+    <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
+    <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
-    <Compile Include="Editors\UserGroupValidateAttribute.cs" />
+    <Compile Include="Editors\Filters\UserGroupValidateAttribute.cs" />
+    <Compile Include="Editors\UsersController.cs" />
     <Compile Include="ExamineStartup.cs" />
-    <Compile Include="Extensions\UdiExtensions.cs" />
+    <Compile Include="Features\DisabledFeatures.cs" />
+    <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="Features\UmbracoFeatures.cs" />
-    <Compile Include="Features\FeaturesResolver.cs" />
+    <Compile Include="HealthCheck\HealthCheckCollection.cs" />
+    <Compile Include="HealthCheck\HealthCheckNotificationMethodAttribute.cs" />
+    <Compile Include="HealthCheck\HealthCheckNotificationMethodCollection.cs" />
+    <Compile Include="HealthCheck\HealthCheckNotificationMethodCollectionBuilder.cs" />
+    <Compile Include="HealthCheck\HealthCheckResults.cs" />
+    <Compile Include="HealthCheck\HeathCheckCollectionBuilder.cs" />
+    <Compile Include="HealthCheck\NotificationMethods\EmailNotificationMethod.cs" />
+    <Compile Include="HealthCheck\NotificationMethods\IHealthCheckNotificationMethod.cs" />
+    <Compile Include="HealthCheck\NotificationMethods\NotificationMethodBase.cs" />
+    <Compile Include="HybridAccessorBase.cs" />
+    <Compile Include="HybridUmbracoContextAccessor.cs" />
+    <Compile Include="HttpContextUmbracoContextAccessor.cs" />
+    <Compile Include="HybridEventMessagesAccessor.cs" />
+    <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
+    <Compile Include="Composing\CompositionRoots\WebMappingProfilesCompositionRoot.cs" />
+    <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Install\InstallStepCollection.cs" />
+    <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
+    <Compile Include="IPublishedContentQuery.cs" />
+    <Compile Include="Editors\MemberGroupController.cs" />
+    <Compile Include="LightInjectExtensions.cs" />
+    <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Macros\MacroContent.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\AcceptableConfiguration.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationService.cs" />
     <Compile Include="HealthCheck\Checks\Config\ConfigurationServiceResult.cs" />
+    <Compile Include="Macros\MacroModel.cs" />
     <Compile Include="HealthCheck\Checks\Config\MacroErrorsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\NotificationEmailCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\TrySkipIisCustomErrorsCheck.cs" />
@@ -377,44 +262,306 @@
     <Compile Include="HealthCheck\Checks\Security\ExcessiveHeadersCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\ClickJackingCheck.cs" />
     <Compile Include="HealthCheck\HealthCheckAction.cs" />
-    <Compile Include="HealthCheck\HealthCheckNotificationMethodAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckAttribute.cs" />
-    <Compile Include="HealthCheck\HealthCheckContext.cs" />
     <Compile Include="HealthCheck\HealthCheckController.cs" />
+    <Compile Include="Macros\MacroPropertyModel.cs" />
+    <Compile Include="Macros\MacroRenderer.cs" />
+    <Compile Include="Macros\UserControlMacroEngine.cs" />
     <Compile Include="HealthCheck\HealthCheckGroup.cs" />
-    <Compile Include="HealthCheck\HealthCheckNotificationMethodResolver.cs" />
-    <Compile Include="HealthCheck\HealthCheckResolver.cs" />
     <Compile Include="HealthCheck\HealthCheck.cs" />
-    <Compile Include="HealthCheck\HealthCheckResults.cs" />
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
-    <Compile Include="HealthCheck\IHealthCheckResolver.cs" />
-    <Compile Include="HealthCheck\IHealthCheckNotificationMethodsResolver.cs" />
-    <Compile Include="HealthCheck\NotificationMethods\NotificationMethodBase.cs" />
-    <Compile Include="HealthCheck\NotificationMethods\EmailNotificationMethod.cs" />
-    <Compile Include="HealthCheck\NotificationMethods\IHealthCheckNotificatationMethod.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
-    <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
+    <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\BackOfficeTourFile.cs" />
     <Compile Include="Models\BackOfficeTourStep.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
+    <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariantSave.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DomainDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DomainSave.cs" />
+    <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />
     <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
     <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
-    <Compile Include="Models\ContentEditing\DictionarySave.cs" />
     <Compile Include="Models\ContentEditing\DictionaryOverviewTranslationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionarySave.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
     <Compile Include="Models\ContentEditing\DictionaryTranslationSave.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
-    <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
+    <Compile Include="Models\ContentEditing\IContentProperties.cs" />
+    <Compile Include="Models\ContentEditing\ITabbedContent.cs" />
+    <Compile Include="Models\ContentEditing\NotifySetting.cs" />
+    <Compile Include="Models\ContentEditing\Permission.cs" />
+    <Compile Include="Models\ContentEditing\PostedFolder.cs" />
+    <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
+    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\ContentEditing\TreeSearchResult.cs" />
+    <Compile Include="Models\ContentEditing\UserDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserGroupDisplay.cs" />
+    <Compile Include="Models\ContentEditing\UserGroupPermissionsSave.cs" />
+    <Compile Include="Models\ContentEditing\UserGroupSave.cs" />
+    <Compile Include="Models\ContentEditing\UserInvite.cs" />
+    <Compile Include="Models\ContentEditing\UserProfile.cs" />
+    <Compile Include="Models\ContentEditing\UserSave.cs" />
+    <Compile Include="Models\ContentEditing\Language.cs" />
+    <Compile Include="Models\ContentTypeImportModel.cs" />
+    <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
+    <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentAppResolver.cs" />
+    <Compile Include="Models\Mapping\ContentItemDisplayNameResolver.cs" />
+    <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
+    <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
+    <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
+    <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
+    <Compile Include="Models\Mapping\DictionaryMapperProfile.cs" />
+    <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
+    <Compile Include="Models\Mapping\MediaAppResolver.cs" />
+    <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
+    <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\EntityProfileExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeBasicResolver.cs" />
+    <Compile Include="Models\Mapping\MemberBasicPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberDtoPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
+    <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
+    <Compile Include="Models\Mapping\MembershipUserTypeConverter.cs" />
+    <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\PropertyTypeVariationsResolver.cs" />
+    <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
+    <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
+    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
+    <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
+    <Compile Include="Models\RelatedLink.cs" />
+    <Compile Include="Models\RelatedLinkBase.cs" />
+    <Compile Include="Models\RelatedLinks.cs" />
+    <Compile Include="Models\RelatedLinkType.cs" />
+    <Compile Include="Models\SendCodeViewModel.cs" />
+    <Compile Include="Models\Trees\ExportMember.cs" />
+    <Compile Include="Models\UserTourStatus.cs" />
+    <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
+    <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
+    <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
+    <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DateConfiguration.cs" />
+    <Compile Include="PropertyEditors\DateValueEditor.cs" />
+    <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
+    <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EmailAddressConfiguration.cs" />
+    <Compile Include="PropertyEditors\GridConfiguration.cs" />
+    <Compile Include="PropertyEditors\GridConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\ImageCropperConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
+    <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
+    <Compile Include="PropertyEditors\MacroContainerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MarkdownConfiguration.cs" />
+    <Compile Include="PropertyEditors\MarkdownConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\MediaPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultiNodePickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodePickerConfigurationTreeSource.cs" />
+    <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultipleTextStringConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
+    <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\NestedContentController.cs" />
+    <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
+    <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RelatedLinksConfiguration.cs" />
+    <Compile Include="PropertyEditors\RelatedLinksConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextConfiguration.cs" />
+    <Compile Include="PropertyEditors\SliderConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\TagConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\TextAreaConfiguration.cs" />
+    <Compile Include="PropertyEditors\TextAreaConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\TextboxConfiguration.cs" />
+    <Compile Include="PropertyEditors\TextboxConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
+    <Compile Include="PropertyEditors\TrueFalseConfiguration.cs" />
+    <Compile Include="PropertyEditors\TrueFalseConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\UserPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksLegacyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
+    <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
+    <Compile Include="PublishedCache\IDefaultCultureAccessor.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\PublishedSnapshot.cs" />
+    <Compile Include="PublishedCache\PublishedElement.cs" />
+    <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
+    <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
+    <Compile Include="PublishedCache\IDomainCache.cs" />
+    <Compile Include="PublishedCache\IPublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\IPublishedSnapshotService.cs" />
+    <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\NuCache\CacheKeys.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentCache.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentNodeKit.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentStore.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />
+    <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
+    <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
+    <Compile Include="PublishedCache\NuCache\MediaCache.cs" />
+    <Compile Include="PublishedCache\NuCache\MemberCache.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\INavigableData.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\NavigableContent.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\NavigableContentType.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\NavigablePropertyType.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\RootContent.cs" />
+    <Compile Include="PublishedCache\NuCache\Navigable\Source.cs" />
+    <Compile Include="PublishedCache\NuCache\Property.cs" />
+    <Compile Include="PublishedCache\NuCache\PublishedContent.cs" />
+    <Compile Include="PublishedCache\NuCache\PublishedMember.cs" />
+    <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
+    <Compile Include="PublishedCache\PublishedCacheBase.cs" />
+    <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
+    <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
+    <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\SafeXmlReaderWriter.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheComponent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlStore.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlStoreFilePersister.cs" />
+    <Compile Include="PublishedElementExtensions.cs" />
+    <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
+    <Compile Include="RelatedLinksTypeConverter.cs" />
+    <Compile Include="Routing\ContentFinderByUrl.cs" />
+    <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
+    <Compile Include="Routing\ContentFinderCollection.cs" />
+    <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
+    <Compile Include="Routing\Domain.cs" />
+    <Compile Include="Routing\IContentLastChanceFinder.cs" />
+    <Compile Include="Routing\UrlInfo.cs" />
+    <Compile Include="Routing\UrlProviderCollection.cs" />
+    <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\HealthCheckNotifier.cs" />
+    <Compile Include="Search\SearchableApplicationTree.cs" />
+    <Compile Include="Search\SearchableTreeAttribute.cs" />
+    <Compile Include="Search\SearchableTreeCollection.cs" />
+    <Compile Include="Search\SearchableTreeCollectionBuilder.cs" />
+    <Compile Include="Search\UmbracoTreeSearcher.cs" />
+    <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\UmbracoSecureDataFormat.cs" />
+    <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
+    <Compile Include="SignalR\IPreviewHub.cs" />
+    <Compile Include="SignalR\PreviewHub.cs" />
+    <Compile Include="SignalR\PreviewHubComponent.cs" />
+    <Compile Include="Suspendable.cs" />
+    <Compile Include="Tour\BackOfficeTourFilter.cs" />
+    <Compile Include="Tour\TourFilterCollection.cs" />
+    <Compile Include="Tour\TourFilterCollectionBuilder.cs" />
+    <Compile Include="Trees\ContentBlueprintTreeController.cs" />
+    <Compile Include="Trees\RelationTypeTreeController.cs" />
+    <Compile Include="Trees\MacrosTreeController.cs" />
+    <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MemberGroupSave.cs" />
+    <Compile Include="Trees\MemberGroupTreeController.cs" />
+    <Compile Include="Trees\MemberTypeAndGroupTreeControllerBase.cs" />
+    <Compile Include="Trees\ScriptsTreeController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
+    <Compile Include="Trees\StylesheetsTreeController.cs" />
+    <Compile Include="Trees\UserPermissionsTreeController.cs" />
+    <Compile Include="Trees\UserTreeController.cs" />
+    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
+    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
+    <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
+    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
+    <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
+    <Compile Include="Editors\Filters\MediaItemSaveValidationAttribute.cs" />
+    <Compile Include="Editors\Filters\MemberSaveValidationAttribute.cs" />
+    <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
+    <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
+    <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
+    <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
+    <Compile Include="Runtime\WebRuntimeComponent.cs" />
+    <Compile Include="Editors\PublishedStatusController.cs" />
+    <Compile Include="Editors\NuCacheStatusController.cs" />
+    <Compile Include="Actions\ActionAssignDomain.cs" />
+    <Compile Include="Actions\ActionBrowse.cs" />
+    <Compile Include="Actions\ActionChangeDocType.cs" />
+    <Compile Include="Actions\ActionCollection.cs" />
+    <Compile Include="Actions\ActionCollectionBuilder.cs" />
+    <Compile Include="Actions\ActionCopy.cs" />
+    <Compile Include="Actions\ActionCreateBlueprintFromContent.cs" />
+    <Compile Include="Actions\ActionDelete.cs" />
+    <Compile Include="Actions\ActionMove.cs" />
+    <Compile Include="Actions\ActionNew.cs" />
+    <Compile Include="Actions\ActionProtect.cs" />
+    <Compile Include="Actions\ActionPublish.cs" />
+    <Compile Include="Actions\ActionRestore.cs" />
+    <Compile Include="Actions\ActionRights.cs" />
+    <Compile Include="Actions\ActionRollback.cs" />
+    <Compile Include="Actions\ActionSort.cs" />
+    <Compile Include="Actions\ActionToPublish.cs" />
+    <Compile Include="Actions\ActionUnpublish.cs" />
+    <Compile Include="Actions\ActionUpdate.cs" />
+    <Compile Include="Actions\IAction.cs" />
+    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
+    <Compile Include="Models\Trees\ApplicationAttribute.cs" />
+    <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
+    <Compile Include="Models\Trees\IApplication.cs" />
+    <Compile Include="Services\SectionService.cs" />
+    <Compile Include="Trees\TreeAttribute.cs" />
+    <Compile Include="Models\Trees\TreeNode.cs" />
+    <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
-    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
@@ -425,47 +572,17 @@
     <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFiles.cs" />
-    <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
-    <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
-    <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
-    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
-    <Compile Include="Models\ContentEditing\UserDisplay.cs" />
-    <Compile Include="Models\ContentEditing\UserBasic.cs" />
-    <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
-    <Compile Include="Models\ContentEditing\UserGroupDisplay.cs" />
-    <Compile Include="Models\ContentEditing\UserGroupPermissionsSave.cs" />
-    <Compile Include="Models\ContentEditing\UserGroupSave.cs" />
-    <Compile Include="Models\DetachedPublishedContent.cs" />
-    <Compile Include="Models\DetachedPublishedProperty.cs" />
-    <Compile Include="Models\ContentEditing\UserInvite.cs" />
-    <Compile Include="Models\ContentEditing\UserSave.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
-    <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
-    <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
-    <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
-    <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
-    <Compile Include="Models\Mapping\EntityModelMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeProfileExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
-    <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
-    <Compile Include="Models\RelatedLink.cs" />
-    <Compile Include="Models\Mapping\TemplateModelMapper.cs" />
     <Compile Include="Models\PackageInstallResult.cs" />
-    <Compile Include="Models\RelatedLinkBase.cs" />
-    <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
-    <Compile Include="Models\SendCodeViewModel.cs" />
-    <Compile Include="Models\RelatedLinks.cs" />
-    <Compile Include="Models\RelatedLinkType.cs" />
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
-    <Compile Include="Models\PublishedContentWithKeyBase.cs" />
-    <Compile Include="Models\BackOfficeTour.cs" />
-    <Compile Include="Models\UserTourStatus.cs" />
     <Compile Include="Models\ValidatePasswordResetCodeModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
@@ -476,118 +593,82 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="Profiling\WebProfilerProvider.cs" />
-    <Compile Include="Profiling\WebProfiler.cs" />
-    <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
-    <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
+    <Compile Include="PropertyEditors\DateConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DateTimeConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\NestedContentController.cs" />
-    <Compile Include="PropertyEditors\NestedContentHelper.cs" />
-    <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ContentPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\LegacyRelatedLinksEditorValueConvertor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MediaPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MemberPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\LegacyMediaPickerPropertyConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
-    <Compile Include="PublishedContentQueryExtensions.cs" />
-    <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
+    <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
-    <Compile Include="RelatedLinksTypeConverter.cs" />
-    <Compile Include="RouteDataExtensions.cs" />
+    <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
-    <Compile Include="Scheduling\HealthCheckNotifier.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
-    <Compile Include="Search\SearchableApplicationTree.cs" />
-    <Compile Include="Search\SearchableTreeAttribute.cs" />
-    <Compile Include="Search\SearchableTreeCollection.cs" />
-    <Compile Include="Search\SearchableTreeResolver.cs" />
-    <Compile Include="Search\UmbracoTreeSearcher.cs" />
-    <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
-    <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
-    <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationHandler.cs" />
-    <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationMiddleware.cs" />
-    <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
+    <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
+    <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
+    <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
+    <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
+    <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
-    <Compile Include="Security\Identity\IUmbracoBackOfficeTwoFactorOptions.cs" />
+    <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
-    <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
-    <Compile Include="SingletonHttpContextAccessor.cs" />
-    <Compile Include="Trees\DictionaryTreeController.cs" />
-    <Compile Include="Trees\MacroTreeController.cs" />
-    <Compile Include="Trees\UserTreeController.cs" />
-    <Compile Include="Suspendable.cs" />
-    <Compile Include="Trees\ContentBlueprintTreeController.cs" />
+    <Compile Include="Services\ApplicationTreeService.cs" />
+    <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
-    <Compile Include="Trees\XsltTreeController.cs" />
-    <Compile Include="umbraco.presentation\SafeXmlReaderWriter.cs" />
-    <Compile Include="Trees\ScriptTreeController.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />
-    <Compile Include="Models\ContentExtensions.cs" />
-    <Compile Include="IDynamicPublishedContentQuery.cs" />
     <Compile Include="ITagQuery.cs" />
-    <Compile Include="ITypedPublishedContentQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Models\LegacyConvertedNode.cs" />
-    <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
-    <Compile Include="Models\Mapping\RelationModelMapper.cs" />
-    <Compile Include="Mvc\DisableClientCacheAttribute.cs" />
+    <Compile Include="Models\Mapping\RelationMapperProfile.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
-    <Compile Include="Mvc\ReflectedFixedRazorViewEngine.cs" />
     <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="Mvc\UrlHelperExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
-    <Compile Include="BatchedWebServiceServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
+    <Compile Include="Cache\ApplicationCacheRefresher.cs" />
+    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
+    <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
+    <Compile Include="Cache\DataTypeCacheRefresher.cs" />
+    <Compile Include="Cache\DictionaryCacheRefresher.cs" />
+    <Compile Include="Cache\DistributedCache.cs" />
+    <Compile Include="Cache\DistributedCacheExtensions.cs" />
+    <Compile Include="Cache\CacheRefresherComponent.cs" />
+    <Compile Include="Cache\DomainCacheRefresher.cs" />
+    <Compile Include="Cache\LanguageCacheRefresher.cs" />
+    <Compile Include="Cache\MacroCacheRefresher.cs" />
+    <Compile Include="Cache\MediaCacheRefresher.cs" />
+    <Compile Include="Cache\MemberCacheRefresher.cs" />
+    <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
+    <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
+    <Compile Include="Cache\TemplateCacheRefresher.cs" />
+    <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
-    <Compile Include="Editors\ContentPostValidateAttribute.cs" />
+    <Compile Include="Editors\Filters\ContentSaveValidationAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
-    <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
-    <Compile Include="Editors\CanvasDesignerController.cs" />
-    <Compile Include="Editors\UsersController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
@@ -604,22 +685,16 @@
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
+    <Compile Include="Models\ContentEditing\ContentBaseSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
-    <Compile Include="Models\DetachedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
-    <Compile Include="Models\ImageCropCoordinates.cs" />
-    <Compile Include="Models\ImageCropDataSet.cs" />
-    <Compile Include="Models\ImageCropFocalPoint.cs" />
     <Compile Include="Models\ImageCropMode.cs" />
-    <Compile Include="Install\DatabaseHelper.cs" />
     <Compile Include="Install\InstallException.cs" />
     <Compile Include="Install\InstallStatusTracker.cs" />
     <Compile Include="Install\InstallSteps\DatabaseConfigureStep.cs" />
     <Compile Include="Install\InstallSteps\DatabaseInstallStep.cs" />
     <Compile Include="Install\InstallSteps\DatabaseUpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\FilePermissionsStep.cs" />
-    <Compile Include="Install\InstallSteps\MajorVersion7UpgradeReport.cs" />
     <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
@@ -644,12 +719,10 @@
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />
     <Compile Include="Install\InstallAuthorizeAttribute.cs" />
-    <Compile Include="Models\ContentEditing\TreeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeValidation.cs" />
-    <Compile Include="Models\ImageCropData.cs" />
     <Compile Include="Models\ImageCropRatioMode.cs" />
-    <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\IContentModel.cs" />
     <Compile Include="Models\PartialViewMacroModelExtensions.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\PublishedProperty.cs" />
@@ -662,13 +735,11 @@
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MacroContainerValueConverter.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
-    <Compile Include="PublishedCache\MemberPublishedContent.cs" />
-    <Compile Include="PublishedCache\RawValueProperty.cs" />
-    <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="PublishedCache\PublishedMember.cs" />
+    <Compile Include="Models\ContentModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
-    <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
@@ -689,81 +760,59 @@
     <Compile Include="Models\ContentEditing\RichTextEditorPlugin.cs" />
     <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
-    <Compile Include="Models\ContentEditing\AuditLogType.cs" />
-    <Compile Include="Models\Mapping\MiscModelsMapper.cs" />
-    <Compile Include="Models\Mapping\MacroModelMapper.cs" />
-    <Compile Include="Models\Mapping\MemberModelMapper.cs" />
-    <Compile Include="Models\Mapping\TabModelMapper.cs" />
+    <Compile Include="Models\Mapping\MacroMapperProfile.cs" />
+    <Compile Include="Models\Mapping\MemberMapperProfile.cs" />
+    <Compile Include="Models\Mapping\TagMapperProfile.cs" />
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
-    <Compile Include="NotificationServiceExtensions.cs" />
-    <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\ColorPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
-    <Compile Include="ImageCropperBaseExtensions.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultipleMediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\PropertyGroupParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\SingleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
-    <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
-    <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
-    <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
     <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
-    <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
-    <Compile Include="Models\Mapping\EntityModelMapper.cs" />
-    <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
+    <Compile Include="Models\Mapping\DataTypeMapperProfile.cs" />
+    <Compile Include="Models\Mapping\EntityMapperProfile.cs" />
+    <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
-    <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
-    <Compile Include="PropertyEditors\FolderBrowserPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
-    <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TagPropertyEditorTagDefinition.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksEditorValueConvertor.cs" />
-    <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RelatedLinksValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueListConfigurationEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -773,48 +822,34 @@
     <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
     <Compile Include="Scheduling\ILatchedBackgroundTask.cs" />
     <Compile Include="Scheduling\RecurringTaskBase.cs" />
-    <Compile Include="Security\Identity\AppBuilderExtensions.cs" />
-    <Compile Include="Security\Identity\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="Security\Identity\AuthenticationManagerExtensions.cs" />
-    <Compile Include="Security\Identity\BackOfficeCookieManager.cs" />
-    <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
-    <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthOptions.cs" />
+    <Compile Include="Security\AppBuilderExtensions.cs" />
+    <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
+    <Compile Include="Security\AuthenticationManagerExtensions.cs" />
+    <Compile Include="Security\BackOfficeCookieManager.cs" />
+    <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
-    <Compile Include="SingletonUmbracoContextAccessor.cs" />
-    <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
-    <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
-    <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Strategies\Migrations\MigrationStartupHander.cs" />
-    <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
-    <Compile Include="Strategies\NotificationsHandler.cs" />
-    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
+    <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
+    <Compile Include="Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
+    <Compile Include="Migrations\EnsureListViewDataTypeIsCreated.cs" />
+    <Compile Include="Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
+    <Compile Include="Components\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />
     <Compile Include="Trees\LanguageTreeController.cs" />
-    <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Models\Trees\CreateChildEntity.cs" />
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="CanvasDesignerUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\XmlCacheFilePersister.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -823,30 +858,22 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
-    <Compile Include="WebApi\Binders\BlueprintItemBinder.cs" />
-    <Compile Include="WebApi\Binders\MemberBinder.cs" />
-    <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
+    <Compile Include="Editors\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\AppendCurrentEventMessagesAttribute.cs" />
-    <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
-    <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
-    <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoWebApiRequireHttpsAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
-    <Compile Include="WebApi\Filters\UmbracoUseHttps.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
-    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
-    <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
@@ -856,11 +883,10 @@
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
-    <Compile Include="PublishedContentPropertyExtension.cs" />
+    <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
-    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
@@ -873,7 +899,6 @@
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
-    <Compile Include="Editors\ValidationHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
@@ -887,22 +912,21 @@
     <Compile Include="Models\ContentEditing\Section.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\ContentEditing\TabbedContentItem.cs" />
-    <Compile Include="Models\ContentEditing\UserProfile.cs" />
+    <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
-    <Compile Include="Models\Mapping\ContentPropertyModelMapper.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyMapperProfile.cs" />
     <Compile Include="Models\Mapping\CreatorResolver.cs" />
-    <Compile Include="Models\Mapping\MediaModelMapper.cs" />
-    <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
-    <Compile Include="Models\Mapping\ContentModelMapper.cs" />
+    <Compile Include="Models\Mapping\MediaMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentTypeMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentMapperProfile.cs" />
     <Compile Include="Models\Mapping\OwnerResolver.cs" />
-    <Compile Include="Models\Mapping\SectionModelMapper.cs" />
+    <Compile Include="Models\Mapping\SectionMapperProfile.cs" />
     <Compile Include="Models\Mapping\TabsAndPropertiesResolver.cs" />
-    <Compile Include="Models\Mapping\UserModelMapper.cs" />
-    <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
+    <Compile Include="Models\Mapping\UserMapperProfile.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
@@ -911,15 +935,9 @@
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Models\Trees\ActionMenuItem.cs" />
-    <Compile Include="Models\Trees\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
-    <Compile Include="Trees\ApplicationTreeRegistrar.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
-    <Compile Include="Trees\LegacyTreeController.cs" />
-    <Compile Include="Search\ISearchableTree.cs" />
-    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
-    <Compile Include="Trees\LegacyTreeJavascript.cs" />
-    <Compile Include="Trees\LegacyTreeParams.cs" />
+    <Compile Include="Trees\ISearchableTree.cs" />
     <Compile Include="Models\Trees\MenuItem.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
@@ -927,8 +945,6 @@
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
-    <Compile Include="Trees\TreeAttribute.cs" />
-    <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />
@@ -946,20 +962,11 @@
     <Compile Include="UI\JavaScript\JsInitialization.cs" />
     <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
-    <Compile Include="Models\ContentEditing\ContentItemFile.cs" />
+    <Compile Include="Models\ContentEditing\ContentPropertyCollectionDto.cs" />
     <Compile Include="Models\ContentEditing\ContentItemSave.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDto.cs" />
-    <Compile Include="Dynamics\DynamicExpression.cs" />
-    <Compile Include="Dynamics\DynamicGrouping.cs" />
-    <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
-    <Compile Include="Dynamics\DynamicPublishedContentListOrdering.cs" />
-    <Compile Include="Dynamics\DynamicQueryable.cs" />
-    <Compile Include="Dynamics\ExpressionParser.cs" />
-    <Compile Include="Dynamics\ExtensionMethods.cs" />
-    <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
@@ -968,29 +975,10 @@
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
-    <Compile Include="Media\ImageUrl.cs" />
-    <Compile Include="Media\ImageUrlProviderResolver.cs" />
-    <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
-    <Compile Include="Models\DynamicPublishedContent.cs" />
-    <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="BaseRest\BaseRestHandler.cs" />
-    <Compile Include="BaseRest\MemberRest.cs" />
-    <Compile Include="BaseRest\RestExtensionAttribute.cs" />
-    <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
-    <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
-    <Compile Include="ContextualPublishedCacheExtensions.cs" />
-    <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedCacheOfT.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
-    <Compile Include="PublishedCache\ContextualPublishedMediaCache.cs" />
-    <Compile Include="PublishedCache\PublishedCachesResolver.cs" />
-    <Compile Include="PublishedCache\IPublishedCaches.cs" />
-    <Compile Include="PublishedCache\PublishedCaches.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
@@ -1012,56 +1000,28 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Strategies\Migrations\RebuildXmlCachesAfterUpgrade.cs" />
-    <Compile Include="Strategies\PublicAccessEventHandler.cs" />
-    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
+    <Compile Include="Components\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
-    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="Models\LegacyNodeHelper.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\ProtectPage.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
-      <DependentUpon>AssignDomain2.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
-      <DependentUpon>AssignDomain2.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UmbracoContextExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Controllers\UmbLoginController.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
+    <Compile Include="Editors\Binders\ContentModelBinderHelper.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
-    <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
+    <Compile Include="Editors\Binders\ContentItemBinder.cs" />
+    <Compile Include="Editors\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
-    <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="Editors\Filters\ContentItemValidationHelper.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
@@ -1077,10 +1037,8 @@
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidator.cs" />
     <Compile Include="WebApi\PrefixlessBodyModelValidatorAttribute.cs" />
-    <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
-    <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
@@ -1097,7 +1055,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="Scheduling\Scheduler.cs" />
+    <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
@@ -1122,48 +1080,70 @@
     <Compile Include="Mvc\SurfaceController.cs" />
     <Compile Include="Mvc\PluginControllerArea.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
-    <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
-    <Compile Include="RenderFieldCaseType.cs" />
-    <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
-    <Compile Include="Routing\ContentFinderByNotFoundHandler.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
     <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\DefaultUrlProvider.cs" />
     <Compile Include="Routing\DomainAndUri.cs" />
     <Compile Include="Routing\IUrlProvider.cs" />
     <Compile Include="Routing\SiteDomainHelper.cs" />
-    <Compile Include="Routing\SiteDomainHelperResolver.cs" />
-    <Compile Include="Routing\UrlProviderResolver.cs" />
-    <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
-    <Compile Include="Security\LegacyDefaultAppMapping.cs" />
-    <Compile Include="Routing\PublishedContentRequestEngine.cs" />
+    <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
-    <Compile Include="Search\ExamineEvents.cs" />
-    <Compile Include="Strategies\DataTypes\LegacyUploadFieldWorkaround.cs" />
-    <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
-    <Compile Include="Strategies\LegacyClasses.cs" />
-    <Compile Include="Strategies\Migrations\EnsureAppsTreesUpdatedOnUpgrade.cs" />
-    <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
+    <Compile Include="Search\ExamineComponent.cs" />
+    <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
-    <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
-    <Compile Include="UI\LegacyDialogHandler.cs" />
-    <Compile Include="UI\LegacyDialogTask.cs" />
+    <Compile Include="_Legacy\Controls\BaseTreePicker.cs" />
+    <Compile Include="_Legacy\Controls\DataAttributes.cs" />
+    <Compile Include="_Legacy\Controls\feedback.cs" />
+    <Compile Include="_Legacy\Controls\FieldDropDownList.cs" />
+    <Compile Include="_Legacy\Controls\MenuButton.cs" />
+    <Compile Include="_Legacy\Controls\MenuButtonI.cs" />
+    <Compile Include="_Legacy\Controls\MenuIcon.cs" />
+    <Compile Include="_Legacy\Controls\MenuIconI.cs" />
+    <Compile Include="_Legacy\Controls\pane.cs" />
+    <Compile Include="_Legacy\Controls\Panel.cs" />
+    <Compile Include="_Legacy\Controls\ProgressBar.cs" />
+    <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
+    <Compile Include="_Legacy\Controls\Splitter.cs" />
+    <Compile Include="_Legacy\Controls\TabPage.cs" />
+    <Compile Include="_Legacy\Controls\TabView.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplication.cs" />
+    <Compile Include="_Legacy\PackageActions\addApplicationTree.cs" />
+    <Compile Include="_Legacy\PackageActions\addDashboardSection.cs" />
+    <Compile Include="_Legacy\PackageActions\addProxyFeedHost.cs" />
+    <Compile Include="_Legacy\PackageActions\addStringToHtmlElement.cs" />
+    <Compile Include="_Legacy\PackageActions\allowDoctype.cs" />
+    <Compile Include="_Legacy\PackageActions\moveRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\PackageHelper.cs" />
+    <Compile Include="_Legacy\PackageActions\publishRootDocument.cs" />
+    <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
+    <Compile Include="_Legacy\Packager\data.cs" />
+    <Compile Include="_Legacy\Packager\Installer.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\IPackageInstance.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackageActions.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackageInstance.cs" />
+    <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
+    <Compile Include="_Legacy\Packager\RequirementsType.cs" />
+    <Compile Include="_Legacy\Packager\Settings.cs" />
+    <Compile Include="_Legacy\UI\ITask.cs" />
+    <Compile Include="_Legacy\UI\ITaskReturnUrl.cs" />
+    <Compile Include="_Legacy\UI\LegacyDialogHandler.cs" />
+    <Compile Include="_Legacy\UI\LegacyDialogTask.cs" />
     <Compile Include="UI\Controls\ProgressBar.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
     <Compile Include="UI\Controls\UmbracoUserControl.cs">
@@ -1182,44 +1162,13 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\macroResultWrapper.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\publishStatus.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\tree.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\treePicker.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.master.cs">
@@ -1228,16 +1177,6 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
-    <Compile Include="umbraco.presentation\XsltExtensionAttribute.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
@@ -1246,178 +1185,51 @@
     <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
-    <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
     <Compile Include="Mvc\MasterControllerFactory.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
-    <Compile Include="Models\RenderModel.cs" />
-    <Compile Include="Mvc\RenderModelBinder.cs" />
+    <Compile Include="Models\ContentModel.cs" />
+    <Compile Include="Mvc\ContentModelBinder.cs" />
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RenderViewEngine.cs" />
-    <Compile Include="Mvc\UmbracoTemplatePage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
     <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
-    <Compile Include="UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
-    <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
-    <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
-    <Compile Include="WebApi\WebApiHelper.cs" />
-    <Compile Include="WebBootManager.cs" />
-    <Compile Include="Routing\LegacyRequestInitializer.cs" />
+    <Compile Include="Runtime\WebRuntime.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentLastChanceFinderResolver.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
-    <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\ThumbnailProvidersResolver.cs" />
-    <Compile Include="UI\Controls\FolderBrowser.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
-    <Compile Include="Routing\ContentFinderByProfile.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
+    <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
-    <Compile Include="Routing\ContentFinderResolver.cs" />
-    <Compile Include="Routing\PublishedContentRequest.cs" />
+    <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
-    <Compile Include="Routing\RoutingContext.cs" />
-    <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\BasePageExtensions.cs" />
-    <Compile Include="umbraco.presentation\content.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\keepAliveService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\library.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\macro.cs" />
     <Compile Include="umbraco.presentation\page.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Settings1.Designer.cs">
+    <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\publishingService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\PublishQueue.cs" />
-    <Compile Include="umbraco.presentation\python.cs" />
-    <Compile Include="umbraco.presentation\NotFoundHandlers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\requestModule.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\showField.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\template.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoContext.cs" />
-    <Compile Include="umbraco.presentation\UmbracoPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\UmbracoRequest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoResponse.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\UmbracoServerUtility.cs" />
-    <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.cs">
-      <DependentUpon>delete.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.designer.cs">
-      <DependentUpon>delete.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.cs">
-      <DependentUpon>editContent.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.designer.cs">
-      <DependentUpon>editContent.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.designer.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\GenericValidation.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\LabelButton.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\macroParameterControl.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.designer.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\SaveClickEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\JTreeContextMenu.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\JTreeContextMenuItem.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\NodeInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\stylesheetPropertyTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\StylesheetTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\XsltTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1427,7 +1239,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
@@ -1438,37 +1249,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\ReadOnlyRelation.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs">
-      <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.cs">
-      <DependentUpon>Preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
-      <DependentUpon>Preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.cs">
-      <DependentUpon>MemberSearch.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.designer.cs">
-      <DependentUpon>MemberSearch.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Page_Legacy.cs" />
-    <Compile Include="umbraco.presentation\umbraco\preview\PreviewContent.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Search\ExamineEvents.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.cs">
-      <DependentUpon>xsltVisualize.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.designer.cs">
-      <DependentUpon>xsltVisualize.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
@@ -1486,37 +1266,9 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.cs">
       <DependentUpon>republish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.designer.cs">
       <DependentUpon>republish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\search.aspx.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\search.aspx.designer.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.cs">
-      <DependentUpon>SendPublish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.designer.cs">
-      <DependentUpon>SendPublish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\dialogHandler_temp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx.cs">
-      <DependentUpon>assemblyBrowser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx.designer.cs">
-      <DependentUpon>assemblyBrowser.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
@@ -1525,282 +1277,11 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx.cs">
-      <DependentUpon>getXsltStatus.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx.cs">
-      <DependentUpon>xsltChooseExtension.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx.designer.cs">
-      <DependentUpon>xsltChooseExtension.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx.cs">
-      <DependentUpon>xsltInsertValueOf.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx.designer.cs">
-      <DependentUpon>xsltInsertValueOf.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx.cs">
-      <DependentUpon>exportDocumenttype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx.cs">
-      <DependentUpon>importDocumenttype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
-      <DependentUpon>rollBack.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
-      <DependentUpon>rollBack.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.cs">
-      <DependentUpon>sendToTranslation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.designer.cs">
-      <DependentUpon>sendToTranslation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.cs">
-      <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
-      <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
-      <DependentUpon>EditMemberGroup.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.designer.cs">
-      <DependentUpon>EditMemberGroup.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\search.aspx.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\search.aspx.designer.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.cs">
-      <DependentUpon>ViewMembers.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.designer.cs">
-      <DependentUpon>ViewMembers.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Properties.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProvider.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\GzipCompressor.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\GzipModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\IModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSON.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSONReader.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSONWriter.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx.cs">
-      <DependentUpon>tinymce3tinymceCompress.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx.designer.cs">
-      <DependentUpon>tinymce3tinymceCompress.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx.cs">
-      <DependentUpon>QuickSearchHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
-      <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.designer.cs">
-      <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.cs">
-      <DependentUpon>editLanguage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.designer.cs">
-      <DependentUpon>editLanguage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadDLRScripts.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadRelationTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\MediaRecycleBin.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\NodeActionsEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeRequestParams.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\ContentExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\ContentTypeExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\DocumentExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\MediaExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\MemberExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\NodeExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\PreValueExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\RelationTypeExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\UmbracoObjectTypeExtensions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx.cs">
-      <DependentUpon>MacroContainerService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\TagsAutoCompleteHandler.ashx.cs">
-      <DependentUpon>TagsAutoCompleteHandler.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx.cs">
-      <DependentUpon>TreeClientService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Macro.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ContentType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.designer.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.cs">
-      <DependentUpon>details.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.designer.cs">
-      <DependentUpon>details.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.designer.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.cs">
-      <DependentUpon>xml.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.designer.cs">
-      <DependentUpon>xml.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\BaseContentTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\ContentRecycleBin.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadContent.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadcontentItemType.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadDataTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadLanguages.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMedia.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMediaTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberGroups.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMembers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadNodeTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPython.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheets.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadTemplates.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadUsers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\LegacyTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx.cs">
-      <DependentUpon>TreeDataService.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TreeService.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs">
-      <DependentUpon>XmlTree.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
-      <DependentUpon>CacheRefresher.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx.cs">
-      <DependentUpon>CheckForUpgrade.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx.cs">
-      <DependentUpon>CMSNode.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx.cs">
-      <DependentUpon>codeEditorSave.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx.cs">
-      <DependentUpon>legacyAjaxCalls.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx.cs">
-      <DependentUpon>nodeSorter.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx.cs">
-      <DependentUpon>progressStatus.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\publication.asmx.cs">
-      <DependentUpon>publication.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-DataTypes.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Dictionary.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Document.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Media.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Members.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Nodes.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-PreValues.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-UmbracoObjectType.cs">
-      <DependentUpon>uQuery.cs</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />
@@ -1810,142 +1291,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="WebServices\BulkPublishController.cs" />
-    <Compile Include="WebServices\CoreStringsController.cs" />
-    <Compile Include="WebServices\DomainsApiController.cs" />
-    <Compile Include="WebServices\EmbedMediaService.cs" />
-    <Compile Include="WebServices\ExamineManagementApiController.cs" />
-    <Compile Include="WebServices\FolderBrowserService.cs" />
-    <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="WebServices\SaveFileController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
+    <Compile Include="TagsController.cs" />
+    <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
+    <Compile Include="UmbracoHttpHandler.cs" />
+    <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="WebServices\XmlDataIntegrityController.cs" />
+    <Compile Include="Editors\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
-    <None Include="..\Umbraco.Web.UI\Views\web.config">
-      <Link>Mvc\web.config</Link>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Web References\org.umbraco.our\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Web References\org.umbraco.our\repository.disco" />
-    <EmbeddedResource Include="UI\JavaScript\Main.js" />
-    <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
-    <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
-    <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\preview.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\actions\publish.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
-    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
-    <None Include="app.config" />
-    <None Include="Web References\org.umbraco.our\repository.wsdl" />
-    <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
-    </None>
-    <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
-    <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
-    <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
-    <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
-    <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx">
-      <SubType>Form</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\webservices\publication.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx" />
-    <None Include="umbraco.presentation\umbraco\Trees\Trees.cd" />
-    <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsd">
-      <SubType>
-      </SubType>
-    </None>
-    <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsx">
-      <DependentUpon>XmlTree.xsd</DependentUpon>
-    </None>
-    <Content Include="umbraco.presentation\umbraco\webservices\TagsAutoCompleteHandler.ashx" />
-    <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
-    <None Include="Web References\org.umbraco.update\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="UI\JavaScript\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -1955,36 +1310,70 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\umbraco\templateControls\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsd">
-      <SubType>
-      </SubType>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsx">
-      <DependentUpon>package.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsc">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xss">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsx">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
+    <EmbeddedResource Include="UI\JavaScript\Main.js" />
+    <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
+    <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="https://our.umbraco.com/umbraco/webservices/api/repository.asmx">
+    <EmbeddedResource Include="UI\JavaScript\PreviewInitialize.js" />
+    <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
+    <Content Include="PublishedCache\NuCache\notes.txt" />
+    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
+    <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
+    <None Include="Web References\org.umbraco.update\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\Umbraco.Web.UI\Views\web.config">
+      <Link>Mvc\web.config</Link>
+    </None>
+    <None Include="Web References\org.umbraco.our\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\org.umbraco.our\repository.disco" />
+    <None Include="Web References\org.umbraco.our\repository.wsdl" />
+    <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>https://our.umbraco.com/umbraco/webservices/api/repository.asmx</UpdateFromURL>
+      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
@@ -2004,28 +1393,30 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="umbraco.presentation\umbraco\settings\scripts\" />
-  </ItemGroup>
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
-    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0</VSToolsPath>
-    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0</VSToolsPath>
-    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0</VSToolsPath>
-  </PropertyGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
-  <ProjectExtensions />
-  <PropertyGroup>
-    <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\lib\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
-  </PropertyGroup>
-  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
+  <!--
+    copied from Microsoft.CSharp.targets
+    because we have webservices, we need to SGEN
+    but it's getting confused by us referencing System.ValueTuple which it cannot load
+
+      Name="UmbGenerateSerializationAssemblies"
+      Condition="'$(_SGenGenerateSerializationAssembliesConfig)' == 'On' or ('@(WebReferenceUrl)'!='' and '$(_SGenGenerateSerializationAssembliesConfig)' == 'Auto')"
+  -->
+  <Target Name="AfterBuild" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(IntermediateOutputPath)$(_SGenDllName)">
+    <PropertyGroup>
+      <SGenMSBuildArchitecture Condition="'$(SGenMSBuildArchitecture)' == ''">$(PlatformTargetAsMSBuildArchitecture)</SGenMSBuildArchitecture>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- we want to exclude all facade references ?! -->
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
+    </ItemGroup>
+    <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
+    <!--
+     ShouldGenerateSerializer="$(SGenShouldGenerateSerializer)"
+     -->
+    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(IntermediateOutputPath)" References="@(FixedReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="$(SGenUseProxyTypes)" UseKeep="$(SGenUseKeep)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)" SdkToolsPath="$(TargetFrameworkSDKToolsDirectory)" EnvironmentVariables="$(SGenEnvironment)" MSBuildArchitecture="$(SGenMSBuildArchitecture)" SerializationAssembly="$(IntermediateOutputPath)$(_SGenDllName)" Platform="$(SGenPlatformTarget)" Types="$(SGenSerializationTypes)">
+      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />
+    </SGen>
+  </Target>
 </Project>

@@ -1,4 +1,4 @@
-<div class="umb-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
+<div class="umb-property-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
     <p ng-if="(mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
@@ -11,6 +11,10 @@
                     <localize key="mediaPicker_trashed"></localize>
                     <i class="icon-trash" aria-hidden="true"></i>
                 </p>
+
+                <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
+                    <div class="umb-button__progress"></div>
+                </div>
 
                 <!-- IMAGE -->
                 <img ng-if="media.thumbnail"
@@ -36,7 +40,7 @@
                 </div>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="goToItem(media)">
+                    <a ng-if="allowEditMedia" class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(media)">
                         <i class="icon icon-edit"></i>
                     </a>
                     <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
@@ -44,20 +48,12 @@
                     </a>
                 </div>
             </li>
-            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd()">
+            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd() && allowAddMedia">
                 <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (mediaItems.length === 0 || isMultiPicker)}" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
             </li>
         </ul>
     </div>
-
-    <umb-overlay
-        data-element="overlay-media-picker"
-        ng-if="mediaPickerOverlay.show"
-        model="mediaPickerOverlay"
-        position="right"
-        view="mediaPickerOverlay.view">
-    </umb-overlay>
 
 </div>

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// example, an application), and an action (whatever is consented).</para>
     /// <para>A consent state registers the state of the consent (granted, revoked...).</para>
     /// </remarks>
-    public interface IConsent : IAggregateRoot, IRememberBeingDirty
+    public interface IConsent : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Determines whether the consent entity represents the current state.

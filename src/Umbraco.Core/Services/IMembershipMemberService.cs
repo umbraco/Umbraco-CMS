@@ -106,13 +106,13 @@ namespace Umbraco.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="membershipUser"><see cref="IMember"/> or <see cref="IUser"/> to Delete</param>
         void Delete(T membershipUser);
-        
+
         /// <summary>
         /// Saves an <see cref="IMembershipUser"/>
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(T entity, bool raiseEvents = true);
 
@@ -121,14 +121,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events. 
+        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IEnumerable<T> entities, bool raiseEvents = true);
 
         /// <summary>
         /// Gets the default MemberType alias
         /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
+        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll
         /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
         /// <returns>Alias of the default MemberType</returns>
         string GetDefaultMemberType();
@@ -143,7 +143,7 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total number of records found (out)</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        IEnumerable<T> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+        IEnumerable<T> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial username
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Services
         /// <param name="totalRecords">Total number of records found (out)</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.StartsWith"/></param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        IEnumerable<T> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+        IEnumerable<T> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Gets a list of paged <see cref="IMembershipUser"/> objects
@@ -165,6 +165,6 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize">Size of the page</param>
         /// <param name="totalRecords">Total number of records found (out)</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
-        IEnumerable<T> GetAll(int pageIndex, int pageSize, out int totalRecords);
+        IEnumerable<T> GetAll(long pageIndex, int pageSize, out long totalRecords);
     }
 }

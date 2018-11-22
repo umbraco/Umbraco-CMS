@@ -58,13 +58,14 @@ describe('service: templateHelper', function () {
         it('should return the snippet for a query', function () {
             var queryExpression = "queryExpression";
             var snippet = "\n@{\n" + "\tvar selection = " + queryExpression + ";\n}\n";
-                snippet += "<ul>\n" +
-                            "\t@foreach(var item in selection){\n" +
-                                "\t\t<li>\n" +
-                                    "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
-                                "\t\t</li>\n" +
-                            "\t}\n" +
-                        "</ul>\n\n";
+            snippet += "<ul>\n" +
+                "\t@foreach (var item in selection)\n" +
+                "\t{\n" +
+                "\t\t<li>\n" +
+                "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
+                "\t\t</li>\n" +
+                "\t}\n" +
+                "</ul>\n\n";
 
             expect(templateHelper.getQuerySnippet(queryExpression)).toBe(snippet);
         });

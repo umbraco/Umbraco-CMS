@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web;
 using System.Web.Mvc;
 
@@ -9,9 +9,9 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class DisableBrowserCacheAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuted(ActionExecutedContext filterContext)
+        public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
-            base.OnActionExecuted(filterContext);
+            base.OnResultExecuting(filterContext);
 
             // could happens if exception (but afaik this wouldn't happen in MVC)
             if (filterContext.HttpContext == null || filterContext.HttpContext.Response == null ||
@@ -20,8 +20,20 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
-            filterContext.HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);            
-            filterContext.HttpContext.Response.Cache.SetMaxAge(TimeSpan.Zero);            
+            if (filterContext.IsChildAction)
+            {
+                return;
+            }
+
+            if (filterContext.HttpContext.Response.StatusCode != 200)
+            {
+                return;
+            }
+
+            filterContext.HttpContext.Response.Cache.SetLastModified(DateTime.Now);
+            filterContext.HttpContext.Response.Cache.SetValidUntilExpires(false);
+            filterContext.HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            filterContext.HttpContext.Response.Cache.SetMaxAge(TimeSpan.Zero);
             filterContext.HttpContext.Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
             filterContext.HttpContext.Response.Cache.SetNoStore();
             filterContext.HttpContext.Response.AddHeader("Pragma", "no-cache");

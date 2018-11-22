@@ -112,7 +112,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         {
                             parentId: args.parentId,
                             id: args.id
-                        }),
+                         }, {responseType: 'text'}),
                         {
                         error: function(data){
                             var errorMsg = 'Failed to move media';
@@ -451,12 +451,13 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * Uses the convention of looking for media items with mediaTypes ending in
           * *Folder so will match "Folder", "bannerFolder", "secureFolder" etc,
           *
-          * NOTE: This will return a max of 500 folders, if more is required it needs to be paged
+          * NOTE: This will return a page of max 500 folders, if more is required it needs to be paged
+          *       and then folders are in the .items property of the returned promise data
           *
           * ##usage
           * <pre>
           * mediaResource.getChildFolders(1234)
-          *    .then(function(data) {
+          *    .then(function(page) {
           *        alert('folders');
           *    });
           * </pre>
@@ -477,9 +478,11 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                               "mediaApiBaseUrl",
                               "GetChildFolders",
                             {
-                                id: parentId
+                                id: parentId,
+                                pageNumber: 1,
+                                pageSize: 500
                             })),
-                  'Failed to retrieve child folders for media item ' + parentId);
+                        'Failed to retrieve child folders for media item ' + parentId);
         },
 
         /**

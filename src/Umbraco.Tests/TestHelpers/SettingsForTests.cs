@@ -5,11 +5,17 @@ using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.TestHelpers
 {
     public class SettingsForTests
     {
+        public static void ConfigureSettings(IGlobalSettings settings)
+        {
+            UmbracoConfig.For.SetGlobalConfig(settings);
+        }
+
         // umbracoSettings
 
         /// <summary>
@@ -21,11 +27,28 @@ namespace Umbraco.Tests.TestHelpers
             UmbracoConfig.For.SetUmbracoSettings(settings);
         }
 
+        public static IGlobalSettings GenerateMockGlobalSettings()
+        {
+            var config = Mock.Of<IGlobalSettings>(
+                settings =>
+                    settings.ConfigurationStatus == UmbracoVersion.SemanticVersion.ToSemanticString() &&
+                    settings.UseHttps == false &&
+                    settings.HideTopLevelNodeFromPath == false &&
+                    settings.Path == IOHelper.ResolveUrl("~/umbraco") &&
+                    settings.UseDirectoryUrls == true &&
+                    settings.TimeOutInMinutes == 20 &&
+                    settings.DefaultUILanguage == "en" &&
+                    settings.LocalTempStorageLocation == LocalTempStorage.Default &&
+                    settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
+                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls);
+            return config;
+        }
+
         /// <summary>
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GenerateMockSettings()
+        public static IUmbracoSettingsSection GenerateMockUmbracoSettings()
         {
             var settings = new Mock<IUmbracoSettingsSection>();
 
@@ -33,143 +56,111 @@ namespace Umbraco.Tests.TestHelpers
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
             var templates = new Mock<ITemplatesSection>();
-            var dev = new Mock<IDeveloperSection>();
-            var viewStateMover = new Mock<IViewStateMoverModuleSection>();
             var logging = new Mock<ILoggingSection>();
             var tasks = new Mock<IScheduledTasksSection>();
-            var distCall = new Mock<IDistributedCallSection>();
             var providers = new Mock<IProvidersSection>();
-            
             var routing = new Mock<IWebRoutingSection>();
-            var scripting = new Mock<IScriptingSection>();
 
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
             settings.Setup(x => x.Templates).Returns(templates.Object);
-            settings.Setup(x => x.Developer).Returns(dev.Object);
-            settings.Setup(x => x.ViewStateMoverModule).Returns(viewStateMover.Object);
             settings.Setup(x => x.Logging).Returns(logging.Object);
             settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
-            settings.Setup(x => x.DistributedCall).Returns(distCall.Object);
             settings.Setup(x => x.Providers).Returns(providers.Object);
-            
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
-            settings.Setup(x => x.Scripting).Returns(scripting.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Setup(x => x.Content.UseLegacyXmlSchema).Returns(false);
             settings.Setup(x => x.Content.ForceSafeAliases).Returns(true);
             settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
             settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
             settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
             settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Setup(x => x.Content.UmbracoLibraryCacheDuration).Returns(1800);
             settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
             settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
             settings.Setup(x => x.Providers.DefaultBackOfficeUserProvider).Returns("UsersMembershipProvider");
-            
+
             return settings.Object;
         }
 
-        // from appSettings
+        //// from appSettings
 
-        private static readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();
+        //private static readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();
 
-        static void SaveSetting(string key)
-        {
-            SavedAppSettings[key] = ConfigurationManager.AppSettings[key];
-        }
+        //static void SaveSetting(string key)
+        //{
+        //    SavedAppSettings[key] = ConfigurationManager.AppSettings[key];
+        //}
 
-        static void SaveSettings()
-        {
-            SaveSetting("umbracoHideTopLevelNodeFromPath");
-            SaveSetting("umbracoUseDirectoryUrls");
-            SaveSetting("umbracoPath");
-            SaveSetting("umbracoReservedPaths");
-            SaveSetting("umbracoReservedUrls");
-            SaveSetting("umbracoConfigurationStatus");
-        }
+        //static void SaveSettings()
+        //{
+        //    SaveSetting("umbracoHideTopLevelNodeFromPath");
+        //    SaveSetting("umbracoUseDirectoryUrls");
+        //    SaveSetting("umbracoPath");
+        //    SaveSetting("umbracoReservedPaths");
+        //    SaveSetting("umbracoReservedUrls");
+        //    SaveSetting("umbracoConfigurationStatus");
+        //}
 
-        public static bool HideTopLevelNodeFromPath
-        {
-            get { return GlobalSettings.HideTopLevelNodeFromPath; }
-            set { ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", value ? "true" : "false"); }
-        }
-
-        public static bool UseDirectoryUrls
-        {
-            get { return GlobalSettings.UseDirectoryUrls; }
-            set { ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", value ? "true" : "false"); }
-        }
-
-        public static string UmbracoPath
-        {
-            get { return GlobalSettings.Path; }
-            set { ConfigurationManager.AppSettings.Set("umbracoPath", value); }
-        }
-
-        public static string ReservedPaths
-        {
-            get { return GlobalSettings.ReservedPaths; }
-            set { GlobalSettings.ReservedPaths = value; }
-        }
-
-        public static string ReservedUrls
-        {
-            get { return GlobalSettings.ReservedUrls; }
-            set { GlobalSettings.ReservedUrls = value; }
-        }
-
-        public static string ConfigurationStatus
-        {
-            get { return GlobalSettings.ConfigurationStatus; }
-            set { ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", value); }
-        }
+      
 
         // reset & defaults
 
-        static SettingsForTests()
-        {
-            SaveSettings();
-        }
+        //static SettingsForTests()
+        //{
+        //    //SaveSettings();
+        //}
 
         public static void Reset()
         {
-            ResetUmbracoSettings();
+            ResetSettings();
             GlobalSettings.Reset();
 
-            foreach (var kvp in SavedAppSettings)
-                ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
+            //foreach (var kvp in SavedAppSettings)
+            //    ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
 
-            // set some defaults that are wrong in the config file?!
-            // this is annoying, really
-            HideTopLevelNodeFromPath = false;
+            //// set some defaults that are wrong in the config file?!
+            //// this is annoying, really
+            //HideTopLevelNodeFromPath = false;
         }
 
         /// <summary>
         /// This sets all settings back to default settings
         /// </summary>
-        private static void ResetUmbracoSettings()
+        private static void ResetSettings()
         {
-            ConfigureSettings(GetDefault());
+            _defaultGlobalSettings = null;
+            ConfigureSettings(GetDefaultUmbracoSettings());
+            ConfigureSettings(GetDefaultGlobalSettings());
         }
 
-        private static IUmbracoSettingsSection _defaultSettings;
+        private static IUmbracoSettingsSection _defaultUmbracoSettings;
+        private static IGlobalSettings _defaultGlobalSettings;
 
-        internal static IUmbracoSettingsSection GetDefault()
+        internal static IGlobalSettings GetDefaultGlobalSettings()
         {
-            if (_defaultSettings == null)
+            if (_defaultGlobalSettings == null)
             {
+                _defaultGlobalSettings = GenerateMockGlobalSettings();
+            }
+            return _defaultGlobalSettings;
+        }
+
+        internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
+        {
+            if (_defaultUmbracoSettings == null)
+            {
+                //TODO: Just make this mocks instead of reading from the config
+
                 var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 
-                var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
+                var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = config.FullName };
                 var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                _defaultSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+                _defaultUmbracoSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
             }
 
-            return _defaultSettings;
+            return _defaultUmbracoSettings;
         }
     }
 }

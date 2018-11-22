@@ -11,7 +11,7 @@
 	min-height: 100%;
 }
 .shadow {
-	box-shadow: 3px 0px 7px @gray-8;
+	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
 .umb-scrollable, .umb-auto-overflow {
@@ -48,6 +48,7 @@ h5.-black {
     border: none
 }
 .bootstrap-datetimepicker-widget {
+  width: auto !important;
     td {
         &.active, span.active {
             background: @turquoise !important;
@@ -116,7 +117,7 @@ h5.-black {
 
 /* FORM GRID */
 .umb-pane {
-  margin: 30px 20px;
+  margin: 20px;
 }
 .umb-control-group {
   border-bottom: 1px solid @gray-10;
@@ -126,6 +127,12 @@ h5.-black {
 
 .umb-control-group.-no-border {
   border: none;
+}
+
+.umb-property:last-of-type .umb-control-group {
+  border: none;
+  margin-bottom: 0 !important;
+  padding-bottom: 0;
 }
 
 /* BLOCK MODE */
@@ -228,12 +235,12 @@ label:not([for]) {
   align-items: center;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny {
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny {
   margin-left: 5px;
   margin-right: 5px;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny:first-child {
   margin-left: 0;
 }
 
@@ -449,15 +456,6 @@ table thead a {
     height: 100%;
 }
 
-#search-form .form-search div {
-    margin-top:3px;
-}
-#search-form .form-search div .btn {
-    position:relative;
-    top:0;
-    left:0;
-}
-
 /* DICTIONARY */
 #dictionaryItems tr {
     border-top:solid 1px @gray-8;
@@ -654,6 +652,15 @@ input[type=checkbox]:checked + .input-label--small {
 	border-radius: 0 !important;
 }
 
+.diff del {
+  background-color: @red-l3;
+}
+
+.diff ins {
+  background-color: @green-l3;
+  text-decoration: none;
+}
+
 .visuallyhidden{
     position: absolute !important;
 	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
@@ -664,3 +671,4 @@ input[type=checkbox]:checked + .input-label--small {
 	width: 1px !important;
 	overflow: hidden;
 }
+

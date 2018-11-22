@@ -1,28 +1,35 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
+		..\build\build.ps1 = ..\build\build.ps1
+		..\NuGet.Config = ..\NuGet.Config
+		SolutionInfo.cs = SolutionInfo.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\apidocs\docfx.filter.yml = ..\apidocs\docfx.filter.yml
-		..\apidocs\docfx.json = ..\apidocs\docfx.json
-		..\apidocs\index.md = ..\apidocs\index.md
+		..\docs\BUILD.md = ..\docs\BUILD.md
+		..\docs\CODE_OF_CONDUCT.md = ..\docs\CODE_OF_CONDUCT.md
+		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
 		..\LICENSE.md = ..\LICENSE.md
-		..\apidocs\toc.yml = ..\apidocs\toc.yml
+		..\docs\PULL_REQUEST_TEMPLATE.md = ..\docs\PULL_REQUEST_TEMPLATE.md
+		..\docs\README.md = ..\docs\README.md
+		..\docs\V8_GETTING_STARTED.md = ..\docs\V8_GETTING_STARTED.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build.ps1 = ..\build\build.ps1
-		..\build\setversion.ps1 = ..\build\setversion.ps1
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
+		..\build\NuSpecs\UmbracoCms.Web.nuspec = ..\build\NuSpecs\UmbracoCms.Web.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -50,45 +57,22 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco.businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.cms", "umbraco.cms\umbraco.cms.csproj", "{CCD75EC3-63DB-4184-B49D-51C1DD337230}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.interfaces", "umbraco.interfaces\umbraco.interfaces.csproj", "{511F6D8D-7717-440A-9A57-A507E9A8B27F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.editorControls", "umbraco.editorControls\umbraco.editorControls.csproj", "{255F5DF1-4E43-4758-AC05-7A0B68EB021B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.providers", "umbraco.providers\umbraco.providers.csproj", "{D7636876-0756-43CB-A192-138C6F0D5E42}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "umbraco.datalayer\umbraco.datalayer.csproj", "{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.controls", "umbraco.controls\umbraco.controls.csproj", "{6EDD2061-82F2-461B-BB6E-879245A832DE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCE4Umbraco", "SQLCE4Umbraco\SqlCE4Umbraco.csproj", "{5BA5425F-27A7-4677-865E-82246498AA2E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Tests\Umbraco.Tests.csproj", "{5D3B8245-ADA6-453F-A008-50ED04BFE770}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine", "UmbracoExamine\UmbracoExamine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine", "Umbraco.Examine\Umbraco.Examine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\tools\applications.config.install.xdt = ..\build\NuSpecs\tools\applications.config.install.xdt
-		..\build\NuSpecs\tools\cache.config.install.xdt = ..\build\NuSpecs\tools\cache.config.install.xdt
 		..\build\NuSpecs\tools\ClientDependency.config.install.xdt = ..\build\NuSpecs\tools\ClientDependency.config.install.xdt
 		..\build\NuSpecs\tools\Dashboard.config.install.xdt = ..\build\NuSpecs\tools\Dashboard.config.install.xdt
 		..\build\NuSpecs\tools\install.core.ps1 = ..\build\NuSpecs\tools\install.core.ps1
 		..\build\NuSpecs\tools\install.ps1 = ..\build\NuSpecs\tools\install.ps1
-		..\build\NuSpecs\tools\log4net.config.install.xdt = ..\build\NuSpecs\tools\log4net.config.install.xdt
-		..\build\NuSpecs\tools\processing.config.install.xdt = ..\build\NuSpecs\tools\processing.config.install.xdt
 		..\build\NuSpecs\tools\Readme.txt = ..\build\NuSpecs\tools\Readme.txt
 		..\build\NuSpecs\tools\ReadmeUpgrade.txt = ..\build\NuSpecs\tools\ReadmeUpgrade.txt
 		..\build\NuSpecs\tools\trees.config.install.xdt = ..\build\NuSpecs\tools\trees.config.install.xdt
-		..\build\NuSpecs\tools\umbracoSettings.config.install.xdt = ..\build\NuSpecs\tools\umbracoSettings.config.install.xdt
-		..\build\NuSpecs\tools\Views.Web.config.install.xdt = ..\build\NuSpecs\tools\Views.Web.config.install.xdt
 		..\build\NuSpecs\tools\Web.config.install.xdt = ..\build\NuSpecs\tools\Web.config.install.xdt
 	EndProjectSection
 EndProject
@@ -98,7 +82,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E
 		..\build\NuSpecs\build\UmbracoCms.targets = ..\build\NuSpecs\build\UmbracoCms.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
+	ProjectSection(SolutionItems) = preProject
+		ApiDocs\docfx.filter.yml = ApiDocs\docfx.filter.yml
+		ApiDocs\docfx.json = ApiDocs\docfx.json
+		ApiDocs\index.md = ApiDocs\index.md
+		ApiDocs\toc.yml = ApiDocs\toc.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,42 +108,6 @@ Global
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCD75EC3-63DB-4184-B49D-51C1DD337230}.Release|Any CPU.Build.0 = Release|Any CPU
-		{511F6D8D-7717-440A-9A57-A507E9A8B27F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{511F6D8D-7717-440A-9A57-A507E9A8B27F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{511F6D8D-7717-440A-9A57-A507E9A8B27F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{511F6D8D-7717-440A-9A57-A507E9A8B27F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{255F5DF1-4E43-4758-AC05-7A0B68EB021B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{255F5DF1-4E43-4758-AC05-7A0B68EB021B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{255F5DF1-4E43-4758-AC05-7A0B68EB021B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{255F5DF1-4E43-4758-AC05-7A0B68EB021B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7636876-0756-43CB-A192-138C6F0D5E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7636876-0756-43CB-A192-138C6F0D5E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7636876-0756-43CB-A192-138C6F0D5E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7636876-0756-43CB-A192-138C6F0D5E42}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BA5425F-27A7-4677-865E-82246498AA2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BA5425F-27A7-4677-865E-82246498AA2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BA5425F-27A7-4677-865E-82246498AA2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BA5425F-27A7-4677-865E-82246498AA2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -164,10 +120,10 @@ Global
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,9 +133,10 @@ Global
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
-		{86DEB346-089F-4106-89C8-D852B9CF2A33} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
+		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B9072511-2B53-4676-9D37-2BAF47662040}
+		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
 	EndGlobalSection
 EndGlobal

@@ -13,7 +13,7 @@ namespace Umbraco.Web
     /// </summary>
     /// <remarks>
     /// This should 100% supercede the StateManager.Cookies
-    /// </remarks> 
+    /// </remarks>
     internal static class HttpCookieExtensions
     {
         /// <summary>
@@ -23,7 +23,7 @@ namespace Umbraco.Web
         /// <param name="cookieName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// Adapted from: https://stackoverflow.com/a/29057304/5018 because there's an issue with .NET WebApi cookie parsing logic 
+        /// Adapted from: https://stackoverflow.com/a/29057304/5018 because there's an issue with .NET WebApi cookie parsing logic
         /// when using requestHeaders.GetCookies() when an invalid cookie name is present.
         /// </remarks>
         public static string GetCookieValue(this HttpRequestHeaders requestHeaders, string cookieName)
@@ -32,7 +32,7 @@ namespace Umbraco.Web
             {
                 if (header.Key.Equals("Cookie", StringComparison.InvariantCultureIgnoreCase) == false)
                     continue;
-                
+
                 var cookiesHeaderValue = header.Value.FirstOrDefault();
                 if (cookiesHeaderValue == null)
                     return null;
@@ -74,6 +74,16 @@ namespace Umbraco.Web
             }
         }
 
+        /// <summary>
+        /// Removes the cookie from the request and the response if it exists
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="cookieName"></param>
+        public static void ExpireCookie(this HttpContext http, string cookieName)
+        {
+            new HttpContextWrapper(http).ExpireCookie(cookieName);
+        }
+
         public static string GetPreviewCookieValue(this HttpRequestMessage request)
         {
             var cookie = request.Headers.GetCookies(Constants.Web.PreviewCookieName).FirstOrDefault();
@@ -85,6 +95,16 @@ namespace Umbraco.Web
                 }
             }
             return null;
+        }
+
+        public static string GetPreviewCookieValue(this HttpRequestBase request)
+        {
+            return request.GetCookieValue(Constants.Web.PreviewCookieName);
+        }
+
+        public static string GetPreviewCookieValue(this HttpRequest request)
+        {
+            return new HttpRequestWrapper(request).GetPreviewCookieValue();
         }
 
         /// <summary>
@@ -102,9 +122,49 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        public static bool HasPreviewCookie(this HttpRequest request)
+        {
+            return new HttpRequestWrapper(request).HasPreviewCookie();
+        }
+
+        /// <summary>
+        /// Does a preview cookie exist ?
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public static bool HasPreviewCookie(this IOwinRequest request)
         {
             return request.Cookies[Constants.Web.PreviewCookieName] != null;
+        }
+
+        /// <summary>
+        /// Returns the cookie's string value
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cookieName"></param>
+        /// <returns></returns>
+        public static string GetCookieValue(this HttpRequestBase request, string cookieName)
+        {
+            var cookie = request.Cookies.Get(cookieName);
+            if (cookie != null)
+            {
+                if (cookie.Value.IsNullOrWhiteSpace() == false)
+                {
+                    return cookie.Value;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the cookie's string value
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cookieName"></param>
+        /// <returns></returns>
+        public static string GetCookieValue(this HttpRequest request, string cookieName)
+        {
+            return new HttpRequestWrapper(request).GetCookieValue(cookieName);
         }
 
         /// <summary>
@@ -114,6 +174,17 @@ namespace Umbraco.Web
         /// <param name="key"></param>
         /// <returns></returns>
         public static bool HasCookie(this HttpRequestBase request, string key)
+        {
+            return request.Cookies[key] != null;
+        }
+
+        /// <summary>
+        /// Does a cookie exist with the specified key ?
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static bool HasCookie(this HttpRequest request, string key)
         {
             return request.Cookies[key] != null;
         }
@@ -129,6 +200,17 @@ namespace Umbraco.Web
             return request.Cookies[key] != null
                    && request.Cookies[key].Value != null
                    && request.Cookies[key].Value.IsNullOrWhiteSpace() == false;
+        }
+
+        /// <summary>
+        /// Is there a cookie with the key supplied and does it have a value that is not empty
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static bool HasCookieValue(this HttpRequest request, string key)
+        {
+            return new HttpRequestWrapper(request).HasCookieValue(key);
         }
     }
 }

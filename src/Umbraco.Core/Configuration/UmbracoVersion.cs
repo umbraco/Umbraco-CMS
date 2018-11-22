@@ -1,43 +1,95 @@
 ﻿using System;
+using System.Configuration;
 using System.Reflection;
 using Semver;
 
 namespace Umbraco.Core.Configuration
 {
-    public class UmbracoVersion
+    /// <summary>
+    /// Represents the version of the executing code.
+    /// </summary>
+    public static class UmbracoVersion
     {
-        private static readonly Version Version = new Version("7.13.0");
-
-        /// <summary>
-        /// Gets the current version of Umbraco.
-        /// Version class with the specified major, minor, build (Patch), and revision numbers.
-        /// </summary>
-        /// <remarks>
-        /// CURRENT UMBRACO VERSION ID.
-        /// </remarks>
-        public static Version Current
+        static UmbracoVersion()
         {
-            get { return Version; }
+            var umbracoCoreAssembly = typeof(UmbracoVersion).Assembly;
+
+            // gets the value indicated by the AssemblyVersion attribute
+            AssemblyVersion = umbracoCoreAssembly.GetName().Version;
+
+            // gets the value indicated by the AssemblyFileVersion attribute
+            AssemblyFileVersion = System.Version.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version);
+
+            // gets the value indicated by the AssemblyInformationalVersion attribute
+            // this is the true semantic version of the Umbraco Cms
+            SemanticVersion = SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
+
+            // gets the non-semantic version
+            Current = SemanticVersion.GetVersion(3);
         }
 
         /// <summary>
-        /// Gets the version comment (like beta or RC).
+        /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        /// <value>The version comment.</value>
-        public static string CurrentComment { get { return ""; } }
+        // TODO rename to Version
+        public static Version Current { get; }
 
-        // Get the version of the umbraco.dll by looking at a class in that dll
-        // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
-        public static string AssemblyVersion { get { return new AssemblyName(typeof(ActionsResolver).Assembly.FullName).Version.ToString(); } }
+        /// <summary>
+        /// Gets the semantic version comments of the Umbraco code.
+        /// </summary>
+        public static string Comment => SemanticVersion.Prerelease;
 
-        public static SemVersion GetSemanticVersion()
+        /// <summary>
+        /// Gets the assembly version of the Umbraco code.
+        /// </summary>
+        /// <remarks>
+        /// <para>The assembly version is the value of the <see cref="AssemblyVersionAttribute"/>.</para>
+        /// <para>Is is the one that the CLR checks for compatibility. Therefore, it changes only on
+        /// hard-breaking changes (for instance, on new major versions).</para>
+        /// </remarks>
+        public static Version AssemblyVersion {get; }
+
+        /// <summary>
+        /// Gets the assembly file version of the Umbraco code.
+        /// </summary>
+        /// <remarks>
+        /// <para>The assembly version is the value of the <see cref="AssemblyFileVersionAttribute"/>.</para>
+        /// </remarks>
+        public static Version AssemblyFileVersion { get; }
+
+        /// <summary>
+        /// Gets the semantic version of the Umbraco code.
+        /// </summary>
+        /// <remarks>
+        /// <para>The semantic version is the value of the <see cref="AssemblyInformationalVersionAttribute"/>.</para>
+        /// <para>It is the full version of Umbraco, including comments.</para>
+        /// </remarks>
+        public static SemVersion SemanticVersion { get; }
+
+        /// <summary>
+        /// Gets the "local" version of the site.
+        /// </summary>
+        /// <remarks>
+        /// <para>Three things have a version, really: the executing code, the database model,
+        /// and the site/files. The database model version is entirely managed via migrations,
+        /// and changes during an upgrade. The executing code version changes when new code is
+        /// deployed. The site/files version changes during an upgrade.</para>
+        /// </remarks>
+        public static SemVersion LocalVersion
         {
-            return new SemVersion(
-                Current.Major,
-                Current.Minor,
-                Current.Build,
-                CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
-                Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
+            get
+            {
+                try
+                {
+                    // fixme - this should live in its own independent file! NOT web.config!
+                    var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+                    return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
         }
     }
 }

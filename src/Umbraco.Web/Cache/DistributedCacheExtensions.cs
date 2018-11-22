@@ -1,42 +1,37 @@
-using System;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
+﻿using System.Linq;
 using Umbraco.Core.Models;
-using umbraco;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
 {
     /// <summary>
-    /// Extension methods for <see cref="DistributedCache"/>
+    /// Extension methods for <see cref="DistributedCache"/>.
     /// </summary>
     internal static class DistributedCacheExtensions
     {
-        #region Public access
+        #region PublicAccessCache
 
         public static void RefreshPublicAccess(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.PublicAccessCacheRefresherGuid);
+            dc.RefreshAll(PublicAccessCacheRefresher.UniqueId);
         }
 
         #endregion
 
-        #region Application tree cache
+        #region ApplicationTreeCache
 
         public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.ApplicationTreeCacheRefresherGuid);
+            dc.RefreshAll(ApplicationTreeCacheRefresher.UniqueId);
         }
 
         #endregion
 
-        #region Application cache
+        #region ApplicationCache
 
         public static void RefreshAllApplicationCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.ApplicationCacheRefresherGuid);
+            dc.RefreshAll(ApplicationCacheRefresher.UniqueId);
         }
 
         #endregion
@@ -45,17 +40,17 @@ namespace Umbraco.Web.Cache
 
         public static void RemoveUserCache(this DistributedCache dc, int userId)
         {
-            dc.Remove(DistributedCache.UserCacheRefresherGuid, userId);
+            dc.Remove(UserCacheRefresher.UniqueId, userId);
         }
 
         public static void RefreshUserCache(this DistributedCache dc, int userId)
         {
-            dc.Refresh(DistributedCache.UserCacheRefresherGuid, userId);
+            dc.Refresh(UserCacheRefresher.UniqueId, userId);
         }
 
         public static void RefreshAllUserCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.UserCacheRefresherGuid);
+            dc.RefreshAll(UserCacheRefresher.UniqueId);
         }
 
         #endregion
@@ -64,326 +59,199 @@ namespace Umbraco.Web.Cache
 
         public static void RemoveUserGroupCache(this DistributedCache dc, int userId)
         {
-            dc.Remove(DistributedCache.UserGroupCacheRefresherGuid, userId);
+            dc.Remove(UserGroupCacheRefresher.UniqueId, userId);
         }
 
         public static void RefreshUserGroupCache(this DistributedCache dc, int userId)
         {
-            dc.Refresh(DistributedCache.UserGroupCacheRefresherGuid, userId);
+            dc.Refresh(UserGroupCacheRefresher.UniqueId, userId);
         }
 
         public static void RefreshAllUserGroupCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.UserGroupCacheRefresherGuid);
+            dc.RefreshAll(UserGroupCacheRefresher.UniqueId);
         }
 
         #endregion
 
-        #region User group permissions cache
 
-        public static void RemoveUserGroupPermissionsCache(this DistributedCache dc, int groupId)
-        {
-            dc.Remove(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
-        }
-
-        public static void RefreshUserGroupPermissionsCache(this DistributedCache dc, int groupId)
-        {
-            //TODO: Not sure if we need this yet depends if we start caching permissions
-            //dc.Refresh(DistributedCache.UserGroupPermissionsCacheRefresherGuid, groupId);
-        }
-
-        public static void RefreshAllUserGroupPermissionsCache(this DistributedCache dc)
-        {
-            dc.RefreshAll(DistributedCache.UserGroupPermissionsCacheRefresherGuid);
-        }
-
-        #endregion
-
-        #region Template cache
+        #region TemplateCache
 
         public static void RefreshTemplateCache(this DistributedCache dc, int templateId)
         {
-            dc.Refresh(DistributedCache.TemplateRefresherGuid, templateId);
+            dc.Refresh(TemplateCacheRefresher.UniqueId, templateId);
         }
 
         public static void RemoveTemplateCache(this DistributedCache dc, int templateId)
         {
-            dc.Remove(DistributedCache.TemplateRefresherGuid, templateId);
-        } 
+            dc.Remove(TemplateCacheRefresher.UniqueId, templateId);
+        }
 
         #endregion
 
-        #region Dictionary cache
+        #region DictionaryCache
 
         public static void RefreshDictionaryCache(this DistributedCache dc, int dictionaryItemId)
         {
-            dc.Refresh(DistributedCache.DictionaryCacheRefresherGuid, dictionaryItemId);
+            dc.Refresh(DictionaryCacheRefresher.UniqueId, dictionaryItemId);
         }
 
         public static void RemoveDictionaryCache(this DistributedCache dc, int dictionaryItemId)
         {
-            dc.Remove(DistributedCache.DictionaryCacheRefresherGuid, dictionaryItemId);
+            dc.Remove(DictionaryCacheRefresher.UniqueId, dictionaryItemId);
         }
 
         #endregion
-        
-        #region Data type cache     
 
-        public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        #region DataTypeCache
+
+        public static void RefreshDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
             if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, false) };
+            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RemoveDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        public static void RemoveDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
             if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true) };
+            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
 
-        #region Page cache
+        #region ContentCache
 
-        public static void RefreshAllPageCache(this DistributedCache dc)
+        public static void RefreshAllContentCache(this DistributedCache dc)
         {
-            dc.RefreshAll(DistributedCache.PageCacheRefresherGuid);
+            var payloads = new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) };
+
+            // note: refresh all content cache does refresh content types too
+            dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RefreshPageCache(this DistributedCache dc, int documentId)
+        public static void RefreshContentCache(this DistributedCache dc, TreeChange<IContent>[] changes)
         {
-            dc.Refresh(DistributedCache.PageCacheRefresherGuid, documentId);
-        }
+            if (changes.Length == 0) return;
 
-        public static void RefreshPageCache(this DistributedCache dc, params IContent[] content)
-        {
-            dc.Refresh(DistributedCache.PageCacheRefresherGuid, x => x.Id, content);
-        }
+            var payloads = changes
+                .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.ChangeTypes));
 
-        public static void RemovePageCache(this DistributedCache dc, params IContent[] content)
-        {
-            dc.Remove(DistributedCache.PageCacheRefresherGuid, x => x.Id, content);
-        }
-
-        public static void RemovePageCache(this DistributedCache dc, int documentId)
-        {
-            dc.Remove(DistributedCache.PageCacheRefresherGuid, documentId);
-        }
-
-        public static void RefreshUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
-        {
-            dc.Refresh(DistributedCache.UnpublishedPageCacheRefresherGuid, x => x.Id, content);
-        }
-
-        public static void RemoveUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
-        {
-            dc.Remove(DistributedCache.UnpublishedPageCacheRefresherGuid, x => x.Id, content);
-        }
-
-        public static void RemoveUnpublishedCachePermanently(this DistributedCache dc, params int[] contentIds)
-        {
-            dc.RefreshByJson(DistributedCache.UnpublishedPageCacheRefresherGuid, UnpublishedPageCacheRefresher.SerializeToJsonPayloadForPermanentDeletion(contentIds));
+            dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
 
-        #region Member cache
+        #region MemberCache
 
         public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            dc.Refresh(DistributedCache.MemberCacheRefresherGuid, x => x.Id, members);
+            dc.Refresh(MemberCacheRefresher.UniqueId, x => x.Id, members);
         }
 
         public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            dc.Remove(DistributedCache.MemberCacheRefresherGuid, x => x.Id, members);
-        } 
-
-        [Obsolete("Use the RefreshMemberCache with strongly typed IMember objects instead")]
-        public static void RefreshMemberCache(this DistributedCache dc, int memberId)
-        {
-            dc.Refresh(DistributedCache.MemberCacheRefresherGuid, memberId);
+            dc.Remove(MemberCacheRefresher.UniqueId, x => x.Id, members);
         }
 
-        [Obsolete("Use the RemoveMemberCache with strongly typed IMember objects instead")]
-        public static void RemoveMemberCache(this DistributedCache dc, int memberId)
-        {
-            dc.Remove(DistributedCache.MemberCacheRefresherGuid, memberId);
-        } 
 
         #endregion
 
-        #region Member group cache
+        #region MemberGroupCache
 
         public static void RefreshMemberGroupCache(this DistributedCache dc, int memberGroupId)
         {
-            dc.Refresh(DistributedCache.MemberGroupCacheRefresherGuid, memberGroupId);
+            dc.Refresh(MemberGroupCacheRefresher.UniqueId, memberGroupId);
         }
 
         public static void RemoveMemberGroupCache(this DistributedCache dc, int memberGroupId)
         {
-            dc.Remove(DistributedCache.MemberGroupCacheRefresherGuid, memberGroupId);
+            dc.Remove(MemberGroupCacheRefresher.UniqueId, memberGroupId);
         }
 
         #endregion
 
-        #region Media Cache
-        
-        public static void RefreshMediaCache(this DistributedCache dc, params IMedia[] media)
+        #region MediaCache
+
+        public static void RefreshAllMediaCache(this DistributedCache dc)
         {
-            dc.RefreshByJson(DistributedCache.MediaCacheRefresherGuid, MediaCacheRefresher.SerializeToJsonPayload(MediaCacheRefresher.OperationType.Saved, media));
+            var payloads = new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) };
+
+            // note: refresh all media cache does refresh content types too
+            dc.RefreshByPayload(MediaCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RefreshMediaCacheAfterMoving(this DistributedCache dc, params MoveEventInfo<IMedia>[] media)
+        public static void RefreshMediaCache(this DistributedCache dc, TreeChange<IMedia>[] changes)
         {
-            dc.RefreshByJson(DistributedCache.MediaCacheRefresherGuid, MediaCacheRefresher.SerializeToJsonPayloadForMoving(MediaCacheRefresher.OperationType.Saved, media));
-        }
+            if (changes.Length == 0) return;
 
-        // clearing by Id will never work for load balanced scenarios for media since we require a Path
-        // to clear all of the cache but the media item will be removed before the other servers can
-        // look it up. Only here for legacy purposes.
-        [Obsolete("Ensure to clear with other RemoveMediaCache overload")]
-        public static void RemoveMediaCache(this DistributedCache dc, int mediaId)
-        {
-            dc.Remove(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
-        }
+            var payloads = changes
+                .Select(x => new MediaCacheRefresher.JsonPayload(x.Item.Id, x.ChangeTypes));
 
-        public static void RemoveMediaCacheAfterRecycling(this DistributedCache dc, params MoveEventInfo<IMedia>[] media)
-        {
-            dc.RefreshByJson(DistributedCache.MediaCacheRefresherGuid, MediaCacheRefresher.SerializeToJsonPayloadForMoving(MediaCacheRefresher.OperationType.Trashed, media));
-        }
-
-        public static void RemoveMediaCachePermanently(this DistributedCache dc, params int[] mediaIds)
-        {
-            dc.RefreshByJson(DistributedCache.MediaCacheRefresherGuid, MediaCacheRefresher.SerializeToJsonPayloadForPermanentDeletion(mediaIds));
+            dc.RefreshByPayload(MediaCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
 
-        #region Macro Cache
+        #region Published Snapshot
 
-        public static void ClearAllMacroCacheOnCurrentServer(this DistributedCache dc)
+        public static void RefreshAllPublishedSnapshot(this DistributedCache dc)
         {
-            var macroRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.MacroCacheRefresherGuid);
-            macroRefresher.RefreshAll();
+            // note: refresh all content & media caches does refresh content types too
+            dc.RefreshAllContentCache();
+            dc.RefreshAllMediaCache();
+            dc.RefreshAllDomainCache();
         }
+
+        #endregion
+
+        #region MacroCache
 
         public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
+            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
         }
 
         public static void RemoveMacroCache(this DistributedCache dc, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
-        }
-
-        public static void RefreshMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
-        {
-            if (macro == null) return;
-            dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
-        }
-        
-        public static void RemoveMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
-        {
-            if (macro == null) return;
-            dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
-        }
-
-        public static void RemoveMacroCache(this DistributedCache dc, macro macro)
-        {
-            if (macro == null || macro.Model == null) return;
-            dc.RefreshByJson(DistributedCache.MacroCacheRefresherGuid, MacroCacheRefresher.SerializeToJsonPayload(macro));
-        } 
-
-        #endregion
-
-        #region Document type cache
-
-        public static void RefreshContentTypeCache(this DistributedCache dc, IContentType contentType)
-        {
-            if (contentType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, contentType));
-        }
-
-        public static void RemoveContentTypeCache(this DistributedCache dc, IContentType contentType)
-        {
-            if (contentType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, contentType));
+            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
         }
 
         #endregion
 
-        #region Media type cache
+        #region Content/Media/Member type cache
 
-        public static void RefreshMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
+        public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IContentType>[] changes)
         {
-            if (mediaType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, mediaType));
+            if (changes.Length == 0) return;
+
+            var payloads = changes
+                .Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof (IContentType).Name, x.Item.Id, x.ChangeTypes));
+
+            dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RemoveMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
+        public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IMediaType>[] changes)
         {
-            if (mediaType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
+            if (changes.Length == 0) return;
+
+            var payloads = changes
+                .Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IMediaType).Name, x.Item.Id, x.ChangeTypes));
+
+            dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, payloads);
         }
 
-        #endregion
-
-        #region Media type cache
-
-        public static void RefreshMemberTypeCache(this DistributedCache dc, IMemberType memberType)
+        public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IMemberType>[] changes)
         {
-            if (memberType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(false, memberType));
-        }
+            if (changes.Length == 0) return;
 
-        public static void RemoveMemberTypeCache(this DistributedCache dc, IMemberType memberType)
-        {
-            if (memberType == null) return;
-            dc.RefreshByJson(DistributedCache.ContentTypeCacheRefresherGuid, ContentTypeCacheRefresher.SerializeToJsonPayload(true, memberType));
-        }
+            var payloads = changes
+                .Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IMemberType).Name, x.Item.Id, x.ChangeTypes));
 
-        #endregion
-
-        #region Stylesheet Cache
-
-        public static void RefreshStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
-        {
-            if (styleSheetProperty == null) return;
-            dc.Refresh(DistributedCache.StylesheetPropertyCacheRefresherGuid, styleSheetProperty.Id);
-        }
-
-        public static void RemoveStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
-        {
-            if (styleSheetProperty == null) return;
-            dc.Remove(DistributedCache.StylesheetPropertyCacheRefresherGuid, styleSheetProperty.Id);
-        }
-
-        public static void RefreshStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Refresh(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RemoveStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Remove(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RefreshStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Refresh(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
-        }
-
-        public static void RemoveStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
-        {
-            if (styleSheet == null) return;
-            dc.Remove(DistributedCache.StylesheetCacheRefresherGuid, styleSheet.Id);
+            dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
@@ -393,19 +261,21 @@ namespace Umbraco.Web.Cache
         public static void RefreshDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain == null) return;
-            dc.Refresh(DistributedCache.DomainCacheRefresherGuid, domain.Id);
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Refresh) };
+            dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
 
         public static void RemoveDomainCache(this DistributedCache dc, IDomain domain)
         {
             if (domain == null) return;
-            dc.Remove(DistributedCache.DomainCacheRefresherGuid, domain.Id);
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(domain.Id, DomainChangeTypes.Remove) };
+            dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
 
-        public static void ClearDomainCacheOnCurrentServer(this DistributedCache dc)
+        public static void RefreshAllDomainCache(this DistributedCache dc)
         {
-            var domainRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.DomainCacheRefresherGuid);
-            domainRefresher.RefreshAll();
+            var payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) };
+            dc.RefreshByPayload(DomainCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
@@ -415,35 +285,13 @@ namespace Umbraco.Web.Cache
         public static void RefreshLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Refresh(DistributedCache.LanguageCacheRefresherGuid, language.Id);
+            dc.Refresh(LanguageCacheRefresher.UniqueId, language.Id);
         }
 
         public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Remove(DistributedCache.LanguageCacheRefresherGuid, language.Id);
-        }
-
-        public static void RefreshLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
-        {
-            if (language == null) return;
-            dc.Refresh(DistributedCache.LanguageCacheRefresherGuid, language.id);
-        }
-
-        public static void RemoveLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
-        {
-            if (language == null) return;
-            dc.Remove(DistributedCache.LanguageCacheRefresherGuid, language.id);
-        }
-
-        #endregion
-
-        #region Xslt Cache
-
-        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            dc.Remove(LanguageCacheRefresher.UniqueId, language.Id);
         }
 
         #endregion
@@ -452,12 +300,12 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshRelationTypeCache(this DistributedCache dc, int id)
         {
-            dc.Refresh(DistributedCache.RelationTypeCacheRefresherGuid, id);
+            dc.Refresh(RelationTypeCacheRefresher.UniqueId, id);
         }
 
         public static void RemoveRelationTypeCache(this DistributedCache dc, int id)
         {
-            dc.Remove(DistributedCache.RelationTypeCacheRefresherGuid, id);
+            dc.Remove(RelationTypeCacheRefresher.UniqueId, id);
         }
 
         #endregion

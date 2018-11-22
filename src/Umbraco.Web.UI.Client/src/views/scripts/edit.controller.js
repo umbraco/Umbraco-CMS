@@ -5,7 +5,6 @@
 
         var vm = this;
         var currentPosition = null;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -20,9 +19,14 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        
+
+        templateHelper.getGeneralShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
+
+        templateHelper.getEditorShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
 
         vm.script = {};
 
@@ -38,7 +42,6 @@
             vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.script,

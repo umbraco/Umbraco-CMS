@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -8,24 +9,59 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     internal abstract class PublishedPropertyBase : IPublishedProperty
     {
-        public readonly PublishedPropertyType PropertyType;
-
-        protected PublishedPropertyBase(PublishedPropertyType propertyType)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.
+        /// </summary>
+        protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
-            if (propertyType == null)
-                throw new ArgumentNullException("propertyType");
-            PropertyType = propertyType;
+            PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
+            ReferenceCacheLevel = referenceCacheLevel;
+
+            ValidateCacheLevel(ReferenceCacheLevel, true);
+            ValidateCacheLevel(PropertyType.CacheLevel, false);
         }
 
-        public string PropertyTypeAlias
+        // validates the cache level
+        private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel, bool validateUnknown)
         {
-            get { return PropertyType.PropertyTypeAlias; }
+            switch (cacheLevel)
+            {
+                case PropertyCacheLevel.Element:
+                case PropertyCacheLevel.Elements:
+                case PropertyCacheLevel.Snapshot:
+                case PropertyCacheLevel.None:
+                    break;
+                case PropertyCacheLevel.Unknown:
+                    if (!validateUnknown) goto default;
+                    break;
+                default:
+                    throw new Exception($"Invalid cache level \"{cacheLevel}\".");
+            }
         }
 
-        // these have to be provided by the actual implementation
-        public abstract bool HasValue { get; }
-        public abstract object DataValue { get; }
-        public abstract object Value { get; }
-        public abstract object XPathValue { get; }
+        /// <summary>
+        /// Gets the property type.
+        /// </summary>
+        public PublishedPropertyType PropertyType { get; }
+
+        /// <summary>
+        /// Gets the property reference cache level.
+        /// </summary>
+        public PropertyCacheLevel ReferenceCacheLevel { get; }
+
+        /// <inheritdoc />
+        public string Alias => PropertyType.Alias;
+
+        /// <inheritdoc />
+        public abstract bool HasValue(string culture = null, string segment = null);
+
+        /// <inheritdoc />
+        public abstract object GetSourceValue(string culture = null, string segment = null);
+
+        /// <inheritdoc />
+        public abstract object GetValue(string culture = null, string segment = null);
+
+        /// <inheritdoc />
+        public abstract object GetXPathValue(string culture = null, string segment = null);
     }
 }

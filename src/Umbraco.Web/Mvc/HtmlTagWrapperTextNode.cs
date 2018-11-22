@@ -4,7 +4,7 @@ namespace Umbraco.Web.Mvc
 {
     public class HtmlTagWrapperTextNode : IHtmlTagWrapper
     {
-		public string Content { get; private set; }
+        public string Content { get; private set; }
         public HtmlTagWrapperTextNode(string content)
         {
             this.Content = content;

@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         public void Init()
         {
             var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/DashboardSettings/web.config"));
-            
+
             var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
             var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Section_Access()
         {
-            
+
             Assert.AreEqual(3, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.Count());
 
             Assert.AreEqual("translator", SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(0).Value);
@@ -66,9 +66,20 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Section_Tabs()
         {
-            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(0).Tabs.Count());
-            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(1).Tabs.Count());
+            //Element 0 Alias "StartupSettingsDashboardSection"
+            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(0).Tabs.Count());
+
+            //Element 1 Alias "StartupDeveloperDashboardSection"
+            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(1).Tabs.Count());
+
+            //Element 2 Alias "StartupMediaDashboardSection"
+            Assert.AreEqual(2, SettingsSection.Sections.ElementAt(2).Tabs.Count());
+
+            //Element 3 Alias "StartupDashboardSection"
             Assert.AreEqual(3, SettingsSection.Sections.ElementAt(3).Tabs.Count());
+
+            //Element 4 Alias "StartupMemberDashboardSection"
+            Assert.AreEqual(1, SettingsSection.Sections.ElementAt(4).Tabs.Count());
 
         }
 
@@ -93,7 +104,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
             Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ShowOnce);
             Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).AddPanel);
             Assert.AreEqual("hello", SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).PanelCaption);
-            Assert.AreEqual("views/dashboard/settings/settingsdashboardintro.html", 
+            Assert.AreEqual("views/dashboard/settings/settingsdashboardintro.html",
                 SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ControlPath);
 
             Assert.AreEqual(false, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).ShowOnce);

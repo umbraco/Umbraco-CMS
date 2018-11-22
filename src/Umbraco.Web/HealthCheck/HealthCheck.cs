@@ -1,34 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.HealthCheck
 {
     /// <summary>
-    /// The abstract health check class
+    /// Provides a base class for health checks.
     /// </summary>
     [DataContract(Name = "healtCheck", Namespace = "")]
     public abstract class HealthCheck : IDiscoverable
     {
-        protected HealthCheck(HealthCheckContext healthCheckContext)
+        protected HealthCheck()
         {
-            HealthCheckContext = healthCheckContext;
             //Fill in the metadata
-            var thisType = this.GetType();
+            var thisType = GetType();
             var meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
             if (meta == null)
-                throw new InvalidOperationException(
-                    string.Format("The health check {0} requires a {1}", thisType, typeof(HealthCheckAttribute)));
+                throw new InvalidOperationException($"The health check {thisType} requires a {typeof (HealthCheckAttribute)}");
             Name = meta.Name;
             Description = meta.Description;
             Group = meta.Group;
             Id = meta.Id;
         }
-
-        [IgnoreDataMember]
-        public HealthCheckContext HealthCheckContext { get; private set; }
 
         [DataMember(Name = "id")]
         public Guid Id { get; private set; }
@@ -56,6 +51,5 @@ namespace Umbraco.Web.HealthCheck
         public abstract HealthCheckStatus ExecuteAction(HealthCheckAction action);
 
         //TODO: What else?
-
     }
 }

@@ -2,46 +2,40 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Web.Security;
-using umbraco.BasePages;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install
 {
     /// <summary>
-    /// Ensures authorization occurs for the installer if it has already completed. If install has not yet occured
-    /// then the authorization is successful
+    /// Ensures authorization occurs for the installer if it has already completed.
+    /// If install has not yet occured then the authorization is successful
     /// </summary>
     internal class InstallAuthorizeAttribute : AuthorizeAttribute
     {
-        private readonly ApplicationContext _applicationContext;
+        // see note in HttpInstallAuthorizeAttribute
         private readonly UmbracoContext _umbracoContext;
+        private readonly IRuntimeState _runtimeState;
 
-        private ApplicationContext GetApplicationContext()
-        {
-            return _applicationContext ?? ApplicationContext.Current;
-        }
+        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext GetUmbracoContext()
-        {
-            return _umbracoContext ?? UmbracoContext.Current;
-        }
+        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public InstallAuthorizeAttribute(UmbracoContext umbracoContext)
+        /// <param name="runtimeState"></param>
+        public InstallAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
             _umbracoContext = umbracoContext;
-            _applicationContext = _umbracoContext.Application;
+            _runtimeState = runtimeState;
         }
 
         public InstallAuthorizeAttribute()
-        {
-        }
+        { }
 
         /// <summary>
         /// Ensures that the user must be logged in or that the application is not configured just yet.
@@ -50,24 +44,15 @@ namespace Umbraco.Web.Install
         /// <returns></returns>
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
             try
             {
-                //if its not configured then we can continue
-                if (!GetApplicationContext().IsConfigured)
-                {
-                    return true;
-                }
-                var umbCtx = GetUmbracoContext();
-                //otherwise we need to ensure that a user is logged in
-                var isLoggedIn = GetUmbracoContext().Security.ValidateCurrentUser();
-                if (isLoggedIn)
-                {
-                    return true;
-                }
-
-                return false;
+                // if not configured (install or upgrade) then we can continue
+                // otherwise we need to ensure that a user is logged in
+                return RuntimeState.Level == RuntimeLevel.Install
+                    || RuntimeState.Level == RuntimeLevel.Upgrade
+                    || UmbracoContext.Security.ValidateCurrentUser();
             }
             catch (Exception)
             {
@@ -81,8 +66,7 @@ namespace Umbraco.Web.Install
         /// <param name="filterContext"></param>
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            filterContext.Result = new RedirectResult(SystemDirectories.Umbraco.EnsureEndsWith('/'));           
+            filterContext.Result = new RedirectResult(SystemDirectories.Umbraco.EnsureEndsWith('/'));
         }
-
     }
 }

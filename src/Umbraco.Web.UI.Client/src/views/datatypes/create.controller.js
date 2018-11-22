@@ -13,14 +13,15 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
+    var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
             dataTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
@@ -28,8 +29,6 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
                 navigationService.syncTree({ tree: "datatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
-
-                var section = appState.getSectionState("currentSection");
 
             }, function(err) {
 
@@ -40,9 +39,15 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
     $scope.createDataType = function() {
         $location.search('create', null);
-        $location.path("/developer/datatypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
+    
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DataType.CreateController", DataTypeCreateController);

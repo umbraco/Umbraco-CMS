@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LightInject;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.Editors
 {
@@ -20,7 +23,7 @@ namespace Umbraco.Web.Editors
             if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
                 return result;
 
-            var filters = TourFilterResolver.Current.Filters.ToList();
+            var filters = Current.Container.GetInstance<TourFilterCollection>().ToList(); // fixme inject
 
             //get all filters that will be applied to all tour aliases
             var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();

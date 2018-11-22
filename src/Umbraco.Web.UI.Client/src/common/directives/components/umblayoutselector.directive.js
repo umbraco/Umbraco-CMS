@@ -1,93 +1,92 @@
-(function() {
-   'use strict';
+(function () {
+    'use strict';
+    
+    angular
+        .module('umbraco.directives')
+        .component('umbLayoutSelector', {
+            templateUrl: 'views/components/umb-layout-selector.html',
+            controller: LayoutSelectorController,
+            controllerAs: 'vm',
+            bindings: {
+                layouts: '<',
+                activeLayout: '<',
+                onLayoutSelect: "&"
+            }
+        });
 
-   function LayoutSelectorDirective() {
+    function LayoutSelectorController($scope, $element) {
 
-      function link(scope, el, attr, ctrl) {
+        var vm = this;
 
-         scope.layoutDropDownIsOpen = false;
-         scope.showLayoutSelector = true;
+        vm.$onInit = onInit;
 
-         function activate() {
+        vm.layoutDropDownIsOpen = false;
+        vm.showLayoutSelector = true;
+        vm.pickLayout = pickLayout;
+        vm.toggleLayoutDropdown = toggleLayoutDropdown;
+        vm.closeLayoutDropdown = closeLayoutDropdown;
 
+        function onInit() {
+            activate();
+        }
+
+        function closeLayoutDropdown() {
+            vm.layoutDropDownIsOpen = false;
+        }
+
+        function toggleLayoutDropdown() {
+            vm.layoutDropDownIsOpen = !vm.layoutDropDownIsOpen;
+        }
+
+        function pickLayout(selectedLayout) {
+            if (vm.onLayoutSelect) {
+                vm.onLayoutSelect({ layout: selectedLayout });
+                vm.layoutDropDownIsOpen = false;
+            }
+        }
+
+        function activate() {
             setVisibility();
+            setActiveLayout(vm.layouts);
+        }
 
-            setActiveLayout(scope.layouts);
+        function setVisibility() {
 
-         }
+            var numberOfAllowedLayouts = getNumberOfAllowedLayouts(vm.layouts);
 
-         function setVisibility() {
-
-            var numberOfAllowedLayouts = getNumberOfAllowedLayouts(scope.layouts);
-
-            if(numberOfAllowedLayouts === 1) {
-               scope.showLayoutSelector = false;
+            if (numberOfAllowedLayouts === 1) {
+                vm.showLayoutSelector = false;
             }
 
-         }
+        }
 
-         function getNumberOfAllowedLayouts(layouts) {
+        function getNumberOfAllowedLayouts(layouts) {
 
             var allowedLayouts = 0;
 
             for (var i = 0; layouts.length > i; i++) {
 
-               var layout = layouts[i];
+                var layout = layouts[i];
 
-               if(layout.selected === true) {
-                  allowedLayouts++;
-               }
+                if (layout.selected === true) {
+                    allowedLayouts++;
+                }
 
             }
 
             return allowedLayouts;
-         }
+        }
 
-         function setActiveLayout(layouts) {
+        function setActiveLayout(layouts) {
 
             for (var i = 0; layouts.length > i; i++) {
-               var layout = layouts[i];
-               if(layout.path === scope.activeLayout.path) {
-                  layout.active = true;
-               }
+                var layout = layouts[i];
+                if (layout.path === vm.activeLayout.path) {
+                    layout.active = true;
+                }
             }
 
-         }
-
-         scope.pickLayout = function(selectedLayout) {
-             if(scope.onLayoutSelect) {
-                 scope.onLayoutSelect(selectedLayout);
-                 scope.layoutDropDownIsOpen = false;
-             }
-         };
-
-         scope.toggleLayoutDropdown = function() {
-            scope.layoutDropDownIsOpen = !scope.layoutDropDownIsOpen;
-         };
-
-         scope.closeLayoutDropdown = function() {
-            scope.layoutDropDownIsOpen = false;
-         };
-
-         activate();
-
-      }
-
-      var directive = {
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/umb-layout-selector.html',
-         scope: {
-            layouts: '=',
-            activeLayout: '=',
-            onLayoutSelect: "="
-         },
-         link: link
-      };
-
-      return directive;
-   }
-
-   angular.module('umbraco.directives').directive('umbLayoutSelector', LayoutSelectorDirective);
+        }
+    }
 
 })();

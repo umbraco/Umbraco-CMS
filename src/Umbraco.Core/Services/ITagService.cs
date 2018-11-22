@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Tag service to query for tags in the tags db table. The tags returned are only relavent for published content & saved media or members 
+    /// Tag service to query for tags in the tags db table. The tags returned are only relavent for published content & saved media or members
     /// </summary>
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained.
-    /// 
+    ///
     /// This service does not contain methods to query for content, media or members based on tags, those methods will be added
     /// to the content, media and member services respectively.
     /// </remarks>
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags for content items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags for media items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags for member items
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to a property by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="propertyTypeAlias">Property type alias</param>
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to a property by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="propertyTypeAlias">Property type alias</param>
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets all tags attached to an entity (content, media or member) by entity id
         /// </summary>
-        /// <remarks>Use the optional tagGroup parameter to limit the 
+        /// <remarks>Use the optional tagGroup parameter to limit the
         /// result to a specific 'Tag Group'.</remarks>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="tagGroup">Optional name of the 'Tag Group'</param>

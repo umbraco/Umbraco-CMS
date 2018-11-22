@@ -1,0 +1,56 @@
+<div data-element="editor-stylesheets" ng-controller="Umbraco.Editors.StyleSheets.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+    <form name="stylesheetsForm"
+          ng-submit="vm.save()"
+          novalidate
+          val-form-manager>
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header name="vm.stylesheet.name"
+                               hide-alias="true"
+                               description="vm.stylesheet.virtualPath"
+                               description-locked="true"
+                               navigation="vm.page.navigation"
+                               on-select-navigation-item="selectApp(item)"
+                               hide-icon="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+                <umb-editor-sub-views
+                    ng-if="!vm.page.loading"
+                    sub-views="vm.page.navigation"
+                    model="vm">
+                </umb-editor-sub-views>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-left>
+
+                    <umb-keyboard-shortcuts-overview model="vm.page.keyboardShortcutsOverview"
+                                                     show-overlay="vm.showKeyboardShortcut"
+                                                     on-close="vm.showKeyboardShortcut = false;">
+                    </umb-keyboard-shortcuts-overview>
+
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="vm.page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+    </form>
+
+</div>

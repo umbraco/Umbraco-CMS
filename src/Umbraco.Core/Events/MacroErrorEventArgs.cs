@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Events
 {
     // Provides information on the macro that caused an error
-    public class MacroErrorEventArgs : System.EventArgs
+    public class MacroErrorEventArgs : EventArgs
     {
         /// <summary>
-        /// Name of the faulting macro. 
+        /// Name of the faulting macro.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Alias of the faulting macro. 
+        /// Alias of the faulting macro.
         /// </summary>
         public string Alias { get; set; }
 
         /// <summary>
         /// Filename, file path, fully qualified class name, or other key used by the macro engine to do it's processing of the faulting macro.
         /// </summary>
-        public string ItemKey { get; set; }
+        public string MacroSource { get; set; }
 
         /// <summary>
         /// Exception raised.
@@ -35,5 +33,10 @@ namespace Umbraco.Core.Events
         /// </summary>
         /// <value>Macro error behaviour enum.</value>
         public MacroErrorBehaviour Behaviour { get; set; }
+
+        /// <summary>
+        /// The html code to display when Behavior is Content.
+        /// </summary>
+        public string Html { get; set; }
     }
 }

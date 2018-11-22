@@ -1,9 +1,15 @@
 <div ng-controller="Umbraco.PropertyEditors.textAreaController">
-	<textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()"></textarea>
-	<span class="help-inline" val-msg-for="textarea" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-	<span class="help-inline" val-msg-for="textarea" val-toggle-msg="valServer"></span>
-    <div class="help" ng-if="model.maxlength">
-        <strong>{{model.count}}</strong> 
-        <localize key="textbox_characters_left">characters left</localize>
-    </div>
+    <ng-form name="textareaFieldForm">
+        <textarea ng-model="model.value" id="{{model.alias}}" name="textarea" rows="{{model.config.rows || 10}}" class="umb-property-editor umb-textarea textstring" val-server="value" ng-keyup="model.change()"></textarea>
+
+        <span ng-messages="textareaFieldForm.textarea.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+            <span class="help-inline" ng-message="valServer">{{textareaFieldForm.textarea.errorMsg}}</span>
+        </span>
+
+        <div class="help" ng-if="model.maxlength">
+            <strong>{{model.count}}</strong>
+            <localize key="textbox_characters_left">characters left</localize>
+        </div>
+    </ng-form>
 </div>

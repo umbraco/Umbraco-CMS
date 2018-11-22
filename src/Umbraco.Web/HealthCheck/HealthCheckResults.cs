@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MarkdownSharp;
+using HeyRed.MarkdownSharp;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 
@@ -13,10 +14,12 @@ namespace Umbraco.Web.HealthCheck
         private readonly Dictionary<string, IEnumerable<HealthCheckStatus>> _results;
         public readonly bool AllChecksSuccessful;
 
+        private ILogger Logger => Current.Logger; // fixme inject
+
         public HealthCheckResults(IEnumerable<HealthCheck> checks)
         {
             _results = checks.ToDictionary(
-                t => t.Name, 
+                t => t.Name,
                 t => {
                     try
                     {
@@ -24,8 +27,8 @@ namespace Umbraco.Web.HealthCheck
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<HealthCheckResults>(string.Format("Error running scheduled health check: {0}", t.Name), ex);
-                        var message = string.Format("Health check failed with exception: {0}. See logs for details.", ex.Message);
+                        Logger.Error<HealthCheckResults>(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
+                        var message = $"Health check failed with exception: {ex.Message}. See logs for details.";
                         return new List<HealthCheckStatus>
                         {
                             new HealthCheckStatus(message)
@@ -33,9 +36,9 @@ namespace Umbraco.Web.HealthCheck
                                 ResultType = StatusResultType.Error
                             }
                         };
-                    }                    
+                    }
                 });
-                
+
             // find out if all checks pass or not
             AllChecksSuccessful = true;
             foreach (var result in _results)
@@ -51,7 +54,7 @@ namespace Umbraco.Web.HealthCheck
 
         public void LogResults()
         {
-            LogHelper.Info<HealthCheckResults>("Scheduled health check results:");
+            Logger.Info<HealthCheckResults>("Scheduled health check results:");
             foreach (var result in _results)
             {
                 var checkName = result.Key;
@@ -59,16 +62,16 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    LogHelper.Info<HealthCheckResults>(string.Format("    Checks for '{0}' all completed succesfully.", checkName));
+                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed succesfully.", checkName);
                 }
                 else
                 {
-                    LogHelper.Warn<HealthCheckResults>(string.Format("    Checks for '{0}' completed with errors.", checkName));
+                    Logger.Warn<HealthCheckResults>("Checks for '{HealthCheckName}' completed with errors.", checkName);
                 }
 
                 foreach (var checkResult in checkResults)
                 {
-                    LogHelper.Info<HealthCheckResults>(string.Format("        Result: {0}, Message: '{1}'", checkResult.ResultType, checkResult.Message));
+                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }

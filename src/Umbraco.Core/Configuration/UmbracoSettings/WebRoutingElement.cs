@@ -1,56 +1,31 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class WebRoutingElement : ConfigurationElement, IWebRoutingSection
     {
         [ConfigurationProperty("trySkipIisCustomErrors", DefaultValue = "false")]
-        public bool TrySkipIisCustomErrors
-        {
-            get { return (bool) base["trySkipIisCustomErrors"]; }
-        }
+        public bool TrySkipIisCustomErrors => (bool) base["trySkipIisCustomErrors"];
 
         [ConfigurationProperty("internalRedirectPreservesTemplate", DefaultValue = "false")]
-        public bool InternalRedirectPreservesTemplate
-        {
-            get { return (bool) base["internalRedirectPreservesTemplate"]; }
-        }
+        public bool InternalRedirectPreservesTemplate => (bool) base["internalRedirectPreservesTemplate"];
 
         [ConfigurationProperty("disableAlternativeTemplates", DefaultValue = "false")]
-        public bool DisableAlternativeTemplates
-        {
-            get { return (bool) base["disableAlternativeTemplates"]; }
-        }
+        public bool DisableAlternativeTemplates => (bool) base["disableAlternativeTemplates"];
 
         [ConfigurationProperty("validateAlternativeTemplates", DefaultValue = "false")]
-        public bool ValidateAlternativeTemplates
-        {
-            get { return (bool)base["validateAlternativeTemplates"]; }
-        }
+        public bool ValidateAlternativeTemplates => (bool) base["validateAlternativeTemplates"];
 
         [ConfigurationProperty("disableFindContentByIdPath", DefaultValue = "false")]
-        public bool DisableFindContentByIdPath
-        {
-            get { return (bool) base["disableFindContentByIdPath"]; }
-        }
+        public bool DisableFindContentByIdPath => (bool) base["disableFindContentByIdPath"];
 
         [ConfigurationProperty("disableRedirectUrlTracking", DefaultValue = "false")]
-        public bool DisableRedirectUrlTracking
-        {
-            get { return (bool) base["disableRedirectUrlTracking"]; }
-        }
+        public bool DisableRedirectUrlTracking => (bool) base["disableRedirectUrlTracking"];
 
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
-        public string UrlProviderMode
-        {
-            get { return (string) base["urlProviderMode"]; }
-        }
+        public string UrlProviderMode => (string) base["urlProviderMode"];
 
         [ConfigurationProperty("umbracoApplicationUrl", DefaultValue = null)]
-        public string UmbracoApplicationUrl
-        {
-            get { return (string)base["umbracoApplicationUrl"]; }
-        }
+        public string UmbracoApplicationUrl => (string)base["umbracoApplicationUrl"];
     }
 }

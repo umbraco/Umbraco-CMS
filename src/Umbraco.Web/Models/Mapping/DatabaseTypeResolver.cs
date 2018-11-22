@@ -1,7 +1,7 @@
 ﻿using System;
-using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -9,16 +9,16 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Gets the DataTypeDatabaseType from the selected property editor for the data type
     /// </summary>
-    internal class DatabaseTypeResolver : ValueResolver<DataTypeSave, DataTypeDatabaseType>
+    internal class DatabaseTypeResolver
     {
-        protected override DataTypeDatabaseType ResolveCore(DataTypeSave source)
+        public ValueStorageType Resolve(DataTypeSave source)
         {
-            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(source.SelectedEditor);
-            if (propertyEditor == null)
-            {
-                throw new InvalidOperationException("Could not find property editor with id " + source.SelectedEditor);
-            }
-            return propertyEditor.ValueEditor.GetDatabaseType();
+            if (!Current.PropertyEditors.TryGet(source.EditorAlias, out var editor))
+                throw new InvalidOperationException($"Could not find property editor \"{source.EditorAlias}\".");
+
+            // fixme - what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
+            var valueType = editor.GetValueEditor().ValueType;
+            return ValueTypes.ToStorageType(valueType);
         }
     }
 }

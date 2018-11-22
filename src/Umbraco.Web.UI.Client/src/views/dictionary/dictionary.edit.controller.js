@@ -6,7 +6,8 @@
  * @description
  * The controller for editing dictionary items
  */
-function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService) {
+function DictionaryEditController($scope, $routeParams, $location, dictionaryResource, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService) {
+    
     var vm = this;
 
     //setup scope vars
@@ -18,6 +19,10 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
     vm.page.menu.currentSection = appState.getSectionState("currentSection");
     vm.page.menu.currentNode = null;
     vm.description = "";
+    vm.showBackButton = true;
+    
+    vm.save = saveDictionary;
+    vm.back = back;
   
     function loadDictionary() {
 
@@ -26,9 +31,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
         //we are editing so get the content item from the server
         dictionaryResource.getById($routeParams.id)
             .then(function (data) {
-
                 bindDictionary(data);
-
                 vm.page.loading = false;               
             });
     }
@@ -99,8 +102,10 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
                     });
         }
     }
-
-    vm.save = saveDictionary;
+    
+    function back() {
+        $location.path(vm.page.menu.currentSection + "/dictionary/list");
+    }
 
     $scope.$watch("vm.content.name", function (newVal, oldVal) {
         //when the value changes, we need to set the name dirty

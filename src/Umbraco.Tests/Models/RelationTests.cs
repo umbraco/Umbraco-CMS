@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;

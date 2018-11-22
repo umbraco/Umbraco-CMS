@@ -125,28 +125,46 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
+function FormsController($scope, $route, $cookies, packageResource, localizationService) {
+
+    var labels = {};
+    var labelKeys = [
+        "packager_installStateDownloading",
+        "packager_installStateImporting",
+        "packager_installStateInstalling",
+        "packager_installStateRestarting",
+        "packager_installStateComplete"
+    ];
+
+    localizationService.localizeMany(labelKeys).then(function(values){
+        labels.installStateDownloading = values[0];
+        labels.installStateImporting = values[1];
+        labels.installStateInstalling = values[2];
+        labels.installStateRestarting = values[3];
+        labels.installStateComplete = values[4];
+    });
+
     $scope.installForms = function(){
-        $scope.state = localizationService.localize("packager_installStateDownloading");
+        $scope.state = labels.installStateDownloading;
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateImporting");
+                    $scope.state = labels.installStateImporting;
                     return packageResource.import(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateInstalling");
+                $scope.state = labels.installStateInstalling;
                     return packageResource.installFiles(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateRestarting");
+                $scope.state = labels.installStateRestarting;
                     return packageResource.installData(pack);
                 },
                 $scope.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateComplete");
+                $scope.state = installStateComplete;
                     return packageResource.cleanUp(pack);
                 },
                 $scope.error)
@@ -155,7 +173,7 @@ function FormsController($scope, $route, $cookieStore, packageResource, localiza
 
     $scope.complete = function(result){
         var url = window.location.href + "?init=true";
-        $cookieStore.put("umbPackageInstallId", result.packageGuid);
+        $cookies.putObject("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 

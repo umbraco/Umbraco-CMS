@@ -1099,7 +1099,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Articles</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
     int pageSize = 2; // How many items per page
@@ -1207,7 +1207,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>ClientAreas</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
       Layout = "SW_Master.cshtml";
       var pages = Model.Content.Children.Where(x => x.IsVisible() && x.TemplateId > 0 && Umbraco.MemberHasAccess(x.Id, x.Path));
@@ -1238,7 +1238,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Contact</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
 }
@@ -1262,7 +1262,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Home</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
 }
@@ -1334,7 +1334,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Login</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[    @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[    @inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
 
@@ -1364,7 +1364,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Search</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @using Lucene.Net;
 @using Examine;
 @using Examine.LuceneEngine.SearchCriteria;
@@ -1509,7 +1509,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Sitemap</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
 }
@@ -1555,7 +1555,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>StandardPage</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
 }
@@ -1578,7 +1578,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Name>SW_Master</Name>
       <Alias>SW_Master</Alias>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
 @{
     Layout = null;
     var homepage = Model.Content.AncestorOrSelf(1);
@@ -2256,7 +2256,9 @@ table th, td {border: 0px solid #fff;}
   <DictionaryItems />
   <Languages />
   <DataTypes>
-    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext">
+    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext"
+              Configuration="{&quot;x&quot;:3}" />
+      <!--
       <PreValues>
         <PreValue Id="5" Value="content" />
         <PreValue Id="6" Value="" />
@@ -2272,7 +2274,7 @@ table th, td {border: 0px solid #fff;}
         <PreValue Id="16" Value="200" />
         <PreValue Id="17" Value="0" />
       </PreValues>
-    </DataType>
+    -->
   </DataTypes>
   <control>/usercontrols/StandardWebsiteInstall.ascx</control>
 </umbPackage>

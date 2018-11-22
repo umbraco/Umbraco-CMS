@@ -11,6 +11,11 @@ namespace Umbraco.Web.Trees
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal class CoreTreeAttribute : Attribute
     {
-        
+        public string TreeGroup { get; set; }
+
+        public CoreTreeAttribute()
+        {
+
+        }
     }
 }

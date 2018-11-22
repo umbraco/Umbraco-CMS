@@ -6,9 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Querying
 {
+    // fixme.npoco - are we basically duplicating entire parts of NPoco just because of SqlSyntax ?!
+
     /// <summary>
     /// An expression tree parser to create SQL statements and SQL parameters based on a strongly typed expression.
     /// </summary>
@@ -29,7 +32,7 @@ namespace Umbraco.Core.Persistence.Querying
         /// <summary>
         /// Gets or sets the SQL syntax provider for the current database.
         /// </summary>
-        protected ISqlSyntaxProvider SqlSyntax { get; private set; }
+        protected ISqlSyntaxProvider SqlSyntax { get; }
 
         /// <summary>
         /// Gets the list of SQL parameters.
@@ -53,6 +56,8 @@ namespace Umbraco.Core.Persistence.Querying
         /// <remarks>Also populates the SQL parameters.</remarks>
         public virtual string Visit(Expression expression)
         {
+            if (expression == null) return string.Empty;
+
             // if the expression is a CachedExpression,
             // visit the inner expression if not already visited
             var cachedExpression = expression as CachedExpression;
@@ -61,8 +66,6 @@ namespace Umbraco.Core.Persistence.Querying
                 Visited = cachedExpression.Visited;
                 expression = cachedExpression.InnerExpression;
             }
-
-            if (expression == null) return string.Empty;
 
             string result;
 
@@ -132,35 +135,28 @@ namespace Umbraco.Core.Persistence.Querying
 
             // if the expression is a CachedExpression,
             // and is not already compiled, assign the result
-            if (cachedExpression != null)
-            {
-                if (cachedExpression.Visited == false)
-                    cachedExpression.VisitResult = result;
-                result = cachedExpression.VisitResult;
-            }
-
-            return result;
+            if (cachedExpression == null)
+                return result;
+            if (!cachedExpression.Visited)
+                cachedExpression.VisitResult = result;
+            return cachedExpression.VisitResult;
         }
 
         protected abstract string VisitMemberAccess(MemberExpression m);
 
         protected virtual string VisitLambda(LambdaExpression lambda)
         {
-            if (lambda.Body.NodeType == ExpressionType.MemberAccess)
-            {
-                var m = lambda.Body as MemberExpression;
-
-                if (m != null && m.Expression != null)
+            if (lambda.Body.NodeType == ExpressionType.MemberAccess &&
+                lambda.Body is MemberExpression memberExpression && memberExpression.Expression != null)
                 {
                     //This deals with members that are boolean (i.e. x => IsTrashed )
-                    var r = VisitMemberAccess(m);
+                    var result = VisitMemberAccess(memberExpression);
 
                     SqlParameters.Add(true);
 
-                    return Visited ? string.Empty : string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
+                    return Visited ? string.Empty : $"{result} = @{SqlParameters.Count - 1}";
                 }
 
-            }
             return Visit(lambda.Body);
         }
 
@@ -172,35 +168,27 @@ namespace Umbraco.Core.Persistence.Querying
             var operand = BindOperant(b.NodeType);
             if (operand == "AND" || operand == "OR")
             {
-                var m = b.Left as MemberExpression;
-                if (m != null && m.Expression != null)
+                if (b.Left is MemberExpression mLeft && mLeft.Expression != null)
                 {
-                    string r = VisitMemberAccess(m);
+                    var r = VisitMemberAccess(mLeft);
 
-                    SqlParameters.Add(1);
+                    SqlParameters.Add(true);
 
-                    //don't execute if compiled
                     if (Visited == false)
-                    {
-                        left = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
-                    }
+                        left = $"{r} = @{SqlParameters.Count - 1}";
                 }
                 else
                 {
                     left = Visit(b.Left);
                 }
-                m = b.Right as MemberExpression;
-                if (m != null && m.Expression != null)
+                if (b.Right is MemberExpression mRight && mRight.Expression != null)
                 {
-                    var r = VisitMemberAccess(m);
+                    var r = VisitMemberAccess(mRight);
 
-                    SqlParameters.Add(1);
+                    SqlParameters.Add(true);
 
-                    //don't execute if compiled
                     if (Visited == false)
-                    {
-                        right = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
-                    }
+                        right = $"{r} = @{SqlParameters.Count - 1}";
                 }
                 else
                 {
@@ -210,29 +198,25 @@ namespace Umbraco.Core.Persistence.Querying
             else if (operand == "=")
             {
                 // deal with (x == true|false) - most common
-                var constRight = b.Right as ConstantExpression;
-                if (constRight != null && constRight.Type == typeof(bool))
-                    return (bool)constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
+                if (b.Right is ConstantExpression constRight && constRight.Type == typeof(bool))
+                    return (bool) constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false == x) - why not
-                var constLeft = b.Left as ConstantExpression;
-                if (constLeft != null && constLeft.Type == typeof(bool))
-                    return (bool)constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
+                if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof(bool))
+                    return (bool) constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
                 left = Visit(b.Left);
             }
             else if (operand == "<>")
             {
                 // deal with (x != true|false) - most common
-                var constRight = b.Right as ConstantExpression;
-                if (constRight != null && constRight.Type == typeof(bool))
-                    return (bool)constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
+                if (b.Right is ConstantExpression constRight && constRight.Type == typeof (bool))
+                    return (bool) constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false != x) - why not
-                var constLeft = b.Left as ConstantExpression;
-                if (constLeft != null && constLeft.Type == typeof(bool))
-                    return (bool)constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
+                if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof (bool))
+                    return (bool) constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
                 left = Visit(b.Left);
             }
             else
@@ -257,21 +241,10 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 case "MOD":
                 case "COALESCE":
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Format("{0}({1},{2})", operand, left, right);
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"{operand}({left},{right})";
+
                 default:
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Concat("(", left, " ", operand, " ", right, ")");
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"({left} {operand} {right})";
             }
         }
 
@@ -293,10 +266,10 @@ namespace Umbraco.Core.Persistence.Querying
             return list;
         }
 
-        protected virtual string VisitNew(NewExpression nex)
+        protected virtual string VisitNew(NewExpression newExpression)
         {
             // TODO : check !
-            var member = Expression.Convert(nex, typeof(object));
+            var member = Expression.Convert(newExpression, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);
             try
             {
@@ -305,32 +278,15 @@ namespace Umbraco.Core.Persistence.Querying
 
                 SqlParameters.Add(o);
 
-                //don't execute if compiled
-                if (Visited == false)
-                {
-                    return string.Format("@{0}", SqlParameters.Count - 1);
-                }
-                //already compiled, return
-                return string.Empty;
+                return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
             }
             catch (InvalidOperationException)
             {
-                //don't execute if compiled
-                if (Visited == false)
-                {
-                    // FieldName ?
-                    List<object> exprs = VisitExpressionList(nex.Arguments);
-                    var r = new StringBuilder();
-                    foreach (var e in exprs)
-                    {
-                        r.AppendFormat("{0}{1}",
-                            r.Length > 0 ? "," : "",
-                            e);
-                    }
-                    return r.ToString();
-                }
-                //already compiled, return
-                return string.Empty;
+                if (Visited)
+                    return string.Empty;
+
+                var exprs = VisitExpressionList(newExpression.Arguments);
+                return string.Join(",", exprs);
             }
         }
 
@@ -346,13 +302,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             SqlParameters.Add(c.Value);
 
-            //don't execute if compiled
-            if (Visited == false)
-            {
-                return string.Format("@{0}", SqlParameters.Count - 1);
-            }
-            //already compiled, return
-            return string.Empty;
+            return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
         }
 
         protected virtual string VisitUnary(UnaryExpression u)
@@ -378,22 +328,10 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // false property , i.e. x => !Trashed
                     SqlParameters.Add(true);
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Format("NOT ({0} = @{1})", o, SqlParameters.Count - 1);
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
                 default:
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        // could be anything else, such as: x => !x.Path.StartsWith("-20")
-                        return string.Concat("NOT (", o, ")");
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    // could be anything else, such as: x => !x.Path.StartsWith("-20")
+                    return Visited ? string.Empty : string.Concat("NOT (", o, ")");
             }
         }
 
@@ -406,44 +344,21 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // true property, i.e. x => Trashed
                     SqlParameters.Add(true);
-
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Format("({0} = @{1})", o, SqlParameters.Count - 1);
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"({o} = @{SqlParameters.Count - 1})";
                 default:
                     // could be anything else, such as: x => x.Path.StartsWith("-20")
-                    return o;
+                    return Visited ? string.Empty : o;
             }
         }
 
         protected virtual string VisitNewArray(NewArrayExpression na)
         {
             var exprs = VisitExpressionList(na.Expressions);
-
-            //don't execute if compiled
-            if (Visited == false)
-            {
-                var r = new StringBuilder();
-                foreach (var e in exprs)
-                {
-                    r.Append(r.Length > 0 ? "," + e : e);
-                }
-
-                return r.ToString();
-            }
-            //already compiled, return
-            return string.Empty;
+            return Visited ? string.Empty : string.Join(",", exprs);
         }
 
         protected virtual List<object> VisitNewArrayFromExpressionList(NewArrayExpression na)
-        {
-            var exprs = VisitExpressionList(na.Expressions);
-            return exprs;
-        }
+            => VisitExpressionList(na.Expressions);
 
         protected virtual string BindOperant(ExpressionType e)
         {
@@ -484,50 +399,61 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitMethodCall(MethodCallExpression m)
         {
-            //Here's what happens with a MethodCallExpression:
-            //  If a method is called that contains a single argument,
-            //      then m.Object is the object on the left hand side of the method call, example:
-            //      x.Path.StartsWith(content.Path)
-            //          m.Object = x.Path
-            //          and m.Arguments.Length == 1, therefor m.Arguments[0] == content.Path
-            //  If a method is called that contains multiple arguments, then m.Object == null and the
-            //      m.Arguments collection contains the left hand side of the method call, example:
-            //      x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar)
-            //          m.Object == null
-            //          m.Arguments.Length == 3, therefor, m.Arguments[0] == x.Path, m.Arguments[1] == content.Path, m.Arguments[2] == TextColumnType.NVarchar
-            // So, we need to cater for these scenarios.
+            // m.Object is the expression that represent the instance for instance method class, or null for static method calls
+            // m.Arguments is the collection of expressions that represent arguments of the called method
+            // m.MethodInfo is the method info for the method to be called
 
-            var objectForMethod = m.Object ?? m.Arguments[0];
-            var visitedObjectForMethod = Visit(objectForMethod);
+            // assume that static methods are extension methods (probably not ok)
+            // and then, the method object is its first argument - get "safe" object
+            var methodObject = m.Object ?? m.Arguments[0];
+            var visitedMethodObject = Visit(methodObject);
+            // and then, "safe" arguments are what would come after the first arg
             var methodArgs = m.Object == null
-                ? m.Arguments.Skip(1).ToArray()
-                : m.Arguments.ToArray();
+                ? new ReadOnlyCollection<Expression>(m.Arguments.Skip(1).ToList())
+                : m.Arguments;
 
             switch (m.Method.Name)
             {
                 case "ToString":
-                    SqlParameters.Add(objectForMethod.ToString());
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return string.Format("@{0}", SqlParameters.Count - 1);
-                    //already compiled, return
-                    return string.Empty;
+                    SqlParameters.Add(methodObject.ToString());
+                    return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
+
                 case "ToUpper":
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return string.Format("upper({0})", visitedObjectForMethod);
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"upper({visitedMethodObject})";
+
                 case "ToLower":
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return string.Format("lower({0})", visitedObjectForMethod);
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"lower({visitedMethodObject})";
+
+                case "Contains":
+                    // for 'Contains', it can either be the string.Contains(string) method, or a collection Contains
+                    // method, which would then need to become a SQL IN clause - but beware that string is
+                    // an enumerable of char, and string.Contains(char) is an extension method - but NOT an SQL IN
+
+                    var isCollectionContains =
+                        (
+                            m.Object == null && // static (extension?) method
+                            m.Arguments.Count == 2 && // with two args
+                            m.Arguments[0].Type != typeof(string) && // but not for string
+                            TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type) && // first arg being an enumerable
+                            m.Arguments[1].NodeType == ExpressionType.MemberAccess // second arg being a member access
+                        ) ||
+                        (
+                            m.Object != null && // instance method
+                            TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Object.Type) && // of an enumerable
+                            m.Object.Type != typeof(string) && // but not for string
+                            m.Arguments.Count == 1 && // with 1 arg
+                            m.Arguments[0].NodeType == ExpressionType.MemberAccess // arg being a member access
+                        );
+
+                    if (isCollectionContains)
+                        goto case "SqlIn";
+                    else
+                        goto case "Contains**String";
+
                 case "SqlWildcard":
                 case "StartsWith":
                 case "EndsWith":
-                case "Contains":
+                case "Contains**String": // see "Contains" above
                 case "Equals":
                 case "SqlStartsWith":
                 case "SqlEndsWith":
@@ -538,22 +464,13 @@ namespace Umbraco.Core.Persistence.Querying
                 case "InvariantContains":
                 case "InvariantEquals":
 
-                    //special case, if it is 'Contains' and the argumet that Contains is being called on is 
-                    //Enumerable and the methodArgs is the actual member access, then it's an SQL IN claus
-                    if (m.Object == null 
-                        && m.Arguments[0].Type != typeof(string)
-                        && m.Arguments.Count == 2
-                        && methodArgs.Length == 1 
-                        && methodArgs[0].NodeType == ExpressionType.MemberAccess
-                        && TypeHelper.IsTypeAssignableFrom<IEnumerable>(m.Arguments[0].Type))
-                    {
-                        goto case "SqlIn";
-                    }
-
                     string compareValue;
 
                     if (methodArgs[0].NodeType != ExpressionType.Constant)
                     {
+                        // if it's a field accessor, we could Visit(methodArgs[0]) and get [a].[b]
+                        // but then, what if we want more, eg .StartsWith(node.Path + ',') ? => not
+
                         //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                         // So we'll go get the value:
                         var member = Expression.Convert(methodArgs[0], typeof(object));
@@ -571,7 +488,7 @@ namespace Umbraco.Core.Persistence.Querying
 
                     //then check if the col type argument has been passed to the current method (this will be the case for methods like
                     // SqlContains and other Sql methods)
-                    if (methodArgs.Length > 1)
+                    if (methodArgs.Count > 1)
                     {
                         var colTypeArg = methodArgs.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
                         if (colTypeArg != null)
@@ -580,7 +497,7 @@ namespace Umbraco.Core.Persistence.Querying
                         }
                     }
 
-                    return HandleStringComparison(visitedObjectForMethod, compareValue, m.Method.Name, colType);
+                    return HandleStringComparison(visitedMethodObject, compareValue, m.Method.Name, colType);
 
                 case "Replace":
                     string searchValue;
@@ -626,14 +543,10 @@ namespace Umbraco.Core.Persistence.Querying
                     }
 
                     SqlParameters.Add(RemoveQuote(searchValue));
-
                     SqlParameters.Add(RemoveQuote(replaceValue));
 
                     //don't execute if compiled
-                    if (Visited == false)
-                        return string.Format("replace({0}, @{1}, @{2})", visitedObjectForMethod, SqlParameters.Count - 2, SqlParameters.Count - 1);
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"replace({visitedMethodObject}, @{SqlParameters.Count - 2}, @{SqlParameters.Count - 1})";
 
                 //case "Substring":
                 //    var startIndex = Int32.Parse(args[0].ToString()) + 1;
@@ -669,30 +582,33 @@ namespace Umbraco.Core.Persistence.Querying
 
                 case "SqlIn":
 
-                    if (m.Object == null && methodArgs.Length == 1 && methodArgs[0].NodeType == ExpressionType.MemberAccess)
+                    if (methodArgs.Count != 1 || methodArgs[0].NodeType != ExpressionType.MemberAccess)
+                        throw new NotSupportedException("SqlIn must contain the member being accessed.");
+
+                    var memberAccess = VisitMemberAccess((MemberExpression) methodArgs[0]);
+
+                    var inMember = Expression.Convert(methodObject, typeof(object));
+                    var inLambda = Expression.Lambda<Func<object>>(inMember);
+                    var inGetter = inLambda.Compile();
+
+                    var inArgs = (IEnumerable) inGetter();
+
+                    var inBuilder = new StringBuilder();
+                    var inFirst = true;
+
+                    inBuilder.Append(memberAccess);
+                    inBuilder.Append(" IN (");
+
+                    foreach (var e in inArgs)
                     {
-                        var memberAccess = VisitMemberAccess((MemberExpression) methodArgs[0]);
-                        
-                        var member = Expression.Convert(m.Arguments[0], typeof(object));
-                        var lambda = Expression.Lambda<Func<object>>(member);
-                        var getter = lambda.Compile();
-
-                        var inArgs = (IEnumerable)getter();
-
-                        var sIn = new StringBuilder();
-                        foreach (var e in inArgs)
-                        {
-                            SqlParameters.Add(e);
-
-                            sIn.AppendFormat("{0}{1}",
-                                sIn.Length > 0 ? "," : "",
-                                string.Format("@{0}", SqlParameters.Count - 1));
-                        }
-
-                        return string.Format("{0} IN ({1})", memberAccess, sIn);
+                        SqlParameters.Add(e);
+                        if (inFirst) inFirst = false; else inBuilder.Append(",");
+                        inBuilder.Append("@");
+                        inBuilder.Append(SqlParameters.Count - 1);
                     }
 
-                    throw new NotSupportedException("SqlIn must contain the member being accessed");
+                    inBuilder.Append(")");
+                    return inBuilder.ToString();
 
                 //case "Desc":
                 //    return string.Format("{0} DESC", r);
@@ -700,6 +616,42 @@ namespace Umbraco.Core.Persistence.Querying
                 //case "As":
                 //    return string.Format("{0} As {1}", r,
                 //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
+
+                case "SqlText":
+                    if (m.Method.DeclaringType != typeof(NPocoSqlExtensions.Statics))
+                        goto default;
+                    if (m.Arguments.Count == 2)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var f = m.Arguments[2];
+                        if (!(f is Expression<Func<string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1);
+                    }
+                    else if (m.Arguments.Count == 3)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var n2 = Visit(m.Arguments[1]);
+                        var f = m.Arguments[2];
+                        if (!(f is Expression<Func<string, string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1, n2);
+                    }
+                    else if (m.Arguments.Count == 4)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var n2 = Visit(m.Arguments[1]);
+                        var n3 = Visit(m.Arguments[3]);
+                        var f = m.Arguments[3];
+                        if (!(f is Expression<Func<string, string, string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1, n2, n3);
+                    }
+                    else
+                        throw new NotSupportedException("Expression is not a proper lambda.");
 
                 default:
 
@@ -715,19 +667,13 @@ namespace Umbraco.Core.Persistence.Querying
         }
 
         public virtual string GetQuotedTableName(string tableName)
-        {
-            return Visited ? tableName : string.Format("\"{0}\"", tableName);
-        }
+            => GetQuotedName(tableName);
 
         public virtual string GetQuotedColumnName(string columnName)
-        {
-            return Visited ? columnName : string.Format("\"{0}\"", columnName);
-        }
+            => GetQuotedName(columnName);
 
         public virtual string GetQuotedName(string name)
-        {
-            return Visited ? name : string.Format("\"{0}\"", name);
-        }
+            => Visited ? name : "\"" + name + "\"";
 
         protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
         {
@@ -735,148 +681,53 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 case "SqlWildcard":
                     SqlParameters.Add(RemoveQuote(val));
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+
                 case "Equals":
-                    SqlParameters.Add(RemoveQuote(val));
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return SqlSyntax.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
-                    //already compiled, return
-                    return string.Empty;
-                case "StartsWith":
-                    SqlParameters.Add(string.Format("{0}{1}",
-                        RemoveQuote(val),
-                        SqlSyntax.GetWildcardPlaceholder()));
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
-                    //already compiled, return
-                    return string.Empty;
-                case "EndsWith":
-                    SqlParameters.Add(string.Format("{0}{1}",
-                        SqlSyntax.GetWildcardPlaceholder(),
-                        RemoveQuote(val)));
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
-                    //already compiled, return
-                    return string.Empty;
-                case "Contains":
-                    SqlParameters.Add(string.Format("{0}{1}{0}",
-                        SqlSyntax.GetWildcardPlaceholder(),
-                        RemoveQuote(val)));
-                    //don't execute if compiled
-                    if (Visited == false)
-                        return SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
-                    //already compiled, return
-                    return string.Empty;
                 case "InvariantEquals":
                 case "SqlEquals":
-                    //recurse
-                    return HandleStringComparison(col, val, "Equals", columnType);
+                    SqlParameters.Add(RemoveQuote(val));
+                    return Visited ? string.Empty : SqlSyntax.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
+
+                case "StartsWith":
                 case "InvariantStartsWith":
                 case "SqlStartsWith":
-                    //recurse
-                    return HandleStringComparison(col, val, "StartsWith", columnType);
+                    SqlParameters.Add(RemoveQuote(val) + SqlSyntax.GetWildcardPlaceholder());
+                    return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+
+                case "EndsWith":
                 case "InvariantEndsWith":
                 case "SqlEndsWith":
-                    //recurse
-                    return HandleStringComparison(col, val, "EndsWith", columnType);
+                    SqlParameters.Add(SqlSyntax.GetWildcardPlaceholder() + RemoveQuote(val));
+                    return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+
+                case "Contains":
                 case "InvariantContains":
                 case "SqlContains":
-                    //recurse
-                    return HandleStringComparison(col, val, "Contains", columnType);
+                    var wildcardPlaceholder = SqlSyntax.GetWildcardPlaceholder();
+                    SqlParameters.Add(wildcardPlaceholder + RemoveQuote(val) + wildcardPlaceholder);
+                    return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
+
                 default:
-                    throw new ArgumentOutOfRangeException("verb");
+                    throw new ArgumentOutOfRangeException(nameof(verb));
             }
         }
 
-        //public virtual string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
-        //{
-        //    if (value == null) return "NULL";
-
-        //    if (escapeCallback == null)
-        //    {
-        //        escapeCallback = EscapeParam;
-        //    }
-        //    if (shouldQuoteCallback == null)
-        //    {
-        //        shouldQuoteCallback = ShouldQuoteValue;
-        //    }
-
-        //    if (!fieldType.UnderlyingSystemType.IsValueType && fieldType != typeof(string))
-        //    {
-        //        //if (TypeSerializer.CanCreateFromString(fieldType))
-        //        //{
-        //        //    return "'" + escapeCallback(TypeSerializer.SerializeToString(value)) + "'";
-        //        //}
-
-        //        throw new NotSupportedException(
-        //            string.Format("Property of type: {0} is not supported", fieldType.FullName));
-        //    }
-
-        //    if (fieldType == typeof(int))
-        //        return ((int)value).ToString(CultureInfo.InvariantCulture);
-
-        //    if (fieldType == typeof(float))
-        //        return ((float)value).ToString(CultureInfo.InvariantCulture);
-
-        //    if (fieldType == typeof(double))
-        //        return ((double)value).ToString(CultureInfo.InvariantCulture);
-
-        //    if (fieldType == typeof(decimal))
-        //        return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-
-        //    if (fieldType == typeof(DateTime))
-        //    {
-        //        return "'" + escapeCallback(((DateTime)value).ToIsoString()) + "'";
-        //    }
-
-        //    if (fieldType == typeof(bool))
-        //        return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
-
-        //    return shouldQuoteCallback(fieldType)
-        //               ? "'" + escapeCallback(value) + "'"
-        //               : value.ToString();
-        //}
-
-        public virtual string EscapeParam(object paramValue)
+        public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax)
         {
-            return paramValue == null ? string.Empty : SqlSyntax.EscapeString(paramValue.ToString());
-        }
-
-        public virtual bool ShouldQuoteValue(Type fieldType)
-        {
-            return true;
+            return paramValue == null
+                ? string.Empty
+                : sqlSyntax.EscapeString(paramValue.ToString());
         }
 
         protected virtual string RemoveQuote(string exp)
         {
-            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
-                    &&
-                    (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
+            if (exp.IsNullOrWhiteSpace()) return exp;
+
+            var c = exp[0];
+            return (c == '"' || c == '`' || c == '\'') && exp[exp.Length - 1] == c
+                ? exp.Substring(1, exp.Length - 2)
+                : exp;
         }
-
-        //protected virtual string RemoveQuoteFromAlias(string expression)
-        //{
-
-        //    if ((expression.StartsWith("\"") || expression.StartsWith("`") || expression.StartsWith("'"))
-        //        &&
-        //        (expression.EndsWith("\"") || expression.EndsWith("`") || expression.EndsWith("'")))
-        //    {
-        //        expression = expression.Remove(0, 1);
-        //        expression = expression.Remove(expression.Length - 1, 1);
-        //    }
-        //    return expression;
-        //}
     }
 }

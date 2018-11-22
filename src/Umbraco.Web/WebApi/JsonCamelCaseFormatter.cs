@@ -29,6 +29,6 @@ namespace Umbraco.Web.WebApi
                 }
             };
             controllerSettings.Formatters.Add(jsonFormatter);
-        }    
+        }
     }
 }

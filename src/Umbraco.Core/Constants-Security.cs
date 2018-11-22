@@ -7,6 +7,18 @@ namespace Umbraco.Core
     {
         public static class Security
         {
+            /// <summary>
+            /// Gets the identifier of the 'super' user.
+            /// </summary>
+            public const int SuperUserId = -1;
+
+            /// <summary>
+            /// The id for the 'unknown' user
+            /// </summary>
+            /// <remarks>
+            /// This is a user row that exists in the DB only for referential integrity but the user is never returned from any of the services
+            /// </remarks>
+            public const int UnknownUserId = 0;
 
             public const string AdminGroupAlias = "admin";
             public const string SensitiveDataGroupAlias = "sensitiveData";
@@ -20,12 +32,12 @@ namespace Umbraco.Core
 
             internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
             internal const string ForceReAuthFlag = "umbraco-force-auth";
-            
+
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
             /// </summary>
             /// <remarks>
-            /// By default we don't want to interfere with front-end external providers and their default setup, for back office the 
+            /// By default we don't want to interfere with front-end external providers and their default setup, for back office the
             /// providers need to be setup differently and each auth type for the back office will be prefixed with this value
             /// </remarks>
             public const string BackOfficeExternalAuthenticationTypePrefix = "Umbraco.";

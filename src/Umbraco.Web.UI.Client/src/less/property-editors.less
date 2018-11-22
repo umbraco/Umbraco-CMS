@@ -1,8 +1,13 @@
 //
 // Container styles
 // --------------------------------------------------
-.umb-editor {
-  min-width:66.6%;
+.umb-property-editor {
+    @media (max-width: 800px) {
+        width: 100%;
+    }
+    @media (min-width: 800px) {
+      min-width:66.6%;
+    }
 
 	&-pull {
 		float:left;
@@ -14,7 +19,7 @@
 	}
 }
 
-.umb-editor-tiny {
+.umb-property-editor-tiny {
   width: 60px;
 
 	&.umb-editor-push {
@@ -23,15 +28,15 @@
 	}
 }
 
-.umb-editor-small {
+.umb-property-editor-small {
   width: 90px;
 }
 
-.umb-modal .umb-editor {
+.umb-modal .umb-property-editor {
   width: 95%;
 }
 
-.umb-dialog .umb-editor {
+.umb-dialog .umb-property-editor {
   width: 95%;
 }
 .umb-dialog .umb-control-group .help-block {
@@ -39,7 +44,7 @@
 }
 
 .umb-codeeditor{
-  width: 99%;
+  width: 99%; 
 }
 
 // displays property inline with preceeding
@@ -97,44 +102,6 @@
   }
 }
 
-/* CODEMIRROR DATATYPE */
-div.umb-codeeditor {
-  border: 1px solid @gray-8;
-}
-div.umb-codeeditor .umb-el-wrap {
-  padding: 0;
-}
-div.umb-codeeditor .umb-btn-toolbar {
-  padding: 0;
-  margin: 0;
-  border-bottom: @gray-8 1px solid;
-  background: @gray-10;
-}
-
-
-//
-// RTE
-// --------------------------------------------------
-.umb-rte {
-    position: relative;
-
-    .-loading {
-        position: absolute;
-    }
-}
-.mce-tinymce{border: 1px solid @gray-8 !important; border-radius: 0 !important;}
-.mce-panel{background: @gray-10 !important; border-color: @gray-8 !important;}
-.mce-btn-group, .mce-btn{border: none !important; background: none !important;}
-.mce-ico{font-size: 12px !important; color: @gray-1 !important;}
-/* Special case to support helviticons for the tiny mce button controls */
-.mce-ico.mce-i-custom[class^="icon-"],
-.mce-ico.mce-i-custom[class*=" icon-"] {
-  font-family: icomoon;
-  font-size:16px !important;
-}
-
-/* pre-value editor */
-.rte-editor-preval .control-group .controls > div > label .mce-ico { line-height: 20px; }
 
 
 //
@@ -430,6 +397,16 @@ div.umb-codeeditor .umb-btn-toolbar {
     width: 124px;
     height: 124px;
     overflow: hidden;
+    position: relative;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__loading {
+    position: absolute;
+    background-color: rgba(255,255,255,0.8);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__actions {
@@ -622,7 +599,7 @@ div.umb-codeeditor .umb-btn-toolbar {
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        max-width: 100%;
+        max-width: 100%; 
         border: 1px solid @gray-10;
 
         @media (min-width: 769px) {
@@ -645,7 +622,7 @@ div.umb-codeeditor .umb-btn-toolbar {
         top: 3px;
         right: 3px;
         cursor: pointer;
-        z-index: 1;
+        z-index: @zindexCropperOverlay + 1;
     }
 
     .umb-close-cropper:hover {
@@ -719,27 +696,7 @@ div.umb-codeeditor .umb-btn-toolbar {
   line-height: 120px
 }
 
-.umb-upload-drop-zone{
-    margin-bottom:5px;
-}
-
-.umb-upload-drop-zone .info, .umb-upload-button-big{
-  display: block;
-  padding: 20px;
-  opacity: 1;
-  border: 1px dashed @gray-8;
-  background: none;
-  text-align: center;
-  font-size: 14px;
-  color: @gray-8;
-}
-
 .umb-upload-button-big:hover{color: @gray-8;}
-
-.umb-upload-drop-zone .info i.icon, .umb-upload-button-big i.icon{
-  font-size: 55px;
-  line-height: 70px
-}
 
 .umb-upload-button-big {display: block}
 .umb-upload-button-big input {
@@ -747,123 +704,6 @@ div.umb-codeeditor .umb-btn-toolbar {
   bottom: 0;
   height: 100%;
   width: 100%;
-}
-
-
-
-//
-// Photo folder styling
-// --------------------------------------------------
-
-.umb-photo-folder .picrow{
-  overflow-y: hidden;
-  position: relative;
-}
-
-
-
-.umb-photo-folder .picrow div, .umb-photo-preview{
-  margin: 0;
-  padding: 0;
-  border: none;
-  display: inline-block;
-  vertical-align: top;
-  position: relative;
-}
-
-
-
-.umb-photo-folder .picrow div a:first-child {
-     width:100%;
-    height:100%;
-}
-
-.umb-photo-folder .picrow div.umb-photo {
-    width:100%;
-    height:100%;
-    background-color: @gray-10;
-}
-
-.umb-photo-folder a:hover{text-decoration: none}
-.umb-photo-folder .umb-non-thumbnail{
-  text-align: center;
-  vertical-align: middle;
-  font-size: 12px;
-  background: @gray-10;
-  color: @black;
-  text-decoration: none;
-}
-
-.umb-photo-folder .selector-overlay{
-  display: none;
-}
-
-//this is a temp hack, to provide selectors in the dialog:
-.umb-photo-folder .pic:hover .selector-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 5px;
-  background: @black;
-  z-index: 100;
-  display: block;
-  text-align: center;
-  color: @white;
-  opacity: 0.4;
-  text-decoration:none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.umb-photo-folder .umb-non-thumbnail i{
-  color: @gray-8;
-  font-size: 50px;
-  line-height: 60px;
-  display: block;
-  margin: auto;
-  /*vertically aligns */
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.umb-photo-folder .umb-non-thumbnail span{
-  position: absolute;
-  display: block;
-  margin: auto;
-  width: 100%;
-  top: 20px;
-}
-
-.umb-photo-folder .selected{
-  position: relative;
-}
-
-.umb-photo-folder .selected:before{
-  content: "\e165";
-  font-family: Icomoon;
-
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-
-  font-size: 24px;
-  color: @black;
-  opacity: 0.5;
-  background: @white;
-
-  line-height: 36px;
-  text-align: center;
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-
-  height: 32px;
-  width: 32px;
-  overflow: hidden;
-  display: block;
-  z-index: 100;
 }
 
 

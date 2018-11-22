@@ -1,30 +1,19 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using HtmlAgilityPack;
 using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web
 {
@@ -97,12 +86,12 @@ namespace Umbraco.Web
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
 
-            if (_umbracoContext.PublishedContentRequest == null)
+            if (_umbracoContext.PublishedRequest == null)
             {
                 throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
             }
 
-            return RenderMacro(alias, parameters, _umbracoContext.PublishedContentRequest.UmbracoPage);
+            return RenderMacro(alias, parameters, _umbracoContext.PublishedRequest.UmbracoPage);
         }
 
         /// <summary>
@@ -117,13 +106,11 @@ namespace Umbraco.Web
             if (alias == null) throw new ArgumentNullException("alias");
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
 
-            var m = macro.GetMacro(alias);
+            var m = Current.Services.MacroService.GetByAlias(alias);
             if (m == null)
-            {
                 throw new KeyNotFoundException("Could not find macro with alias " + alias);
-            }
 
-            return RenderMacro(m, parameters, umbracoPage);
+            return RenderMacro(new MacroModel(m), parameters, umbracoPage);
         }
 
         /// <summary>
@@ -133,10 +120,10 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
         /// <returns></returns>
-        internal IHtmlString RenderMacro(macro m, IDictionary<string, object> parameters, page umbracoPage)
+        internal IHtmlString RenderMacro(MacroModel m, IDictionary<string, object> parameters, page umbracoPage)
         {
-            if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
-            if (m == null) throw new ArgumentNullException("m");
+            if (umbracoPage == null) throw new ArgumentNullException(nameof(umbracoPage));
+            if (m == null) throw new ArgumentNullException(nameof(m));
 
             if (_umbracoContext.PageId == null)
             {
@@ -146,16 +133,15 @@ namespace Umbraco.Web
             var macroProps = new Hashtable();
             foreach (var i in parameters)
             {
-                //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
+                //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
 
 
                 //NOTE: the value could have html encoded values, so we need to deal with that
                 macroProps.Add(i.Key.ToLowerInvariant(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
-            var macroControl = m.renderMacro(macroProps,
-                umbracoPage.Elements,
-                _umbracoContext.PageId.Value);
+            var renderer = new MacroRenderer(Current.ProfilingLogger);
+            var macroControl = renderer.Render(m, umbracoPage.Elements, _umbracoContext.PageId.Value, macroProps).GetAsControl();
 
             string html;
             if (macroControl is LiteralControl)
@@ -180,9 +166,9 @@ namespace Umbraco.Web
                     // within Razor since it will never be inserted into the page pipeline (which may even not exist at all
                     // if we're running MVC).
                     //
-                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure 
+                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure
                     // those out as we go along. One thing we lose is the content type response output.
-                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
+                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So
                     // here we'll save the content type response and reset it after execute is called.
 
                     var contentType = _umbracoContext.HttpContext.Response.ContentType;
@@ -194,127 +180,11 @@ namespace Umbraco.Web
                     _umbracoContext.HttpContext.Response.ContentType = contentType;
 
                     //Now, we need to ensure that local links are parsed
-                    html = TemplateUtilities.ParseInternalLinks(output.ToString());
+                    html = TemplateUtilities.ParseInternalLinks(output.ToString(), _umbracoContext.UrlProvider);
                 }
             }
 
             return new HtmlString(html);
-        }
-
-        /// <summary>
-        /// Renders an field to the template
-        /// </summary>
-        /// <param name="currentPage"></param>
-        /// <param name="fieldAlias"></param>
-        /// <param name="altFieldAlias"></param>
-        /// <param name="altText"></param>
-        /// <param name="insertBefore"></param>
-        /// <param name="insertAfter"></param>
-        /// <param name="recursive"></param>
-        /// <param name="convertLineBreaks"></param>
-        /// <param name="removeParagraphTags"></param>
-        /// <param name="casing"></param>
-        /// <param name="encoding"></param>
-        /// <param name="formatAsDate"></param>
-        /// <param name="formatAsDateWithTime"></param>
-        /// <param name="formatAsDateWithTimeSeparator"></param>
-        //// <param name="formatString"></param>
-        /// <returns></returns>
-        public IHtmlString Field(IPublishedContent currentPage, string fieldAlias,
-            string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
-            bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
-            RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
-            bool formatAsDate = false,
-            bool formatAsDateWithTime = false,
-            string formatAsDateWithTimeSeparator = "")
-
-            //TODO: commented out until as it is not implemented by umbraco:item yet
-        //,string formatString = "")
-        {
-            Mandate.ParameterNotNull(currentPage, "currentPage");
-            Mandate.ParameterNotNullOrEmpty(fieldAlias, "fieldAlias");
-
-            //TODO: This is real nasty and we should re-write the 'item' and 'ItemRenderer' class but si fine for now
-
-            var attributes = new Dictionary<string, string>
-				{
-					{"field", fieldAlias},
-					{"recursive", recursive.ToString().ToLowerInvariant()},
-					{"useifempty", altFieldAlias},
-					{"textifempty", altText},
-					{"stripparagraph", removeParagraphTags.ToString().ToLowerInvariant()},
-					{
-						"case", casing == RenderFieldCaseType.Lower ? "lower"
-						        	: casing == RenderFieldCaseType.Upper ? "upper"
-						        	  	: casing == RenderFieldCaseType.Title ? "title"
-						        	  	  	: string.Empty
-						},
-					{"inserttextbefore", insertBefore},
-					{"inserttextafter", insertAfter},
-					{"convertlinebreaks", convertLineBreaks.ToString().ToLowerInvariant()},
-                    {"formatasdate", formatAsDate.ToString().ToLowerInvariant()},
-                    {"formatasdatewithtime", formatAsDateWithTime.ToString().ToLowerInvariant()},
-                    {"formatasdatewithtimeseparator", formatAsDateWithTimeSeparator}
-				};
-            switch (encoding)
-            {
-                case RenderFieldEncodingType.Url:
-                    attributes.Add("urlencode", "true");
-                    break;
-                case RenderFieldEncodingType.Html:
-                    attributes.Add("htmlencode", "true");
-                    break;
-                case RenderFieldEncodingType.Unchanged:
-                default:
-                    break;
-            }
-
-            //need to convert our dictionary over to this weird dictionary type
-            var attributesForItem = new AttributeCollectionAdapter(
-                new AttributeCollection(
-                    new StateBag()));
-            foreach (var i in attributes)
-            {
-                attributesForItem.Add(i.Key, i.Value);
-            }
-
-
-
-            var item = new Item(currentPage)
-            {
-                Field = fieldAlias,
-                TextIfEmpty = altText,
-                LegacyAttributes = attributesForItem
-            };
-
-            //here we are going to check if we are in the context of an Umbraco routed page, if we are we 
-            //will leave the NodeId empty since the underlying ItemRenderer will work ever so slightly faster
-            //since it already knows about the current page. Otherwise, we'll assign the id based on our
-            //currently assigned node. The PublishedContentRequest will be null if:
-            // * we are rendering a partial view or child action
-            // * we are rendering a view from a custom route
-            if ((_umbracoContext.PublishedContentRequest == null
-                || _umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
-                && currentPage.Id > 0) // in case we're rendering a detached content (id == 0)
-            {
-                item.NodeId = currentPage.Id.ToString(CultureInfo.InvariantCulture);
-            }
-
-
-            var containerPage = new FormlessPage();
-            containerPage.Controls.Add(item);
-
-            using (var output = new StringWriter())
-            using (var htmlWriter = new HtmlTextWriter(output))
-            {
-                ItemRenderer.Instance.Init(item);
-                ItemRenderer.Instance.Load(item);
-                ItemRenderer.Instance.Render(item, htmlWriter);
-
-                //because we are rendering the output through the legacy Item (webforms) stuff, the {localLinks} will already be replaced.
-                return new HtmlString(output.ToString());
-            }
         }
     }
 }

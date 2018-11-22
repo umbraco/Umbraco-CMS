@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryItem : Entity, IDictionaryItem
+    public class DictionaryItem : EntityBase, IDictionaryItem
     {
         public Func<int, ILanguage> GetLanguage { get; set; }
         private Guid? _parentId;
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
                 }
 
                 SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
-                    Ps.Value.DictionaryTranslationComparer);                
+                    Ps.Value.DictionaryTranslationComparer);
             }
         }
     }

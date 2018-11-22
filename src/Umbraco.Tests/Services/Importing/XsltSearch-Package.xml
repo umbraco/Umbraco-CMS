@@ -161,10 +161,8 @@ p.xsltsearch_result_description {padding-bottom: 10px;}
     <macro>
       <name>XSLTsearch</name>
       <alias>XSLTsearch</alias>
-      <scriptType>
-      </scriptType>
-      <scriptAssembly>
-      </scriptAssembly>
+      <macroType>Unknown</macroType>
+      <macroSource />
       <xslt>XSLTsearch.xslt</xslt>
       <useInEditor>False</useInEditor>
       <refreshRate>0</refreshRate>

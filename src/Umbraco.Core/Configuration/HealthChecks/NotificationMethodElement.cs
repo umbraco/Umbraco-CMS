@@ -13,7 +13,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         private const string SettingsKey = "settings";
 
         [ConfigurationProperty(AliasKey, IsKey = true, IsRequired = true)]
-        public string Alias 
+        public string Alias
         {
             get
             {

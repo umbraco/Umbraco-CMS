@@ -325,5 +325,23 @@
         };
     }
 
+    if (!Object.toBoolean) {
+
+        /** Converts a string/integer/bool to true/false */
+        Object.toBoolean = function (obj) {
+            if (obj === undefined || obj === null) {
+                return false;
+            }
+
+            if ((typeof obj) === "boolean") {
+                return obj;
+            }
+
+            if (obj === "1" || obj === 1 || obj.toString().toLowerCase() === "true") {
+                return true;
+            }
+            return false;
+        };
+    }
 
 })();

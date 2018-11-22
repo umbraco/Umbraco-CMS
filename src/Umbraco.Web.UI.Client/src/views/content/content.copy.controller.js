@@ -1,7 +1,6 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
     function ($scope, userService, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
-	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
 	    localizationService.localize("general_search").then(function (value) {
 	        searchText = value + "...";
@@ -9,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 
 	    $scope.relateToOriginal = true;
 	    $scope.recursive = true;
-	    $scope.dialogTreeEventHandler = $({});
+	    $scope.dialogTreeApi = {};
 	    $scope.busy = false;
 	    $scope.searchInfo = {
 	        searchFromId: null,
@@ -26,15 +25,15 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
 	    });
 
-	    var node = dialogOptions.currentNode;
+	    var node = $scope.currentNode;
 
-        function treeLoadedHandler(ev, args) {
+        function treeLoadedHandler(args) {
             if (node && node.path) {
-                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
             }
         }
 
-	    function nodeSelectHandler(ev, args) {
+	    function nodeSelectHandler(args) {
 
 			if(args && args.event) {
 	        	args.event.preventDefault();
@@ -53,7 +52,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 
 	    }
 
-	    function nodeExpandedHandler(ev, args) {
+	    function nodeExpandedHandler(args) {
 			// open mini list view for list views
           	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
@@ -78,7 +77,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
                 }
                 $scope.recursive = true;
             }
-        }
+		}
+		
+		$scope.closeDialog = function() {
+			navigationService.hideDialog();
+		};
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;
@@ -127,25 +130,15 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
                 }, function (err) {
                     $scope.success = false;
                     $scope.error = err;
-                    $scope.busy = false;
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
+                    $scope.busy = false;                   
                 });
 	    };
 
-	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	    });
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }
 
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
@@ -160,5 +153,5 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 		function openMiniListView(node) {
 			$scope.miniListView = node;
 		}
-
+		
 	});

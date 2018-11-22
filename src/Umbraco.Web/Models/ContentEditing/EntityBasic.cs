@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.Web.Http.ModelBinding;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Serialization;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -62,12 +64,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "path")]
         public string Path { get; set; }
-        
+
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
         [DataMember(Name = "metaData")]
         [ReadOnly(true)]
-        public IDictionary<string, object> AdditionalData { get; private set; } 
+        public IDictionary<string, object> AdditionalData { get; private set; }
     }
 }

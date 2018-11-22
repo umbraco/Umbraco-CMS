@@ -1,43 +1,52 @@
 <div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval">
 
-	<umb-control-group label="Toolbar" hide-label="false">
-		<div ng-repeat="cmd in tinyMceConfig.commands">
+    <umb-control-group label="Toolbar" hide-label="false">
+        <div ng-repeat="cmd in tinyMceConfig.commands">
             <label>
-			    <input type="checkbox" 
-				       ng-checked="selected(cmd, cmd.frontEndCommand, model.value.toolbar)" 
-				       ng-model="cmd.selected" 
-				       ng-change="selectCommand(cmd)" /> 
+                <input type="checkbox"
+                       ng-checked="selected(cmd, cmd.alias, model.value.toolbar)"
+                       ng-model="cmd.selected"
+                       ng-change="selectCommand(cmd)" />
 
-				<!--<img ng-src="{{cmd.icon}}" />-->
+                <!--<img ng-src="{{cmd.icon}}" />-->
                 <i class="mce-ico" ng-class="(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon"></i>
 
                 {{cmd.name}}
             </label>
-		</div>
-	</umb-control-group>
+        </div>
+    </umb-control-group>
 
-	<umb-control-group label="Stylesheets" hide-label="0">
-		<div ng-repeat="css in stylesheets">
+    <umb-control-group label="Stylesheets" hide-label="0">
+        <div ng-repeat="css in stylesheets">
             <label>
-			    <input type="checkbox" 
-				       ng-checked="selected(css, css.name, model.value.stylesheets)" 
-				       ng-model="css.selected" 
-				       ng-change="selectStylesheet(css)" /> 
-		        {{css.name}}
+                <input type="checkbox"
+                       ng-checked="selected(css, css.name, model.value.stylesheets)"
+                       ng-model="css.selected"
+                       ng-change="selectStylesheet(css)" />
+                {{css.name}}
             </label>
-		</div>
-	</umb-control-group>
+        </div>
+    </umb-control-group>
 
     <umb-control-group label="Dimensions" description="Width x Height">
         <div class="vertical-align-items">
-            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-editor-tiny" placeholder="Width" /> &times;
-            <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-editor-tiny" placeholder="Height" /> Pixels
+            <input type="number" min="0" ng-model="model.value.dimensions.width" class="umb-property-editor-tiny" placeholder="Width" /> &times;
+            <input type="number" min="0" ng-model="model.value.dimensions.height" class="umb-property-editor-tiny" placeholder="Height" /> Pixels
         </div>
     </umb-control-group>
 
     <umb-control-group label="Maximum size for inserted images" description="0 to disable resizing">
         <div class="vertical-align-items">
-            <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-editor-tiny" placeholder="Width/Height" /> Pixels
-        </div> 
+            <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-property-editor-tiny" placeholder="Width/Height" /> Pixels
+        </div>
+    </umb-control-group>
+
+    <umb-control-group label="Mode" description="Select mode">
+        <div class="vertical-align-items">
+            <select ng-model="model.value.mode">
+                <option value="classic">Classic</option> <!-- Theme:modern & inline:false-->
+                <option value="distraction-free">Distraction Free</option> <!-- Theme:inlite & inline:true -->
+            </select>
+        </div>
     </umb-control-group>
 </div>

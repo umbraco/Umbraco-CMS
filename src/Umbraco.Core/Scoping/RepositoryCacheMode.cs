@@ -1,16 +1,37 @@
 ﻿namespace Umbraco.Core.Scoping
 {
+    /// <summary>
+    /// Specifies the cache mode of repositories.
+    /// </summary>
     public enum RepositoryCacheMode
     {
-        // ?
+        /// <summary>
+        /// Unspecified.
+        /// </summary>
         Unspecified = 0,
 
-        // the default, full L2 cache
+        /// <summary>
+        /// Default, full L2 cache.
+        /// </summary>
         Default = 1,
 
-        // a scoped cache
-        // reads from and writes to a local cache
-        // clears the global cache on completion
-        Scoped = 2
+        /// <summary>
+        /// Scoped cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>Reads from, and writes to, a scope-local cache.</para>
+        /// <para>Upon scope completion, clears the global L2 cache.</para>
+        /// </remarks>
+        Scoped = 2,
+
+        /// <summary>
+        /// No cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>Bypasses caches entirely.</para>
+        /// <para>Upon scope completion, clears the global L2 cache.</para>
+        /// fixme - what about a L1 cache?
+        /// </remarks>
+        None = 3
     }
 }

@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
@@ -23,7 +24,7 @@ namespace Umbraco.Web
 
         public RelatedLinksTypeConverter()
         {
-            
+
         }
 
         private static readonly Type[] ConvertableTypes = new[]
@@ -66,7 +67,7 @@ namespace Umbraco.Web
                             if (type == "internal")
                             {
                                 var linkId = a.Value<int>("link");
-                                var link = umbracoHelper.NiceUrl(linkId);
+                                var link = umbracoHelper.Url(linkId);
                                 a["link"] = link;
                             }
                         }
@@ -86,12 +87,12 @@ namespace Umbraco.Web
 
             if (UmbracoContext.Current == null)
             {
-                LogHelper.Warn<RelatedLinksTypeConverter>("Cannot create an UmbracoHelper the UmbracoContext is null");
+                Current.Logger.Warn<RelatedLinksTypeConverter>("Cannot create an UmbracoHelper the UmbracoContext is null");
                 return null;
             }
 
             //DO NOT assign to _umbracoHelper variable, this is a singleton class and we cannot assign this based on an UmbracoHelper which is request based
-            return new UmbracoHelper(UmbracoContext.Current);
+            return new UmbracoHelper(UmbracoContext.Current, Current.Services, Current.ApplicationCache);
         }
     }
 }

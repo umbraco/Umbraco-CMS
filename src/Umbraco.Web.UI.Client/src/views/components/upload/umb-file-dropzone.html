@@ -1,10 +1,10 @@
 <div data-element="dropzone" class="umb-file-dropzone-directive">
 
-<ng-form name="uploadForm">
+<ng-form name="uploadForm" umb-isolate-form>
 
 <!-- Drag and drop files area -->
     <div ngf-drop
-        ng-hide="hideDropzone"
+        ng-hide="hideDropzone === 'true'"
         ng-model="filesHolder"
         ngf-change="handleFiles($files, $event)"
         class="dropzone"
@@ -28,7 +28,7 @@
                  class="file-select"
                  ngf-select
                  ng-model="filesHolder"
-                 ngf-change="handleFiles($files, $event)"
+                 ngf-change="handleFiles($newFiles, $event)"
                  ngf-multiple="true"
                  ngf-pattern="{{ accept }}"
                  ngf-max-size="{{ maxFileSize }}">

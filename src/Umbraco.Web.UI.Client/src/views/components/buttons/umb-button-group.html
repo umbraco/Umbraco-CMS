@@ -5,15 +5,18 @@
       alias="{{defaultButton.alias ? defaultButton.alias : 'groupPrimary' }}"
       type="button"
       action="defaultButton.handler()"
-      button-style="success"
+      button-style="{{buttonStyle}}"
       state="state"
       label="{{defaultButton.labelKey}}"
       label-key="{{defaultButton.labelKey}}"
       shortcut="{{defaultButton.hotKey}}"
-      shortcut-when-hidden="{{defaultButton.hotKeyWhenHidden}}">
+      shortcut-when-hidden="{{defaultButton.hotKeyWhenHidden}}"
+      size="{{size}}"
+      icon="{{icon}}"
+      add-ellipsis={{defaultButton.addEllipsis}}>
    </umb-button>
 
-   <a data-element="button-group-toggle" class="btn btn-success dropdown-toggle umb-button-group__toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+   <a data-element="button-group-toggle" class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}" data-toggle="dropdown" ng-if="subButtons.length > 0">
       <span class="caret"></span>
    </a>
 
@@ -21,6 +24,7 @@
       <li ng-repeat="subButton in subButtons">
          <a data-element="{{subButton.alias ? 'button-' + subButton.alias : 'button-group-secondary-' + $index }}" href="#" ng-click="subButton.handler()" hotkey="{{subButton.hotKey}}" hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}" prevent-default>
             <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
+            <span ng-if="subButton.addEllipsis === 'true'">...</span>
          </a>
       </li>
    </ul>

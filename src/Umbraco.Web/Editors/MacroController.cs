@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -11,9 +11,10 @@ using System.Web.SessionState;
 using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using umbraco;
+using Umbraco.Web.Macros;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Editors
 {
@@ -28,6 +29,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MacroController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+
+        public MacroController(IVariationContextAccessor variationContextAccessor)
+        {
+            _variationContextAccessor = variationContextAccessor;
+        }
+
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
@@ -95,15 +103,13 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            //need to get a legacy macro object - eventually we'll have a new format but nto yet
-            var macro = new macro(macroAlias);
-            if (macro == null)
-            {
+            var m = Services.MacroService.GetByAlias(macroAlias);
+            if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var macro = new MacroModel(m);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
-            if (macro.DontRenderInEditor)
+            if (macro.RenderInEditor == false)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as html since this controller has been configured
@@ -124,12 +130,11 @@ namespace Umbraco.Web.Editors
             var culture = publishedContent?.GetCulture();
             if (culture != null)
             {
-                Thread.CurrentThread.CurrentCulture = culture;
-                Thread.CurrentThread.CurrentUICulture = culture;
+                Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture.Culture);
             }
 
-            var legacyPage = new global::umbraco.page(doc);
-            UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
+            var legacyPage = new global::umbraco.page(doc, _variationContextAccessor);
+
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
 
@@ -158,7 +163,7 @@ namespace Umbraco.Web.Editors
             {
                 Alias = macroName.ToSafeAlias(),
                 Name = macroName,
-                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
+                MacroSource = model.VirtualPath.EnsureStartsWith("~")
             };
 
             Services.MacroService.Save(macro); // may throw

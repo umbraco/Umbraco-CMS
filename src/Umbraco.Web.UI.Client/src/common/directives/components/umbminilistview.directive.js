@@ -8,10 +8,9 @@
             scope.search = "";
             scope.miniListViews = [];
             scope.breadcrumb = [];
-            
+            scope.listViewAnimation = "";
+
             var miniListViewsHistory = [];
-            var goingForward = true;
-            var skipAnimation = true;
 
             function onInit() {
                 open(scope.node);
@@ -23,8 +22,6 @@
                 if(node && node.icon) {
                     node.icon = iconHelper.convertFromLegacyIcon(node.icon);
                 }
-
-                goingForward = true;
 
                 var miniListView = {
                     node: node,
@@ -41,6 +38,7 @@
 
                 // clear and push mini list view in dom so we only render 1 view
                 scope.miniListViews = [];
+                scope.listViewAnimation = "in";
                 scope.miniListViews.push(miniListView);
 
                 // store in history so we quickly can navigate back
@@ -121,7 +119,7 @@
             scope.clickBreadcrumb = function(ancestor) {
 
                 var found = false;
-                goingForward = false;
+                scope.listViewAnimation = "out";
 
                 angular.forEach(miniListViewsHistory, function(historyItem, index){
                     // We need to make sure we can compare the two id's. 
@@ -187,22 +185,6 @@
                     getChildrenForMiniListView(miniListView);
                 });
             }, 500);
-
-            /* Animation */
-            scope.getMiniListViewAnimation = function() {
-
-                // disable the first "slide-in-animation"" if the start node is a list view
-                if(scope.node.metaData && scope.node.metaData.IsContainer && skipAnimation || scope.node.isContainer && skipAnimation) {
-                    skipAnimation = false;
-                    return;
-                }
-
-                if(goingForward) {
-                    return 'umb-mini-list-view--forward';
-                } else {
-                    return 'umb-mini-list-view--backwards';
-                }
-            };
 
             onInit();
 

@@ -1,138 +1,71 @@
 using System;
-using System.Data;
 using System.Web;
-using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
 using System.Web.UI;
+using Umbraco.Core.Persistence;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.UI.Pages
 {
     /// <summary>
     /// umbraco.BasePages.BasePage is the default page type for the umbraco backend.
-    /// The basepage keeps track of the current user and the page context. But does not 
+    /// The basepage keeps track of the current user and the page context. But does not
     /// Restrict access to the page itself.
     /// The keep the page secure, the umbracoEnsuredPage class should be used instead
     /// </summary>
     public class BasePage : Page
     {
-        
-        private ClientTools _clientTools;
-        
-
-        //We won't expose this... people should be using the DatabaseContext for custom queries if they need them.
-
-        ///// <summary>
-        ///// Gets the SQL helper.
-        ///// </summary>
-        ///// <value>The SQL helper.</value>
-        //protected ISqlHelper SqlHelper
-        //{
-        //    get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
-        //}
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public ProfilingLogger ProfilingLogger
-        {
-            get { return _logger ?? (_logger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)); }
-        }
-
-        private ProfilingLogger _logger;
-        
-
-	    private UrlHelper _url;
-		/// <summary>
-		/// Returns a UrlHelper
-		/// </summary>
-		/// <remarks>
-		/// This URL helper is created without any route data and an empty request context
-		/// </remarks>
-	    public UrlHelper Url
-	    {
-		    get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
-	    }
-
+        private UrlHelper _url;
         private HtmlHelper _html;
-        /// <summary>
-        /// Returns a HtmlHelper
-        /// </summary>        
-        /// <remarks>
-        /// This html helper is created with an empty context and page so it may not have all of the functionality expected.
-        /// </remarks>
-        public HtmlHelper Html
-        {
-            get { return _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage())); }
-        }
+        private ClientTools _clientTools;
 
         /// <summary>
-        /// Returns the current ApplicationContext
+        /// Gets the logger.
         /// </summary>
-        public ApplicationContext ApplicationContext
-        {
-            get { return ApplicationContext.Current; }
-        }
+        public ILogger Logger => Current.Logger;
 
         /// <summary>
-        /// Returns the current UmbracoContext
+        /// Gets the profiling helper.
         /// </summary>
-        public UmbracoContext UmbracoContext
-        {
-            get { return UmbracoContext.Current; }
-        }
+        public ProfilingLogger ProfilingLogger => Current.ProfilingLogger;
 
         /// <summary>
-        /// Returns the current WebSecurity instance
+        /// Gets the Url helper.
         /// </summary>
-        public WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
-        }
+        /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
 
         /// <summary>
-        /// Returns a ServiceContext
+        /// Gets the Html helper.
         /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
-        }
+        /// <remarks>This html helper is created with an empty context and page so it may not have all of the functionality expected.</remarks>
+        public HtmlHelper Html => _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage()));
 
         /// <summary>
-        /// Returns a DatabaseContext
+        /// Gets the Umbraco context.
         /// </summary>
-        public DatabaseContext DatabaseContext
-        {
-            get { return ApplicationContext.DatabaseContext; }
-        }
+        public UmbracoContext UmbracoContext => Current.UmbracoContext;
 
         /// <summary>
-        /// Returns a refernce of an instance of ClientTools for access to the pages client API
+        /// Gets the web security helper.
         /// </summary>
-        public ClientTools ClientTools
-        {
-            get { return _clientTools ?? (_clientTools = new ClientTools(this)); }
-        }
-        
-        
+        public WebSecurity Security => UmbracoContext.Security;
+
+        /// <summary>
+        /// Gets the services context.
+        /// </summary>
+        public ServiceContext Services => Current.Services;
+
+        /// <summary>
+        /// Gets an instance of ClientTools for access to the pages client API.
+        /// </summary>
+        public ClientTools ClientTools => _clientTools ?? (_clientTools = new ClientTools(this));
 
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"></see> event.
@@ -142,12 +75,10 @@ namespace Umbraco.Web.UI.Pages
         {
             base.OnLoad(e);
 
-            if (!Request.IsSecureConnection && GlobalSettings.UseSSL)
-            {
-                string serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
-                Response.Redirect(string.Format("https://{0}{1}", serverName, Request.FilePath));
-            }
-        }
+            if (Request.IsSecureConnection || UmbracoConfig.For.GlobalSettings().UseHttps == false) return;
 
+            var serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
+            Response.Redirect($"https://{serverName}{Request.FilePath}");
+        }
     }
 }

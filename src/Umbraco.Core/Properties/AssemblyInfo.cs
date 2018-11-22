@@ -2,57 +2,40 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
 [assembly: AssemblyTitle("Umbraco.Core")]
-[assembly: AssemblyDescription("Core assembly containing the new codebase foundation")]
+[assembly: AssemblyDescription("Umbraco Core")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Umbraco CMS")]
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("130a6b5c-50e7-4df3-a0dd-e9e7eb0b7c5c")]
 
-[assembly: InternalsVisibleTo("umbraco")]
-[assembly: InternalsVisibleTo("Umbraco.Tests")]
-[assembly: InternalsVisibleTo("Umbraco.Extensions")]
-[assembly: InternalsVisibleTo("businesslogic")]
-[assembly: InternalsVisibleTo("cms")]
-[assembly: InternalsVisibleTo("umbraco.editorControls")]
-[assembly: InternalsVisibleTo("umbraco.webservices")]
-[assembly: InternalsVisibleTo("umbraco.datalayer")]
-[assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-[assembly: InternalsVisibleTo("umbraco.providers")]
-[assembly: InternalsVisibleTo("umbraco.editorControls")]
-[assembly: InternalsVisibleTo("Umbraco.Tests")]
-[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
-[assembly: InternalsVisibleTo("Umbraco.Core")]
+// Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("UmbracoExamine")]
+[assembly: InternalsVisibleTo("Umbraco.Examine")]
 
-[assembly: InternalsVisibleTo("Concorde.Sync")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
+[assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
 
+[assembly: InternalsVisibleTo("Umbraco.Extensions")] // fixme - what is this?
+
+// Allow this to be mocked in our unit tests
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// Umbraco Deploy
 [assembly: InternalsVisibleTo("Umbraco.Deploy")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Deploy.Cloud")]
 
+// Umbraco Forms
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
+// Umbraco Headless
 [assembly: InternalsVisibleTo("Umbraco.Headless")]
 
-//allow this to be mocked in our unit tests
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-
-//allow custom unit-testing code to access internals through custom adapters
-[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]          // backwards compat.
-[assembly: InternalsVisibleTo("Umbraco.UnitTesting.Adapter")]   // new, more imperative name
+// code analysis
+// IDE1006 is broken, wants _value syntax for consts, etc - and it's even confusing ppl at MS, kill it
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "~_~")]

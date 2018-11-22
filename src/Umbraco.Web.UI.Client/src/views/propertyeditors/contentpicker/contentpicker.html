@@ -1,30 +1,29 @@
-<div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-editor umb-contentpicker">
+<div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-property-editor umb-contentpicker">
 
     <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems"></localize></p>
 
     <ng-form name="contentPickerForm">
 
-        <div ui-sortable="sortableOptions" ng-model="renderModel">
-            <umb-node-preview
-                ng-repeat="node in renderModel"
-                icon="node.icon"
-                name="node.name"
-                published="node.published"
-                description="node.url"
-                sortable="!sortableOptions.disabled"
-                allow-remove="allowRemoveButton"
-                allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
-                on-remove="remove($index)"
-                on-open="openMiniEditor(node)">
+        <div ui-sortable="sortableOptions" ng-model="sortableModel">
+            <umb-node-preview ng-repeat="node in renderModel track by node.id"
+                              icon="node.icon"
+                              name="node.name"
+                              published="node.published"
+                              description="node.url"
+                              sortable="!sortableOptions.disabled"
+                              allow-remove="allowRemoveButton"
+                              allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
+                              on-remove="remove($index)"
+                              on-open="openContentEditor(node)">
             </umb-node-preview>
         </div>
- 
+
         <a ng-show="model.config.multiPicker === true && renderModel.length < model.config.maxNumber || renderModel.length === 0 || !model.config.maxNumber"
-            class="umb-node-preview-add"
-            href=""
-            ng-click="openContentPicker()"
-            prevent-default>
+           class="umb-node-preview-add"
+           href=""
+           ng-click="openContentPicker()"
+           prevent-default>
             <localize key="general_add">Add</localize>
         </a>
 
@@ -37,7 +36,7 @@
                     <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected"> items selected</localize>
                 </span>
             </span>
-            
+
             <!-- Equal min and max -->
             <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber === model.config.maxNumber">
                 <span ng-if="renderModel.length < model.config.maxNumber">Add {{model.config.minNumber - renderModel.length}} item(s)</span>
@@ -65,21 +64,17 @@
         <input type="hidden" name="minCount" ng-model="renderModel" />
         <input type="hidden" name="maxCount" ng-model="renderModel" />
 
-        <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
-            <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
+        <div ng-messages="contentPickerForm.minCount.$error" show-validation-on-submit >
+            <div class="help-inline" ng-message="minCount">
+                <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
+            </div>
         </div>
-
-        <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
-            <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+        <div ng-messages="contentPickerForm.maxCount.$error" show-validation-on-submit >
+            <div class="help-inline" ng-message="maxCount">
+                <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+            </div>
         </div>
 
     </ng-form>
-
-    <umb-overlay
-      ng-if="contentPickerOverlay.show"
-      model="contentPickerOverlay"
-      view="contentPickerOverlay.view"
-      position="right">
-    </umb-overlay>
 
 </div>

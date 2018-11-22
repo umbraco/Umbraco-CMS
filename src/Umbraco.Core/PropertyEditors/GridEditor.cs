@@ -1,11 +1,15 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    internal class GridEditor : IGridEditorConfig
+    public class GridEditor : IGridEditorConfig
     {
+        private string _view;
+        private string _render;
+
         public GridEditor()
         {
             Config = new Dictionary<string, object>();
@@ -18,10 +22,18 @@ namespace Umbraco.Core.PropertyEditors
         public string Alias { get; set; }
 
         [JsonProperty("view", Required = Required.Always)]
-        public string View { get; set; }
+        public string View
+        {
+            get => _view;
+            set => _view = IOHelper.ResolveVirtualUrl(value);
+        }
 
         [JsonProperty("render")]
-        public string Render { get; set; }
+        public string Render
+        {
+            get => _render;
+            set => _render = IOHelper.ResolveVirtualUrl(value);
+        }
 
         [JsonProperty("icon", Required = Required.Always)]
         public string Icon { get; set; }
@@ -50,7 +62,7 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Serves as a hash function for a particular type. 
+        /// Serves as a hash function for a particular type.
         /// </summary>
         /// <returns>
         /// A hash code for the current <see cref="T:System.Object"/>.

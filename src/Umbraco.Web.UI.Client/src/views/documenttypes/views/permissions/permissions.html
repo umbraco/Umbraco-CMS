@@ -1,50 +1,61 @@
 <div ng-controller="Umbraco.Editors.DocumentType.PermissionsController as vm">
 
-    <div class="sub-view-columns">
+    <umb-box>
+        <umb-box-content>
 
-        <div class="sub-view-column-left">
-            <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
-            <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
-        </div>
-        <div class="sub-view-column-right">
-            <umb-toggle
-                data-element="permissions-allow-as-root"
-                checked="model.allowAsRoot"
-                on-click="vm.toggle()"
-                hotkey="alt+shift+r"
-                >
-            </umb-toggle>
-        </div>
+            <div class="sub-view-columns">
 
-    </div>
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_allowAsRootHeading" /></h5>
+                    <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-as-root"
+                                checked="model.allowAsRoot"
+                                on-click="vm.toggleAllowAsRoot()"
+                                hotkey="alt+shift+r">
+                    </umb-toggle>
+                </div>
 
-    <div class="sub-view-columns">
+            </div>
 
-        <div class="sub-view-column-left">
-            <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
-            <small><localize key="contentTypeEditor_childNodesDescription" /></small>
-        </div>
+            <div class="sub-view-columns">
 
-        <div class="sub-view-column-right">
-            <umb-child-selector
-                    selected-children="vm.selectedChildren"
-                    available-children="vm.contentTypes"
-                    parent-name="model.name"
-                    parent-icon="model.icon"
-                    parent-id="model.id"
-                    on-add="vm.addChild"
-                    on-remove="vm.removeChild">
-            </umb-child-selector>
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_childNodesHeading" /></h5>
+                    <small><localize key="contentTypeEditor_childNodesDescription" /></small>
+                </div>
 
-            <umb-overlay
-               ng-if="vm.childNodeSelectorOverlay.show"
-               model="vm.childNodeSelectorOverlay"
-               position="target"
-               view="vm.childNodeSelectorOverlay.view">
-            </umb-overlay>
+                <div class="sub-view-column-right">
+                    <umb-child-selector selected-children="vm.selectedChildren"
+                                        available-children="vm.contentTypes"
+                                        parent-name="model.name"
+                                        parent-icon="model.icon"
+                                        parent-id="model.id"
+                                        on-add="vm.addChild"
+                                        on-remove="vm.removeChild">
+                    </umb-child-selector>
+                </div>
 
-        </div>
+            </div>
 
-    </div>
+            <div class="sub-view-columns">
 
+                <div class="sub-view-column-left">
+                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                    <small><localize key="contentTypeEditor_variantsDescription" /></small>
+                </div>
+
+                <div class="sub-view-column-right">
+                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                checked="model.allowCultureVariant"
+                                on-click="vm.toggleAllowCultureVariants()"
+                                hotkey="alt+shift+v">
+                    </umb-toggle>
+                </div>
+    
+            </div>
+
+        </umb-box-content>
+    </umb-box>
 </div>
