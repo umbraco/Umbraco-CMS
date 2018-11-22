@@ -33,6 +33,26 @@ namespace Umbraco.Examine
         }
     }
 
+    public class HtmlAnalyzer : Analyzer
+    {
+        public override TokenStream TokenStream(string fieldName, TextReader reader)
+        {
+            return new LowerCaseFilter(                 //case insensitive
+                 new EmailAddressTokenizer(reader));    //email tokenizer
+        }
+
+        /// <summary>
+        /// Used for email addresses
+        /// </summary>
+        public class HtmlTokenizer : Tokenizer
+        {
+            public override bool IncrementToken()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
     /// <summary>
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
