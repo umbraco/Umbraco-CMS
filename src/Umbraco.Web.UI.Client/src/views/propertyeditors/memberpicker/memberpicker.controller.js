@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, entityResource, iconHelper, angularHelper, editorService){
+function memberPickerController($scope, dialogService, entityResource, $log, iconHelper, angularHelper){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -38,24 +38,27 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
         angular.extend(dialogOptions, $scope.model.config);
     }
 
-    $scope.openMemberPicker = function () {
+    $scope.openMemberPicker = function() {
+       $scope.memberPickerOverlay = dialogOptions;
+       $scope.memberPickerOverlay.view = "memberPicker";
+       $scope.memberPickerOverlay.show = true;
 
-        var memberPicker = dialogOptions;
+       $scope.memberPickerOverlay.submit = function(model) {
 
-        memberPicker.submit = function (model) {
-            if (model.selection) {
-                _.each(model.selection, function (item, i) {
-                    $scope.add(item);
-                });
-            }
-            editorService.close();
-        };
+          if (model.selection) {
+             _.each(model.selection, function(item, i) {
+                $scope.add(item);
+             });
+          }
 
-        memberPicker.close = function () {
-            editorService.close();
-        };
+          $scope.memberPickerOverlay.show = false;
+          $scope.memberPickerOverlay = null;
+       };
 
-        editorService.treePicker(memberPicker);
+       $scope.memberPickerOverlay.close = function(oldModel) {
+          $scope.memberPickerOverlay.show = false;
+          $scope.memberPickerOverlay = null;
+       };
 
     };
 

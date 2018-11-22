@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for <see cref="IAuditEntry"/> entities.
     /// </summary>
-    public interface IAuditEntryRepository : IReadWriteQueryRepository<int, IAuditEntry>
+    public interface IAuditEntryRepository : IRepositoryQueryable<int, IAuditEntry>
     {
         /// <summary>
         /// Gets a page of entries.

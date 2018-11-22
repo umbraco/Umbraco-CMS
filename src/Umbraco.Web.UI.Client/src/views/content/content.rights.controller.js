@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper, navigationService) {
+    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper) {
 
         var vm = this;
         var currentForm;
@@ -21,7 +21,6 @@
         vm.cancelManagePermissions = cancelManagePermissions;
         vm.closeDialog = closeDialog;
         vm.stay = stay;
-        vm.discardChanges = discardChanges;
 
         function onInit() {
             vm.loading = true;
@@ -167,16 +166,14 @@
         }
 
         function closeDialog() {
+
           // check if form has been changed. If it has show discard changes notification
           if (currentForm && currentForm.$dirty) {
             vm.showNotification = true;
           } else {
-            navigationService.hideDialog();
+            $scope.nav.hideDialog();
           }
-        }
-
-        function discardChanges() {
-          navigationService.hideDialog();
+          
         }
 
         onInit();

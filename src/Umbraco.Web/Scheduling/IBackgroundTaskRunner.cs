@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Hosting;
 
 namespace Umbraco.Web.Scheduling

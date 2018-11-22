@@ -11,8 +11,7 @@
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
-@using Umbraco.Core.Configuration
-@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
+@inherits System.Web.Mvc.WebViewPage
 @{
     Layout = null;
 
@@ -26,14 +25,15 @@
 
 <html lang="en">
 <head>
-    <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -45,19 +45,21 @@
 </head>
 <body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController" class="login-only">
 
-    <umb-login on-login="loginAndRedirect()"></umb-login>
+    <div data-backdrop="false" class="modal hide login-overlay" aria-hidden="false" style="display: block;">
+        <div ng-include="'views/common/dialogs/login.html'"></div>
+    </div>
 
     <umb-notifications></umb-notifications>
 
     @{
         var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
         {
-            area = ViewBag.UmbracoPath,
+            area = ViewBag.UmbracoPath, 
             //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl)
 
     <script type="text/javascript">
     document.angularReady = function (app) {
@@ -69,7 +71,7 @@
     </script>
 
     @*And finally we can load in our angular app*@
-    <script type="text/javascript" src="lib/lazyload-js/lazyload.min.js"></script>
+    <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
 </body>

@@ -1,20 +1,23 @@
-﻿using Umbraco.Core.Logging;
+using System;
+using System.Data;
+using System.Web.Security;
+using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
-using Umbraco.Core;
-using Umbraco.Web;
-using Umbraco.Web.Composing;
-using Umbraco.Web._Legacy.UI;
-using umbraco.cms.businesslogic.packager;
+using umbraco.BusinessLogic;
+using umbraco.DataLayer;
+using umbraco.BasePages;
+using Umbraco.Core.IO;
+using umbraco.cms.businesslogic.member;
 
-namespace Umbraco.Web
+namespace umbraco
 {
     public class CreatedPackageTasks : LegacyDialogTask
     {
-
+        
         public override bool PerformSave()
         {
-            Current.Logger.Info<CreatedPackageTasks>("Xml save started");
-            int id = CreatedPackage.MakeNew(Alias).Data.Id;
+            LogHelper.Info<CreatedPackageTasks>("Xml save started");
+            int id = cms.businesslogic.packager.CreatedPackage.MakeNew(Alias).Data.Id;
             _returnUrl = string.Format("developer/packages/editPackage.aspx?id={0}", id);
             return true;
         }
@@ -26,7 +29,7 @@ namespace Umbraco.Web
             {
                 ParentID = int.Parse(Alias.Substring("package_".Length));
             }
-            CreatedPackage.GetById(ParentID).Delete();
+            cms.businesslogic.packager.CreatedPackage.GetById(ParentID).Delete();
             return true;
         }
 
@@ -39,7 +42,7 @@ namespace Umbraco.Web
 
         public override string AssignedApp
         {
-            get { return Constants.Applications.Packages.ToString(); }
+            get { return DefaultApps.developer.ToString(); }
         }
     }
 }

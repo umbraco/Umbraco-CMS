@@ -8,26 +8,52 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class TraceCheck : AbstractConfigCheck
     {
+        private readonly ILocalizedTextService _textService;
 
-        public TraceCheck(ILocalizedTextService textService)
-            : base(textService)
-        { }
-
-        public override string FilePath => "~/Web.config";
-
-        public override string XPath => "/configuration/system.web/trace/@enabled";
-
-        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
-
-        public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
+        public TraceCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
-            new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
-        };
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/traceModeCheckSuccessMessage");
+        public override string FilePath
+        {
+            get { return "~/Web.config"; }
+        }
 
-        public override string CheckErrorMessage => TextService.Localize("healthcheck/traceModeCheckErrorMessage");
+        public override string XPath
+        {
+            get { return "/configuration/system.web/trace/@enabled"; }
+        }
 
-        public override string RectifySuccessMessage => TextService.Localize("healthcheck/traceModeCheckRectifySuccessMessage");
+        public override ValueComparisonType ValueComparisonType
+        {
+            get { return ValueComparisonType.ShouldEqual; }
+        }
+
+        public override IEnumerable<AcceptableConfiguration> Values
+        {
+            get
+            {
+                return new List<AcceptableConfiguration>
+                {
+                    new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
+                };
+            }
+        }
+
+        public override string CheckSuccessMessage
+        {
+            get { return _textService.Localize("healthcheck/traceModeCheckSuccessMessage"); }
+        }
+
+        public override string CheckErrorMessage
+        {
+            get { return _textService.Localize("healthcheck/traceModeCheckErrorMessage"); }
+        }
+
+        public override string RectifySuccessMessage
+        {
+            get { return _textService.Localize("healthcheck/traceModeCheckRectifySuccessMessage"); }
+        }
     }
 }

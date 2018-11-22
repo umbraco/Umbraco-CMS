@@ -2,43 +2,48 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
+using umbraco.BasePages;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Ensures authorization is successful for a back office user.
-    /// </summary>
-    public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
-    {
-        // see note in HttpInstallAuthorizeAttribute
+    /// <summary>	
+	/// Ensures authorization is successful for a back office user
+	/// </summary>
+	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
+	{
+        private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
-        private readonly IRuntimeState _runtimeState;
         private readonly string _redirectUrl;
 
-        private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
 
-        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             _umbracoContext = umbracoContext;
-            _runtimeState = runtimeState;
+            _applicationContext = _umbracoContext.Application;
         }
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public UmbracoAuthorizeAttribute()
-        { }
+        {
+        }
 
         /// <summary>
         /// Constructor specifying to redirect to the specified location if not authorized
@@ -57,7 +62,7 @@ namespace Umbraco.Web.Mvc
         {
             if (redirectToUmbracoLogin)
             {
-                _redirectUrl = UmbracoConfig.For.GlobalSettings().Path.EnsureStartsWith("~");
+                _redirectUrl = GlobalSettings.Path.EnsureStartsWith("~");
             }
         }
 
@@ -67,22 +72,26 @@ namespace Umbraco.Web.Mvc
         /// <param name="httpContext"></param>
         /// <returns></returns>
         protected override bool AuthorizeCore(HttpContextBase httpContext)
-        {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+		{
+		    if (httpContext == null) throw new ArgumentNullException("httpContext");
+            
+		    try
+			{
+                var appContext = GetApplicationContext();
+                var umbContext = GetUmbracoContext();
 
-            try
-            {
-                // if not configured (install or upgrade) then we can continue
-                // otherwise we need to ensure that a user is logged in
-                return RuntimeState.Level == RuntimeLevel.Install
-                    || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || UmbracoContext.Security.ValidateCurrentUser();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+				//we need to that the app is configured and that a user is logged in
+                if (!appContext.IsConfigured)
+					return false;
+
+                var isLoggedIn = umbContext.Security.ValidateCurrentUser();
+				return isLoggedIn;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
 
         /// <summary>
         /// Override to to ensure no redirect occurs
@@ -101,9 +110,9 @@ namespace Umbraco.Web.Mvc
                 filterContext.Result = new RedirectResult(_redirectUrl);
             }
 
-            // DON'T do a FormsAuth redirect... argh!! thankfully we're running .Net 4.5 :)
+            //DON'T do a FormsAuth redirect... argh!! thankfully we're running .Net 4.5 :)
             filterContext.RequestContext.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
         }
 
-    }
+	}
 }

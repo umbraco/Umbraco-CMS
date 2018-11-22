@@ -4,39 +4,17 @@ namespace Umbraco.Core
 {
     public static class HttpContextExtensions
     {
-        public static T GetContextItem<T>(this HttpContextBase httpContext, string key)
-        {
-            if (httpContext == null) return default(T);
-            if (httpContext.Items[key] == null) return default(T);
-            var val = httpContext.Items[key].TryConvertTo<T>();
-            if (val) return val.Result;
-            return default(T);
-        }
-
-        public static T GetContextItem<T>(this HttpContext httpContext, string key)
-        {
-            return new HttpContextWrapper(httpContext).GetContextItem<T>(key);
-        }
-
         public static string GetCurrentRequestIpAddress(this HttpContextBase httpContext)
         {
             if (httpContext == null)
             {
                 return "Unknown, httpContext is null";
             }
-
-            HttpRequestBase request;
-            try
-            {
-                // is not null - throws
-                request = httpContext.Request;
-            }
-            catch
+            if (httpContext.Request == null)
             {
                 return "Unknown, httpContext.Request is null";
             }
-
-            if (request.ServerVariables == null)
+            if (httpContext.Request.ServerVariables == null)
             {
                 return "Unknown, httpContext.Request.ServerVariables is null";
             }
@@ -45,16 +23,16 @@ namespace Umbraco.Core
 
             try
             {
-                var ipAddress = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+                var ipAddress = httpContext.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
                 if (string.IsNullOrEmpty(ipAddress))
-                    return request.UserHostAddress;
+                    return httpContext.Request.UserHostAddress;
 
                 var addresses = ipAddress.Split(',');
                 if (addresses.Length != 0)
                     return addresses[0];
 
-                return request.UserHostAddress;
+                return httpContext.Request.UserHostAddress;
             }
             catch (System.Exception ex)
             {

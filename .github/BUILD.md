@@ -6,13 +6,19 @@ Umbraco Cms Build
 
 To build Umbraco, fire PowerShell and move to Umbraco's repository root (the directory that contains `src`, `build`, `README.md`...). There, trigger the build with the following command:
 
-    build/build.ps1
+    build\build.ps1
     
+By default, this builds the current version. It is possible to specify a different version as a parameter to the build script: 
+
+    build\build.ps1 7.6.44
+
+Valid version strings are defined in the `Set-UmbracoVersion` documentation below.
+
 ## PowerShell Quirks
 
 There is a good chance that running `build.ps1` ends up in error, with messages such as
 
->The file ...\build.ps1 is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies.
+>The file ...\build\build.ps1 is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies.
 
 PowerShell has *Execution Policies* that may prevent the script from running. You can check the current policies with:
 
@@ -36,7 +42,7 @@ Alternatively, you can do it at machine level, from within an elevated PowerShel
 
 And *then* the script should run. It *might* however still complain about executing scripts, with messages such as:
 
->Security warning - Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning message. Do you want to run ...\build.ps1?
+>Security warning - Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning message. Do you want to run ...\build\build.ps1?
 [D] Do not run  [R] Run once  [S] Suspend  [?] Help (default is "D"):
 
 This is usually caused by the scripts being *blocked*. And that usually happens when the source code has been downloaded as a Zip file. When Windows downloads Zip files, they are marked as *blocked* (technically, they have a Zone.Identifier alternate data stream, with a value of "3" to indicate that they were downloaded from the Internet). And when such a Zip file is un-zipped, each and every single file is also marked as blocked.
@@ -45,20 +51,30 @@ The best solution is to unblock the Zip file before un-zipping: right-click the 
 
     PS> Get-ChildItem -Recurse *.* | Unblock-File
 
-## Git Quirks
+## Notes
 
 Git might have issues dealing with long file paths during build. You may want/need to enable `core.longpaths` support (see [this page](https://github.com/msysgit/msysgit/wiki/Git-cannot-create-a-file-or-directory-with-a-long-path) for details).
 
-# Build Infrastructure
+# Build
 
-The Umbraco Build infrastructure relies on a PowerShell object. The object can be retrieved with:
+The Umbraco Build solution relies on a PowerShell module. The module needs to be imported into PowerShell. From within Umbraco's repository root:
 
-    $ubuild = build/build.ps1 -get
+    build\build.ps1 -ModuleOnly
 
-The object exposes various properties and methods that can be used to fine-grain build Umbraco. Some, but not all, of them are detailed below.
+Or the abbreviated form:
+
+    build\build.ps1 -mo
+
+Once the module has been imported, a set of commands are added to PowerShell.
+
+## Get-UmbracoBuildEnv
+
+Gets the Umbraco build environment ie NuGet, Semver, Visual Studio, etc. Downloads things that can be downloaded such as NuGet. Examples:
+
+    $uenv = Get-UmbracoBuildEnv
+    Write-Host $uenv.SolutionRoot
+    &$uenv.NuGet help
     
-## Properties
-
 The object exposes the following properties:
 
 * `SolutionRoot`: the absolute path to the solution root
@@ -76,11 +92,11 @@ The Visual Studio object is `null` when Visual Studio has not been detected (eg 
 * `Minor`: Visual Studio minor version
 * `MsBUild`: the absolute path to the MsBuild executable
 
-## GetUmbracoVersion
+## Get-UmbracoVersion
 
 Gets an object representing the current Umbraco version. Example:
 
-    $v = $ubuild.GetUmbracoVersion()
+    $v = Get-UmbracoVersion
     Write-Host $v.Semver
 
 The object exposes the following properties:
@@ -90,24 +106,28 @@ The object exposes the following properties:
 * `Comment`: the pre release part of the version (eg `alpha02`)
 * `Build`: the build number part of the version (eg `1234`)
 
-## SetUmbracoVersion
+## Set-UmbracoVersion
 
 Modifies Umbraco files with the new version.
 
->This entirely replaces the legacy `UmbracoVersion.txt` file. Do *not* edit version infos in files.
+>This entirely replaces the legacy `UmbracoVersion.txt` file.
 
 The version must be a valid semver version. It can include a *pre release* part (eg `alpha02`) and/or a *build number* (eg `1234`). Examples:
 
-    $ubuild.SetUmbracoVersion("7.6.33")
-    $ubuild.SetUmbracoVersion("7.6.33-alpha.2")
-    $ubuild.SetUmbracoVersion("7.6.33+1234")
-    $ubuild.SetUmbracoVersion("7.6.33-beta.5+5678")
+    Set-UmbracoVersion 7.6.33
+    Set-UmbracoVersion 7.6.33-alpha02
+    Set-UmbracoVersion 7.6.33+1234
+    Set-UmbracoVersion 7.6.33-beta05+5678
 
-## Build
+Note that `Set-UmbracoVersion` enforces a slightly more restrictive naming scheme than what semver would tolerate. The pre release part can only be composed of a-z and 0-9, therefore `alpha033` is considered valid but not `alpha.033` nor `alpha033-preview` nor `RC2` (would need to be lowercased `rc2`). 
+
+>It is considered best to add trailing zeroes to pre releases, else NuGet gets the order of versions wrong. So if you plan to have more than 10, but no more that 100 alpha versions, number the versions `alpha00`, `alpha01`, etc. 
+
+## Build-Umbraco
 
 Builds Umbraco. Temporary files are generated in `build.tmp` while the actual artifacts (zip files, NuGet packages...) are produced in `build.out`. Example:
 
-    $ubuild.Build()
+    Build-Umbraco
 
 Some log files, such as MsBuild logs, are produced in `build.tmp` too. The `build` directory should remain clean during a build.
 
@@ -160,5 +180,7 @@ Nightlies should use some sort of build number.
 We should increment versions as soon as a version is released. Ie, as soon as `7.6.33` is released, we should `Set-UmbracoVersion 7.6.34-alpha` and push.
 
 NuGet / NuSpec consistency checks are performed in tests. We should move it so it is done as part of the PowerShell script even before we try to compile and run the tests.
+
+There are still a few commands in `build` (to build docs, install Git or cleanup the install) that will need to be migrated to PowerShell.
 
 /eof

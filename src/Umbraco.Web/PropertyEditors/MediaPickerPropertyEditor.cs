@@ -1,24 +1,51 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents a media picker property editor.
+    /// Legacy media property editor that stores Integer Ids
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MediaPicker, EditorType.PropertyValue | EditorType.MacroParameter,
-        "Media Picker", "mediapicker", ValueType = ValueTypes.Text, Group = "media", Icon = "icon-picture")]
-    public class MediaPickerPropertyEditor : DataEditor
+    [Obsolete("This editor is obsolete, use ContentPicker2PropertyEditor instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "(Obsolete) Media Picker", PropertyEditorValueTypes.Integer, "mediapicker", Group = "media", Icon = "icon-picture", IsDeprecated = true)]
+    public class MediaPickerPropertyEditor : MediaPicker2PropertyEditor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MediaPickerPropertyEditor"/> class.
-        /// </summary>
-        public MediaPickerPropertyEditor(ILogger logger)
-            : base(logger)
-        { }
+        public MediaPickerPropertyEditor()
+        {
+            InternalPreValues = new Dictionary<string, object>
+                {
+                    {"multiPicker", "0"},
+                    {"onlyImages", "0"},
+                    {"idType", "int"}
+                };
+        }
 
-        /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor();
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new SingleMediaPickerPreValueEditor();
+        }
+
+        internal class SingleMediaPickerPreValueEditor : PreValueEditor
+        {
+            public SingleMediaPickerPreValueEditor()
+            {
+                Fields.Add(new PreValueField()
+                {
+                    Key = "startNodeId",
+                    View = "mediapicker",
+                    Name = "Start node",
+                    Config = new Dictionary<string, object>
+                    {
+                        {"idType", "int"}
+                    }
+                });
+            }
+        }
     }
 }

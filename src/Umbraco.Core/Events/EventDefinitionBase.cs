@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 
 namespace Umbraco.Core.Events
@@ -7,27 +7,28 @@ namespace Umbraco.Core.Events
     {
         protected EventDefinitionBase(object sender, object args, string eventName = null)
         {
-            Sender = sender ?? throw new ArgumentNullException(nameof(sender));
-            Args = args ?? throw new ArgumentNullException(nameof(args));
+            if (sender == null) throw new ArgumentNullException("sender");
+            if (args == null) throw new ArgumentNullException("args");
+            Sender = sender;
+            Args = args;
             EventName = eventName;
 
             if (EventName.IsNullOrWhiteSpace())
             {
-                // don't match "Ing" suffixed names
-                var findResult = EventNameExtractor.FindEvent(sender, args, exclude:EventNameExtractor.MatchIngNames);
+                var findResult = EventNameExtractor.FindEvent(sender, args, 
+                    //don't match "Ing" suffixed names
+                    exclude:EventNameExtractor.MatchIngNames);
 
                 if (findResult.Success == false)
-                    throw new AmbiguousMatchException("Could not automatically find the event name, the event name will need to be explicitly registered for this event definition. "
-                        + $"Sender: {sender.GetType()} Args: {args.GetType()}"
-                        + " Error: " + findResult.Result.Error);
+                    throw new AmbiguousMatchException("Could not automatically find the event name, the event name will need to be explicitly registered for this event definition. Error: " + findResult.Result.Error);
                 EventName = findResult.Result.Name;
             }
         }
 
-        public object Sender { get; }
-        public object Args { get; }
-        public string EventName { get; }
-
+        public object Sender { get; private set; }
+        public object Args { get; private set; }
+        public string EventName { get; private set; }
+        
         public abstract void RaiseEvent();
 
         public bool Equals(EventDefinitionBase other)

@@ -1,23 +1,32 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(string))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class EmailAddressValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.EmailAddress);
-
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (string);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
-            return source?.ToString() ?? string.Empty;
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
+            {
+                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.EmailAddressAlias);
+            }
+            return false;
         }
+
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        {
+            if(source == null) 
+            {
+                return string.Empty;
+            }
+            
+            return source.ToString();
+        }
+        
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -16,12 +16,12 @@ namespace Umbraco.Web.Editors
     /// <remarks>
     /// An example would be if you had json like:
     /// { ids: [1,2,3,4] }
-    ///
+    /// 
     /// And you had an action like: GetByIds(int[] ids, UmbracoEntityTypes type)
-    ///
-    /// The ids array will not bind because the object being sent up is an object and not an array so the
-    /// normal json formatter will not figure this out.
-    ///
+    /// 
+    /// The ids array will not bind because the object being sent up is an object and not an array so the 
+    /// normal json formatter will not figure this out. 
+    /// 
     /// This would also let you bind sub levels of the JSON being sent up too if you wanted with any jsonpath
     /// </remarks>
     internal class FromJsonPathAttribute : ModelBinderAttribute
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 var json = JsonConvert.DeserializeObject<JObject>(strJson);
-
+                
                 //if no explicit json path then use the model name
                 var match = json.SelectToken(_jsonPath ?? bindingContext.ModelName);
 
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Editors
                 return true;
             }
         }
-
-
+        
+        
     }
 }

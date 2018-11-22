@@ -1,8 +1,8 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Packaging
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Packaging
 
             string test;
             packageExtraction.Setup(a => a.ReadTextFileFromArchive(pagePath, Constants.Packaging.PackageXmlFileName, out test)).Returns(Xml);
-
+            
             var fileService = new Mock<IFileService>();
             var macroService = new Mock<IMacroService>();
             var packagingService = new Mock<IPackagingService>();

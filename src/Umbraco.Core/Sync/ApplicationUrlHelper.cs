@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
 {
@@ -16,6 +16,8 @@ namespace Umbraco.Core.Sync
         // because we cannot logger.Info<ApplicationUrlHelper> because type is static
         private static readonly Type TypeOfApplicationUrlHelper = typeof(ApplicationUrlHelper);
 
+        private static Func<HttpRequestBase, string> _applicationUrlProvider;
+
         /// <summary>
         /// Gets or sets a custom provider for the umbraco application url.
         /// </summary>
@@ -26,32 +28,68 @@ namespace Umbraco.Core.Sync
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
-        // FIXME need another way to do it, eg an interface, injected!
-        public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; }
-
-        internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, IServerRegistrar serverRegistrar, HttpRequestBase request = null)
+        public static Func<HttpRequestBase, string> ApplicationUrlProvider 
         {
-            var umbracoApplicationUrl = TryGetApplicationUrl(settings, logger, globalSettings, serverRegistrar);
-            if (umbracoApplicationUrl != null)
-                return umbracoApplicationUrl;
-
-            umbracoApplicationUrl = ApplicationUrlProvider?.Invoke(request);
-            if (string.IsNullOrWhiteSpace(umbracoApplicationUrl) == false)
+            get
             {
-                umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (provider)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
+                return _applicationUrlProvider;
+            }
+            set
+            {
+                using (Resolution.Configuration)
+                {
+                    _applicationUrlProvider = value;
+                }
+            } 
+        } 
+
+        // request: will be null if called from ApplicationContext
+        // settings: for unit tests only
+        internal static void EnsureApplicationUrl(ApplicationContext appContext, HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
+        {
+            bool newApplicationUrl = false;
+            if (request != null)
+            {
+                var applicationUrl = GetApplicationUrlFromRequest(request);
+                newApplicationUrl = appContext._umbracoApplicationDomains.TryAdd(applicationUrl, applicationUrl);
+                if (newApplicationUrl)
+                {
+                    LogHelper.Info(typeof(ApplicationUrlHelper), string.Format("New ApplicationUrl detected: {0}", applicationUrl));
+                }
             }
 
-            if (request == null) return null;
+            // if initialized, return
+            if (appContext._umbracoApplicationUrl != null && !newApplicationUrl) return;
 
-            umbracoApplicationUrl = GetApplicationUrlFromCurrentRequest(request, globalSettings);
-            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (UmbracoModule request)", umbracoApplicationUrl);
-            return umbracoApplicationUrl;
+            var logger = appContext.ProfilingLogger.Logger;
+
+            // try settings and IServerRegistrar
+            if (TrySetApplicationUrl(appContext, settings ?? UmbracoConfig.For.UmbracoSettings()))
+                return;
+
+            // try custom provider
+            if (_applicationUrlProvider != null)
+            {
+                var url = _applicationUrlProvider(request);
+                if (url.IsNullOrWhiteSpace() == false)
+                {
+                    appContext._umbracoApplicationUrl = url.TrimEnd('/');
+                    logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (provider)");
+                    return;
+                }
+            }
+
+            // last chance,
+            // use the current request as application url
+            if (request == null) return;
+            SetApplicationUrlFromCurrentRequest(appContext, request);
         }
 
-        internal static string TryGetApplicationUrl(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings, IServerRegistrar serverRegistrar)
+        // internal for tests
+        internal static bool TrySetApplicationUrl(ApplicationContext appContext, IUmbracoSettingsSection settings)
         {
+            var logger = appContext.ProfilingLogger.Logger;
+
             // try umbracoSettings:settings/web.routing/@umbracoApplicationUrl
             // which is assumed to:
             // - end with SystemDirectories.Umbraco
@@ -61,9 +99,9 @@ namespace Umbraco.Core.Sync
             var url = settings.WebRouting.UmbracoApplicationUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
+                appContext._umbracoApplicationUrl = url.TrimEnd('/');
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using web.routing/@umbracoApplicationUrl)");
+                return true;
             }
 
             // try umbracoSettings:settings/scheduledTasks/@baseUrl
@@ -75,11 +113,11 @@ namespace Umbraco.Core.Sync
             url = settings.ScheduledTasks.BaseUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var ssl = globalSettings.UseHttps ? "s" : "";
+                var ssl = GlobalSettings.UseSSL ? "s" : "";
                 url = "http" + ssl + "://" + url;
-                var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using scheduledTasks/@baseUrl)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
+                appContext._umbracoApplicationUrl = url.TrimEnd('/');
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
+                return true;
             }
 
             // try the server registrar
@@ -88,32 +126,42 @@ namespace Umbraco.Core.Sync
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
             // eg "http://www.mysite.com/umbraco"
-            url = serverRegistrar.GetCurrentServerUmbracoApplicationUrl();
+            var resolver = ServerRegistrarResolver.HasCurrent ? ServerRegistrarResolver.Current : null;
+            var registrar = resolver == null ? null : resolver.Registrar as IServerRegistrar2;
+            url = registrar == null ? null : registrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (IServerRegistrar)", umbracoApplicationUrl);
-                return umbracoApplicationUrl;
+                appContext._umbracoApplicationUrl = url.TrimEnd('/');
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (IServerRegistrar)");
+                return true;
             }
 
             // else give up...
-            return null;
+            return false;
         }
 
-        public static string GetApplicationUrlFromCurrentRequest(HttpRequestBase request, IGlobalSettings globalSettings)
+        private static void SetApplicationUrlFromCurrentRequest(ApplicationContext appContext, HttpRequestBase request)
+        {
+            var logger = appContext.ProfilingLogger.Logger;
+
+            appContext._umbracoApplicationUrl = GetApplicationUrlFromRequest(request);
+            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (UmbracoModule request)");
+        }
+
+        private static string GetApplicationUrlFromRequest(HttpRequestBase request)
         {
             // if (HTTP and SSL not required) or (HTTPS and SSL required),
             //  use ports from request
             // otherwise,
             //  if non-standard ports used,
-            //  user may need to set umbracoApplicationUrl manually per
+            //  user may need to set umbracoApplicationUrl manually per 
             //  https://our.umbraco.com/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
-            var port = (request.IsSecureConnection == false && globalSettings.UseHttps == false)
-                        || (request.IsSecureConnection && globalSettings.UseHttps)
+            var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
+                        || (request.IsSecureConnection && GlobalSettings.UseSSL)
                 ? ":" + request.ServerVariables["SERVER_PORT"]
                 : "";
 
-            var useSsl = globalSettings.UseHttps || port == "443";
+            var useSsl = GlobalSettings.UseSSL || port == "443";
             var ssl = useSsl ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 

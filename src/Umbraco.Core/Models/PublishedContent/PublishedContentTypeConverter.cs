@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -7,22 +7,33 @@ namespace Umbraco.Core.Models.PublishedContent
 {
     internal class PublishedContentTypeConverter : TypeConverter
     {
-        private static readonly Type[] ConvertingTypes = { typeof(int) };
+        private static readonly Type[] ConvertableTypes = new[]
+        {
+            typeof(int)
+        };
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            return ConvertingTypes.Any(x => x.IsAssignableFrom(destinationType))
-                   || CanConvertFrom(context, destinationType);
+            return ConvertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
+                   || base.CanConvertFrom(context, destinationType);
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo(
+            ITypeDescriptorContext context,
+            CultureInfo culture,
+            object value,
+            Type destinationType)
         {
-            if (!(value is IPublishedContent publishedContent))
+            var publishedContent = value as IPublishedContent;
+            if (publishedContent == null)
                 return null;
 
-            return typeof(int).IsAssignableFrom(destinationType)
-                ? publishedContent.Id
-                : base.ConvertTo(context, culture, value, destinationType);
+            if (TypeHelper.IsTypeAssignableFrom<int>(destinationType))
+            {
+                return publishedContent.Id;
+            }
+
+            return base.ConvertTo(context, culture, value, destinationType);
         }
     }
 }

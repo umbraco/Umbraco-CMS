@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MacroController",
-    function ($scope, $timeout, editorService, macroResource, macroService,  $routeParams) {
+    function ($scope, $rootScope, $timeout, dialogService, macroResource, macroService,  $routeParams) {
 
         $scope.title = "Click to insert macro";
 
@@ -14,24 +14,31 @@ angular.module("umbraco")
                 }
             };
 
-            var macroPicker = {
-                dialogData: dialogData,
-                submit: function(model) {
-                    var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+            $scope.macroPickerOverlay = {};
+            $scope.macroPickerOverlay.view = "macropicker";
+            $scope.macroPickerOverlay.dialogData = dialogData;
+            $scope.macroPickerOverlay.show = true;
 
-                    $scope.control.value = {
+            $scope.macroPickerOverlay.submit = function(model) {
+
+                var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+
+                $scope.control.value = {
                         macroAlias: macroObject.macroAlias,
                         macroParamsDictionary: macroObject.macroParamsDictionary
-                    };
-    
-                    $scope.setPreview($scope.control.value );
-                    editorService.close();
-                },
-                close: function() {
-                    editorService.close();
-                }
-            }
-            editorService.macroPicker(macroPicker);
+                };
+
+                $scope.setPreview($scope.control.value );
+
+                $scope.macroPickerOverlay.show = false;
+                $scope.macroPickerOverlay = null;
+            };
+
+            $scope.macroPickerOverlay.close = function(oldModel) {
+                $scope.macroPickerOverlay.show = false;
+                $scope.macroPickerOverlay = null;
+            };
+
     	};
 
         $scope.setPreview = function(macro){

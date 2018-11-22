@@ -1,7 +1,7 @@
 <%@ Page Language="C#" ValidateRequest="false" AutoEventWireup="true" MasterPageFile="../../masterpages/umbracoPage.Master"
     Title="Package and export content" CodeBehind="editPackage.aspx.cs" Inherits="umbraco.presentation.developer.packages._Default" %>
 
-<%@ Register TagPrefix="cc2" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
+<%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         var updateMethod = "";
@@ -36,14 +36,14 @@
                 ControlToValidate="packageVersion">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_icon" Text="Package Icon URL">
-            <asp:TextBox ID="iconUrl" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
+            <asp:TextBox ID="iconUrl" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>            
         </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_file" Text="Package file (.zip):">
             <asp:Literal ID="packageUmbFile" runat="server" />
         </cc2:PropertyPanel>
-
+         
     </cc2:Pane>
-
+    
     <cc2:Pane ID="Pane5" runat="server">
         <cc2:PropertyPanel runat="server" ID="pp_umbracoVersion" Text="Umbraco Target Version">
             <asp:TextBox ID="umbracoVersion" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
@@ -51,7 +51,7 @@
                 ControlToValidate="umbracoVersion">*</asp:RequiredFieldValidator>
             <asp:RegularExpressionValidator ID="VersionValidator" runat="server" EnableClientScript="false"
                 ControlToValidate="umbracoVersion" ValidationExpression="^\d+\.\d+\.\d+$">Invalid version number (eg. 7.5.0)</asp:RegularExpressionValidator>
-        </cc2:PropertyPanel>
+        </cc2:PropertyPanel>        
     </cc2:Pane>
 
     <cc2:Pane ID="Pane1_1" runat="server">
@@ -132,7 +132,7 @@
         <table border="0" style="width: 100%;">
             <tr>
                 <td>
-                    <strong style="color: Red;">Remember:</strong> .ascx files for your macros
+                    <strong style="color: Red;">Remember:</strong> .xslt and .ascx files for your macros
                     will be added automaticly, but you will still need to add <strong>assemblies</strong>,
                     <strong>images</strong> and <strong>script files</strong> manually to the list below.
                 </td>
@@ -204,7 +204,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="https://our.umbraco.org/documentation/Reference/Packaging/
+                        <a href="https://our.umbraco.com/documentation/Reference/Packaging/
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

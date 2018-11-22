@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
-
+    
     internal class ControlElement : RawXmlConfigurationElement, IDashboardControl
     {
         public bool ShowOnce
@@ -51,8 +51,8 @@ namespace Umbraco.Core.Configuration.Dashboard
             }
         }
 
-        public string ControlPath
-        {
+        public string ControlPath 
+        { 
             get
             {
                 //we need to return the first (and only) text element of the children (wtf... who designed this configuration ! :P )

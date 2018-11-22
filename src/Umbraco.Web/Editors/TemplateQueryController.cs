@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using System;
+using System.Diagnostics;
+using Umbraco.Web.Dynamics;
+using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -18,6 +19,13 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
+        public TemplateQueryController()
+        { }
+
+        public TemplateQueryController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        { }
+
         private IEnumerable<OperathorTerm> Terms
         {
             get
@@ -59,20 +67,19 @@ namespace Umbraco.Web.Editors
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
-            var umbraco = new UmbracoHelper(UmbracoContext, Services, ApplicationCache);
+            var umbraco = new UmbracoHelper(UmbracoContext);
 
             var queryResult = new QueryResultModel();
 
             var sb = new StringBuilder();
             var indention = Environment.NewLine + "\t\t\t\t\t\t";
 
-            sb.Append("Model.Root()");
-
+            sb.Append("Model.Content.Site()");
             var timer = new Stopwatch();
 
             timer.Start();
 
-            var currentPage = umbraco.ContentAtRoot().FirstOrDefault();
+            var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
             timer.Stop();
 
             var pointerNode = currentPage;
@@ -80,7 +87,7 @@ namespace Umbraco.Web.Editors
             // adjust the "FROM"
             if (model != null && model.Source != null && model.Source.Id > 0)
             {
-                var targetNode = umbraco.Content(model.Source.Id);
+                var targetNode = umbraco.TypedContent(model.Source.Id);
 
                 if (targetNode != null)
                 {
@@ -90,7 +97,7 @@ namespace Umbraco.Web.Editors
                     {
                         timer.Start();
 
-                        pointerNode = pointerNode.FirstChild(x => x.ContentType.Alias == contentTypeAlias);
+                        pointerNode = pointerNode.FirstChild(x => x.DocumentTypeAlias == contentTypeAlias);
 
                         if (pointerNode == null) break;
 
@@ -103,7 +110,7 @@ namespace Umbraco.Web.Editors
                     {
                         // we did not find the path
                         sb.Clear();
-                        sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
+                        sb.AppendFormat("Umbraco.TypedContent({0})", model.Source.Id);
                         pointerNode = targetNode;
                     }
                 }
@@ -159,14 +166,12 @@ namespace Umbraco.Web.Editors
                     timer.Start();
 
                     //trial-run the tokenized clause to time the execution
-                    //for review - this uses a tonized query rather then the normal linq query.
-                    // fixme - that cannot work anymore now that we have killed dynamic support
-                    //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
-                    throw new NotImplementedException();
-
+                    //for review - this uses a tonized query rather then the normal linq query. 
+                    contents = contents.AsQueryable().Where(tokenizedClause, model.Filters.Select(this.GetConstraintValue).ToArray());
                     contents = contents.Where(x => x.IsVisible());
 
                     timer.Stop();
+
 
                     //the query to output to the editor
                     sb.Append(indention);
@@ -195,16 +200,10 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
-                    sb.Append(indention);
+                    var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
 
-                    if (model.Sort.Direction == "ascending")
-                    {
-                        sb.AppendFormat(".OrderBy(x => x.{0})", model.Sort.Property.Alias);
-                    }
-                    else
-                    {
-                        sb.AppendFormat(".OrderByDescending(x => x.{0})", model.Sort.Property.Alias);
-                    }
+                    sb.Append(indention);
+                    sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Alias, direction);
                 }
 
                 if (model.Take > 0)
@@ -255,10 +254,12 @@ namespace Umbraco.Web.Editors
                         ? contents.OrderBy(x => x.Id)
                         : contents.OrderByDescending(x => x.Id);
                 case "createDate":
+
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.CreateDate)
                         : contents.OrderByDescending(x => x.CreateDate);
                 case "publishDate":
+
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.UpdateDate)
                         : contents.OrderByDescending(x => x.UpdateDate);
@@ -267,6 +268,7 @@ namespace Umbraco.Web.Editors
                         ? contents.OrderBy(x => x.Name)
                         : contents.OrderByDescending(x => x.Name);
                 default:
+
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.Name)
                         : contents.OrderByDescending(x => x.Name);
@@ -278,10 +280,10 @@ namespace Umbraco.Web.Editors
             var aliases = new List<string>();
 
             if (targetNode == null || targetNode.Id == current.Id) return aliases;
-
             if (targetNode.Id != current.Id)
             {
-                aliases.Add(targetNode.ContentType.Alias);
+                aliases.Add(targetNode.DocumentTypeAlias);
+
             }
 
             aliases.AddRange(this.GetChildContentTypeAliases(targetNode.Parent, current));
@@ -295,11 +297,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
-            var contentTypes = Services.ContentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
-                .OrderBy(x => x.Name).ToList();
+            var contentTypes =
+                ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
+                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
+                    .OrderBy(x => x.Name).ToList();
 
-            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
+            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
 
             return contentTypes;
         }

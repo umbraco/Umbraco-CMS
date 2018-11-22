@@ -1,90 +1,66 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresher, DomainCacheRefresher.JsonPayload>
+    /// <summary>
+    /// A cache refresher to ensure language cache is refreshed when languages change
+    /// </summary>
+    public sealed class DomainCacheRefresher : CacheRefresherBase<DomainCacheRefresher>
     {
-        private readonly IPublishedSnapshotService _publishedSnapshotService;
-
-        public DomainCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService)
-            : base(cacheHelper)
+        protected override DomainCacheRefresher Instance
         {
-            _publishedSnapshotService = publishedSnapshotService;
+            get { return this; }
         }
 
-        #region Define
-
-        protected override DomainCacheRefresher This => this;
-
-        public static readonly Guid UniqueId = Guid.Parse("11290A79-4B57-4C99-AD72-7748A3CF38AF");
-
-        public override Guid RefresherUniqueId => UniqueId;
-
-        public override string Name => "Domain Cache Refresher";
-
-        #endregion
-
-        #region Refresher
-
-        public override void Refresh(JsonPayload[] payloads)
+        public override Guid UniqueIdentifier
         {
-            ClearAllIsolatedCacheByEntityType<IDomain>();
-
-            // note: must do what's above FIRST else the repositories still have the old cached
-            // content and when the PublishedCachesService is notified of changes it does not see
-            // the new content...
-
-            // notify
-            _publishedSnapshotService.Notify(payloads);
-            // then trigger event
-            base.Refresh(payloads);
+            get { return new Guid(DistributedCache.DomainCacheRefresherId); }
         }
 
-        // these events should never trigger
-        // everything should be PAYLOAD/JSON
+        public override string Name
+        {
+            get { return "Domain cache refresher"; }
+        }
 
         public override void RefreshAll()
         {
-            throw new NotSupportedException();
+            ClearCache();
+            base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
-            throw new NotSupportedException();
-        }
-
-        public override void Refresh(Guid id)
-        {
-            throw new NotSupportedException();
+            ClearCache();
+            base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            throw new NotSupportedException();
+            ClearCache();
+            base.Remove(id);
         }
 
-        #endregion
+        private void ClearCache()
+        {            
+            ClearAllIsolatedCacheByEntityType<IDomain>();
 
-        #region Json
-
-        public class JsonPayload
-        {
-            public JsonPayload(int id, DomainChangeTypes changeType)
+            // SD: we need to clear the routes cache here!             
+            //
+            // zpqrtbnk: no, not here, in fact the caches should subsribe to refresh events else we
+            // are creating a nasty dependency - but keep it like that for the time being while
+            // SD is cleaning cache refreshers up.
+            if (UmbracoContext.Current != null)
             {
-                Id = id;
-                ChangeType = changeType;
+                var contentCache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                if (contentCache != null)
+                    contentCache.RoutesCache.Clear();    
             }
-
-            public int Id { get; }
-
-            public DomainChangeTypes ChangeType { get; }
         }
-
-        #endregion
-
     }
 }

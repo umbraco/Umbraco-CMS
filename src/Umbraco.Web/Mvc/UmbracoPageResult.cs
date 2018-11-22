@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Web;
 using System.Web.Mvc;
@@ -6,40 +6,46 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
-    /// <summary>
-    /// Used by posted forms to proxy the result to the page in which the current URL matches on
-    /// </summary>
-    public class UmbracoPageResult : ActionResult
-    {
-        private readonly ProfilingLogger _profilingLogger;
+	/// <summary>
+	/// Used by posted forms to proxy the result to the page in which the current URL matches on
+	/// </summary>
+	public class UmbracoPageResult : ActionResult
+	{
+	    private readonly ProfilingLogger _profilingLogger;
 
-        public UmbracoPageResult(ProfilingLogger profilingLogger)
-        {
-            _profilingLogger = profilingLogger;
-        }
+	    public UmbracoPageResult(ProfilingLogger profilingLogger)
+	    {
+	        _profilingLogger = profilingLogger;
+	    }
 
-        public override void ExecuteResult(ControllerContext context)
-        {
-            ResetRouteData(context.RouteData);
+        [Obsolete("Use the ctor specifying all depenendencies instead")]
+	    public UmbracoPageResult()
+            : this(new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
+	    {
+	        
+	    }
+
+	    public override void ExecuteResult(ControllerContext context)
+		{
+			ResetRouteData(context.RouteData);
 
             ValidateRouteData(context.RouteData);
 
-            var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
+			var routeDef = (RouteDefinition)context.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken];
 
-            //Special case, if it is webforms but we're posting to an MVC surface controller, then we
+            //Special case, if it is webforms but we're posting to an MVC surface controller, then we 
             // need to return the webforms result instead
-            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.WebForms)
-            {
-                EnsureViewContextForWebForms(context);
-                var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
-                webFormsHandler.ProcessRequest(HttpContext.Current);
-            }
-            else
-            {
+		    if (routeDef.PublishedContentRequest.RenderingEngine == RenderingEngine.WebForms)
+		    {
+		        EnsureViewContextForWebForms(context);
+		        var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
+		        webFormsHandler.ProcessRequest(HttpContext.Current);
+		    }
+		    else
+		    {
                 var factory = ControllerBuilder.Current.GetControllerFactory();
                 context.RouteData.Values["action"] = routeDef.ActionName;
                 ControllerBase controller = null;
@@ -55,30 +61,30 @@ namespace Umbraco.Web.Mvc
                 finally
                 {
                     CleanupController(controller, factory);
-                }
-            }
-        }
+                }    
+		    }
+		}
 
         /// <summary>
         /// Executes the controller action
         /// </summary>
-        private void ExecuteControllerAction(ControllerContext context, IController controller)
-        {
+	    private void ExecuteControllerAction(ControllerContext context, IController controller)
+	    {
             using (_profilingLogger.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
-            {
-                controller.Execute(context.RequestContext);
-            }
-        }
-
-        /// <summary>
-        /// Since we could be returning the current page from a surface controller posted values in which the routing values are changed, we
+	        {
+	            controller.Execute(context.RequestContext);
+	        }
+	    }
+        
+	    /// <summary>
+        /// Since we could be returning the current page from a surface controller posted values in which the routing values are changed, we 
         /// need to revert these values back to nothing in order for the normal page to render again.
         /// </summary>
         private static void ResetRouteData(RouteData routeData)
-        {
+	    {
             routeData.DataTokens["area"] = null;
             routeData.DataTokens["Namespaces"] = null;
-        }
+	    }
 
         /// <summary>
         /// Validate that the current page execution is not being handled by the normal umbraco routing system
@@ -124,7 +130,7 @@ namespace Umbraco.Web.Mvc
                 controller.ViewData[d.Key] = d.Value;
 
             //We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
-            // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is
+            // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is 
             // to Save the state of the temp data first then it will automatically be picked up.
             // http://issues.umbraco.org/issue/U4-1339
 
@@ -134,9 +140,9 @@ namespace Umbraco.Web.Mvc
             {
                 targetController.TempDataProvider = sourceController.TempDataProvider;
                 targetController.TempData = sourceController.TempData;
-                targetController.TempData.Save(sourceController.ControllerContext, sourceController.TempDataProvider);
+                targetController.TempData.Save(sourceController.ControllerContext, sourceController.TempDataProvider);    
             }
-
+            
         }
 
         /// <summary>
@@ -164,11 +170,11 @@ namespace Umbraco.Web.Mvc
                 controller.DisposeIfDisposable();
         }
 
-        private class DummyView : IView
-        {
-            public void Render(ViewContext viewContext, TextWriter writer)
-            {
-            }
-        }
-    }
+	    private class DummyView : IView
+	    {
+	        public void Render(ViewContext viewContext, TextWriter writer)
+	        {
+	        }
+	    }
+	}
 }

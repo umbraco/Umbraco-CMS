@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models
             {
                 return this._propertyData;
             }
-        }
+        }        
 
         public IEnumerator<RelatedLink> GetEnumerator()
         {

@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -21,9 +24,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase("Alpha (10)", "Alpha (2)", +1)] // this is the real stuff
         [TestCase("Kilo", "Golf (2)", +1)]
         [TestCase("Kilo (1)", "Golf (2)", +1)]
-        [TestCase("", "", 0)]
-        [TestCase(null, null, 0)]
-        public void ComparerTest(string name1, string name2, int expected)
+		[TestCase("", "", 0)]
+		[TestCase(null, null, 0)]
+		public void ComparerTest(string name1, string name2, int expected)
         {
             var comparer = new SimilarNodeName.Comparer();
 
@@ -75,9 +78,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase(0, "Alpha", "Alpha (3)")]
         [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
         [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
-        [TestCase(0, "", " (1)")]
-        [TestCase(0, null, " (1)")]
-        public void Test(int nodeId, string nodeName, string expected)
+		[TestCase(0, "", " (1)")]
+		[TestCase(0, null, " (1)")]
+		public void Test(int nodeId, string nodeName, string expected)
         {
             var names = new[]
             {

@@ -2,14 +2,13 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
@@ -21,6 +20,18 @@ namespace Umbraco.Web.Trees
     [AngularJsonOnlyConfiguration]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController
     {
+        protected TreeControllerBase()
+        {
+        }
+
+        protected TreeControllerBase(UmbracoContext umbracoContext) : base(umbracoContext)
+        {
+        }
+
+        protected TreeControllerBase(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper) : base(umbracoContext, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -74,7 +85,7 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("searchable", "true");
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode
+            //now update all data based on some of the query strings, like if we are running in dialog mode           
             if (IsDialog(queryStrings))
             {
                 node.RoutePath = "#";
@@ -92,7 +103,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings">
         /// All of the query string parameters passed from jsTree
         /// </param>
-        /// <returns>JSON markup for jsTree</returns>
+        /// <returns>JSON markup for jsTree</returns>        
         /// <remarks>
         /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
@@ -108,7 +119,7 @@ namespace Umbraco.Web.Trees
                 AddQueryStringsToAdditionalData(node, queryStrings);
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode
+            //now update all data based on some of the query strings, like if we are running in dialog mode            
             if (IsDialog((queryStrings)))
             {
                 foreach (var node in nodes)
@@ -195,7 +206,7 @@ namespace Umbraco.Web.Trees
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
             var node = new TreeNode(id, parentId, jsonUrl, menuUrl)
             {
-                Name = title,
+                Name = title, 
                 Icon = icon,
                 NodeType = TreeAlias
             };
@@ -229,12 +240,11 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
+        public TreeNode CreateTreeNode(UmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
         {
-            var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
-            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
+            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, entity.ContentTypeIcon);
             treeNode.Path = entity.Path;
-            treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
+            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }
@@ -252,8 +262,8 @@ namespace Umbraco.Web.Trees
         public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, string icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
-            treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.Path = entity.Path;
+            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }
@@ -360,8 +370,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public static event TypedEventHandler<TreeControllerBase, TreeNodeRenderingEventArgs> RootNodeRendering;
 
-        // internal for temp class below - kill eventually!
-        internal static void OnRootNodeRendering(TreeControllerBase instance, TreeNodeRenderingEventArgs e)
+        private static void OnRootNodeRendering(TreeControllerBase instance, TreeNodeRenderingEventArgs e)
         {
             var handler = RootNodeRendering;
             if (handler != null) handler(instance, e);
@@ -379,79 +388,6 @@ namespace Umbraco.Web.Trees
         {
             var handler = MenuRendering;
             if (handler != null) handler(instance, e);
-        }
-    }
-
-    internal class TreeControllerBaseStuffForLegacy
-    {
-        private readonly string _treeAlias;
-        private readonly string _rootNodeDisplayName;
-        private readonly UrlHelper _url;
-
-        public TreeControllerBaseStuffForLegacy(string treeAlias, string rootNodeDisplayName, UrlHelper url)
-        {
-            _treeAlias = treeAlias;
-            _rootNodeDisplayName = rootNodeDisplayName;
-            _url = url;
-        }
-
-        public TreeNode GetRootNode(FormDataCollection queryStrings)
-        {
-            if (queryStrings == null) queryStrings = new FormDataCollection("");
-            var node = CreateRootNode(queryStrings);
-
-            //add the tree alias to the root
-            node.AdditionalData["treeAlias"] = _treeAlias;
-
-            AddQueryStringsToAdditionalData(node, queryStrings);
-
-            //check if the tree is searchable and add that to the meta data as well
-            if (this is ISearchableTree)
-            {
-                node.AdditionalData.Add("searchable", "true");
-            }
-
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            if (IsDialog(queryStrings))
-            {
-                node.RoutePath = "#";
-            }
-
-            TreeControllerBase.OnRootNodeRendering(null, new TreeNodeRenderingEventArgs(node, queryStrings));
-
-            return node;
-        }
-
-        protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
-            var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-
-            var node = new TreeNode(
-                rootNodeAsString,
-                null, //this is a root node, there is no parent
-                _url.GetTreeUrl(GetType(), rootNodeAsString, queryStrings),
-                _url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
-            {
-                HasChildren = true,
-                RoutePath = currApp,
-                Name = _rootNodeDisplayName
-            };
-
-            return node;
-        }
-
-        protected void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
-        {
-            foreach (var q in queryStrings.Where(x => node.AdditionalData.ContainsKey(x.Key) == false))
-            {
-                node.AdditionalData.Add(q.Key, q.Value);
-            }
-        }
-
-        protected bool IsDialog(FormDataCollection queryStrings)
-        {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
         }
     }
 }

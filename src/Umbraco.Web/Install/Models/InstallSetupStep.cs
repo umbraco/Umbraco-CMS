@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 
@@ -71,9 +71,9 @@ namespace Umbraco.Web.Install.Models
 
         [IgnoreDataMember]
         public bool PerformsAppRestart { get; private set; }
-
+        
         /// <summary>
-        /// Defines what order this step needs to execute on the server side since the
+        /// Defines what order this step needs to execute on the server side since the 
         /// steps might be shown out of order on the front-end
         /// </summary>
         [DataMember(Name = "serverOrder")]
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Install.Models
         /// </summary>
         [IgnoreDataMember]
         public abstract Type StepType { get; }
-
+        
         [IgnoreDataMember]
         public bool HasUIElement
         {

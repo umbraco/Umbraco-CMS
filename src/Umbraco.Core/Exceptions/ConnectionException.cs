@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Core.Exceptions
 {
@@ -6,7 +6,7 @@ namespace Umbraco.Core.Exceptions
     {
         public ConnectionException(string message, Exception innerException) : base(message, innerException)
         {
-
+            
         }
     }
 }

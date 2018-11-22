@@ -1,0 +1,553 @@
+// item-list
+// -------------------------
+
+
+.umb-item-list {
+	margin: 0;
+	width: auto;
+	display: block
+}
+.umb-item-list li {
+	display: block;
+	width: auto;
+}
+
+
+
+
+// Tree
+// -------------------------
+
+.umb-tree {
+	margin: 0;
+	min-width: 100%;
+	width: auto;
+}
+
+.umb-tree li {
+	display: block;
+	min-width: 100%;
+	width: auto;
+}
+.umb-tree li.current > div,
+.umb-tree div.selected {
+	background: @turquoise-d1;
+}
+.umb-tree li.current > div a.umb-options i,
+.umb-tree div.selected i {
+	background: @white;
+	border-color: @turquoise-d1;
+	transition: opacity 120ms ease;
+}
+
+.umb-tree li.current > div a.umb-options:hover i,
+.umb-tree div.selected i {
+	opacity: .7;
+}
+
+.umb-tree li.current > div a,
+.umb-tree li.current > div i.icon,
+.umb-tree li.current > div ins {
+	color: @white !important;
+	background-color: @turquoise-d1;
+	border-color: @turquoise-d1;
+}
+
+.umb-tree li.root > div:first-child {
+  padding: 0;
+}
+
+.umb-tree li.root > div h5, .umb-tree li.root > div h6 {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.umb-tree li.root > div:first-child h5 > a, .umb-tree-header {
+  display: flex;
+  padding: 20px 0 20px 20px;
+  box-sizing: border-box;
+}
+
+.umb-tree * {
+	white-space: nowrap
+}
+.umb-tree ul {
+	padding: 0;
+	margin: 0;
+	min-width: 100%;
+	width: 100%;
+	//display: table
+}
+
+.umb-tree ul.collapsed {
+    display:none;
+}
+
+.umb-tree a {
+    cursor:pointer;
+	text-decoration: none;
+	outline: none;
+}
+
+.umb-tree a:hover {
+	text-decoration: none
+}
+
+/*.umb-tree div.tree-node {
+	padding: 5px 0 5px 0;
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+}*/
+
+.umb-tree div {
+  padding: 5px 0 5px 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.umb-tree a.noSpr {
+	background-position: 0
+}
+
+.umb-tree div > a.umb-options {
+	visibility: hidden;
+    flex: 1 0 auto;
+}
+.umb-tree div:hover > a.umb-options {
+	visibility: visible;
+}
+
+.umb-tree li.root > div a,
+.umb-tree li.root h5, .umb-tree-header {
+	color: @gray-2;
+	font-weight: bold;
+	font-size: 15px;
+}
+
+.umb-tree ins {
+	margin: -4px 0 0 -16px;
+	width: 16px;
+	height: 16px;
+	visibility: hidden;
+	text-decoration: none;
+    font-size: 12px;
+	transition: opacity 120ms ease;
+}
+
+.umb-tree ins:hover {
+	opacity: .7;
+}
+
+.umb-tree li:hover ins {
+	visibility: visible;
+	cursor: pointer
+}
+
+.umb-tree li div {
+	padding: 0;
+}
+
+.umb-tree li > div a:not(.umb-options) {
+	padding: 6px 0;
+	display: flex;
+    flex: 1 1 100%;
+}
+
+.umb-tree li > div:hover a:not(.umb-options) {
+	overflow: hidden;
+    margin-right: 6px;
+}
+
+.umb-tree .icon {
+	vertical-align: middle;
+	margin: 0 13px 0 0;
+	color: @gray-1;
+	font-size: 20px;
+}
+
+.umb-tree-icon {
+    cursor: pointer;
+}
+
+.umb-tree i.noSpr {
+	display: inline-block;
+	margin-top: 1px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+}
+
+.umb-tree div:hover,
+.umb-tree div.active {
+	background: @gray-10;
+}
+
+.umb-tree small.search-subtitle{
+	color: @gray-7;
+	display: block;
+	padding-left: 35px;
+}
+
+.umb-tree .umb-tree-node-search {
+    cursor:pointer;
+    /*color:@turquoise;*/
+}
+
+.umb-tree div.umb-search-group {
+  position: inherit;
+  display: inherit;
+}
+
+.umb-tree div.umb-search-group:hover {
+  background: inherit;
+}
+.umb-tree div.umb-search-group h6 {
+  /*color: @gray-5;*/
+  padding: 10px 0 10px 20px;
+  font-weight: inherit;
+  background: @gray-10;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.umb-tree .umb-search-group-item {
+	padding-left: 20px;
+}
+
+.umb-tree .umb-search-group-item-link {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	font-weight: normal !important;
+}
+
+.icon-check:before {
+	content: "\e165";
+}
+
+.umb-tree .umb-tree-node-checked i[class^="icon-"],
+.umb-tree .umb-tree-node-checked i[class*=" icon-"] {
+    font-family: 'icomoon' !important;
+    color:@green !important;
+}
+.umb-tree .umb-tree-node-checked i:before {
+	/*check box*/
+    content: "\e165" !important;
+	font-family: inherit;
+}
+
+a.umb-options {
+	visibility: hidden;
+	display: flex;
+	justify-content: flex-end;
+    padding: 9px 5px;
+    text-align: center;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+a.umb-options i {
+	height: 5px !important;
+	width: 5px !important;
+	border-radius: 20px;
+	background: @black;
+	display: inline-block;
+	margin: 0 2px 0 0;
+}
+
+a.umb-options i:last-child {
+	margin: 0;
+}
+
+a.umb-options:hover {
+	background: @btnBackgroundHighlight;
+	.border-radius(@baseBorderRadius);
+}
+
+li.root > div > a.umb-options {
+    top: 18px;
+	display: flex;
+    padding: 10px 5px;
+}
+
+.hide-options a.umb-options{display: none !important}
+.hide-header h5{display: none !important}
+
+
+.umb-icon-item {
+	padding: 2px;
+	padding-left: 55px;
+	display: block;
+	position: relative;
+}
+
+.umb-icon-item:hover {
+	background: @gray-10;
+}
+.umb-icon-item i.icon {
+	position: absolute;
+	top: 8px;
+	left: 19px;
+}
+.umb-icon-item a:hover div {
+	text-decoration: underline;
+}
+
+.umb-icon-item a {
+	color: @gray-3;
+	padding-top: 3px;
+	height: 15px;
+	font-size: 12px;
+	text-decoration: none;
+}
+.umb-icon-item small {
+	color: @gray-6;
+	font-size: 10px;
+	display: block
+}
+.umb-icon-item:hover a.umb-options {
+	visibility: visible
+}
+.umb-icon-item .umb-spr {
+	float: left
+}
+
+
+
+// Tree item states
+// -------------------------
+div.not-published > i.icon,div.not-published > a{
+	opacity: 0.6;
+}
+div.protected:before{
+	content:"\e256";
+	font-family: 'icomoon';
+	color: @red;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
+	bottom: 0;
+}
+
+div.has-unpublished-version:before{
+	content:"\e25a";
+	font-family: 'icomoon';
+	color: @green;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
+	bottom: 0;
+}
+
+div.not-allowed > i.icon,div.not-allowed > a{
+	cursor: not-allowed;
+}
+
+// override small icon color
+.umb-tree li.current > div:before {
+	color: @turquoise-l2;
+}
+div.is-container:before{
+	content:"\e04e";
+	font-family: 'icomoon';
+	color: @turquoise;
+	position: absolute;
+	font-size: 8px;
+	padding-left: 13px;
+	padding-top: 8px;
+	pointer-events: none;
+	bottom: 0;
+}
+
+div.locked:before{
+	content:"\e0a7";
+	font-family: 'icomoon';
+	color: @red;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
+	bottom: 0;
+}
+
+.umb-tree li div.no-access .umb-tree-icon,
+.umb-tree li div.no-access .root-link,
+.umb-tree li div.no-access .umb-tree-item__label {
+	color: @gray-7;
+	cursor: not-allowed;
+}
+
+// Tree context menu
+// -------------------------
+.umb-actions {
+	margin: 12px 0px 0px 0px;
+	padding: 0px;
+	list-style: none;
+	user-select: none;
+}
+
+.umb-actions ul {
+}
+
+.umb-actions li.sep {
+	display: block;
+	border-top: 1px solid @gray-9;
+}
+
+.umb-actions li.sep:first-child {
+	border-top: none;
+}
+
+.umb-actions a {
+	white-space: nowrap;
+	display: block;
+	font-size: 15px;
+	color: @black;
+	padding: 9px 25px 9px 20px;
+	text-decoration: none;
+	cursor: pointer;
+	display: flex;
+    align-items: center;
+}
+
+.umb-actions a:hover, .umb-actions a:focus,
+.umb-actions li.selected {
+	color: @black !important;
+	background: @gray-10 !important;
+}
+
+.umb-actions .menu-label {
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 15px;
+}
+
+.umb-actions i {
+	color: @gray-6;
+	font-size: 18px;
+	vertical-align: middle;
+	color: @gray-3;
+}
+
+.umb-actions-child {
+	list-style: none;
+	display: block;
+	margin: 0px;
+}
+
+.umb-actions-child li {
+	display: block;
+}
+
+.umb-actions-child a {
+	display: block;
+	clear: both;
+	text-decoration: none;
+	padding-left: 10px;
+}
+.umb-actions-child li .menu-label {
+	font-size: 14px;
+	color: @black;
+	margin-left: 10px;
+}
+
+.umb-actions-child li .menu-label small {
+	font-size: 12px;
+	display: block;
+	clear: right;
+	line-height: 14px;
+	color: @gray-6;
+	white-space: normal;
+	margin-top: 2px;
+}
+.umb-actions-child li a:hover .menuLabel small {
+	text-decoration: none !important
+}
+.umb-actions-child i {
+	font-size: 30px;
+    min-width: 30px;
+    text-align: center;
+    line-height: 24px; /* set line-height to ensure all icons use same line-height */
+}
+
+.umb-actions-child li.add {
+	margin-top: 20px;
+	border-top: 1px solid @gray-8;
+	padding-top: 20px;
+}
+.umb-actions-child li.add i {
+	opacity: 0.4;
+}
+
+
+// Tree icon colors
+// -------------------------
+
+.umb-tree i.icon.blue {
+	color: @blue;
+}
+.umb-tree i.icon.green {
+	color: @green;
+}
+.umb-tree i.icon.purple {
+	color: @purple;
+}
+.umb-tree i.icon.orange {
+	color: @orange;
+}
+.umb-tree i.icon.red {
+	color: @red;
+}
+
+
+
+
+// Loading Animation
+// ------------------------
+
+.umb-tree li div.l{
+	width:100%;
+	height:1px;
+	overflow:hidden;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+}
+
+.umb-tree li div.l div {
+    .umb-loader;
+}
+
+//loader defaults
+.umb-tree .umb-loader{
+	height: 10px; margin: 10px 10px 10px 10px;
+}
+
+
+/*body.touch .umb-tree .icon{font-size: 19px;}*/
+body.touch .umb-tree ins{font-size: 14px; visibility: visible; padding: 7px;}
+body.touch .umb-tree li > div {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	font-size: 110%;
+}
+
+// change height of this if touch devices should have a different height of preloader.
+body.touch .umb-tree li div.l div {
+	padding: 0;
+}
+
+body.touch .umb-actions a {
+	padding: 7px 25px 7px 20px;
+	font-size: 110%;
+}

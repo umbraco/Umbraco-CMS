@@ -54,7 +54,9 @@ namespace Umbraco.Core
                     { Script, UdiType.StringUdi},
                     { PartialView, UdiType.StringUdi},
                     { PartialViewMacro, UdiType.StringUdi},
-                    { Stylesheet, UdiType.StringUdi}
+                    { Stylesheet, UdiType.StringUdi},
+                    { UserControl, UdiType.StringUdi},
+                    { Xslt, UdiType.StringUdi},
                 };
             }
 
@@ -107,6 +109,8 @@ namespace Umbraco.Core
             public const string Stylesheet = "stylesheet";
             public const string PartialView = "partial-view";
             public const string PartialViewMacro = "partial-view-macro";
+            public const string UserControl = "usercontrol";
+            public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
             {

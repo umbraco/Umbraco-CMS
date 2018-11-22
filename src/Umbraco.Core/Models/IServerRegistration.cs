@@ -1,10 +1,10 @@
-﻿using System;
-using Umbraco.Core.Models.Entities;
+using System;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
-    public interface IServerRegistration : IServerAddress, IEntity, IRememberBeingDirty
+    public interface IServerRegistration : IServerAddress, IAggregateRoot, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the server unique identity.

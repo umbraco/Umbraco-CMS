@@ -207,7 +207,7 @@ angular.module("umbraco")
                 tagsHound.clearPrefetchCache();
                 tagsHound.clearRemoteCache();
                 $element.find('.tags-' + $scope.model.alias).typeahead('destroy');
-                tagsHound = null;
+                delete tagsHound;
             });
 
         });

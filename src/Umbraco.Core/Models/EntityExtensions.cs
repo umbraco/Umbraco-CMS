@@ -1,17 +1,24 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using System.Linq;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     public static class EntityExtensions
     {
+
         /// <summary>
-        /// Gets additional data.
+        /// Returns true if this entity has just been created and persisted to the data store
         /// </summary>
-        public static object GetAdditionalDataValueIgnoreCase(this IHaveAdditionalData entity, string key, object defaultValue)
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is useful when handling events to determine if an entity is a brand new entity or was
+        /// already existing.
+        /// </remarks>
+        public static bool IsNewEntity(this IEntity entity)
         {
-            if (!entity.HasAdditionalData) return defaultValue;
-            if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultValue;
-            return entity.AdditionalData.GetValueIgnoreCase(key, defaultValue);
+            var dirty = (IRememberBeingDirty)entity;
+            return dirty.WasPropertyDirty("Id");
         }
     }
 }

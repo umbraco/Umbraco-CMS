@@ -1,93 +1,113 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
-using LightInject;
 using Microsoft.Owin;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// Provides a base class for Umbraco controllers.
+    /// A base controller class containing all of the Umbraco objects as properties that a developer requires
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        private UmbracoHelper _umbracoHelper;
+        protected UmbracoController(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            UmbracoContext = umbracoContext;
+        }
 
-        // for debugging purposes
-        internal Guid InstanceId { get; } = Guid.NewGuid();
+        protected UmbracoController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
+            UmbracoContext = umbracoContext;
+            _umbraco = umbracoHelper;
+        }
 
-        // note
-        // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
-        // don't need to implement complex constructors + need to refactor them each time we change ours.
-        // this means that these properties have a setter.
-        // what can go wrong?
+        protected UmbracoController()
+            : this(UmbracoContext.Current)
+        {
+            
+        }
 
-        /// <summary>
-        /// Gets or sets the Umbraco context.
-        /// </summary>
-        [Inject]
-        public virtual IGlobalSettings GlobalSettings { get; set; }
+        protected IOwinContext OwinContext
+        {
+            get { return Request.GetOwinContext(); }
+        }
 
-        /// <summary>
-        /// Gets or sets the Umbraco context.
-        /// </summary>
-        [Inject]
-        public virtual UmbracoContext UmbracoContext { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database context.
-        /// </summary>
-        [Inject]
-        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
+        private UmbracoHelper _umbraco;
 
         /// <summary>
-        /// Gets or sets the services context.
+        /// Returns the MemberHelper instance
         /// </summary>
-        [Inject]
-        public ServiceContext Services { get; set; }
+        public MembershipHelper Members
+        {
+            get { return Umbraco.MembershipHelper; }
+        }
 
         /// <summary>
-        /// Gets or sets the application cache.
+        /// Returns an UmbracoHelper object
         /// </summary>
-        [Inject]
-        public CacheHelper ApplicationCache { get; set; }
+        public virtual UmbracoHelper Umbraco
+        {
+            get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
+        }
 
         /// <summary>
-        /// Gets or sets the logger.
+        /// Returns an ILogger
         /// </summary>
-        [Inject]
-        public ILogger Logger { get; set; }
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
 
         /// <summary>
-        /// Gets or sets the profiling logger.
+        /// Returns a ProfilingLogger
         /// </summary>
-        [Inject]
-        public ProfilingLogger ProfilingLogger { get; set; }
-
-        protected IOwinContext OwinContext => Request.GetOwinContext();
-
-        /// <summary>
-        /// Gets the membership helper.
-        /// </summary>
-        public MembershipHelper Members => Umbraco.MembershipHelper;
+        public virtual ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
 
         /// <summary>
-        /// Gets the Umbraco helper.
+        /// Returns the current UmbracoContext
         /// </summary>
-        public UmbracoHelper Umbraco => _umbracoHelper
-            ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext, Services, ApplicationCache));
+        public virtual UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
-        /// Gets the web security helper.
+        /// Returns the current ApplicationContext
         /// </summary>
-        public virtual WebSecurity Security => UmbracoContext.Security;
+        public virtual ApplicationContext ApplicationContext
+        {
+            get { return UmbracoContext.Application; }
+        }
+
+        /// <summary>
+        /// Returns a ServiceContext
+        /// </summary>
+        public ServiceContext Services
+        {
+            get { return ApplicationContext.Services; }
+        }
+
+        /// <summary>
+        /// Returns a DatabaseContext
+        /// </summary>
+        public DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
+
+        /// <summary>
+        /// Returns the WebSecurity instance
+        /// </summary>
+        public virtual WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
+        }
     }
 }

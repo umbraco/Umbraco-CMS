@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Umbraco.Web.Install.Models
 {
@@ -8,7 +8,7 @@ namespace Umbraco.Web.Install.Models
     public class InstallSetupResult
     {
         public InstallSetupResult()
-        {
+        {            
         }
 
         public InstallSetupResult(IDictionary<string, object> savedStepData, string view, object viewModel = null)

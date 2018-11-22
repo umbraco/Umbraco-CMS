@@ -173,12 +173,6 @@ angular.module('umbraco.directives')
                     return;
                 }
 
-                // ignore clicks in flatpickr datepicker
-                var flatpickr = $(event.target).closest(".flatpickr-calendar");
-                if (flatpickr.length === 1) {
-                    return;
-                }
-
                 //ignore clicks inside this element
                 if( $(element).has( $(event.target) ).length > 0 ){
                     return;
@@ -220,7 +214,7 @@ angular.module('umbraco.directives')
     };
 })
 
-.directive('onRightClick',function($parse){
+.directive('onRightClick',function(){
 
     document.oncontextmenu = function (e) {
        if(e.target.hasAttribute('on-right-click')) {
@@ -234,10 +228,7 @@ angular.module('umbraco.directives')
         el.on('contextmenu',function(e){
             e.preventDefault();
             e.stopPropagation();
-            var fn = $parse(attrs.onRightClick);
-            scope.$apply(function () {
-                fn(scope, { $event: event });
-            });
+            scope.$apply(attrs.onRightClick);
             return false;
         });
     };

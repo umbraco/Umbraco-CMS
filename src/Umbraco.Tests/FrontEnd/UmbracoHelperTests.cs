@@ -1,29 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using LightInject;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.FrontEnd
 {
     [TestFixture]
     public class UmbracoHelperTests
+        : BaseUmbracoApplicationTest
     {
         private const string SampleWithAnchorElement = "Hello world, this is some text <a href='blah'>with a link</a>";
         private const string SampleWithBoldAndAnchorElements = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
         [Test]
         public static void Truncate_Simple()
         {
@@ -83,7 +74,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             var result = encryptedRouteString.DecryptWithMachineKey();
-
             const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
             Assert.AreEqual(expectedResult, result);
@@ -108,7 +98,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             var result = encryptedRouteString.DecryptWithMachineKey();
-
             const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
             Assert.AreEqual(expectedResult, result);
@@ -169,7 +158,7 @@ namespace Umbraco.Tests.FrontEnd
         [Test]
         public static void Strip_Invalid_Html()
         {
-            const string text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
+            var text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
@@ -342,10 +331,9 @@ namespace Umbraco.Tests.FrontEnd
         /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public void Converting_String_Udi_To_A_Udi_Returns_Original_Udi_Value()
+        public static void Converting_String_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
-            SetUpDependencyContainer();
             Udi.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
@@ -364,10 +352,9 @@ namespace Umbraco.Tests.FrontEnd
         /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public void Converting_Hello_To_A_Udi_Returns_False()
+        public static void Converting_Hello_To_A_Udi_Returns_False()
         {
             // Arrange
-            SetUpDependencyContainer();
             Udi.ResetUdiTypes();
             const string sample = "Hello";
 
@@ -402,24 +389,6 @@ namespace Umbraco.Tests.FrontEnd
             // Assert
             Assert.IsFalse(success);
             Assert.That(result, Is.Null);
-        }
-
-        private void SetUpDependencyContainer()
-        {
-            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IServiceContainer>();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-
-            container
-                .Setup(x => x.GetInstance(typeof(TypeLoader)))
-                .Returns(new TypeLoader(
-                    NullCacheProvider.Instance,
-                    globalSettings,
-                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
-                    )
-                );
-
-            Current.Container = container.Object;
         }
     }
 }

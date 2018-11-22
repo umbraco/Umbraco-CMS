@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Owin.Logging;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging
 {
@@ -13,7 +16,9 @@ namespace Umbraco.Core.Logging
         /// <returns/>
         public Microsoft.Owin.Logging.ILogger Create(string name)
         {
-            return new OwinLogger(Current.Logger, new Lazy<Type>(() => Type.GetType(name) ?? typeof (OwinLogger)));
+            return new OwinLogger(
+                LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger(),
+                new Lazy<Type>(() => Type.GetType(name) ?? typeof (OwinLogger)));
         }
     }
 }

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using System.Threading;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-    public class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : IFileSystem2
     {
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
         // eg "c:" or "c:\path\to\site" or "\\server\path"
@@ -28,9 +26,9 @@ namespace Umbraco.Core.IO
         // the "~/" is mandatory.
         public PhysicalFileSystem(string virtualRoot)
         {
-            if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
-            if (virtualRoot.StartsWith("~/") == false)
-                throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
+	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
+			if (virtualRoot.StartsWith("~/") == false)
+				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
             _rootPath = EnsureDirectorySeparatorChar(IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
@@ -39,9 +37,14 @@ namespace Umbraco.Core.IO
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
         {
-            if (string.IsNullOrEmpty(rootPath)) throw new ArgumentNullOrEmptyException(nameof(rootPath));
-            if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentNullOrEmptyException(nameof(rootUrl));
-            if (rootPath.StartsWith("~/")) throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
+            if (string.IsNullOrEmpty(rootPath))
+                throw new ArgumentException("The argument 'rootPath' cannot be null or empty.");
+
+            if (string.IsNullOrEmpty(rootUrl))
+                throw new ArgumentException("The argument 'rootUrl' cannot be null or empty.");
+
+			if (rootPath.StartsWith("~/"))
+				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
             // rootPath should be... rooted, as in, it's a root path!
             if (Path.IsPathRooted(rootPath) == false)
@@ -73,11 +76,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
             }
 
             return Enumerable.Empty<string>();
@@ -109,7 +112,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
             }
         }
 
@@ -153,8 +156,10 @@ namespace Umbraco.Core.IO
             if (directory == null) throw new InvalidOperationException("Could not get directory.");
             Directory.CreateDirectory(directory); // ensure it exists
 
-            if (stream.CanSeek) // fixme - what else?
-                stream.Seek(0, 0);
+            // if can seek, be safe and go back to start, else...
+            // hope that the stream hasn't been read already
+            if (stream.CanSeek)
+                stream.Seek(0, SeekOrigin.Begin);
 
             using (var destination = (Stream) File.Create(fullPath))
                 stream.CopyTo(destination);
@@ -189,11 +194,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{FullPath}'", fullPath);
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
             }
 
             return Enumerable.Empty<string>();
@@ -226,7 +231,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
+                LogHelper.Info<PhysicalFileSystem>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
             }
         }
 
@@ -284,7 +289,9 @@ namespace Umbraco.Core.IO
             var opath = path;
             path = EnsureDirectorySeparatorChar(path);
 
-            // fixme - this part should go!
+            // TODO in v8 this should be cleaned up
+            // the first part should probably removed
+
             // not sure what we are doing here - so if input starts with a (back) slash,
             // we assume it's not a FS relative path and we try to convert it... but it
             // really makes little sense?
@@ -362,7 +369,7 @@ namespace Umbraco.Core.IO
             return file.Exists ? file.Length : -1;
         }
 
-        public bool CanAddPhysical => true;
+        public bool CanAddPhysical { get { return true; } }
 
         public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
         {
@@ -371,7 +378,7 @@ namespace Umbraco.Core.IO
             if (File.Exists(fullPath))
             {
                 if (overrideIfExists == false)
-                    throw new InvalidOperationException($"A file at path '{path}' already exists");
+                    throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
                 WithRetry(() => File.Delete(fullPath));
             }
 

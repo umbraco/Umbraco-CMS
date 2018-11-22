@@ -1,26 +1,31 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    /// <summary>
-    /// Represents a textbox property and parameter editor.
-    /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.TextBox, EditorType.PropertyValue | EditorType.MacroParameter, "Textbox", "textbox", Group = "Common")]
-    public class TextboxPropertyEditor : DataEditor
+    [PropertyEditor(Constants.PropertyEditors.TextboxAlias, "Textbox", "textbox", IsParameterEditor = true, Group = "Common")]
+    public class TextboxPropertyEditor : PropertyEditor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
-        /// </summary>
-        public TextboxPropertyEditor(ILogger logger)
-            : base(logger)
-        { }
+        protected override PropertyValueEditor CreateValueEditor()
+        {
+            return new TextOnlyValueEditor(base.CreateValueEditor());
+        }
 
-        /// <inheritdoc/>
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new TextboxPreValueEditor();
+        }
 
-        /// <inheritdoc/>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor();
+        internal class TextboxPreValueEditor : PreValueEditor
+        {
+            [PreValueField("maxChars", "Maximum allowed characters", "textstringlimited", Description = "If empty - 500 character limit")]
+            public bool MaxChars { get; set; }
+        }
     }
 }

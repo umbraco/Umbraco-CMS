@@ -6,14 +6,12 @@
  * @description
  * The controller for creating content blueprints
  */
-function ContentBlueprintCreateController($scope, $location, contentTypeResource, navigationService, appState) {
+function ContentBlueprintCreateController($scope, $location, contentTypeResource, navigationService) {
 
     var vm = this;
-    var node = $scope.currentNode;
-    var section = appState.getSectionState("currentSection");
+    var node = $scope.dialogOptions.currentNode;
 
     vm.createBlueprint = createBlueprint;
-    vm.close = close;
 
     function onInit() {
 
@@ -27,13 +25,8 @@ function ContentBlueprintCreateController($scope, $location, contentTypeResource
     }
 
     function createBlueprint(documentType) {
-        $location.path("/" + section + "/contentBlueprints/edit/" + node.id).search("create", "true").search("doctype", documentType.alias);
+        $location.path("/settings/contentBlueprints/edit/" + node.id).search("create", "true").search("doctype", documentType.alias);
         navigationService.hideMenu();
-    }
-
-    function close() {
-        const showMenu = true;
-        navigationService.hideDialog(showMenu);
     }
 
     onInit();

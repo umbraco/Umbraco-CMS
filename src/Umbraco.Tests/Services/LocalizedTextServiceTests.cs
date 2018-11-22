@@ -9,7 +9,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Tests.Services
 {
@@ -46,7 +45,7 @@ namespace Umbraco.Tests.Services
 
             var result = txtService.GetAllStoredValues(culture);
 
-            Assert.AreEqual(4, result.Count);
+            Assert.AreEqual(4, result.Count());
             Assert.AreEqual("testArea1/testKey1", result.ElementAt(0).Key);
             Assert.AreEqual("testArea1/testKey2", result.ElementAt(1).Key);
             Assert.AreEqual("testArea2/blah1", result.ElementAt(2).Key);
@@ -250,7 +249,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "testValue"))))
                     }
                 }, Mock.Of<ILogger>());
@@ -270,7 +269,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "testValue"))))
                     }
                 }, Mock.Of<ILogger>());
@@ -290,7 +289,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "testValue"))))
                     }
                 }, Mock.Of<ILogger>());
@@ -311,7 +310,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "testValue"))))
                     }
                 }, Mock.Of<ILogger>());
@@ -331,7 +330,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "Hello %0%, you are such a %1% %2%"))))
                     }
                 }, Mock.Of<ILogger>());
@@ -375,7 +374,7 @@ namespace Umbraco.Tests.Services
                     {
                         culture, new Lazy<XDocument>(() => new XDocument(
                             new XElement("area", new XAttribute("alias", "testArea"),
-                                new XElement("key", new XAttribute("alias", "testKey"),
+                                new XElement("key", new XAttribute("alias", "testKey"), 
                                     "testValue"))))
                     }
                 }, Mock.Of<ILogger>());

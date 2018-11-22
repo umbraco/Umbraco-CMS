@@ -10,52 +10,10 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
     //the factory object returned
     return {
 
-        getPermissions: function (nodeIds) {
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "currentUserApiBaseUrl",
-                        "GetPermissions"),
-                    nodeIds),
-                'Failed to get permissions');
-        },
-
-        /**
-          * @ngdoc method
-          * @name umbraco.resources.currentUserResource#hasPermission
-          * @methodOf umbraco.resources.currentUserResource
-          *
-          * @description
-          * Returns true/false given a permission char to check against a nodeID
-          * for the current user
-          *
-          * ##usage
-          * <pre>
-          * contentResource.hasPermission('p',1234)
-          *    .then(function() {
-          *        alert('You are allowed to publish this item');
-          *    });
-          * </pre> 
-          *
-          * @param {String} permission char representing the permission to check
-          * @param {Int} id id of content item to delete        
-          * @returns {Promise} resourcePromise object.
-          *
-          */
-        checkPermission: function (permission, id) {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "currentUserApiBaseUrl",
-                        "HasPermission",
-                        [{ permissionToCheck: permission }, { nodeId: id }])),
-                'Failed to check permission for item ' + id);
-        },
-
         saveTourStatus: function (tourStatus) {
 
             if (!tourStatus) {
-                return $q.reject({ errorMsg: 'tourStatus cannot be empty' });
+                return angularHelper.rejectedPromise({ errorMsg: 'tourStatus cannot be empty' });
             }
 
             return umbRequestHelper.resourcePromise(
@@ -79,7 +37,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
         performSetInvitedUserPassword: function (newPassword) {
 
             if (!newPassword) {
-                return $q.reject({ errorMsg: 'newPassword cannot be empty' });
+                return angularHelper.rejectedPromise({ errorMsg: 'newPassword cannot be empty' });
             }
 
             return umbRequestHelper.resourcePromise(

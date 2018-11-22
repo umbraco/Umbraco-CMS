@@ -9,10 +9,8 @@ using System.Web.UI.WebControls;
 //This is only in case an upgrade goes wrong and the the /masterpages/ files are not copied over
 //which would result in an error. so we have kept the old namespaces intact with references to new ones
 using StackExchange.Profiling;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Profiling;
 using Umbraco.Web;
-using Umbraco.Web.UI.JavaScript;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
 {
@@ -81,7 +79,7 @@ namespace umbraco.presentation.masterpages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected UmbracoClientDependencyLoader ClientLoader;
+        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
 
         /// <summary>
         /// CssInclude1 control.

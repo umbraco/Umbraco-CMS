@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Http.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -38,7 +36,7 @@ namespace Umbraco.Web
 
             if (methodParams.Any() == false)
             {
-                return url.GetUmbracoApiService<T>(method.Name);
+                return url.GetUmbracoApiService<T>(method.Name);    
             }
             return url.GetUmbracoApiService<T>(method.Name, methodParams.Values.First());
         }
@@ -53,12 +51,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, Type apiControllerType, object id = null)
         {
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
-            if (apiControllerType == null) throw new ArgumentNullException(nameof(apiControllerType));
+            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
+            Mandate.ParameterNotNull(apiControllerType, "apiControllerType");
 
             var area = "";
 
-            var apiController = Current.UmbracoApiControllerTypes
+            var apiController = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
                 .SingleOrDefault(x => x == apiControllerType);
             if (apiController == null)
                 throw new InvalidOperationException("Could not find the umbraco api controller of type " + apiControllerType.FullName);
@@ -95,8 +93,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, string area, object id = null)
         {
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
 
             string routeName;
             if (area.IsNullOrWhiteSpace())
@@ -141,7 +139,7 @@ namespace Umbraco.Web
         public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            var method = ExpressionHelper.GetMethodInfo(methodSelector);
+            var method = Core.ExpressionHelper.GetMethodInfo(methodSelector);
             if (method == null)
             {
                 throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");

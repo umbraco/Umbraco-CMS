@@ -13,7 +13,8 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         creatingFolder: false
     };
 
-    var node = $scope.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -22,7 +23,8 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm
+            formCtrl: this.createFolderForm,
+            statusMessage: localizeCreateFolder
         })) {
             mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -44,12 +46,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         $location.search('create', null);
         $location.path("/settings/mediatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    };
-
-    $scope.close = function() {
-        const showMenu = true;
-        navigationService.hideDialog(showMenu);
-    };
+    }
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.MediaTypes.CreateController", MediaTypesCreateController);

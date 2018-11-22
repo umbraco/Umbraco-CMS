@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -22,16 +22,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             _controllerFactory = controllerFactory;
         }
 
-        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method,
-            HttpContent content = null,
-            MediaTypeWithQualityHeaderValue mediaTypeHeader = null,
-            bool assertOkResponse = true)
+        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method, HttpContent content = null)
         {
-            if (mediaTypeHeader == null)
-            {
-                mediaTypeHeader = new MediaTypeWithQualityHeaderValue("application/json");
-            }
-
             var startup = new TestStartup(
                 configuration =>
                 {
@@ -52,29 +44,25 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 if (content != null)
                     request.Content = content;
 
-                request.Headers.Accept.Add(mediaTypeHeader);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 Console.WriteLine(request);
                 var response = await server.HttpClient.SendAsync(request);
                 Console.WriteLine(response);
 
+                string json = "";
                 if (response.IsSuccessStatusCode == false)
                 {
                     WriteResponseError(response);
                 }
-
-                var json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-                if (!json.IsNullOrWhiteSpace())
+                else
                 {
+                    json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
                     var deserialized = JsonConvert.DeserializeObject(json);
                     Console.Write(JsonConvert.SerializeObject(deserialized, Formatting.Indented));
                 }
 
-                if (assertOkResponse)
-                {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-                }
-                
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 return Tuple.Create(response, json);
             }
         }
@@ -83,8 +71,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         {
             var result = response.Content.ReadAsStringAsync().Result;
             Console.Out.WriteLine("Http operation unsuccessfull");
-            Console.Out.WriteLine($"Status: '{response.StatusCode}'");
-            Console.Out.WriteLine($"Reason: '{response.ReasonPhrase}'");
+            Console.Out.WriteLine(string.Format("Status: '{0}'", response.StatusCode));
+            Console.Out.WriteLine(string.Format("Reason: '{0}'", response.ReasonPhrase));
             Console.Out.WriteLine(result);
         }
     }

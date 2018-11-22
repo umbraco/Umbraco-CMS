@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using System.Xml;
 using System.Xml.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
 {
@@ -20,149 +22,154 @@ namespace Umbraco.Core.Services
     internal class EntityXmlSerializer
     {
         /// <summary>
-        /// Exports an IContent item as an XElement.
+        /// Exports an <see cref="IContent"/> item to xml as an <see cref="XElement"/>
         /// </summary>
-        public static XElement Serialize(
-            IContentService contentService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            ILocalizationService localizationService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IContent content,
-            bool published,
-            bool withDescendants = false) //fixme take care of usage! only used for the packager
+        /// <param name="contentService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="content">Content to export</param>
+        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
+        public XElement Serialize(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent content, bool deep = false)
         {
-            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var xml = SerializeContentBase(dataTypeService, localizationService, content, content.GetUrlSegment(urlSegmentProviders), nodeName, published);
-
+            var xml = Serialize(dataTypeService, content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
-            xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-
-            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService)?.Name ?? "??"));
-            //xml.Add(new XAttribute("creatorID", content.CreatorId));
-            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService)?.Name ?? "??"));
+            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService).Name));
+            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService).Name));
             xml.Add(new XAttribute("writerID", content.WriterId));
-
-            xml.Add(new XAttribute("template", content.Template?.Id.ToString(CultureInfo.InvariantCulture) ?? "0"));
-
+            xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
+            xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
             xml.Add(new XAttribute("isPublished", content.Published));
 
-            if (withDescendants)
+            if (deep)
             {
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while(page * pageSize < total)
-                {
-                    var children = contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
-                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml, published);
-                }
-                
+                var descendants = contentService.GetDescendants(content).ToArray();
+                var currentChildren = descendants.Where(x => x.ParentId == content.Id);
+                AddChildXml(contentService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
         }
 
         /// <summary>
-        /// Exports an IMedia item as an XElement.
+        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
         /// </summary>
-        public static XElement Serialize(
-            IMediaService mediaService,
-            IDataTypeService dataTypeService,
-            IUserService userService,
-            ILocalizationService localizationService,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IMedia media,
-            bool withDescendants = false)
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="media">Media to export</param>
+        /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
+        public XElement Serialize(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia media, bool deep = false)
         {
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
-            if (media == null) throw new ArgumentNullException(nameof(media));
-            if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            const bool published = false; // always false for media
-            var xml = SerializeContentBase(dataTypeService, localizationService, media, media.GetUrlSegment(urlSegmentProviders), nodeName, published);
-
+            var xml = Serialize(dataTypeService, media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
+            xml.Add(new XAttribute("writerName", media.GetCreatorProfile(userService).Name));
+            xml.Add(new XAttribute("writerID", media.CreatorId));
+            xml.Add(new XAttribute("version", media.Version));
+            xml.Add(new XAttribute("template", 0));
             xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
 
-            //xml.Add(new XAttribute("creatorName", media.GetCreatorProfile(userService).Name));
-            //xml.Add(new XAttribute("creatorID", media.CreatorId));
-            xml.Add(new XAttribute("writerName", media.GetWriterProfile(userService)?.Name ?? string.Empty));
-            xml.Add(new XAttribute("writerID", media.WriterId));
-
-            //xml.Add(new XAttribute("template", 0)); // no template for media
-
-            if (withDescendants)
+            if (deep)
             {
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while (page * pageSize < total)
-                {
-                    var children = mediaService.GetPagedChildren(media.Id, page++, pageSize, out total);
-                    SerializeChildren(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, children, xml);
-                }
+                var descendants = mediaService.GetDescendants(media).ToArray();
+                var currentChildren = descendants.Where(x => x.ParentId == media.Id);
+                AddChildXml(mediaService, dataTypeService, userService, descendants, currentChildren, xml);
             }
 
             return xml;
         }
 
         /// <summary>
-        /// Exports an IMember item as an XElement.
+        /// Exports an <see cref="IMember"/> item to xml as an <see cref="XElement"/>
         /// </summary>
-        public static XElement Serialize(
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IMember member)
+        /// <param name="dataTypeService"></param>
+        /// <param name="member">Member to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IMember member)
         {
-            // nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
-            const bool published = false; // always false for member
-            var xml = SerializeContentBase(dataTypeService, localizationService, member, "", nodeName, published);
-
+            var xml = Serialize(dataTypeService, member, nodeName);
             xml.Add(new XAttribute("nodeType", member.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
 
-            // what about writer/creator/version?
-
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
+            
             xml.Add(new XAttribute("icon", member.ContentType.Icon));
 
             return xml;
         }
 
-        public XElement Serialize(IDataTypeService dataTypeService, IDataType dataType)
+        public XElement Serialize(IDataTypeService dataTypeService, Property property)
         {
-            var xml = new XElement("DataType");
-            xml.Add(new XAttribute("Name", dataType.Name));
+            var propertyType = property.PropertyType;
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+
+            var xElement = new XElement(nodeName);
+
+            //Add the property alias to the legacy schema
+            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
+            {
+                var a = new XAttribute("alias", property.Alias.ToSafeAlias());
+                xElement.Add(a);
+            }
+
+            //Get the property editor for thsi property and let it convert it to the xml structure
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
+            if (propertyEditor != null)
+            {
+                var xmlValue = propertyEditor.ValueEditor.ConvertDbToXml(property, propertyType, dataTypeService);
+                xElement.Add(xmlValue);
+            }
+
+            return xElement;
+        }
+
+        /// <summary>
+        /// Exports an <see cref="IDataTypeDefinition"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="dataTypeDefinition">IDataTypeDefinition type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IDataTypeDefinition dataTypeDefinition)
+        {
+            var prevalues = new XElement("PreValues");
+            var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+                .FormatAsDictionary();
+
+            var sort = 0;
+            foreach (var pv in prevalueList)
+            {
+                var prevalue = new XElement("PreValue");
+                prevalue.Add(new XAttribute("Id", pv.Value.Id));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value ?? ""));
+                prevalue.Add(new XAttribute("Alias", pv.Key));
+                prevalue.Add(new XAttribute("SortOrder", sort));
+                prevalues.Add(prevalue);
+                sort++;
+            }
+
+            var xml = new XElement("DataType", prevalues);
+            xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
             //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
-            xml.Add(new XAttribute("Id", dataType.EditorAlias));
-            xml.Add(new XAttribute("Definition", dataType.Key));
-            xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration)));
+            xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
+            xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
+            xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
 
             var folderNames = string.Empty;
-            if (dataType.Level != 1)
+            if (dataTypeDefinition.Level != 1)
             {
                 //get url encoded folder names
-                var folders = dataTypeService.GetContainers(dataType)
+                var folders = dataTypeService.GetContainers(dataTypeDefinition)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
 
@@ -170,7 +177,7 @@ namespace Umbraco.Core.Services
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
-                xml.Add(new XAttribute("Folders", folderNames));
+                xml.Add(new XAttribute("Folders", folderNames));            
 
             return xml;
         }
@@ -227,10 +234,11 @@ namespace Umbraco.Core.Services
             xml.Add(new XElement("Alias", template.Alias));
             xml.Add(new XElement("Design", new XCData(template.Content)));
 
-            if (template is Template concreteTemplate && concreteTemplate.MasterTemplateId != null)
+            var concreteTemplate = template as Template;
+            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
             {
                 if (concreteTemplate.MasterTemplateId.IsValueCreated &&
-                    concreteTemplate.MasterTemplateId.Value != default)
+                    concreteTemplate.MasterTemplateId.Value != default(int))
                 {
                     xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
                     xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
@@ -263,7 +271,7 @@ namespace Umbraco.Core.Services
             var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in mediaType.PropertyTypes)
             {
-                var definition = dataTypeService.GetDataType(propertyType.DataTypeId);
+                var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
 
                 var propertyGroup = propertyType.PropertyGroupId == null // true generic property
                     ? null
@@ -306,8 +314,10 @@ namespace Umbraco.Core.Services
             var xml = new XElement("macro");
             xml.Add(new XElement("name", macro.Name));
             xml.Add(new XElement("alias", macro.Alias));
-            xml.Add(new XElement("macroType", macro.MacroType));
-            xml.Add(new XElement("macroSource", macro.MacroSource));
+            xml.Add(new XElement("scriptType", macro.ControlType));
+            xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
+            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
+            xml.Add(new XElement("xslt", macro.XsltPath));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
             xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
             xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
@@ -328,6 +338,13 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
+        /// <summary>
+        /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="contentType">Content type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
         public XElement Serialize(IDataTypeService dataTypeService, IContentTypeService contentTypeService, IContentType contentType)
         {
             var info = new XElement("Info",
@@ -372,7 +389,7 @@ namespace Umbraco.Core.Services
             var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in contentType.PropertyTypes)
             {
-                var definition = dataTypeService.GetDataType(propertyType.DataTypeId);
+                var definition = dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
 
                 var propertyGroup = propertyType.PropertyGroupId == null // true generic property
                     ? null
@@ -388,7 +405,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
-
+                
                 genericProperties.Add(genericProperty);
             }
 
@@ -413,7 +430,7 @@ namespace Umbraco.Core.Services
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get url encoded folder names
-                var folders = contentTypeService.GetContainers(contentType)
+                var folders = contentTypeService.GetContentTypeContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
 
@@ -426,9 +443,43 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
-        // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
-        private static XElement SerializeContentBase(IDataTypeService dataTypeService, ILocalizationService localizationService, IContentBase contentBase, string urlValue, string nodeName, bool published)
+        /// <summary>
+        /// Used by Media Export to recursively add children
+        /// </summary>
+        /// <param name="mediaService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="originalDescendants"></param>
+        /// <param name="currentChildren"></param>
+        /// <param name="currentXml"></param>
+        private void AddChildXml(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, IMedia[] originalDescendants, IEnumerable<IMedia> currentChildren, XElement currentXml)
         {
+            foreach (var child in currentChildren)
+            {
+                //add the child's xml
+                var childXml = Serialize(mediaService, dataTypeService, userService, child);
+                currentXml.Add(childXml);
+                //copy local (out of closure)
+                var c = child;
+                //get this item's children                
+                var children = originalDescendants.Where(x => x.ParentId == c.Id);
+                //recurse and add it's children to the child xml element
+                AddChildXml(mediaService, dataTypeService, userService, originalDescendants, children, childXml);
+            }
+        }
+
+        /// <summary>
+        /// Part of the export of IContent and IMedia and IMember which is shared
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentBase">Base Content or Media to export</param>
+        /// <param name="nodeName">Name of the node</param>
+        /// <returns><see cref="XElement"/></returns>
+        private XElement Serialize(IDataTypeService dataTypeService, IContentBase contentBase, string nodeName)
+        {
+            //NOTE: that one will take care of umbracoUrlName
+            var url = contentBase.GetUrlSegment();
+
             var xml = new XElement(nodeName,
                 new XAttribute("id", contentBase.Id),
                 new XAttribute("key", contentBase.Key),
@@ -439,67 +490,40 @@ namespace Umbraco.Core.Services
                 new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
                 new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
                 new XAttribute("nodeName", contentBase.Name),
-                new XAttribute("urlName", urlValue),
+                new XAttribute("urlName", url),
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties)
-                xml.Add(SerializeProperty(dataTypeService, localizationService, property, published));
+            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            {
+                xml.Add(Serialize(dataTypeService, property));
+            }
 
             return xml;
         }
 
-        // exports a property as XElements.
-        private static IEnumerable<XElement> SerializeProperty(IDataTypeService dataTypeService, ILocalizationService localizationService, Property property, bool published)
+        /// <summary>
+        /// Used by Content Export to recursively add children
+        /// </summary>
+        /// <param name="contentService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="originalDescendants"></param>
+        /// <param name="currentChildren"></param>
+        /// <param name="currentXml"></param>
+        private void AddChildXml(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, IContent[] originalDescendants, IEnumerable<IContent> currentChildren, XElement currentXml)
         {
-            var propertyType = property.PropertyType;
-
-            // get the property editor for this property and let it convert it to the xml structure
-            var propertyEditor = Current.PropertyEditors[propertyType.PropertyEditorAlias];
-            return propertyEditor == null
-                ? Array.Empty<XElement>()
-                : propertyEditor.GetValueEditor().ConvertDbToXml(property, dataTypeService, localizationService, published);
-        }
-
-        // exports an IContent item descendants.
-        private static void SerializeChildren(IContentService contentService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IContent> children, XElement xml, bool published)
-        {
-            foreach (var child in children)
+            foreach (var child in currentChildren)
             {
-                // add the child xml
-                var childXml = Serialize(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, child, published);
-                xml.Add(childXml);
-
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while(page * pageSize < total)
-                {
-                    var grandChildren = contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
-                    // recurse
-                    SerializeChildren(contentService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml, published);
-                }
-            }
-        }
-
-        // exports an IMedia item descendants.
-        private static void SerializeChildren(IMediaService mediaService, IDataTypeService dataTypeService, IUserService userService, ILocalizationService localizationService, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IEnumerable<IMedia> children, XElement xml)
-        {
-            foreach (var child in children)
-            {
-                // add the child xml
-                var childXml = Serialize(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, child);
-                xml.Add(childXml);
-
-                const int pageSize = 500;
-                var page = 0;
-                var total = long.MaxValue;
-                while (page * pageSize < total)
-                {
-                    var grandChildren = mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
-                    // recurse
-                    SerializeChildren(mediaService, dataTypeService, userService, localizationService, urlSegmentProviders, grandChildren, childXml);
-                }
+                //add the child's xml
+                var childXml = Serialize(contentService, dataTypeService, userService, child);
+                currentXml.Add(childXml);
+                //copy local (out of closure)
+                var c = child;
+                //get this item's children                
+                var children = originalDescendants.Where(x => x.ParentId == c.Id);
+                //recurse and add it's children to the child xml element
+                AddChildXml(contentService, dataTypeService, userService, originalDescendants, children, childXml);
             }
         }
     }

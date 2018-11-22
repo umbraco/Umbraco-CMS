@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Used to track the property types that are visible/editable on member profiles

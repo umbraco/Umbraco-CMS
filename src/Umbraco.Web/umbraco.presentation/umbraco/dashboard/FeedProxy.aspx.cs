@@ -2,17 +2,14 @@
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
-using Umbraco.Web.UI.Pages;
-using System;
-using System.Linq;
-using System.Net.Mime;
-using Umbraco.Core.IO;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Composing;
 
 namespace dashboardUtilities
 {
-
+    using System;
+    using System.Linq;
+    using System.Net.Mime;
+    using umbraco.BasePages;
+    using Umbraco.Core.IO;
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
@@ -53,12 +50,12 @@ namespace dashboardUtilities
                 }
                 else
                 {
-                                Current.Logger.Debug<FeedProxy>("Access to unallowed feedproxy attempted: {RequestUrl}", requestUri);
+                    LogHelper.Debug<FeedProxy>($"Access to unallowed feedproxy attempted: {requestUri}");
                 }
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<FeedProxy>(ex, "Exception occurred");
+                LogHelper.Error<FeedProxy>("Exception occurred", ex);
             }
         }
     }

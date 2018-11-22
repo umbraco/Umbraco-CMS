@@ -1,192 +1,133 @@
+//this controller simply tells the dialogs service to open a mediaPicker window
+//with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function ($scope, fileManager) {
+    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
 
         var config = angular.copy($scope.model.config);
+        $scope.imageIsLoaded = false;
 
-        $scope.filesSelected = onFileSelected;
-        $scope.filesChanged = onFilesChanged;
-        $scope.fileUploaderInit = onFileUploaderInit;
-        $scope.imageLoaded = imageLoaded;
-        $scope.crop = crop;
-        $scope.done = done;
-        $scope.clear = clear;
-        $scope.reset = reset;
-        $scope.close = close;
-        $scope.focalPointChanged = focalPointChanged;
-        //declare a special method which will be called whenever the value has changed from the server
-        $scope.model.onValueChanged = onValueChanged;
+        //move previously saved value to the editor
+        if ($scope.model.value) {
+            //backwards compat with the old file upload (incase some-one swaps them..)
+            if (angular.isString($scope.model.value)) {
+                config.src = $scope.model.value;
+                $scope.model.value = config;
+            } else if ($scope.model.value.crops) {
+                //sync any config changes with the editor and drop outdated crops
+                _.each($scope.model.value.crops, function (saved) {
+                    var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
 
-        /**
-         * Called when the umgImageGravity component updates the focal point value
-         * @param {any} left
-         * @param {any} top
-         */
-        function focalPointChanged(left, top) {
-            //update the model focalpoint value
-            $scope.model.value.focalPoint = {
-                left: left,
-                top: top
-            };
-
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
-        }
-
-        /**
-         * Used to assign a new model value
-         * @param {any} src
-         */
-        function setModelValueWithSrc(src) {
-            if (!$scope.model.value || !$scope.model.value.src) {
-                //we are copying to not overwrite the original config
-                $scope.model.value = angular.extend(angular.copy($scope.model.config), { src: src });
-            }
-        }
-
-        /**
-         * called whenever the value has changed from the server
-         * @param {any} newVal
-         * @param {any} oldVal
-         */
-        function onValueChanged(newVal, oldVal) {
-            //clear current uploaded files
-            fileManager.setFiles({
-                propertyAlias: $scope.model.alias,
-                culture: $scope.model.culture,
-                files: []
-            });
-        }
-
-        /**
-         * Called when the a new file is selected
-         * @param {any} value
-         */
-        function onFileSelected(value, files) {
-            setModelValueWithSrc(value);
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
-        }
-
-        function imageLoaded (isCroppable, hasDimensions) {
-            $scope.isCroppable = isCroppable;
-            $scope.hasDimensions = hasDimensions;
-        };
-
-        /**
-         * Called when the file collection changes
-         * @param {any} value
-         * @param {any} files
-         */
-        function onFilesChanged(files) {
-            if (files && files[0]) {
-                $scope.imageSrc = files[0].fileSrc;
-                //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
-            }
-        }
-
-        /**
-         * Called when the file uploader initializes
-         * @param {any} value
-         */
-        function onFileUploaderInit(value, files) {
-            //move previously saved value to the editor
-            if ($scope.model.value) {
-                //backwards compat with the old file upload (incase some-one swaps them..)
-                if (angular.isString($scope.model.value)) {
-                    setModelValueWithSrc($scope.model.value);
-                }
-                else if ($scope.model.value.crops) {
-                    //sync any config changes with the editor and drop outdated crops
-                    _.each($scope.model.value.crops, function (saved) {
-                        var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
-
-                        if (configured && configured.height === saved.height && configured.width === saved.width) {
-                            configured.coordinates = saved.coordinates;
-                        }
-                    });
-                    $scope.model.value.crops = config.crops;
-
-                    //restore focalpoint if missing
-                    if (!$scope.model.value.focalPoint) {
-                        $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
+                    if (configured && configured.height === saved.height && configured.width === saved.width) {
+                        configured.coordinates = saved.coordinates;
                     }
-                }
+                });
+                $scope.model.value.crops = config.crops;
 
-                //if there are already files in the client assigned then set the src
-                if (files && files[0]) {
-                    $scope.imageSrc = files[0].fileSrc;
+                //restore focalpoint if missing
+                if (!$scope.model.value.focalPoint) {
+                    $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
                 }
-                else {
-                    $scope.imageSrc = $scope.model.value.src;
-                }
-                
             }
+
+            $scope.imageSrc = $scope.model.value.src;
         }
 
-        /**
-         * crop a specific crop
-         * @param {any} crop
-         */
-        function crop(crop) {
+
+        //crop a specific crop
+        $scope.crop = function (crop) {
             // clone the crop so we can discard the changes
             $scope.currentCrop = angular.copy(crop);
-            $scope.currentPoint = null;
-
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
+            $scope.currentPoint = undefined;
         };
 
-        /** done cropping */
-        function done() {
+        //done cropping
+        $scope.done = function () {
             if (!$scope.currentCrop) {
                 return;
             }
             // find the original crop by crop alias and update its coordinates
-            var editedCrop = _.find($scope.model.value.crops, crop => crop.alias === $scope.currentCrop.alias);
+            var editedCrop = _.find($scope.model.value.crops, function(crop) {
+                return crop.alias === $scope.currentCrop.alias;
+            });
             editedCrop.coordinates = $scope.currentCrop.coordinates;
             $scope.close();
-
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
         };
 
-        function reset() {
+        //reset the current crop
+        $scope.reset = function() {
             $scope.currentCrop.coordinates = undefined;
             $scope.done();
         }
 
-        function close() {
+        //close crop overlay
+        $scope.close = function (crop) {
             $scope.currentCrop = undefined;
             $scope.currentPoint = undefined;
-        }
+        };
 
-        /**
-         * crop a specific crop
-         * @param {any} crop
-         */
-        function clear(crop) {
+        //crop a specific crop
+        $scope.clear = function (crop) {
             //clear current uploaded files
-            fileManager.setFiles({
-                propertyAlias: $scope.model.alias,
-                culture: $scope.model.culture,
-                files: []
-            });
+            fileManager.setFiles($scope.model.alias, []);
 
             //clear the ui
-            $scope.imageSrc = null;
+            $scope.imageSrc = undefined;
             if ($scope.model.value) {
-                $scope.model.value = null;
+                delete $scope.model.value;
             }
 
-            //set form to dirty to track changes
-            $scope.imageCropperForm.$setDirty();
+            // set form to dirty to tricker discard changes dialog
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
         };
-        
+
+        //show previews
+        $scope.togglePreviews = function () {
+            if ($scope.showPreviews) {
+                $scope.showPreviews = false;
+                $scope.tempShowPreviews = false;
+            } else {
+                $scope.showPreviews = true;
+            }
+        };
+
+        $scope.imageLoaded = function (isCroppable, hasDimensions) {
+            $scope.imageIsLoaded = true;
+            $scope.isCroppable = isCroppable;
+            $scope.hasDimensions = hasDimensions;
+        };
+
+        //on image selected, update the cropper
+        $scope.$on("filesSelected", function (ev, args) {
+            $scope.model.value = config;
+
+            if (args.files && args.files[0]) {
+
+                fileManager.setFiles($scope.model.alias, args.files);
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+
+                    $scope.$apply(function () {
+                        $scope.imageSrc = e.target.result;
+                    });
+
+                };
+
+                reader.readAsDataURL(args.files[0]);
+            }
+        });
+
+
+        //here we declare a special method which will be called whenever the value has changed from the server
+        $scope.model.onValueChanged = function (newVal, oldVal) {
+            //clear current uploaded files
+            fileManager.setFiles($scope.model.alias, []);
+        };
+
         var unsubscribe = $scope.$on("formSubmitting", function () {
-            $scope.currentCrop = null;
-            $scope.currentPoint = null;
+            $scope.done();
         });
 
         $scope.$on('$destroy', function () {

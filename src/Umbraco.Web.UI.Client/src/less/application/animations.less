@@ -45,20 +45,15 @@
 
 
 // TREE ANIMATION
-
-.umb-tree-item.ng-animate {
-    display: none;
-}
-
-.umb-tree-item--deleted.ng-leave {
+ 
+.tree-node-delete-leave { 
+    -webkit-animation: leave 600ms cubic-bezier(0.445, 0.050, 0.550, 0.950);
+    -moz-animation: leave 600ms cubic-bezier(0.445, 0.050, 0.550, 0.950);
+    -o-animation: leave 600ms cubic-bezier(0.445, 0.050, 0.550, 0.950);
     animation: leave 600ms cubic-bezier(0.445, 0.050, 0.550, 0.950);
     display: block;
-    position: relative;
-}
-
-.umb-tree-item--deleted.ng-leave * { 
-    color: @red !important;
-}
+    position: relative;    
+} 
 
 @-webkit-keyframes leave {
     to {
@@ -135,6 +130,11 @@
         bottom: 0px;
     }
 }
+
+.tree-node-delete-leave * { 
+    color:@red !important;
+}
+
 
 .tree-node-slide-up
 { 

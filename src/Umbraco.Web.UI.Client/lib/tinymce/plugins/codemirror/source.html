@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+/**
+ * source.html
+ *
+ * Copyright 2013-2014 Web Power, www.webpower.nl
+ * @author Arjan Haverkamp
+ */
+
+// Global vars:
+var tinymce,     // Reference to TinyMCE
+	editor,      // Reference to TinyMCE editor
+	codemirror,  // CodeMirror instance
+	chr = 0,     // Unused utf-8 character, placeholder for cursor
+	isMac = /macintosh|mac os/i.test(navigator.userAgent),
+	CMsettings;  // CodeMirror settings
+
+function inArray(key, arr)
+{
+	"use strict";
+	arr = '|' + arr.join('|') + '|';
+	return arr.indexOf('|'+key+'|') != -1;
+}
+
+(function()
+{// Initialise (before load)
+	"use strict";
+
+	tinymce = parent.tinymce;
+	editor = tinymce.activeEditor;
+	var i, userSettings = editor.settings.codemirror ? (typeof editor.settings.codemirror === 'object') ? editor.settings.codemirror : JSON.parse(editor.settings.codemirror) : {};
+	CMsettings = {
+		path: userSettings.path || 'CodeMirror',
+		indentOnInit: userSettings.indentOnInit || false,
+		config: {// Default config
+			mode: 'htmlmixed',
+			lineNumbers: true,
+			lineWrapping: true,
+			indentUnit: 2,
+			tabSize: 2,
+			matchBrackets: true,
+			styleActiveLine: true,
+			
+			// CodeMirror v2
+			onChange: function(inst) {
+				inst.isDirty = true;
+			},
+			
+		}, // CodeMirror v4 commented out below.
+		jsFiles: [// Default JS files
+			'lib/codemirror.js',
+            'addon/edit/matchbrackets.js',
+			'addon/search/match-highlighter.js',
+			'mode/xml/xml.js',
+			'mode/javascript/javascript.js',
+			'mode/css/css.js',
+			'mode/htmlmixed/htmlmixed.js',
+			'addon/dialog/dialog.js', 
+			'addon/search/searchcursor.js', 
+			'addon/search/search.js',
+			'addon/selection/active-line.js'
+		],
+		cssFiles: [// Default CSS files
+			'lib/codemirror.css',
+			'addon/dialog/dialog.css'
+		]
+	};
+
+	// Merge config
+	for (i in userSettings.config) {
+		CMsettings.config[i] = userSettings.config[i];
+	}
+	
+	// Merge jsFiles
+	for (i in userSettings.jsFiles) {
+		if (!inArray(userSettings.jsFiles[i], CMsettings.jsFiles)) {
+			CMsettings.jsFiles.push(userSettings.jsFiles[i]);
+		}
+	}
+
+	// Merge cssFiles
+	for (i in userSettings.cssFiles) {
+		if (!inArray(userSettings.cssFiles[i], CMsettings.cssFiles)) {
+			CMsettings.cssFiles.push(userSettings.cssFiles[i]);
+		}
+	}
+
+	// Add trailing slash to path
+	if (!/\/$/.test(CMsettings.path)) {
+		CMsettings.path += '/';
+	}
+
+	// Write stylesheets
+	for (i = 0; i < CMsettings.cssFiles.length; i++) {
+		document.write('<li'+'nk rel="stylesheet" type="text/css" href="' + CMsettings.path + CMsettings.cssFiles[i] + '" />');
+	}
+
+	// Write JS source files
+	for (i = 0; i < CMsettings.jsFiles.length; i++) {
+		document.write('<scr'+'ipt type="text/javascript" src="' + CMsettings.path + CMsettings.jsFiles[i] + '"></scr'+'ipt>');
+	}
+
+	window.onload = start;
+}());
+
+function start()
+{// Initialise (on load)
+	"use strict";
+
+	if (typeof(window.CodeMirror) !== 'function') {
+		alert('CodeMirror not found in "' + CMsettings.path + '", aborting...');
+		return;
+	}
+
+	// Create legend for keyboard shortcuts for find & replace:
+	var head = parent.document.querySelectorAll('.mce-foot')[0],
+		div = parent.document.createElement('div'),
+		td1 = '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">',
+		td2 = '<td style="font-size:11px;padding-right: 1em;">';
+	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tbody>' + 
+	    '<tr><tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Start search</td>' +
+	    '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Ctrl-G</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Find next</td></tr>' + 
+	    '<tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Find previous</td>' +
+	    '<td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-F</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Replace</td></tr>' +
+	    '<tr><td style="font-size:11px;font-family:courier;font-weight:bold;text-align:right;padding-right: 1em;">Shift-Ctrl-R</td>' +
+	    '<td style="font-size:11px;padding-right: 1em;">Replace all</td><td></td><td></td></tr>'+
+	    '</tbody></table>';
+	div.style.position = 'absolute';
+	div.style.left = '1em';
+	div.style.bottom = '.5em'; 
+	head.appendChild(div);
+	
+	// Set CodeMirror cursor to same position as cursor was in TinyMCE:
+	var html = editor.getContent({source_view: true});
+	html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
+	editor.dom.remove(editor.dom.select('.CmCaReT'));
+	html = html.replace(/(<div class=".*?umb-macro-holder.*?mceNonEditable.*?"><!-- <\?UMBRACO_MACRO macroAlias="(.*?)".*?\/> --> *<ins>)[\s\S]*?(<\/ins> *<\/div>)/ig, "$1Macro alias: <strong>$2</strong>$3");
+
+	//CodeMirror v4
+	CodeMirror.defineInitHook(function(inst) 
+	{
+		// Move cursor to correct position:
+		inst.focus();
+		var cursor = inst.getSearchCursor(String.fromCharCode(chr), false);
+		if (cursor.findNext()) {
+			inst.setCursor(cursor.to());
+			cursor.replace('');
+		}
+		
+		// Indent all code, if so requested:
+		if (editor.settings.codemirror.indentOnInit) {
+			var last = inst.lineCount();
+			inst.operation(function() {
+				for (var i = 0; i < last; ++i) {
+					inst.indentLine(i);
+				}
+			});
+		}
+	});
+
+	CMsettings.config.value = html;
+
+	// Instantiante CodeMirror:
+	codemirror = CodeMirror(document.body, CMsettings.config);
+	codemirror.isDirty = false;
+	/*codemirror.on('change', function(inst) {  // CodeMirror v4
+		inst.isDirty = true;
+	});*/
+}
+
+function findDepth(haystack, needle)
+{
+	"use strict";
+
+	var idx = haystack.indexOf(needle), depth = 0, x;
+	for (x = idx; x >= 0; x--) {
+		switch(haystack.charAt(x)) {
+			case '<': depth--; break;
+			case '>': depth++; break;
+		}
+	}
+	return depth;
+}
+
+// This function is called by plugin.js, when user clicks 'Ok' button
+function submit()
+{
+	"use strict";
+		
+	var cc = '&#x0;', isDirty = codemirror.isDirty, doc = codemirror;  // CodeMirror v4 doc = codemirror.doc
+
+	if (doc.getSelection() != "") { // CodeMirror v4 if(doc.somethingSelected()) {
+		// Clear selection:
+		doc.setCursor(doc.getCursor());
+	}
+
+	// Insert cursor placeholder (&#x0;)
+	doc.replaceSelection(cc);
+
+	var pos = codemirror.getCursor(),
+		curLineHTML = doc.getLine(pos.line);
+
+	if (findDepth(curLineHTML, cc) !== 0) {
+		// Cursor is inside a <tag>, don't set cursor:
+		curLineHTML = curLineHTML.replace(cc, '');
+		doc.getLineHandle(pos.line).text = curLineHTML;
+	}
+
+	// Submit HTML to TinyMCE:
+	editor.setContent(codemirror.getValue().replace(cc, '<span class="CmCaReT">&nbsp;</span>'));
+	editor.isNotDirty = !isDirty;
+	if (isDirty) {
+		editor.nodeChanged();
+	}
+
+	// Set cursor:
+	var el = editor.dom.select('span.CmCaReT')[0];
+	if (el) {
+		editor.selection.scrollIntoView(el);
+		editor.selection.setCursorLocation(el,0);
+		editor.dom.remove(el);
+	}
+}
+
+</script>
+<style type="text/css">
+
+html,body,.CodeMirror-scroll {
+	height: 100%;
+}
+body {
+	margin: 0;
+}
+
+.CodeMirror {
+	height: 100%;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+.CodeMirror-activeline-background {
+	background: #e8f2ff !important;
+}
+
+</style>
+</head>
+<body></body>
+</html>

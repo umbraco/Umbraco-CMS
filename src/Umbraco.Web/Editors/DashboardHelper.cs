@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -46,9 +46,7 @@ namespace Umbraco.Web.Editors
             var tabs = new List<Tab<DashboardControl>>();
             var i = 1;
 
-            //disable packages section dashboard
-            if (section == "packages") return tabs;
-
+            // The dashboard config can contain more than one area inserted by a package.
             foreach (var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
             {
                 //we need to validate access to this section

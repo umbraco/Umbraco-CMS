@@ -1,58 +1,106 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using StackExchange.Profiling.Data;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Logging; 
 
 namespace Umbraco.Core.Persistence
 {
     internal static class DbConnectionExtensions
     {
-        public static string DetectProviderNameFromConnectionString(string connectionString)
+
+        public static DatabaseProviders DetectProviderFromConnectionString(string connString)
         {
-            var builder = new DbConnectionStringBuilder { ConnectionString = connectionString };
+            var builder = new DbConnectionStringBuilder {ConnectionString = connString};
             var allKeys = builder.Keys.Cast<string>();
 
-            var mySql = new[] { "Server", "Database", "Uid", "Pwd" };
+            var mySql = new[] {"Server", "Database", "Uid", "Pwd"};
             if (mySql.All(x => allKeys.InvariantContains(x)))
             {
-                return Constants.DbProviderNames.MySql;
+                return DatabaseProviders.MySql;
             }
 
-            if (allKeys.InvariantContains("Data Source")
+            if (allKeys.InvariantContains("Data Source") 
                 //this dictionary is case insensitive
                 && builder["Data source"].ToString().InvariantContains(".sdf"))
             {
-                return Constants.DbProviderNames.SqlCe;
+                return DatabaseProviders.SqlServerCE;
             }
 
-            return Constants.DbProviderNames.SqlServer;
+            return DatabaseProviders.SqlServer;
         }
 
-        public static bool IsConnectionAvailable(string connectionString, string providerName)
+        public static bool IsConnectionAvailable(string connString, DatabaseProviders provider)
         {
-            if (providerName != Constants.DbProviderNames.SqlCe
-                && providerName != Constants.DbProviderNames.MySql
-                && providerName != Constants.DbProviderNames.SqlServer)
-                throw new NotSupportedException($"Provider \"{providerName}\" is not supported.");
+            DbProviderFactory factory;
+            switch (provider)
+            {
+                case DatabaseProviders.SqlServer:
+                case DatabaseProviders.SqlAzure:
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.SqlServer);
+                    break;
+                case DatabaseProviders.SqlServerCE:
+                    factory = DbProviderFactories.GetFactory("System.Data.SqlServerCe.4.0");
+                    break;
+                case DatabaseProviders.MySql:
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.MySql);
+                    break;
+                case DatabaseProviders.PostgreSQL:
+                case DatabaseProviders.Oracle:
+                case DatabaseProviders.SQLite:                    
+                default:
+                    throw new NotSupportedException("The provider " + provider + " is not supported");
+            }
 
-            var factory = DbProviderFactories.GetFactory(providerName);
-            var connection = factory.CreateConnection();
-
-            if (connection == null)
-                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
-
-            connection.ConnectionString = connectionString;
-            using (connection)
+            var conn = factory.CreateConnection();
+            if (conn == null)
+            {
+                throw new InvalidOperationException("Could not create a connection for provider " + provider);
+            }
+            conn.ConnectionString = connString;
+            using (var connection = conn)
             {
                 return connection.IsAvailable();
             }
+        }
+
+        public static string GetConnStringExSecurityInfo(this IDbConnection connection)
+        {
+            try
+            {
+                if (connection is SqlConnection)
+                {
+                    var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("DataSource: {0}, InitialCatalog: {1}", builder.DataSource, builder.InitialCatalog);
+                }
+
+                if (connection is SqlCeConnection)
+                {
+                    var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("DataSource: {0}", builder.DataSource);
+                }
+
+                if (connection is MySqlConnection)
+                {
+                    var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("Server: {0}, Database: {1}", builder.Server, builder.Database);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WarnWithException(typeof(DbConnectionExtensions),
+                    "Could not resolve connection string parameters", ex);
+                return "(Could not resolve)";
+            }
+
+            throw new ArgumentException(string.Format("The connection type {0} is not supported", connection.GetType()));
         }
 
         public static bool IsAvailable(this IDbConnection connection)
@@ -62,66 +110,17 @@ namespace Umbraco.Core.Persistence
                 connection.Open();
                 connection.Close();
             }
-            catch (DbException e)
+            catch (DbException exc)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                Current.Logger.Warn<IDbConnection>(e, "Configured database is reporting as not being available.");
+                LogHelper.WarnWithException(typeof(DbConnectionExtensions),
+                    "Configured database is reporting as not being available! {0}", exc, connection.GetConnStringExSecurityInfo);
                 return false;
             }
 
             return true;
         }
 
-        /// <summary>
-        /// Unwraps a database connection.
-        /// </summary>
-        /// <remarks>UmbracoDatabase wraps the original database connection in various layers (see
-        /// OnConnectionOpened); this unwraps and returns the original database connection.</remarks>
-        internal static IDbConnection UnwrapUmbraco(this IDbConnection connection)
-        {
-            var unwrapped = connection;
-            IDbConnection c;
-            do
-            {
-                c = unwrapped;
-                if (unwrapped is ProfiledDbConnection profiled) unwrapped = profiled.InnerConnection;
-                if (unwrapped is RetryDbConnection retrying) unwrapped = retrying.Inner;
-
-            } while (c != unwrapped);
-
-            return unwrapped;
-        }
-
-        public static string GetConnStringExSecurityInfo(this IDbConnection connection)
-        {
-            try
-            {
-                switch (connection)
-                {
-                    case SqlConnection _:
-                    {
-                        var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
-                        return $"DataSource: {builder.DataSource}, InitialCatalog: {builder.InitialCatalog}";
-                    }
-                    case SqlCeConnection _:
-                    {
-                        var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
-                        return $"DataSource: {builder.DataSource}";
-                    }
-                    case MySqlConnection _:
-                    {
-                        var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
-                        return $"Server: {builder.Server}, Database: {builder.Database}";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Current.Logger.Warn(typeof(DbConnectionExtensions), ex, "Could not resolve connection string parameters");
-                return "(Could not resolve)";
-            }
-
-            throw new ArgumentException($"The connection type {connection.GetType()} is not supported");
-        }
+        
     }
 }

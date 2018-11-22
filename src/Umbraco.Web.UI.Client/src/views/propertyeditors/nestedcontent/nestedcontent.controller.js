@@ -300,8 +300,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         _.each($scope.model.config.contentTypes, function (contentType) {
             contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
                 // remove all tabs except the specified tab
-                var tabs = scaffold.variants[0].tabs;
-                var tab = _.find(tabs, function (tab) {
+                var tab = _.find(scaffold.tabs, function (tab) {
                     return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
                 });
                 scaffold.tabs = [];

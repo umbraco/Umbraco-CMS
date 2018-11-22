@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -10,19 +9,28 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// Tree for displaying partial view macros in the developer app
     /// </summary>
-    [Tree(Constants.Applications.Settings, Constants.Trees.PartialViewMacros, null, sortOrder: 8)]
+    [Tree(Constants.Applications.Developer, "partialViewMacros", null, sortOrder: 6)]
     [UmbracoTreeAuthorize(Constants.Trees.PartialViewMacros)]
     [PluginController("UmbracoTrees")]
-    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
-    public class PartialViewMacrosTreeController : PartialViewsTreeController
+    [CoreTree]
+    public class PartialViewMacrosTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => Current.FileSystems.MacroPartialsFileSystem;
+        protected override IFileSystem2 FileSystem
+        {
+            get { return FileSystemProviderManager.Current.MacroPartialsFileSystem; }
+        }
 
         private static readonly string[] ExtensionsStatic = {"cshtml"};
 
-        protected override string[] Extensions => ExtensionsStatic;
+        protected override string[] Extensions
+        {
+            get { return ExtensionsStatic; }
+        }
 
-        protected override string FileIcon => "icon-article";
+        protected override string FileIcon
+        {
+            get { return "icon-article"; }
+        }
 
         protected override void OnRenderFolderNode(ref TreeNode treeNode)
         {

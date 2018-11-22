@@ -2,72 +2,72 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class LanguageRepositoryTest : TestWithDatabaseBase
+    public class LanguageRepositoryTest : BaseDatabaseFactoryTest
     {
-        public override void SetUp()
+        [SetUp]
+        public override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
 
             CreateTestData();
         }
 
-        private LanguageRepository CreateRepository(IScopeProvider provider)
+        private LanguageRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
-            return new LanguageRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
         }
+
+     
 
         [Test]
         public void Can_Perform_Get_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repository = CreateRepository(provider);
-
                 // Act
                 var language = repository.Get(1);
 
                 // Assert
                 Assert.That(language, Is.Not.Null);
                 Assert.That(language.HasIdentity, Is.True);
-                Assert.That(language.CultureName, Is.EqualTo("English (United States)"));
-                Assert.That(language.IsoCode, Is.EqualTo("en-US"));
-                Assert.That(language.FallbackLanguageId, Is.Null);
+                Assert.That(language.CultureName, Is.EqualTo("en-US"));
+                Assert.That(language.IsoCode, Is.EqualTo("en-US"));   
             }
         }
 
         [Test]
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
                 {
-                    CultureName = au.DisplayName,
-                    FallbackLanguageId = 1
+                    CultureName = au.DisplayName
                 };
-                repository.Save(language);
+                repository.AddOrUpdate(language);
+                unitOfWork.Commit();
 
-                //re-get
+                //re-get 
                 language = repository.GetByIsoCode(au.Name);
 
                 // Assert
@@ -75,20 +75,43 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(language.HasIdentity, Is.True);
                 Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
                 Assert.That(language.IsoCode, Is.EqualTo(au.Name));
-                Assert.That(language.FallbackLanguageId, Is.EqualTo(1));
             }
         }
 
+        [Test]
+        public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var au = CultureInfo.GetCultureInfo("en-AU");
+                var language = (ILanguage)new Language(au.Name)
+                {
+                    CultureName = au.DisplayName
+                };
+                repository.AddOrUpdate(language);
+                unitOfWork.Commit();
+
+                //re-get 
+                language = repository.GetByCultureName(au.DisplayName);
+
+                // Assert
+                Assert.That(language, Is.Not.Null);
+                Assert.That(language.HasIdentity, Is.True);
+                Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
+                Assert.That(language.IsoCode, Is.EqualTo(au.Name));
+            }
+        }
 
         [Test]
-        public void Get_When_Id_Doesnt_Exist_Returns_Null()
+        public void Get_WhenIdDoesntExist_ReturnsNull()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var language = repository.Get(0);
 
@@ -101,13 +124,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
-                var languages = repository.GetMany();
+                var languages = repository.GetAll();
 
                 // Assert
                 Assert.That(languages, Is.Not.Null);
@@ -119,15 +142,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         [Test]
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
-        {
+        { 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
-                var languages = repository.GetMany(1, 2);
+                var languages = repository.GetAll(1, 2);
 
                 // Assert
                 Assert.That(languages, Is.Not.Null);
@@ -141,14 +164,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
-                var query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
-                var result = repository.Get(query);
+                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == "da-DK");
+                var result = repository.GetByQuery(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -161,13 +184,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
-                var query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
+                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -179,95 +202,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language("pt-BR") { CultureName = "pt-BR" };
-                repository.Save(languageBR);
+                var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
+                repository.AddOrUpdate(languageBR);
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
                 Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
-                Assert.IsFalse(languageBR.IsDefault);
-                Assert.IsFalse(languageBR.IsMandatory);
-                Assert.IsNull(languageBR.FallbackLanguageId);
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_On_LanguageRepository_With_Boolean_Properties()
-        {
-            // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var repository = CreateRepository(provider);
-
-                // Act
-                var languageBR = new Language("pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
-                repository.Save(languageBR);
-
-                // Assert
-                Assert.That(languageBR.HasIdentity, Is.True);
-                Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
-                Assert.IsTrue(languageBR.IsDefault);
-                Assert.IsTrue(languageBR.IsMandatory);
-                Assert.IsNull(languageBR.FallbackLanguageId);
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_On_LanguageRepository_With_Fallback_Language()
-        {
-            // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var repository = CreateRepository(provider);
-
-                // Act
-                var languageBR = new Language("pt-BR")
-                    {
-                        CultureName = "pt-BR",
-                        FallbackLanguageId = 1
-                    };
-                repository.Save(languageBR);
-
-                // Assert
-                Assert.That(languageBR.HasIdentity, Is.True);
-                Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
-                Assert.That(languageBR.FallbackLanguageId, Is.EqualTo(1));
-            }
-        }
-
-        [Test]
-        public void Can_Perform_Add_On_LanguageRepository_With_New_Default()
-        {
-            // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var repository = CreateRepository(provider);
-
-                var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
-                repository.Save(languageBR);
-                var languageEN = new Language("en-AU") { CultureName = "en-AU" };
-                repository.Save(languageEN);
-
-                Assert.IsTrue(languageBR.IsDefault);
-                Assert.IsTrue(languageBR.IsMandatory);
-
-                // Act
-                var languageNZ = new Language("en-NZ") { CultureName = "en-NZ", IsDefault = true, IsMandatory = true };
-                repository.Save(languageNZ);
-                languageBR = repository.Get(languageBR.Id);
-
-                // Assert
-                Assert.IsFalse(languageBR.IsDefault);
-                Assert.IsTrue(languageNZ.IsDefault);
             }
         }
 
@@ -275,18 +222,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(5);
                 language.IsoCode = "pt-BR";
                 language.CultureName = "pt-BR";
-                language.FallbackLanguageId = 1;
 
-                repository.Save(language);
+                repository.AddOrUpdate(language);
+                unitOfWork.Commit();
 
                 var languageUpdated = repository.Get(5);
 
@@ -294,7 +241,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(languageUpdated, Is.Not.Null);
                 Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
                 Assert.That(languageUpdated.CultureName, Is.EqualTo("pt-BR"));
-                Assert.That(languageUpdated.FallbackLanguageId, Is.EqualTo(1));
             }
         }
 
@@ -302,14 +248,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(3);
                 repository.Delete(language);
+                unitOfWork.Commit();
 
                 var exists = repository.Exists(3);
 
@@ -319,37 +266,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Delete_On_LanguageRepository_With_Language_Used_As_Fallback()
-        {
-            // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                // Add language to delete as a fall-back language to another one
-                var repository = CreateRepository(provider);
-                var languageToFallbackFrom = repository.Get(5);
-                languageToFallbackFrom.FallbackLanguageId = 2; // fall back to #2 (something we can delete)
-                repository.Save(languageToFallbackFrom);
-
-                // delete #2
-                var languageToDelete = repository.Get(2);
-                repository.Delete(languageToDelete);
-
-                var exists = repository.Exists(2);
-
-                // has been deleted
-                Assert.That(exists, Is.False);
-            }
-        }
-
-        [Test]
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Act
                 var exists = repository.Exists(3);
@@ -367,10 +290,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private void CreateTestData()
+        public void CreateTestData()
         {
-            //Id 1 is en-US - when Umbraco is installed
-
             var languageDK = new Language("da-DK") { CultureName = "da-DK" };
             ServiceContext.LocalizationService.Save(languageDK);//Id 2
 

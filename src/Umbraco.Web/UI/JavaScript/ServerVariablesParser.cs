@@ -25,9 +25,9 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             var json = JObject.FromObject(items);
-            return vars.Replace(Token, json.ToString());
-
+            return vars.Replace(Token, json.ToString());  
+          
         }
-
+        
     }
 }

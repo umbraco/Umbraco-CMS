@@ -1,104 +1,102 @@
 module.exports = function (config) {
 
-    config.set({
-                
-        // base path, that will be used to resolve files and exclude
-        basePath: '../..',
+  config.set({
 
-        frameworks: ['jasmine'],
+    // base path, that will be used to resolve files and exclude
+    basePath: '../..',
 
-        // list of files / patterns to load in the browser
-        files: [
+    frameworks: ['jasmine'],
 
-            //libraries
-            'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/angular/angular.js',
-            'node_modules/angular-animate/angular-animate.js',
-            'node_modules/angular-cookies/angular-cookies.js',
-            'node_modules/angular-local-storage/dist/angular-local-storage.min.js',
-            'node_modules/angular-route/angular-route.js',
-            'node_modules/angular-sanitize/angular-sanitize.js',
-            'node_modules/angular-mocks/angular-mocks.js',
-            'node_modules/angular-ui-sortable/dist/sortable.js',
-            'node_modules/underscore/underscore-min.js',
-            'node_modules/moment/min/moment-with-locales.js',
-            'lib/umbraco/Extensions.js',
-            'node_modules/lazyload-js/lazyload.min.js',
+    // list of files / patterns to load in the browser
+    files: [
 
-            //app bootstrap and loader
-            'test/config/app.unit.js',
+      //libraries
+      'lib-bower/jquery/jquery.min.js',
+      'lib/angular/1.1.5/angular.js',
+      'lib/angular/1.1.5/angular-cookies.min.js',
+      'lib/angular/1.1.5/angular-mocks.js',
+      'lib/angular/angular-ui-sortable.js',
+      'lib-bower/underscore/underscore-min.js',
+      'lib-bower/moment/moment-with-locales.js',
+      'lib/umbraco/Extensions.js',
+      'lib-bower/rgrove-lazyload/lazyload.js',
+      'lib-bower//angular-local-storage/angular-local-storage.min.js',
 
-            //application files
-            'src/common/directives/*.js',
-            'src/common/filters/*.js',
-            'src/common/services/*.js',
-            'src/common/interceptors/*.js',
-            'src/common/resources/*.js',
-            'src/views/**/*.controller.js',
+      //app bootstrap and loader
+      'test/config/app.unit.js',
 
-            //mocked data and routing
-            'src/common/mocks/umbraco.servervariables.js',
-            'src/common/mocks/**/*.js',
+      //application files
+      'src/common/directives/*.js',
+      'src/common/filters/*.js',
+      'src/common/services/*.js',
+      'src/common/security/*.js',
+      'src/common/resources/*.js',
+      'src/views/**/*.controller.js',
 
-            //tests
-            'test/unit/**/*.spec.js'
-        ],
+      //mocked data and routing
+      'src/common/mocks/umbraco.servervariables.js',
+      'src/common/mocks/**/*.js',
 
-        // list of files to exclude
-        exclude: [],
+      //tests
+      'test/unit/**/*.spec.js'
+    ],
 
-        // use dolts reporter, as travis terminal does not support escaping sequences
-        // possible values: 'dots', 'progress', 'junit', 'teamcity'
-        // CLI --reporters progress
-        reporters: ['progress'],
+    // list of files to exclude
+    exclude: [],
 
-        // web server port
-        // CLI --port 9876
-        port: 9876,
+    // use dolts reporter, as travis terminal does not support escaping sequences
+    // possible values: 'dots', 'progress', 'junit', 'teamcity'
+    // CLI --reporters progress
+    reporters: ['progress'],
 
-        // cli runner port
-        // CLI --runner-port 9100
+    // web server port
+    // CLI --port 9876
+    port: 9876,
+
+    // cli runner port
+    // CLI --runner-port 9100
     runnerPort: 9100,
 
-        // enable / disable colors in the output (reporters and logs)
-        // CLI --colors --no-colors
-        colors: true,
+    // enable / disable colors in the output (reporters and logs)
+    // CLI --colors --no-colors
+    colors: true,
 
-        // level of logging
-        // possible values: karma.LOG_DISABLE || karma.LOG_ERROR || karma.LOG_WARN || karma.LOG_INFO || karma.LOG_DEBUG
-        // CLI --log-level debug
-        logLevel: config.LOG_INFO,
+    // level of logging
+    // possible values: karma.LOG_DISABLE || karma.LOG_ERROR || karma.LOG_WARN || karma.LOG_INFO || karma.LOG_DEBUG
+    // CLI --log-level debug
+    logLevel: config.LOG_WARN,
 
-        // enable / disable watching file and executing tests whenever any file changes
-        // CLI --auto-watch --no-auto-watch
-        autoWatch: false,
+    // enable / disable watching file and executing tests whenever any file changes
+    // CLI --auto-watch --no-auto-watch
+    autoWatch: false,
 
-        // Start these browsers, currently available:
-        // - Chrome
-        // - ChromeCanary
-        // - Firefox
-        // - Opera
-        // - Safari (only Mac)
-        // - PhantomJS
-        // - IE (only Windows)
-        // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['PhantomJS'],
+    // Start these browsers, currently available:
+    // - Chrome
+    // - ChromeCanary
+    // - Firefox
+    // - Opera
+    // - Safari (only Mac)
+    // - PhantomJS
+    // - IE (only Windows)
+    // CLI --browsers Chrome,Firefox,Safari
+    browsers: ['PhantomJS'],
 
-        // allow waiting a bit longer, some machines require this
+    // allow waiting a bit longer, some machines require this
+	
+    browserNoActivityTimeout: 100000,     // default 10,000ms
 
-        browserNoActivityTimeout: 100000,     // default 10,000ms
-        
-        // Auto run tests on start (when browsers are captured) and exit
-        // CLI --single-run --no-single-run
-        singleRun: true,
 
-        // report which specs are slower than 500ms
-        // CLI --report-slower-than 500
-        reportSlowerThan: 500,
+    // Auto run tests on start (when browsers are captured) and exit
+    // CLI --single-run --no-single-run
+    singleRun: true,
 
-        plugins: [
-            require('karma-jasmine'),
-            require('karma-phantomjs-launcher')
-        ]
-    });
+    // report which specs are slower than 500ms
+    // CLI --report-slower-than 500
+    reportSlowerThan: 500,
+    
+    plugins: [
+      'karma-jasmine',
+      'karma-phantomjs-launcher'
+    ]
+  });
 };

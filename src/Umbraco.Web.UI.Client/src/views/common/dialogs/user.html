@@ -1,0 +1,119 @@
+<div class="umb-panel umb-user-panel" ng-controller="Umbraco.Dialogs.UserController">
+    <div class="umb-panel-header">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar">
+                <button ng-click="logout()" hotkey="ctrl+shift+l" class="btn btn-warning">
+                    <localize key="general_logout">Log out</localize>
+                </button>
+            </div>
+        </div>
+        <h1 class="headline">{{user.name}}</h1>
+        <small class="umb-version">Umbraco version {{version}}</small>
+        <p class="muted">
+            <small>
+                <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
+            </small>
+        </p>
+
+    </div>
+
+    <div class="umb-panel-body umb-scrollable">
+        <div class="tab-content umb-control-group">
+
+            <div class="umb-pane" ng-if="!showPasswordFields">
+
+               <h5><localize key="user_yourProfile" /></h5>
+
+               <a href="#/users/users/user/{{user.id}}"
+                  class="btn btn-primary"
+                  ng-click="close()"
+                  ng-if="canEditProfile">
+                  <localize key="general_edit">Edit</localize>
+               </a>
+
+               <umb-button
+                  type="button"
+                  action="togglePasswordFields()"
+                  label="Change password"
+                  button-style="success">
+               </umb-button>
+
+            </div>
+
+            <div class="umb-pane external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
+
+                <h5><localize key="defaultdialogs_externalLoginProviders">External login providers</localize></h5>
+
+                <div ng-repeat="login in externalLoginProviders">
+
+					<form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
+						  action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
+						<input type="hidden" name="provider" value="{{login.authType}}" />
+						<button class="btn btn-block btn-social"
+								ng-class="login.properties.SocialStyle"
+								id="{{login.authType}}"
+								onclick="document.forms.oauthloginform.submit();">
+
+							<i class="fa" ng-class="login.properties.SocialIcon"></i>
+							<localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
+						</button>
+					</form>
+
+                    <button ng-if="login.linkedProviderKey != undefined"
+                            ng-click="unlink($event, login.authType, login.linkedProviderKey)"
+                            class="btn btn-block btn-social"
+                            ng-class="login.properties.SocialStyle"
+                            id="{{login.authType}}"
+                            name="provider"
+                            value="{{login.authType}}">
+                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                        <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="umb-pane" ng-if="!showPasswordFields">
+                <h5><localize key="user_yourHistory" /></h5>
+                <ul class="umb-tree">
+                    <li ng-repeat="item in history | orderBy:'time':true">
+                        <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
+                            <i class="{{item.icon}}"></i> {{item.name}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="umb-pane" ng-show="showPasswordFields">
+
+               <h5>Change password</h5>
+
+               <form
+                  name="passwordForm"
+                  class="block-form"
+                  ng-submit="changePassword()"
+                  novalidate
+                  val-form-manager>
+
+                  <umb-editor model="changePasswordModel"></umb-editor>
+
+                  <umb-button
+                     type="button"
+                     action="togglePasswordFields()"
+                     label="Back"
+                     button-style="Cancel">
+                  </umb-button>
+
+                  <umb-button
+                     type="submit"
+                     label="Change password"
+                     state="changePasswordButtonState"
+                     button-style="success">
+                  </umb-button>
+
+               </form>
+
+            </div>
+
+    </div>
+</div>

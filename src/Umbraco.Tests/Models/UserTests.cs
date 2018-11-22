@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Models
         {
             var item = new User()
             {
-                Id = 3,
+                Id = 3,                
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 CreateDate = DateTime.Now,
@@ -35,11 +35,11 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentIds = new[] { 3 },
-                StartMediaIds = new[] { 8 },
-                Username = "username"
+                StartContentIds = new []{ 3 },
+                StartMediaIds = new[]{ 8 },
+                Username = "username"                            
             };
-
+          
             var clone = (User)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
@@ -82,8 +82,8 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentIds = new[] { 3 },
-                StartMediaIds = new[] { 8 },
+                StartContentIds = new[]{ 3 },
+                StartMediaIds = new []{ 8 },
                 Username = "username"
             };
 

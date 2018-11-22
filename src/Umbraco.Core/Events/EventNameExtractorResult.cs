@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Events
+namespace Umbraco.Core.Events
 {
     internal class EventNameExtractorResult
     {

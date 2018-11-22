@@ -3,38 +3,41 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class TemplateRepositoryTest : TestWithDatabaseBase
+    public class TemplateRepositoryTest : BaseDatabaseFactoryTest
     {
         private IFileSystem _masterPageFileSystem;
         private IFileSystem _viewsFileSystem;
 
-        private ITemplateRepository CreateRepository(IScopeProvider provider, ITemplatesSection templatesSection = null)
+        private ITemplateRepository CreateRepository(IScopeUnitOfWork unitOfWork, ITemplatesSection templatesSection = null)
         {
-            return new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger,
-                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc),
-                _masterPageFileSystem, _viewsFileSystem);
+            return new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, _masterPageFileSystem, _viewsFileSystem,
+                templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc));
         }
 
-        public override void SetUp()
+        [SetUp]
+        public override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
 
             _masterPageFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
@@ -44,10 +47,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -59,18 +64,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_Detect_Content()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -83,15 +87,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
             {
-                var repository = CreateRepository(provider, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
-
                 // Act
                 var template = new Template("test", "test");
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -110,21 +113,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_MasterPage_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms)))
             {
-                var repository = CreateRepository(provider, Mock.Of<ITemplatesSection>(x => x.DefaultRenderingEngine == RenderingEngine.WebForms));
-
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
-                repository.Save(template2);
-                
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
@@ -140,15 +142,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test");
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -161,24 +162,23 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
-                    @"@inherits Umbraco.Web.Mvc.UmbracoViewPage @{ Layout = null;}".StripWhitespace(),
+                    @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = null;}".StripWhitespace(), 
                     template.Content.StripWhitespace());
             }
 
@@ -188,27 +188,26 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content_With_Parent()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
-                repository.Save(template2);
-                
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test2.cshtml"), Is.True);
                 Assert.AreEqual(
-                    "@inherits Umbraco.Web.Mvc.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
+                    "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
                     template2.Content.StripWhitespace());
             }
         }
@@ -217,25 +216,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_Unique_Alias()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 var template2 = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template2);
-                
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.AreEqual("test1", template2.Alias);
@@ -247,29 +245,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_Unique_Alias()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 var template2 = new Template("test1", "test1")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template2);
-                
+                repository.AddOrUpdate(template2);
+                unitOfWork.Commit();
 
                 template.Alias = "test1";
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 //Assert
                 Assert.AreEqual("test11", template.Alias);
@@ -283,22 +280,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_MasterPage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 template.Content = @"<%@ Master Language=""VB"" %>";
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 var updated = repository.Get("test");
 
@@ -314,22 +310,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_View()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 // Act
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 template.Content += "<html></html>";
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 var updated = repository.Get("test");
 
@@ -337,116 +332,121 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
             }
+
+
         }
 
         [Test]
         public void Can_Perform_Delete_MasterPage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var template = new Template("test", "test")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 // Act
                 var templates = repository.Get("test");
                 Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.True);
                 repository.Delete(templates);
-                
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
                 Assert.That(_masterPageFileSystem.FileExists("test.master"), Is.False);
             }
+
+
         }
 
         [Test]
         public void Can_Perform_Delete_View()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var template = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.Save(template);
-                
+                repository.AddOrUpdate(template);
+                unitOfWork.Commit();
 
                 // Act
                 var templates = repository.Get("test");
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
                 repository.Delete(templates);
-                
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
+
+
         }
 
         [Test]
         public void Can_Perform_Delete_When_Assigned_To_Doc()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+
+            using (var templateRepository = CreateRepository(unitOfWork))
             {
-                var templateRepository = CreateRepository(provider);
+                var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+                var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
+                var contentRepo = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
 
-                var tagRepository = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, templateRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var contentRepo = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
-
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-                var textpage = MockedContent.CreateSimpleContent(contentType);
-                contentRepo.Save(textpage);
-                
-
-
-                var template = new Template("test", "test")
+                using (contentRepo)
                 {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                templateRepository.Save(template);
-                
+                    var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
+                    var textpage = MockedContent.CreateSimpleContent(contentType);
+                    contentTypeRepository.AddOrUpdate(contentType);
+                    contentRepo.AddOrUpdate(textpage);
+                    unitOfWork.Commit();
 
-                textpage.Template = template;
-                contentRepo.Save(textpage);
-                
 
-                // Act
-                var templates = templateRepository.Get("test");
-                templateRepository.Delete(templates);
-                
+                    var template = new Template("test", "test")
+                    {
+                        Content = @"<%@ Master Language=""C#"" %>"
+                    };
+                    templateRepository.AddOrUpdate(template);
+                    unitOfWork.Commit();
 
-                // Assert
-                Assert.IsNull(templateRepository.Get("test"));
+                    textpage.Template = template;
+                    contentRepo.AddOrUpdate(textpage);
+                    unitOfWork.Commit();
+
+                    // Act
+                    var templates = templateRepository.Get("test");
+                    templateRepository.Delete(templates);
+                    unitOfWork.Commit();
+
+                    // Assert
+                    Assert.IsNull(templateRepository.Get("test"));
+                }
             }
+
         }
 
         [Test]
         public void Can_Perform_Delete_On_Nested_Templates()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var parent = new Template("parent", "parent")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
@@ -463,18 +463,46 @@ namespace Umbraco.Tests.Persistence.Repositories
                 child.MasterTemplateId = new Lazy<int>(() => parent.Id);
                 baby.MasterTemplateAlias = child.Alias;
                 baby.MasterTemplateId = new Lazy<int>(() => child.Id);
-                repository.Save(parent);
-                repository.Save(child);
-                repository.Save(baby);
-                
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child);
+                repository.AddOrUpdate(baby);
+                unitOfWork.Commit();
 
                 // Act
                 var templates = repository.Get("parent");
                 repository.Delete(templates);
-                
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
+            }
+
+
+        }
+
+        [Test]
+        public void Can_Get_Template_Tree()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                CreateHierarchy(repository, unitOfWork);
+
+                // Act
+                var rootNode = repository.GetTemplateNode("parent");
+
+                // Assert
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "parent"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child1"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child2"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler1"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler2"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler3"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler4"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby1"));
+                Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby2"));
             }
         }
 
@@ -482,17 +510,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var created = CreateHierarchy(repository).ToArray();
+                var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
                 var all = repository.GetAll();
                 var allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
-                var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
+                var allById = repository.GetAll(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
 
                 // Assert
                 Assert.AreEqual(9, all.Count());
@@ -510,12 +537,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var created = CreateHierarchy(repository).ToArray();
+                var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
                 var childrenById = repository.GetChildren(created[1].Id);
@@ -527,6 +553,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(2, childrenById.DistinctBy(x => x.Id).Count());
                 Assert.AreEqual(2, childrenByAlias.Count());
                 Assert.AreEqual(2, childrenByAlias.DistinctBy(x => x.Id).Count());
+
             }
         }
 
@@ -534,12 +561,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children_At_Root()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                CreateHierarchy(repository).ToArray();
+                CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
                 var children = repository.GetChildren(-1);
@@ -548,6 +574,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.AreEqual(1, children.Count());
                 Assert.AreEqual(1, children.DistinctBy(x => x.Id).Count());
+
             }
         }
 
@@ -555,12 +582,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Descendants()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var created = CreateHierarchy(repository).ToArray();
+                var created = CreateHierarchy(repository, unitOfWork).ToArray();
 
                 // Act
                 var descendantsById = repository.GetDescendants(created[1].Id);
@@ -580,11 +606,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Creation()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var parent = new Template("parent", "parent");
                 var child1 = new Template("child1", "child1");
                 var toddler1 = new Template("toddler1", "toddler1");
@@ -614,16 +639,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Act
-                repository.Save(parent);
-                repository.Save(child1);
-                repository.Save(child2);
-                repository.Save(toddler1);
-                repository.Save(toddler2);
-                repository.Save(toddler3);
-                repository.Save(toddler4);
-                repository.Save(baby1);
-                repository.Save(baby2);
-                
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                repository.AddOrUpdate(child2);
+                repository.AddOrUpdate(toddler1);
+                repository.AddOrUpdate(toddler2);
+                repository.AddOrUpdate(toddler3);
+                repository.AddOrUpdate(toddler4);
+                repository.AddOrUpdate(baby1);
+                repository.AddOrUpdate(baby2);
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.AreEqual(string.Format("-1,{0}", parent.Id), parent.Path);
@@ -637,17 +662,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id), baby1.Path);
                 Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id), baby2.Path);
             }
+
+
         }
 
         [Test]
         public void Path_Is_Set_Correctly_On_Update()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var parent = new Template("parent", "parent");
                 var child1 = new Template("child1", "child1");
                 var child2 = new Template("child2", "child2");
@@ -663,20 +689,21 @@ namespace Umbraco.Tests.Persistence.Repositories
                 toddler2.MasterTemplateAlias = child1.Alias;
                 toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
 
-                repository.Save(parent);
-                repository.Save(child1);
-                repository.Save(child2);
-                repository.Save(toddler1);
-                repository.Save(toddler2);
-                
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                repository.AddOrUpdate(child2);
+                repository.AddOrUpdate(toddler1);
+                repository.AddOrUpdate(toddler2);
+                unitOfWork.Commit();
 
                 //Act
                 toddler2.SetMasterTemplate(child2);
-                repository.Save(toddler2);
-                
+                repository.AddOrUpdate(toddler2);
+                unitOfWork.Commit();
 
                 //Assert
-                Assert.AreEqual($"-1,{parent.Id},{child2.Id},{toddler2.Id}", toddler2.Path);
+                Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler2.Id), toddler2.Path);
+
             }
         }
 
@@ -684,30 +711,31 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Update_With_Master_Template_Removal()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var parent = new Template("parent", "parent");
                 var child1 = new Template("child1", "child1");
 
                 child1.MasterTemplateAlias = parent.Alias;
-                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+                child1.MasterTemplateId = new Lazy<int>(() => parent.Id);               
 
-                repository.Save(parent);
-                repository.Save(child1);
-                
+                repository.AddOrUpdate(parent);
+                repository.AddOrUpdate(child1);
+                unitOfWork.Commit();
 
                 //Act
                 child1.SetMasterTemplate(null);
-                repository.Save(child1);
-                
+                repository.AddOrUpdate(child1);
+                unitOfWork.Commit();
 
                 //Assert
-                Assert.AreEqual($"-1,{child1.Id}", child1.Path);
+                Assert.AreEqual(string.Format("-1,{0}", child1.Id), child1.Path);
+
             }
         }
+
 
         [TearDown]
         public override void TearDown()
@@ -742,7 +770,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return stream;
         }
 
-        private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository)
+        private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository, IDatabaseUnitOfWork unitOfWork)
         {
             var parent = new Template("parent", "parent")
             {
@@ -805,16 +833,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             baby2.MasterTemplateAlias = toddler4.Alias;
             baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
 
-            repository.Save(parent);
-            repository.Save(child1);
-            repository.Save(child2);
-            repository.Save(toddler1);
-            repository.Save(toddler2);
-            repository.Save(toddler3);
-            repository.Save(toddler4);
-            repository.Save(baby1);
-            repository.Save(baby2);
-            
+            repository.AddOrUpdate(parent);
+            repository.AddOrUpdate(child1);
+            repository.AddOrUpdate(child2);
+            repository.AddOrUpdate(toddler1);
+            repository.AddOrUpdate(toddler2);
+            repository.AddOrUpdate(toddler3);
+            repository.AddOrUpdate(toddler4);
+            repository.AddOrUpdate(baby1);
+            repository.AddOrUpdate(baby2);
+            unitOfWork.Commit();
 
             return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};
         }

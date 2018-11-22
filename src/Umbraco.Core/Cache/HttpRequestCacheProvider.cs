@@ -79,26 +79,24 @@ namespace Umbraco.Core.Cache
 
         #region Lock
 
-        private bool _entered;
-
-        protected override void EnterReadLock() => EnterWriteLock();
-
-        protected override void EnterWriteLock()
+        protected override IDisposable ReadLock
         {
-            if (HasContextItems)
-            {
-                System.Threading.Monitor.Enter(ContextItems.SyncRoot, ref _entered);
-            }
+            // there's no difference between ReadLock and WriteLock here
+            get { return WriteLock; }
         }
 
-        protected override void ExitReadLock() => ExitWriteLock();
-
-        protected override void ExitWriteLock()
+        protected override IDisposable WriteLock
         {
-            if (_entered)
+            // NOTE
+            //   could think about just overriding base.Locker to return a different
+            //   object but then we'd create a ReaderWriterLockSlim per request,
+            //   which is less efficient than just using a basic monitor lock.
+
+            get
             {
-                _entered = false;
-                System.Threading.Monitor.Exit(ContextItems.SyncRoot);
+                return HasContextItems 
+                    ? (IDisposable) new MonitorLock(ContextItems.SyncRoot) 
+                    : new NoopLocker();
             }
         }
 
@@ -115,9 +113,8 @@ namespace Umbraco.Core.Cache
 
             Lazy<object> result;
 
-            try
+            using (WriteLock)
             {
-                EnterWriteLock();
                 result = ContextItems[cacheKey] as Lazy<object>; // null if key not found
 
                 // cannot create value within the lock, so if result.IsValueCreated is false, just
@@ -130,10 +127,6 @@ namespace Umbraco.Core.Cache
                     ContextItems[cacheKey] = result;
                 }
             }
-            finally
-            {
-                ExitWriteLock();
-            }
 
             // using GetSafeLazy and GetSafeLazyValue ensures that we don't cache
             // exceptions (but try again and again) and silently eat them - however at
@@ -143,7 +136,8 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            var eh = value as ExceptionHolder;
+            if (eh != null) throw eh.Exception; // throw once!
             return value;
         }
 

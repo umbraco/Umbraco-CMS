@@ -41,7 +41,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IImagingAutoFillUploadField.Alias
         {
             get { return Alias; }
-
+            
         }
 
         string IImagingAutoFillUploadField.WidthFieldAlias

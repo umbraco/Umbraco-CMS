@@ -1,8 +1,9 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Web.Composing;
+using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -12,24 +13,26 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
+        private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httContext;
 
-        public StarterKitInstallStep(HttpContextBase httContext)
+        public StarterKitInstallStep(ApplicationContext applicationContext, HttpContextBase httContext)
         {
+            _applicationContext = applicationContext;
             _httContext = httContext;
         }
 
 
         public override InstallSetupResult Execute(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();            
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 
             InstallBusinessLogic(manifestId, packageFile);
 
-            Current.RestartAppPool(_httContext);
+            _applicationContext.RestartApplicationPool(_httContext);
 
             return null;
         }
@@ -39,11 +42,11 @@ namespace Umbraco.Web.Install.InstallSteps
             packageFile = HttpUtility.UrlDecode(packageFile);
             var installer = new Installer();
             installer.LoadConfig(packageFile);
-            installer.InstallBusinessLogic(manifestId, packageFile);
+            installer.InstallBusinessLogic(manifestId, packageFile);            
         }
 
         public override bool RequiresExecution(object model)
-        {
+        {            
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("manifestId")) == false)

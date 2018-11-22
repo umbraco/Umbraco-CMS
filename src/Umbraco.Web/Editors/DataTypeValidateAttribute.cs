@@ -2,15 +2,15 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using AutoMapper;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 
@@ -21,81 +21,106 @@ namespace Umbraco.Web.Editors
     /// </summary>
     internal sealed class DataTypeValidateAttribute : ActionFilterAttribute
     {
-        // LightInject can inject dependencies into properties
+        private readonly IDataTypeService _dataTypeService;
 
-        [Inject]
-        public IDataTypeService DataTypeService { get; set; }
+        public DataTypeValidateAttribute()
+        {
+        }
 
-        [Inject]
-        public PropertyEditorCollection PropertyEditors { get; set; }
+        public DataTypeValidateAttribute(IDataTypeService dataTypeService)
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
+        private IDataTypeService DataTypeService
+        {
+            get { return _dataTypeService ?? ApplicationContext.Current.Services.DataTypeService; }
+        }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            var dataType = (DataTypeSave) actionContext.ActionArguments["dataType"];
+            var dataType = (DataTypeSave)actionContext.ActionArguments["dataType"];
 
             dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
             dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
 
-            // get the property editor, ensuring that it exits
-            if (!PropertyEditors.TryGet(dataType.EditorAlias, out var propertyEditor))
+            //Validate that the property editor exists
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(dataType.SelectedEditor);
+            if (propertyEditor == null)
             {
-                var message = $"Property editor \"{dataType.EditorAlias}\" was not found.";
+                var message = string.Format("Property editor with id: {0} was not found", dataType.SelectedEditor);
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                 return;
             }
 
-            // assign
+            //assign the prop editor to the model
             dataType.PropertyEditor = propertyEditor;
 
-            // validate that the data type exists, or create one if required
-            IDataType persisted;
+            //Validate the data type exists or create one if required
+            IDataTypeDefinition persisted;
             switch (dataType.Action)
             {
                 case ContentSaveAction.Save:
-                    persisted = DataTypeService.GetDataType(Convert.ToInt32(dataType.Id));
+                    persisted = DataTypeService.GetDataTypeDefinitionById(Convert.ToInt32(dataType.Id));
                     if (persisted == null)
                     {
-                        var message = $"Data type with id {dataType.Id} was not found.";
+                        var message = string.Format("Data type with id: {0} was not found", dataType.Id);
                         actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                         return;
                     }
-                    // map the model to the persisted instance
+                    //map the model to the persisted instance
                     Mapper.Map(dataType, persisted);
                     break;
-
                 case ContentSaveAction.SaveNew:
-                    // create the persisted model from mapping the saved model
-                    persisted = Mapper.Map<IDataType>(dataType);
-                    ((DataType) persisted).ResetIdentity();
+                    //create the persisted model from mapping the saved model
+                    persisted = Mapper.Map<IDataTypeDefinition>(dataType);
+                    ((DataTypeDefinition)persisted).ResetIdentity();
                     break;
-
                 default:
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new ArgumentOutOfRangeException());
                     return;
             }
 
-            // assign (so it's available in the action)
+            //now assign the persisted entity to the model so we can use it in the action
             dataType.PersistedDataType = persisted;
 
-            // validate the configuration
-            // which is posted as a set of fields with key (string) and value (object)
-            var configurationEditor = propertyEditor.GetConfigurationEditor();
-            foreach (var field in dataType.ConfigurationFields)
+            //Validate each field
+            foreach (var preVal in dataType.PreValues)
             {
-                var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
-                if (editorField == null) continue;
+                var postedValue = preVal.Value;
 
-                // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here) - fixme - editing
-                foreach (var validator in editorField.Validators)
-                foreach (var result in validator.Validate(field.Value, null, null))
-                    actionContext.ModelState.AddValidationError(result, "Properties", field.Key);
+                foreach (var v in propertyEditor.PreValueEditor.Fields.Where(x => x.Key == preVal.Key).SelectMany(x => x.Validators))
+                {
+                    foreach (var result in v.Validate(postedValue, null, propertyEditor))
+                    {
+                        //if there are no member names supplied then we assume that the validation message is for the overall property
+                        // not a sub field on the property editor
+                        if (!result.MemberNames.Any())
+                        {
+                            //add a model state error for the entire property
+                            actionContext.ModelState.AddModelError(string.Format("{0}.{1}", "Properties", preVal.Key), result.ErrorMessage);
+                        }
+                        else
+                        {
+                            //there's assigned field names so we'll combine the field name with the property name
+                            // so that we can try to match it up to a real sub field of this editor
+                            foreach (var field in result.MemberNames)
+                            {
+                                actionContext.ModelState.AddModelError(string.Format("{0}.{1}.{2}", "Properties", preVal.Key, field), result.ErrorMessage);
+                            }
+                        }
+                    }
+                }
             }
 
             if (actionContext.ModelState.IsValid == false)
             {
-                // if it is not valid, do not continue and return the model state
+                //if it is not valid, do not continue and return the model state
                 actionContext.Response = actionContext.Request.CreateValidationErrorResponse(actionContext.ModelState);
+                return;
             }
+
         }
     }
 }

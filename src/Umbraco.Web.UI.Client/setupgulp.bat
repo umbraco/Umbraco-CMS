@@ -12,11 +12,12 @@ if /I "%c%" EQU "N" goto :eof
 
 :setupgulp
 call npm install
+call npm -g install bower
 call npm -g install gulp
 call npm -g install gulp-cli
 
 ECHO.
 ECHO.
-ECHO You should now be able to run: gulp build or gulp dev
+ECHO You should now be able to run: gulp build
 ECHO.
 ECHO.

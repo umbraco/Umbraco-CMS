@@ -1,26 +1,28 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    /// <summary>
-    /// Represents a textarea property and parameter editor.
-    /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.TextArea, EditorType.PropertyValue | EditorType.MacroParameter, "Textarea", "textarea", ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
-    public class TextAreaPropertyEditor : DataEditor
+    [PropertyEditor(Constants.PropertyEditors.TextboxMultipleAlias, "Textarea", "textarea", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.Text, Icon="icon-application-window-alt")]
+    public class TextAreaPropertyEditor : PropertyEditor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
-        /// </summary>
-        public TextAreaPropertyEditor(ILogger logger)
-            : base(logger)
-        { }
+        protected override PropertyValueEditor CreateValueEditor()
+        {
+            return new TextOnlyValueEditor(base.CreateValueEditor());
+        }
 
-        /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new TextAreaPreValueEditor();
+        }
 
-        /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();
+        internal class TextAreaPreValueEditor : PreValueEditor
+        {
+            [PreValueField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
+            public int MaxChars { get; set; }
+
+            [PreValueField("rows", "Number of rows", "number", Description = "If empty - 10 rows would be set as the default value")]
+            public int Rows { get; set; }
+        }
     }
 }

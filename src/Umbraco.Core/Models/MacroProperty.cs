@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : BeingDirtyBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
+    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
     {
         public MacroProperty()
         {
@@ -31,6 +31,14 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = Guid.NewGuid();
+
+            //try to get the new mapped parameter editor
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
+            if (mapped.IsNullOrWhiteSpace() == false)
+            {
+                editorAlias = mapped;
+            }
+
             _editorAlias = editorAlias;
         }
 
@@ -50,6 +58,14 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = key;
+
+            //try to get the new mapped parameter editor
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
+            if (mapped.IsNullOrWhiteSpace() == false)
+            {
+                editorAlias = mapped;
+            }
+
             _editorAlias = editorAlias;
         }
 
@@ -68,7 +84,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<EntityBase, int>(x => x.Id);
+            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
             public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
         }
 
@@ -135,7 +151,10 @@ namespace Umbraco.Core.Models
             get { return _editorAlias; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _editorAlias, Ps.Value.PropertyTypeSelector);
+                //try to get the new mapped parameter editor
+                var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
+                var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
+                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);                
             }
         }
 

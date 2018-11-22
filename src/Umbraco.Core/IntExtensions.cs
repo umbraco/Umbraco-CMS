@@ -1,21 +1,21 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Core
 {
-    public static class IntExtensions
-    {
-        /// <summary>
-        /// Does something 'x' amount of times
-        /// </summary>
-        /// <param name="n"></param>
-        /// <param name="action"></param>
-        public static void Times(this int n, Action<int> action)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                action(i);
-            }
-        }
+	public static class IntExtensions
+	{
+		/// <summary>
+		/// Does something 'x' amount of times
+		/// </summary>
+		/// <param name="n"></param>
+		/// <param name="action"></param>
+		public static void Times(this int n, Action<int> action)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				action(i);
+			}
+		}
 
         /// <summary>
         /// Creates a Guid based on an integer value
@@ -28,5 +28,5 @@ namespace Umbraco.Core
             BitConverter.GetBytes(value).CopyTo(bytes, 0);
             return new Guid(bytes);
         }
-    }
+	}
 }

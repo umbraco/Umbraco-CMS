@@ -1,49 +1,74 @@
 ﻿using System;
+using System.ComponentModel;
 using Umbraco.Core;
+using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents a published snapshot domain with its normalized uri.
+    /// Represents an Umbraco domain and its normalized uri.
     /// </summary>
     /// <remarks>
     /// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>
     /// <para>The normalized uri of a domain begins with a scheme and ends with no slash, eg <c>http://example.com/</c>, <c>https://www.example.com/</c>, <c>http://example.com/foo/</c>.</para>
     /// </remarks>
-    public class DomainAndUri : Domain
+    public class DomainAndUri
     {
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainAndUri"/> class.
+        /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.
         /// </summary>
-        /// <param name="domain">The original domain.</param>
-        /// <param name="currentUri">The context current Uri.</param>
-        public DomainAndUri(Domain domain, Uri currentUri)
-            : base(domain)
+        /// <param name="domain">The domain.</param>
+        /// <param name="scheme">The uri scheme.</param>
+        public DomainAndUri(IDomain domain, string scheme)
         {
+            UmbracoDomain = domain;
             try
             {
-                // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-                var name = Name.StartsWith("/") && currentUri != null
-                    ? currentUri.GetLeftPart(UriPartial.Authority) + Name
-                    : Name;
-                var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
-                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
+                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.DomainName, scheme)));
             }
             catch (UriFormatException)
             {
-                throw new ArgumentException($"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"."
-                    + " Hostname should be a valid uri.", nameof(domain));
+                var name = domain.DomainName.ToCSharpString();
+                throw new ArgumentException(string.Format("Failed to parse invalid domain: node id={0}, hostname=\"{1}\"."
+                    + " Hostname should be a valid uri.", domain.RootContentId, name), "domain");
             }
         }
 
-        /// <summary>
-        /// Gets the normalized uri of the domain, within the current context.
-        /// </summary>
-        public Uri Uri { get; }
+        [Obsolete("This should not be used, use the other contructor specifying the non legacy IDomain instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DomainAndUri(Domain domain, string scheme)
+            : this(domain.DomainEntity, scheme)
+        {
+            
+        }
 
+        
+        [Obsolete("This should not be used, use the non-legacy property called UmbracoDomain instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Domain Domain
+        {
+            get { return new Domain(UmbracoDomain); }
+        }
+
+        /// <summary>
+        /// Gets the Umbraco domain.
+        /// </summary>
+        public IDomain UmbracoDomain { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the normalized uri of the domain.
+        /// </summary>
+        public Uri Uri { get; private set; }
+
+        /// <summary>
+        /// Gets a string that represents the <see cref="DomainAndUri"/> instance.
+        /// </summary>
+        /// <returns>A string that represents the current <see cref="DomainAndUri"/> instance.</returns>
         public override string ToString()
         {
-            return $"{{ \"{Name}\", \"{Uri}\" }}";
+            return string.Format("{{ \"{0}\", \"{1}\" }}", UmbracoDomain.DomainName, Uri);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
     [TestFixture]
     public class ServerVariablesParserTests
     {
-
+       
 
         [Test]
         public void Parse()

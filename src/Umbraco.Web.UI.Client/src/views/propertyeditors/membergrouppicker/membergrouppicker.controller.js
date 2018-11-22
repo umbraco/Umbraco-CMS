@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberGroupPicker($scope, editorService){
+function memberGroupPicker($scope, dialogService){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -18,25 +18,34 @@ function memberGroupPicker($scope, editorService){
     }
 
     $scope.openMemberGroupPicker = function() {
-        var memberGroupPicker = {
-            multiPicker: true,
-            submit: function(model) {
-                if(model.selectedMemberGroups) {
-                    _.each(model.selectedMemberGroups, function (item, i) {
-                        $scope.add(item);
-                    });
-                }
-                if(model.selectedMemberGroup) {
-                    $scope.clear();
-                    $scope.add(model.selectedMemberGroup);
-                }
-                editorService.close();
-            },
-            close: function() {
-                editorService.close();
-            }
-        };
-        editorService.memberGroupPicker(memberGroupPicker);
+
+      $scope.memberGroupPicker = {};
+      $scope.memberGroupPicker.multiPicker = true;
+      $scope.memberGroupPicker.view = "memberGroupPicker";
+      $scope.memberGroupPicker.show = true;
+
+      $scope.memberGroupPicker.submit = function(model) {
+
+         if(model.selectedMemberGroups) {
+            _.each(model.selectedMemberGroups, function (item, i) {
+                $scope.add(item);
+            });
+         }
+
+         if(model.selectedMemberGroup) {
+            $scope.clear();
+            $scope.add(model.selectedMemberGroup);
+         }
+
+         $scope.memberGroupPicker.show = false;
+         $scope.memberGroupPicker = null;
+      };
+
+      $scope.memberGroupPicker.close = function(oldModel) {
+         $scope.memberGroupPicker.show = false;
+         $scope.memberGroupPicker = null;
+      };
+
     };
 
     $scope.remove =function(index){

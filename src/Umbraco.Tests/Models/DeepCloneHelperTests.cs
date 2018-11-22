@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,8 +37,8 @@ namespace Umbraco.Tests.Models
             var clone = (Test3)test1.DeepClone();
 
             Assert.AreNotSame(test1, clone);
-            Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
-            for (int i = 0; i < test1.MyTest1.Length; i++)
+            Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
+            for (int i = 0; i < test1.MyTest1.Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -56,8 +56,8 @@ namespace Umbraco.Tests.Models
             var clone = (Test4)test1.DeepClone();
 
             Assert.AreNotSame(test1, clone);
-            Assert.AreEqual(test1.MyTest1.Length, clone.MyTest1.Length);
-            for (int i = 0; i < test1.MyTest1.Length; i++)
+            Assert.AreEqual(test1.MyTest1.Count(), clone.MyTest1.Count());
+            for (int i = 0; i < test1.MyTest1.Count(); i++)
             {
                 Assert.IsNotNull(clone.MyTest1.ElementAt(i));
                 Assert.AreNotSame(clone.MyTest1.ElementAt(i), test1.MyTest1.ElementAt(i));
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Models
         {
             public string Name { get; set; }
             public object[] MyTest1 { get; set; }
-
+            
         }
 
         public class Test4 : BaseCloneable

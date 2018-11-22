@@ -164,6 +164,8 @@ namespace Umbraco.Core.Xml.XPath
 #pragma warning disable 168
             var msg = string.Format(format, args); // unused if not writing, hence #pragma
 #pragma warning restore 168
+            //LogHelper.Debug<MacroNavigator>(msg); // beware! this can quicky overflow log4net
+            //Console.WriteLine(msg);
         }
 #endif
 
@@ -216,7 +218,7 @@ namespace Umbraco.Core.Xml.XPath
             public bool WrapNavigatorInNodes { get; private set; }
             public KeyValuePair<string, string>[] Attributes { get; private set; }
         }
-
+        
         #endregion
 
         /// <summary>
@@ -237,7 +239,7 @@ namespace Umbraco.Core.Xml.XPath
         /// </summary>
         public override bool IsEmptyElement
         {
-            get
+            get 
             {
                 DebugEnter("IsEmptyElement");
                 bool isEmpty;
@@ -1028,7 +1030,7 @@ namespace Umbraco.Core.Xml.XPath
             // gets a value indicating whether this state is at the same position as another one.
             public bool IsSamePosition(State other)
             {
-                return other.Position == Position
+                return other.Position == Position 
                     && (Position != StatePosition.ParameterNavigator || other.ParameterNavigator.IsSamePosition(ParameterNavigator))
                     && other.ParameterIndex == ParameterIndex
                     && other.ParameterAttributeIndex == ParameterAttributeIndex;

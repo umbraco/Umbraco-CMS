@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,22 +11,23 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web.Security;
+using System.Web.WebPages;
 using AutoMapper;
+using ClientDependency.Core;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -44,12 +46,34 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public UsersController()
+            : this(UmbracoContext.Current)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public UsersController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+        }
+
+        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) 
+            : base(umbracoContext, umbracoHelper, backOfficeUserManager)
+        {
+        }
+        
+        /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -60,7 +84,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationCache.StaticCache, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, id);
         }
 
         internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, ICacheProvider staticCache, int id)
@@ -105,13 +129,13 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    Current.FileSystems.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    FileSystemProviderManager.Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
 
                 //track the temp file so the cleanup filter removes it
-                tempFiles.UploadedFiles.Add(new ContentPropertyFile
+                tempFiles.UploadedFiles.Add(new ContentItemFile
                 {
                     TempFilePath = file.LocalFileName
                 });
@@ -130,7 +154,7 @@ namespace Umbraco.Web.Editors
             var filePath = found.Avatar;
 
             //if the filePath is already null it will mean that the user doesn't have a custom avatar and their gravatar is currently
-            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value
+            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value 
             //for the avatar.
             if (filePath.IsNullOrWhiteSpace() == false)
             {
@@ -146,11 +170,11 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (Current.FileSystems.MediaFileSystem.FileExists(filePath))
-                    Current.FileSystems.MediaFileSystem.DeleteFile(filePath);
+                if (FileSystemProviderManager.Current.MediaFileSystem.FileExists(filePath))
+                    FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache));
         }
 
         /// <summary>
@@ -204,13 +228,13 @@ namespace Umbraco.Web.Editors
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
-            var filterQuery = Current.SqlContext.Query<IUser>();
+            var filterQuery = Query<IUser>.Builder;
 
-            if (!Security.CurrentUser.IsSuper())
+            //if the current user is not the administrator, then don't include this in the results.
+            var isAdminUser = Security.CurrentUser.Id == 0;
+            if (isAdminUser == false)
             {
-                // only super can see super - but don't use IsSuper, cannot be mapped to SQL - fixme NOW
-                //filterQuery.Where(x => !x.IsSuper());
-                filterQuery.Where(x => x.Id != Constants.Security.SuperUserId);
+                filterQuery.Where(x => x.Id != 0);
             }
 
             if (filter.IsNullOrWhiteSpace() == false)
@@ -252,7 +276,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-
+            
             if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
@@ -321,7 +345,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Invites a user
         /// </summary>
-        /// <param name="userSave"></param>
+        /// <param name="userSave"></param> 
         /// <returns></returns>
         /// <remarks>
         /// This will email the user an invite and generate a token that will be validated in the email
@@ -337,7 +361,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-
+            
             if (EmailSender.CanSendRequiredEmail == false)
             {
                 throw new HttpResponseException(
@@ -356,7 +380,7 @@ namespace Umbraco.Web.Editors
                 user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
-
+            
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
@@ -449,20 +473,20 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(),
+                    area = GlobalSettings.UmbracoMvcArea,
                     invite = inviteToken
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = RuntimeState.ApplicationUrl;
+            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
             var inviteUri = new Uri(applicationUri, action);
 
             var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
+                UserExtensions.GetUserCulture(to.Language, Services.TextService));
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
+                UserExtensions.GetUserCulture(to.Language, Services.TextService),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(
@@ -507,7 +531,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
             }
-
+            
             var hasErrors = false;
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
@@ -543,7 +567,7 @@ namespace Umbraco.Web.Editors
             {
                 userSave.Username = userSave.Email;
             }
-
+            
             if (userSave.ChangePassword != null)
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
@@ -575,10 +599,10 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
-
+            
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
-        }
+        }        
 
         /// <summary>
         /// Disables the users with the given user ids
@@ -586,8 +610,7 @@ namespace Umbraco.Web.Editors
         /// <param name="userIds"></param>
         public HttpResponseMessage PostDisableUsers([FromUri]int[] userIds)
         {
-            var tryGetCurrentUserId = Security.GetUserId();
-            if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
+            if (userIds.Contains(Security.GetUserId()))
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("The current user cannot disable itself"));
@@ -631,7 +654,7 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
         }
 
         /// <summary>
@@ -653,7 +676,7 @@ namespace Umbraco.Web.Editors
                 }
                 var user = await UserManager.FindByIdAsync(userIds[0]);
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
+                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));                
             }
 
             foreach (var u in userIds)
@@ -730,6 +753,6 @@ namespace Umbraco.Web.Editors
             [DataMember(Name = "userStates")]
             public IDictionary<UserState, int> UserStates { get; set; }
         }
-
+        
     }
 }

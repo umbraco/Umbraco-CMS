@@ -9,7 +9,7 @@
 (function() {
    "use strict";
 
-   function ListViewLayoutsPreValsController($scope, editorService) {
+   function ListViewLayoutsPreValsController($scope) {
 
       var vm = this;
       vm.focusLayoutName = false;
@@ -63,22 +63,21 @@
       }
 
       function openIconPicker(layout) {
-            var iconPicker = {
-                submit: function(model) {
-                    if (model.color) {
-                        layout.icon = model.icon + " " + model.color;
-                    } else {
-                        layout.icon = model.icon;
-                    }
-                    vm.focusLayoutName = true;
-                    editorService.close();
-                },
-                close: function() {
-                    editorService.close();
-                }
-            };
-            editorService.iconPicker(iconPicker);
-        }
+          vm.iconPickerDialog = {
+              view: "iconpicker",
+              show: true,
+              submit: function(model) {
+                  if (model.color) {
+                     layout.icon = model.icon + " " + model.color;
+                  } else {
+                     layout.icon = model.icon;
+                  }
+                  vm.focusLayoutName = true;
+                  vm.iconPickerDialog.show = false;
+                  vm.iconPickerDialog = null;
+              }
+          };
+      }
 
       activate();
 

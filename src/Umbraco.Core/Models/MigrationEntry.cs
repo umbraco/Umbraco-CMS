@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reflection;
 using Semver;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public class MigrationEntry : EntityBase, IMigrationEntry
+    public class MigrationEntry : Entity, IMigrationEntry
     {
         public MigrationEntry()
         {

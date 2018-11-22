@@ -15,7 +15,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             return ((ImagingAutoFillUploadFieldElement)element).Alias;
         }
-
+        
         internal void Add(ImagingAutoFillUploadFieldElement item)
         {
             BaseAdd(item);

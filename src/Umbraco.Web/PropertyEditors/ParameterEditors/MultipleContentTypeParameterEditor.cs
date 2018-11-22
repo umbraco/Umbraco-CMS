@@ -1,17 +1,14 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [DataEditor("contentTypeMultiple", EditorType.MacroParameter, "Multiple Content Type Picker", "entitypicker")]
-    public class MultipleContentTypeParameterEditor : DataEditor
+    [ParameterEditor("contentTypeMultiple", "Multiple Content Type Picker", "entitypicker")]
+    public class MultipleContentTypeParameterEditor : ParameterEditor
     {
-        public MultipleContentTypeParameterEditor(ILogger logger)
-            : base(logger)
+        public MultipleContentTypeParameterEditor()
         {
-            // configure
-            DefaultConfiguration.Add("multiple", true);
-            DefaultConfiguration.Add("entityType", "DocumentType");
+            Configuration.Add("multiple", "1");
+            Configuration.Add("entityType", "DocumentType");
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,9 +9,9 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     internal static class DefinitionFactory
     {
-        public static TableDefinition GetTableDefinition(Type modelType, ISqlSyntaxProvider sqlSyntax)
+        public static TableDefinition GetTableDefinition(ISqlSyntaxProvider syntaxProvider, Type modelType)
         {
-            //Looks for NPoco's TableNameAtribute for the name of the table
+            //Looks for PetaPoco's TableNameAtribute for the name of the table
             //If no attribute is set we use the name of the Type as the default convention
             var tableNameAttribute = modelType.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? modelType.Name : tableNameAttribute.Value;
@@ -33,7 +32,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                 //Otherwise use the name of the property itself as the default convention
                 var columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
                 string columnName = columnAttribute != null ? columnAttribute.Name : propertyInfo.Name;
-                var columnDefinition = GetColumnDefinition(modelType, propertyInfo, columnName, tableName, sqlSyntax);
+                var columnDefinition = GetColumnDefinition(syntaxProvider, modelType, propertyInfo, columnName, tableName);
                 tableDefinition.Columns.Add(columnDefinition);
 
                 //Creates a foreignkey definition and adds it to the collection on the table definition
@@ -59,7 +58,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
             return tableDefinition;
         }
 
-        public static ColumnDefinition GetColumnDefinition(Type modelType, PropertyInfo propertyInfo, string columnName, string tableName, ISqlSyntaxProvider sqlSyntax)
+        public static ColumnDefinition GetColumnDefinition(ISqlSyntaxProvider syntaxProvider, Type modelType, PropertyInfo propertyInfo, string columnName, string tableName)
         {
             var definition = new ColumnDefinition{ Name = columnName, TableName = tableName, ModificationType = ModificationType.Create };
 
@@ -109,9 +108,9 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
             var constraintAttribute = propertyInfo.FirstAttribute<ConstraintAttribute>();
             if (constraintAttribute != null)
             {
-                //Special case for MySQL as it can't have multiple default DateTime values, which
+                //Special case for MySQL as it can't have multiple default DateTime values, which 
                 //is what the umbracoServer table definition is trying to create
-                if (sqlSyntax is MySqlSyntaxProvider && definition.TableName == "umbracoServer" &&
+                if (syntaxProvider is MySqlSyntaxProvider && definition.TableName == "umbracoServer" &&
                         definition.TableName.ToLowerInvariant() == "lastNotifiedDate".ToLowerInvariant())
                     return definition;
 

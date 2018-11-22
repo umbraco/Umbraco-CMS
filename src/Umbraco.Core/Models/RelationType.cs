@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
@@ -12,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RelationType : EntityBase, IRelationType
+    public class RelationType : Entity, IAggregateRoot, IRelationType
     {
         private string _name;
         private string _alias;
@@ -20,19 +19,19 @@ namespace Umbraco.Core.Models
         private Guid _parentObjectType;
         private Guid _childObjectType;
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias)
         {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            Mandate.ParameterNotNullOrEmpty(@alias, "alias");
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
             Name = _alias;
         }
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
-            : this(childObjectType, parentObjectType, alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias, string name)
+            :this(childObjectType, parentObjectType, @alias)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            Mandate.ParameterNotNullOrEmpty(name, "name");
             Name = name;
         }
 

@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Tests.PropertyEditors
 {
     [TestFixture]
-    public class PropertyEditorValueConverterTests
-    {
+	public class PropertyEditorValueConverterTests
+	{
         // see notes in the converter
         // only ONE date format is expected here
 
@@ -30,14 +23,14 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10T13:14:15", true)]
         [TestCase("", false)]
-        public void CanConvertDatePickerPropertyEditor(string date, bool expected)
-        {
-            var converter = new DatePickerValueConverter();
-            var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-            var result = converter.ConvertSourceToIntermediate(null, null, date, false); // does not use type for conversion
+		public void CanConvertDatePickerPropertyEditor(string date, bool expected)
+		{
+			var converter = new DatePickerValueConverter();
+			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
+			var result = converter.ConvertDataToSource(null, date, false); // does not use type for conversion
 
-            if (expected)
-                Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
+		    if (expected)
+		        Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
             else
                 Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
         }
@@ -60,7 +53,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertYesNoPropertyEditor(object value, bool expected)
         {
             var converter = new YesNoValueConverter();
-            var result = converter.ConvertSourceToIntermediate(null, null, value, false); // does not use type for conversion
+            var result = converter.ConvertDataToSource(null, value, false); // does not use type for conversion
 
             Assert.AreEqual(expected, result);
         }
@@ -73,55 +66,53 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
         {
             var converter = new CheckboxListValueConverter();
-            var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, value, false);
+            var result = converter.ConvertSourceToObject(null, value, false);
 
             Assert.AreEqual(expected, result);
         }
 
-        [TestCase("apples", new[] { "apples" })]
-        [TestCase("apples,oranges", new[] { "apples", "oranges" })]
-        [TestCase("apples , oranges, pears ", new[] { "apples", "oranges", "pears" })]
-        [TestCase("", new string[] { })]
-        [TestCase(null, new string[] { })]
-        public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
-        {
-            var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
-            mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
-                .Returns(new PublishedDataType(123, "test", new Lazy<object>(() => new DropDownFlexibleConfiguration
-                    {
-                        Multiple = true
-                    })));
-
-            var publishedPropType = new PublishedPropertyType(
-                new PublishedContentType(1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
-                new PropertyType("test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
-                new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
-                Mock.Of<IPublishedModelFactory>(), mockPublishedContentTypeFactory.Object);
-
-            var converter = new FlexibleDropdownPropertyValueConverter();
-            var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);
-            var result = converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);
+        [TestCase("apples", new[] {"apples"})]
+        [TestCase("apples,oranges", new[] {"apples", "oranges"})]
+        [TestCase("apples , oranges, pears ", new[] {"apples", "oranges", "pears"})]
+        [TestCase("", new string[] {})]
+        [TestCase(null, new string[] {})]
+	    public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
+	    {
+	        var converter = new DropdownListMultipleValueConverter();
+	        var result = converter.ConvertSourceToObject(null, value, false);
 
             Assert.AreEqual(expected, result);
-        }
-        
-        [TestCase("1", 1)]
-        [TestCase("1", 1)]
-        [TestCase("0", 0)]
-        [TestCase("0", 0)]
-        [TestCase(null, 0)]
-        [TestCase(null, 0)]
-        [TestCase("-1", -1)]
-        [TestCase("-1", -1)]
-        [TestCase("1.65", 1.65)]
-        [TestCase("1.65", 1.65)]
-        [TestCase("-1.65", -1.65)]
-        [TestCase("-1.65", -1.65)]
-        public void CanConvertDecimalAliasPropertyEditor(object value, double expected)
+	    }
+
+        [TestCase("100", new[] {100})]
+        [TestCase("100,200", new[] {100, 200})]
+        [TestCase("100 , 200, 300 ", new[] {100, 200, 300})]
+        [TestCase("", new int[] {})]
+        [TestCase(null, new int[] {})]
+	    public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
+	    {
+	        var converter = new DropdownListMultipleWithKeysValueConverter();
+	        var result = converter.ConvertDataToSource(null, value, false);
+
+            Assert.AreEqual(expected, result);
+	    }
+
+        [TestCase(null, "1", false, 1)]
+        [TestCase(null, "1", true, 1)]
+        [TestCase(null, "0", false, 0)]
+        [TestCase(null, "0", true, 0)]
+        [TestCase(null, null, false, 0)]
+        [TestCase(null, null, true, 0)]
+        [TestCase(null, "-1", false, -1)]
+        [TestCase(null, "-1", true, -1)]
+        [TestCase(null, "1.65", false, 1.65)]
+        [TestCase(null, "1.65", true, 1.65)]
+        [TestCase(null, "-1.65", false, -1.65)]
+        [TestCase(null, "-1.65", true, -1.65)]
+        public void CanConvertDecimalAliasPropertyEditor(Core.Models.PublishedContent.PublishedPropertyType propertyType, object value, bool preview, double expected)
         {
             var converter = new DecimalValueConverter();
-            var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
-            var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
+            var result = converter.ConvertDataToSource(propertyType, value, preview);
 
             Assert.AreEqual(expected, result);
         }

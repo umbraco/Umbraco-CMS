@@ -5,7 +5,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a tagged entity.
     /// </summary>
-    /// <remarks>Note that it is the properties of an entity (like Content, Media, Members, etc.) that is tagged,
+    /// <remarks>Note that it is the properties of an entity (like Content, Media, Members, etc.) that is tagged, 
     /// which is why this class is composed of a list of tagged properties and an Id reference to the actual entity.</remarks>
     public class TaggedEntity
     {

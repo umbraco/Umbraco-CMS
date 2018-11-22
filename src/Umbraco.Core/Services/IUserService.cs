@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -64,8 +64,8 @@ namespace Umbraco.Core.Services
         /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection,
-            UserState[] userState = null,
+            string orderBy, Direction orderDirection, 
+            UserState[] userState = null, 
             string[] includeUserGroups = null,
             string[] excludeUserGroups = null,
             IQuery<IUser> filter = null);
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services
         /// <param name="userState"></param>
         /// <param name="userGroups">
         /// A filter to only include user that belong to these user groups
-        /// </param>
+        /// </param>        
         /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
@@ -120,13 +120,13 @@ namespace Umbraco.Core.Services
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileByUserName(string username);
-
+        
         /// <summary>
         /// Gets a user by Id
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser GetUserById(int id);
+        IUser GetUserById(int id);        
 
         /// <summary>
         /// Gets a users by Id
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);        
 
         /// <summary>
         /// Gets the implicit/inherited permissions for the user for the given path
@@ -184,10 +184,10 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Replaces the same permission set for a single group to any number of entities
-        /// </summary>
+        /// </summary>        
         /// <param name="groupId">Id of the group</param>
         /// <param name="permissions">
-        /// Permissions as enumerable list of <see cref="char"/>,
+        /// Permissions as enumerable list of <see cref="char"/>, 
         /// if no permissions are specified then all permissions for this node are removed for this group
         /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-        #region User groups
+        #region User groups        
 
         /// <summary>
         /// Gets all UserGroups or those specified as parameters
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Services
         /// <param name="ids">Optional Ids of UserGroups to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
         IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
-
+        
         /// <summary>
         /// Gets a UserGroup by its Alias
         /// </summary>
@@ -251,10 +251,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userGroup">UserGroup to save</param>
         /// <param name="userIds">
-        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
+        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in 
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
+        /// <param name="raiseEvents">Optional parameter to raise events. 
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
 

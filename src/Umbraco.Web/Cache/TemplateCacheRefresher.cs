@@ -1,33 +1,36 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+
+using umbraco;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
-    {
-        private readonly IdkMap _idkMap;
 
-        public TemplateCacheRefresher(CacheHelper cacheHelper, IdkMap idkMap)
-            : base(cacheHelper)
+    /// <summary>
+    /// A cache refresher to ensure template cache is updated when members change
+    /// </summary>
+    /// <remarks>
+    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
+    /// </remarks>
+    public class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
+    {
+        protected override TemplateCacheRefresher Instance
         {
-            _idkMap = idkMap;
+            get { return this; }
         }
 
-        #region Define
+        public override string Name
+        {
+            get { return "Template cache refresher"; }
+        }
 
-        protected override TemplateCacheRefresher This => this;
-
-        public static readonly Guid UniqueId = Guid.Parse("DD12B6A0-14B9-46e8-8800-C154F74047C8");
-
-        public override Guid RefresherUniqueId => UniqueId;
-
-        public override string Name => "Template Cache Refresher";
-
-        #endregion
-
-        #region Refresher
+        public override Guid UniqueIdentifier
+        {
+            get { return DistributedCache.TemplateRefresherGuid; }
+        }
 
         public override void Refresh(int id)
         {
@@ -51,13 +54,13 @@ namespace Umbraco.Web.Cache
 
         private void RemoveFromCache(int id)
         {
-            _idkMap.ClearCache(id);
-            CacheHelper.RuntimeCache.ClearCacheItem($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
+            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
+                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
             //need to clear the runtime cache for templates
             ClearAllIsolatedCacheByEntityType<ITemplate>();
         }
 
-        #endregion
     }
 }

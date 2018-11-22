@@ -1,20 +1,16 @@
-﻿using System;
-using System.Globalization;
+using System;
 using System.Linq;
-using System.Security;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Security;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
-
+using umbraco;
+using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
+using umbraco.interfaces;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -29,7 +25,7 @@ namespace Umbraco.Web.UI.Pages
             var treeAuth = this.GetType().GetCustomAttribute<WebformsPageTreeAuthorizeAttribute>(true);
             if (treeAuth != null)
             {
-                var treeByAlias = Current.Services.ApplicationTreeService
+                var treeByAlias = ApplicationContext.Current.Services.ApplicationTreeService
                     .GetByAlias(treeAuth.TreeAlias);
                 if (treeByAlias != null)
                 {
@@ -46,30 +42,29 @@ namespace Umbraco.Web.UI.Pages
         /// <param name="actionToCheck"></param>
         protected void CheckPathAndPermissions(int entityId, UmbracoObjectTypes objectType, IAction actionToCheck)
         {
-            if (objectType != UmbracoObjectTypes.Document && objectType != UmbracoObjectTypes.Media)
-                return;
-
-            //check path access
-
-            var entity = entityId == Constants.System.Root
-                ? EntitySlim.Root
-                : Services.EntityService.Get(entityId, objectType);
-            var hasAccess = objectType == UmbracoObjectTypes.Document
-                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
-                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
-            if (hasAccess == false)
-                throw new AuthorizationException($"The current user doesn't have access to the path '{entity.Path}'");
-
-            //only documents have action permissions
-            if (objectType == UmbracoObjectTypes.Document)
+            if (objectType == UmbracoObjectTypes.Document || objectType == UmbracoObjectTypes.Media)
             {
-                var allActions = Current.Actions;
-                var perms = Security.CurrentUser.GetPermissions(entity.Path, Services.UserService);
-                var actions = perms
-                    .Select(x => allActions.FirstOrDefault(y => y.Letter.ToString(CultureInfo.InvariantCulture) == x))
-                    .WhereNotNull();
-                if (actions.Contains(actionToCheck) == false)
-                    throw new AuthorizationException($"The current user doesn't have permission to {actionToCheck.Alias} on the path '{entity.Path}'");
+                //check path access                    
+
+                var entity = entityId == Constants.System.Root
+                    ? UmbracoEntity.Root
+                    : Services.EntityService.Get(
+                        entityId,
+                        objectType);
+                var hasAccess = Security.CurrentUser.HasPathAccess(
+                    entity,
+                    Services.EntityService,
+                    objectType == UmbracoObjectTypes.Document ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia);
+                if (hasAccess == false)
+                    throw new UserAuthorizationException(string.Format("The current user doesn't have access to the path '{0}'", entity.Path));
+
+                //only documents have action permissions
+                if (objectType == UmbracoObjectTypes.Document)
+                {
+                    var allowedActions = ActionsResolver.Current.FromActionSymbols(Security.CurrentUser.GetPermissions(entity.Path, Services.UserService)).ToArray();
+                    if (allowedActions.Contains(actionToCheck) == false)
+                        throw new UserAuthorizationException(string.Format("The current user doesn't have permission to {0} on the path '{1}'", actionToCheck.Alias, entity.Path));
+                }
             }
         }
 
@@ -80,7 +75,7 @@ namespace Umbraco.Web.UI.Pages
         /// </summary>
         /// <param name="e"></param>
         /// <remarks>
-        /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office
+        /// Checks if the page exists outside of the /umbraco route, in which case the request will not have been authenticated for the back office 
         /// so we'll force authentication.
         /// </remarks>
         protected override void OnPreInit(EventArgs e)
@@ -90,7 +85,7 @@ namespace Umbraco.Web.UI.Pages
             //If this is not a back office request, then the module won't have authenticated it, in this case we
             // need to do the auth manually and since this is an UmbracoEnsuredPage, this is the anticipated behavior
             // TODO: When we implement Identity, this process might not work anymore, will be an interesting challenge
-            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, UmbracoConfig.For.GlobalSettings()) == false)
+            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false)
             {
                 var http = new HttpContextWrapper(Context);
                 var ticket = http.GetUmbracoAuthTicket();
@@ -104,8 +99,8 @@ namespace Umbraco.Web.UI.Pages
 
                 if (!Security.ValidateUserApp(CurrentApp))
                 {
-                    var ex = new SecurityException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
-                    Current.Logger.Error<UmbracoEnsuredPage>(ex, "Tried to access '{CurrentApp}'", CurrentApp);
+                    var ex = new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
+                    LogHelper.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
                     throw ex;
                 }
 
@@ -115,11 +110,11 @@ namespace Umbraco.Web.UI.Pages
                 // Clear content as .NET transfers rendered content.
                 Response.Clear();
 
-                // Ensure the person is definitely logged out
-                UmbracoContext.Current.Security.ClearCurrentLogin();
-
-                // Redirect to the login page
-                Response.Redirect(SystemDirectories.Umbraco + "#/login", true);
+                // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
+                if (RedirectToUmbraco)
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?t=" + Security.GetSessionId(), true);
+                else
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.GetSessionId(), true);
             }
         }
 
@@ -132,7 +127,26 @@ namespace Umbraco.Web.UI.Pages
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
         protected bool RedirectToUmbraco { get; set; }
-
+        
+        /// <summary>
+        /// Returns the current user
+        /// </summary>
+        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
+        protected User UmbracoUser
+        {
+            get
+            {
+                //throw exceptions if not valid (true)
+                if (!_hasValidated)
+                {
+                    Security.ValidateCurrentUser(true);
+                    _hasValidated = true;
+                }
+                
+                return new User(Security.CurrentUser);
+            }
+        }
+        
         /// <summary>
         /// Used to assign a webforms page's security to a specific tree which will in turn check to see
         /// if the current user has access to the specified tree's registered section

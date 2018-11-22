@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 
 namespace Umbraco.Core.Cache
@@ -7,7 +7,7 @@ namespace Umbraco.Core.Cache
     /// Used to get/create/manipulate isolated runtime cache
     /// </summary>
     /// <remarks>
-    /// This is useful for repository level caches to ensure that cache lookups by key are fast so
+    /// This is useful for repository level caches to ensure that cache lookups by key are fast so 
     /// that the repository doesn't need to search through all keys on a global scale.
     /// </remarks>
     public class IsolatedRuntimeCache
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Cache
         /// Returns an isolated runtime cache for a given type
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <returns></returns>        
         public IRuntimeCacheProvider GetOrCreateCache<T>()
         {
             return _isolatedCache.GetOrAdd(typeof(T), type => CacheFactory(type));
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Returns an isolated runtime cache for a given type
         /// </summary>
-        /// <returns></returns>
+        /// <returns></returns>        
         public IRuntimeCacheProvider GetOrCreateCache(Type type)
         {
             return _isolatedCache.GetOrAdd(type, t => CacheFactory(t));

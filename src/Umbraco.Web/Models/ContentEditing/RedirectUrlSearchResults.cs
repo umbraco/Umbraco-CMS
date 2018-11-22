@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         [DataMember(Name = "searchResults")]
         public IEnumerable<ContentRedirectUrl> SearchResults { get; set; }
-
+        
         [DataMember(Name = "totalCount")]
         public long TotalCount { get; set; }
 
@@ -17,6 +17,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public int PageCount { get; set; }
 
         [DataMember(Name = "currentPage")]
-        public int CurrentPage { get; set; }
+        public int CurrentPage { get; set; }     
     }
 }

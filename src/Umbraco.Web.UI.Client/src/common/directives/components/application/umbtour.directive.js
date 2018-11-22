@@ -455,28 +455,13 @@ In the following example you see how to run some custom logic before a step goes
             function waitForPendingRerequests() {
                 var deferred = $q.defer();
                 var timer = window.setInterval(function(){
-                    
-                    var requestsReady = false;
-                    var animationsDone = false;
-
                     // check for pending requests both in angular and on the document
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
-                        requestsReady = true;
-                    }
-
-                    // check for animations. ng-enter and ng-leave are default angular animations. 
-                    // Also check for infinite editors animating
-                    if(document.querySelectorAll(".ng-enter, .ng-leave, .umb-editor--animating").length === 0) {
-                        animationsDone = true;
-                    }
-
-                    if(requestsReady && animationsDone) {
                         $timeout(function(){
                             deferred.resolve();
                             clearInterval(timer);
                         });
                     }
-
                 }, 50);
                 return deferred.promise;
             }

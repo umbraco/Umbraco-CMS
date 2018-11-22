@@ -1,20 +1,29 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class PublicAccessServiceTests : TestWithSomeContentBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
+    public class PublicAccessServiceTests : BaseServiceTest
     {
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
+
         [Test]
         public void Can_Add_New_Entry()
         {
@@ -22,7 +31,6 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -42,7 +50,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(OperationResultType.Success, result.Result.Result);
+            Assert.AreEqual(OperationStatusType.Success, result.Result.StatusType);
             Assert.IsTrue(entry.HasIdentity);
             Assert.AreNotEqual(entry.Key, Guid.Empty);
             Assert.AreEqual(c.Id, entry.LoginNodeId);
@@ -57,7 +65,6 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -77,9 +84,9 @@ namespace Umbraco.Tests.Services
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert
+            // Assert           
             Assert.IsTrue(updated.Success);
-            Assert.AreEqual(OperationResultType.Success, updated.Result.Result);
+            Assert.AreEqual(OperationStatusType.Success, updated.Result.StatusType);
             Assert.AreEqual(2, entry.Rules.Count());
         }
 
@@ -90,7 +97,6 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -112,11 +118,11 @@ namespace Umbraco.Tests.Services
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert
+            // Assert           
             Assert.IsTrue(updated1.Success);
             Assert.IsTrue(updated2.Success);
-            Assert.AreEqual(OperationResultType.Success, updated1.Result.Result);
-            Assert.AreEqual(OperationResultType.Success, updated2.Result.Result);
+            Assert.AreEqual(OperationStatusType.Success, updated1.Result.StatusType);
+            Assert.AreEqual(OperationStatusType.Success, updated2.Result.StatusType);
             Assert.AreEqual(3, entry.Rules.Count());
         }
 
@@ -127,7 +133,6 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -145,16 +150,16 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestValue2"
                 },
             });
-            publicAccessService.Save(entry);
+            publicAccessService.Save(entry);            
 
             // Act
             var removed = publicAccessService.RemoveRule(c, "TestType", "TestValue1");
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
-            // Assert
+            // Assert           
             Assert.IsTrue(removed.Success);
-            Assert.AreEqual(OperationResultType.Success, removed.Result.Result);
+            Assert.AreEqual(OperationStatusType.Success, removed.Result.StatusType);
             Assert.AreEqual(1, entry.Rules.Count());
             Assert.AreEqual("TestValue2", entry.Rules.ElementAt(0).RuleValue);
         }

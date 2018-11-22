@@ -10,8 +10,7 @@ namespace Umbraco.Core.Collections
         /// <summary>
         /// Initializes a new instance of the <see cref="CompositeTypeTypeKey"/> struct.
         /// </summary>
-        public CompositeTypeTypeKey(Type type1, Type type2)
-            : this()
+        public CompositeTypeTypeKey(Type type1, Type type2) : this()
         {
             Type1 = type1;
             Type2 = type2;
@@ -20,12 +19,12 @@ namespace Umbraco.Core.Collections
         /// <summary>
         /// Gets the first type.
         /// </summary>
-        public Type Type1 { get; }
+        public Type Type1 { get; private set; }
 
         /// <summary>
         /// Gets the second type.
         /// </summary>
-        public Type Type2 { get; }
+        public Type Type2 { get; private set; }
 
         /// <inheritdoc/>
         public bool Equals(CompositeTypeTypeKey other)
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Collections
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            var other = obj is CompositeTypeTypeKey key ? key : default;
+            var other = obj is CompositeTypeTypeKey ? (CompositeTypeTypeKey)obj : default(CompositeTypeTypeKey);
             return Type1 == other.Type1 && Type2 == other.Type2;
         }
 

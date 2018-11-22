@@ -10,9 +10,11 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
+            // Arrange
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "Id");
+            string column = new DictionaryMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[pk]"));
@@ -21,9 +23,11 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
+            // Arrange
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "Key");
+            string column = new DictionaryMapper().Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[id]"));
@@ -32,9 +36,11 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_ItemKey_Property()
         {
+            // Arrange
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map(new SqlCeSyntaxProvider(), "ItemKey");
+            string column = new DictionaryMapper().Map("ItemKey");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[key]"));

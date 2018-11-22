@@ -8,15 +8,15 @@
 
     <!-- actions -->
     <ul class="dropdown-menu umb-actions" role="menu" aria-labelledby="dLabel">
-        <li class="umb-action" ng-class="{'sep':action.seperatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
+        <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
 
             <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
             <a prevent-default
-                class="umb-action-link"
                 ng-click="executeMenuItem(action)">
                 <i class="icon icon-{{action.cssclass}}"></i>
                 <span class="menu-label">{{action.name}}</span>
             </a>
+
         </li>
     </ul>
 </div>

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Mvc
 {
     internal class MvcVersionCheck
     {

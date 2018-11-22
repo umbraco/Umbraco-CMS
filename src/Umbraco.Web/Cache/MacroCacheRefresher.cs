@@ -1,107 +1,38 @@
 ﻿using System;
+using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using umbraco;
+
 using Umbraco.Core.Persistence.Repositories;
+using umbraco.interfaces;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
+    /// <summary>
+    /// A cache refresher to ensure macro cache is updated when members change
+    /// </summary>
+    /// <remarks>
+    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
+    /// </remarks>
+    public class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
     {
-        public MacroCacheRefresher(CacheHelper cacheHelper)
-            : base(cacheHelper)
-        { }
-
-        #region Define
-
-        protected override MacroCacheRefresher This => this;
-
-        public static readonly Guid UniqueId = Guid.Parse("7B1E683C-5F34-43dd-803D-9699EA1E98CA");
-
-        public override Guid RefresherUniqueId => UniqueId;
-
-        public override string Name => "Macro Cache Refresher";
-
-        #endregion
-
-        #region Refresher
-
-        public override void RefreshAll()
-        {
-            foreach (var prefix in GetAllMacroCacheKeys())
-                CacheHelper.RuntimeCache.ClearCacheByKeySearch(prefix);
-
-            ClearAllIsolatedCacheByEntityType<IMacro>();
-
-            CacheHelper.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
-
-            base.RefreshAll();
-        }
-
-        public override void Refresh(string json)
-        {
-            var payloads = Deserialize(json);
-
-            foreach (var payload in payloads)
-            {
-                foreach (var alias in GetCacheKeysForAlias(payload.Alias))
-                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(alias);
-
-                var macroRepoCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMacro>();
-                if (macroRepoCache)
-                {
-                    macroRepoCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
-                }
-            };
-
-            base.Refresh(json);
-        }
-
-        #endregion
-
-        #region Json
-
-        public class JsonPayload
-        {
-            public JsonPayload(int id, string alias)
-            {
-                Id = id;
-                Alias = alias;
-            }
-
-            public int Id { get; }
-
-            public string Alias { get; }
-        }
-
-        private static JsonPayload[] Deserialize(string json)
-        {
-            return JsonConvert.DeserializeObject<JsonPayload[]>(json);
-        }
-
-        internal static string Serialize(params Macro[] macros)
-        {
-            return JsonConvert.SerializeObject(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
-        }
-
-        internal static string Serialize(params IMacro[] macros)
-        {
-            return JsonConvert.SerializeObject(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
-        }
-
-        #endregion
-
-        #region Helpers
-
+        #region Static helpers
+        
         internal static string[] GetAllMacroCacheKeys()
         {
             return new[]
                 {
-                    CacheKeys.MacroContentCacheKey, // macro render cache
+                    CacheKeys.MacroCacheKey,
+                    CacheKeys.MacroControlCacheKey,
+                    CacheKeys.MacroHtmlCacheKey,
+                    CacheKeys.MacroHtmlDateAddedCacheKey,
+                    CacheKeys.MacroControlDateAddedCacheKey,
+                    CacheKeys.MacroXsltCacheKey,
                 };
         }
 
@@ -110,11 +41,162 @@ namespace Umbraco.Web.Cache
             return GetAllMacroCacheKeys().Select(x => x + alias).ToArray();
         }
 
-        public static void ClearMacroContentCache(CacheHelper cacheHelper)
+        /// <summary>
+        /// Converts the json to a JsonPayload object
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        private static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            cacheHelper.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
+            return jsonObject;
+        }
+
+        /// <summary>
+        /// Creates the custom Json payload used to refresh cache amongst the servers
+        /// </summary>
+        /// <param name="macros"></param>
+        /// <returns></returns>
+        internal static string SerializeToJsonPayload(params Macro[] macros)
+        {
+            var items = macros.Select(FromMacro).ToArray();
+            var json = JsonConvert.SerializeObject(items);
+            return json;
+        }
+
+        /// <summary>
+        /// Creates the custom Json payload used to refresh cache amongst the servers
+        /// </summary>
+        /// <param name="macros"></param>
+        /// <returns></returns>
+        internal static string SerializeToJsonPayload(params IMacro[] macros)
+        {
+            var items = macros.Select(FromMacro).ToArray();
+            var json = JsonConvert.SerializeObject(items);
+            return json;
+        }
+
+        /// <summary>
+        /// Creates the custom Json payload used to refresh cache amongst the servers
+        /// </summary>
+        /// <param name="macros"></param>
+        /// <returns></returns>
+        internal static string SerializeToJsonPayload(params macro[] macros)
+        {
+            var items = macros.Select(FromMacro).ToArray();
+            var json = JsonConvert.SerializeObject(items);
+            return json;
+        }
+
+        /// <summary>
+        /// Converts a macro to a jsonPayload object
+        /// </summary>
+        /// <param name="macro"></param>
+        /// <returns></returns>
+        private static JsonPayload FromMacro(IMacro macro)
+        {
+            var payload = new JsonPayload
+            {
+                Alias = macro.Alias,
+                Id = macro.Id
+            };
+            return payload;
+        }
+
+        /// <summary>
+        /// Converts a macro to a jsonPayload object
+        /// </summary>
+        /// <param name="macro"></param>
+        /// <returns></returns>
+        private static JsonPayload FromMacro(Macro macro)
+        {
+            var payload = new JsonPayload
+            {
+                Alias = macro.Alias,
+                Id = macro.Id
+            };            
+            return payload;
+        }
+
+        /// <summary>
+        /// Converts a macro to a jsonPayload object
+        /// </summary>
+        /// <param name="macro"></param>
+        /// <returns></returns>
+        private static JsonPayload FromMacro(macro macro)
+        {
+            var payload = new JsonPayload
+            {
+                Alias = macro.Alias,
+                Id = macro.Model.Id
+            };
+            return payload;
         }
 
         #endregion
+
+        #region Sub classes
+
+        private class JsonPayload
+        {            
+            public string Alias { get; set; }
+            public int Id { get; set; }
+        }
+
+        #endregion
+
+        protected override MacroCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return "Macro cache refresher";
+            }
+        }
+
+        public override Guid UniqueIdentifier
+        {
+            get
+            {
+                return new Guid(DistributedCache.MacroCacheRefresherId);
+            }
+        }
+
+        public override void RefreshAll()
+        {
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            GetAllMacroCacheKeys().ForEach(
+                    prefix =>
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(prefix));
+
+            ClearAllIsolatedCacheByEntityType<IMacro>();
+
+            base.RefreshAll();
+        }
+
+        public override void Refresh(string jsonPayload)
+        {
+            var payloads = DeserializeFromJsonPayload(jsonPayload);
+
+            payloads.ForEach(payload =>
+            {
+                GetCacheKeysForAlias(payload.Alias).ForEach(
+                    alias =>
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(alias));
+
+                var macroRepoCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMacro>();
+                if (macroRepoCache)
+                {
+                    macroRepoCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMacro>(payload.Id));
+                }
+            });
+
+            base.Refresh(jsonPayload);
+        }
+
     }
 }

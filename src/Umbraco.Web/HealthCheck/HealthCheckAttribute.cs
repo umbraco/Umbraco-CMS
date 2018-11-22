@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -7,7 +7,7 @@ namespace Umbraco.Web.HealthCheck
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class HealthCheckAttribute : Attribute
-    {
+    {        
         public HealthCheckAttribute(string id, string name)
         {
             Id = new Guid(id);

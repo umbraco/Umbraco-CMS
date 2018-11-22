@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a redirect url.
     /// </summary>
-    public interface IRedirectUrl : IEntity, IRememberBeingDirty
+    public interface IRedirectUrl : IAggregateRoot, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the identifier of the content item.

@@ -50,26 +50,14 @@ namespace Umbraco.Core.Cache
 
         #region Lock
 
-        protected override void EnterReadLock()
+        protected override IDisposable ReadLock
         {
-            _locker.EnterReadLock();
+            get { return new ReadLock(_locker); }
         }
 
-        protected override void EnterWriteLock()
+        protected override IDisposable WriteLock
         {
-            _locker.EnterWriteLock();;
-        }
-
-        protected override void ExitReadLock()
-        {
-            if (_locker.IsReadLockHeld)
-                _locker.ExitReadLock();
-        }
-
-        protected override void ExitWriteLock()
-        {
-            if (_locker.IsWriteLockHeld)
-                _locker.ExitWriteLock();
+            get { return new WriteLock(_locker); }
         }
 
         #endregion
@@ -110,7 +98,7 @@ namespace Umbraco.Core.Cache
             // on the Lazy lock to ensure that getCacheItem runs once and everybody waits on it, while the global
             // application lock has been released.
 
-            // NOTE
+            // NOTE 
             //   The Lazy value creation may produce a null value.
             //   Must make sure (for backward compatibility) that we pretend they are not in the cache.
             //   So if we find an entry in the cache that already has its value created and is null,
@@ -130,15 +118,9 @@ namespace Umbraco.Core.Cache
             // reads. We first try with a normal ReadLock for maximum concurrency and take the penalty of
             // having to re-lock in case there's no value. Would need to benchmark to figure out whether
             // it's worth it, though...
-            try
+            using (new ReadLock(_locker))
             {
-                _locker.EnterReadLock();
                 result = _cache.Get(cacheKey) as Lazy<object>; // null if key not found
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
             }
             var value = result == null ? null : GetSafeLazyValue(result);
             if (value != null) return value;
@@ -171,7 +153,8 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             value = result.Value; // will not throw (safe lazy)
-            if (value is ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            var eh = value as ExceptionHolder;
+            if (eh != null) throw new Exception("Exception while creating a value.", eh.Exception); // throw once!
             return value;
         }
 
@@ -213,16 +196,10 @@ namespace Umbraco.Core.Cache
             var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
-            try
+            using (new WriteLock(_locker))
             {
-                _locker.EnterWriteLock();
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
             }
         }
 

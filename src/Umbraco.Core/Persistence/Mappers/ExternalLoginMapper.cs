@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -16,9 +16,12 @@ namespace Umbraco.Core.Persistence.Mappers
 
         #region Overrides of BaseMapper
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
 
-        protected override void BuildMap()
+        internal override void BuildMap()
         {
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.Id, dto => dto.Id);
             CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.CreateDate, dto => dto.CreateDate);

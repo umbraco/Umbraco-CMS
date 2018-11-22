@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MockedEntity : EntityBase
+    public class MockedEntity : Entity
     {
         [DataMember]
         public string Alias { get; set; }

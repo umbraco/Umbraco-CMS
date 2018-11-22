@@ -1,5 +1,3 @@
-﻿using Umbraco.Web.Trees;
-
 namespace Umbraco.Web.Search
 {
     public class SearchableApplicationTree
@@ -11,8 +9,9 @@ namespace Umbraco.Web.Search
             SearchableTree = searchableTree;
         }
 
-        public string AppAlias { get; }
-        public string TreeAlias { get; }
-        public ISearchableTree SearchableTree { get; }
+        public string AppAlias { get; private set; }
+        public string TreeAlias { get; private set; }
+        public ISearchableTree SearchableTree { get; private set; }
+        
     }
 }

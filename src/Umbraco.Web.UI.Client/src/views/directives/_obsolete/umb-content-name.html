@@ -1,0 +1,19 @@
+<ng-form name="contentNameForm">        
+    <div class="umb-headline-editor-wrapper" ng-class="{'ng-invalid': contentNameForm.name.$invalid}">
+        
+        <input type="text"
+            ng-disabled="ngDisabled"
+            name="name"
+            localize="placeholder" 
+            class="umb-headline" 
+            select-on-focus 
+            placeholder="{{placeholder}}" 
+            ng-model="model" 
+            required   
+            val-server-field="Name"/>
+
+        <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
+        <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>
+
+    </div> 
+</ng-form>

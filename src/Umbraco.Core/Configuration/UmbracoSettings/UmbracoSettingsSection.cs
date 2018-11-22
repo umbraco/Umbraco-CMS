@@ -37,7 +37,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (TemplatesElement)this["templates"]; }
         }
-        
+
+        [ConfigurationProperty("developer")]
+        internal DeveloperElement Developer
+        {
+            get { return (DeveloperElement)this["developer"]; }
+        }
+
+        [ConfigurationProperty("viewstateMoverModule")]
+        internal ViewstateMoverModuleElement ViewstateMoverModule
+        {
+            get { return (ViewstateMoverModuleElement)this["viewstateMoverModule"]; }
+        }
+
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
         {
@@ -50,10 +62,22 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ScheduledTasksElement)this["scheduledTasks"]; }
         }
 
+        [ConfigurationProperty("distributedCall")]
+        internal DistributedCallElement DistributedCall
+        {
+            get { return (DistributedCallElement)this["distributedCall"]; }
+        }
+        
         [ConfigurationProperty("providers")]
         internal ProvidersElement Providers
         {
             get { return (ProvidersElement)this["providers"]; }
+        }
+
+        [ConfigurationProperty("help")]
+        internal HelpElement Help
+        {
+            get { return (HelpElement)this["help"]; }
         }
 
         [ConfigurationProperty("web.routing")]
@@ -62,6 +86,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (WebRoutingElement)this["web.routing"]; }
         }
 
+        [ConfigurationProperty("scripting")]
+        internal ScriptingElement Scripting
+        {
+            get { return (ScriptingElement)this["scripting"]; }
+        }
+        
         IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
@@ -87,6 +117,16 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return BackOffice; }
         }
 
+        IDeveloperSection IUmbracoSettingsSection.Developer
+        {
+            get { return Developer; }
+        }
+
+        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
+        {
+            get { return ViewstateMoverModule; }
+        }
+
         ILoggingSection IUmbracoSettingsSection.Logging
         {
             get { return Logging; }
@@ -96,10 +136,22 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return ScheduledTasks; }
         }
-        
+
+        IDistributedCallSection IUmbracoSettingsSection.DistributedCall
+        {
+            get { return DistributedCall; }
+        }
+
         IProvidersSection IUmbracoSettingsSection.Providers
         {
             get { return Providers; }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This is no longer used and will be removed in future versions")]
+        IHelpSection IUmbracoSettingsSection.Help
+        {
+            get { return Help; }
         }
 
         IWebRoutingSection IUmbracoSettingsSection.WebRouting
@@ -107,5 +159,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return WebRouting; }
         }
 
+        IScriptingSection IUmbracoSettingsSection.Scripting
+        {
+            get { return Scripting; }
+        }
     }
 }

@@ -9,15 +9,15 @@ namespace Umbraco.Tests.TestHelpers.Entities
         internal static User CreateUser(string suffix = "")
         {
             var user = new User
-            {
-                Language = "en",
-                IsApproved = true,
-                Name = "TestUser" + suffix,
-                RawPasswordValue = "testing",
-                IsLockedOut = false,
-                Email = "test" + suffix + "@test.com",
-                Username = "TestUser" + suffix
-            };
+                {
+                    Language = "en",
+                    IsApproved = true,
+                    Name = "TestUser" + suffix,
+                    RawPasswordValue = "testing",
+                    IsLockedOut = false,
+                    Email = "test" + suffix + "@test.com",
+                    Username = "TestUser" + suffix
+                };
 
             return user;
         }
@@ -30,8 +30,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
             {
                 var name = "Member No-" + i;
                 var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i);
-
-                onCreating?.Invoke(i, user);
+                
+                if (onCreating != null)
+                {
+                    onCreating(i, user);
+                }
 
                 user.ResetDirtyProperties(false);
 

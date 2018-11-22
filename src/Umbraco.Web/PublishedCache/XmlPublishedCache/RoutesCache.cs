@@ -3,31 +3,59 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
-    // Note: RoutesCache closely follows the caching strategy dating from v4, which
-    // is obviously broken in many ways (eg it's a global cache but relying to some
-    // extend to the content cache, which itself is local to each request...).
-    // Not going to fix it anyway.
-
     class RoutesCache
     {
         private ConcurrentDictionary<int, string> _routes;
         private ConcurrentDictionary<string, int> _nodeIds;
 
-        // NOTE
-        // RoutesCache is cleared by
-        // - ContentTypeCacheRefresher, whenever anything happens to any content type
-        // - DomainCacheRefresher, whenever anything happens to any domain
-        // - XmlStore, whenever anything happens to the XML cache
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutesCache"/> class.
         /// </summary>
         public RoutesCache()
+            : this(true)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoutesCache"/> class.
+        /// </summary>
+        internal RoutesCache(bool bindToEvents)
+		{
+			Clear();
+
+			if (bindToEvents)
+			{
+                Resolution.Frozen += ResolutionFrozen;
+			}			
+		}
+
+        /// <summary>
+        /// Once resolution is frozen, then we can bind to the events that we require
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="args"></param>
+        private void ResolutionFrozen(object s, EventArgs args)
         {
-            Clear();
+            // content - whenever the entire XML cache is rebuilt (from disk cache or from database)
+            //  we must clear the cache entirely
+            global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
+
+            // document - whenever a document is updated in, or removed from, the XML cache
+            //  we must clear the cache - at the moment, we clear the entire cache
+            global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
+            global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
+
+            // fixme - should refactor once content events are refactored
+            // the content class needs to be refactored - at the moment 
+            // content.XmlContentInternal setter does not trigger any event
+            // content.UpdateDocumentCache(List<Document> Documents) does not trigger any event
+            // content.RefreshContentFromDatabaseAsync triggers AfterRefresh _while_ refreshing
+            // etc...
+            // in addition some events do not make sense... we trigger Publish when moving
+            // a node, which we should not (the node is moved, not published...) etc.
         }
 
         /// <summary>
@@ -109,7 +137,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _routes = new ConcurrentDictionary<int, string>();
             _nodeIds = new ConcurrentDictionary<string, int>();
         }
-
+        
         #endregion
     }
 }

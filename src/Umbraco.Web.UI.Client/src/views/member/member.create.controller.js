@@ -6,16 +6,11 @@
  * @description
  * The controller for the member creation dialog
  */
-function memberCreateController($scope, memberTypeResource, iconHelper, navigationService) {
+function memberCreateController($scope, $routeParams, memberTypeResource, iconHelper) {
     
     memberTypeResource.getTypes($scope.currentNode.id).then(function (data) {
         $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
-
-    $scope.close = function() {
-        const showMenu = true;
-        navigationService.hideDialog(showMenu);
-    };
     
 }
 

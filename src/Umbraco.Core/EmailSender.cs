@@ -78,7 +78,7 @@ namespace Umbraco.Core
                         client.Send(message);
                     }
                 }
-            }
+            }            
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Umbraco.Core
         {
             get { return SendEmail != null; }
         }
-
+        
         /// <summary>
         /// An event that is raised when no smtp server is configured if events are enabled
         /// </summary>

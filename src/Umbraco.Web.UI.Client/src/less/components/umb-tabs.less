@@ -1,75 +1,15 @@
-.umb-tabs-nav {
-    margin-left: 0;
-    margin-bottom: 0;
-    list-style: none;
-    border-bottom: 1px solid @gray-9;
-    display: block;
-    margin-bottom: 20px;
+.umb-nav-tabs {
+  position: absolute;
+  z-index: 999;
 }
 
-.umb-tab {
-    display: inline-flex;
-    position: relative;
-    top: 1px;
+.umb-nav-tabs.-padding-left {
+  padding-left: 20px;
 }
 
-.umb-tab > a {
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: @gray-3;
-    padding: 5px 20px 15px 20px;
-    transition: color 150ms ease-in-out;
-}
-
-.umb-tab > a:hover,
-.umb-tab > a:focus {
-    color: @black;
-    text-decoration: none;
-}
-
-.umb-tab--active > a,
-.umb-tab--active > a:hover,
-.umb-tab--active > a:focus {
-  color: @black;
-  border-bottom-color: @turquoise;
-}
-
-.show-validation .umb-tab--error > a,
-.show-validation .umb-tab--error > a:hover,
-.show-validation .umb-tab--error > a:focus {
-  color: @white !important;
-  background-color: @red !important;
-  border-color: @errorBorder;
-}
-
-.show-validation .umb-tab--error a:before {
-  content: "\e25d";
-  font-family: 'icomoon';
-  margin-right: 5px;
-  vertical-align: top;
-}
-
-// tabs tray
-
-.umb-tabs-tray {
-    right: 0;
-    left: auto;
-}
-
-.umb-tabs-tray > a {
-    cursor: pointer;
-}
-
-.umb-tabs-tray-item--active {
-    border-left: 2px solid @turquoise;
-}
-
-.umb-tab--expand > a > i {
-    height: 5px;
-    width: 5px;
-    border-radius: 50%;
-    background: @black;
-    display: inline-block;
-    margin: 0 5px 0 0;
-    opacity: .6;
+.umb-tab-content {
+  padding-top: 20px;
+  position: relative;
+  top: 31px;
+  border-top: 1px solid @purple-l3;
 }

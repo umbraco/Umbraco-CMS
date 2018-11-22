@@ -10,6 +10,13 @@ namespace Umbraco.Core.Strings
     public interface IUrlSegmentProvider
     {
         /// <summary>
+        /// Gets the default url segment for a specified content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The url segment.</returns>
+        string GetUrlSegment(IContentBase content);
+
+        /// <summary>
         /// Gets the url segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
@@ -18,9 +25,9 @@ namespace Umbraco.Core.Strings
         /// <remarks>This is for when Umbraco is capable of managing more than one url
         /// per content, in 1-to-1 multilingual configurations. Then there would be one
         /// url per culture.</remarks>
-        string GetUrlSegment(IContentBase content, string culture = null);
+        string GetUrlSegment(IContentBase content, CultureInfo culture);
 
-        //TODO: For the 301 tracking, we need to add another extended interface to this so that
+        //TODO: For the 301 tracking, we need to add another extended interface to this so that 
         // the RedirectTrackingEventHandler can ask the IUrlSegmentProvider if the URL is changing.
         // Currently the way it works is very hacky, see notes in: RedirectTrackingEventHandler.ContentService_Publishing
     }

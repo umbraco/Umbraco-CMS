@@ -27,7 +27,7 @@ function RowConfigController($scope) {
             collection = [];
         }
         else {
-            collection = null;
+            delete collection;
         }
     };
 

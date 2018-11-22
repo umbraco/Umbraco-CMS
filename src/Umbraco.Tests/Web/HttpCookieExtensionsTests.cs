@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Web
             else
             {
                 Assert.IsNull(valueFromHeader);
-            }
+            }                
         }
     }
 }

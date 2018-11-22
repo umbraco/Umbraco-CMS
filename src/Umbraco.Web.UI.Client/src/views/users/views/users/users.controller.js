@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -69,7 +69,7 @@
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
-                handler: function () {
+                handler: function() {
                     vm.setUsersViewState('inviteUser');
                 }
             };
@@ -135,7 +135,7 @@
             getUsers();
 
             // Get user groups
-            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
+            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false}).then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
 
@@ -250,11 +250,14 @@
                 // show the correct badges
                 setUserDisplayState(vm.users);
 
+                formHelper.showNotifications(data);
+
                 vm.disableUserButtonState = "init";
                 clearSelection();
 
             }, function (error) {
                 vm.disableUserButtonState = "error";
+                formHelper.showNotifications(error.data);
             });
         }
 
@@ -270,10 +273,13 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
+                // show notification
+                formHelper.showNotifications(data);
                 vm.enableUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
+                formHelper.showNotifications(error.data);
             });
         }
 
@@ -289,10 +295,13 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
+                // show notification
+                formHelper.showNotifications(data);
                 vm.unlockUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.unlockUserButtonState = "error";
+                formHelper.showNotifications(error.data);
             });
         }
 
@@ -300,13 +309,17 @@
             return _.find(users, function (u) { return u.id === userId });
         }
 
-        function openBulkUserGroupPicker() {
+        function openBulkUserGroupPicker(event) {
             var firstSelectedUser = getUserFromArrayById(vm.selection[0], vm.users);
 
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
-            var userGroupPicker = {
+            vm.userGroupPicker = {
+                title: localizationService.localize("user_selectUserGroups"),
+                view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
+                closeButtonLabel: localizationService.localize("general_cancel"),
+                show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
                         // sorting to ensure they show up in right order when updating the UI
@@ -320,36 +333,46 @@
                                 user.userGroups = vm.selectedBulkUserGroups;
                             });
                         vm.selectedBulkUserGroups = [];
-                        editorService.close();
+                        vm.userGroupPicker.show = false;
+                        vm.userGroupPicker = null;
+                        formHelper.showNotifications(data);
                         clearSelection();
-                    }, angular.noop);
+                    }, function (error) {
+                        formHelper.showNotifications(error.data);
+                    });
                 },
-                close: function () {
+                close: function (oldModel) {
                     vm.selectedBulkUserGroups = [];
-                    editorService.close();
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
             };
-            editorService.userGroupPicker(userGroupPicker);
         }
 
-        function openUserGroupPicker() {
-            var oldSelection = angular.copy(vm.newUser.userGroups);
-            var userGroupPicker = {
+        function openUserGroupPicker(event) {
+            vm.userGroupPicker = {
+                title: localizationService.localize("user_selectUserGroups"),
+                view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
+                closeButtonLabel: localizationService.localize("general_cancel"),
+                show: true,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.newUser.userGroups = model.selection;
                     }
-                    editorService.close();
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 },
-                close: function () {
+                close: function (oldModel) {
                     // rollback on close
-                    vm.newUser.userGroups = oldSelection;
-                    editorService.close();
+                    if (oldModel.selection) {
+                        vm.newUser.userGroups = oldModel.selection;
+                    }
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
             };
-            editorService.userGroupPicker(userGroupPicker);
         }
 
         function removeSelectedUserGroup(index, selection) {
@@ -482,7 +505,7 @@
 
         function createUser(addUserForm) {
 
-            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope })) {
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
 
                 vm.newUser.id = -1;
                 vm.newUser.parentId = -1;
@@ -504,7 +527,7 @@
 
         function inviteUser(addUserForm) {
 
-            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope })) {
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
                 vm.newUser.id = -1;
                 vm.newUser.parentId = -1;
                 vm.page.createButtonState = "busy";
@@ -531,32 +554,12 @@
 
         // copy to clip board success
         function copySuccess() {
-
-            if (vm.page.copyPasswordButtonState != "success") {
-
-                vm.page.copyPasswordButtonState = "success";
-
-                $timeout(function () {
-                    resetClipboardButtonState()
-                }, 1000);
-            }
-
+            vm.page.copyPasswordButtonState = "success";
         }
 
         // copy to clip board error
         function copyError() {
-            if (vm.page.copyPasswordButtonState != "error") {
-
-                vm.page.copyPasswordButtonState = "error";
-
-                $timeout(function () {
-                    resetClipboardButtonState()
-                }, 1000);
-            }
-        }
-
-        function resetClipboardButtonState() {
-            vm.page.copyPasswordButtonState = "init";
+            vm.page.copyPasswordButtonState = "error";
         }
 
         function goToUser(userId) {
@@ -605,7 +608,7 @@
                     var localOffset = new Date().getTimezoneOffset();
                     var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
 
-                    if (serverTimeNeedsOffsetting) {
+                    if(serverTimeNeedsOffsetting) {
                         dateVal = dateHelper.convertToLocalMomentTime(user.lastLoginDate, serverOffset);
                     } else {
                         dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");

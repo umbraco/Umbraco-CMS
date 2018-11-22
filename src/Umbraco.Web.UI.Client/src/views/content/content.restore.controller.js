@@ -1,7 +1,8 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
     function ($scope, relationResource, contentResource, navigationService, appState, treeService, localizationService) {
+		var dialogOptions = $scope.dialogOptions;
 
-		var node = $scope.currentNode;
+		var node = dialogOptions.currentNode;
 
 		$scope.error = null;
 	    $scope.success = false;

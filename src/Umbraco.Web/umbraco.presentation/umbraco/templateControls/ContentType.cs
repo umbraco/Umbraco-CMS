@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace umbraco.presentation.templateControls
+namespace umbraco.presentation.templateControls 
 {
     [DefaultProperty("MimeType")]
     [ToolboxData("<{0}:ContentType runat=server></{0}:ContentType>")]
@@ -25,7 +25,7 @@ namespace umbraco.presentation.templateControls
 
         protected override void Render(HtmlTextWriter writer)
         {
-
+           
         }
     }
 }

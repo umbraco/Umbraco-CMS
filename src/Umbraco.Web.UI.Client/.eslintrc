@@ -7,10 +7,6 @@
         "comma-dangle": ["error", "never"]
     },
 
-    "parserOptions": {
-        "ecmaVersion": 6
-    },
-
     "globals": {
         "angular": false,
         "_": false,

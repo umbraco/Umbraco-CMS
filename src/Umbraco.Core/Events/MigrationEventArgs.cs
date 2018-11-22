@@ -1,18 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Semver;
-using Umbraco.Core.Migrations;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.Migrations;
 
 namespace Umbraco.Core.Events
 {
-    public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEquatable<MigrationEventArgs>
+    public class MigrationEventArgs : CancellableObjectEventArgs<IList<IMigration>>, IEquatable<MigrationEventArgs>
     {
-        public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
-            : this(migrationTypes, null, configuredVersion, targetVersion, productName, canCancel)
+        /// <summary>
+        /// Constructor accepting multiple migrations that are used in the migration runner
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="productName"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="configuredVersion"></param>
+        public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
+            : this(eventObject, null, configuredVersion, targetVersion, productName, canCancel)
         { }
 
-        internal MigrationEventArgs(IList<Type> migrationTypes, IMigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
-            : base(migrationTypes, canCancel)
+        /// <summary>
+        /// Constructor accepting multiple migrations that are used in the migration runner
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="configuredVersion"></param>
+        [Obsolete("Use constructor accepting a product name instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion, bool canCancel)
+            : this(eventObject, null, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName, canCancel)
+        { }
+
+        [Obsolete("Use constructor accepting SemVersion instances and a product name instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion, bool canCancel)
+			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), Constants.System.UmbracoMigrationName, canCancel)
+         { }
+
+        /// <summary>
+        /// Constructor accepting multiple migrations that are used in the migration runner
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="migrationContext"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="productName"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="configuredVersion"></param>
+        internal MigrationEventArgs(IList<IMigration> eventObject, MigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
+            : base(eventObject, canCancel)
         {
             MigrationContext = migrationContext;
             ConfiguredSemVersion = configuredVersion;
@@ -20,35 +58,89 @@ namespace Umbraco.Core.Events
             ProductName = productName;
         }
 
-        public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName)
-            : this(migrationTypes, null, configuredVersion, targetVersion, productName, false)
+        /// <summary>
+        /// Constructor accepting multiple migrations that are used in the migration runner
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="migrationContext"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="canCancel"></param>
+        /// <param name="configuredVersion"></param>
+        [Obsolete("Use constructor accepting a product name instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        internal MigrationEventArgs(IList<IMigration> eventObject, MigrationContext migrationContext, SemVersion configuredVersion, SemVersion targetVersion, bool canCancel)
+            : base(eventObject, canCancel)
+        {
+            MigrationContext = migrationContext;
+            ConfiguredSemVersion = configuredVersion;
+            TargetSemVersion = targetVersion;
+            ProductName = Constants.System.UmbracoMigrationName;
+        }
+
+        /// <summary>
+        /// Constructor accepting multiple migrations that are used in the migration runner
+        /// </summary>
+        /// <param name="eventObject"></param>
+        /// <param name="configuredVersion"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="productName"></param>
+        public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion, string productName)
+            : this(eventObject, null, configuredVersion, targetVersion, productName, false)
         { }
 
         /// <summary>
-        /// Returns all migrations that were used in the migration runner
+        /// Constructor accepting multiple migrations that are used in the migration runner
         /// </summary>
-        public IList<Type> MigrationsTypes => EventObject;
+        /// <param name="eventObject"></param>
+        /// <param name="configuredVersion"></param>
+        /// <param name="targetVersion"></param>
+        [Obsolete("Use constructor accepting a product name instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public MigrationEventArgs(IList<IMigration> eventObject, SemVersion configuredVersion, SemVersion targetVersion)
+            : this(eventObject, null, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName, false)
+        { }
+
+        [Obsolete("Use constructor accepting SemVersion instances and a product name instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public MigrationEventArgs(IList<IMigration> eventObject, Version configuredVersion, Version targetVersion)
+			: this(eventObject, null, new SemVersion(configuredVersion), new SemVersion(targetVersion), Constants.System.UmbracoMigrationName, false)
+		{ }
+
+		/// <summary>
+		/// Returns all migrations that were used in the migration runner
+		/// </summary>
+        public IList<IMigration> Migrations
+		{
+			get { return EventObject; }
+		}
+
+        [Obsolete("Use ConfiguredSemVersion instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Version ConfiguredVersion
+        {
+            get { return ConfiguredSemVersion.GetVersion(); }
+        }
+
+        [Obsolete("Use TargetUmbracoVersion instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Version TargetVersion
+        {
+            get { return TargetSemVersion.GetVersion(); }
+        }
 
         /// <summary>
         /// Gets the origin version of the migration, i.e. the one that is currently installed.
         /// </summary>
-        public SemVersion ConfiguredSemVersion { get; }
+        public SemVersion ConfiguredSemVersion { get; private set; }
 
         /// <summary>
         /// Gets the target version of the migration.
         /// </summary>
-        public SemVersion TargetSemVersion { get; }
+        public SemVersion TargetSemVersion { get; private set; }
 
-        /// <summary>
-        /// Gets the product name.
-        /// </summary>
-        public string ProductName { get; }
+        public string ProductName { get; private set; }
 
-        /// <summary>
-        /// Gets the migration context.
-        /// </summary>
-        /// <remarks>Is only available after migrations have run, for post-migrations.</remarks>
-        internal IMigrationContext MigrationContext { get; }
+        internal MigrationContext MigrationContext { get; private set; }
 
         public bool Equals(MigrationEventArgs other)
         {

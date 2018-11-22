@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 
 
 namespace Umbraco.Tests.IO
 {
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
+    [TestFixture, RequiresSTA]
     public class PhysicalFileSystemTests : AbstractFileSystemTests
     {
         public PhysicalFileSystemTests()
@@ -22,7 +20,7 @@ namespace Umbraco.Tests.IO
         [SetUp]
         public void Setup()
         {
-
+            
         }
 
         [TearDown]

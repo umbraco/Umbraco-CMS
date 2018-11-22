@@ -4,7 +4,6 @@ using System.IO;
 using System.Net.Configuration;
 using System.Net.Sockets;
 using System.Web.Configuration;
-using Umbraco.Core;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Services
@@ -17,12 +16,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
     public class SmtpCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IRuntimeState _runtime;
 
-        public SmtpCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public SmtpCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
-            _textService = textService;
-            _runtime = runtime;
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
         }
 
         /// <summary>
@@ -51,8 +48,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
             var message = string.Empty;
             var success = false;
 
-            // appPath is the virtual application root path on the server
-            var config = WebConfigurationManager.OpenWebConfiguration(_runtime.ApplicationVirtualPath);
+            var config = WebConfigurationManager.OpenWebConfiguration(HealthCheckContext.ApplicationPath);
             var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
             if (settings == null)
             {

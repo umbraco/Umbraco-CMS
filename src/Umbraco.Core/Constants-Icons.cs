@@ -10,7 +10,7 @@ namespace Umbraco.Core
     {
         public static class Icons
         {
-
+            
 
             /// <summary>
             /// System contenttype icon

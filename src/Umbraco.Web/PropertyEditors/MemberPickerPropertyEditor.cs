@@ -1,16 +1,20 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using System;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.MemberPicker, "Member Picker", "memberpicker", ValueType = ValueTypes.String, Group = "People", Icon = "icon-user")]
-    public class MemberPickerPropertyEditor : DataEditor
-    {
-        public MemberPickerPropertyEditor(ILogger logger)
-            : base(logger)
-        { }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfiguration();
+    [Obsolete("This editor is obsolete, use MemberPickerPropertyEditor2 instead which stores UDI")]
+    [PropertyEditor(Constants.PropertyEditors.MemberPickerAlias, "(Obsolete) Member Picker", PropertyEditorValueTypes.Integer, "memberpicker", Group = "People", Icon = "icon-user", IsDeprecated = true)]
+    public class MemberPickerPropertyEditor : MemberPicker2PropertyEditor
+    {
+        public MemberPickerPropertyEditor()
+        {
+            InternalPreValues["idType"] = "int";
+        }
     }
 }

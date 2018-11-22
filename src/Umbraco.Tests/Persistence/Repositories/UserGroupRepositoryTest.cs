@@ -1,41 +1,54 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
+
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class UserGroupRepositoryTest : TestWithDatabaseBase
+    public class UserGroupRepositoryTest : BaseDatabaseFactoryTest
     {
-        private UserGroupRepository CreateRepository(IScopeProvider provider)
+        [SetUp]
+        public override void Initialize()
         {
-            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            base.Initialize();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
+
+        private UserGroupRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        {
+            return new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
         }
 
         [Test]
         public void Can_Perform_Add_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.Save(userGroup);
-                scope.Complete();
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.That(userGroup.HasIdentity, Is.True);
@@ -46,19 +59,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Multiple_Adds_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 var userGroup1 = MockedUserGroup.CreateUserGroup("1");
                 var userGroup2 = MockedUserGroup.CreateUserGroup("2");
 
                 // Act
-                repository.Save(userGroup1);
-                
-                repository.Save(userGroup2);
-                scope.Complete();
+                repository.AddOrUpdate(userGroup1);
+                unitOfWork.Commit();
+                repository.AddOrUpdate(userGroup2);
+                unitOfWork.Commit();
 
                 // Assert
                 Assert.That(userGroup1.HasIdentity, Is.True);
@@ -70,18 +83,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.Save(userGroup);
-                scope.Complete();
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
 
                 // Act
                 var resolved = repository.Get(userGroup.Id);
-                bool dirty = ((UserGroup)resolved).IsDirty();
+                bool dirty = ((UserGroup) resolved).IsDirty();
 
                 // Assert
                 Assert.That(dirty, Is.False);
@@ -92,21 +104,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.Save(userGroup);
-                
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
 
                 // Act
                 var resolved = repository.Get(userGroup.Id);
                 resolved.Name = "New Name";
-                resolved.Permissions = new[] { "Z", "Y", "X" };
-                repository.Save(resolved);
-                scope.Complete();
+                resolved.Permissions = new[]{"Z", "Y", "X"};
+                repository.AddOrUpdate(resolved);
+                unitOfWork.Commit();
                 var updatedItem = repository.Get(userGroup.Id);
 
                 // Assert
@@ -119,26 +130,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Delete_On_UserGroupRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.Save(userGroup);
-                
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
                 var id = userGroup.Id;
 
-                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.CacheHelper.CreateDisabledCacheHelper(), Logger);
-                repository2.Delete(userGroup);
-                scope.Complete();
+                using (var repository2 = new UserGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+                {
+                    repository2.Delete(userGroup);
+                    unitOfWork.Commit();
 
-                var resolved = repository2.Get(id);
+                    var resolved = repository2.Get(id);
 
-                // Assert
-                Assert.That(resolved, Is.Null);
+                    // Assert
+                    Assert.That(resolved, Is.Null);    
+                }
+                
             }
         }
 
@@ -146,14 +161,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.Save(userGroup);
-                scope.Complete();
+                repository.AddOrUpdate(userGroup);
+                unitOfWork.Commit();
 
                 // Act
                 var resolved = repository.Get(userGroup.Id);
@@ -172,16 +186,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                CreateAndCommitMultipleUserGroups(repository);
+                CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1");
-                var result = repository.Get(query);
+                var query = Query<IUserGroup>.Builder.Where(x => x.Alias == "testUserGroup1");
+                var result = repository.GetByQuery(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
@@ -192,15 +205,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Param_Ids_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var userGroups = CreateAndCommitMultipleUserGroups(repository);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetMany(userGroups[0].Id, userGroups[1].Id);
+                var result = repository.GetAll(userGroups[0].Id, userGroups[1].Id);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -213,15 +225,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                CreateAndCommitMultipleUserGroups(repository);
+                CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetMany();
+                var result = repository.GetAll();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -234,12 +245,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var userGroups = CreateAndCommitMultipleUserGroups(repository);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
                 var exists = repository.Exists(userGroups[0].Id);
@@ -253,15 +263,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_UserGroupRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var userGroups = CreateAndCommitMultipleUserGroups(repository);
+                var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
+                var query = Query<IUserGroup>.Builder.Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -273,12 +282,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Remove_Section_For_Group()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var groups = CreateAndCommitMultipleUserGroups(repository);
+                var groups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
 
@@ -291,12 +299,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 groups[1].RemoveAllowedSection("media");
                 groups[1].RemoveAllowedSection("media");
 
-                repository.Save(groups[0]);
-                repository.Save(groups[1]);
-                scope.Complete();
+                repository.AddOrUpdate(groups[0]);
+                repository.AddOrUpdate(groups[1]);
+                unitOfWork.Commit();
 
                 // Assert
-                var result = repository.GetMany((int)groups[0].Id, (int)groups[1].Id).ToArray();
+                var result = repository.GetAll((int)groups[0].Id, (int)groups[1].Id).ToArray();
                 Assert.AreEqual(1, result[0].AllowedSections.Count());
                 Assert.AreEqual("media", result[0].AllowedSections.First());
                 Assert.AreEqual(1, result[1].AllowedSections.Count());
@@ -308,12 +316,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_Section_ForGroup()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var groups = CreateAndCommitMultipleUserGroups(repository);
+                var groups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
 
@@ -333,18 +340,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 groups[2].ClearAllowedSections();
 
-                repository.Save(groups[0]);
-                repository.Save(groups[1]);
-                repository.Save(groups[2]);
-                scope.Complete();
-
-                for (var i = 0; i < 3; i++)
-                    Assert.IsNotNull(repository.Get(groups[i].Id));
+                repository.AddOrUpdate(groups[0]);
+                repository.AddOrUpdate(groups[1]);
+                repository.AddOrUpdate(groups[2]);
+                unitOfWork.Commit();
 
                 // Assert
-                var result = repository.GetMany(groups[0].Id, groups[1].Id, groups[2].Id).ToArray();
-                Assert.AreEqual(3, result.Length);
-
+                var result = repository.GetAll((int)groups[0].Id, (int)groups[1].Id, (int)groups[2].Id).ToArray();
                 Assert.AreEqual(3, result[0].AllowedSections.Count());
                 Assert.IsTrue(result[0].AllowedSections.Contains("content"));
                 Assert.IsTrue(result[0].AllowedSections.Contains("media"));
@@ -359,23 +361,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_Section_For_Group()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
-                var groups = CreateAndCommitMultipleUserGroups(repository);
+                var groups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
 
                 groups[0].RemoveAllowedSection("content");
                 groups[0].AddAllowedSection("settings");
 
-                repository.Save(groups[0]);
-                scope.Complete();
+                repository.AddOrUpdate(groups[0]);
+                unitOfWork.Commit();
 
                 // Assert
-                var result = repository.Get(groups[0].Id);
+                var result = repository.Get((int)groups[0].Id);
                 Assert.AreEqual(2, result.AllowedSections.Count());
                 Assert.IsTrue(result.AllowedSections.Contains("settings"));
                 Assert.IsTrue(result.AllowedSections.Contains("media"));
@@ -387,23 +388,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_Groups_Assigned_To_Section()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
             {
-                var repository = CreateRepository(provider);
-
                 var user1 = MockedUserGroup.CreateUserGroup("1", allowedSections: new[] { "test1" });
                 var user2 = MockedUserGroup.CreateUserGroup("2", allowedSections: new[] { "test2" });
                 var user3 = MockedUserGroup.CreateUserGroup("3", allowedSections: new[] { "test1" });
-                repository.Save(user1);
-                repository.Save(user2);
-                repository.Save(user3);
-                scope.Complete();
+                repository.AddOrUpdate(user1);
+                repository.AddOrUpdate(user2);
+                repository.AddOrUpdate(user3);
+                unitOfWork.Commit();
 
                 // Act
                 var groups = repository.GetGroupsAssignedToSection("test1");
 
-                // Assert
+                // Assert            
                 Assert.AreEqual(2, groups.Count());
                 var names = groups.Select(x => x.Name).ToArray();
                 Assert.IsTrue(names.Contains("TestUserGroup1"));
@@ -412,15 +412,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IUserGroup[] CreateAndCommitMultipleUserGroups(IUserGroupRepository repository)
+        private IUserGroup[] CreateAndCommitMultipleUserGroups(IUserGroupRepository repository, IUnitOfWork unitOfWork)
         {
             var userGroup1 = MockedUserGroup.CreateUserGroup("1");
             var userGroup2 = MockedUserGroup.CreateUserGroup("2");
             var userGroup3 = MockedUserGroup.CreateUserGroup("3");
-            repository.Save(userGroup1);
-            repository.Save(userGroup2);
-            repository.Save(userGroup3);
-
+            repository.AddOrUpdate(userGroup1);
+            repository.AddOrUpdate(userGroup2);
+            repository.AddOrUpdate(userGroup3);
+            unitOfWork.Commit();
             return new IUserGroup[] { userGroup1, userGroup2, userGroup3 };
         }
     }

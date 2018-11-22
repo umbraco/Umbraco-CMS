@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,14 +21,13 @@ namespace Umbraco.Core.Models
             var val = media.Properties[propertyType];
             if (val == null) return string.Empty;
 
-            //fixme doesn't take into account variants
-            var jsonString = val.GetValue() as string;
+            var jsonString = val.Value as string;
             if (jsonString == null) return string.Empty;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                 return jsonString;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper)
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)
             {
                 if (jsonString.DetectIsJson() == false)
                     return jsonString;
@@ -41,7 +40,7 @@ namespace Umbraco.Core.Models
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<ImageCropperValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", jsonString);
+                    logger.Error<ImageCropperValueConverter>("Could not parse the string " + jsonString + " to a json object", ex);
                     return string.Empty;
                 }
             }

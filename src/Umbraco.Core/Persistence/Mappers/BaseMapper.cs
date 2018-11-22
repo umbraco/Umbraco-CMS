@@ -2,37 +2,43 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using NPoco;
+using umbraco.interfaces;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     public abstract class BaseMapper : IDiscoverable
     {
-        protected BaseMapper()
+        private readonly ISqlSyntaxProvider _sqlSyntax;
+
+        protected BaseMapper() : this(SqlSyntaxContext.SqlSyntaxProvider)
+        {            
+        }
+
+        protected BaseMapper(ISqlSyntaxProvider sqlSyntax)
         {
-            Build();
+            _sqlSyntax = sqlSyntax;
         }
 
         internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
 
-        private void Build()
+        internal abstract void BuildMap();
+
+        internal string Map(string propertyName, bool throws = false)
         {
-            BuildMap();
-        }
-
-        protected abstract void BuildMap();
-
-        internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
-        {
-            if (PropertyInfoCache.TryGetValue(propertyName, out var dtoTypeProperty))
-                return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-
-            if (throws)
-                throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
-
-            return string.Empty;
+            DtoMapModel dtoTypeProperty;
+            if (PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty))
+            {
+                return GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
+            }
+            else
+            {
+                if (throws)
+                {
+                    throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
+                }
+                return string.Empty;
+            }
         }
 
         internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
@@ -44,25 +50,27 @@ namespace Umbraco.Core.Persistence.Mappers
         internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
         {
             var source = ExpressionHelper.FindProperty(sourceMember);
-            var destination = (PropertyInfo) ExpressionHelper.FindProperty(destinationMember).Item1;
+            var destination = (PropertyInfo)ExpressionHelper.FindProperty(destinationMember);
 
             if (destination == null)
             {
                 throw new InvalidOperationException("The 'destination' returned was null, cannot resolve the mapping");
             }
 
-            return new DtoMapModel(typeof(TDestination), destination, source.Item1.Name);
+            return new DtoMapModel(typeof(TDestination), destination, source.Name);
         }
 
-        internal virtual string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)
+        internal virtual string GetColumnName(Type dtoType, PropertyInfo dtoProperty)
         {
             var tableNameAttribute = dtoType.FirstAttribute<TableNameAttribute>();
-            var tableName = tableNameAttribute.Value;
+            string tableName = tableNameAttribute.Value;
 
             var columnAttribute = dtoProperty.FirstAttribute<ColumnAttribute>();
-            var columnName = columnAttribute.Name;
+            string columnName = columnAttribute.Name;
 
-            var columnMap = sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(columnName);
+            string columnMap = string.Format("{0}.{1}",
+                                             _sqlSyntax.GetQuotedTableName(tableName),
+                                             _sqlSyntax.GetQuotedColumnName(columnName));
             return columnMap;
         }
     }

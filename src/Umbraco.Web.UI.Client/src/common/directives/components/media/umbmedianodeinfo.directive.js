@@ -1,31 +1,23 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
 
-            scope.allowChangeMediaType = false;
-
             function onInit() {
-
-                userService.getCurrentUser().then(function(user){
-                    // only allow change of media type if user has access to the settings sections
-                    angular.forEach(user.sections, function(section){
-                        if(section.alias === "settings") {
-                            scope.allowChangeMediaType = true;
-                        }
-                    });
-                });
-
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, contentType is null, see MediaModelMapper
+                scope.allowOpen = scope.node.contentType !== null;
+                
                 // get document type details
                 scope.mediaType = scope.node.contentType;
 
                 // set the media link initially
                 setMediaLink();
-
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }
@@ -43,16 +35,9 @@
             }
 
             scope.openMediaType = function (mediaType) {
-                var editor = {
-                    id: mediaType.id,
-                    submit: function(model) {
-                        editorService.close();
-                    },
-                    close: function() {
-                        editorService.close();
-                    }
-                };
-                editorService.mediaTypeEditor(editor);
+                // remove first "#" from url if it is prefixed else the path won't work
+                var url = "/settings/mediaTypes/edit/" + mediaType.id;
+                $location.path(url);
             };
 
             // watch for content updates - reload content when node is saved, published etc.

@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -18,22 +17,29 @@ namespace Umbraco.Core.Models.PublishedContent
             if (content == null)
                 return null;
 
-            // in order to provide a nice, "fluent" experience, this extension method
-            // needs to access Current, which is not always initialized in tests - not
-            // very elegant, but works
-            if (!Current.HasContainer) return content;
+            if (PublishedContentModelFactoryResolver.Current.HasValue == false)
+                return content;
 
             // get model
             // if factory returns nothing, throw
-            var model = Current.PublishedModelFactory.CreateModel(content);
+            // if factory just returns what it got, return
+            var model = PublishedContentModelFactoryResolver.Current.Factory.CreateModel(content);
             if (model == null)
-                throw new Exception("Factory returned null.");
+                throw new Exception("IPublishedContentFactory returned null.");
+            if (ReferenceEquals(model, content))
+                return content;
 
-            // if factory returns a different type, throw
-            if (!(model is IPublishedContent publishedContent))
-                throw new Exception($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
+            // at the moment, other parts of our code assume that all models will
+            // somehow implement IPublishedContentExtended and not just be IPublishedContent,
+            // so we'd better check this here to fail as soon as we can.
+            //
+            // see also PublishedContentExtended.Extend
 
-            return publishedContent;
+            var extended = model as IPublishedContentExtended;
+            if (extended == null)
+                throw new Exception("IPublishedContentFactory created an object that does not implement IPublishedContentModelExtended.");
+
+            return model;
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class RelationTypeFactory
+    internal class RelationTypeFactory 
     {
         #region Implementation of IEntityFactory<RelationType,RelationTypeDto>
 
-        public static IRelationType BuildEntity(RelationTypeDto dto)
+        public IRelationType BuildEntity(RelationTypeDto dto)
         {
             var entity = new RelationType(dto.ChildObjectType, dto.ParentObjectType, dto.Alias);
 
@@ -20,7 +20,8 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.IsBidirectional = dto.Dual;
                 entity.Name = dto.Name;
 
-                // reset dirty initial properties (U4-1946)
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
                 entity.ResetDirtyProperties(false);
                 return entity;
             }
@@ -30,7 +31,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static RelationTypeDto BuildDto(IRelationType entity)
+        public RelationTypeDto BuildDto(IRelationType entity)
         {
             var dto = new RelationTypeDto
             {

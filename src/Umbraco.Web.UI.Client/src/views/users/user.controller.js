@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -131,7 +131,7 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope })) {
+            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
@@ -150,8 +150,11 @@
                         //if the user saved, then try to execute all extended save options
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
-                            formHelper.resetForm({ scope: $scope });
-                        }, angular.noop);
+                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
+                        }, function(err) {
+                            //otherwise show the notifications for the user being saved
+                            formHelper.showNotifications(saved);
+                        });
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -171,7 +174,10 @@
                             redirectOnFailure: false,
                             err: err
                         });
-                        
+                        //show any notifications
+                        if (err.data) {
+                            formHelper.showNotifications(err.data);
+                        }
                         vm.page.saveButtonState = "error";
                     });
             }
@@ -209,33 +215,38 @@
         }
 
         function openUserGroupPicker() {
-            var oldSelection = angular.copy(vm.user.userGroups);
-            var userGroupPicker = {
+            vm.userGroupPicker = {
+                view: "usergrouppicker",
                 selection: vm.user.userGroups,
+                closeButtonLabel: vm.labels.cancel,
+                show: true,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.user.userGroups = model.selection;
                     }
-                    editorService.close();
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 },
-                close: function () {
-                    // roll back the selection
-                    vm.user.userGroups = oldSelection;
-                    editorService.close();
+                close: function (oldModel) {
+                    // rollback on close
+                    if (oldModel.selection) {
+                        vm.user.userGroups = oldModel.selection;
+                    }
+                    vm.userGroupPicker.show = false;
+                    vm.userGroupPicker = null;
                 }
             };
-            editorService.userGroupPicker(userGroupPicker);
         }
 
         function openContentPicker() {
-            var contentPicker = {
+            vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                section: "content",
-                treeAlias: "content",
+                view: "contentpicker",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,
+                show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
@@ -247,18 +258,22 @@
                             multiSelectItem(item, vm.user.startContentIds);
                         });
                     }
-                    editorService.close();
+                    // close overlay
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 },
-                close: function () {
-                    editorService.close();
+                close: function (oldModel) {
+                    // close overlay
+                    vm.contentPicker.show = false;
+                    vm.contentPicker = null;
                 }
             };
-            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            var mediaPicker = {
+            vm.mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
+                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
@@ -277,14 +292,15 @@
                         });
                     }
                     // close overlay
-                    editorService.close();
+                    vm.mediaPicker.show = false;
+                    vm.mediaPicker = null;
                 },
-                close: function () {
+                close: function (oldModel) {
                     // close overlay
-                    editorService.close();
+                    vm.mediaPicker.show = false;
+                    vm.mediaPicker = null;
                 }
             };
-            editorService.treePicker(mediaPicker);
         }
 
         function multiSelectItem(item, selection) {
@@ -313,10 +329,10 @@
                 vm.user.userState = 1;
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
-                
+                formHelper.showNotifications(data);
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                
+                formHelper.showNotifications(error.data);
             });
         }
 
@@ -326,8 +342,10 @@
                 vm.user.userState = 0;
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
+                formHelper.showNotifications(data);
             }, function (error) {
                 vm.enableUserButtonState = "error";
+                formHelper.showNotifications(error.data);
             });
         }
 
@@ -339,8 +357,10 @@
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
                 
+                formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";
+                formHelper.showNotifications(error.data);
             });
         }
 

@@ -68,10 +68,13 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Flag mask for encoding.
         /// </summary>
-        CodeMask = Utf8 | Ascii | TryAscii,
+        CodeMask = Unicode | Utf8 | Ascii | TryAscii,
 
-        // Unicode encoding is obsolete, use Utf8
-        //Unicode = 0x0100,
+        /// <summary>
+        /// Unicode encoding.
+        /// </summary>
+        [Obsolete("Use .Utf8 instead.")]
+        Unicode = 0x0100,
 
         /// <summary>
         /// Utf8 encoding.

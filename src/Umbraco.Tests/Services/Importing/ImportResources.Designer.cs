@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Services.Importing {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ImportResources {
@@ -85,6 +85,34 @@ namespace Umbraco.Tests.Services.Importing {
         internal static string CheckboxList_Content_Package {
             get {
                 return ResourceManager.GetString("CheckboxList_Content_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;CheckboxListTest&lt;/name&gt;
+        ///      &lt;version&gt;1&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
+        ///      &lt;url&gt;1&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;1&lt;/name&gt;
+        ///      &lt;website&gt;1&lt;/website&gt;
+        ///    &lt;/author&gt;
+        ///    &lt;r [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CheckboxList_Content_Package_LegacyIds {
+            get {
+                return ResourceManager.GetString("CheckboxList_Content_Package_LegacyIds", resourceCulture);
             }
         }
         

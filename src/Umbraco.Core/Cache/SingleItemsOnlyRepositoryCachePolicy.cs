@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {
@@ -14,10 +13,10 @@ namespace Umbraco.Core.Cache
     /// <para>Used by DictionaryRepository.</para>
     /// </remarks>
     internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IEntity
+        where TEntity : class, IAggregateRoot
     {
-        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-            : base(cache, scopeAccessor, options)
+        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
+            : base(cache, options)
         { }
 
         protected override void InsertEntities(TId[] ids, TEntity[] entities)

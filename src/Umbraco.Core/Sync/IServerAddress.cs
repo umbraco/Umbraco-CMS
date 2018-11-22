@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Sync
+﻿using Umbraco.Core.Models.EntityBase;
+
+namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// Provides the address of a server.

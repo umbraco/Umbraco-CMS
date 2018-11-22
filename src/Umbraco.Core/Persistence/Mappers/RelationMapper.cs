@@ -1,11 +1,13 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Relation"/> to DTO mapper used to translate the properties of the public api
+    /// Represents a <see cref="Relation"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IRelation))]
@@ -14,9 +16,21 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
+        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
+        // otherwise that would fail because there is no public constructor.
+        public RelationMapper()
+        {
+            BuildMap();
+        }
 
-        protected override void BuildMap()
+        #region Overrides of BaseMapper
+
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
+
+        internal override void BuildMap()
         {
             CacheMap<Relation, RelationDto>(src => src.Id, dto => dto.Id);
             CacheMap<Relation, RelationDto>(src => src.ChildId, dto => dto.ChildId);
@@ -25,5 +39,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Relation, RelationDto>(src => src.ParentId, dto => dto.ParentId);
             CacheMap<Relation, RelationDto>(src => src.RelationTypeId, dto => dto.RelationType);
         }
+
+        #endregion
     }
 }

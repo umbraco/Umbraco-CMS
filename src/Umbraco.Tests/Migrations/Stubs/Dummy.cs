@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Migrations;
+﻿using Umbraco.Core.Persistence.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
@@ -8,7 +8,12 @@ namespace Umbraco.Tests.Migrations.Stubs
     /// </summary>
     public class Dummy : IMigration
     {
-        public void Migrate()
+        public void Up()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Down()
         {
             throw new System.NotImplementedException();
         }

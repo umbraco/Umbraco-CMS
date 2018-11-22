@@ -1,6 +1,6 @@
-@using Umbraco.Core.Models.PublishedContent
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@using Umbraco.Core.Models
 @using Umbraco.Web
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
     This snippet creates links for every single page (no matter how deep) below
@@ -37,15 +37,16 @@
     </ul>
 }
 
+
 @helper ChildPages(IPublishedContent[] selection)
 {
     @* Ensure that we have a collection of pages *@
     if (selection.Length > 0)
     {
-        @* Get the first page in pages and get the level *@
+    @* Get the first page in pages and get the level *@
         var naviLevel = selection[0].Level;
 
-        @* Add in level for a CSS hook *@
+    @* Add in level for a CSS hook *@
         <ul class="level-@(naviLevel)">
             @foreach (var item in selection)
             {
@@ -57,7 +58,7 @@
                         var children = item.Children.Where(x => x.IsVisible()).ToArray();
                         if (children.Length > 0)
                         {
-                            @* Recurse and call our helper to display the children *@
+                        @* Recurse and call our helper to display the children *@
                             @ChildPages(children)
                         }
                     }

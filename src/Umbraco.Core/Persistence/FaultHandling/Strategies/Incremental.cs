@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         private readonly TimeSpan increment;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Incremental"/> class.
+        /// Initializes a new instance of the <see cref="Incremental"/> class. 
         /// </summary>
         public Incremental()
             : this(DefaultClientRetryCount, DefaultRetryInterval, DefaultRetryIncrement)
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Incremental"/> class.
+        /// Initializes a new instance of the <see cref="Incremental"/> class. 
         /// </summary>
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="initialInterval">The initial interval that will apply for the first retry.</param>
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Incremental"/> class.
+        /// Initializes a new instance of the <see cref="Incremental"/> class. 
         /// </summary>
         /// <param name="name">The retry strategy name.</param>
         /// <param name="retryCount">The number of retry attempts.</param>
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Incremental"/> class.
+        /// Initializes a new instance of the <see cref="Incremental"/> class. 
         /// </summary>
         /// <param name="name">The retry strategy name.</param>
         /// <param name="retryCount">The number of retry attempts.</param>

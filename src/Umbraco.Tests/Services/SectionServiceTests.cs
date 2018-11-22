@@ -1,19 +1,25 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
+using System;
 using System.Linq;
-using System.Threading;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
     /// <summary>
     /// Tests covering the SectionService
     /// </summary>
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-    public class SectionServiceTests : TestWithSomeContentBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
+    public class SectionServiceTests : BaseServiceTest
     {
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
         public override void CreateTestData()
         {
             base.CreateTestData();

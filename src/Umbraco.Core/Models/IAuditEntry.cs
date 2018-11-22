@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// <para>Depending on audit loggers, these properties can be purely free-form text, or
     /// contain json serialized objects.</para>
     /// </remarks>
-    public interface IAuditEntry : IEntity, IRememberBeingDirty
+    public interface IAuditEntry : IAggregateRoot, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the identifier of the user triggering the audited event.

@@ -7,7 +7,7 @@
 }
 
 .umb-folder-grid__folder {
-   background: @white;
+   background: @gray-10;
    margin: 5px;
    display: flex;
    align-items: center;
@@ -20,8 +20,6 @@
    justify-content: space-between;
    cursor: pointer;
    user-select: none;
-   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
-   border-radius: 3px;
 }
 
 .umb-folder-grid__folder:focus,
@@ -31,8 +29,7 @@
 
 .umb-folder-grid__folder:hover {
    text-decoration: none;
-   box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
-   transition: box-shadow 150ms ease-in-out;
+   background-color: @gray-9;
 }
 
 .umb-folder-grid__folder-description {

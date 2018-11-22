@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence.Querying
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Querying
         /// </summary>
         public string VisitResult
         {
-            get => _visitResult;
+            get { return _visitResult; }
             set
             {
                 if (Visited)

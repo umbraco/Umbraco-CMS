@@ -1,7 +1,6 @@
 ﻿using System.Web.Mvc;
 using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.Mapping
@@ -9,22 +8,25 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Gets the tree node url for the IMember
     /// </summary>
-    internal class MemberTreeNodeUrlResolver : IValueResolver<IMember, MemberDisplay, string>
+    internal class MemberTreeNodeUrlResolver : IValueResolver
     {
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-
-        public MemberTreeNodeUrlResolver(IUmbracoContextAccessor umbracoContextAccessor)
+        
+        public ResolutionResult Resolve(ResolutionResult source)
         {
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            return source.New(ResolveCore(source, (IMember)source.Value), typeof(string));
         }
 
-        public string Resolve(IMember source, MemberDisplay destination, string destMember, ResolutionContext context)
+        private string ResolveCore(ResolutionResult res, IMember source)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (umbracoContext == null) return null;
-
-            var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);
-            return urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+            var umbCtx = res.Context.GetUmbracoContext();
+            //map the tree node url
+            if (umbCtx != null)
+            {
+                var urlHelper = new UrlHelper(umbCtx.HttpContext.Request.RequestContext);
+                var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(source.Key.ToString("N"), null));
+                return url;
+            }
+            return null;
         }
     }
 }

@@ -1,120 +1,78 @@
 ﻿using System;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Sync;
+using umbraco.interfaces;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// A base class for cache refreshers that handles events.
+    /// A base class for cache refreshers to inherit from that ensures the correct events are raised
+    /// when cache refreshing occurs.
     /// </summary>
-    /// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
-    /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
+    /// <typeparam name="TInstanceType">The real cache refresher type, this is used for raising strongly typed events</typeparam>
     public abstract class CacheRefresherBase<TInstanceType> : ICacheRefresher
-        where TInstanceType : class, ICacheRefresher
+        where TInstanceType : ICacheRefresher
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CacheRefresherBase{TInstanceType}"/>.
-        /// </summary>
-        /// <param name="cacheHelper">A cache helper.</param>
-        protected CacheRefresherBase(CacheHelper cacheHelper)
-        {
-            CacheHelper = cacheHelper;
-        }
-
-        /// <summary>
-        /// Triggers when the cache is updated on the server.
+        /// An event that is raised when cache is updated on an individual server
         /// </summary>
         /// <remarks>
-        /// Triggers on each server configured for an Umbraco project whenever a cache refresher is updated.
+        /// This event will fire on each server configured for an Umbraco project whenever a cache refresher
+        /// is updated.
         /// </remarks>
         public static event TypedEventHandler<TInstanceType, CacheRefresherEventArgs> CacheUpdated;
 
-        #region Define
-
         /// <summary>
-        /// Gets the typed 'this' for events.
+        /// Raises the event
         /// </summary>
-        protected abstract TInstanceType This { get; }
-
-        /// <summary>
-        /// Gets the unique identifier of the refresher.
-        /// </summary>
-        public abstract Guid RefresherUniqueId { get; }
-
-        /// <summary>
-        /// Gets the name of the refresher.
-        /// </summary>
-        public abstract string Name { get; }
-
-        #endregion
-
-        #region Refresher
-
-        /// <summary>
-        /// Refreshes all entities.
-        /// </summary>
-        public virtual void RefreshAll()
-        {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
-        }
-
-        /// <summary>
-        /// Refreshes an entity.
-        /// </summary>
-        /// <param name="id">The entity's identifier.</param>
-        public virtual void Refresh(int id)
-        {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
-        }
-
-        /// <summary>
-        /// Refreshes an entity.
-        /// </summary>
-        /// <param name="id">The entity's identifier.</param>
-        public virtual void Refresh(Guid id)
-        {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
-        }
-
-        /// <summary>
-        /// Removes an entity.
-        /// </summary>
-        /// <param name="id">The entity's identifier.</param>
-        public virtual void Remove(int id)
-        {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RemoveById));
-        }
-
-        #endregion
-
-        #region Protected
-
-        /// <summary>
-        /// Gets the cache helper.
-        /// </summary>
-        protected CacheHelper CacheHelper { get; }
-
-        /// <summary>
-        /// Clears the cache for all repository entities of a specified type.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of the entities.</typeparam>
-        protected void ClearAllIsolatedCacheByEntityType<TEntity>()
-            where TEntity : class, IEntity
-        {
-            CacheHelper.IsolatedRuntimeCache.ClearCache<TEntity>();
-        }
-
-        /// <summary>
-        /// Raises the CacheUpdated event.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         protected static void OnCacheUpdated(TInstanceType sender, CacheRefresherEventArgs args)
         {
-            CacheUpdated?.Invoke(sender, args);
+            if (CacheUpdated != null)
+            {
+                CacheUpdated(sender, args);
+            }
         }
 
-        #endregion
+        /// <summary>
+        /// Returns the real instance of the object ('this') for use  in strongly typed events
+        /// </summary>
+        protected abstract TInstanceType Instance { get; }
+
+        public abstract Guid UniqueIdentifier { get; }
+
+        public abstract string Name { get; }
+
+        public virtual void RefreshAll()
+        {
+            OnCacheUpdated(Instance, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
+        }
+
+        public virtual void Refresh(int id)
+        {
+            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+        }
+
+        public virtual void Remove(int id)
+        {
+            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RemoveById));
+        }
+
+        public virtual void Refresh(Guid id)
+        {
+            OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+        }
+
+        /// <summary>
+        /// Clears the cache for all repository entities of this type
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        internal void ClearAllIsolatedCacheByEntityType<TEntity>()
+            where TEntity : class, IAggregateRoot
+        {
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<TEntity>();
+        }
     }
 }

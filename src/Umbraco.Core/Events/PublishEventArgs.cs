@@ -58,28 +58,28 @@ namespace Umbraco.Core.Events
         /// <param name="canCancel"></param>
         /// <param name="isAllPublished"></param>
         public PublishEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, bool isAllPublished)
-            : base(eventObject, canCancel)
-        {
+			: base(eventObject, canCancel)
+		{
             IsAllRepublished = isAllPublished;
-        }
+		}
 
         /// <summary>
         /// Constructor accepting multiple entities that are used in the publish operation
         /// </summary>
         /// <param name="eventObject"></param>
         public PublishEventArgs(IEnumerable<TEntity> eventObject)
-            : base(eventObject)
-        {
-        }
+			: base(eventObject)
+		{
+		}
 
         /// <summary>
         /// Constructor accepting a single entity instance
         /// </summary>
         /// <param name="eventObject"></param>
         public PublishEventArgs(TEntity eventObject)
-            : base(new List<TEntity> { eventObject })
-        {
-        }
+			: base(new List<TEntity> { eventObject })
+		{
+		}
 
         /// <summary>
         /// Constructor accepting a single entity instance
@@ -88,18 +88,18 @@ namespace Umbraco.Core.Events
         /// <param name="canCancel"></param>
         /// <param name="isAllPublished"></param>
         public PublishEventArgs(TEntity eventObject, bool canCancel, bool isAllPublished)
-            : base(new List<TEntity> { eventObject }, canCancel)
-        {
+			: base(new List<TEntity> { eventObject }, canCancel)
+		{
             IsAllRepublished = isAllPublished;
-        }
+		}
 
-        /// <summary>
-        /// Returns all entities that were published during the operation
-        /// </summary>
-        public IEnumerable<TEntity> PublishedEntities
-        {
-            get { return EventObject; }
-        }
+		/// <summary>
+		/// Returns all entities that were published during the operation
+		/// </summary>
+		public IEnumerable<TEntity> PublishedEntities
+		{
+			get { return EventObject; }
+		}
 
         public bool IsAllRepublished { get; private set; }
 

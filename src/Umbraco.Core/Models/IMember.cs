@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
-    public interface IMember : IContentBase, IMembershipUser, IHaveAdditionalData
+    public interface IMember : IContentBase, IMembershipUser
     {
         /// <summary>
         /// String alias of the default ContentType

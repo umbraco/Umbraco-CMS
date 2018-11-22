@@ -9,12 +9,12 @@ namespace Umbraco.Core.IO
     {
         public FileSecurityException()
         {
-
+            
         }
 
         public FileSecurityException(string message) : base(message)
         {
-
+            
         }
     }
 }

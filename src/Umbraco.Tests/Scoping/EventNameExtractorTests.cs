@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using Umbraco.Core.Events;
 
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Scoping
             var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<double>(0), EventNameExtractor.MatchIngNames);
             Assert.IsFalse(found.Success);
             Assert.AreEqual(EventNameExtractorError.NoneFound, found.Result.Error);
-        }
+        }        
 
         public static event EventHandler<SaveEventArgs<string>> FindingMe;
         public static event EventHandler<SaveEventArgs<string>> FoundMe;

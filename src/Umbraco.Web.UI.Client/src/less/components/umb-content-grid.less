@@ -1,19 +1,17 @@
 .umb-content-grid {
-   display: grid;
-   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-   grid-template-rows: auto;
-   grid-gap: 15px;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   justify-content: center;
 }
 
 .umb-content-grid__item {
-   background: @white;
+   background: @gray-10;
    flex: 0 1 200px;
    cursor: pointer;
    position: relative;
-   //margin: 10px;
+   margin: 10px;
    user-select: none;
-   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
-   border-radius: 3px;
 }
 
 .umb-content-grid__item.-selected {
@@ -21,6 +19,7 @@
 }
 
 .umb-content-grid__icon-container {
+   background: @gray-9;
    height: 75px;
    display: flex;
    align-items: center;
@@ -30,13 +29,12 @@
 .umb-content-grid__icon,
 .umb-content-grid__icon[class^="icon-"],
 .umb-content-grid__icon[class*=" icon-"] {
-   font-size: 20px;
-   color: @gray-8;
-   margin-right: 5px;
+   font-size: 40px;
+   color: @gray-6;
 }
 
 .umb-content-grid__icon.-light {
-   color: @gray-5;
+   color: @gray-8;
 }
 
 
@@ -47,10 +45,12 @@
 
 .umb-content-grid__item-name {
    font-weight: bold;
-   margin-bottom: 15px;
+   margin-bottom: 10px;
    color: @black;
+   padding-bottom: 10px;
    line-height: 1.4em;
-   display: inline-flex;
+   border-bottom: 1px solid @gray-8;
+   display: inline-block;
 }
 
 .umb-content-grid__item-name:hover {
@@ -58,7 +58,7 @@
 }
 
 .umb-content-grid__item-name.-light {
-   color: @gray-5;
+   color: @gray-8;
 }
 
 .umb-content-grid__details-list {
@@ -69,7 +69,7 @@
 }
 
 .umb-content-grid__details-list.-light {
-   color: @gray-5;
+   color: @gray-8;
 }
 
 .umb-content-grid__details-label {
@@ -79,7 +79,6 @@
 
 .umb-content-grid__details-value {
    display: inline-block;
-   word-break: break-word;
 }
 
 .umb-content-grid__checkmark {

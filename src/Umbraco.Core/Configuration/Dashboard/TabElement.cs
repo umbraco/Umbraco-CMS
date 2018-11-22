@@ -10,7 +10,7 @@ namespace Umbraco.Core.Configuration.Dashboard
         {
             get { return (string)this["caption"]; }
         }
-
+        
         [ConfigurationProperty("access")]
         public AccessElement Access
         {
@@ -24,10 +24,10 @@ namespace Umbraco.Core.Configuration.Dashboard
             get { return (ControlCollection)base[""]; }
             set { base[""] = value; }
         }
-
+        
         IEnumerable<IDashboardControl> IDashboardTab.Controls
         {
-            get { return ControlCollection; }
+            get { return ControlCollection; }            
         }
 
         IAccess IDashboardTab.AccessRights

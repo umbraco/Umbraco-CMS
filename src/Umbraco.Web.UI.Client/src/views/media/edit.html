@@ -1,74 +1,88 @@
 <div data-element="editor-media" ng-controller="Umbraco.Editors.Media.EditController">
 
-    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-    <form novalidate name="contentForm"
-          ng-submit="save()"
-          val-form-manager>
+   <form novalidate name="contentForm"
+      ng-submit="save()"
+      val-form-manager>
 
-        <umb-editor-view ng-if="!page.loading">
+      <umb-editor-view ng-if="!page.loading" umb-tabs>
 
-            <umb-editor-header name="content.name"
-                               menu="page.menu"
-                               hide-icon="true"
-                               hide-description="true"
-                               hide-alias="true"
-                               navigation="content.apps">
-            </umb-editor-header>
+         <umb-editor-header
+            name="content.name"
+            tabs="content.tabs"
+            menu="page.menu"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+         </umb-editor-header>
 
-            <umb-editor-container>
-                <div class="umb-editor-sub-views" ng-if="!page.loading">
-                    <div id="sub-view-{{$index}}" ng-repeat="app in content.apps track by app.alias">
-                        <umb-editor-sub-view model="app" content="content"  />
+         <umb-editor-container>
+
+            <umb-tabs-content view="true" class="form-horizontal">
+               <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+
+                    <!-- Other tabs than info -->
+                    <div ng-if="tab.id !== -1 && tab.alias !== '_umb_infoTab'">
+                        <umb-property data-element="property-{{property.alias}}" property="property" ng-repeat="property in tab.properties">
+                            <umb-editor model="property"></umb-editor>
+                        </umb-property>
                     </div>
-                </div>
-            </umb-editor-container>
+                    
+                    <!-- Info tab -->
+                    <div ng-if="tab.id === -1 && tab.alias === '_umb_infoTab'">
+                        <umb-media-node-info
+                            ng-if="content"
+                            node="content">
+                        </umb-media-node-info>
+                    </div>
+                
+               </umb-tab>
+            </umb-tabs-content>
 
-            <umb-editor-footer>
+         </umb-editor-container>
 
-                <umb-editor-footer-content-left>
+         <umb-editor-footer>
 
-                    <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0"
-                                     ancestors="ancestors"
-                                     entity-type="media">
-                    </umb-breadcrumbs>
+            <umb-editor-footer-content-left>
 
-                </umb-editor-footer-content-left>
+               <umb-breadcrumbs
+                  ng-if="ancestors && ancestors.length > 0"
+                  ancestors="ancestors"
+                  entity-type="media">
+               </umb-breadcrumbs>
 
-
-                <umb-editor-footer-content-right>
-
-                    <umb-button ng-if="model.infiniteMode"
-                                action="close()"
-                                button-style="link"
-                                label="Close"
-                                type="button">
-                    </umb-button>
-
-                    <umb-button alias="returnToList"
-                                ng-if="page.listViewPath"
-                                type="link"
-                                href="#{{page.listViewPath}}"
-                                label="Return to list"
-                                label-key="buttons_returnToList">
-                    </umb-button>
-
-                    <!-- label-key="buttons_save" -->
-                    <umb-button alias="save"
-                                type="submit"
-                                label="{{page.submitButtonLabel}}"
-                                button-style="success"
-                                shortcut="ctrl+s"
-                                state="page.saveButtonState">
-                    </umb-button>
-
-                </umb-editor-footer-content-right>
+            </umb-editor-footer-content-left>
 
 
-            </umb-editor-footer>
+            <umb-editor-footer-content-right>
+
+               <umb-button
+                  alias="returnToList"
+                  ng-if="page.listViewPath"
+                  type="link"
+                  href="#{{page.listViewPath}}"
+                  label="Return to list"
+                  label-key="buttons_returnToList">
+               </umb-button>
+
+               <umb-button
+                  alias="save"
+                  type="submit"
+                  label="Save"
+                  label-key="buttons_save"
+                  button-style="success"
+                  shortcut="ctrl+s"
+                  state="page.saveButtonState">
+               </umb-button>
+
+            </umb-editor-footer-content-right>
 
 
-        </umb-editor-view>
+         </umb-editor-footer>
 
-    </form>
-</div>
+
+      </umb-editor-view>
+
+   </form>
+<div>

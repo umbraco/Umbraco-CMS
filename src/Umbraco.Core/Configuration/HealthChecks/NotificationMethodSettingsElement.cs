@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         private const string ValueKey = "value";
 
         [ConfigurationProperty(KeyKey, IsKey = true, IsRequired = true)]
-        public string Key
+        public string Key 
         {
             get
             {

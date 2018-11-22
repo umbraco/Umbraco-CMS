@@ -8,9 +8,7 @@ angular.module("umbraco")
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
 
         if(!$scope.model.title) {
-            localizationService.localize("general_user").then(function(value){
-                $scope.model.title = value;
-            });
+            $scope.model.title = localizationService.localize("general_user");
         }
 
         $scope.externalLoginProviders = externalLoginInfo.providers;
@@ -38,7 +36,7 @@ angular.module("umbraco")
 
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
             $scope.model.close();
-            $location.path("/logout").search('');
+            $location.path("/logout");
         };
 
         $scope.gotoHistory = function (link) {
@@ -147,7 +145,7 @@ angular.module("umbraco")
                         $scope.changePasswordModel.value.generatedPassword = data.value;
                     }
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                     $scope.changePasswordButtonState = "success";
                     $timeout(function() {

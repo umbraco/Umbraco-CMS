@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using DataType = System.ComponentModel.DataAnnotations.DataType;
 
 namespace Umbraco.Web.Models
 {
@@ -19,7 +18,7 @@ namespace Umbraco.Web.Models
         // If we want to have this as an 'object' with a true type on it, we have to create a custom model binder
         // for an UmbracoProperty and then bind with the correct type based on the property type for this alias. This
         // would be a bit long winded and perhaps unnecessary. The reason is because it is always posted as a string anyways
-        // and when we set this value on the property object that gets sent to the database we do a TryConvertTo to the
+        // and when we set this value on the property object that gets sent to the database we do a TryConvertTo to the 
         // real type anyways.
 
         [DataType(DataType.Text)]
@@ -31,7 +30,7 @@ namespace Umbraco.Web.Models
         //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers can just render their own inside the view
 
         ///// <summary>
-        ///// This can dynamically be set to a custom template name to change
+        ///// This can dynamically be set to a custom template name to change 
         ///// the editor type for this property
         ///// </summary>
         //[ReadOnly(true)]

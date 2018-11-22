@@ -22,5 +22,20 @@ namespace Umbraco.Tests.Web.Controllers
         };
 
 
+        [TestCaseSource("TestLegacyJsActionPaths")]
+        public void Separates_Legacy_JsActions_By_Block_Or_Url(object[] jsActions)
+        {
+            var jsBlocks =
+                BackOfficeController.GetLegacyActionJsForActions(BackOfficeController.LegacyJsActionType.JsBlock,
+                    jsActions.Select(n => n.ToString()));
+
+            var jsUrls =
+                BackOfficeController.GetLegacyActionJsForActions(BackOfficeController.LegacyJsActionType.JsUrl,
+                    jsActions.Select(n => n.ToString()));
+
+            Assert.That(jsBlocks.Count() == 4);
+            Assert.That(jsUrls.Count() == 3);
+            Assert.That(jsUrls.Last().StartsWith("~/") == false);
+        }
     }
 }

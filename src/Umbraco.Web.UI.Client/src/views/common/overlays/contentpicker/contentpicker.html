@@ -1,0 +1,48 @@
+<div ng-controller="Umbraco.Overlays.TreePickerController" ng-init="init('content')">
+
+    <div ng-hide="miniListView">
+
+        <div class="umb-control-group">
+            <umb-tree-search-box
+                hide-search-callback="hideSearch"
+                search-callback="onSearchResults"
+                search-from-id="{{searchInfo.searchFromId}}"
+                search-from-name="{{searchInfo.searchFromName}}"
+                show-search="{{searchInfo.showSearch}}"
+                section="content">
+            </umb-tree-search-box>
+        </div>
+
+        <umb-tree-search-results
+            ng-if="searchInfo.showSearch"
+            results="searchInfo.results"
+            select-result-callback="selectResult">
+        </umb-tree-search-results>
+
+        <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+            <umb-tree
+                section="content"
+                treealias="content"
+                hideheader="{{hideHeader}}"
+                hideoptions="true"
+                isdialog="true"
+                customtreeparams="{{customTreeParams}}"
+                eventhandler="dialogTreeEventHandler"
+                enablelistviewsearch="true"
+                enablelistviewexpand="true"
+                enablecheckboxes="{{multiPicker}}">
+            </umb-tree>
+        </div>
+
+    </div>
+
+    <umb-mini-list-view
+        ng-if="miniListView"
+        node="miniListView"
+        entity-type="{{entityType}}"
+        start-node-id="model.startNodeId"
+        on-select="selectListViewNode(node)"
+        on-close="closeMiniListView()">
+    </umb-mini-list-view>
+
+</div>

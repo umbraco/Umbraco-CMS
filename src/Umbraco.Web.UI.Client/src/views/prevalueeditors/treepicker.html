@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PrevalueEditors.TreePickerController" class="umb-property-editor umb-contentpicker">
+<div ng-controller="Umbraco.PrevalueEditors.TreePickerController" class="umb-editor umb-contentpicker">
 
 	<div ng-model="renderModel">
 		<umb-node-preview
@@ -22,5 +22,12 @@
 		prevent-default>
 		<localize key="general_add">Add</localize>
 	</a>
+
+	<umb-overlay
+		ng-if="treePickerOverlay.show"
+		model="treePickerOverlay"
+		position="right"
+		view="treePickerOverlay.view">
+	</umb-overlay>
 
 </div>

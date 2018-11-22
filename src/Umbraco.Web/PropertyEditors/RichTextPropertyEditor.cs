@@ -1,59 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    /// <summary>
-    /// Represents a rich text property editor.
-    /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
-    public class RichTextPropertyEditor : DataEditor
+    [PropertyEditor(Constants.PropertyEditors.TinyMCEAlias, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    public class RichTextPropertyEditor : PropertyEditor
     {
-        /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
-        /// </summary>
-        public RichTextPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
-
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
+        protected override PropertyValueEditor CreateValueEditor()
+        {
+            return new RichTextPropertyValueEditor(base.CreateValueEditor());
+        }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new RichTextPreValueEditor();
+        }
 
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : DataValueEditor
+        internal class RichTextPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute)
-                : base(attribute)
-            { }
-
-            /// <inheritdoc />
-            public override object Configuration
+            public RichTextPropertyValueEditor(PropertyValueEditor wrapped)
+                : base(wrapped)
             {
-                get => base.Configuration;
-                set
-                {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
-                    if (!(value is RichTextConfiguration configuration))
-                        throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
-                    base.Configuration = value;
+            }
 
-                    HideLabel = configuration.HideLabel;
+            /// <summary>
+            /// override so that we can hide the label based on the pre-value
+            /// </summary>
+            /// <param name="preValues"></param>
+            public override void ConfigureForDisplay(Core.Models.PreValueCollection preValues)
+            {
+                base.ConfigureForDisplay(preValues);
+                var asDictionary = preValues.FormatAsDictionary();
+                if (asDictionary.ContainsKey("hideLabel"))
+                {
+                    var boolAttempt = asDictionary["hideLabel"].Value.TryConvertTo<bool>();
+                    if (boolAttempt.Success)
+                    {
+                        HideLabel = boolAttempt.Result;
+                    }
                 }
             }
 
@@ -61,17 +57,15 @@ namespace Umbraco.Web.PropertyEditors
             /// Format the data for the editor
             /// </summary>
             /// <param name="property"></param>
+            /// <param name="propertyType"></param>
             /// <param name="dataTypeService"></param>
-            /// <param name="culture"></param>
-            /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                var val = property.GetValue(culture, segment);
-                if (val == null)
+                if (property.Value == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(val.ToString(), new Dictionary<string, string>());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(property.Value.ToString(), new Dictionary<string, string>());
                 return parsed;
             }
 
@@ -81,7 +75,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+            public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null)
                     return null;
@@ -92,5 +86,5 @@ namespace Umbraco.Web.PropertyEditors
         }
     }
 
-
+    
 }

@@ -8,25 +8,48 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Configuration")]
     public class NotificationEmailCheck : AbstractConfigCheck
     {
+        private readonly ILocalizedTextService _textService;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService)
-            : base(textService)
-        { }
-
-        public override string FilePath => "~/Config/umbracoSettings.config";
-
-        public override string XPath => "/settings/content/notifications/email";
-
-        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
-
-        public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
+        public NotificationEmailCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
-            new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
-        };
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+        }
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new [] { CurrentValue } );
+        public override string FilePath
+        {
+            get { return "~/Config/umbracoSettings.config"; }
+        }
 
-        public override string CheckErrorMessage => TextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+        public override string XPath
+        {
+            get { return "/settings/content/notifications/email"; }
+        }
+
+        public override ValueComparisonType ValueComparisonType
+        {
+            get { return ValueComparisonType.ShouldNotEqual; }
+        }
+
+        public override IEnumerable<AcceptableConfiguration> Values
+        {
+            get
+            {
+                return new List<AcceptableConfiguration>
+                {
+                    new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
+                };
+            }
+        }
+
+        public override string CheckSuccessMessage
+        {
+            get { return _textService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new [] { CurrentValue } ); }
+        }
+
+        public override string CheckErrorMessage
+        {
+            get { return _textService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail }); }
+        }
     }
 }

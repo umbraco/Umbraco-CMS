@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -8,10 +8,10 @@ namespace Umbraco.Tests.Models.Collections
 {
     public class SimpleOrder : KeyedCollection<int, OrderItem>, INotifyCollectionChanged
     {
-        // The parameterless constructor of the base class creates a
-        // KeyedCollection with an internal dictionary. For this code
-        // example, no other constructors are exposed.
-        //
+        // The parameterless constructor of the base class creates a  
+        // KeyedCollection with an internal dictionary. For this code  
+        // example, no other constructors are exposed. 
+        // 
         public SimpleOrder() : base() { }
 
         public SimpleOrder(IEnumerable<OrderItem> properties)
@@ -19,23 +19,23 @@ namespace Umbraco.Tests.Models.Collections
             Reset(properties);
         }
 
-        // This is the only method that absolutely must be overridden,
-        // because without it the KeyedCollection cannot extract the
-        // keys from the items. The input parameter type is the
-        // second generic type argument, in this case OrderItem, and
-        // the return value type is the first generic type argument,
-        // in this case int.
-        //
+        // This is the only method that absolutely must be overridden, 
+        // because without it the KeyedCollection cannot extract the 
+        // keys from the items. The input parameter type is the  
+        // second generic type argument, in this case OrderItem, and  
+        // the return value type is the first generic type argument, 
+        // in this case int. 
+        // 
         protected override int GetKeyForItem(OrderItem item)
         {
-            // In this example, the key is the part number.
+            // In this example, the key is the part number. 
             return item.PartNumber;
         }
 
         internal void Reset(IEnumerable<OrderItem> properties)
         {
             Clear();
-            foreach (var property in properties) Add(property);
+            properties.ForEach(Add);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 

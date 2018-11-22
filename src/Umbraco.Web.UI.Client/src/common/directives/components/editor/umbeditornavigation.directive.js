@@ -1,141 +1,64 @@
-(function () {
-    'use strict';
+(function() {
+   'use strict';
 
-    function EditorNavigationDirective($window, $timeout, eventsService, windowResizeListener) {
+   function EditorNavigationDirective() {
 
-        function link(scope) {
+      function link(scope, el, attr, ctrl) {
 
-            scope.showNavigation = true;
-            scope.showMoreButton = false;
-            scope.showDropdown = false;
-            scope.overflowingItems = 0;
-            scope.itemsLimit = 6;
+         scope.showNavigation = true;
 
-            scope.moreButton = {
-                alias: "more",
-                active: false,
-                name: "More"
-            };
+         scope.clickNavigationItem = function(selectedItem) {
+            setItemToActive(selectedItem);
+            runItemAction(selectedItem);
+         };
 
-            scope.clickNavigationItem = function (selectedItem) {
-                scope.showDropdown = false;
-                runItemAction(selectedItem);
-                setItemToActive(selectedItem);
-                if(scope.onSelect) {
-                    scope.onSelect({"item": selectedItem});
-                }
-                eventsService.emit("app.tabChange", selectedItem);
-            };
+         function runItemAction(selectedItem) {
+            if (selectedItem.action) {
+               selectedItem.action(selectedItem);
+            }
+         }
 
-            scope.toggleDropdown = function () {
-                scope.showDropdown = !scope.showDropdown;
-            };
+         function setItemToActive(selectedItem) {
+            // set all other views to inactive
+            if (selectedItem.view) {
 
-            scope.hideDropdown = function() {
-                scope.showDropdown = false;
-            };
+               for (var index = 0; index < scope.navigation.length; index++) {
+                  var item = scope.navigation[index];
+                  item.active = false;
+               }
 
-            function onInit() {
-
-                // hide navigation if there is only 1 item
-                if (scope.navigation.length <= 1) {
-                    scope.showNavigation = false;
-                }
-                
-                $timeout(function(){
-                    if($window && $window.innerWidth) {
-                        calculateVisibleItems($window.innerWidth);
-                    }
-                });
+               // set view to active
+               selectedItem.active = true;
 
             }
+         }
 
-            function calculateVisibleItems(windowWidth) {
+         function activate() {
 
-                // if we don't get a windowWidth stick with the default item limit
-                if(!windowWidth) {
-                    return;
-                }
-
-                scope.itemsLimit = 0;
-
-                // set visible items based on browser width
-                if (windowWidth > 1500) {
-                    scope.itemsLimit = 6;
-                } 
-                else if (windowWidth > 700) {
-                    scope.itemsLimit = 4;
-                }
-
-                // toggle more button
-                if(scope.navigation.length > scope.itemsLimit) {
-                    scope.showMoreButton = true;
-                    scope.overflowingItems = scope.itemsLimit - scope.navigation.length;
-                } else {
-                    scope.showMoreButton = false;
-                    scope.overflowingItems = 0;
-                }
+            // hide navigation if there is only 1 item
+            if (scope.navigation.length <= 1) {
+               scope.showNavigation = false;
             }
 
-            function runItemAction(selectedItem) {
-                if (selectedItem.action) {
-                    selectedItem.action(selectedItem);
-                }
-            }
+         }
 
-            function setItemToActive(selectedItem) {
-                if (selectedItem.view) {
-                    
-                    // deselect all items
-                    angular.forEach(scope.navigation, function(item, index){
-                        item.active = false;
-                    });
-                    
-                    // set clicked item to active
-                    selectedItem.active = true;
+         activate();
 
-                    // set more button to active if item in dropdown is clicked
-                    var selectedItemIndex = scope.navigation.indexOf(selectedItem);
-                    if (selectedItemIndex + 1 > scope.itemsLimit) {
-                        scope.moreButton.active = true;
-                    } else {
-                        scope.moreButton.active = false;
-                    }
+      }
 
-                }
-            }
+      var directive = {
+         restrict: 'E',
+         replace: true,
+         templateUrl: 'views/components/editor/umb-editor-navigation.html',
+         scope: {
+            navigation: "="
+         },
+         link: link
+      };
 
-            var resizeCallback = function(size) {
-                if(size && size.width) {
-                    calculateVisibleItems(size.width);
-                }
-            };
+      return directive;
+   }
 
-            windowResizeListener.register(resizeCallback);
-
-            //ensure to unregister from all events and kill jquery plugins
-            scope.$on('$destroy', function () {
-                windowResizeListener.unregister(resizeCallback);
-            });
-
-            onInit();
-
-        }
-
-        var directive = {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/editor/umb-editor-navigation.html',
-            scope: {
-                navigation: "=",
-                onSelect: "&"
-            },
-            link: link
-        };
-
-        return directive;
-    }
-
-    angular.module('umbraco.directives.html').directive('umbEditorNavigation', EditorNavigationDirective);
+   angular.module('umbraco.directives.html').directive('umbEditorNavigation', EditorNavigationDirective);
 
 })();

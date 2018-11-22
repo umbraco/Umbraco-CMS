@@ -1,30 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using System.Web.Http;
+using System.Net;
+using System;
+using System.Net.Http;
 
 namespace Umbraco.Web.Editors
 {
-
+    
     /// <summary>
-    /// An API controller used for dealing with member types
+    /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]    
-    public class MemberTypeController : ContentTypeControllerBase<IMemberType>
+    public class MemberTypeController : ContentTypeControllerBase
     {
-        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public MemberTypeController()
+            : this(UmbracoContext.Current)
+        {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public MemberTypeController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+        }
+
+        private readonly MembershipProvider _provider;
 
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
@@ -98,7 +117,7 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
-
+       
         /// <summary>
         /// Returns all member types
         /// </summary>
@@ -107,7 +126,7 @@ namespace Umbraco.Web.Editors
             if (_provider.IsUmbracoMembershipProvider())
             {
                 return Services.MemberTypeService.GetAll()
-                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
+                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);    
             }
             return Enumerable.Empty<ContentTypeBasic>();
         }
@@ -153,7 +172,7 @@ namespace Umbraco.Web.Editors
             }
            
 
-            var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => ct,
                 saveContentType:            type => Services.MemberTypeService.Save(type));

@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
                 switch (sqlException.Number)
                 {
                     // SQL Error Code: 11001
-                    // A network-related or instance-specific error occurred while establishing a connection to SQL Server.
-                    // The server was not found or was not accessible. Verify that the instance name is correct and that SQL
+                    // A network-related or instance-specific error occurred while establishing a connection to SQL Server. 
+                    // The server was not found or was not accessible. Verify that the instance name is correct and that SQL 
                     // Server is configured to allow remote connections. (provider: TCP Provider, error: 0 - No such host is known.)
                     case 11001:
                         return true;

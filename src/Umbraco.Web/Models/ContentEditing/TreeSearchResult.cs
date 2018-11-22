@@ -17,8 +17,8 @@ namespace Umbraco.Web.Models.ContentEditing
         public string TreeAlias { get; set; }
 
         /// <summary>
-        /// This is optional but if specified should be the name of an angular service to format the search result.
-        /// </summary>
+        /// This is optional but if specified should be the name of an angular service to format the search result. 
+        /// </summary>        
         [DataMember(Name = "jsSvc")]
         public string JsFormatterService { get; set; }
 

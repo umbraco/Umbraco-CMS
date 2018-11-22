@@ -4,18 +4,16 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
+    [PropertyValueType(typeof(int))]
+    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class IntegerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => Constants.PropertyEditors.Aliases.Integer.Equals(propertyType.EditorAlias);
+        {
+            return Constants.PropertyEditors.IntegerAlias.Equals(propertyType.PropertyEditorAlias);
+        }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (int);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             return source.TryConvertTo<int>().Result;
         }

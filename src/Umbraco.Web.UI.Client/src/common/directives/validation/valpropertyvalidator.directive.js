@@ -33,9 +33,11 @@ function valPropertyValidator(serverValidationManager) {
             if (!scope.valPropertyValidator || !angular.isFunction(scope.valPropertyValidator)) {
                 throw new Error('val-property-validator directive must specify a function to call');
             }
-            
+
+            var initResult = scope.valPropertyValidator();
+
             // Validation method
-            function validate (viewValue) {
+            var validate = function (viewValue) {
                 // Calls the validition method
                 var result = scope.valPropertyValidator();
                 if (!result.errorKey || result.isValid === undefined || !result.errorMsg) {
@@ -59,9 +61,6 @@ function valPropertyValidator(serverValidationManager) {
 
             // Parsers are called as soon as the value in the form input is modified
             modelCtrl.$parsers.push(validate);
-
-            //call on init
-            validate();
 
         }
     };

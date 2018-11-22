@@ -10,8 +10,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
-
-        protected ILocalizedTextService TextService { get; }
+        private readonly ILocalizedTextService _textService;
 
         /// <summary>
         /// Gets the config file path.
@@ -51,21 +50,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return false; }
         }
 
-        protected AbstractConfigCheck(ILocalizedTextService textService)
+        protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
-            TextService = textService;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService);
+            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, _textService);
         }
 
         /// <summary>
         /// Gets the name of the file.
         /// </summary>
-        private string FileName => Path.GetFileName(FilePath);
+        private string FileName
+        {
+            get { return Path.GetFileName(FilePath); }
+        }
 
         /// <summary>
         /// Gets the absolute file path.
         /// </summary>
-        private string AbsoluteFilePath => IOHelper.MapPath(FilePath);
+        private string AbsoluteFilePath
+        {
+            get { return IOHelper.MapPath(FilePath); }
+        }
 
         /// <summary>
         /// Gets the message for when the check has succeeded.
@@ -74,7 +79,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/checkSuccessMessage",
+                return _textService.Localize("healthcheck/checkSuccessMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath  });
             }
         }
@@ -87,9 +92,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return ValueComparisonType == ValueComparisonType.ShouldEqual
-                    ? TextService.Localize("healthcheck/checkErrorMessageDifferentExpectedValue",
+                    ? _textService.Localize("healthcheck/checkErrorMessageDifferentExpectedValue",
                         new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath })
-                    : TextService.Localize("healthcheck/checkErrorMessageUnexpectedValue",
+                    : _textService.Localize("healthcheck/checkErrorMessageUnexpectedValue",
                         new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
             }
         }
@@ -105,7 +110,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 var rectifiedValue = recommendedValue != null
                     ? recommendedValue.Value
                     : ProvidedValue;
-                return TextService.Localize("healthcheck/rectifySuccessMessage",
+                return _textService.Localize("healthcheck/rectifySuccessMessage",
                     new[]
                     {
                         CurrentValue,
@@ -119,12 +124,18 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// <summary>
         /// Gets a value indicating whether this check can be rectified automatically.
         /// </summary>
-        public virtual bool CanRectify => ValueComparisonType == ValueComparisonType.ShouldEqual;
+        public virtual bool CanRectify
+        {
+            get { return ValueComparisonType == ValueComparisonType.ShouldEqual; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this check can be rectified automatically if a value is provided.
         /// </summary>
-        public virtual bool CanRectifyWithValue => ValueComparisonType == ValueComparisonType.ShouldNotEqual;
+        public virtual bool CanRectifyWithValue
+        {
+            get { return ValueComparisonType == ValueComparisonType.ShouldNotEqual; }
+        }
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
@@ -156,7 +167,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             // Declare the action for rectifying the config value
             var rectifyAction = new HealthCheckAction("rectify", Id)
             {
-                Name = TextService.Localize("healthcheck/rectifyButton"),
+                Name = _textService.Localize("healthcheck/rectifyButton"),
                 ValueRequired = CanRectifyWithValue,
             };
 
@@ -178,7 +189,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         public virtual HealthCheckStatus Rectify()
         {
             if (ValueComparisonType == ValueComparisonType.ShouldNotEqual)
-                throw new InvalidOperationException(TextService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
+                throw new InvalidOperationException(_textService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
 
             var recommendedValue = Values.First(v => v.IsRecommended).Value;
             return UpdateConfigurationValue(recommendedValue);
@@ -192,10 +203,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         public virtual HealthCheckStatus Rectify(string value)
         {
             if (ValueComparisonType == ValueComparisonType.ShouldEqual)
-                throw new InvalidOperationException(TextService.Localize("healthcheck/cannotRectifyShouldEqualWithValue"));
+                throw new InvalidOperationException(_textService.Localize("healthcheck/cannotRectifyShouldEqualWithValue"));
 
             if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidOperationException(TextService.Localize("healthcheck/valueToRectifyNotProvided"));
+                throw new InvalidOperationException(_textService.Localize("healthcheck/valueToRectifyNotProvided"));
 
             // Need to track provided value in order to correctly put together the rectify message
             ProvidedValue = value;

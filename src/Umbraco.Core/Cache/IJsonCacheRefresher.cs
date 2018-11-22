@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Cache
+﻿using umbraco.interfaces;
+
+namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// A cache refresher that supports refreshing or removing cache based on a custom Json payload
@@ -8,7 +10,7 @@
         /// <summary>
         /// Refreshes, clears, etc... any cache based on the information provided in the json
         /// </summary>
-        /// <param name="json"></param>
-        void Refresh(string json);
+        /// <param name="jsonPayload"></param>
+        void Refresh(string jsonPayload);
     }
 }

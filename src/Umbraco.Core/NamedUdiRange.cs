@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+namespace Umbraco.Core
 {
     /// <summary>
     /// Represents a <see cref="UdiRange"/> complemented with a name.

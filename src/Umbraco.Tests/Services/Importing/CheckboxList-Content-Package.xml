@@ -65,13 +65,12 @@
   <DictionaryItems />
   <Languages />
   <DataTypes>
-    <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar"
-              Configuration="{&quot;items&quot;:[{&quot;id&quot;:59,&quot;value&quot;:&quot;test&quot;},{&quot;id&quot;:60,&quot;value&quot;:&quot;test3&quot;},{&quot;id&quot;:61,&quot;value&quot;:&quot;test2&quot;}]}">
-      <!-- <PreValues>
+    <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar">
+      <PreValues>
         <PreValue Id="59" Value="test" />
         <PreValue Id="60" Value="test3" />
         <PreValue Id="61" Value="test2" />
-      </PreValues> -->
+      </PreValues>
     </DataType>
   </DataTypes>
 </umbPackage>

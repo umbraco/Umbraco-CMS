@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         public ContentErrorPageElement()
         {
-
+            
         }
 
         public bool HasContentId

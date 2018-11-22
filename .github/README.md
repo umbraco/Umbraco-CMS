@@ -1,17 +1,6 @@
-_You are browsing the Umbraco v8 branch. Umbraco 8 is currently under development._
+[![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7)
 
-_Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch._
-
-_Ready to try out Version 8? [See the quick start guide](V8_GETTING_STARTED.md)._
-
-When is Umbraco 8 coming?
-=========================
-When it's ready. We're done with the major parts of the architecture work and are focusing on three seperate tracks to prepare Umbraco 8 for release:
-1) Editor Track (_currently in progress_). Without editors, there's no market for Umbraco. So we want to make sure that Umbraco 8 is full of love for editors.
-2) Partner Track. Without anyone implementing Umbraco, there's nothing for editors to update. So we want to make sure that Umbraco 8 is a joy to implement
-3) Contributor Track. Without our fabulous ecosystem of both individual Umbracians and 3rd party ISVs, Umbraco wouldn't be as rich a platform as it is today. We want to make sure that it's easy, straight forward and as backwards-compatible as possible to create packages for Umbraco
-
-Once a track is done, we start releasing previews where we ask people to test the features we believe are ready. While the testing is going on and we gather feedback, we move on to the next track. This doesn't mean that there hasn't already been work done in the area, but that a track focuses on finalizing, polishing and preparing the features for release.
+_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 branch_
 
 Umbraco CMS
 ===========
@@ -55,7 +44,7 @@ Umbraco is contribution-focused and community-driven. If you want to contribute 
 
 ## Found a bug?
 
-Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](CONTRIBUTING_DETAILED.md#reporting-bugs).
+Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report, refer to our [online guide for reporting issues](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md).
 
 You can comment and report issues on the [github issue tracker](https://github.com/umbraco/Umbraco-CMS/issues).
 Since [September 2018](https://umbraco.com/blog/a-second-take-on-umbraco-issue-tracker-hello-github-issues/), the old issue tracker is in read-only mode, but can still be found at [http://issues.umbraco.org](http://issues.umbraco.org).

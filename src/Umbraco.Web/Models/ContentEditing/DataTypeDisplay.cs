@@ -27,13 +27,13 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<PropertyEditorBasic> AvailableEditors { get; set; }
 
         [DataMember(Name = "preValues")]
-        public IEnumerable<DataTypeConfigurationFieldDisplay> PreValues { get; set; }
+        public IEnumerable<PreValueFieldDisplay> PreValues { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
-
+       
     }
 }

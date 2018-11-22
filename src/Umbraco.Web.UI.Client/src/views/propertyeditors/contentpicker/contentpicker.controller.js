@@ -1,18 +1,7 @@
+//this controller simply tells the dialogs service to open a mediaPicker window
+//with a specified callback, this callback will receive an object with a selection on it
 
-/**
- * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
- * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
- * @param {any} $scope
- * @param {any} entityResource
- * @param {any} editorState
- * @param {any} iconHelper
- * @param {any} $routeParams
- * @param {any} angularHelper
- * @param {any} navigationService
- * @param {any} $location
- * @param {any} localizationService
- */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
 
     var unsubscribe;
 
@@ -30,10 +19,24 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         return str.replace(rgxtrim, '');
     }
 
-    /** Performs validation based on the renderModel data */
-    function validate() {
-        if ($scope.contentPickerForm) {
+    function startWatch() {
+        //We need to watch our renderModel so that we can update the underlying $scope.model.value properly, this is required
+        // because the ui-sortable doesn't dispatch an event after the digest of the sort operation. Any of the events for UI sortable
+        // occur after the DOM has updated but BEFORE the digest has occured so the model has NOT changed yet - it even states so in the docs.
+        // In their source code there is no event so we need to just subscribe to our model changes here.
+        //This also makes it easier to manage models, we update one and the rest will just work.
+        $scope.$watch(function () {
+            //return the joined Ids as a string to watch
+            return _.map($scope.renderModel, function (i) {
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;                 
+            }).join();
+        }, function (newVal) {
+            var currIds = _.map($scope.renderModel, function (i) {
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;                
+            });
+            $scope.model.value = trim(currIds.join(), ",");
             angularHelper.getCurrentForm($scope).$setDirty();
+
             //Validate!
             if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
@@ -48,32 +51,15 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             else {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", true);
             }
-        }
-    }
 
-    function startWatch() {
-       
-        //due to the way angular-sortable works, it needs to update a model, we don't want it to update renderModel since renderModel
-        //is updated based on changes to model.value so if we bound angular-sortable to that and put a watch on it we'd end up in a
-        //infinite loop. Instead we have a custom array model for angular-sortable and we'll watch that which we'll use to sync the model.value
-        //which in turn will sync the renderModel.
-        $scope.$watchCollection("sortableModel", function(newVal, oldVal) {
-            $scope.model.value = newVal.join();
-        });
+            setSortingState($scope.renderModel);
 
-        //if the underlying model changes, update the view model, this ensures that the view is always consistent with the underlying
-        //model if it changes (i.e. based on server updates, or if used in split view, etc...)
-        $scope.$watch("model.value", function(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                syncRenderModel();
-            }
         });
     }
 
     $scope.renderModel = [];
-    $scope.sortableModel = [];
-
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
+	    
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
 
     //the default pre-values
     var defaultConfig = {
@@ -82,11 +68,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showEditButton: false,
         showPathOnHover: false,
         maxNumber: 1,
-        minNumber: 0,
+        minNumber : 0,
         startNode: {
             query: "",
             type: "content",
-            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
+	        id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
     };
 
@@ -107,16 +93,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
-    $scope.model.config.multiPicker = Object.toBoolean($scope.model.config.multiPicker);
-    $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
-    $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
-    $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
-
+    $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
+    $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
+    $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
+    $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
-            ? "Media"
-            : "Document";
+        ? "Media"
+        : "Document";
     $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
@@ -141,9 +127,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
-        idType: "int",
-        //only show the lang selector for content
-        showLanguageSelector: $scope.model.config.startNode.type === "content"
+        idType: "int"
     };
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
@@ -157,7 +141,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dialogOptions.filterCssClass = "not-allowed";
         var currFilter = dialogOptions.filter;
         //now change the filter to be a method
-        dialogOptions.filter = function (i) {
+        dialogOptions.filter = function(i) {
             //filter out the list view nodes
             if (i.metaData.isContainer) {
                 return true;
@@ -176,11 +160,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             return false;
         }
     }
+
     if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
         //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
         dialogOptions.startNodeId = -1;
-    }
-    else if ($scope.model.config.startNode.query) {
+    } else if ($scope.model.config.startNode.query) {
         //if we have a query for the startnode, we will use that.
         var rootId = $routeParams.id;
         entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
@@ -192,35 +176,34 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function () {
-        $scope.contentPicker = dialogOptions;
+    $scope.openContentPicker = function() {
+      $scope.contentPickerOverlay = dialogOptions;
+      $scope.contentPickerOverlay.view = "treepicker";
+      $scope.contentPickerOverlay.show = true;
 
-        $scope.contentPicker.submit = function (model) {
-            if (angular.isArray(model.selection)) {
-                _.each(model.selection, function (item, i) {
-                    $scope.add(item);
-                });
+      $scope.contentPickerOverlay.submit = function(model) {
+
+          if (angular.isArray(model.selection)) {
+             _.each(model.selection, function (item, i) {
+                  $scope.add(item);
+              });
               angularHelper.getCurrentForm($scope).$setDirty();
-            }
-            angularHelper.getCurrentForm($scope).$setDirty();
-            editorService.close();
-        }
+          }
 
-        $scope.contentPicker.close = function () {
-            editorService.close();
-        }
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
 
-        editorService.contentPicker($scope.contentPicker);
+      $scope.contentPickerOverlay.close = function(oldModel) {
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
 
     };
 
     $scope.remove = function (index) {
-        var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
-        if (currIds.length > 0) {
-            currIds.splice(index, 1);
-            angularHelper.getCurrentForm($scope).$setDirty();
-            $scope.model.value = currIds.join();
-        }
+        $scope.renderModel.splice(index, 1);
+        angularHelper.getCurrentForm($scope).$setDirty();
     };
 
     $scope.showNode = function (index) {
@@ -239,140 +222,78 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     $scope.add = function (item) {
-        var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
+        var currIds = _.map($scope.renderModel, function (i) {
+            return $scope.model.config.idType === "udi" ? i.udi : i.id;
+        });
 
         var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
 
         if (currIds.indexOf(itemId) < 0) {
-            currIds.push(itemId);
-            $scope.model.value = currIds.join();
+            setEntityUrl(item);
         }
     };
 
     $scope.clear = function () {
-        $scope.model.value = null;
+        $scope.renderModel = [];
     };
 
-    $scope.openContentEditor = function (node)  {
-        var contentEditor = {
-            id: node.id,
-            submit: function (model) {
-                // update the node
-                node.name = model.contentNode.name;
-                node.published = model.contentNode.hasPublishedVersion;
-                if (entityType !== "Member") {
-                    entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
-                        node.url = data;
-                    });
-                }
-                editorService.close();
-            },
-            close: function () {
-                editorService.close();
+    $scope.openMiniEditor = function(node) {
+        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
+            // update the node
+            node.name = updatedNode.name;
+            node.published = updatedNode.hasPublishedVersion;
+            if(entityType !== "Member") {
+                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
+                    node.url = data;
+                });
             }
-        };
-        editorService.contentEditor(contentEditor);
+        });
     };
 
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
-        if (unsubscribe) {
+        if(unsubscribe) {
             unsubscribe();
         }
     });
+    
+    var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
-    /** Syncs the renderModel based on the actual model.value and returns a promise */
-    function syncRenderModel(doValidation) {
+    //load current data if anything selected
+    if (modelIds.length > 0) {
+        entityResource.getByIds(modelIds, entityType).then(function(data) {
 
-        var valueIds = $scope.model.value ? $scope.model.value.split(',') : [];
-
-        //sync the sortable model
-        $scope.sortableModel = valueIds;
-
-        //load current data if anything selected
-        if (valueIds.length > 0) {
-
-            //need to determine which items we already have loaded
-            var renderModelIds = _.map($scope.renderModel, function(d) {
-                return $scope.model.config.idType === "udi" ? d.udi : d.id;
-            });
-
-            //get the ids that no longer exist
-            var toRemove = _.difference(renderModelIds, valueIds);
-
-            //remove the ones that no longer exist
-            for (var j = 0; j < toRemove.length; j++) {
-                var index = renderModelIds.indexOf(toRemove[j]);
-                $scope.renderModel.splice(index, 1);
-            }
-
-            //get the ids that we need to lookup entities for
-            var missingIds = _.difference(valueIds, renderModelIds);
-
-            if (missingIds.length > 0) {
-                return entityResource.getByIds(missingIds, entityType).then(function(data) {
-
-                    _.each(valueIds,
-                        function(id, i) {
-                            var entity = _.find(data, function(d) {
-                                return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
-                            });
-
-                            if (entity) {
-                                addSelectedItem(entity);
-                            }
-
+            _.each(modelIds,
+                function(id, i) {
+                    var entity = _.find(data,
+                        function(d) {
+                            return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
                         });
 
-                    if (doValidation) {
-                        validate();
+                    if (entity) {
+                        setEntityUrl(entity);
                     }
-                    
-                    setSortingState($scope.renderModel);
-                    return $q.when(true);
+
                 });
-            }
-            else {
-                //if there's nothing missing, make sure it's sorted correctly
 
-                var current = $scope.renderModel;
-                $scope.renderModel = [];
-                for (var k = 0; k < valueIds.length; k++) {
-                    var id = valueIds[k];
-                    var found = _.find(current, function(d) {
-                        return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
-                    });
-                    if (found) {
-                        $scope.renderModel.push(found);
-                    }
-                }
-
-                if (doValidation) {
-                    validate();
-                }
-
-                setSortingState($scope.renderModel);
-                return $q.when(true);
-            }
-        }
-        else {
-            $scope.renderModel = [];
-            if (validate) {
-                validate();
-            }
-            setSortingState($scope.renderModel);
-            return $q.when(true);
-        }
-
+            //everything is loaded, start the watch on the model
+            startWatch();
+            subscribe();
+        });
+    }
+    else {
+        //everything is loaded, start the watch on the model
+        startWatch();
+        subscribe();
     }
 
     function setEntityUrl(entity) {
 
         // get url for content and media items
-        if (entityType !== "Member") {
-            entityResource.getUrl(entity.id, entityType).then(function (data) {
+        if(entityType !== "Member") {
+            entityResource.getUrl(entity.id, entityType).then(function(data){
                 // update url                
-                angular.forEach($scope.renderModel, function (item) {
+                angular.forEach($scope.renderModel, function(item){
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = localizationService.dictionary.general_recycleBin;
@@ -384,12 +305,17 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             });
         }
 
+        // add the selected item to the renderModel
+        // if it needs to show a url the item will get 
+        // updated when the url comes back from server
+        addSelectedItem(entity);
+
     }
 
     function addSelectedItem(item) {
 
         // set icon
-        if (item.icon) {
+        if(item.icon) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
         }
 
@@ -408,7 +334,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         }
 
-        $scope.renderModel.push({
+        $scope.renderModel.push({ 
             "name": item.name,
             "id": item.id,
             "udi": item.udi,
@@ -420,27 +346,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });
 
-        setEntityUrl(item);
     }
 
     function setSortingState(items) {
         // disable sorting if the list only consist of one item
-        if (items.length > 1) {
+        if(items.length > 1) {
             $scope.sortableOptions.disabled = false;
         } else {
             $scope.sortableOptions.disabled = true;
         }
     }
-
-    function init() {
-        syncRenderModel(false).then(function () {
-            //everything is loaded, start the watch on the model
-            startWatch();
-            subscribe();
-        });
-    }
-
-    init();
 
 }
 

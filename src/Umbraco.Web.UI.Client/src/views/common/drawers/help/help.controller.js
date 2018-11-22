@@ -6,7 +6,7 @@
         var vm = this;
         var evts = [];
 
-        vm.title = "";
+        vm.title = localizationService.localize("general_help");
         vm.subtitle = "Umbraco version" + " " + Umbraco.Sys.ServerVariables.application.version;
         vm.section = $routeParams.section;
         vm.tree = $routeParams.tree;
@@ -25,11 +25,6 @@
         }
 
         function oninit() {
-
-            // set title
-            localizationService.localize("general_help").then(function(data){
-                vm.title = data;
-            });
 
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;

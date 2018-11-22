@@ -1,0 +1,763 @@
+﻿body {
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	  font-size: 12px;
+	  font-weight: normal;
+    background-color: #fff}
+  
+body *{outline: none;}
+
+
+/* STYLES FOR Legacy iframe content */
+
+html > body > form > div.panel{
+    width:100%;
+    height:100%;
+}
+
+
+/*CREATE DIALOG */				
+.createDescription 
+{
+	padding: 25px 0 0 0;
+	height: 170px;
+}
+
+.createDescription img 
+{
+	height: 128px;
+	float: left;
+	margin: 0 10px 10px 0;
+}
+
+.bigInput 
+{
+	font-size: 1.8em;
+	width: 560px;
+}
+
+
+a 
+{
+	color: #1541a9;
+}
+
+a:hover 
+{
+	text-decoration: underline;
+}
+
+img 
+{
+	border: none;
+}
+
+
+.feedbackCreate 
+{
+	margin: 5px;
+	padding: 5px 5px 3px 36px;
+	background: url(../images/okLayerBackground.gif);
+	display: block;
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: bold;
+	color: White;
+}
+
+.feedbackDelete
+{
+	margin: 5px;
+	padding: 5px 5px 3px 36px;
+	background: url(../images/errorLayerBackground.gif);
+	display: block;
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: bold;
+	color: White;
+}
+
+.loginHeader 
+{
+	width: 242px; 
+	height: 24px; 
+	background-image: url(../images/loginHeader.gif);
+	font-family: Trebuchet MS, Arial, Helvetica,Lucida Grande;
+	font-size: medium;
+	font-weight: bold;
+	color: #666;
+}
+
+.nolink 
+{
+	text-decoration: none;
+	color: Black;
+}
+
+.clickImg 
+{
+	border: none;
+}
+
+h3 
+{
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	padding: 0px;
+	margin-left: 0px;
+	margin-bottom: -5px;
+	margin-top: 10px;
+}
+
+/* deprecated down */
+.propertyuicontrols .Pane, .propertyPane 
+{
+	border: 1px solid #BABABA;
+	background-image: url(../propertyPane/images/propertyBackground.gif);
+	margin: 10px;
+	display: block;
+}
+
+tr.propertyHeader td, td.propertyHeader 
+{
+	font-weight: bold;
+	vertical-align: top;
+	padding: 7px;
+	/* border-bottom: 1px solid #DBDBDF; */
+}
+
+tr.propertyContent td, td.propertyContent
+{
+	vertical-align: top;
+	padding: 7px;
+ /*	border-bottom: 1px solid #DBDBDF; */
+}
+/* deprecated up */
+
+div.propertyDiv 
+{
+	border: 1px solid #BABABA;
+	background-image: url(../propertyPane/images/propertyBackground.gif);
+	display: block;
+	padding: 7px;
+	margin-bottom: 10px;
+}
+
+
+.guiDialogHeader {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.guiDialogMedium {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 10px;
+}
+
+td, .guiDialogNormal {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: none;
+}
+
+th 
+{
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: left;
+	vertical-align: top;
+}
+
+.guiDialogDisabled {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: none;
+	color: #CCCCCC;
+}
+
+.guiDialogForm {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.guiDialogTiny {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 10px !Important;
+	color: #A8A8A3;
+}
+
+.guiDialogTinyMark {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 10px !Important;
+	color: #606057;
+}
+
+.guiDialogTinyTop {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 10px;
+	font-weight: bold;
+	color: #378080;
+}
+
+.guiInputCode, .codepress {
+	font-family: Consolas, courier;
+	line-height:1.6em; font-size: 1em; background:#F6F6F9; border:1px solid #CCCCCC;
+	margin: 0px !Important;
+}
+
+.umbEditorTextField {
+	width: 400px;
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+}
+
+.umbEditorTextFieldMultiple {
+	width: 400px;
+	height: 150px;
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+}
+
+.guiDialogBox {
+	background-color: #e0eced;
+	border: 1px dotted #3399CC;
+}
+
+.guiInputText {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	color: #333333;
+	padding: 2px 2px 2px 2px;
+}
+
+.guiInputTextStandard {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	width: 70%;
+	color: #333333;
+	padding: 2px 2px 2px 2px;
+}
+
+.guiInputMediumSize{
+  width: 70%;
+}
+
+.guiInputLargeSize{
+  width: 90%;
+}
+
+.guiInputStandardSize{
+  width: 250px;
+}
+
+
+.guiInputDisabled {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 12px;
+	color: #999999;
+	border: 0px solid;
+	padding: 4px 4px 4px 4px;
+}
+
+.guiInputTextTiny, input, select {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 11px;
+	color: #333333;
+}
+
+
+.guiInputButton {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	font-size: 10px;
+	color: #333333;
+	font-weight: bolder;
+}
+
+.umbracoEditorBagground {
+	background-color: white;
+}
+
+/*
+.editorIcon 
+{
+	width: 20px;
+	height: 20px;
+}
+*/
+
+.editorArrowOver {
+	cursor: hand;
+	background-color: #DEDFFD;
+}
+
+.editorIconOver {
+	cursor: hand;
+	background-image:	url("../menuicon/images/buttonbg.gif");
+}
+
+.editorIconDown {
+	cursor: hand;
+	background-image:	url("../menuicon/images/buttonbgdown.gif");
+}
+
+.editorIconOn {
+	cursor: hand;
+	background-image:	url("../menuicon/images/buttonbgdown.gif");
+}
+
+.editorIconDisabled {
+	Filter: Alpha(Opacity=30);
+}
+
+.editorDropDown {
+	font-family: verdana, arial;
+	font-size: 10px;
+	width: 80px;
+	color: #666699;
+}
+
+.tinymceMenuBar 
+{
+}
+
+.mceToolbarExternal 
+{
+	position: absolute;
+	z-index: 100;
+	top: -2px;
+	left: 90px;
+}
+
+.guiTab {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	padding: 3px 0px 0px 0px;
+	font-size: 10px;
+}
+
+.guiLine {
+	background-color: #A2A2A0;
+}
+
+.guiLineSelected {
+	background-color: #F5F5F5;
+}
+
+guiEditor {
+	background-color: #FFFFFF;
+	width: 100%;
+	height: 100%;
+}
+
+
+
+.datePicker {
+	border:		1px solid WindowText;
+	background:	Window;
+	width:		170px;
+	padding:	0px;
+	cursor:		default;
+	-moz-user-focus: normal;
+}
+
+
+.datePicker td {
+	font:			smallcaption;
+	font:			small-caption;
+	text-align:		center;
+	color:			WindowText;
+	cursor:			default;
+	font-weight:	normal !important;
+	-moz-user-select:	none;
+	padding:		0;
+}
+
+.datePicker td.red {
+	color:			red;
+}
+
+.datePicker .header {
+	background:		ActiveCaption;
+	padding:		3px;
+	border-bottom:	1px solid WindowText;
+}
+
+.datePicker .headerTable {
+	width:			100%;
+}
+
+.datePicker .footer {
+	padding: 3px;
+}
+
+.datePicker .footerTable {
+	width:		100%;
+}
+
+.datePicker .grid {
+	padding:	3px;
+}
+.datePicker .gridTable {
+	width:	100%;
+}
+
+.datePicker .gridTable td {
+	width:	14.3%;
+}
+
+.datePicker .gridTable .daysRow td {
+	font-weight:	bold !important;
+	border-bottom:	1px solid ThreeDDarkShadow;
+}
+
+.datePicker .grid .gridTable .upperLine {
+	width:		100%;
+	height:		2px;
+	overflow:	hidden;
+	background:	transparent;
+}
+
+.datePicker td.today {
+	font-weight:	bold !important;
+}
+
+.datePicker td.selected {
+	background:		Highlight;
+	color:			HighlightText !important;
+}
+
+.datePicker td.labelContainer {
+	width:	100%;
+}
+
+.datePicker td .topLabel {
+	color:			CaptionText;
+	display:		block;
+	font-weight:	bold !important;
+	width:			100%;
+	text-decoration:	none;
+
+}
+
+.datePicker td.filler {
+	width:			100%;
+}
+
+.datePicker button {
+	border-width:	1px;
+	font:			Caption;
+	font-weight:	normal !important;
+	display:		block;
+}
+
+.datePicker .previousButton {
+	background:	buttonface url("../images/arrow.left.png") no-repeat center center;
+}
+
+.datePicker .nextButton {
+	background:	buttonface url("../images/arrow.right.png") no-repeat center center;
+}
+.datePicker .previousButton,
+.datePicker .nextButton {
+	width:			14px;
+	height:			14px;
+}
+
+.datePicker .todayButton,
+.datePicker .noneButton {
+	width:	50px;
+}
+
+
+.datePicker .labelPopup {
+	position:	absolute;
+	min-width:	130px;
+	background:	Window;
+	border:		1px solid WindowText;
+	padding:	1px;
+}
+
+.datePicker .labelPopup a {
+	width:				100%;
+	display:			block;
+	color:				WindowText;
+	text-decoration:	none;
+	white-space:		nowrap;
+}
+
+.datePicker .labelPopup a:hover {
+	background:	Highlight;
+	color:		HighlightText;
+}
+
+.datePicker .labelPopup a.selected {
+	font-weight:	bold;
+}
+
+.treePickerTitle {
+	border-bottom: 1px dotted #333;
+}
+
+.umbMacroHolder 
+{
+	margin: 5px;
+	padding: 5px;
+	border: 2px dotted orange;
+	display: inline;
+}
+
+.umbTagElement 
+{
+	float: left;
+	margin-left: 10px;
+	padding: 0;
+}
+
+.umbTagDelete 
+{
+	color: Red;
+}
+
+.umbTagContainer 
+{
+	width: 300px;
+	margin: 5px 0;
+	display: block;
+}
+
+.umbIconDropdownList option.spriteBackground
+{
+	background-repeat:no-repeat;
+	padding: 1px;
+	padding-left:25px;
+	margin-left:2px;
+	display:block ! important;
+}
+.umbIconDropdownList option.deprecatedImage{
+  background-repeat:no-repeat;
+  background-position:4px 1px;
+  padding: 1px;
+  padding-left:25px;
+}
+
+.umbThumbnailDropdownList .ddChild img {
+    width: 90px;
+}
+
+#auditTrailList span 
+{
+    margin-left: 22px;
+}
+
+.umbNitroList{}
+.umbNitroList input{float: left; display: block;}
+.umbNitroList tr td{border-bottom: 1px solid #ccc; padding: 10px;}
+
+.umbNitroList div{float: left; padding-left: 15px; display: block; width: 550px;}
+.umbNitroList div h3{margin: 0px;}
+
+/* Generel error / success / notice classes, as seen in the umbraco installer. */
+.error, .notice, .success {padding:0 .6em;margin-bottom:.5em;border:2px solid #ddd;}
+.error {background:#FBE3E4;color:#8a1f11;border-color:#FBC2C4;}
+.notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
+.success {background:#E6EFC2;color:#264409;border-color:#C6D880;}
+
+.error a {color:#8a1f11;}
+.notice a {color:#514721;}
+.success a {color:#264409;}
+
+.error p, .notice p, .success p {margin: 0.6em 0 !important;}
+
+.sprTree {
+   /*background-color: #fff;*/
+   background-image: url(../../umbraco/images/umbraco/sprites.png);
+   display: inline;
+   padding-bottom: 2px;
+}
+.sprTree img{width: 16px; height: 18px; padding-right: 7px;}
+
+.treeContainer 
+{
+	padding:5px;
+	background-color:White;
+}
+
+/* DASHBOARD */
+
+.dashboardWrapper
+{
+    padding:5px 5px 5px 5px;
+    overflow:hidden;
+    color:#333;
+}
+
+.dashboardWrapper p
+{
+    font-size:1.1em;
+    margin-top:0;
+}
+
+.dashboardWrapper h2
+{
+    margin-top:0;
+    padding-bottom:10px;
+    border-bottom:1px solid #ccc;
+    padding-left:37px;
+    line-height:32px;
+}
+
+.dashboardWrapper h3
+{
+    margin-bottom:10px;
+}
+
+.dashboardWrapper h4
+{
+    
+}
+
+.dashboardIcon
+{
+    position:absolute;
+    top:10px;
+    left:10px;
+}
+
+.dashboardColWrapper
+{
+    position:relative;
+    overflow:hidden;
+}
+
+.dashboardColWrapper h3
+{
+    margin-bottom:0;
+}
+
+.dashboardColWrapper ul
+{
+    margin-left:1.5em;
+    margin-right:1.5em;
+    padding:0;
+    list-style-image:url(/umbraco/images/listitemorange.gif);
+}
+
+.dashboardColWrapper li
+{
+    line-height:1.2em;
+    font-size:1.1em;
+    padding-bottom:.5em;   
+}
+
+
+.dashboardCols
+{
+
+}
+
+.dashboardCol
+{
+    position:relative;
+    padding:10px 1%;
+    background: url(/umbraco_client/propertypane/images/propertyBackground.gif) repeat-x scroll center top #FFFFFF;
+}
+
+   
+
+.third
+{
+    width:30.33%;
+    float:left;
+    margin-right:1%;
+}
+
+.dashboardCols .last
+{
+    margin-right:0;
+}
+
+.dashboardCols h3
+{
+    margin-top:0;
+    padding-bottom:5px;
+    border-bottom:1px solid #ccc;
+}
+    
+
+
+.dashboardHideLink 
+{
+    /*float: right;
+    color: #aaa;
+    text-decoration: none;*/
+    
+    position:absolute;
+    right:10px;
+    top:10px;
+    text-decoration:none;
+    color:#666;
+    border:none;
+    font-size:.9em;
+    font-weight:bold;
+    padding:5px;
+    margin:0;
+    border-radius:3px;
+    border:1px solid #ccc;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    background-color:#ddd;
+    background: -moz-linear-gradient(100% 100% 90deg, #ddd, #fefefe);
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fefefe), to(#ddd));
+
+}
+
+.dashboardHideLink:hover
+{
+    text-decoration:none;
+    background-color:#fefefe;
+    background: -moz-linear-gradient(100% 100% 90deg, #fefefe, #ddd);
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddd), to(#fefefe));
+    cursor:pointer;
+}
+
+.treePickerTooltip {
+	display: none;
+	position: absolute;
+	border: 1px solid #333;
+	background-color: #fff8cb;
+	padding: 3px;
+	color: #000;
+}
+
+/* SORTABLE DOCUMENT TYPE LISTS */
+table.tabs-table {width: 100%;}
+table.tabs-table tbody {float: left; width: 100%; }
+table.tabs-table tr.propertyContent 
+{
+    float: left; 
+    clear: both;    
+    cursor: move; 
+    width: 100%;
+    border: solid 1px #CCC;
+    background: url(../tabView/images/background.gif) #EEE repeat-x bottom;
+    margin-bottom: 4px;
+}
+table.tabs-table tr.propertyContent td
+{
+    padding-right: 40px;
+    width: 100%;
+}
+table.tabs-table input[type=text] { width: 200px;  }
+table.tabs-table input[type=submit] { text-align: right;  }
+
+table.tabs-table tr.propertyContent input.sort-order {
+    width: 20px;
+    background-color: lightgray;
+    padding: 0px 5px 0px 5px;
+}
+
+li.no-properties-on-tab {background: none; background-color: #fff; cursor: default; }
+
+.doc-type-property-drop-zone { border: dashed 1px #ccc; padding: 4px; }

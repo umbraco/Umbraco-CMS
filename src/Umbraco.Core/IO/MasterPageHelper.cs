@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
 
 namespace Umbraco.Core.IO
 {
@@ -27,7 +26,13 @@ namespace Umbraco.Core.IO
         {
             return _masterPageFileSystem.FileExists(GetFilePath(t));
         }
-        
+
+        [Obsolete("This is only used for legacy purposes and will be removed in future versions")]
+        internal string GetPhysicalFilePath(ITemplate t)
+        {
+            return _masterPageFileSystem.GetFullPath(GetFilePath(t.Alias));
+        }
+
         private string GetFilePath(ITemplate t)
         {
             return GetFilePath(t.Alias);
@@ -52,8 +57,8 @@ namespace Umbraco.Core.IO
 
                 using (var ms = new MemoryStream(withBom))
                 {
-                    _masterPageFileSystem.AddFile(filePath, ms, true);
-                }
+                    _masterPageFileSystem.AddFile(filePath, ms, true);    
+                }                
             }
             else
             {
@@ -61,7 +66,7 @@ namespace Umbraco.Core.IO
                 using (var tr = new StreamReader(s, Encoding.UTF8))
                 {
                     masterpageContent = tr.ReadToEnd();
-                    tr.Close();
+                    tr.Close();    
                 }
             }
 
@@ -77,7 +82,7 @@ namespace Umbraco.Core.IO
         //        using (var tr = new StreamReader(s))
         //        {
         //            masterpageContent = tr.ReadToEnd();
-        //            tr.Close();
+        //            tr.Close();    
         //        }
         //    }
 
@@ -191,7 +196,7 @@ namespace Umbraco.Core.IO
         private void UpdateChildTemplates(ITemplate template, string currentAlias, ITemplateRepository templateRepo)
         {
             //if we have a Old Alias if the alias and therefor the masterpage file name has changed...
-            //so before we save the new masterfile, we'll clear the old one, so we don't up with
+            //so before we save the new masterfile, we'll clear the old one, so we don't up with 
             //Unused masterpage files
             if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != template.Alias)
             {
@@ -275,7 +280,7 @@ namespace Umbraco.Core.IO
         //    }
 
         //    //we have a Old Alias if the alias and therefor the masterpage file name has changed...
-        //    //so before we save the new masterfile, we'll clear the old one, so we don't up with
+        //    //so before we save the new masterfile, we'll clear the old one, so we don't up with 
         //    //Unused masterpage files
         //    if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != template.Alias)
         //    {
@@ -289,7 +294,7 @@ namespace Umbraco.Core.IO
         //                UpdateMasterPageFile(t, null, templateRepo);
         //        }
 
-        //        //then kill the old file..
+        //        //then kill the old file.. 
         //        var oldFile = GetFilePath(currentAlias);
         //        if (_masterPageFileSystem.FileExists(oldFile))
         //            _masterPageFileSystem.DeleteFile(oldFile);
@@ -336,7 +341,7 @@ namespace Umbraco.Core.IO
             return masterTemplate;
         }
 
-        internal static string GetMasterContentElement(ITemplate template)
+        private static string GetMasterContentElement(ITemplate template)
         {
             if (template.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
             {
@@ -350,96 +355,96 @@ namespace Umbraco.Core.IO
 
         }
 
-        internal static string EnsureMasterPageSyntax(string templateAlias, string masterPageContent)
-        {
-            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
-            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
+        //internal static string EnsureMasterPageSyntax(string templateAlias, string masterPageContent)
+        //{
+        //    ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
+        //    ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
 
-            // Parse the design for macros
-            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
-            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
+        //    // Parse the design for macros
+        //    ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
+        //    ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
 
-            // Parse the design for load childs
-            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", CreateDefaultPlaceHolder(templateAlias))
-                .Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", CreateDefaultPlaceHolder(templateAlias));
-            // Parse the design for aspnet forms
-            GetAspNetMasterPageForm(ref masterPageContent, templateAlias);
-            masterPageContent = masterPageContent.Replace("</?ASPNET_FORM>", "</form>");
-            // Parse the design for aspnet heads
-            masterPageContent = masterPageContent.Replace("</ASPNET_HEAD>", String.Format("<head id=\"{0}Head\" runat=\"server\">", templateAlias.Replace(" ", "")));
-            masterPageContent = masterPageContent.Replace("</?ASPNET_HEAD>", "</head>");
-            return masterPageContent;
-        }
+        //    // Parse the design for load childs
+        //    masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", CreateDefaultPlaceHolder(templateAlias))
+        //        .Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", CreateDefaultPlaceHolder(templateAlias));
+        //    // Parse the design for aspnet forms
+        //    GetAspNetMasterPageForm(ref masterPageContent, templateAlias);
+        //    masterPageContent = masterPageContent.Replace("</?ASPNET_FORM>", "</form>");
+        //    // Parse the design for aspnet heads
+        //    masterPageContent = masterPageContent.Replace("</ASPNET_HEAD>", String.Format("<head id=\"{0}Head\" runat=\"server\">", templateAlias.Replace(" ", "")));
+        //    masterPageContent = masterPageContent.Replace("</?ASPNET_HEAD>", "</head>");
+        //    return masterPageContent;
+        //}
 
 
-        private static void GetAspNetMasterPageForm(ref string design, string templateAlias)
-        {
-            var formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        //private static void GetAspNetMasterPageForm(ref string design, string templateAlias)
+        //{
+        //    var formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-            if (string.IsNullOrEmpty(formElement.Value) == false)
-            {
-                string formReplace = String.Format("<form id=\"{0}Form\" runat=\"server\">", templateAlias.Replace(" ", ""));
-                if (formElement.Groups.Count == 0)
-                {
-                    formReplace += "<asp:scriptmanager runat=\"server\"></asp:scriptmanager>";
-                }
-                design = design.Replace(formElement.Value, formReplace);
-            }
-        }
+        //    if (string.IsNullOrEmpty(formElement.Value) == false)
+        //    {
+        //        string formReplace = String.Format("<form id=\"{0}Form\" runat=\"server\">", templateAlias.Replace(" ", ""));
+        //        if (formElement.Groups.Count == 0)
+        //        {
+        //            formReplace += "<asp:scriptmanager runat=\"server\"></asp:scriptmanager>";
+        //        }
+        //        design = design.Replace(formElement.Value, formReplace);
+        //    }
+        //}
 
-        private static string CreateDefaultPlaceHolder(string templateAlias)
-        {
-            return String.Format("<asp:ContentPlaceHolder ID=\"{0}ContentPlaceHolder\" runat=\"server\"></asp:ContentPlaceHolder>", templateAlias.Replace(" ", ""));
-        }
+        //private static string CreateDefaultPlaceHolder(string templateAlias)
+        //{
+        //    return String.Format("<asp:ContentPlaceHolder ID=\"{0}ContentPlaceHolder\" runat=\"server\"></asp:ContentPlaceHolder>", templateAlias.Replace(" ", ""));
+        //}
 
-        private static void ReplaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
-        {
-            var m =
-                Regex.Matches(design, GetElementRegExp(elementName, checkForQuotes),
-                    RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        //private static void ReplaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
+        //{
+        //    var m =
+        //        Regex.Matches(design, GetElementRegExp(elementName, checkForQuotes),
+        //            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-            foreach (Match match in m)
-            {
-                GroupCollection groups = match.Groups;
+        //    foreach (Match match in m)
+        //    {
+        //        GroupCollection groups = match.Groups;
 
-                // generate new element (compensate for a closing trail on single elements ("/"))
-                string elementAttributes = groups[1].Value;
-                // test for macro alias
-                if (elementName == "?UMBRACO_MACRO")
-                {
-                    var tags = XmlHelper.GetAttributesFromElement(match.Value);
-                    if (tags["macroAlias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"]) + elementAttributes;
-                    else if (tags["macroalias"] != null)
-                        elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"]) + elementAttributes;
-                }
-                string newElement = "<" + newElementName + " runat=\"server\" " + elementAttributes.Trim() + ">";
-                if (elementAttributes.EndsWith("/"))
-                {
-                    elementAttributes = elementAttributes.Substring(0, elementAttributes.Length - 1);
-                }
-                else if (groups[0].Value.StartsWith("</"))
-                    // It's a closing element, so generate that instead of a starting element
-                    newElement = "</" + newElementName + ">";
+        //        // generate new element (compensate for a closing trail on single elements ("/"))
+        //        string elementAttributes = groups[1].Value;
+        //        // test for macro alias
+        //        if (elementName == "?UMBRACO_MACRO")
+        //        {
+        //            var tags = XmlHelper.GetAttributesFromElement(match.Value);
+        //            if (tags["macroAlias"] != null)
+        //                elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroAlias"]) + elementAttributes;
+        //            else if (tags["macroalias"] != null)
+        //                elementAttributes = String.Format(" Alias=\"{0}\"", tags["macroalias"]) + elementAttributes;
+        //        }
+        //        string newElement = "<" + newElementName + " runat=\"server\" " + elementAttributes.Trim() + ">";
+        //        if (elementAttributes.EndsWith("/"))
+        //        {
+        //            elementAttributes = elementAttributes.Substring(0, elementAttributes.Length - 1);
+        //        }
+        //        else if (groups[0].Value.StartsWith("</"))
+        //            // It's a closing element, so generate that instead of a starting element
+        //            newElement = "</" + newElementName + ">";
 
-                if (checkForQuotes)
-                {
-                    // if it's inside quotes, we'll change element attribute quotes to single quotes
-                    newElement = newElement.Replace("\"", "'");
-                    newElement = String.Format("\"{0}\"", newElement);
-                }
-                design = design.Replace(match.Value, newElement);
-            }
-        }
+        //        if (checkForQuotes)
+        //        {
+        //            // if it's inside quotes, we'll change element attribute quotes to single quotes
+        //            newElement = newElement.Replace("\"", "'");
+        //            newElement = String.Format("\"{0}\"", newElement);
+        //        }
+        //        design = design.Replace(match.Value, newElement);
+        //    }
+        //}
 
-        private static string GetElementRegExp(string elementName, bool checkForQuotes)
-        {
-            if (checkForQuotes)
-                return String.Format("\"<[^>\\s]*\\b{0}(\\b[^>]*)>\"", elementName);
-            else
-                return String.Format("<[^>\\s]*\\b{0}(\\b[^>]*)>", elementName);
+        //private static string GetElementRegExp(string elementName, bool checkForQuotes)
+        //{
+        //    if (checkForQuotes)
+        //        return String.Format("\"<[^>\\s]*\\b{0}(\\b[^>]*)>\"", elementName);
+        //    else
+        //        return String.Format("<[^>\\s]*\\b{0}(\\b[^>]*)>", elementName);
 
-        }
+        //}
 
     }
 }

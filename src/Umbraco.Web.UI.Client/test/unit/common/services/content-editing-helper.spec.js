@@ -3,7 +3,10 @@ describe('contentEditingHelper tests', function () {
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.mocks'));
-    beforeEach(module('ngRoute'));
+    
+
+    //Only for 1.2: beforeEach(module('ngRoute'));
+
 
     beforeEach(inject(function ($injector, localizationMocks) {
         localizationMocks.register();
@@ -123,8 +126,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            //note the null, that's because culture is null
-            formHelper.handleServerValidation({ "_Properties.bodyText.null.value": ["Required"] });
+            formHelper.handleServerValidation({ "_Properties.bodyText.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -144,8 +146,7 @@ describe('contentEditingHelper tests', function () {
                 {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],
-                    //note the null, that's because culture is null
-                    "_Properties.bodyText.null.value": ["Required field"],
+                    "_Properties.bodyText.value": ["Required field"],
                     "_Properties.textarea": ["Invalid format"]
                 });
 
@@ -193,13 +194,13 @@ describe('contentEditingHelper tests', function () {
             expect(result).toBe(true);
         });
         
-        it('does not redirect when creating content with an invalid id', function () {
+        it('does not redirect when creating content with an invalid name', function () {
             
             //arrange
             $routeParams.create = true;
 
             //act
-            var result = contentEditingHelper.redirectToCreatedContent(0, {Name: ["Required"]});
+            var result = contentEditingHelper.redirectToCreatedContent(1234, {Name: ["Required"]});
 
             //assert
             expect(result).toBe(false);
@@ -214,7 +215,6 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var origContent = mocksUtils.getMockContent(1234);
-            origContent.save = true;
             origContent.tabs[0].properties[0].value = { complex1: "origValue1a", complex2: "origValue1b" };
             origContent.tabs[1].properties[0].value = "origValue2";
             origContent.tabs[1].properties[1].value = "origValue3";
@@ -229,7 +229,6 @@ describe('contentEditingHelper tests', function () {
             //act
             var changed = contentEditingHelper.reBindChangedProperties(origContent, newContent);
 
-            
             //assert
             expect(changed.length).toBe(2);
             expect(changed[0].alias).toBe("grid");

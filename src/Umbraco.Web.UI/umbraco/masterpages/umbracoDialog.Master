@@ -1,0 +1,38 @@
+﻿<%@ Master Language="C#" AutoEventWireup="True" CodeBehind="UmbracoDialog.master.cs" Inherits="Umbraco.Web.UI.Umbraco.Masterpages.UmbracoDialog" %>
+
+<asp:contentplaceholder id="DocType" runat="server">
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+</asp:contentplaceholder>
+
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title></title>
+
+    <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
+
+    <!-- Default script and style -->
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="assets/css/umbraco.css" PathNameAlias="UmbracoRoot" />
+
+    <umbClient:JsApplicationLib runat="server" />
+    <umbClient:JsJQueryCore runat="server" />
+    <umbClient:JsUmbracoApplicationCore runat="server" />
+
+
+    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+
+<body class="umbracoDialog umb-dialog">
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server"></asp:ScriptManager>
+        <asp:ContentPlaceHolder ID="body" runat="server">
+        </asp:ContentPlaceHolder>
+    </form>
+    <asp:ContentPlaceHolder ID="footer" runat="server"></asp:ContentPlaceHolder>
+</body>
+</html>

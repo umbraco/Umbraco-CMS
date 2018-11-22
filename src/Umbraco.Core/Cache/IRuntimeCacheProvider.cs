@@ -14,8 +14,8 @@ namespace Umbraco.Core.Cache
     public interface IRuntimeCacheProvider : ICacheProvider
     {
         object GetCacheItem(
-            string cacheKey,
-            Func<object> getCacheItem,
+            string cacheKey, 
+            Func<object> getCacheItem, 
             TimeSpan? timeout,
             bool isSliding = false,
             CacheItemPriority priority = CacheItemPriority.Normal,

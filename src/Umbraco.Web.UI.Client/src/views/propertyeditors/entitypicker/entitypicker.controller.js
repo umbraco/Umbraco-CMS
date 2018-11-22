@@ -32,7 +32,7 @@ function entityPicker($scope, entityResource) {
     }
     else {
         //if it's multiple, change the value to an array
-        if (Object.toBoolean($scope.model.config.multiple)) {
+        if ($scope.model.config.multiple === "1") {
             if (_.isString($scope.model.value)) {
                 $scope.model.value = $scope.model.value.split(',');
             }

@@ -1,8 +1,8 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, editorService) {
-    
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
+
     function link(scope, el, attr, ctrl) {
 
         var validationTranslated = "";
@@ -245,21 +245,51 @@
       scope.openCompositionsDialog = function() {
 
         scope.compositionsDialogModel = {
+            title: "Compositions",
             contentType: scope.model,
             compositeContentTypes: scope.model.compositeContentTypes,
-            view: "views/common/infiniteeditors/compositions/compositions.html",
-            size: "small",
-            submit: function() {
-              
-              // make sure that all tabs has an init property
-              if (scope.model.groups.length !== 0) {
-                angular.forEach(scope.model.groups, function(group) {
-                  addInitProperty(group);
-                });
-              }
+            view: "views/common/overlays/contenttypeeditor/compositions/compositions.html",
+            confirmSubmit: {
+                title: "Warning",
+                description: "Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?",
+                checkboxLabel: "I know what I'm doing",
+                enable: true
+            },
+            submit: function(model, oldModel, confirmed) {
 
-              // remove overlay
-              editorService.close();
+                var compositionRemoved = false;
+
+                // check if any compositions has been removed
+                for(var i = 0; oldModel.compositeContentTypes.length > i; i++) {
+
+                    var oldComposition = oldModel.compositeContentTypes[i];
+
+                    if(_.contains(model.compositeContentTypes, oldComposition) === false) {
+                        compositionRemoved = true;
+                    }
+
+                }
+
+                // show overlay confirm box if compositions has been removed.
+                if(compositionRemoved && confirmed === false) {
+
+                    scope.compositionsDialogModel.confirmSubmit.show = true;
+
+                // submit overlay if no compositions has been removed
+                // or the action has been confirmed
+                } else {
+
+                    // make sure that all tabs has an init property
+                    if (scope.model.groups.length !== 0) {
+                      angular.forEach(scope.model.groups, function(group) {
+                        addInitProperty(group);
+                      });
+                    }
+
+                    // remove overlay
+                    scope.compositionsDialogModel.show = false;
+                    scope.compositionsDialogModel = null;
+                }
 
             },
             close: function(oldModel) {
@@ -269,7 +299,8 @@
                 scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
 
                 // remove overlay
-                editorService.close();
+                scope.compositionsDialogModel.show = false;
+                scope.compositionsDialogModel = null;
 
             },
             selectCompositeContentType: function (selectedContentType) {
@@ -317,40 +348,39 @@
 
             }
         };
-
-        //select which resource methods to use, eg document Type or Media Type versions
+          //select which resource methods to use, eg document Type or Media Type versions
         var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
-        var whereUsedContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getWhereCompositionIsUsedInContentTypes : mediaTypeResource.getWhereCompositionIsUsedInContentTypes;
-        var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
+          var whereUsedContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getWhereCompositionIsUsedInContentTypes : mediaTypeResource.getWhereCompositionIsUsedInContentTypes;
+          var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
 
-        //get the currently assigned property type aliases - ensure we pass these to the server side filer
-        var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
-            return _.map(g.properties, function(p) {
-                return p.alias;
-            });
-        })), function(f) {
-            return f !== null && f !== undefined;
-        });
-        $q.all([
-            //get available composite types
-            availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
-                setupAvailableContentTypesModel(result); 
-            }),
-                //get where used document types
-                whereUsedContentTypeResource(scope.model.id).then(function (whereUsed) {
-                //pass to the dialog model the content type eg documentType or mediaType 
-                scope.compositionsDialogModel.section = scope.contentType;
-                //pass the list of 'where used' document types
-                scope.compositionsDialogModel.whereCompositionUsed = whereUsed;
-            }),
-            //get content type count
-            countContentTypeResource().then(function(result) {
-                scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
-            })
-        ]).then(function() {
-            //resolves when both other promises are done, now show it
-            editorService.open(scope.compositionsDialogModel);
-        });
+          //get the currently assigned property type aliases - ensure we pass these to the server side filer
+          var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
+              return _.map(g.properties, function(p) {
+                  return p.alias;
+              });
+          })), function(f) {
+              return f !== null && f !== undefined;
+          });
+          $q.all([
+              //get available composite types
+              availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
+                  setupAvailableContentTypesModel(result); 
+              }),
+                  //get where used document types
+                  whereUsedContentTypeResource(scope.model.id).then(function (whereUsed) {
+                  //pass to the dialog model the content type eg documentType or mediaType 
+                  scope.compositionsDialogModel.section = scope.contentType;
+                  //pass the list of 'where used' document types
+                  scope.compositionsDialogModel.whereCompositionUsed = whereUsed;
+              }),
+              //get content type count
+              countContentTypeResource().then(function(result) {
+                  scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
+              })
+          ]).then(function() {
+              //resolves when both other promises are done, now show it
+              scope.compositionsDialogModel.show = true;
+          });
 
       };
 
@@ -469,80 +499,77 @@
 
         if (!property.inherited) {
 
-          var oldPropertyModel = angular.copy(property);
-
-          var propertySettings = {
-            title: "Property settings",
-            property: property,
-            contentType: scope.contentType,
-            contentTypeName: scope.model.name,
-            contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
-            view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
-            size: "small",
-            submit: function(model) {
-
-              property.inherited = false;
-              property.dialogIsOpen = false;
-  
-              // update existing data types
-              if(model.updateSameDataTypes) {
-                updateSameDataTypes(property);
-              }
-  
-              // close the editor
-              editorService.close();
-  
-              // push new init property to group
-              addInitProperty(group);
-  
-              // set focus on init property
-              var numberOfProperties = group.properties.length;
-              group.properties[numberOfProperties - 1].focus = true;
-  
-              // push new init tab to the scope
-              addInitGroup(scope.model.groups);
-
-            },
-            close: function() {
-
-              // reset all property changes
-              property.label = oldPropertyModel.label;
-              property.alias = oldPropertyModel.alias;
-              property.description = oldPropertyModel.description;
-              property.config = oldPropertyModel.config;
-              property.editor = oldPropertyModel.editor;
-              property.view = oldPropertyModel.view;
-              property.dataTypeId = oldPropertyModel.dataTypeId;
-              property.dataTypeIcon = oldPropertyModel.dataTypeIcon;
-              property.dataTypeName = oldPropertyModel.dataTypeName;
-              property.validation.mandatory = oldPropertyModel.validation.mandatory;
-              property.validation.pattern = oldPropertyModel.validation.pattern;
-              property.showOnMemberProfile = oldPropertyModel.showOnMemberProfile;
-              property.memberCanEdit = oldPropertyModel.memberCanEdit;
-              property.isSensitiveValue = oldPropertyModel.isSensitiveValue;
-
-              // because we set state to active, to show a preview, we have to check if has been filled out
-              // label is required so if it is not filled we know it is a placeholder
-              if(oldPropertyModel.editor === undefined || oldPropertyModel.editor === null || oldPropertyModel.editor === "") {
-                property.propertyState = "init";
-              } else {
-                property.propertyState = oldPropertyModel.propertyState;
-              }
-
-              // remove the editor
-              editorService.close();
-              
-            }
-          };
-
-          // open property settings editor
-          editorService.open(propertySettings);
+          scope.propertySettingsDialogModel = {};
+          scope.propertySettingsDialogModel.title = "Property settings";
+          scope.propertySettingsDialogModel.property = property;
+          scope.propertySettingsDialogModel.contentType = scope.contentType;
+          scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
+          scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
+          scope.propertySettingsDialogModel.show = true;
 
           // set state to active to access the preview
           property.propertyState = "active";
 
           // set property states
           property.dialogIsOpen = true;
+
+          scope.propertySettingsDialogModel.submit = function(model) {
+
+            property.inherited = false;
+            property.dialogIsOpen = false;
+
+            // update existing data types
+            if(model.updateSameDataTypes) {
+              updateSameDataTypes(property);
+            }
+
+            // remove dialog
+            scope.propertySettingsDialogModel.show = false;
+            scope.propertySettingsDialogModel = null;
+
+            // push new init property to group
+            addInitProperty(group);
+
+            // set focus on init property
+            var numberOfProperties = group.properties.length;
+            group.properties[numberOfProperties - 1].focus = true;
+
+            // push new init tab to the scope
+            addInitGroup(scope.model.groups);
+
+          };
+
+          scope.propertySettingsDialogModel.close = function(oldModel) {
+
+            // reset all property changes
+            property.label = oldModel.property.label;
+            property.alias = oldModel.property.alias;
+            property.description = oldModel.property.description;
+            property.config = oldModel.property.config;
+            property.editor = oldModel.property.editor;
+            property.view = oldModel.property.view;
+            property.dataTypeId = oldModel.property.dataTypeId;
+            property.dataTypeIcon = oldModel.property.dataTypeIcon;
+            property.dataTypeName = oldModel.property.dataTypeName;
+            property.validation.mandatory = oldModel.property.validation.mandatory;
+            property.validation.pattern = oldModel.property.validation.pattern;
+            property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
+            property.memberCanEdit = oldModel.property.memberCanEdit;
+            property.isSensitiveValue = oldModel.property.isSensitiveValue;
+
+            // because we set state to active, to show a preview, we have to check if has been filled out
+            // label is required so if it is not filled we know it is a placeholder
+            if(oldModel.property.editor === undefined || oldModel.property.editor === null || oldModel.property.editor === "") {
+              property.propertyState = "init";
+            } else {
+              property.propertyState = oldModel.property.propertyState;
+            }
+
+            // remove dialog
+            scope.propertySettingsDialogModel.show = false;
+            scope.propertySettingsDialogModel = null;
+
+          };
 
         }
       };

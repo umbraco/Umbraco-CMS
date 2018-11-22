@@ -9,7 +9,7 @@
 function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService, iconHelper) {
 
     $scope.model = {
-        allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === "container",
+        allowCreateFolder: $scope.dialogOptions.currentNode.parentId === null || $scope.dialogOptions.currentNode.nodeType === "container",
         folderName: "",
         creatingFolder: false,
         creatingDoctypeCollection: false
@@ -18,7 +18,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
     $scope.model.disableTemplates = disableTemplates;
 
-    var node = $scope.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
@@ -32,7 +33,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.createContainer = function () {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder })) {
 
             contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -47,7 +48,9 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     activate: true
                 });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({
+                    scope: $scope
+                });
 
                 var section = appState.getSectionState("currentSection");
 
@@ -55,6 +58,12 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                 $scope.error = err;
 
+                //show any notifications
+                if (angular.isArray(err.data.notifications)) {
+                    for (var i = 0; i < err.data.notifications.length; i++) {
+                        notificationsService.showNotification(err.data.notifications[i]);
+                    }
+                }
             });
         }
     };
@@ -76,33 +85,32 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     }
                 }
 
-                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon)
-                    .then(function (collectionData) {
+                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon).then(function (collectionData) {
 
-                        navigationService.hideMenu();
-                        $location.search('create', null);
-                        $location.search('notemplate', null);
+                    navigationService.hideMenu();
+                    $location.search('create', null);
+                    $location.search('notemplate', null);
 
-                        formHelper.resetForm({
-                            scope: $scope
-                        });
-
-                        var section = appState.getSectionState("currentSection");
-
-                        // redirect to the item id
-                        $location.path("/" + section + "/documenttypes/edit/" + collectionData.containerId);
-
-                    }, function (err) {
-
-                        $scope.error = err;
-
-                        //show any notifications
-                        if (angular.isArray(err.data.notifications)) {
-                            for (var i = 0; i < err.data.notifications.length; i++) {
-                                notificationsService.showNotification(err.data.notifications[i]);
-                            }
-                        }
+                    formHelper.resetForm({
+                        scope: $scope
                     });
+
+                    var section = appState.getSectionState("currentSection");
+
+                    // redirect to the item id
+                    $location.path("/settings/documenttypes/edit/" + collectionData.ItemId);
+
+                }, function (err) {
+
+                    $scope.error = err;
+
+                    //show any notifications
+                    if (angular.isArray(err.data.notifications)) {
+                        for (var i = 0; i < err.data.notifications.length; i++) {
+                            notificationsService.showNotification(err.data.notifications[i]);
+                        }
+                    }
+                });
             });
         }
 
@@ -123,11 +131,6 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $location.search('notemplate', null);
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
         navigationService.hideMenu();
-    };
-
-    $scope.close = function() {
-        const showMenu = true;
-        navigationService.hideDialog(showMenu);
     };
 }
 

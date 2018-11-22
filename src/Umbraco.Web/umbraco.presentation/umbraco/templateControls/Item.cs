@@ -1,20 +1,12 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.Web;
-using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Macros;
-
+using umbraco.BusinessLogic.Actions;
 
 namespace umbraco.presentation.templateControls
 {
@@ -23,12 +15,12 @@ namespace umbraco.presentation.templateControls
     /// </summary>
     [DefaultProperty("Field")]
     [ToolboxData("<{0}:Item runat=\"server\"></{0}:Item>")]
-    [Designer("umbraco.presentation.templateControls.ItemDesigner, Umbraco.Web")]
+	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
     public class Item : CompositeControl
     {
-
+        
         #region Private Fields
-
+        
         /// <summary>The item's unique ID on the page.</summary>
         private readonly int m_ItemId;
         public AttributeCollectionAdapter LegacyAttributes;
@@ -41,7 +33,7 @@ namespace umbraco.presentation.templateControls
         internal IPublishedContent ContentItem { get; private set; }
 
         #region Public Control Properties
-
+        
         /// <summary>
         /// Gets or sets the field name.
         /// </summary>
@@ -83,7 +75,42 @@ namespace umbraco.presentation.templateControls
             get { return (string)ViewState["TextIfEmpty"] ?? String.Empty; }
             set { ViewState["TextIfEmpty"] = value; }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the XPath expression used for the inline XSLT transformation.
+        /// </summary>
+        /// <value>
+        /// The XPath expression, or an empty string to disable XSLT transformation.
+        /// The code <c>{0}</c> is used as a placeholder for the rendered field contents.
+        /// </value>
+        [Bindable(true)]
+        [Category("Umbraco")]
+        [DefaultValue("")]
+        [Localizable(true)]
+        public string Xslt
+        {
+            get { return (string)ViewState["Xslt"] ?? String.Empty; }
+            set { ViewState["Xslt"] = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether XML entity escaping of the XSLT transformation output is disabled.
+        /// </summary>
+        /// <value><c>true</c> HTML escaping is disabled; otherwise, <c>false</c> (default).</value>
+        /// <remarks>
+        ///     This corresponds value to the <c>disable-output-escaping</c> parameter
+        ///     of the XSLT <c>value-of</c> element.
+        /// </remarks>
+        [Bindable(true)]
+        [Category("Umbraco")]
+        [DefaultValue(false)]
+        [Localizable(true)]
+        public bool XsltDisableEscaping
+        {
+            get { return ViewState["XsltEscape"] == null ? false : (bool)ViewState["XsltEscape"]; }
+            set { ViewState["XsltEscape"] = value; }
+        }
+
         [Bindable(true)]
         [Category("Umbraco")]
         [DefaultValue("")]
@@ -99,7 +126,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Public Readonly Properties
-
+        
         /// <summary>
         /// Gets the item's unique ID on the page.
         /// </summary>
@@ -108,7 +135,7 @@ namespace umbraco.presentation.templateControls
         {
             get { return m_ItemId; }
         }
-
+        
         /// <summary>
         /// Gets the Umbraco page elements.
         /// </summary>
@@ -124,12 +151,12 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Public Constructors
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="Item"/> class.
         /// </summary>
         public Item()
-        {
+        {            
             Renderer = ItemRenderer.Instance;
         }
 
@@ -146,7 +173,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Overriden Control Methods
-
+        
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
@@ -158,7 +185,7 @@ namespace umbraco.presentation.templateControls
             Renderer.Init(this);
 
             base.OnInit(e);
-        }
+        }  
 
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"/> event.
@@ -187,7 +214,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Helper Functions
-
+        
         /// <summary>
         /// Gets the parsed node id. As a nodeid on a item element can be null, an integer or even a squarebracket syntax, this helper method
         /// is handy for getting the exact parsed nodeid back.
@@ -197,16 +224,16 @@ namespace umbraco.presentation.templateControls
         {
             if (!String.IsNullOrEmpty(NodeId))
             {
-                string tempNodeId = MacroRenderer.ParseAttribute(PageElements, NodeId);
+                string tempNodeId = helper.parseAttribute(PageElements, NodeId);
                 int nodeIdInt = 0;
                 if (int.TryParse(tempNodeId, out nodeIdInt))
                 {
                     return nodeIdInt;
                 }
             }
-            else if (UmbracoContext.Current.PageId != null)
+            else if (PageElements["pageID"] != null)
             {
-                return UmbracoContext.Current.PageId.Value;
+                return int.Parse(PageElements["pageID"].ToString());
             }
             return null;
         }
@@ -240,21 +267,14 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Field Information Functions
-
-        static string FindAttribute(IDictionary attributes, string key)
-        {
-            key = key.ToLowerInvariant();
-            var attributeValue = attributes.Contains(key) ? attributes[key].ToString() : string.Empty;
-            return MacroRenderer.ParseAttribute(null, attributeValue);
-        }
-
+        
         /// <summary>
         /// Determines whether the field is a dictionary item.
         /// </summary>
         /// <returns><c>true</c> if the field is a dictionary item; otherwise, <c>false</c>.</returns>
         protected virtual bool FieldIsDictionaryItem()
         {
-            return FindAttribute(new AttributeCollectionAdapter(Attributes), "field").StartsWith("#");
+            return helper.FindAttribute(new AttributeCollectionAdapter(Attributes), "field").StartsWith("#");
         }
 
         /// <summary>
@@ -263,9 +283,20 @@ namespace umbraco.presentation.templateControls
         /// <returns><c>true</c> if the field is recursive; otherwise, <c>false</c>.</returns>
         protected virtual bool FieldIsRercursive()
         {
-            return FindAttribute(new AttributeCollectionAdapter(Attributes), "recursive") == "true";
+            return helper.FindAttribute(new AttributeCollectionAdapter(Attributes), "recursive") == "true";
         }
 
+        /// <summary>
+        /// Determines whether field uses the API to lookup the value
+        /// (if a NodeId attribute is specified and is different from the current page id).
+        /// </summary>
+        /// <returns><c>true</c> if API lookup is used; otherwise, <c>false</c>.</returns>
+        [Obsolete("Method never implemented", true)]
+        protected virtual bool FieldIsApiLookup()
+        {
+            // TODO: remove false and add security
+            return false;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the current item is editable by the current user.
@@ -273,12 +304,9 @@ namespace umbraco.presentation.templateControls
         /// <value><c>true</c> if the current item is editable by the current user; otherwise, <c>false</c>.</value>
         protected virtual bool FieldEditableWithUserPermissions()
         {
-            var u = UmbracoContext.Current.Security.CurrentUser;
-            if (u == null) return false;
-            var permission = Current.Services.UserService.GetPermissions(u, PageElements["path"].ToString());
-
-            return permission.AssignedPermissions.Contains(ActionUpdate.ActionLetter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
-        }
+            BusinessLogic.User u = helper.GetCurrentUmbracoUser();
+            return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture));
+        } 
 
         #endregion
     }
@@ -303,7 +331,7 @@ namespace umbraco.presentation.templateControls
             if (this.Component != null) {
                 m_control = this.Component as Item;
             }
-
+            
             if (m_control != null && !String.IsNullOrEmpty(m_control.Field))
             {
                 return returnMarkup(String.Format("Getting '{0}'", m_control.Field));

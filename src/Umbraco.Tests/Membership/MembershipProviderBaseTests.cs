@@ -1,31 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Diagnostics;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Security;
-using LightInject;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Membership
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true)]
-    public class MembershipProviderBaseTests : UmbracoTestBase
+    public class MembershipProviderBaseTests
     {
+        
+
         [Test]
         public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             var provider = providerMock.Object;
 
@@ -35,7 +32,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Change_Password_With_AllowManuallyChangingPassword_And_Invalid_Creds()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
             var provider = providerMock.Object;
@@ -43,7 +40,7 @@ namespace Umbraco.Tests.Membership
             Assert.IsFalse(provider.ChangePassword("test", "test", "test"));
 
         }
-
+        
         [Test]
         public void ChangePasswordQuestionAndAnswer_Without_RequiresQuestionAndAnswer()
         {
@@ -128,12 +125,7 @@ namespace Umbraco.Tests.Membership
             Assert.Throws<ProviderException>(() => provider.GetPassword("test", "test"));
         }
 
-        // fixme
-        // in v7 this test relies on ApplicationContext.Current being null, which makes little
-        // sense, not going to port the weird code in MembershipProviderBase.ResetPassword, so
-        // what shall we do?
         [Test]
-        [Ignore("makes no sense?")]
         public void ResetPassword_Without_EnablePasswordReset()
         {
             var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
@@ -146,7 +138,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Sets_Defaults()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };                  
             var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection());
 
@@ -168,7 +160,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Throws_Exception_With_Hashed_Password_And_Password_Retrieval()
         {
-            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
             var provider = providerMock.Object;
 
             Assert.Throws<ProviderException>(() => provider.Initialize("test", new NameValueCollection()
@@ -207,16 +199,16 @@ namespace Umbraco.Tests.Membership
             for (var i = 0; i < 10000; i++)
             {
                 var result = MembershipProviderBase.GenerateSalt();
-
+                
                 if (i > 0)
                 {
                     Assert.AreEqual(lastLength, result.Length);
                 }
 
-                lastLength = result.Length;
+                lastLength = result.Length;                
             }
         }
-
+        
         [Test]
         public void Get_Stored_Password_Hashed()
         {
@@ -353,7 +345,7 @@ namespace Umbraco.Tests.Membership
             string salt;
             var pass = "ThisIsAnEncryptedPassword";
             var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-
+            
             var result = provider.CheckPassword("ThisIsAnEncryptedPassword", encrypted);
 
             Assert.IsTrue(result);
@@ -383,7 +375,7 @@ namespace Umbraco.Tests.Membership
             string salt;
             var pass = "ThisIsAnEncryptedPassword";
             var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-
+            
             var result = provider.DecryptPassword(encrypted);
 
             Assert.AreEqual(pass, result);

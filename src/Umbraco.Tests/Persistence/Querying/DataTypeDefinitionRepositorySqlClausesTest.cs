@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Querying
@@ -15,19 +14,19 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectTypeId = Constants.ObjectTypes.DataType;
+            var NodeObjectTypeId = new Guid(Constants.ObjectTypes.DataType);
 
             var expected = new Sql();
             expected.Select("*")
-                .From($"[{Constants.DatabaseSchema.Tables.DataType}]")
-                .InnerJoin("[umbracoNode]").On($"[{Constants.DatabaseSchema.Tables.DataType}].[nodeId] = [umbracoNode].[id]")
+                .From("[cmsDataType]")
+                .InnerJoin("[umbracoNode]").On("[cmsDataType].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"));
 
-            var sql = Sql();
-            sql.SelectAll()
+            var sql = new Sql();
+            sql.Select("*")
                .From<DataTypeDto>()
                .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));

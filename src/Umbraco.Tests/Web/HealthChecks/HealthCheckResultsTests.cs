@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.HealthCheck;
 
@@ -17,7 +19,7 @@ namespace Umbraco.Tests.Web.HealthChecks
             private readonly string _message;
             private readonly StatusResultType _resultType;
 
-            public StubHealthCheck(StatusResultType resultType, string message)
+            public StubHealthCheck(StatusResultType resultType, string message) : base(null)
             {
                 _resultType = resultType;
                 _message = message;

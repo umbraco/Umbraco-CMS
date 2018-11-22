@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Services
 {
@@ -17,10 +14,9 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [TestFixture]
-    [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class LocalizationServiceTests : TestWithSomeContentBase
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+    [TestFixture, RequiresSTA]
+    public class LocalizationServiceTests : BaseServiceTest
     {
         private Guid _parentItemGuidId;
         private int _parentItemIntId;
@@ -28,6 +24,18 @@ namespace Umbraco.Tests.Services
         private int _childItemIntId;
         private int _danishLangId;
         private int _englishLangId;
+
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
 
         [Test]
         public void Can_Get_Root_Dictionary_Items()
@@ -101,7 +109,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Get_Dictionary_Item_Descendants()
         {
-            using (var scope = ScopeProvider.CreateScope())
+            try
             {
                 var en = ServiceContext.LocalizationService.GetLanguageById(_englishLangId);
                 var dk = ServiceContext.LocalizationService.GetLanguageById(_danishLangId);
@@ -132,18 +140,33 @@ namespace Umbraco.Tests.Services
                     currParentId = desc1.Key;
                 }
 
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                DatabaseContext.Database.EnableSqlTrace = true;
+                DatabaseContext.Database.EnableSqlCount();
 
                 var items = ServiceContext.LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
                     .ToArray();
 
-                Debug.WriteLine("SQL CALLS: " + scope.Database.AsUmbracoDatabase().SqlCount);
+                Debug.WriteLine("SQL CALLS: " + DatabaseContext.Database.SqlCount);
 
                 Assert.AreEqual(51, items.Length);
                 //there's a call or two to get languages, so apart from that there should only be one call per level
-                Assert.Less(scope.Database.AsUmbracoDatabase().SqlCount, 30);
+                Assert.Less(DatabaseContext.Database.SqlCount, 30);
             }
+            finally
+            {
+                DatabaseContext.Database.EnableSqlTrace = false;
+                DatabaseContext.Database.DisableSqlCount();
+            }
+           
+        }
+
+        [Test]
+        public void Can_Get_Language_By_Culture_Code()
+        {
+            var danish = ServiceContext.LocalizationService.GetLanguageByCultureCode("Danish");
+            var english = ServiceContext.LocalizationService.GetLanguageByCultureCode("English");
+            Assert.NotNull(danish);
+            Assert.NotNull(english);
         }
 
         [Test]
@@ -193,20 +216,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Delete_Language_Used_As_Fallback()
-        {
-            var danish = ServiceContext.LocalizationService.GetLanguageByIsoCode("da-DK");
-            var norwegian = new Language("nb-NO") { CultureName = "Norwegian", FallbackLanguageId = danish.Id };
-            ServiceContext.LocalizationService.Save(norwegian, 0);
-            var languageId = danish.Id;
-
-            ServiceContext.LocalizationService.Delete(danish);
-
-            var language = ServiceContext.LocalizationService.GetLanguageById(languageId);
-            Assert.Null(language);
-        }
-
-        [Test]
         public void Can_Create_DictionaryItem_At_Root()
         {
             var english = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
@@ -249,9 +258,9 @@ namespace Umbraco.Tests.Services
             Assert.Greater(allLangs.Count(), 0);
             foreach (var language in allLangs)
             {
-                Assert.AreEqual("Hellooooo", item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);
+                Assert.AreEqual("Hellooooo", item.Translations.Single(x => x.Language.CultureName == language.CultureName).Value);    
             }
-
+            
         }
 
         [Test]
@@ -332,11 +341,11 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var localizationService = ServiceContext.LocalizationService;
-
+            
             // Act
             var languages = localizationService.GetAllLanguages();
 
-            // Assert
+            // Assert 
             Assert.That(3, Is.EqualTo(languages.Count()));
         }
 
@@ -369,28 +378,6 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.NotNull(result);
-        }
-
-        [Test]
-        public void Set_Default_Language()
-        {
-            var localizationService = ServiceContext.LocalizationService;
-            var language = new Core.Models.Language("en-AU");
-            language.IsDefault = true;
-            localizationService.Save(language);
-            var result = localizationService.GetLanguageById(language.Id);
-
-            Assert.IsTrue(result.IsDefault);
-
-            var language2 = new Core.Models.Language("en-NZ");
-            language2.IsDefault = true;
-            localizationService.Save(language2);
-            var result2 = localizationService.GetLanguageById(language2.Id);
-            //re-get
-            result = localizationService.GetLanguageById(language.Id);
-
-            Assert.IsTrue(result2.IsDefault);
-            Assert.IsFalse(result.IsDefault);
         }
 
         [Test]

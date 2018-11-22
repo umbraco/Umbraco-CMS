@@ -27,7 +27,7 @@ namespace Umbraco.Web.WebApi.Filters
                 //if they are not valid for some strange reason - we need to continue setting valid ones
                 string failedReason;
                 if (AngularAntiForgeryHelper.ValidateHeaders(context.Request.Headers, out failedReason))
-                {
+                {                    
                     return;
                 }
             }
@@ -43,14 +43,14 @@ namespace Umbraco.Web.WebApi.Filters
                     Path = "/",
                     //must be js readable
                     HttpOnly = false,
-                    Secure = UmbracoConfig.For.GlobalSettings().UseHttps
+                    Secure = GlobalSettings.UseSSL
                 };
 
             var validationCookie = new CookieHeaderValue(AngularAntiForgeryHelper.CsrfValidationCookieName, cookieToken)
             {
                 Path = "/",
                 HttpOnly = true,
-                Secure = UmbracoConfig.For.GlobalSettings().UseHttps
+                Secure = GlobalSettings.UseSSL
             };
 
             context.Response.Headers.AddCookies(new[] { angularCookie, validationCookie });

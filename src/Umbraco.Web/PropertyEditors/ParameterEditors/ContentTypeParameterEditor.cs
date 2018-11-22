@@ -1,23 +1,20 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    /// <summary>
-    /// Represents a content type parameter editor.
-    /// </summary>
-    [DataEditor("contentType", EditorType.MacroParameter, "Content Type Picker", "entitypicker")]
-    public class ContentTypeParameterEditor : DataEditor
+    [ParameterEditor("contentType", "Content Type Picker", "entitypicker")]
+    public class ContentTypeParameterEditor : ParameterEditor
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
-        /// </summary>
-        public ContentTypeParameterEditor(ILogger logger)
-            : base(logger)
+        public ContentTypeParameterEditor()
         {
-            // configure
-            DefaultConfiguration.Add("multiple", false);
-            DefaultConfiguration.Add("entityType", "DocumentType");
+            Configuration.Add("multiple", "0");
+            Configuration.Add("entityType", "DocumentType");
         }
     }
 }

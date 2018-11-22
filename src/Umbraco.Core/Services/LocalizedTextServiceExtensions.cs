@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services
@@ -12,12 +11,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
-        public static string Localize(this ILocalizedTextService manager, string area, string key)
-        {
-            var fullKey = string.Join("/", area, key);
-            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
-        }
-
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>
@@ -99,6 +92,12 @@ namespace Umbraco.Core.Services
         }
 
         private static ICultureDictionary CultureDictionary
-            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
+        {
+            get
+            {
+                return _cultureDictionary
+                    ?? (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
+            }
+        }
     }
 }

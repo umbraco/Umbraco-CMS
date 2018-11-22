@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -33,32 +32,33 @@ namespace Umbraco.Core.Configuration.Grid
             {
                 Func<List<GridEditor>> getResult = () =>
                 {
-                    // fixme - should use the common one somehow! + ignoring _appPlugins here!
-                    var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger);
-
                     var editors = new List<GridEditor>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
                     if (File.Exists(gridConfig))
                     {
-                        var sourceString = File.ReadAllText(gridConfig);
-
                         try
                         {
-                            editors.AddRange(parser.ParseGridEditors(sourceString));
+                            var arr = JArray.Parse(File.ReadAllText(gridConfig));
+                            //ensure the contents parse correctly to objects
+                            var parsed = ManifestParser.GetGridEditors(arr);
+                            editors.AddRange(parsed);
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<GridEditorsConfig>(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
+                            _logger.Error<GridEditorsConfig>("Could not parse the contents of grid.editors.config.js into a JSON array", ex);
                         }
                     }
 
-                    // add manifest editors, skip duplicates
-                    foreach (var gridEditor in parser.Manifest.GridEditors)
+                    var parser = new ManifestParser(_appPlugins, _runtimeCache);
+                    var builder = new ManifestBuilder(_runtimeCache, parser);
+                    foreach (var gridEditor in builder.GridEditors)
                     {
+                        //no duplicates! (based on alias)
                         if (editors.Contains(gridEditor) == false)
+                        {
                             editors.Add(gridEditor);
+                        }
                     }
-
                     return editors;
                 };
 
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Configuration.Grid
 
                 return result;
             }
-
+            
         }
     }
 }

@@ -28,7 +28,7 @@ angular.module("umbraco")
     		    if(toggle){
     		        collection = [];
     		    }else{
-    		        collection = null;
+    		        delete collection;
     		    }
     		};
 

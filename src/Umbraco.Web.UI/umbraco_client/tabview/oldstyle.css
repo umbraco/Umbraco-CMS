@@ -1,0 +1,76 @@
+    .header {
+      float:left;
+      width:100%;
+      background:#DAE0D2 url("bg.gif") repeat-x bottom;
+      font-size:93%;
+      line-height:normal;
+      }
+    .header ul {
+      margin:0;
+      padding:10px 10px 0;
+      list-style:none;
+      }
+  
+    li.tabOff, li.tabOn {
+      float:left;background:url("left_both.gif") no-repeat left top;
+      margin:0;
+      padding:0 0 0 9px;
+      border-bottom:1px solid #765;
+      color:#000;
+      }
+      
+    a.tabOff, a.tabOn {
+      float:left;
+      display:block;
+      width:.1em;
+      background:url("right_both.gif") no-repeat right top;
+      padding:5px 15px 4px 6px;
+      text-decoration:none;
+      font-weight:bold;
+      color:#765;
+      }
+
+    .header > ul a {width:auto;}
+
+    #header a:hover {
+    
+      color:#333;
+      }
+      
+    .header li:hover, .header li:hover a {
+    	  background-position:0% -150px;
+    	  color:#333;
+      }
+    
+     .header li:hover a {
+      	background-position:100% -150px;
+      }
+    
+    li.tabOn {
+      background-position:0 -150px;
+      border-width:0;
+      }
+
+    li.tabOn a {
+      background-position:100% -150px;
+      padding-bottom:5px;
+      color:#333;
+      }
+    .layer {
+      display:none;
+     }
+     
+     .menubar {
+	     background:#F5F5F5;
+	     height:32px;
+	     width:100%;
+	     float:left;
+	     border-bottom:1px solid #919B9C;
+	    }
+	 
+.tabpagecontainer {
+	border-bottom:1px solid #919B9C;
+	border-left:1px solid #919B9C;
+	border-right:1px solid #919B9C;
+	height:99%;
+	}

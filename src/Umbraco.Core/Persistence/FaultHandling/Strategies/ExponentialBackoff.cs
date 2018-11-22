@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         private readonly TimeSpan deltaBackoff;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class.
+        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class. 
         /// </summary>
         public ExponentialBackoff()
             : this(DefaultClientRetryCount, DefaultMinBackoff, DefaultMaxBackoff, DefaultClientBackoff)
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class.
+        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class. 
         /// </summary>
         /// <param name="retryCount">The maximum number of retry attempts.</param>
         /// <param name="minBackoff">The minimum back-off time</param>
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class.
+        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class. 
         /// </summary>
         /// <param name="name">The name of the retry strategy.</param>
         /// <param name="retryCount">The maximum number of retry attempts.</param>
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class.
+        /// Initializes a new instance of the <see cref="ExponentialBackoff"/> class. 
         /// </summary>
         /// <param name="name">The name of the retry strategy.</param>
         /// <param name="retryCount">The maximum number of retry attempts.</param>
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
         /// <param name="maxBackoff">The maximum back-off time.</param>
         /// <param name="deltaBackoff">The value that will be used for calculating a random delta in the exponential delay between retries.</param>
         /// <param name="firstFastRetry">
-        /// Indicates whether or not the very first retry attempt will be made immediately
+        /// Indicates whether or not the very first retry attempt will be made immediately 
         /// whereas the subsequent retries will remain subject to retry interval.
         /// </param>
         public ExponentialBackoff(string name, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff, bool firstFastRetry)

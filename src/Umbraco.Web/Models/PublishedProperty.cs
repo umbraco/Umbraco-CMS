@@ -1,14 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models
 {
     public static class PublishedProperty
     {
+        /// <summary>
+        /// Creates a detached published property.
+        /// </summary>
+        /// <param name="propertyType">A published property type.</param>
+        /// <param name="value">The property data raw value.</param>
+        /// <param name="isPreviewing">A value indicating whether to evaluate the property value in previewing context.</param>
+        /// <returns>A detached published property holding the value.</returns>
+        internal static IPublishedProperty GetDetached(PublishedPropertyType propertyType, object value, bool isPreviewing = false)
+        {
+            if (propertyType.IsDetachedOrNested == false)
+                throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
+            var property = UmbracoContext.Current.ContentCache.InnerCache.CreateDetachedProperty(propertyType, value, isPreviewing);
+            return property;
+        }
+
         /// <summary>
         /// Maps a collection of Property to a collection of IPublishedProperty for a specified collection of PublishedPropertyType.
         /// </summary>
@@ -22,19 +41,16 @@ namespace Umbraco.Web.Models
             IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
             Func<PublishedPropertyType, object, IPublishedProperty> map)
         {
-            var propertyEditors = Current.PropertyEditors;
-            var dataTypeService = Current.Services.DataTypeService;
-
-            // fixme not dealing with variants
-            // but the entire thing should die anyways
+            var propertyEditorResolver = PropertyEditorResolver.Current;
+            var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
             return propertyTypes.Select(x =>
                 {
-                    var p = properties.SingleOrDefault(xx => xx.Alias == x.Alias);
-                    var v = p == null || p.GetValue() == null ? null : p.GetValue();
+                    var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
+                    var v = p == null || p.Value == null ? null : p.Value;
                     if (v != null)
                     {
-                        var e = propertyEditors[x.EditorAlias];
+                        var e = propertyEditorResolver.GetByAlias(x.PropertyEditorAlias);
 
                         // We are converting to string, even for database values which are integer or
                         // DateTime, which is not optimum. Doing differently would require that we have a way to tell
@@ -48,7 +64,7 @@ namespace Umbraco.Web.Models
                         // nothing ensures that the two methods are consistent.
 
                         if (e != null)
-                            v = e.GetValueEditor().ConvertDbToString(p.PropertyType, v, dataTypeService);
+                            v = e.ValueEditor.ConvertDbToString(p, p.PropertyType, dataTypeService);
                     }
 
                     return map(x, v);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
@@ -10,7 +10,6 @@ using ClientDependency.Core.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -31,18 +30,14 @@ namespace Umbraco.Web.Editors
     internal class BackOfficeServerVariables
     {
         private readonly UrlHelper _urlHelper;
-        private readonly IRuntimeState _runtimeState;
-        private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings)
+        public BackOfficeServerVariables(UrlHelper urlHelper, ApplicationContext applicationContext, IUmbracoSettingsSection umbracoSettings)
         {
             _urlHelper = urlHelper;
-            _runtimeState = runtimeState;
-            _features = features;
-            _globalSettings = globalSettings;
+            _applicationContext = applicationContext;
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
         }
@@ -112,6 +107,7 @@ namespace Umbraco.Web.Editors
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
+                        {"legacyTreeJs", _urlHelper.Action("LegacyTreeJs", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
                         //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
@@ -150,7 +146,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(""))
+                                controller => controller.GetBigThumbnail(0))
                         },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -198,7 +194,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetPagedEntityLog(0, 0, 0, Core.Persistence.DatabaseModelDefinitions.Direction.Ascending, null))
+                                controller => controller.GetEntityLog(0))
                         },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
@@ -223,10 +219,6 @@ namespace Umbraco.Web.Editors
                         {
                             "memberTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
                                 controller => controller.GetAllTypes())
-                        },
-                        {
-                            "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
-                                controller => controller.GetAllGroups())
                         },
                         {
                             "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
@@ -257,7 +249,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetTags(""))
                         },
                         {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
+                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
                                 controller => controller.GetIndexerDetails())
                         },
                         {
@@ -277,17 +269,9 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetByPath("", ""))
                         },
                         {
-                            "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
-                                controller => controller.GetPublishedStatusUrl())
-                        },
-                        {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
 						},
-                        {
-                            "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
-                                controller => controller.GetStatus())
-                        },
                         {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
@@ -295,17 +279,14 @@ namespace Umbraco.Web.Editors
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
-                        },
-                        {
-                            "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
-                                controller => controller.GetAllLanguages())
                         }
+
                     }
                 },
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", _globalSettings.Path},
+                        {"umbracoPath", GlobalSettings.Path},
                         {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
@@ -367,7 +348,7 @@ namespace Umbraco.Web.Editors
                         {
                             "disabledFeatures", new Dictionary<string,object>
                             {
-                                { "disableTemplates", _features.Disabled.DisableTemplates}
+                                { "disableTemplates", FeaturesResolver.Current.Features.Disabled.DisableTemplates}
                             }
                         }
 
@@ -410,10 +391,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <remarks>
         /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
-        /// it's resolving which is unecessary and annoying.
+        /// it's resolving which is unecessary and annoying. 
         /// </remarks>
-        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes
-            = new Lazy<IEnumerable<Type>>(() => Current.TypeLoader.GetAttributedTreeControllers().ToArray()); // fixme inject
+        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes = new Lazy<IEnumerable<Type>>(() => PluginManager.Current.ResolveAttributedTreeControllers().ToArray());
 
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -423,19 +403,15 @@ namespace Umbraco.Web.Editors
         {
             var app = new Dictionary<string, object>
             {
-                // add versions - see UmbracoVersion for details & differences
-
-                // the complete application version (eg "8.1.2-alpha.25")
-                { "version", _runtimeState.SemanticVersion.ToSemanticString() }, // fixme that's UmbracoVersion.Version!
-
-                // the assembly version (eg "8.0.0")
-                { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }
+                {"assemblyVersion", UmbracoVersion.AssemblyVersion}
             };
 
-            var version = _runtimeState.SemanticVersion.ToSemanticString();
+            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
-            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+            app.Add("cacheBuster", $"{version}.{_applicationContext.IsConfigured}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+
+            app.Add("version", version);
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));
@@ -446,11 +422,11 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
-        private static string GetMaxRequestLength()
+        private string GetMaxRequestLength()
         {
-            return ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section
-                ? section.MaxRequestLength.ToString()
-                : string.Empty;
+            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+            if (section == null) return string.Empty;
+            return section.MaxRequestLength.ToString();
         }
     }
 }

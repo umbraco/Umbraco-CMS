@@ -1,9 +1,10 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
     function ($scope, userService, eventsService, mediaResource, appState, treeService, navigationService) {
+	    var dialogOptions = $scope.dialogOptions;
 
-	    $scope.dialogTreeApi = {};
-	    var node = $scope.currentNode;
+	    $scope.dialogTreeEventHandler = $({});
+	    var node = dialogOptions.currentNode;
 
         $scope.treeModel = {
             hideHeader: false
@@ -12,13 +13,13 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
             $scope.treeModel.hideHeader = userData.startMediaIds.length > 0 && userData.startMediaIds.indexOf(-1) == -1;
         });
 
-        function treeLoadedHandler(args) {
+        function treeLoadedHandler(ev, args) {
             if (node && node.path) {
-                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
             }
         }
 
-	    function nodeSelectHandler(args) {
+	    function nodeSelectHandler(ev, args) {
 
 			if(args && args.event) {
 				args.event.preventDefault();
@@ -36,22 +37,16 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 	        $scope.target.selected = true;
 	    }
 
-		function nodeExpandedHandler(args) {
+		function nodeExpandedHandler(ev, args) {
 			// open mini list view for list views
         	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
 	    }
 
-        $scope.onTreeInit = function () {
-            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
-            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
-            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
-        }	  
-        
-        $scope.close = function() {
-            navigationService.hideDialog();
-        };
+	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
+	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 	    $scope.move = function () {
 	        $scope.busy = true;
@@ -83,7 +78,13 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
                     $scope.error = err;
                 });
 	    };
-        
+
+	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
+	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+			$scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
+	    });
+
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;

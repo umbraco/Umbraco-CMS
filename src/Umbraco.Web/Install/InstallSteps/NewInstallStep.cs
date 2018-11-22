@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Net;
@@ -9,8 +9,6 @@ using System.Web.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -19,25 +17,21 @@ namespace Umbraco.Web.Install.InstallSteps
     /// This is the first UI step for a brand new install
     /// </summary>
     /// <remarks>
-    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an
-    /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
+    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an 
+    /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll    
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly HttpContextBase _http;
-        private readonly IUserService _userService;
-        private readonly DatabaseBuilder _databaseBuilder;
+        private readonly ApplicationContext _applicationContext;
         private static HttpClient _httpClient;
-        private readonly IGlobalSettings _globalSettings;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
+        public NewInstallStep(HttpContextBase http, ApplicationContext applicationContext)
         {
             _http = http;
-            _userService = userService;
-            _databaseBuilder = databaseBuilder;
-            _globalSettings = globalSettings;
+            _applicationContext = applicationContext;
         }
 
         //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
@@ -52,16 +46,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(UserModel user)
         {
-            var admin = _userService.GetUserById(Constants.Security.SuperUserId);
+            var admin = _applicationContext.Services.UserService.GetUserById(0);
             if (admin == null)
             {
-                throw new InvalidOperationException("Could not find the super user!");
+                throw new InvalidOperationException("Could not find the admi user!");
             }
 
-            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperUserId, true);
+            var membershipUser = CurrentProvider.GetUser(0, true);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+                throw new InvalidOperationException("No user found in membership provider with id of 0");
             }
 
             try
@@ -81,7 +75,7 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Name = user.Name.Trim();
             admin.Username = user.Email.Trim();
 
-            _userService.Save(admin);
+            _applicationContext.Services.UserService.Save(admin);
             
             if (user.SubscribeToNewsLetter)
             {
@@ -124,7 +118,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 return RequiresExecution(null)
               //the user UI
-                ? "user"
+              ? "user"
               //the continue install UI
               : "continueinstall";
             }
@@ -135,18 +129,31 @@ namespace Umbraco.Web.Install.InstallSteps
             //now we have to check if this is really a new install, the db might be configured and might contain data
             var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
-            //if there's already a version then there should def be a user but in some cases someone may have
+            //if there's already a version then there should def be a user but in some cases someone may have 
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
-            if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
+            if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
-            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
-                return _databaseBuilder.HasSomeNonDefaultUser() == false;
-
-            // In this one case when it's a brand new install and nothing has been configured, make sure the
-            // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings)
+                && _applicationContext.DatabaseContext.IsDatabaseConfigured)
+            {
+                //check if we have the default user configured already
+                var result = _applicationContext.DatabaseContext.Database.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                if (result == 1)
+                {
+                    //the user has not been configured
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                // In this one case when it's a brand new install and nothing has been configured, make sure the 
+                // back office cookie is cleared so there's no old cookies lying around causing problems
+                _http.ExpireCookie(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
 
                 return true;
+            }
         }
     }
 }

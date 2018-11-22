@@ -5,16 +5,16 @@
             <umb-box-content class="block-form">
 
                 <umb-empty-state
-                    ng-if="!nodeUrl || !nodeUrl.isUrl"
+                    ng-if="!nodeUrl"
                     size="small">
                     <localize key="content_noMediaLink"></localize>
                 </umb-empty-state>
 
-                <ul ng-if="nodeUrl && nodeUrl.isUrl" class="nav nav-stacked" style="margin-bottom: 0;">
+                <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
-                        <a href="{{nodeUrl.text}}" target="_blank">
+                        <a href="{{nodeUrl}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
-                            <span>{{nodeUrl.text}}</span>
+                            <span>{{nodeUrl}}</span>
                         </a>
                     </li>
                 </ul>
@@ -42,7 +42,7 @@
                         style="max-width: 100%; margin-bottom: 0px;"
                         icon="node.icon"
                         name="node.contentTypeName"
-                        allow-open="allowChangeMediaType"
+                        allow-open="allowOpen"
                         on-open="openMediaType(mediaType)">
                     </umb-node-preview>
                 </umb-control-group>

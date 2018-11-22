@@ -7,7 +7,6 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Search
 {
@@ -48,18 +47,14 @@ namespace Umbraco.Web.Search
         {
             try
             {
-                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
-                    return 0;
-
-                using (searcher)
-                using (var reader = searcher.IndexReader)
+                using (var reader = indexer.GetIndexWriter().GetReader())
                 {
                     return reader.NumDocs();
                 }
             }
             catch (AlreadyClosedException)
             {
-                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetIndexDocumentCount, the writer is already closed");
                 return 0;
             }
         }
@@ -71,21 +66,40 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
+            //TODO: check for closing! and AlreadyClosedException
+
             try
             {
-                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
-                    return 0;
-
-                using (searcher)
-                using (var reader = searcher.IndexReader)
+                using (var reader = indexer.GetIndexWriter().GetReader())
                 {
                     return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
                 }
             }
             catch (AlreadyClosedException)
             {
-                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetIndexFieldCount, the writer is already closed");
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetIndexFieldCount, the writer is already closed");
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the index is optimized or not
+        /// </summary>
+        /// <param name="indexer"></param>
+        /// <returns></returns>
+        public static bool IsIndexOptimized(this LuceneIndexer indexer)
+        {
+            try
+            {
+                using (var reader = indexer.GetIndexWriter().GetReader())
+                {
+                    return reader.IsOptimized();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get IsIndexOptimized, the writer is already closed");
+                return false;
             }
         }
 
@@ -98,7 +112,7 @@ namespace Umbraco.Web.Search
         /// If the index does not exist we'll consider it locked
         /// </remarks>
         public static bool IsIndexLocked(this LuceneIndexer indexer)
-        {
+        {   
             return indexer.IndexExists() == false
                    || IndexWriter.IsLocked(indexer.GetLuceneDirectory());
         }
@@ -112,18 +126,14 @@ namespace Umbraco.Web.Search
         {
             try
             {
-                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
-                    return 0;
-
-                using (searcher)
-                using (var reader = searcher.IndexReader)
+                using (var reader = indexer.GetIndexWriter().GetReader())
                 {
-                    return reader.NumDeletedDocs;
+                    return reader.NumDeletedDocs();
                 }
             }
             catch (AlreadyClosedException)
             {
-                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetDeletedDocumentsCount, the writer is already closed");
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetDeletedDocumentsCount, the writer is already closed");
                 return 0;
             }
         }

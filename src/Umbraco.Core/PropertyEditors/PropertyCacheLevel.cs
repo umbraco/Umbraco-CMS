@@ -1,37 +1,35 @@
 ﻿namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Specifies the level of cache for a property value.
+    /// Specifies the acceptable level of cache for a property value.
     /// </summary>
+    /// <remarks>By default, <c>Request</c> is assumed.</remarks>
     public enum PropertyCacheLevel
     {
-        /// <summary>
-        /// Default value.
-        /// </summary>
-        Unknown = 0,
+        // note: we use the relative values in PublishedPropertyType to ensure that
+        // object level >= source level
+        // xpath level >= source level
 
         /// <summary>
-        /// Indicates that the property value can be cached at the element level, i.e. it can be
-        /// cached until the element itself is modified.
+        /// Indicates that the property value can be cached at the content level, ie it can be
+        /// cached until the content itself is modified.
         /// </summary>
-        Element = 1,
+        Content = 1,
 
         /// <summary>
-        /// Indicates that the property value can be cached at the elements level, i.e. it can
-        /// be cached until any element is modified.
+        /// Indicates that the property value can be cached at the content cache level, ie it can
+        /// be cached until any content in the cache is modified.
         /// </summary>
-        Elements = 2,
+        ContentCache = 2,
 
         /// <summary>
-        /// Indicates that the property value can be cached at the snapshot level, i.e. it can be
-        /// cached for the duration of the current snapshot.
+        /// Indicates that the property value can be cached at the request level, ie it can be
+        /// cached for the duration of the current request.
         /// </summary>
-        /// <remarks>In most cases, a snapshot is created per request, and therefore this is
-        /// equivalent to cache the value for the duration of the request.</remarks>
-        Snapshot = 3,
+        Request = 3,
 
         /// <summary>
-        /// Indicates that the property value cannot be cached and has to be converted each time
+        /// Indicates that the property value cannot be cached and has to be converted any time
         /// it is requested.
         /// </summary>
         None = 4

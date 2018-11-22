@@ -51,8 +51,7 @@
                             hideheader="{{treeModel.hideHeader}}"
                             hideoptions="true"
                             isdialog="true"
-                            api="dialogTreeApi"
-                            on-init="onTreeInit()"
+                            eventhandler="dialogTreeEventHandler"
                             enablelistviewexpand="true"
                             enablecheckboxes="true">
                         </umb-tree>
@@ -84,7 +83,7 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="closeDialog()" ng-show="!busy">
+        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
         <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">

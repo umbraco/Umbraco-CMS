@@ -1,0 +1,157 @@
+.sbPlaceHolder
+{
+        display:inline;
+        width:90px;
+        height:23px;
+        vertical-align:top;
+}
+
+.sbLink
+{
+    vertical-align:top;
+}
+
+.menudown
+{
+    
+    clear:both;
+    text-align: center;
+    cursor:pointer;
+   
+}
+
+.menudown span
+{
+     background:url('images/splitbutton_downarrow.png') no-repeat 0px 0px;
+   
+}
+.menudown:hover
+{
+    background-color:#DDD;
+}
+a.l-btn{
+	color:#444;
+	font-size:12px;
+	text-decoration:none;
+	display:inline-block;
+	zoom:1;
+	height:24px;
+	padding-right:18px;
+	cursor:pointer;
+	outline:none;
+}
+a.l-btn-plain{
+	background:transparent;
+	padding-right:5px;
+	border:1px solid transparent;
+	_border:0px solid #efefef;
+	_padding:1px 6px 1px 1px;
+}
+
+
+a.l-btn span.l-btn-left{
+	display:block;
+	padding:4px 0px 4px 18px;
+	line-height:16px;
+}
+a.l-btn-plain span.l-btn-left{
+	background:transparent;
+	padding-left:5px;
+}
+
+a.l-btn span span.l-btn-text{
+	display:inline-block;
+	height:16px;
+	line-height:16px;
+	padding:0px;
+}
+a.l-btn span span span.l-btn-empty{
+	display:inline-block;
+	padding:0px;
+	width:16px;
+}
+a:hover.l-btn{
+	background-position: bottom right;
+	outline:none;
+}
+
+a:hover.l-btn-plain{
+	border:1px solid #4b4b6f;
+	background:url('images/splitbutton_hover.png') repeat-x left bottom;
+	_padding:0px 5px 0px 0px;
+}
+a:hover.l-btn-disabled{
+	background-position:top right;
+}
+a:hover.l-btn-disabled span.l-btn-left{
+	background-position:top left;
+}
+
+.menu{
+	position:absolute;
+	background-color:#f0f0f0;
+	margin:0;
+	padding:2px;
+	border: 1px solid #979797;
+	overflow:hidden;
+}
+.menu-item{
+	position:relative;
+	margin:0;
+	padding:0;
+	height:22px;
+	line-height:20px;
+	overflow:hidden;
+	font-size:12px;
+	cursor:pointer;
+	border:1px solid transparent;
+	_border:1px solid #f0f0f0;
+}
+.menu-text{
+	position:absolute;
+	left:2px;
+	top:0px;
+}
+.menu-icon{
+	position:absolute;
+	width:16px;
+	height:16px;
+	top:3px;
+	left:2px;
+}
+
+
+.menu-active{
+	border: 1px solid #a8d8eb;
+	background: #dcecf3;	
+}
+
+
+.s-btn-downarrow{
+	display:inline-block;
+	width:16px;
+	background:url('images/splitbutton_downarrow.png') no-repeat 4px 0px;
+}
+
+a.s-btn-active{
+	background-position: bottom right;
+}
+a.s-btn-active span.l-btn-left{
+	background-position: bottom left;
+}
+a.s-btn-active .s-btn-downarrow{
+	background:url('images/splitbutton_downarrow.png') no-repeat 4px -18px;
+}
+a:hover.l-btn .s-btn-downarrow{
+	background:url('images/splitbutton_downarrow.png') no-repeat 4px -18px;
+}
+
+a.s-btn-plain-active{
+	background:transparent;
+	border:1px solid #8f8f8f;
+	_padding:0px 5px 0px 0px;
+
+}
+a.s-btn-plain-active .s-btn-downarrow{
+	background:url('images/splitbutton_downarrow.png') no-repeat 4px -18px;
+}

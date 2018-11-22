@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
@@ -38,16 +37,26 @@ namespace Umbraco.Core
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
-        private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
+        private readonly SortedList<int, Action> _callbacks = new SortedList<int, Action>(new WeightComparer());
 
         private const int LockTimeoutMilliseconds = 90000; // (1.5 * 60 * 1000) == 1 min 30 seconds
+
+        private class WeightComparer : IComparer<int>
+        {
+            public int Compare(int x, int y)
+            {
+                var result = x.CompareTo(y);
+                // return "equal" as "greater than"
+                return result == 0 ? 1 : result;
+            }
+        }
 
         #endregion
 
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger)
+        internal MainDom(ILogger logger)
         {
             _logger = logger;
 
@@ -102,9 +111,10 @@ namespace Umbraco.Core
             lock (_locko)
             {
                 if (_signaled) return false;
-                install?.Invoke();
+                if (install != null)
+                    install();
                 if (release != null)
-                    _callbacks.Add(new KeyValuePair<int, Action>(weight, release));
+                    _callbacks.Add(weight, release);
                 return true;
             }
         }
@@ -117,7 +127,7 @@ namespace Umbraco.Core
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled {Signaled} ({SignalSource})", _signaled ? "(again)" : string.Empty, source);
+                _logger.Debug<MainDom>("Signaled" + (_signaled ? " (again)" : "") + " (" + source + ").");
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
@@ -125,8 +135,8 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Info<MainDom>("Stopping ({SignalSource})", source);
-                foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
+                _logger.Info<MainDom>("Stopping...");
+                foreach (var callback in _callbacks.Values)
                 {
                     try
                     {
@@ -134,19 +144,19 @@ namespace Umbraco.Core
                     }
                     catch (Exception e)
                     {
-                        _logger.Error<MainDom>(e, "Error while running callback, remaining callbacks will not run.");
+                        _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
                         throw;
                     }
 
                 }
-                _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                _logger.Debug<MainDom>("Stopped.");
             }
             finally
             {
                 // in any case...
                 _isMainDom = false;
                 _asyncLocker.Dispose();
-                _logger.Info<MainDom>("Released ({SignalSource})", source);
+                _logger.Info<MainDom>("Released MainDom.");
             }
         }
 
@@ -159,11 +169,11 @@ namespace Umbraco.Core
                 // the handler is not installed so that would be the hosting environment
                 if (_signaled)
                 {
-                    _logger.Info<MainDom>("Cannot acquire (signaled).");
+                    _logger.Info<MainDom>("Cannot acquire MainDom (signaled).");
                     return false;
                 }
 
-                _logger.Info<MainDom>("Acquiring.");
+                _logger.Info<MainDom>("Acquiring MainDom...");
 
                 // signal other instances that we want the lock, then wait one the lock,
                 // which may timeout, and this is accepted - see comments below
@@ -190,13 +200,16 @@ namespace Umbraco.Core
 
                 HostingEnvironment.RegisterObject(this);
 
-                _logger.Info<MainDom>("Acquired.");
+                _logger.Info<MainDom>("Acquired MainDom.");
                 return true;
             }
         }
 
         // gets a value indicating whether we are the main domain
-        public bool IsMainDom => _isMainDom;
+        public bool IsMainDom
+        {
+            get { return _isMainDom; }
+        }
 
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)

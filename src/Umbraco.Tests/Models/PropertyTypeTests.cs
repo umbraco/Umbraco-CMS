@@ -1,23 +1,23 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.Testing;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class PropertyTypeTests : UmbracoTestBase
+    public class PropertyTypeTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+            var pt = new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
-                DataTypeId = 5,
+                DataTypeDefinitionId = 5,
                 PropertyEditorAlias = "propTest",
                 Description = "testing",
                 Key = Guid.NewGuid(),
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.Nvarchar
+                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar                                
             };
 
             var clone = (PropertyType)pt.DeepClone();
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Id, pt.Id);
             Assert.AreEqual(clone.Alias, pt.Alias);
             Assert.AreEqual(clone.CreateDate, pt.CreateDate);
-            Assert.AreEqual(clone.DataTypeId, pt.DataTypeId);
+            Assert.AreEqual(clone.DataTypeDefinitionId, pt.DataTypeDefinitionId);
             Assert.AreEqual(clone.DataTypeId, pt.DataTypeId);
             Assert.AreEqual(clone.Description, pt.Description);
             Assert.AreEqual(clone.Key, pt.Key);
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.SortOrder, pt.SortOrder);
             Assert.AreEqual(clone.UpdateDate, pt.UpdateDate);
             Assert.AreEqual(clone.ValidationRegExp, pt.ValidationRegExp);
-            Assert.AreEqual(clone.ValueStorageType, pt.ValueStorageType);
+            Assert.AreEqual(clone.DataTypeDatabaseType, pt.DataTypeDatabaseType);
 
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
@@ -62,11 +62,11 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+            var pt = new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
-                DataTypeId = 5,
+                DataTypeDefinitionId = 5,
                 PropertyEditorAlias = "propTest",
                 Description = "testing",
                 Key = Guid.NewGuid(),
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.Nvarchar
+                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
             };
 
             var result = ss.ToStream(pt);

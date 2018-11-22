@@ -11,7 +11,7 @@ namespace Umbraco.Web.WebApi
     public class AngularJsonOnlyConfigurationAttribute : Attribute, IControllerConfiguration
     {
         public virtual void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
-        {
+        {            
             //remove all json/xml formatters then add our custom one
             var toRemove = controllerSettings.Formatters.Where(t => (t is JsonMediaTypeFormatter) || (t is XmlMediaTypeFormatter)).ToList();
             foreach (var r in toRemove)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -14,6 +15,29 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table
+        /// </summary>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>        
+        IEnumerable<XElement> GetPagedXmlEntries(long pageIndex, int pageSize, out long totalRecords);
+
+        /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
+        void RebuildXmlStructures(params int[] contentTypeIds);
+
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
+            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
         /// </summary>
@@ -74,7 +98,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned
+        /// <remarks>Using this method will persist the Member object before its returned 
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -86,7 +110,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates and persists a Member
         /// </summary>
-        /// <remarks>Using this method will persist the Member object before its returned
+        /// <remarks>Using this method will persist the Member object before its returned 
         /// meaning that it will have an Id available (unlike the CreateMember method)</remarks>
         /// <param name="username">Username of the Member to create</param>
         /// <param name="email">Email of the Member to create</param>
@@ -96,13 +120,13 @@ namespace Umbraco.Core.Services
         IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
         /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be 
         /// used during Member creation.
         /// </summary>
         /// <remarks>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
+        /// This method exists so that Umbraco developers can use this entry point to set a password when Creating members ...
         /// this will not work for updating members in most cases (depends on your membership provider settings)
-        ///
+        /// 
         /// It is preferred to use the membership APIs for working with passwords, in the near future this method will be obsoleted
         /// and the ASP.NET Identity APIs should be used instead.
         /// </remarks>
@@ -175,6 +199,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         void DeleteMembersOfType(int memberTypeId);
+        
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Finds Members based on their display name

@@ -1,5 +1,5 @@
 angular.module('umbraco.mocks').
-    factory('mocksUtils', ['$cookies', function ($cookies) {
+    factory('mocksUtils', ['$cookieStore', function($cookieStore) {
         'use strict';
          
         //by default we will perform authorization
@@ -297,7 +297,7 @@ angular.module('umbraco.mocks').
             /** Checks for our mock auth cookie, if it's not there, returns false */
             checkAuth: function () {
                 if (doAuth) {
-                    var mockAuthCookie = $cookies.get("mockAuthCookie");
+                    var mockAuthCookie = $cookieStore.get("mockAuthCookie");
                     if (!mockAuthCookie) {
                         return false;
                     }
@@ -311,12 +311,12 @@ angular.module('umbraco.mocks').
             /** Creates/sets the auth cookie with a value indicating the user is now authenticated */
             setAuth: function() {
                 //set the cookie for loging
-                $cookies.put("mockAuthCookie", "Logged in!");
+                $cookieStore.put("mockAuthCookie", "Logged in!");
             },
             
             /** removes the auth cookie  */
             clearAuth: function() {
-                $cookies.remove("mockAuthCookie");
+                $cookieStore.remove("mockAuthCookie");
             },
 
             urlRegex: function(url) {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Collections
+namespace Umbraco.Core.Collections
 {
     internal enum ListCloneBehavior
     {

@@ -6,56 +6,26 @@
  * @description
  * Some angular helper/extension methods
  */
-function angularHelper($q) {
+function angularHelper($log, $q) {
     return {
 
         /**
-         * Method used to re-run the $parsers for a given ngModel
-         * @param {} scope 
-         * @param {} ngModel 
-         * @returns {} 
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#rejectedPromise
+         * @methodOf umbraco.services.angularHelper
+         * @function
+         *
+         * @description
+         * In some situations we need to return a promise as a rejection, normally based on invalid data. This
+         * is a wrapper to do that so we can save on writing a bit of code.
+         *
+         * @param {object} objReject The object to send back with the promise rejection
          */
-        revalidateNgModel: function (scope, ngModel) {
-            this.safeApply(scope, function() {
-                angular.forEach(ngModel.$parsers, function (parser) {
-                    parser(ngModel.$viewValue);
-                });
-            });
-        },
-
-        /**
-         * Execute a list of promises sequentially. Unlike $q.all which executes all promises at once, this will execute them in sequence.
-         * @param {} promises 
-         * @returns {} 
-         */
-        executeSequentialPromises: function (promises) {
-
-            //this is sequential promise chaining, it's not pretty but we need to do it this way.
-            //$q.all doesn't execute promises in sequence but that's what we want to do here.
-
-            if (!angular.isArray(promises)) {
-                throw "promises must be an array";
-            }
-
-            //now execute them in sequence... sorry there's no other good way to do it with angular promises
-            var j = 0;
-            function pExec(promise) {
-                j++;
-                return promise.then(function (data) {
-                    if (j === promises.length) {
-                        return $q.when(data); //exit
-                    }
-                    else {
-                        return pExec(promises[j]); //recurse
-                    }
-                });
-            }
-            if (promises.length > 0) {
-                return pExec(promises[0]); //start the promise chain
-            }
-            else {
-                return $q.when(true); // just exit, no promises to execute
-            }
+        rejectedPromise: function (objReject) {
+            var deferred = $q.defer();
+            //return an error object including the error message for UI
+            deferred.reject(objReject);
+            return deferred.promise;
         },
 
         /**
@@ -68,7 +38,7 @@ function angularHelper($q) {
          * This checks if a digest/apply is already occuring, if not it will force an apply call
          */
         safeApply: function (scope, fn) {
-            if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
+            if (scope.$$phase || scope.$root.$$phase) {
                 if (angular.isFunction(fn)) {
                     fn();
                 }
@@ -104,7 +74,8 @@ function angularHelper($q) {
             // is to inject the $element object and use: $element.inheritedData('$formController');
 
             var form = null;
-            var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
+            //var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
+            var requiredFormProps = ["$addControl", "$removeControl", "$setValidity", "$setDirty", "$setPristine"];
 
             // a method to check that the collection of object prop names contains the property name expected
             function propertyExists(objectPropNames) {
@@ -166,24 +137,18 @@ function angularHelper($q) {
          * Returns a null angular FormController, mostly for use in unit tests
          *      NOTE: This is actually the same construct as angular uses internally for creating a null form but they don't expose
          *          any of this publicly to us, so we need to create our own.
-         *      NOTE: The properties has been added to the null form because we use them to get a form on a scope.
          *
          * @param {string} formName The form name to assign
          */
         getNullForm: function (formName) {
             return {
-                $error: {},
-                $dirty: false,
-                $pristine: true,
-                $valid: true,
-                $submitted: false,
-                $pending: undefined,
                 $addControl: angular.noop,
                 $removeControl: angular.noop,
                 $setValidity: angular.noop,
                 $setDirty: angular.noop,
                 $setPristine: angular.noop,
                 $name: formName
+                //NOTE: we don't include the 'properties', just the methods.
             };
         }
     };

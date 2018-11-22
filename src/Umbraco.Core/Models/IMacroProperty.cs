@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets or sets the parameter editor alias
-        /// </summary>
+        /// </summary>        
         [DataMember]
         string EditorAlias { get; set; }
     }

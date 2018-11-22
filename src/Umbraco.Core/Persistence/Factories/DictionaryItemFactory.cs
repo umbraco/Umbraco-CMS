@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class DictionaryItemFactory
+    internal class DictionaryItemFactory 
     {
         #region Implementation of IEntityFactory<DictionaryItem,DictionaryDto>
 
-        public static IDictionaryItem BuildEntity(DictionaryDto dto)
+        public IDictionaryItem BuildEntity(DictionaryDto dto)
         {
             var item = new DictionaryItem(dto.Parent, dto.Key);
 
@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Factories
 
                 item.Id = dto.PrimaryKey;
                 item.Key = dto.UniqueId;
-
-                // reset dirty initial properties (U4-1946)
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
                 item.ResetDirtyProperties(false);
                 return item;
             }
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static DictionaryDto BuildDto(IDictionaryItem entity)
+        public DictionaryDto BuildDto(IDictionaryItem entity)
         {
             return new DictionaryDto
                        {
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #endregion
 
-        private static List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
+        private List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
         {
             var list = new List<LanguageTextDto>();
             foreach (var translation in entity.Translations)

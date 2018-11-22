@@ -2,7 +2,7 @@
 <language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Angi domene</key>
@@ -61,6 +61,7 @@
   </area>
   <area alias="buttons">
     <key alias="select">Velg</key>
+    <key alias="selectCurrentFolder">Velg gjeldende mappe</key>
     <key alias="somethingElse">Gjør noe annet</key>
     <key alias="bold">Fet</key>
     <key alias="deindent">Reduser innrykk</key>
@@ -150,7 +151,7 @@
     <key alias="titleOptional">Tittel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
-    <key alias="unpublish">Avpubliser</key>
+    <key alias="unPublish">Avpubliser</key>
     <key alias="updateDate">Sist endret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for siste endring</key>
     <key alias="uploadClear">Fjern fil</key>
@@ -162,6 +163,7 @@
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klikk for å laste opp</key>
+    <key alias="dropFilesHere">Slipp filene her...</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opprett et nytt medlem</key>
@@ -191,22 +193,27 @@
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
+    
     <key alias="deletedItem">Deleted %0% item</key>
     <key alias="deletedItems">Deleted %0% items</key>
     <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
     <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+
     <key alias="publishedItem">Published %0% item</key>
     <key alias="publishedItems">Published %0% items</key>
     <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
     <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+
     <key alias="unpublishedItem">Unpublished %0% item</key>
     <key alias="unpublishedItems">Unpublished %0% items</key>
     <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
     <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+
     <key alias="movedItem">Moved %0% item</key>
     <key alias="movedItems">Moved %0% items</key>
     <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
     <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+
     <key alias="copiedItem">Copied %0% item</key>
     <key alias="copiedItems">Copied %0% items</key>
     <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
@@ -272,13 +279,20 @@
     <key alias="enterTags">Skriv inn nøkkelord (trykk på Enter etter hvert nøkkelord)...</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Tillat på rotnivå</key>
+    <key alias="allowAtRootDesc" version="7.2">Kun dokumenttyper med denne innstillingen aktivert kan opprettes på rotnivå under Innhold og Mediearkiv</key>
     <key alias="allowedchildnodetypes">Tillatte underordnede noder</key>
+    <key alias="contenttypecompositions">Sammensetting av dokumenttyper</key>
     <key alias="create">Opprett</key>
     <key alias="deletetab">Slett arkfane</key>
     <key alias="description">Beskrivelse</key>
     <key alias="newtab">Ny arkfane</key>
     <key alias="tab">Arkfane</key>
     <key alias="thumbnail">Miniatyrbilde</key>
+    <key alias="hasListView">Aktiver listevisning</key>
+    <key alias="hasListViewDesc" version="7.2">Viser undersider i en søkbar liste, undersider vises ikke i innholdstreet</key>
+    <key alias="currentListView" version="7.2">Gjeldende listevisning</key>
+    <key alias="currentListViewDesc" version="7.2">Den aktive listevisningsdatatypen</key>
     <key alias="createListView" version="7.2">Opprett brukerdefinert listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brukerdefinert listevisning</key>
   </area>
@@ -316,11 +330,16 @@
     <key alias="missingTitle">Tittel mangler</key>
     <key alias="missingType">Type mangler</key>
     <key alias="pictureResizeBiggerThanOrg">Du er i ferd med å gjøre bildet større enn originalen. Det vil forringe kvaliteten på bildet, ønsker du å fortsette?</key>
+    <key alias="pythonErrorHeader">Feil i python-skriptet</key>
+    <key alias="pythonErrorText">Python-skriptet ble ikke lagret fordi det inneholder en eller flere feil</key>
     <key alias="startNodeDoesNotExists">Startnode er slettet. Kontakt din administrator</key>
     <key alias="stylesMustMarkBeforeSelect">Du må markere innhold før du kan endre stil</key>
     <key alias="stylesNoStylesOnPage">Det er ingen aktive stiler eller formateringer på denne siden</key>
     <key alias="tableColMergeLeft">Sett markøren til venstre i de 2 cellene du ønsker å slå sammen</key>
     <key alias="tableSplitNotSplittable">Du kan ikke dele en celle som allerede er delt.</key>
+    <key alias="xsltErrorHeader">Feil i XSLT kode</key>
+    <key alias="xsltErrorText">XSLT ble ikke lagret på grunn av feil i koden</key>
+    <key alias="missingPropertyEditorErrorMessage">Det er et problem dem datatypen som brukes til denne egenskapen. Kontroller innstillingene og prøv igjen.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -375,6 +394,7 @@
     <key alias="logout">Logg ut</key>
     <key alias="macro">Makro</key>
     <key alias="move">Flytt</key>
+    <key alias="more">Mer</key>
     <key alias="name">Navn</key>
     <key alias="new">Ny</key>
     <key alias="next">Neste</key>
@@ -449,7 +469,7 @@
     <key alias="databaseHeader">Databasekonfigurasjon</key>
     <key alias="databaseInstall"><![CDATA[Klikk <strong>installer</strong>-knappen for å installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% har nå blitt kopiert til din database. Trykk <strong>Neste</strong> for å fortsette.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").<br/> Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Trykk på knappen <strong>oppgrader</strong> for å oppgradere databasen din til Umbraco %0%</p> <p> Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key>
@@ -692,8 +712,12 @@ Vennlig hilsen Umbraco roboten
     <key alias="users">Brukere</key>
     <key alias="help" version="7.0">Hjelp</key>
     <key alias="forms">Skjemaer</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="help">
+    <key alias="goTo">gå til</key>
+    <key alias="helpTopicsFor">Hjelpeemner for</key>
+    <key alias="videoChaptersFor">Videokapitler for</key>
     <key alias="theBestUmbracoVideoTutorials">De beste Umbraco opplæringsvideoer</key>
   </area>
   <area alias="settings">
@@ -713,6 +737,8 @@ Vennlig hilsen Umbraco roboten
     <key alias="contentTypeUses">Denne dokumenttypen bruker</key>
     <key alias="asAContentMasterType">som hoveddokumenttype. Arkfaner fra hoveddokumenttyper vises ikke og kan kun endres på hoveddokumenttypen selv.</key>
     <key alias="noPropertiesDefinedOnTab">Ingen egenskaper definert i denne arkfanen. Klikk på "legg til ny egenskap" lenken i toppen for å opprette en ny egenskap.</key>
+    <key alias="masterDocumentType">Hovedinnholdstype</key>
+    <key alias="createMatchingTemplate">Opprett tilhørende mal</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sort order</key>
@@ -761,15 +787,29 @@ Vennlig hilsen Umbraco roboten
     <key alias="fileSavedHeader">Filen ble lagret</key>
     <key alias="fileSavedText">Filen ble lagret uten feil</key>
     <key alias="languageSaved">Språk lagret</key>
+    <key alias="pythonErrorHeader">Python-skriptet ble ikke lagret</key>
+    <key alias="pythonErrorText">Python-skriptet kunne ikke lagres fordi det inneholder en eller flere feil</key>
+    <key alias="pythonSavedHeader">Python-skriptet er lagret!</key>
+    <key alias="pythonSavedText">Ingen feil i python-skriptet!</key>
     <key alias="templateErrorHeader">Malen ble ikke lagret</key>
     <key alias="templateErrorText">Vennligst forviss deg om at du ikke har to maler med samme alias</key>
     <key alias="templateSavedHeader">Malen ble lagret</key>
     <key alias="templateSavedText">Malen ble lagret uten feil!</key>
+    <key alias="xsltErrorHeader">XSLT-koden ble ikke lagret</key>
+    <key alias="xsltErrorText">XSLT-koden inneholdt en feil</key>
+    <key alias="xsltPermissionErrorText">XSLT-koden ble ikke lagret, sjekk filrettigheter</key>
+    <key alias="xsltSavedHeader">XSLT lagret</key>
+    <key alias="xsltSavedText">Ingen feil i XSLT!</key>
     <key alias="contentUnpublished">Innhold avpublisert</key>
     <key alias="partialViewSavedHeader">Delmal lagret</key>
     <key alias="partialViewSavedText">Delmal lagret uten feil</key>
     <key alias="partialViewErrorHeader">Delmal ble ikke lagret!</key>
     <key alias="partialViewErrorText">En feil oppsto ved lagring av delmal</key>
+    <key alias="scriptSavedHeader">Script visning lagret</key>
+    <key alias="scriptSavedText">Script visning lagret uten feil!</key>
+    <key alias="scriptErrorHeader">Script visning ikke lagret</key>
+    <key alias="scriptErrorText">En feil oppsto under lagring av filen.</key>
+    <key alias="cssErrorText">En feil oppsto under lagring av filen.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Bruk CSS syntaks f.eks: h1, .redHeader, .blueText</key>
@@ -791,20 +831,27 @@ Vennlig hilsen Umbraco roboten
     <key alias="template">Mal</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
     <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Sett inn element</key>
     <key alias="chooseLayout">Velg layout</key>
     <key alias="addRows">Legg til rad</key>
     <key alias="addElement">Legg til innhold</key>
     <key alias="dropElement">Slipp innhold</key>
     <key alias="settingsApplied">Raden har tilpasset design</key>
+
     <key alias="contentNotAllowed">Innholdstypen er ikke tillatt her</key>
     <key alias="contentAllowed">Innholdstypen er tillatt her</key>
+
     <key alias="clickToEmbed">Klikk for å bygge inn</key>
     <key alias="clickToInsertImage">Klikk for å sette inn et bilde</key>
     <key alias="placeholderImageCaption">Bildetekst...</key>
     <key alias="placeholderWriteHere">Skriv her...</key>
+    
     <key alias="gridLayouts">Rutenettoppsett</key>
     <key alias="gridLayoutsDetail">Et oppsett er det overordnede arbeidsområdet til ditt rutenett - du vil typisk kun behøve ett eller to</key>
     <key alias="addGridLayout">Legg til rutenettoppsett</key>
@@ -813,12 +860,18 @@ Vennlig hilsen Umbraco roboten
     <key alias="rowConfigurationsDetail">Rader er forhåndsdefinerte celler arrangert vannrett</key>
     <key alias="addRowConfiguration">Legg til radkonfigurasjon</key>
     <key alias="addRowConfigurationDetail">Juster raden ved å sette cellebredder og legge til flere celler</key>
+
     <key alias="columns">Kolonner</key>
     <key alias="columnsDetails">Totalt antall kolonner i rutenettet</key>
+    
     <key alias="settings">Innstillinger</key>
     <key alias="settingsDetails">Konfigurer hvilke innstillinger brukeren kan endre</key>
+
     <key alias="styles">Stiler</key>
     <key alias="stylesDetails">Konfigurer hvilke stiler redaktørene kan endre</key>
+
+    <key alias="settingDialogDetails">Innstillingene lagres kun når konfigurasjonen er gyldig</key>
+    
     <key alias="allowAllEditors">Tillatt alle editorer</key>
     <key alias="allowAllRowConfigurations">Tillat alle radkonfigurasjoner</key>
     <key alias="setAsDefault">Bruk som standard</key>
@@ -855,7 +908,12 @@ Vennlig hilsen Umbraco roboten
     <key alias="withTime">Ja, med klokkeslett. Dato/tid separator: </key>
   </area>
   <area alias="translation">
+    <key alias="assignedTasks">Oppgaver satt til deg</key>
+    <key alias="assignedTasksHelp"><![CDATA[Listen nedenfor viser oversettelsesoppgaver <strong>som du er tildelt</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". <br/> For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key>
+    <key alias="closeTask">Lukk oppgave</key>
     <key alias="details">Oversettelses detaljer</key>
+    <key alias="downloadAllAsXml">Last ned all oversettelsesoppgaver som XML</key>
+    <key alias="downloadTaskAsXml">Last ned XML</key>
     <key alias="DownloadXmlDTD">Last ned XML DTD</key>
     <key alias="fields">Felt</key>
     <key alias="includeSubpages">Inkluder undersider</key>
@@ -871,9 +929,14 @@ Vennlig hilsen Umbraco roboten
 
 			Vennlig hilsen Umbraco Robot.
 		]]></key>
+    <key alias="mailSubject">[%0%] Oversettingsoppgave for %1%</key>
     <key alias="noTranslators">Ingen oversettelses-bruker funnet. Vennligst opprett en oversettelses-bruker før du begynner å sende innhold til oversetting</key>
+    <key alias="ownedTasks">Oppgaver opprettet av deg</key>
+    <key alias="ownedTasksHelp"><![CDATA[Listen under viser sider <strong>opprettet av deg</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key>
     <key alias="pageHasBeenSendToTranslation">Siden '%0%' har blitt sendt til oversetting</key>
     <key alias="sendToTranslate">Send til oversetting</key>
+    <key alias="taskAssignedBy">Tildelt av</key>
+    <key alias="taskOpened">Oppgave åpnet</key>
     <key alias="totalWords">Antall ord</key>
     <key alias="translateTo">Oversett til</key>
     <key alias="translationDone">Oversetting fullført.</key>
@@ -903,6 +966,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="nodeTypes">Dokumenttyper</key>
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
+    <key alias="python">Python Filer</key>
     <key alias="repositories">Installer fra pakkeregister</key>
     <key alias="runway">Installer Runway</key>
     <key alias="runwayModules">Runway moduler</key>
@@ -910,9 +974,8 @@ Vennlig hilsen Umbraco roboten
     <key alias="scripts">Skript</key>
     <key alias="stylesheets">Stiler</key>
     <key alias="templates">Maler</key>
-    <key alias="userPermissions">Brukertillatelser</key>
-    <key alias="userTypes">Brukertyper typer</key>
-    <key alias="users">Brukere</key>
+    <key alias="xslt">XSLT Filer</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny oppdatering er klar</key>
@@ -956,6 +1019,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brukertillatelser</key>
     <key alias="writer">Forfatter</key>
+    <key alias="translator">Oversetter</key>
     <key alias="change">Endre</key>
     <key alias="yourProfile" version="7.0">Din profil</key>
     <key alias="yourHistory" version="7.0">Din historikk</key>

@@ -1,0 +1,131 @@
+<div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Overlay.PropertySettingsOverlay as vm">
+
+   <div class="umb-control-group" ng-if="!model.property.locked">
+       <div class="control-group">
+           <textarea class="editor-label"
+               data-element="property-name"
+               name="propertyLabel"
+               ng-model="model.property.label"
+               localize="placeholder"
+               placeholder="@placeholders_entername"
+               umb-auto-focus
+               focus-on-filled="true"
+               umb-auto-resize
+               required
+               overlay-submit-on-enter>
+            </textarea>
+            <div class="umb-validation-label" val-msg-for="propertyLabel" val-toggle-msg="required">Required label</div>
+       </div>
+       <div class="control-group -no-margin">
+           <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
+       </div>
+   </div>
+
+   <div class="umb-control-group control-group">
+      <textarea
+          data-element="property-description"
+          class="editor-description"
+          ng-model="model.property.description"
+          localize="placeholder"
+          placeholder="@placeholders_enterDescription"
+          overlay-submit-on-enter
+          umb-auto-resize>
+      </textarea>
+   </div>
+
+   <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
+
+      <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
+          <localize key="shortcuts_addEditor"></localize>
+      </a>
+
+      <div class="editor clearfix" ng-if="model.property.editor">
+
+         <a href="" class="editor-icon-wrapper" ng-click="vm.openEditorPickerOverlay(model.property)">
+            <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+         </a>
+
+         <div class="editor-details">
+            <a href="" class="editor-name" ng-click="vm.openEditorPickerOverlay(model.property)">{{ model.property.dataTypeName }}</a>
+            <a href="" class="editor-editor" ng-click="vm.openEditorPickerOverlay(model.property)">{{ model.property.editor }}</a>
+         </div>
+
+         <a href class="editor-settings-icon pull-right"
+            ng-click="vm.openEditorSettingsOverlay(model.property)"
+            hotkey="alt+shift+d"
+            ng-if="model.property.editor">
+            <i class="icon icon-settings"></i>
+         </a>
+
+      </div>
+
+   </div>
+
+   <div class="umb-control-group clearfix"  ng-if="!model.property.locked">
+
+       <h5><localize key="validation_validation"></localize></h5>
+
+      <label class="checkbox no-indent">
+         <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}">
+         <localize key="validation_fieldIsMandatory"></localize>
+      </label>
+
+      <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
+         <option value=""><localize key="validation_validation">Validation</localize></option>
+      </select>
+
+      <textarea
+         class="editor-validation-pattern"
+         localize="placeholder"
+         placeholder="@validation_validationRegExp"
+         ng-model="model.property.validation.pattern"
+         ng-change="vm.changeValidationPattern()"
+         ng-if="vm.showValidationPattern"
+         umb-auto-resize
+         focus-when="{{vm.focusOnPatternField}}"
+         overlay-submit-on-enter>
+      </textarea>
+
+   </div>
+
+   <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+
+       <h5><localize key="general_options"></localize></h5>
+       
+       <label class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+           <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+           <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
+       </label>
+
+       <label class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.memberCanEdit">
+           <localize key="contentTypeEditor_memberCanEdit"></localize>
+           <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
+       </label>
+
+       <label ng-if="vm.showSensitiveData" class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.isSensitiveData">
+           <localize key="contentTypeEditor_isSensitiveData"></localize>
+           <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
+       </label>
+
+   </div>
+
+   <umb-overlay
+      data-element="overlay-editor-picker"
+      ng-if="vm.editorPickerOverlay.show"
+      model="vm.editorPickerOverlay"
+      position="right"
+      view="vm.editorPickerOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+      data-element="overlay-editor-settings"
+      ng-if="vm.editorSettingsOverlay.show"
+      model="vm.editorSettingsOverlay"
+      position="right"
+      view="vm.editorSettingsOverlay.view">
+   </umb-overlay>
+
+</div>

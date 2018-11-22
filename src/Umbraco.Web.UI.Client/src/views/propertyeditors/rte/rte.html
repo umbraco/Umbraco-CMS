@@ -1,6 +1,35 @@
-<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-property-editor umb-rte">
+<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-editor umb-rte">
     <div class="-loading" ng-if="isLoading"><localize key="general_loading">Loading</localize>...</div>
+    <textarea ng-style="{ visibility :  isLoading ? 'hidden' : 'visible'}"
+              ng-model="model.value" rows="10"
+              id="{{textAreaHtmlId}}"></textarea>
 
-    <div ng-style="{ visibility :  isLoading ? 'hidden' : 'visible'}"
-         id="{{textAreaHtmlId}}" class="umb-rte-editor"></div>
+    <umb-overlay
+        ng-if="linkPickerOverlay.show"
+        model="linkPickerOverlay"
+        view="linkPickerOverlay.view"
+        position="right">
+    </umb-overlay>
+
+   <umb-overlay
+      ng-if="mediaPickerOverlay.show"
+      model="mediaPickerOverlay"
+      position="right"
+      view="mediaPickerOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+      ng-if="embedOverlay.show"
+      model="embedOverlay"
+      position="right"
+      view="embedOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+       ng-if="macroPickerOverlay.show"
+       model="macroPickerOverlay"
+       view="macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
+
 </div>

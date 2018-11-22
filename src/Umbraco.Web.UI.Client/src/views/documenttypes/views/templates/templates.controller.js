@@ -18,7 +18,6 @@
         vm.availableTemplates = [];
         vm.canCreateTemplate = false;
         vm.updateTemplatePlaceholder = false;
-        vm.loadingTemplates = false;
 
         vm.createTemplate = createTemplate;
 
@@ -26,7 +25,6 @@
 
         function onInit() {
 
-            vm.loadingTemplates = true;
             entityResource.getAll("Template").then(function (templates) {
 
                 vm.availableTemplates = templates;
@@ -37,7 +35,6 @@
                     vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
                 }
 
-                vm.loadingTemplates = false;
                 checkIfTemplateExists();
 
             });

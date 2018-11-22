@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             : base(rawXml)
         {
         }
-
+        
         string IFileExtension.Extension
         {
             get { return Value; }

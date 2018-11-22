@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var filter = new ResultExecutingContext(controllerCtx, new ContentResult()) {RouteData = controllerCtx.RouteData};
             var att = new MergeParentContextViewDataAttribute();
-
+            
             Assert.IsTrue(filter.IsChildAction);
             att.OnResultExecuting(filter);
 
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Web.Mvc
 
         internal class MyController : Controller
         {
-
+            
         }
     }
 }

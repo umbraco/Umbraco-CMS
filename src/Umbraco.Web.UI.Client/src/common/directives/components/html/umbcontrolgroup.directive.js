@@ -14,7 +14,7 @@ angular.module("umbraco.directives.html")
         labelFor: "@",
         required: "@?"
       },
-      require: '?^^form',
+      require: '?^form',
       transclude: true,
       restrict: 'E',
       replace: true,
@@ -31,20 +31,14 @@ angular.module("umbraco.directives.html")
         };
 
         if (scope.label && scope.label[0] === "@") {
-          localizationService.localize(scope.label.substring(1))
-            .then(function(data){
-              scope.labelstring = data;
-            });
+          scope.labelstring = localizationService.localize(scope.label.substring(1));
         }
         else {
           scope.labelstring = scope.label;
         }
 
         if (scope.description && scope.description[0] === "@") {
-          localizationService.localize(scope.description.substring(1))
-            .then(function(data){
-              scope.descriptionstring = data;
-            });
+          scope.descriptionstring = localizationService.localize(scope.description.substring(1));
         }
         else {
           scope.descriptionstring = scope.description;

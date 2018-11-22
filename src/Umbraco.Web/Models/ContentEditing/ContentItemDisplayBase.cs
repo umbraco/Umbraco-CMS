@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    public abstract class ContentItemDisplayBase<T> : TabbedContentItem<T>, INotificationModel, IErrorModel
-        where T : ContentPropertyBasic
+    public abstract class ContentItemDisplayBase<T, TPersisted> : TabbedContentItem<T, TPersisted>, INotificationModel, IErrorModel
+        where T : ContentPropertyBasic 
+        where TPersisted : IContentBase
     {
         protected ContentItemDisplayBase()
         {
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// A content item can be invalid but still be saved. This occurs when there's property validation errors, we will
         /// still save the item but it cannot be published. So we need a way of returning validation errors as well as the
         /// updated model.
-        ///
+        /// 
         /// NOTE: The ProperCase is important because when we return ModeState normally it will always be proper case.
         /// </remarks>
         [DataMember(Name = "ModelState")]

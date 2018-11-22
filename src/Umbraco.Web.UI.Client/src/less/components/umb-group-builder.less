@@ -8,12 +8,12 @@
 
 .umb-group-builder__group {
   min-height: 86px;
-  border: 1px solid transparent;
-  border-radius: @baseBorderRadius;
+  margin: 50px 0 0 0;
+  border: 2px solid @gray-7;
+  border-radius: 0 10px 10px 10px;
+  padding: 10px 10px 5px 10px;
   box-sizing: border-box;
-  background-color: @white;
-  position: relative;
-  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+  position:relative;
 }
 
 .umb-group-builder__group.-active {
@@ -23,7 +23,6 @@
 .umb-group-builder__group.-inherited {
   border-color: @gray-9;
   animation: fadeIn 0.5s;
-  box-shadow: none;
 }
 
 .umb-group-builder__group.-placeholder {
@@ -32,11 +31,10 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border: 1px dashed @gray-7;
+  border: 1px dashed @gray-8;
   color: @turquoise-d1;
   font-weight: bold;
   position: relative;
-  box-shadow: none;
 }
 
 .umb-group-builder__group.-sortable {
@@ -58,8 +56,9 @@
 }
 
 .umb-group-builder__group-remove {
-  position: relative;
-  margin-left: auto;
+  position: absolute;
+  top: -30px;
+  right: 20px;
   font-size: 18px;
 }
 
@@ -71,15 +70,28 @@
 .umb-group-builder__group-title-wrapper {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid @gray-9;
-  padding: 10px 15px;
+  margin-left: -12px;
+  margin-top: -55px;
+}
+
+.umb-group-builder__group-title-wrapper.-placeholder {
+  position: absolute;
+  left: -1px;
+  top: -44px;
+  margin-left: 0;
+  margin-top: 0;
 }
 
 .umb-group-builder__group-title {
+  padding: 5px 9px 0 9px;
+  height: 38px;
+  background: @white;
+  border: 2px solid @gray-7;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
   font-weight: bold;
   display: flex;
   align-items: center;
-  color: @black;
 }
 
 .umb-group-builder__group-title-icon {
@@ -104,12 +116,8 @@ input.umb-group-builder__group-title-input {
   border-color: transparent;
   background: transparent;
   font-weight: bold;
-  color: @black;
+  color: @gray-3;
   margin-bottom: 0;
-}
-
-input.umb-group-builder__group-title-input:disabled:hover {
-  border: none;
 }
 
 .umb-group-builder__group-title-input:hover {
@@ -122,14 +130,17 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 .umb-group-builder__group-inherited-label {
   font-size: 13px;
+  color: @gray-8;
   display: inline-block;
   position: relative;
   top: 2px;
+  margin-left: 10px;
 }
 
 .umb-group-builder__group-sort-order {
-    margin-right: 10px;
-    margin-left: auto;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
 }
 
 /* ---------- PROPERTIES ---------- */
@@ -137,7 +148,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
 .umb-group-builder__properties {
   list-style: none;
   margin: 0;
-  padding: 15px;
+  padding: 0;
   min-height: 35px; // the height of a sortable property
 }
 
@@ -145,21 +156,33 @@ input.umb-group-builder__group-title-input:disabled:hover {
   position: relative;
   display: flex;
   flex-flow: row;
+  margin-bottom: 5px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 5px;
   box-sizing: border-box;
-  border-bottom: 1px solid @gray-10; 
-  padding: 10px 0;
 }
 
-.umb-group-builder__property:first-of-type {
-  padding-top: 0;
+.umb-group-builder__property:hover {
+  border: 1px dashed @inputBorder;
 }
 
-.umb-group-builder__property:last-of-type {
-  margin-bottom: 15px;
+.umb-group-builder__property.-placeholder {
+  background: @white;
+  border: 1px dashed @gray-8;
+  border-radius: 5px;
+  cursor: pointer;
+  align-items: center;
+  animation: fadeIn 0.5s;
 }
 
 .umb-group-builder__property.-inherited {
+  border: transparent;
   animation: fadeIn 0.5s;
+}
+
+.umb-group-builder__property.-inherited:hover {
+  border: transparent;
 }
 
 .umb-group-builder__property.-locked {
@@ -174,16 +197,14 @@ input.umb-group-builder__group-title-input:disabled:hover {
 .umb-group-builder__property.-sortable,
 .umb-group-builder__property.-sortable-locked {
     min-height: 35px;
-    border-radius: @baseBorderRadius;
+    border-radius: 5px;
     border: none;
     animation: none;
     align-items: center;
-    padding: 5px 10px;
-    margin-bottom: 5px;
 }
 
 .umb-group-builder__property.-sortable {
-  background: @gray-10;
+  background: @gray-9;
   color: @gray-1;
   cursor: move;
 }
@@ -195,17 +216,16 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 
 .umb-group-builder__property-meta {
-  flex: 0 0 250px;
+  flex: 0 0 175px;
   margin-right: 20px;
 }
 
 .umb-group-builder__property-meta.-full-width {
   flex: 1;
-  margin-right: 0;
 }
 
 .umb-group-builder__property-meta-alias {
-  font-size: 12px;
+  font-size: 10px;
   color: @gray-3;
   word-break: break-word;
   line-height: 1.5;
@@ -252,7 +272,7 @@ input.umb-group-builder__group-title-input:disabled:hover {
   overflow: hidden;
   position: relative;
   padding: 35px 10px 25px 10px;
-  background-color: @gray-10;
+  background: url("../img/checkered-background-20.png");
 }
 
 .umb-group-builder__property-preview:hover {
@@ -336,6 +356,42 @@ input.umb-group-builder__group-title-input:disabled:hover {
     margin-right: 3px;
 }
 
+
+/* ---------- PLACEHOLDER BOX ---------- */
+
+.umb-group-builder__placeholder-box {
+  background: @gray-9;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: @turquoise-d1;
+}
+
+.umb-group-builder__placeholder-box.-input {
+  height: 10px;
+  margin-bottom: 5px;
+}
+
+.umb-group-builder__placeholder-box.-input-small {
+  height: 5px;
+  margin-bottom: 5px;
+  width: 25%;
+}
+
+.umb-group-builder__placeholder-box.-text-full-width {
+  height: 3px;
+  margin-bottom: 3px;
+}
+
+.umb-group-builder__placeholder-box.-text-short {
+  height: 3px;
+  margin-bottom: 3px;
+  width: 75%;
+}
+
 /* ---------- SORTABLE ---------- */
 
 .umb-group-builder__group-sortable-placeholder {
@@ -361,15 +417,10 @@ input.umb-group-builder__group-title-input:disabled:hover {
   text-align: center;
 }
 
-input.umb-group-builder__group-sort-value {
-  margin-bottom: 0;
-  margin-left: auto;
-}
-
 
 /* ---------- DIALOGS ---------- */
 
-.show-validation .edit-property-settings .ng-invalid-val-required-component .editor-placeholder {
+.umb-overlay .show-validation .ng-invalid-val-required-component .editor-placeholder {
    border-color: @red;
    color: @red;
 }

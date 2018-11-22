@@ -1,21 +1,12 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [DataEditor(Constants.PropertyEditors.Aliases.EmailAddress, EditorType.PropertyValue | EditorType.MacroParameter, "Email address", "email", Icon="icon-message")]
-    public class EmailAddressPropertyEditor : DataEditor
+    [PropertyEditor(Constants.PropertyEditors.EmailAddressAlias, "Email address", "email", IsParameterEditor = true, Icon="icon-message")]
+    public class EmailAddressPropertyEditor : PropertyEditor
     {
-        /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
-        /// </summary>
-        public EmailAddressPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
-
-        protected override IDataValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             //add an email address validator
@@ -23,9 +14,18 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override IConfigurationEditor CreateConfigurationEditor()
+        protected override PreValueEditor CreatePreValueEditor()
         {
-            return new EmailAddressConfigurationEditor();
+            return new EmailAddressePreValueEditor();
         }
+
+        internal class EmailAddressePreValueEditor : PreValueEditor
+        {
+            //TODO: This doesn't seem necessary since it can be specified at the property type level - this will however be useful if/when
+            // we support overridden property value pre-value options.
+            [PreValueField("Required?", "boolean")]
+            public bool IsRequired { get; set; }
+        }
+
     }
 }

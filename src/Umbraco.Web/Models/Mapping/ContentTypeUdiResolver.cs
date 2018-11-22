@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
@@ -6,9 +7,9 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Resolves a UDI for a content type based on it's type
     /// </summary>
-    internal class ContentTypeUdiResolver
+    internal class ContentTypeUdiResolver : ValueResolver<IContentTypeComposition, Udi>
     {
-        public Udi Resolve(IContentTypeComposition source)
+        protected override Udi ResolveCore(IContentTypeComposition source)
         {
             if (source == null) return null;
 

@@ -1,16 +1,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Caching;
 using System.Web.UI;
 using System.Xml;
+using StackExchange.Profiling;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Profiling;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Macros;
+using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.property;
+using umbraco.cms.businesslogic.web;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.templateControls
 {
@@ -58,10 +70,12 @@ namespace umbraco.presentation.templateControls
 
                 // parse macros and execute the XSLT transformation on the result if not empty
                 string renderOutput = renderOutputWriter.ToString();
-                renderOutput = renderOutput.Trim().Length == 0 ? string.Empty : renderOutput;
+                string xsltTransformedOutput = renderOutput.Trim().Length == 0
+                                               ? String.Empty
+                                               : XsltTransform(item.Xslt, renderOutput, item.XsltDisableEscaping);
                 // handle text before/after
-                renderOutput = AddBeforeAfterText(renderOutput, FindAttribute(item.LegacyAttributes, "insertTextBefore"), FindAttribute(item.LegacyAttributes, "insertTextAfter"));
-                string finalResult = renderOutput.Trim().Length > 0 ? renderOutput : GetEmptyText(item);
+                xsltTransformedOutput = AddBeforeAfterText(xsltTransformedOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
+                string finalResult = xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item);
 
                 //Don't parse urls if a content item is assigned since that is taken care
                 // of with the value converters
@@ -73,7 +87,7 @@ namespace umbraco.presentation.templateControls
                 {
                     writer.Write(finalResult);
                 }
-
+                
             }
             catch (Exception renderException)
             {
@@ -86,13 +100,6 @@ namespace umbraco.presentation.templateControls
                     writer.RenderEndTag();
                 }
             }
-        }
-
-        static string FindAttribute(IDictionary attributes, string key)
-        {
-            key = key.ToLowerInvariant();
-            var attributeValue = attributes.Contains(key) ? attributes[key].ToString() : string.Empty;
-            return MacroRenderer.ParseAttribute(null, attributeValue);
         }
 
         /// <summary>
@@ -111,15 +118,11 @@ namespace umbraco.presentation.templateControls
                 if (tempNodeId != null && tempNodeId.Value != 0)
                 {
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-                    // stop using GetXml
-                    //var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-                    //if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
-                    //var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
-                    //var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
-                    var c = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(tempNodeId.Value);
-                    var itemPage = new page(c);
-
-                    tempElementContent =
+                    var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                    if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                    var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
+                    var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
+                    tempElementContent = 
                         new item(item.ContentItem, itemPage.Elements, item.LegacyAttributes).FieldContent;
                 }
             }
@@ -146,7 +149,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="item">The item.</param>
         public virtual void Load(Item item)
         {
-            using (Current.ProfilingLogger.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
+            using (DisposableTimer.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
             {
                 ParseMacros(item);
             }
@@ -157,11 +160,11 @@ namespace umbraco.presentation.templateControls
         /// </summary>
         /// <param name="item">The item.</param>
         protected virtual void ParseMacros(Item item)
-        {
+        {  
             // do nothing if the macros have already been rendered
             if (item.Controls.Count > 0)
                 return;
-
+            
             var elementText = GetFieldContents(item);
 
             //Don't parse macros if there's a content item assigned since the content value
@@ -172,7 +175,7 @@ namespace umbraco.presentation.templateControls
             }
             else
             {
-                using (Current.ProfilingLogger.DebugDuration<ItemRenderer>("Parsing Macros"))
+                using (DisposableTimer.DebugDuration<ItemRenderer>("Parsing Macros"))
                 {
 
                     MacroTagParser.ParseMacros(
@@ -196,7 +199,48 @@ namespace umbraco.presentation.templateControls
                         });
                 }
             }
+            
+        }
 
+        /// <summary>
+        /// Transforms the content using the XSLT attribute, if provided.
+        /// </summary>
+        /// <param name="xpath">The xpath expression.</param>
+        /// <param name="itemData">The item's rendered content.</param>
+        /// <param name="disableEscaping">if set to <c>true</c>, escaping is disabled.</param>
+        /// <returns>The transformed content if the XSLT attribute is present, otherwise the original content.</returns>
+        protected virtual string XsltTransform(string xpath, string itemData, bool disableEscaping)
+        {
+            if (!String.IsNullOrEmpty(xpath))
+            {
+                // XML-encode the expression and add the itemData parameter to it
+                string xpathEscaped = xpath.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+                string xpathExpression = string.Format(xpathEscaped, "$itemData");
+
+                // prepare support for XSLT extensions
+                StringBuilder namespaceList = new StringBuilder();
+                StringBuilder namespaceDeclaractions = new StringBuilder();
+                foreach (KeyValuePair<string, object> extension in macro.GetXsltExtensions())
+                {
+                    namespaceList.Append(extension.Key).Append(' ');
+                    namespaceDeclaractions.AppendFormat("xmlns:{0}=\"urn:{0}\" ", extension.Key);
+                }
+
+                // add the XSLT expression into the full XSLT document, together with the needed parameters
+                string xslt = string.Format(Umbraco.Web.umbraco.presentation.umbraco.templateControls.Resources.InlineXslt, xpathExpression, disableEscaping ? "yes" : "no",
+                                                                  namespaceList, namespaceDeclaractions);
+
+                // create the parameter
+                Dictionary<string, object> parameters = new Dictionary<string, object>(1);
+                parameters.Add("itemData", itemData);
+
+                // apply the XSLT transformation
+                XmlTextReader xslReader = new XmlTextReader(new StringReader(xslt));
+                System.Xml.Xsl.XslCompiledTransform xsl = macro.CreateXsltTransform(xslReader, false);
+                itemData = macro.GetXsltTransformResult(new XmlDocument(), xsl, parameters);
+                xslReader.Close();
+            }
+            return itemData;
         }
 
         protected string AddBeforeAfterText(string text, string before, string after)
@@ -222,5 +266,62 @@ namespace umbraco.presentation.templateControls
             return item.TextIfEmpty;
         }
 
+        /// <summary>
+        /// Gets the field content from database instead of the published XML via the APIs.
+        /// </summary>
+        /// <param name="itemAttributes"></param>
+        /// <param name="nodeIdInt">The node id.</param>
+        /// <param name="currentField">The field that should be fetched.</param>
+        /// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
+        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual string GetContentFromDatabase(AttributeCollectionAdapter itemAttributes, int nodeIdInt, string currentField)
+        {
+            var c = new Content(nodeIdInt);
+
+            var property = c.getProperty(currentField);
+            if (property == null)
+                throw new ArgumentException(String.Format("Could not find property {0} of node {1}.", currentField, nodeIdInt));
+
+            var umbItem = new item(property.Value.ToString(), itemAttributes);
+            var tempElementContent = umbItem.FieldContent;
+
+            // If the current content object is a document object, we'll only output it if it's published
+            if (c.nodeObjectType == Document._objectType)
+            {
+                try
+                {
+                    var d = (Document)c;
+                    if (!d.Published)
+                        tempElementContent = "";
+                }
+                catch { }
+            }
+
+            // Add the content to the cache
+            if (!string.IsNullOrEmpty(tempElementContent))
+            {
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
+                    string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, currentField),
+                    priority:       CacheItemPriority.Default, 
+                    getCacheItem:   () => tempElementContent);
+            }
+            return tempElementContent;
+        }
+
+        /// <summary>
+        /// Gets the content from cache.
+        /// </summary>
+        /// <param name="nodeIdInt">The node id.</param>
+        /// <param name="field">The field.</param>
+        /// <returns>The cached contents of the <paramref name="field"/> from the <paramref name="nodeIdInt"/> content object</returns>
+        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual object GetContentFromCache(int nodeIdInt, string field)
+        {
+            var content = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, field));
+            return content;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
@@ -7,17 +7,17 @@ using System.Text.RegularExpressions;
 namespace Umbraco.Core.Events
 {
     /// <summary>
-    /// There is actually no way to discover an event name in c# at the time of raising the event. It is possible
-    /// to get the event name from the handler that is being executed based on the event being raised, however that is not
+    /// There is actually no way to discover an event name in c# at the time of raising the event. It is possible 
+    /// to get the event name from the handler that is being executed based on the event being raised, however that is not 
     /// what we want in this case. We need to find the event name before it is being raised - you would think that it's possible
     /// with reflection or anything but that is not the case, the delegate that defines an event has no info attached to it, it
     /// is literally just an event.
-    ///
+    /// 
     /// So what this does is take the sender and event args objects, looks up all public/static events on the sender that have
     /// a generic event handler with generic arguments (but only) one, then we match the type of event arguments with the ones
     /// being passed in. As it turns out, in our services this will work for the majority of our events! In some cases it may not
-    /// work and we'll have to supply a string but hopefully this saves a bit of magic strings.
-    ///
+    /// work and we'll have to supply a string but hopefully this saves a bit of magic strings. 
+    /// 
     /// We can also write tests to validate these are all working correctly for all services.
     /// </summary>
     internal class EventNameExtractor
@@ -35,12 +35,12 @@ namespace Umbraco.Core.Events
         /// null if not found or an ambiguous match
         /// </returns>
         public static Attempt<EventNameExtractorResult> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
-        {
+        {   
             var found = MatchedEventNames.GetOrAdd(new Tuple<Type, Type>(senderType, argsType), tuple =>
             {
                 var events = CandidateEvents.GetOrAdd(senderType, t =>
                 {
-                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                    return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
                         //we can only look for events handlers with generic types because that is the only
                         // way that we can try to find a matching event based on the arg type passed in
                         .Where(x => x.EventHandlerType.IsGenericType)

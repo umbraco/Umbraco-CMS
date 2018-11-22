@@ -14,7 +14,6 @@
 *@
 
 @{ var propertyAlias = Model.MacroParameters["propertyAlias"]; }
-
 @if (propertyAlias != null)
 {
     var selection = Model.Content.Children.Where(x => x.IsVisible()).OrderBy(x => x.GetPropertyValue(propertyAlias.ToString())).ToArray();

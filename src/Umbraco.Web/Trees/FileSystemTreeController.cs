@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
-
-using Constants = Umbraco.Core.Constants;
+using System.Web;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
-        protected abstract IFileSystem FileSystem { get; }
+        protected abstract IFileSystem2 FileSystem { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
 
@@ -48,7 +45,7 @@ namespace Umbraco.Web.Trees
                 var name = Path.GetFileName(directory);
                 var node = CreateTreeNode(HttpUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
                 OnRenderFolderNode(ref node);
-                if (node != null)
+                if(node != null)
                     nodes.Add(node);
             }
 
@@ -75,24 +72,16 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
-        {
-            var root = base.CreateRootNode(queryStrings);
-            //check if there are any children
-            root.HasChildren = GetTreeNodes(Constants.System.Root.ToInvariantString(), queryStrings).Any();
-            return root;
-        }
-
         protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.ActionAlias;
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
             //refresh action
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
             return menu;
         }
@@ -102,9 +91,9 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.ActionAlias;
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
 
             var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
@@ -112,11 +101,11 @@ namespace Umbraco.Web.Trees
             if (hasChildren == false)
             {
                 //delete action
-                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
             }
 
             //refresh action
-            menu.Items.Add(new RefreshNode(Services.TextService, true));
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
             return menu;
         }
@@ -126,7 +115,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
 
             return menu;
         }

@@ -1,46 +1,16 @@
-<ul class="umb-sub-views-nav" ng-show="showNavigation">
-
-    <li ng-repeat="item in navigation | limitTo: itemsLimit ">
-        <div ng-show="item.alias !== 'more'"
-            ng-class="item.errorClass">
-            <a data-element="sub-view-{{item.alias}}"
-               tabindex="-1"
-               class="umb-sub-views-nav-item js-umb-sub-views-nav-item"
-               href=""
-               ng-click="clickNavigationItem(item, $index)"
-               hotkey="{{$index+1}}"
-               ng-class="{'is-active': item.active, '-has-error': item.hasError}">
-                <i class="icon {{ item.icon }}"></i>
-                <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
-            </a>
-        </div>
-    </li>
-
-    <li ng-show="showMoreButton" style="position: relative;">
-
-        <a data-element="sub-view-{{moreButton.alias}}"
-            class="umb-sub-views-nav-item"
-            href=""
-            ng-click="toggleDropdown()"
-            ng-class="{'is-active': moreButton.active}">
-            <div class="umb-sub-views-nav-item__more"><i></i><i></i><i></i></div>
-            <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
-        </a>
-
-        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav__dropdown">
-            <umb-dropdown-item ng-repeat="item in navigation | limitTo: overflowingItems">
-                <a data-element="sub-view-{{item.alias}}"
-                    style="display: flex; border: none;"
-                    class="umb-sub-views-nav-item"
-                    ng-href=""
-                    ng-click="clickNavigationItem(item, $index)"
-                    ng-class="{'is-active': item.active, '-has-error': item.hasError}">
-                    <i class="icon {{ item.icon }}"></i>
-                    <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
-                </a>
-            </umb-dropdown-item>
-        </umb-dropdown>
-
-    </li>
-
-</ul>
+<div>
+  <ul class="umb-sub-views-nav" ng-if="showNavigation">
+      <li ng-repeat="item in navigation">
+         <a data-element="sub-view-{{item.alias}}"
+         tabindex="-1"
+         class="umb-sub-views-nav-item"
+         href=""
+         ng-click="clickNavigationItem(item)"
+         hotkey="{{$index+1}}"
+         ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+            <i class="icon {{ item.icon }}"></i>
+            <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+         </a>
+      </li>
+  </ul>
+</div>

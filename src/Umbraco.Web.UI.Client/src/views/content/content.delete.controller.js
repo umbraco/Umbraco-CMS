@@ -6,42 +6,31 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService) {
+function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
 
-    /**
-     * Used to toggle UI elements during delete operations
-     * @param {any} isDeleting
-     */
-    function toggleDeleting(isDeleting) {
-        $scope.currentNode.loading = isDeleting;
-        $scope.busy = isDeleting;
-    }
-    
     $scope.performDelete = function() {
 
         // stop from firing again on double-click
         if ($scope.busy) { return false; }
 
-        toggleDeleting(true);
+        //mark it for deletion (used in the UI)
+        $scope.currentNode.loading = true;
+        $scope.busy = true;
 
         contentResource.deleteById($scope.currentNode.id).then(function () {
-            
+            $scope.currentNode.loading = false;
+
             //get the root node before we remove it
             var rootNode = treeService.getTreeRoot($scope.currentNode);
 
             treeService.removeNode($scope.currentNode);
 
-            toggleDeleting(false);
-
             if (rootNode) {
-                $timeout(function () {
-                    //ensure the recycle bin has child nodes now            
-                    var recycleBin = treeService.getDescendantNode(rootNode, -20);
-                    if (recycleBin) {
-                        //TODO: This seems to return a rejection and we end up with "Possibly unhanded rejection"
-                        treeService.syncTree({ node: recycleBin, path: treeService.getPath(recycleBin), forceReload: true });
-                    }
-                }, 500);
+                //ensure the recycle bin has child nodes now            
+                var recycleBin = treeService.getDescendantNode(rootNode, -20);
+                if (recycleBin) {
+                    recycleBin.hasChildren = true;
+                }
             }
             
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
@@ -58,19 +47,25 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
             navigationService.hideMenu();
         }, function(err) {
 
-            toggleDeleting(false);
+            $scope.currentNode.loading = false;
+            $scope.busy = false;
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                overlayService.ysod(err);
+                dialogService.ysodDialog(err);
+            }
+            
+            if (err.data && angular.isArray(err.data.notifications)) {
+                for (var i = 0; i < err.data.notifications.length; i++) {
+                    notificationsService.showNotification(err.data.notifications[i]);
+                }
             }
         });
 
     };
 
     $scope.cancel = function() {
-        toggleDeleting(false);
-        navigationService.hideDialog();        
+        navigationService.hideDialog();
     };
 }
 

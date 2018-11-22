@@ -72,11 +72,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 }
 
                 member.ResetDirtyProperties(false);
-
+                
                 list.Add(member);
             }
 
             return list;
-        }
+        } 
     }
 }

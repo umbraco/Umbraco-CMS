@@ -22,8 +22,17 @@ function ContentRecycleBinController($scope, $routeParams, contentResource, navi
 
     $routeParams.id = "-20";
     contentResource.getRecycleBin().then(function (result) {
-        $scope.content = result;
+        //we'll get the 'content item' for the recycle bin, we know that it will contain a single tab and a 
+        // single property, so we'll extract that property (list view) and use it's data.
+        var listproperty = result.tabs[0].properties[0];
+
+        _.each(listproperty.config, function (val, key) {
+            $scope.model.config[key] = val;
+        });
+        $scope.listViewPath = 'views/propertyeditors/listview/listview.html';
     });
+
+    $scope.model = { config: { entityType: $routeParams.section, layouts: [] } };
 
     // sync tree node
     navigationService.syncTree({ tree: "content", path: ["-1", $routeParams.id], forceReload: false });

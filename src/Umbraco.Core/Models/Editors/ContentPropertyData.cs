@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Umbraco.Core.Models.Editors
 {
@@ -11,35 +16,32 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
-        public ContentPropertyData(object value, object dataTypeConfiguration)
+        public ContentPropertyData(object value, PreValueCollection preValues) 
+            : this(value, preValues, new Dictionary<string, object>())
+        {
+        }
+
+        public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
         {
             Value = value;
-            DataTypeConfiguration = dataTypeConfiguration;
+            PreValues = preValues;
+            AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
         }
 
         /// <summary>
         /// The value submitted for the property
         /// </summary>
-        public object Value { get; }
+        public object Value { get; private set; }
 
         /// <summary>
-        /// The data type configuration for the property.
+        /// The pre-value collection for the content property
         /// </summary>
-        public object DataTypeConfiguration { get; }
+        public PreValueCollection PreValues { get; private set; }
 
         /// <summary>
-        /// Gets or sets the unique identifier of the content owning the property.
+        /// A dictionary containing any additional objects that are related to this property when saving
         /// </summary>
-        public Guid ContentKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the property type.
-        /// </summary>
-        public Guid PropertyTypeKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the uploaded files.
-        /// </summary>
-        public ContentPropertyFile[] Files { get; set; }
+        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
+        
     }
 }

@@ -1,55 +1,41 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using Umbraco.Core;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Models.Trees
 {
-    /// <inheritdoc />
-    ///  <summary>
-    ///  A menu item that represents some JS that needs to execute when the menu item is clicked.
-    ///  </summary>
-    ///  <remarks>
-    ///  These types of menu items are rare but they do exist. Things like refresh node simply execute
-    ///  JS and don't launch a dialog.
-    ///  Each action menu item describes what angular service that it's method exists in and what the method name is.
-    ///  An action menu item must describe the angular service name for which it's method exists. It may also define what the
-    ///  method name is that will be called in this service but if one is not specified then we will assume the method name is the
-    ///  same as the Type name of the current action menu class.
-    ///  </remarks>
+    /// <summary>
+    /// A menu item that represents some JS that needs to execute when the menu item is clicked.
+    /// </summary>
+    /// <remarks>
+    /// These types of menu items are rare but they do exist. Things like refresh node simply execute
+    /// JS and don't launch a dialog.
+    /// 
+    /// Each action menu item describes what angular service that it's method exists in and what the method name is.
+    /// 
+    /// An action menu item must describe the angular service name for which it's method exists. It may also define what the 
+    /// method name is that will be called in this service but if one is not specified then we will assume the method name is the
+    /// same as the Type name of the current action menu class.
+    /// </remarks>
     public abstract class ActionMenuItem : MenuItem
     {
-        /// <summary>
-        /// The angular service name containing the <see cref="AngularServiceMethodName"/>
-        /// </summary>
-        public abstract string AngularServiceName { get; }
-
-        /// <summary>
-        /// The angular service method name to call for this menu item
-        /// </summary>
-        public virtual string AngularServiceMethodName { get; } = null;
-
-        protected ActionMenuItem(string alias, string name) : base(alias, name)
+        protected ActionMenuItem()
+            : base()
         {
-            Initialize();
-        }
+            var attribute = GetType().GetCustomAttribute<ActionMenuItemAttribute>(false);
+            if (attribute == null)
+            {
+                throw new InvalidOperationException("All " + typeof (ActionMenuItem).FullName + " instances must be attributed with " + typeof (ActionMenuItemAttribute).FullName);
+            }
 
-        protected ActionMenuItem(string alias, ILocalizedTextService textService) : base(alias, textService)
-        {
-            Initialize();
-        }
-
-        private void Initialize()
-        {
             //add the current type to the metadata
-            if (AngularServiceMethodName.IsNullOrWhiteSpace())
+            if (attribute.MethodName.IsNullOrWhiteSpace())
             {
                 //if no method name is supplied we will assume that the menu action is the type name of the current menu class
-                ExecuteJsMethod($"{AngularServiceName}.{this.GetType().Name}");
+                AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, this.GetType().Name));
             }
             else
             {
-                ExecuteJsMethod($"{AngularServiceName}.{AngularServiceMethodName}");
+                AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));    
             }
         }
     }

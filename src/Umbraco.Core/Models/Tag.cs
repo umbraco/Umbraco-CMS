@@ -1,61 +1,58 @@
 ﻿using System;
+using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    /// <summary>
-    /// Represents a tag entity.
-    /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Tag : EntityBase, ITag
+    public class Tag : Entity, ITag
     {
-        private static PropertySelectors _selectors;
-
-        private string _group;
-        private string _text;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Tag"/> class.
-        /// </summary>
         public Tag()
-        { }
+        {            
+        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Tag"/> class.
-        /// </summary>
-        public Tag(int id, string group, string text)
+        public Tag(int id, string text, string @group)
         {
             Id = id;
             Text = text;
-            Group = group;
+            Group = @group;
         }
 
-        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+        public Tag(int id, string text, string @group, int nodeCount)
+            : this(id, text, @group)
+        {
+            NodeCount = nodeCount;            
+        }
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private class PropertySelectors
         {
-            public readonly PropertyInfo Group = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
-            public readonly PropertyInfo Text = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
+            public readonly PropertyInfo TextSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Text);
+            public readonly PropertyInfo GroupSelector = ExpressionHelper.GetPropertyInfo<Tag, string>(x => x.Group);
         }
 
-        /// <inheritdoc />
-        public string Group
-        {
-            get => _group;
-            set => SetPropertyValueAndDetectChanges(value, ref _group, Selectors.Group);
-        }
+        private string _text;
+        private string _group;
 
-        /// <inheritdoc />
         public string Text
         {
-            get => _text;
-            set => SetPropertyValueAndDetectChanges(value, ref _text, Selectors.Text);
+            get { return _text; }
+            set { SetPropertyValueAndDetectChanges(value, ref _text, Ps.Value.TextSelector); }
         }
 
-        /// <inheritdoc />
+        public string Group
+        {
+            get { return _group; }
+            set { SetPropertyValueAndDetectChanges(value, ref _group, Ps.Value.GroupSelector); }
+        }
+
         public int NodeCount { get; internal set; }
+
+        //TODO: enable this at some stage
+        //public int ParentId { get; set; }
     }
 }

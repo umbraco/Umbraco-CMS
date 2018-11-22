@@ -1,13 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -32,7 +28,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns></returns>
@@ -56,7 +52,7 @@ namespace Umbraco.Web
         /// The crop alias e.g. thumbnail
         /// </param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
@@ -120,9 +116,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -201,9 +197,9 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="urlHelper"></param>
         /// <param name="htmlEncode">
-        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be
+        /// Whether to HTML encode this URL - default is true - w3c standards require html attributes to be html encoded but this can be 
         /// set to false if using the result of this method for CSS.
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -227,30 +223,7 @@ namespace Umbraco.Web
             var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
                 upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
-        }
-
-        public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
-            ImageCropperValue imageCropperValue,
-            int? width = null,
-            int? height = null,
-            string cropAlias = null,
-            int? quality = null,
-            ImageCropMode? imageCropMode = null,
-            ImageCropAnchor? imageCropAnchor = null,
-            bool preferFocalPoint = false,
-            bool useCropDimensions = false,
-            string cacheBusterValue = null,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
-            bool htmlEncode = true)
-        {
-            var imageUrl = imageCropperValue.Src;
-            var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);            
         }
 
         #endregion
@@ -291,8 +264,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, string controllerName, string area, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            Mandate.ParameterNotNullOrEmpty(action, "action");
+            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 
             var encryptedRoute = UmbracoHelper.CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
@@ -322,12 +295,13 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+            Mandate.ParameterNotNullOrEmpty(action, "action");
+            Mandate.ParameterNotNull(surfaceType, "surfaceType");
 
             var area = "";
 
-            var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
+            var surfaceController = SurfaceControllerResolver.Current.RegisteredSurfaceControllers
+                                                             .SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
                 throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
             var metaData = PluginController.GetMetadata(surfaceController);

@@ -5,125 +5,243 @@ namespace Umbraco.Core
     public static partial class Constants
     {
         /// <summary>
-        /// Defines the Umbraco object type unique identifiers.
+        /// Defines the identifiers for Umbraco object types as constants for easy centralized access/management.
         /// </summary>
         public static class ObjectTypes
         {
             /// <summary>
-            /// Defines the Umbraco object type unique identifiers as string.
+            /// Guid for a data type container
             /// </summary>
-            /// <remarks>Should be used only when it's not possible to use the corresponding
-            /// readonly Guid value, e.g. in attributes (where only consts can be used).</remarks>
-            public static class Strings
-            {
-                // ReSharper disable MemberHidesStaticFromOuterClass
+            public const string DataTypeContainer = "521231E3-8B37-469C-9F9D-51AFC91FEB7B";
 
-                public const string DataTypeContainer = "521231E3-8B37-469C-9F9D-51AFC91FEB7B";
+            /// <summary>
+            /// Guid for a data type container
+            /// </summary>
+            public static readonly Guid DataTypeContainerGuid = new Guid(DataTypeContainer);
 
-                public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
+            public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";
 
-                public const string MediaTypeContainer = "42AEF799-B288-4744-9B10-BE144B73CDC4";
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
+            public static readonly Guid DocumentTypeContainerGuid = new Guid(DocumentTypeContainer);
 
-                public const string ContentItem = "10E2B09F-C28B-476D-B77A-AA686435E44A";
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
+            public const string MediaTypeContainer = "42AEF799-B288-4744-9B10-BE144B73CDC4";
 
-                public const string ContentItemType = "7A333C54-6F43-40A4-86A2-18688DC7E532";
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
+            public static readonly Guid MediaTypeContainerGuid = new Guid(MediaTypeContainer);
 
-                public const string ContentRecycleBin = "01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8";
+            /// <summary>
+            /// Guid for a Content Item object.
+            /// </summary>
+            public const string ContentItem = "10E2B09F-C28B-476D-B77A-AA686435E44A";
 
-                public const string DataType = "30A2A501-1978-4DDB-A57B-F7EFED43BA3C";
+            /// <summary>
+            /// Guid for a Content Item Type object.
+            /// </summary>
+            public const string ContentItemType = "7A333C54-6F43-40A4-86A2-18688DC7E532";
 
-                public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
+            /// <summary>
+            /// Guid for the Content Recycle Bin.
+            /// </summary>
+            public const string ContentRecycleBin = "01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8";
 
-                public const string DocumentBlueprint = "6EBEF410-03AA-48CF-A792-E1C1CB087ACA";
+            /// <summary>
+            /// Guid for a DataType object.
+            /// </summary>
+            public const string DataType = "30A2A501-1978-4DDB-A57B-F7EFED43BA3C";
 
-                public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
+            /// <summary>
+            /// Guid for a DataType object.
+            /// </summary>
+            public static readonly Guid DataTypeGuid = new Guid(DataType);
 
-                public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public const string Document = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
+            
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentGuid = new Guid(Document);
 
-                public const string MediaRecycleBin = "CF3D8E34-1C1C-41e9-AE56-878B57B32113";
+            /// <summary>
+            /// Guid for a Document Blueprint object.
+            /// </summary>
+            public const string DocumentBlueprint = "6EBEF410-03AA-48CF-A792-E1C1CB087ACA";
 
-                public const string MediaType = "4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E";
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid DocumentBlueprintGuid = new Guid(DocumentBlueprint);
 
-                public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
+            /// <summary>
+            /// Guid for a Document Type object.
+            /// </summary>
+            public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
 
-                public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";
+            /// <summary>
+            /// Guid for a Document Type object.
+            /// </summary>
+            public static readonly Guid DocumentTypeGuid = new Guid(DocumentType);
 
-                public const string MemberType = "9B5416FB-E72F-45A9-A07B-5A9A2709CE43";
+            /// <summary>
+            /// Guid for a Media object.
+            /// </summary>
+            public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
 
-                public const string SystemRoot = "EA7D8624-4CFE-4578-A871-24AA946BF34D";
+            /// <summary>
+            /// Guid for a Document object.
+            /// </summary>
+            public static readonly Guid MediaGuid = new Guid(Media);
 
-                public const string Template = "6FBDE604-4178-42CE-A10B-8A2600A2F07D";
+            /// <summary>
+            /// Guid for the Media Recycle Bin.
+            /// </summary>
+            public const string MediaRecycleBin = "CF3D8E34-1C1C-41e9-AE56-878B57B32113";
 
-                public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
+            /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public const string MediaType = "4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E";
 
-                public const string RelationType = "B1988FAD-8675-4F47-915A-B3A602BC5D8D";
+            /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MediaTypeGuid = new Guid(MediaType);
 
-                public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
+            /// <summary>
+            /// Guid for a Member object.
+            /// </summary>
+            public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
 
-                public const string FormsPreValue = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
+            /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MemberGuid = new Guid(Member);
 
-                public const string FormsDataSource = "CFED6CE4-9359-443E-9977-9956FEB1D867";
+            /// <summary>
+            /// Guid for a Member Group object.
+            /// </summary>
+            public const string MemberGroup = "366E63B9-880F-4E13-A61C-98069B029728";
 
-                public const string Language = "6B05D05B-EC78-49BE-A4E4-79E274F07A77";
+            /// <summary>
+            /// Guid for a Member Group object.
+            /// </summary>
+            public static readonly Guid MemberGroupGuid = new Guid(MemberGroup);
 
-                public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
+            /// <summary>
+            /// Guid for a Member Type object.
+            /// </summary>
+            public const string MemberType = "9B5416FB-E72F-45A9-A07B-5A9A2709CE43";
 
-                [Obsolete("This no longer exists in the database")]
-                internal const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
+            /// <summary>
+            /// Guid for a Member Type object.
+            /// </summary>
+            public static readonly Guid MemberTypeGuid = new Guid(MemberType);
 
-                // ReSharper restore MemberHidesStaticFromOuterClass
-            }
+            /// <summary>
+            /// Guid for a Stylesheet object.
+            /// </summary>
+            [Obsolete("This no longer exists in the database")]
+            public const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
-            public static readonly Guid SystemRoot = new Guid(Strings.SystemRoot);
+            [Obsolete("This no longer exists in the database")]
+            internal const string StylesheetProperty = "5555da4f-a123-42b2-4488-dcdfb25e4111";
 
-            public static readonly Guid ContentRecycleBin = new Guid(Strings.ContentRecycleBin);
+            /// <summary>
+            /// Guid for the System Root.
+            /// </summary>
+            public const string SystemRoot = "EA7D8624-4CFE-4578-A871-24AA946BF34D";
 
-            public static readonly Guid MediaRecycleBin = new Guid(Strings.MediaRecycleBin);
+            /// <summary>
+            /// Guid for a Template object.
+            /// </summary>
+            public const string Template = "6FBDE604-4178-42CE-A10B-8A2600A2F07D";
 
-            public static readonly Guid DataTypeContainer = new Guid(Strings.DataTypeContainer);
+            /// <summary>
+            /// Guid for a Template object.
+            /// </summary>
+            public static readonly Guid TemplateTypeGuid = new Guid(Template);
 
-            public static readonly Guid DocumentTypeContainer = new Guid(Strings.DocumentTypeContainer);
+            /// <summary>
+            /// Guid for a Lock object.
+            /// </summary>
+            public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
 
-            public static readonly Guid MediaTypeContainer = new Guid(Strings.MediaTypeContainer);
+            /// <summary>
+            /// Guid for a Lock object.
+            /// </summary>
+            public static readonly Guid LockObjectGuid = new Guid(LockObject);
 
-            public static readonly Guid DataType = new Guid(Strings.DataType);
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public const string RelationType = "B1988FAD-8675-4F47-915A-B3A602BC5D8D";
 
-            public static readonly Guid Document = new Guid(Strings.Document);
+            /// <summary>
+            /// Guid for a relation type.
+            /// </summary>
+            public static readonly Guid RelationTypeGuid = new Guid(RelationType);
 
-            public static readonly Guid DocumentBlueprint = new Guid(Strings.DocumentBlueprint);
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public const string FormsForm = "F5A9F787-6593-46F0-B8FF-BFD9BCA9F6BB";
 
-            public static readonly Guid DocumentType = new Guid(Strings.DocumentType);
+            /// <summary>
+            /// Guid for a Forms Form.
+            /// </summary>
+            public static readonly Guid FormsFormGuid = new Guid(FormsForm);
 
-            public static readonly Guid Media = new Guid(Strings.Media);
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public const string FormsPreValue = "42D7BF9B-A362-4FEE-B45A-674D5C064B70";
 
-            public static readonly Guid MediaType = new Guid(Strings.MediaType);
+            /// <summary>
+            /// Guid for a Forms PreValue Source.
+            /// </summary>
+            public static readonly Guid FormsPreValueGuid = new Guid(FormsPreValue);
 
-            public static readonly Guid Member = new Guid(Strings.Member);
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public const string FormsDataSource = "CFED6CE4-9359-443E-9977-9956FEB1D867";
 
-            public static readonly Guid MemberGroup = new Guid(Strings.MemberGroup);
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid FormsDataSourceGuid = new Guid(FormsDataSource);
 
-            public static readonly Guid MemberType = new Guid(Strings.MemberType);
+            /// <summary>
+            /// Guid for a Language.
+            /// </summary>
+            public const string Language = "6B05D05B-EC78-49BE-A4E4-79E274F07A77";
 
-            public static readonly Guid TemplateType = new Guid(Strings.Template);
+            /// <summary>
+            /// Guid for a Forms DataSource.
+            /// </summary>
+            public static readonly Guid LanguageGuid = new Guid(Language);
 
-            public static readonly Guid LockObject = new Guid(Strings.LockObject);
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
 
-            public static readonly Guid RelationType = new Guid(Strings.RelationType);
-
-            public static readonly Guid FormsForm = new Guid(Strings.FormsForm);
-
-            public static readonly Guid FormsPreValue = new Guid(Strings.FormsPreValue);
-
-            public static readonly Guid FormsDataSource = new Guid(Strings.FormsDataSource);
-
-            public static readonly Guid Language = new Guid(Strings.Language);
-
-            public static readonly Guid IdReservation = new Guid(Strings.IdReservation);
-
-            public static readonly Guid Template = new Guid(Strings.Template);
-
-            public static readonly Guid ContentItem = new Guid(Strings.ContentItem);
-
+            /// <summary>
+            /// Guid for an Identifier Reservation.
+            /// </summary>
+            public static readonly Guid IdReservationGuid = new Guid(IdReservation);
         }
     }
 }

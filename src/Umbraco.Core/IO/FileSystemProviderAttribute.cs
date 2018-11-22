@@ -5,7 +5,7 @@ using System.Text;
 using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
-{
+{	
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class FileSystemProviderAttribute : Attribute
     {

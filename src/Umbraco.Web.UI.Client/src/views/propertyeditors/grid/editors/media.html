@@ -14,4 +14,11 @@
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>
 
+	<umb-overlay
+		ng-if="mediaPickerOverlay.show"
+		model="mediaPickerOverlay"
+		view="mediaPickerOverlay.view"
+		position="right">
+	</umb-overlay>
+
 </div>

@@ -37,35 +37,34 @@ Use this directive to construct a main content area inside the main editor windo
 </ul>
 **/
 
-(function () {
-    'use strict';
+(function() {
+   'use strict';
 
-    function EditorContainerDirective(overlayHelper) {
+   function EditorContainerDirective(overlayHelper) {
 
-        function link(scope, el, attr, ctrl) {
+      function link(scope, el, attr, ctrl) {
 
-            scope.numberOfOverlays = 0;
+         scope.numberOfOverlays = 0;
 
-            //TODO: this shouldn't be a watch, this should be based on an event handler
-            scope.$watch(function () {
-                return overlayHelper.getNumberOfOverlays();
-            }, function (newValue) {
-                scope.numberOfOverlays = newValue;
-            });
+         scope.$watch(function(){
+            return overlayHelper.getNumberOfOverlays();
+         }, function (newValue) {
+            scope.numberOfOverlays = newValue;
+         });
 
-        }
+      }
 
-        var directive = {
-            transclude: true,
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/editor/umb-editor-container.html',
-            link: link
-        };
+      var directive = {
+         transclude: true,
+         restrict: 'E',
+         replace: true,
+         templateUrl: 'views/components/editor/umb-editor-container.html',
+         link: link
+      };
 
-        return directive;
-    }
+      return directive;
+   }
 
-    angular.module('umbraco.directives').directive('umbEditorContainer', EditorContainerDirective);
+   angular.module('umbraco.directives').directive('umbEditorContainer', EditorContainerDirective);
 
 })();

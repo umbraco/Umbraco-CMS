@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -15,23 +15,46 @@ namespace Umbraco.Core.Models.Membership
 
         string Name { get; set; }
         int SessionTimeout { get; set; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int StartContentId { get; set; }
+
         int[] StartContentIds { get; set; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        int StartMediaId { get; set; }
+
         int[] StartMediaIds { get; set; }
+
         string Language { get; set; }
-        
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IUserType UserType { get; set; }
+
         DateTime? EmailConfirmedDate { get; set; }
         DateTime? InvitedDate { get; set; }
 
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>
-        IEnumerable<IReadOnlyUserGroup> Groups { get; }
+        IEnumerable<IReadOnlyUserGroup> Groups { get; }        
 
         void RemoveGroup(string group);
         void ClearGroups();
         void AddGroup(IReadOnlyUserGroup group);
-
+        
         IEnumerable<string> AllowedSections { get; }
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void RemoveAllowedSection(string sectionAlias);
+
+        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        void AddAllowedSection(string sectionAlias);
 
         /// <summary>
         /// Exposes the basic profile data

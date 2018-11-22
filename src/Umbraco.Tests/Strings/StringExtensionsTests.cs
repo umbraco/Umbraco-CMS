@@ -2,42 +2,28 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringExtensionsTests : UmbracoTestBase
+    public class StringExtensionsTests
     {
-        public override void SetUp()
+        [SetUp]
+        public void Setup()
         {
-            base.SetUp();
-
-            // fixme - in "compose"?
-            Container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
+            ShortStringHelperResolver.Reset();
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new MockShortStringHelper());
+            Resolution.Freeze();
         }
 
-        [Test]
-        public void CurrentHelper()
+        [TearDown]
+        public void TearDown()
         {
-            var helper = Current.ShortStringHelper;
-            Assert.IsInstanceOf<MockShortStringHelper>(helper);
-        }
-
-        [TestCase("hello-world.png", "Hello World")]
-        [TestCase("hello-world .png", "Hello World")]
-        [TestCase("_hello-world __1.png", "Hello World 1")]
-        public void To_Friendly_Name(string first, string second)
-        {
-            Assert.AreEqual(first.ToFriendlyName(), second);
+            ShortStringHelperResolver.Reset();
         }
 
         [TestCase("hello", "world", false)]
@@ -234,7 +220,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeAliasWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias(null);
+            var output = "JUST-ANYTHING".ToSafeAlias(CultureInfo.InvariantCulture);
             Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -248,7 +234,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToUrlSegmentWithCulture()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment(null);
+            var output = "JUST-ANYTHING".ToUrlSegment(CultureInfo.InvariantCulture);
             Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -262,7 +248,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeFileNameWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeFileName(null);
+            var output = "JUST-ANYTHING".ToSafeFileName(CultureInfo.InvariantCulture);
             Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -280,31 +266,18 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
         }
 
-        [Test] // can't do cases with an IDictionary
+        [Test]
         public void ReplaceManyWithCharMap()
         {
-            const string input = "télévisiön tzvâr ßup &nbsp; pof";
-            const string expected = "television tzvar ssup   pof";
-            IDictionary<string, string> replacements = new Dictionary<string, string>
-                {
-                    { "é", "e" },
-                    { "ö", "o" },
-                    { "â", "a" },
-                    { "ß", "ss" },
-                    { "&nbsp;", " " },
-                };
-            var output = input.ReplaceMany(replacements);
-            Assert.AreEqual(expected, output);
+            var output = "JUST-ANYTHING".ReplaceMany(null);
+            Assert.AreEqual("REPLACE-MANY-A::JUST-ANYTHING", output);
         }
 
-        #region Cases
-        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
-        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
-        #endregion
-        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
+        [Test]
+        public void ReplaceManyByOneChar()
         {
-            var output = input.ReplaceMany(toReplace.ToArray(), replacement);
-            Assert.AreEqual(expected, output);
+            var output = "JUST-ANYTHING".ReplaceMany(new char[] { }, '*');
+            Assert.AreEqual("REPLACE-MANY-B::JUST-ANYTHING", output);
         }
     }
 }

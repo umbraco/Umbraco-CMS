@@ -2,12 +2,8 @@
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
@@ -103,7 +99,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -118,7 +114,7 @@ namespace Umbraco.Web
              ImageCropAnchor? imageCropAnchor = null,
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
-             bool cacheBuster = true,
+             bool cacheBuster = true, 
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true)
@@ -129,12 +125,12 @@ namespace Umbraco.Web
 
             if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
                 return string.Empty;
-
+            
             //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(propertyAlias);
+            var cropperValue = mediaItem.GetPropertyValue(propertyAlias);
 
             //is it strongly typed?
-            var stronglyTyped = cropperValue as ImageCropperValue;
+            var stronglyTyped = cropperValue as ImageCropDataSet;
             string mediaItemUrl;
             if (stronglyTyped != null)
             {
@@ -148,7 +144,7 @@ namespace Umbraco.Web
             var jobj = cropperValue as JObject;
             if (jobj != null)
             {
-                stronglyTyped = jobj.ToObject<ImageCropperValue>();
+                stronglyTyped = jobj.ToObject<ImageCropDataSet>();
                 mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
@@ -211,7 +207,7 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -226,17 +222,17 @@ namespace Umbraco.Web
             ImageCropAnchor? imageCropAnchor = null,
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
-            string cacheBusterValue = null,
+            string cacheBusterValue = null, 
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true)
         {
             if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
 
-            ImageCropperValue cropDataSet = null;
+            ImageCropDataSet cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                cropDataSet = imageCropperValue.DeserializeImageCropperValue();
+                cropDataSet = imageCropperValue.DeserializeToCropDataSet();                    
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
@@ -290,13 +286,13 @@ namespace Umbraco.Web
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
-            ImageCropperValue cropDataSet,
+            ImageCropDataSet cropDataSet,
             int? width = null,
             int? height = null,
             string cropAlias = null,
@@ -318,12 +314,17 @@ namespace Umbraco.Web
                 {
                     var crop = cropDataSet.GetCrop(cropAlias);
 
-                    // if a crop was specified, but not found, return null
-                    if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
-                        return null;
-
                     imageProcessorUrl.Append(cropDataSet.Src);
-                    cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
+
+                    var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
+                    if (cropBaseUrl != null)
+                    {
+                        imageProcessorUrl.Append(cropBaseUrl);
+                    }
+                    else
+                    {
+                        return null;
+                    }
 
                     if (crop != null & useCropDimensions)
                     {
@@ -364,7 +365,7 @@ namespace Umbraco.Web
 
                 var hasFormat = furtherOptions != null && furtherOptions.InvariantContains("&format=");
 
-                //Only put quality here, if we don't have a format specified.
+                //Only put quality here, if we don't have a format specified. 
                 //Otherwise we need to put quality at the end to avoid it being overridden by the format.
                 if (quality != null && hasFormat == false)
                 {
@@ -430,28 +431,6 @@ namespace Umbraco.Web
             }
 
             return string.Empty;
-        }
-
-        internal static ImageCropperValue DeserializeImageCropperValue(this string json)
-        {
-            var imageCrops = new ImageCropperValue();
-            if (json.DetectIsJson())
-            {
-                try
-                {
-                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
-                }
-            }
-
-            return imageCrops;
         }
     }
 }
