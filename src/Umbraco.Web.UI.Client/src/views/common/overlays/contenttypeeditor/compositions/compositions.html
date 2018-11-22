@@ -32,27 +32,35 @@
             <li class="umb-checkbox-list__item" ng-repeat="contentTypeEntity in model.whereCompositionUsed"><a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)"><i class="{{contentTypeEntity.contentType.icon}}"></i>&nbsp;{{contentTypeEntity.contentType.name}}</a></li>
         </ul>
     </div>
-    <ul class="umb-checkbox-list">
-        <li class="umb-checkbox-list__item"
-            ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm"
-            ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
+    <div ng-if="model.availableCompositeContentTypes.length > 0">
+        <!-- TODO: split model.availableCompositeContentTypes into "Active composition document types" and "Other document types" -->
+        <!-- TODO: localize headings -->
+        <h5>Other document types</h5>
+        <ul class="umb-checkbox-list">
+            <li class="umb-checkbox-list__item"
+                ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm"
+                ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
 
-            <div class="umb-checkbox-list__item-checkbox"
-                 ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
-                <input type="checkbox"
-                       id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
-                       checklist-model="model.compositeContentTypes"
-                       checklist-value="compositeContentType.contentType.alias"
-                       ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                       ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
-            </div>
+                <div class="umb-checkbox-list__item-checkbox"
+                     ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
+                    <input type="checkbox"
+                           id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
+                           checklist-model="model.compositeContentTypes"
+                           checklist-value="compositeContentType.contentType.alias"
+                           ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
+                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
+                </div>
 
-            <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
-                <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
-                {{ compositeContentType.contentType.name }}
-                <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
-            </label>
+                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
+                    <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon" style="font-size: 30px"></i>
+                    <span>
+                        {{ compositeContentType.contentType.name }}
+                        <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
+                        <small style="margin-top: -5px">{{ compositeContentType.contentType.metaData.containerPath }}</small>
+                    </span>
+                </label>
 
-        </li>
-    </ul>
+            </li>
+        </ul>
+    </div>
 </div>
