@@ -1,50 +1,18 @@
 ﻿function sliderController($scope, $log, $element, assetsService, angularHelper) {
 
-    var sliderRef = null;
+    let sliderRef = null;
 
     /** configure some defaults on init */
     function configureDefaults() {
-        
-        if (!$scope.model.config.orientation) {
-            $scope.model.config.orientation = "horizontal";
-        }
-        if (!$scope.model.config.enableRange) {
-            $scope.model.config.enableRange = false;
-        }
-        else {
-            $scope.model.config.enableRange = Object.toBoolean($scope.model.config.enableRange);
-        }
 
-        if (!$scope.model.config.initVal1) {
-            $scope.model.config.initVal1 = 0;
-        }
-        else {
-            $scope.model.config.initVal1 = parseFloat($scope.model.config.initVal1);
-        }
-        if (!$scope.model.config.initVal2) {
-            $scope.model.config.initVal2 = 0;
-        }
-        else {
-            $scope.model.config.initVal2 = parseFloat($scope.model.config.initVal2);
-        }
-        if (!$scope.model.config.minVal) {
-            $scope.model.config.minVal = 0;
-        }
-        else {
-            $scope.model.config.minVal = parseFloat($scope.model.config.minVal);
-        }
-        if (!$scope.model.config.maxVal) {
-            $scope.model.config.maxVal = 100;
-        }
-        else {
-            $scope.model.config.maxVal = parseFloat($scope.model.config.maxVal);
-        }
-        if (!$scope.model.config.step) {
-            $scope.model.config.step = 1;
-        }
-        else {
-            $scope.model.config.step = parseFloat($scope.model.config.step);
-        }
+        $scope.model.config.orientation = $scope.model.config.orientation ? $scope.model.config.orientation : "horizontal";
+        $scope.model.config.enableRange = $scope.model.config.enableRange ? Object.toBoolean($scope.model.config.enableRange) : false;
+        $scope.model.config.initVal1 = $scope.model.config.initVal1 ? parseFloat($scope.model.config.initVal1) : 0;
+        $scope.model.config.initVal2 = $scope.model.config.initVal2 ? parseFloat($scope.model.config.initVal2) : 0;
+        $scope.model.config.minVal = $scope.model.config.minVal ? parseFloat($scope.model.config.minVal) : 0;
+        $scope.model.config.maxVal = $scope.model.config.maxVal ? parseFloat($scope.model.config.maxVal) : 100;
+        $scope.model.config.step = $scope.model.config.step ? parseFloat($scope.model.config.step) : 1;
+
 
         if (!$scope.model.config.handle) {
             $scope.model.config.handle = "round";
@@ -209,9 +177,39 @@
         }
     }
 
+    function setModelValue(values) {
+        $scope.model.value = values.toString();
+    }
+
+    $scope.setup = function(slider) {
+        sliderRef = slider;
+    };
+
+    $scope.update = function(values) {
+        setModelValue(values);
+    };
+
     function init() {
 
         configureDefaults();
+
+        // format config to fit slider plugin
+        const start = $scope.model.config.enableRange ? [$scope.model.config.initVal1, $scope.model.config.initVal2] : [$scope.model.config.initVal1];
+        const step = $scope.model.config.step;
+        const tooltips = $scope.model.config.enableRange ? [true, true] : [true];
+        const min = $scope.model.config.minVal ? [$scope.model.config.minVal] : [$scope.model.config.minVal];
+        const max = $scope.model.config.maxVal ? [$scope.model.config.maxVal] : [$scope.model.config.maxVal];
+
+        // setup default
+        $scope.sliderOptions = {
+            "start": start,
+            "step": step,
+            "tooltips": tooltips,
+            "range": {
+                "min": min,
+                "max": max
+            }
+        };
 
         //tell the assetsService to load the bootstrap slider
         //libs from the plugin folder

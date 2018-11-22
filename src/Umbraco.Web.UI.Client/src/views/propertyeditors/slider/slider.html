@@ -1,5 +1,19 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.SliderController">
 
     <input type="text" name="slider" class="slider-item" />
+
+    <div style="margin-top: 70px;">
+        <umb-range-slider 
+            ng-model="model.value" 
+            options="sliderOptions"
+            on-setup="setup(slider)"
+            on-update="update(values)">
+        </umb-range-slider>
+    </div>
+    
+    <h5>Value</h5>
+    {{model.value}}
+    <h5>config</h5>
+    <pre>{{model.config | json}}</pre>
     
 </div>
