@@ -404,9 +404,6 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(createDateVal.Value, doc.CreateDate);
             Assert.AreEqual(updateDateVal.Value, doc.UpdateDate);
             Assert.AreEqual(levelVal, doc.Level);
-
         }
-
-
     }
 }
