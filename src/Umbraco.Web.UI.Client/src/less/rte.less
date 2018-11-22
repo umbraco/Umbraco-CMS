@@ -1,6 +1,14 @@
 // Styles for the RTE, the whole stylesheet is used in Tiny and these are specific to it's content
 // -------------------------
 
+.umb-rte {
+    position: relative;
+
+    .-loading {
+        position: absolute;
+    }
+}
+
 .umb-rte .mce-tinymce {
     box-shadow: none;
     
@@ -60,4 +68,10 @@
 .mce-ico.mce-i-custom[class*=" icon-"] {
     font-family: icomoon;
     font-size: 16px !important;
+}
+
+
+/* pre-value editor */
+.rte-editor-preval .control-group .controls > div > label .mce-ico {
+    line-height: 20px;
 }

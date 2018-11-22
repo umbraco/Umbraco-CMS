@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService, editorService, editorState) {
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
@@ -208,9 +208,9 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
                 //create a baseline Config to exten upon
                 var config = {
-                    //fixed_toolbar_container: "#blah",
                     selector: "#" + args.htmlId,
                     theme: modeTheme,
+                    //skin: "umbraco",
                     inline: modeInline,
                     plugins: plugins,
                     valid_elements: tinyMceConfig.validElements,
@@ -323,15 +323,14 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * Creates the umbrco insert embedded media tinymce plugin
 		 *
 		 * @param {Object} editor the TinyMCE editor instance
-		 * @param {Object} $scope the current controller scope
 		 */
-        createInsertEmbeddedMedia: function (editor, $scope, callback) {
+        createInsertEmbeddedMedia: function (editor, callback) {
             editor.addButton('umbembeddialog', {
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
                     if (callback) {
-                        angularHelper.safeApply($scope, function() {
+                        angularHelper.safeApply($rootScope, function() {
                             callback();
                         });
                     }
@@ -344,7 +343,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
         },
 
 
-        createAceCodeEditor: function(editor, $scope, callback){
+        createAceCodeEditor: function(editor, callback){
 
             editor.addButton("ace", {
                 icon: "code",
@@ -365,9 +364,8 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * Creates the umbrco insert media tinymce plugin
 		 *
 		 * @param {Object} editor the TinyMCE editor instance
-		 * @param {Object} $scope the current controller scope
 		 */
-        createMediaPicker: function (editor, $scope, callback) {
+        createMediaPicker: function (editor, callback) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -397,7 +395,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
-                            angularHelper.safeApply($scope, function() {
+                            angularHelper.safeApply($rootScope, function() {
                                 callback(currentTarget, userData);
                             });
                         }
@@ -457,9 +455,8 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 		 * Creates the insert umbrco macro tinymce plugin
 		 *
 		 * @param {Object} editor the TinyMCE editor instance
-		 * @param {Object} $scope the current controller scope
 		 */
-        createInsertMacro: function (editor, $scope, callback) {
+        createInsertMacro: function (editor, callback) {
 
             var createInsertMacroScope = this;
 
@@ -600,7 +597,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
                         //get all macro divs and load their content
                         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                            createInsertMacroScope.loadMacroContent($(this), null, $scope);
+                            createInsertMacroScope.loadMacroContent($(this), null);
                         });
 
                     });
@@ -732,7 +729,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     }
 
                     if (callback) {
-                        angularHelper.safeApply($scope, function () {
+                        angularHelper.safeApply($rootScope, function () {
                             callback(dialogData);
                         });
                     }
@@ -740,7 +737,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             });
         },
 
-        insertMacroInEditor: function (editor, macroObject, $scope) {
+        insertMacroInEditor: function (editor, macroObject) {
 
             //put the macro syntax in comments, we will parse this out on the server side to be used
             //for persisting.
@@ -758,12 +755,12 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
 
             //async load the macro content
-            this.loadMacroContent($macroDiv, macroObject, $scope);
+            this.loadMacroContent($macroDiv, macroObject);
 
         },
 
         /** loads in the macro content async from the server */
-        loadMacroContent: function ($macroDiv, macroData, $scope) {
+        loadMacroContent: function ($macroDiv, macroData) {
 
             //if we don't have the macroData, then we'll need to parse it from the macro div
             if (!macroData) {
@@ -787,7 +784,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             var contentId = $routeParams.id;
 
             //need to wrap in safe apply since this might be occuring outside of angular
-            angularHelper.safeApply($scope, function () {
+            angularHelper.safeApply($rootScope, function () {
                 macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
                     .then(function (htmlResult) {
 
@@ -801,7 +798,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
 
         },
 
-        createLinkPicker: function (editor, $scope, onClick) {
+        createLinkPicker: function (editor, onClick) {
 
             function createLinkList(callback) {
                 return function () {
@@ -1008,7 +1005,7 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                     }
                 }
 
-                angularHelper.safeApply($scope,
+                angularHelper.safeApply($rootScope,
                     function () {
                         if (onClick) {
                             onClick(currentTarget, anchorElm);
@@ -1209,6 +1206,184 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
             // reset padding in top of mce so the content does not "jump" up
             tinyMceEditArea.css("padding-top", "0");
             toolbar.css("position", "static");
+        },
+
+        /** Helper method to initialize the tinymce editor within Umbraco */
+        initializeEditor: function (args) {
+
+            if (!args.editor) {
+                throw "args.editor is required";
+            }
+            //if (!args.value) {
+            //    throw "args.value is required";
+            //}
+
+            var unwatch = null;
+
+            //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
+            function startWatch() {
+                unwatch = $rootScope.$watch(() => args.value, function (newVal, oldVal) {
+                    if (newVal !== oldVal) {
+                        //update the display val again if it has changed from the server;
+                        //uses an empty string in the editor when the value is null
+                        args.editor.setContent(newVal || "", { format: 'raw' });
+
+                        //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
+                        // is required for our plugins listening to this event to execute
+                        args.editor.fire('LoadContent', null);
+                    }
+                });
+            }
+
+            //Stops the watch on model.value which is done anytime we are manually updating the model.value
+            function stopWatch() {
+                if (unwatch) {
+                    unwatch();
+                }
+            }
+
+            function syncContent() {
+
+                //stop watching before we update the value
+                stopWatch();
+                angularHelper.safeApply($rootScope, function () {
+                    args.value = args.editor.getContent();
+                });
+                //re-watch the value
+                startWatch();
+            }
+
+            args.editor.on('init', function (e) {
+
+                if (args.value) {
+                    args.editor.setContent(args.value);
+                }
+                //enable browser based spell checking
+                args.editor.getBody().setAttribute('spellcheck', true);
+            });
+
+            args.editor.on('Change', function (e) {
+                syncContent();
+            });
+
+            //when we leave the editor (maybe)
+            args.editor.on('blur', function (e) {
+                syncContent();
+            });
+
+            args.editor.on('ObjectResized', function (e) {
+                var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
+                var srcAttr = $(e.target).attr("src");
+                var path = srcAttr.split("?")[0];
+                $(e.target).attr("data-mce-src", path + qs);
+
+                syncContent();
+            });
+
+            args.editor.on('Dirty', function (e) {
+                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                // the angular bits because tinymce replaces the textarea.
+                if (args.currentForm) {
+                    args.currentForm.$setDirty();
+                }
+            });
+
+            var self = this;
+
+            //create link picker
+            self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
+                var linkPicker = {
+                    currentTarget: currentTarget,
+                    anchors: self.getAnchorNames(JSON.stringify(editorState.current.properties)),
+                    submit: function (model) {
+                        self.insertLinkInEditor(args.editor, model.target, anchorElement);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.linkPicker(linkPicker);
+            });
+
+            //Create the insert media plugin
+            self.createMediaPicker(args.editor, function (currentTarget, userData) {
+                var mediaPicker = {
+                    currentTarget: currentTarget,
+                    onlyImages: true,
+                    showDetails: true,
+                    disableFolderSelect: true,
+                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    submit: function (model) {
+                        self.insertMediaInEditor(args.editor, model.selectedImages[0]);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.mediaPicker(mediaPicker);
+            });
+
+            //Create the embedded plugin
+            self.createInsertEmbeddedMedia(args.editor, function () {
+                var embed = {
+                    submit: function (model) {
+                        self.insertEmbeddedMediaInEditor(args.editor, model.embed.preview);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.embed(embed);
+            });
+
+            //Create the insert macro plugin
+            self.createInsertMacro(args.editor, function (dialogData) {
+                var macroPicker = {
+                    dialogData: dialogData,
+                    submit: function (model) {
+                        var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+                        self.insertMacroInEditor(args.editor, macroObject, $scope);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.macroPicker(macroPicker);
+            });
+
+            self.createAceCodeEditor(args.editor, function () {
+
+                //TODO: CHECK TO SEE WHAT WE NEED TO DO WIT MACROS (See code block?)
+                /*
+                var html = editor.getContent({source_view: true});
+                html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
+                editor.dom.remove(editor.dom.select('.CmCaReT'));
+                html = html.replace(/(<div class=".*?umb-macro-holder.*?mceNonEditable.*?"><!-- <\?UMBRACO_MACRO macroAlias="(.*?)".*?\/> --> *<ins>)[\s\S]*?(<\/ins> *<\/div>)/ig, "$1Macro alias: <strong>$2</strong>$3");
+                */
+
+                var aceEditor = {
+                    content: args.editor.getContent(),
+                    view: 'views/propertyeditors/rte/codeeditor.html',
+                    size: 'small',
+                    submit: function (model) {
+                        args.editor.setContent(model.content);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(aceEditor);
+            });
+
+            //start watching the value
+            startWatch(args.editor);
         }
 
     };
