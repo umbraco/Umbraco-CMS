@@ -11,9 +11,10 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
-using Umbraco.Web._Legacy.Actions;
+
 
 namespace umbraco.presentation.templateControls
 {
@@ -276,7 +277,7 @@ namespace umbraco.presentation.templateControls
             if (u == null) return false;
             var permission = Current.Services.UserService.GetPermissions(u, PageElements["path"].ToString());
 
-            return permission.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
+            return permission.AssignedPermissions.Contains(ActionUpdate.ActionLetter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
         #endregion

@@ -51,13 +51,13 @@ namespace Umbraco.Core.Models
         string GetCultureName(string culture);
 
         /// <summary>
-        /// Gets the names of the content item.
+        /// Gets culture infos of the content item.
         /// </summary>
         /// <remarks>
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> CultureNames { get; }
+        IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos { get; }
 
         /// <summary>
         /// Gets the available cultures.
@@ -76,6 +76,7 @@ namespace Umbraco.Core.Models
         /// <para>Returns <c>false</c> for the invariant culture, in order to be consistent
         /// with <seealso cref="AvailableCultures"/>, even though the invariant culture is
         /// always available.</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCultureAvailable(string culture);
 

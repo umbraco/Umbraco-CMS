@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IMemberGroup PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id = id });
 
             var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
                 foreach (var toAssign in nonAssignedRoles)
                 {
-                    var groupId = rolesForNames.First(x => x.Text == toAssign).NodeId;
+                    var groupId = rolesForNames.First(x => x.Text.InvariantEquals(toAssign)).NodeId;
                     Database.Insert(new Member2MemberGroupDto { Member = mId, MemberGroup = groupId });
                 }
             }

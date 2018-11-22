@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Reflection;
 using System.Threading;
 using System.Web;
 using LightInject;
@@ -12,12 +13,14 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Runtime
 {
@@ -28,26 +31,29 @@ namespace Umbraco.Core.Runtime
     /// should be possible to use this runtime in console apps.</remarks>
     public class CoreRuntime : IRuntime
     {
-        private readonly UmbracoApplicationBase _app;
         private BootLoader _bootLoader;
         private RuntimeState _state;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
         /// </summary>
-        /// <param name="umbracoApplication">The Umbraco HttpApplication.</param>
-        public CoreRuntime(UmbracoApplicationBase umbracoApplication)
-        {
-            _app = umbracoApplication ?? throw new ArgumentNullException(nameof(umbracoApplication));
-        }
+        public CoreRuntime()
+        { }
 
         /// <inheritdoc/>
         public virtual void Boot(ServiceContainer container)
         {
-            // some components may want to initialize with the UmbracoApplicationBase
-            // well, they should not - we should not do this
-            // TODO remove this eventually.
-            container.RegisterInstance(_app);
+            container.ConfigureUmbracoCore(); // also sets Current.Container
+
+            // register the essential stuff,
+            // ie the global application logger
+            // (profiler etc depend on boot manager)
+            var logger = GetLogger();
+            container.RegisterInstance(logger);
+            // now it is ok to use Current.Logger
+
+            ConfigureUnhandledException(logger);
+            ConfigureAssemblyResolve(logger);
 
             Compose(container);
 
@@ -113,6 +119,46 @@ namespace Umbraco.Core.Runtime
             //var sa = container.GetInstance<IDatabaseScopeAccessor>();
             //sa.Scope?.Dispose();
         }
+
+        /// <summary>
+        /// Gets a logger.
+        /// </summary>
+        protected virtual ILogger GetLogger()
+        {
+            return SerilogLogger.CreateWithDefaultConfiguration();
+        }
+
+        protected virtual void ConfigureUnhandledException(ILogger logger)
+        {
+            //take care of unhandled exceptions - there is nothing we can do to
+            // prevent the launch process to go down but at least we can try
+            // and log the exception
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception)args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                msg += ".";
+                logger.Error<CoreRuntime>(exception, msg);
+            };
+        }
+
+        protected virtual void ConfigureAssemblyResolve(ILogger logger)
+        {
+            // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
+            // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
+                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+                if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
+                    return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+                return null;
+            };
+        }
+
 
         private void AquireMainDom(IServiceFactory container)
         {
@@ -245,7 +291,7 @@ namespace Umbraco.Core.Runtime
 
         private void SetRuntimeStateLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = UmbracoVersion.Local; // the local, files, version
+            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = _state.SemanticVersion; // the executing code version
             var connect = false;
 
@@ -306,28 +352,26 @@ namespace Umbraco.Core.Runtime
                 throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
             }
 
-            // if we already know we want to upgrade, no need to look for migrations...
-            if (_state.Level == RuntimeLevel.Upgrade)
-                return;
+            // if we already know we want to upgrade,
+            // still run EnsureUmbracoUpgradeState to get the states
+            // (v7 will just get a null state, that's ok)
 
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
             // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
-            bool exists;
+            bool noUpgrade;
             try
             {
-                exists = EnsureUmbracoUpgradeState(databaseFactory, logger);
+                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory, logger);
             }
             catch (Exception e)
             {
-                // can connect to the database but cannot access the migration table... need to install
+                // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
-                logger.Debug<CoreRuntime>("Could not check the upgrade state, need to install Umbraco.");
-                _state.Level = RuntimeLevel.Install;
-                return;
+                throw new BootFailedException("Could not check the upgrade state.", e);
             }
 
-            if (exists)
+            if (noUpgrade)
             {
                 // the database version matches the code & files version, all clear, can run
                 _state.Level = RuntimeLevel.Run;
@@ -345,27 +389,19 @@ namespace Umbraco.Core.Runtime
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            // no scope, no key value service - just directly accessing the database
-
             var umbracoPlan = new UmbracoPlan();
             var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
 
-            string state;
+            // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
-                var sql = databaseFactory.SqlContext.Sql()
-                    .Select<KeyValueDto>()
-                    .From<KeyValueDto>()
-                    .Where<KeyValueDto>(x => x.Key == stateValueKey);
-                state = database.FirstOrDefault<KeyValueDto>(sql)?.Value;
+                _state.CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
+                _state.FinalMigrationState = umbracoPlan.FinalState;
             }
 
-            _state.CurrentMigrationState = state;
-            _state.FinalMigrationState = umbracoPlan.FinalState;
+            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");
 
-            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, state ?? "<null>");
-
-            return state == _state.FinalMigrationState;
+            return _state.CurrentMigrationState == _state.FinalMigrationState;
         }
 
         #region Locals

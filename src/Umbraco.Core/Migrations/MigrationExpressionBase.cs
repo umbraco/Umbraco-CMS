@@ -50,12 +50,13 @@ namespace Umbraco.Core.Migrations
             if (_executed)
                 throw new InvalidOperationException("This expression has already been executed.");
             _executed = true;
+            Context.BuildingExpression = false;
 
             var sql = GetSql();
 
             if (string.IsNullOrWhiteSpace(sql))
             {
-                Logger.Info(GetType(), "SQL [{ContextIndex}: <empty>", Context.Index);
+                Logger.Info(GetType(), "SQL [{ContextIndex}]: <empty>", Context.Index);
             }
             else
             {

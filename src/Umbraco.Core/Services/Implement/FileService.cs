@@ -91,7 +91,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
 
-                Audit(AuditType.Save, "Save Stylesheet performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Stylesheet));
                 scope.Complete();
             }
         }
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedStylesheet, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete Stylesheet performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Stylesheet));
                 scope.Complete();
             }
         }
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedScript, this, saveEventArgs);
 
-                Audit(AuditType.Save, "Save Script performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1, "Script");
                 scope.Complete();
             }
         }
@@ -247,7 +247,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedScript, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete Script performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1, "Script");
                 scope.Complete();
             }
         }
@@ -362,7 +362,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedTemplate, this, saveEventArgs);
 
-                Audit(AuditType.Save, "Save Template performed by user", userId, template.Id);
+                Audit(AuditType.Save, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
             }
 
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(template, false));
 
-                Audit(AuditType.Save, "Save Template performed by user", userId, template.Id);
+                Audit(AuditType.Save, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
             }
         }
@@ -551,7 +551,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(templatesA, false));
 
-                Audit(AuditType.Save, "Save Template performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
             }
         }
@@ -605,7 +605,7 @@ namespace Umbraco.Core.Services.Implement
                 args.CanCancel = false;
                 scope.Events.Dispatch(DeletedTemplate, this, args);
 
-                Audit(AuditType.Delete, "Delete Template performed by user", userId, template.Id);
+                Audit(AuditType.Delete, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
             }
         }
@@ -788,7 +788,7 @@ namespace Umbraco.Core.Services.Implement
                 newEventArgs.CanCancel = false;
                 scope.Events.Dispatch(CreatedPartialView, this, newEventArgs);
 
-                Audit(AuditType.Save, $"Save {partialViewType} performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
@@ -828,7 +828,7 @@ namespace Umbraco.Core.Services.Implement
                 repository.Delete(partialView);
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedPartialView, this, deleteEventArgs);
-                Audit(AuditType.Delete, $"Delete {partialViewType} performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1, partialViewType.ToString());
 
                 scope.Complete();
             }
@@ -860,7 +860,7 @@ namespace Umbraco.Core.Services.Implement
                 var repository = GetPartialViewRepository(partialViewType);
                 repository.Save(partialView);
                 saveEventArgs.CanCancel = false;
-                Audit(AuditType.Save, $"Save {partialViewType} performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1, partialViewType.ToString());
                 scope.Events.Dispatch(SavedPartialView, this, saveEventArgs);
 
                 scope.Complete();
@@ -1038,9 +1038,9 @@ namespace Umbraco.Core.Services.Implement
 
         #endregion
         
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId, string entityType)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
         }
 
         //TODO Method to change name and/or alias of view/masterpage template

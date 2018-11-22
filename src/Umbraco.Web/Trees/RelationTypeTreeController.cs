@@ -4,17 +4,18 @@ using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Web.Actions;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.RelationTypes, null, sortOrder: 5)]
     [Mvc.PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
     public class RelationTypeTreeController : TreeController
     {
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
@@ -24,12 +25,10 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
-                //use the legacy format
-                .ConvertLegacyMenuItem(null, "initrelationTypes", queryStrings.GetValue<string>("application"));
+                var addMenuItem = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                addMenuItem.LaunchDialogUrl("developer/RelationTypes/NewRelationType.aspx", "Create New RelationType");
                 //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Trees
             if (relationType == null) return new MenuItemCollection();
 
             //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true)
                 //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new EntitySlim

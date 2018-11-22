@@ -1,7 +1,7 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.DataType.MoveController",
     function ($scope, dataTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
-        var dialogOptions = $scope.dialogOptions;
+
         $scope.dialogTreeApi = {};
 
         function nodeSelectHandler(args) {
@@ -22,7 +22,7 @@ angular.module("umbraco")
             $scope.busy = true;
             $scope.error = false;
 
-            dataTypeResource.move({ parentId: $scope.target.id, id: dialogOptions.currentNode.id })
+            dataTypeResource.move({ parentId: $scope.target.id, id: $scope.currentNode.id })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
@@ -57,6 +57,10 @@ angular.module("umbraco")
 
         $scope.onTreeInit = function () {
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
-        }
+        };
+
+        $scope.close = function() {
+            navigationService.hideDialog();
+        };
         
     });

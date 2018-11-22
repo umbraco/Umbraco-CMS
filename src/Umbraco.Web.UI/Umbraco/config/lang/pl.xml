@@ -87,7 +87,7 @@
     <key alias="domainUpdated">Domena '%0%' została zaktualizowana</key>
     <key alias="orEdit">Edytuj Aktualne Domeny</key>
     <key alias="domainHelp"><![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
-    "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać. 
+    "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać.
     Preferowane jest użycie powyższych ustawień języka.]]></key>
     <key alias="inherit">Odziedziczona</key>
     <key alias="setLanguage">Język</key>
@@ -335,9 +335,9 @@
     <key alias="siterepublishHelp">Cache strony zostanie odświeżone. Cała zawartość opublikowana będzie aktualna, lecz nieopublikowana zawartość pozostanie niewidoczna</key>
     <key alias="tableColumns">Liczba kolumn</key>
     <key alias="tableRows">Liczba wierszy</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów, 
+    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów,
       ustawiając dowiązanie do tego ID na elemencie <code>&lt;asp:treści /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko 
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko
       spośród ID na szablonie nadrzędnym tego formularza.]]></key>
     <key alias="thumbnailimageclickfororiginal">Kliknij na obrazie, aby zobaczyć go w pełnym rozmiarze</key>
     <key alias="treepicker">Wybierz element</key>
@@ -626,23 +626,23 @@
 Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umbraco %0%
 ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% zostało skopiowane do Twojej bazy danych. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź, czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p> 
-                <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p> 
+    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź, czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p>
+                <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p>
                 <p>
-                Kliknij <strong>ponów próbę</strong> kiedy 
+                Kliknij <strong>ponów próbę</strong> kiedy
                 skończysz.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
                 Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />
-                Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba. 
+                Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba.
                 W przypadku instalacji na lokalnej maszynie lub serwerze możesz potrzebować pomocy administratora.]]></key>
     <key alias="databaseUpgrade"><![CDATA[
                 <p>
-                Naciśnij przycisk <strong>aktualizuj</strong>, aby zaktualizować swoją bazę danych do Umbraco %0%</p> 
+                Naciśnij przycisk <strong>aktualizuj</strong>, aby zaktualizować swoją bazę danych do Umbraco %0%</p>
                 <p>
                 Bez obaw - żadne dane nie zostaną usunięte i wszystko będzie działać jak należy!
                 </p>
                 ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Twoja baza danych została zaktualizowana do wersji %0%.<br />Naciśnij przycisk <strong>Dalej</strong>, aby 
+    <key alias="databaseUpgradeDone"><![CDATA[Twoja baza danych została zaktualizowana do wersji %0%.<br />Naciśnij przycisk <strong>Dalej</strong>, aby
                 kontynuować.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Twoja baza danych nie wymaga aktualizacji! Naciśnij przycisk <strong>Dalej</strong>, aby kontynuować kreatora instalacji.]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Hasło domyślnego użytkownika musi zostać zmienione!</strong>]]></key>
@@ -655,7 +655,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="permissionsAffectedFolders">Zmienione pliki i foldery</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Więcej informacji na temat ustalania pozwoleń dla Umbraco znajdziesz tutaj</key>
     <key alias="permissionsAffectedFoldersText">Musisz zezwolić procesowi ASP.NET na zmianę poniższych plików/folderów</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Twoje ustawienia uprawnień są prawie idealne!</strong><br /><br /> 
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Twoje ustawienia uprawnień są prawie idealne!</strong><br /><br />
                 Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane, aby w pełni wykorzystać możliwości Umbraco.]]></key>
     <key alias="permissionsHowtoResolve">Jak to Rozwiązać</key>
     <key alias="permissionsHowtoResolveLink">Kliknij tutaj, aby przeczytać wersję tekstową</key>
@@ -663,42 +663,42 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Twoje ustawienia uprawnień mogą stanowić problem!</strong>
                 <br /><br />
                 Umbraco będzie działało bez problemów, ale nie będzie możliwa instalacja pakietów, które są rekomendowane, aby w pełni wykorzystać możliwości Umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Twoje ustawienia uprawnień nie są gotowe na Umbraco!</strong> 
-                <br /><br /> 
+    <key alias="permissionsNotReady"><![CDATA[<strong>Twoje ustawienia uprawnień nie są gotowe na Umbraco!</strong>
+                <br /><br />
                 Aby Umbraco mogło działać musisz uaktualnić swoje ustawienia zabezpieczeń.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Twoje ustawienia uprawnień są idealne!</strong><br /><br />  
+    <key alias="permissionsPerfect"><![CDATA[<strong>Twoje ustawienia uprawnień są idealne!</strong><br /><br />
                 Umbraco będzie działać bez problemów i będzie można instalować pakiety!]]></key>
     <key alias="permissionsResolveFolderIssues">Rozwiązywanie problemów z folderami</key>
     <key alias="permissionsResolveFolderIssuesLink">Kliknij ten link, aby uzyskać więcej informacji na temat problemów z ASP.NET i tworzeniem folderów.</key>
     <key alias="permissionsSettingUpPermissions">Ustawianie uprawnień dostępu do folderów</key>
     <key alias="permissionsText"><![CDATA[
-                Umbraco potrzebuje uprawnień do zapisu/odczytu pewnych katalogów w celu przechowywania plików jak obrazki i PDFy. 
+                Umbraco potrzebuje uprawnień do zapisu/odczytu pewnych katalogów w celu przechowywania plików jak obrazki i PDFy.
                 Umbraco przechowuje także tymczasowe dane (aka: cache), aby zwiększyć wydajność Twojej strony.
                 ]]></key>
     <key alias="runwayFromScratch">Chcę zacząć od zera</key>
     <key alias="runwayFromScratchText"><![CDATA[
-                Twoja strona jest obecnie pusta. To idealna sytuacja, jeśli chcesz zacząć od zera i stworzyć własne typy dokumentów i szablony. 
-                (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dowiedz się jak</a>) 
+                Twoja strona jest obecnie pusta. To idealna sytuacja, jeśli chcesz zacząć od zera i stworzyć własne typy dokumentów i szablony.
+                (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dowiedz się jak</a>)
                 Ciągle możesz wybrać, aby zainstalować Runway w późniejszym terminie. W tym celu przejdź do sekcji Deweloper i wybierz Pakiety.
                 ]]></key>
     <key alias="runwayHeader">Właśnie stworzyłeś czystą instalację platformy Umbraco. Co chcesz zrobić teraz?</key>
     <key alias="runwayInstalled">Pakiet Runway został zainstalowany pomyślnie</key>
     <key alias="runwayInstalledText"><![CDATA[
-                Twoje fundamenty są postawione właściwie. Wybierz, które moduły chcesz na nich zainstalować.<br /> 
-                To jest nasza lista rekomendowanych modułów. Zaznacz te, które chcesz zainstalować lub wyświetl <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">pełną listę modułów</a>  
+                Twoje fundamenty są postawione właściwie. Wybierz, które moduły chcesz na nich zainstalować.<br />
+                To jest nasza lista rekomendowanych modułów. Zaznacz te, które chcesz zainstalować lub wyświetl <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">pełną listę modułów</a>
                 ]]></key>
     <key alias="runwayOnlyProUsers">Rekomendowane tylko dla doświadczonych użytkowników</key>
     <key alias="runwaySimpleSite">Chcę rozpocząć z prostą stroną</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
                 <p>
-                Pakiet "Runway" to prosta strona, dostarczająca kilku podstawowych typów dokumentów i szablonów. Instalator może automatycznie zainstalować pakiet Runway za Ciebie, 
-                ale możesz w łatwy sposób edytować, rozszerzyć lub usunąć go. Nie jest on potrzebny i możesz doskonale używać Umbraco bez niego. 
-                Jednakże pakiet Runway oferuje łatwą podstawę, bazującą na najlepszych praktykach, która pozwolić Ci rozpocząć pracę w mgnieniu oka. 
-                Jeśli zdecydujesz się zainstalować pakiet Runway, możesz opcjonalnie wybrać podstawowe klocki zwane Modułami Runway, aby poprawić swoje strony. 
-                </p> 
+                Pakiet "Runway" to prosta strona, dostarczająca kilku podstawowych typów dokumentów i szablonów. Instalator może automatycznie zainstalować pakiet Runway za Ciebie,
+                ale możesz w łatwy sposób edytować, rozszerzyć lub usunąć go. Nie jest on potrzebny i możesz doskonale używać Umbraco bez niego.
+                Jednakże pakiet Runway oferuje łatwą podstawę, bazującą na najlepszych praktykach, która pozwolić Ci rozpocząć pracę w mgnieniu oka.
+                Jeśli zdecydujesz się zainstalować pakiet Runway, możesz opcjonalnie wybrać podstawowe klocki zwane Modułami Runway, aby poprawić swoje strony.
+                </p>
                 <small>
-                <em>Dołączone z pakietem Runway:</em> Strona domowa, strona Jak rozpocząć pracę, strona Instalowanie Modułów.<br /> 
-                <em>Opcjonalne moduły:</em>Górna nawigacja, Mapa strony, Formularz kontaktowy, Galeria. 
+                <em>Dołączone z pakietem Runway:</em> Strona domowa, strona Jak rozpocząć pracę, strona Instalowanie Modułów.<br />
+                <em>Opcjonalne moduły:</em>Górna nawigacja, Mapa strony, Formularz kontaktowy, Galeria.
                 </small>
                 ]]></key>
     <key alias="runwayWhatIsRunway">Co to jest pakiet Runway</key>
@@ -708,23 +708,23 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="step4">Krok 4/5: Sprawdzanie zabezpieczeń Umbraco</key>
     <key alias="step5">Krok 5/5: Umbraco jest gotowe do pracy</key>
     <key alias="thankYou">Dziękujemy za wybór Umbraco</key>
-    <key alias="theEndBrowseSite"><![CDATA[<h3>Przeglądaj swoją nową stronę</h3> 
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Przeglądaj swoją nową stronę</h3>
                 Pakiet Runway został zainstalowany, zobacz zatem jak wygląda Twoja nowa strona.]]></key>
-    <key alias="theEndFurtherHelp"><![CDATA[<h3>Dalsza pomoc i informacje</h3> 
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Dalsza pomoc i informacje</h3>
                 Zaczerpnij pomocy z naszej nagrodzonej społeczności, przeglądaj dokumentację lub obejrzyj niektóre darmowe filmy o tym, jak budować proste strony, jak używać pakietów i szybki przewodnik po terminologii Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% zostało zainstalowane i jest gotowe do użycia</key>
-    <key alias="theEndInstallFailed"><![CDATA[Aby dokończyć instalację musisz 
+    <key alias="theEndInstallFailed"><![CDATA[Aby dokończyć instalację musisz
                 ręcznie edytować <strong>plik web.config</strong> i zaktualizować klucz AppSetting o nazwie <strong>UmbracoConfigurationStatus</strong> na dole do wartości <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[Możesz <strong>rozpocząć natychmiast</strong> klikając przycisk "Uruchom Umbraco" poniżej. <br />Jeżeli jesteś <strong>nowy dla Umbraco</strong> 
+    <key alias="theEndInstallSuccess"><![CDATA[Możesz <strong>rozpocząć natychmiast</strong> klikając przycisk "Uruchom Umbraco" poniżej. <br />Jeżeli jesteś <strong>nowy dla Umbraco</strong>
                 znajdziesz mnóstwo materiałów na naszych stronach "jak rozpocząć".]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Uruchom Umbraco</h3> 
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Uruchom Umbraco</h3>
                 Aby zarządzać swoją stroną po prostu otwórz zaplecze Umbraco i zacznij dodawać treść, aktualizować szablony i style lub dodawaj nową funkcjonalność]]></key>
     <key alias="Unavailable">Połączenie z bazą danych nie zostało ustanowione.</key>
     <key alias="Version3">Umbraco wersja 3</key>
     <key alias="Version4">Umbraco wersja 4</key>
     <key alias="watch">Zobacz</key>
-    <key alias="welcomeIntro"><![CDATA[Ten kreator przeprowadzi Cię przez proces konfiguracji <strong>Umbraco %0%</strong> dla świeżej instalacji lub aktualizacji z wersji 3.0. 
-                <br /><br /> 
+    <key alias="welcomeIntro"><![CDATA[Ten kreator przeprowadzi Cię przez proces konfiguracji <strong>Umbraco %0%</strong> dla świeżej instalacji lub aktualizacji z wersji 3.0.
+                <br /><br />
                 Wciśnij <strong>"dalej"</strong>, aby rozpocząć proces konfigruacji.]]></key>
   </area>
   <area alias="language">
@@ -736,6 +736,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="renewSession">Wznów sesję teraz, aby zapisać swoją pracę</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Szczęśliwej super niedzieli</key>
     <key alias="greeting1">Szczęśliwego maniakalnego poniedziałku </key>
     <key alias="greeting2">Szczęśliwego świetnego wtorku</key>
     <key alias="greeting3">Szczęśliwej niesamowitej środy</key>
@@ -778,11 +779,11 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   <area alias="notifications">
     <key alias="editNotifications">Edytuj powiadomienie dla %0%</key>
     <key alias="mailBody"><![CDATA[
-                Witaj %0% 
+                Witaj %0%
 
-                To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie '%1%' 
-                zostało wykonane na stronie '%2%' 
-                przez użytkownika '%3%'. 
+                To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie '%1%'
+                zostało wykonane na stronie '%2%'
+                przez użytkownika '%3%'.
 
                 Możesz dalej edytować pod adresem http://%4%/#/content/content/edit/%5%
 
@@ -790,39 +791,39 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 
                 Pozdrowienia od robota Umbraco
           ]]></key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Witaj %0%</p> 
+    <key alias="mailBodyHtml"><![CDATA[<p>Witaj %0%</p>
 
-              <p>To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie <strong>'%1%'</strong> 
-              zostało wykonane na stronie <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 
-              przez użytkownika <strong>'%3%'</strong> 
-              </p> 
-              <div style="margin: 8px 0; padding: 8px; display: block;"> 
+              <p>To jest automatyczny e-mail, wysłany, aby poinformować Cię, że polecenie <strong>'%1%'</strong>
+              zostało wykonane na stronie <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
+              przez użytkownika <strong>'%3%'</strong>
+              </p>
+              <div style="margin: 8px 0; padding: 8px; display: block;">
                 <br />
-                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDYTUJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-                <br /> 
-              </div> 
-              <p> 
-                <h3>Podsumowanie zmian:</h3> 
-                <table style="width: 100%;"> 
-                    %6% 
-                </table> 
-              </p> 
+                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDYTUJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+                <br />
+              </div>
+              <p>
+                <h3>Podsumowanie zmian:</h3>
+                <table style="width: 100%;">
+                    %6%
+                </table>
+              </p>
 
-              <div style="margin: 8px 0; padding: 8px; display: block;"> 
-                <br /> 
-                <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIKUJ&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDYTUJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;USUŃ&nbsp;&nbsp;&nbsp;&nbsp;</a> 
-                <br /> 
-              </div> 
+              <div style="margin: 8px 0; padding: 8px; display: block;">
+                <br />
+                <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIKUJ&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDYTUJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;USUŃ&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                <br />
+              </div>
 
-              <p>Miłego dnia!<br /><br /> 
-                Pozdrowienia od robota Umbraco 
+              <p>Miłego dnia!<br /><br />
+                Pozdrowienia od robota Umbraco
               </p>]]></key>
     <key alias="mailSubject">[%0%] Powiadomienie o %1% wykonane na %2%</key>
     <key alias="notifications">Powiadomienie</key>
   </area>
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
-      Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk "Przeglądaj"<br /> 
+      Wskaż pakiet z Twojego komputera, poprzez kliknięcie na przycisk "Przeglądaj"<br />
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
     <key alias="dropHere">Upuść, aby załadować</key>
@@ -875,7 +876,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageUninstalledText">Pakiet został pomyślnie odinstalowany</key>
     <key alias="packageUninstallHeader">Odinstaluj pakiet</key>
     <key alias="packageUninstallText"><![CDATA[Poniżej możesz odznaczyć elementy, których nie chcesz usunąć tym razem. Kiedy klikniesz "potwierdź odinstalowanie", wszystkie zaznaczone elementy zostaną usunięte.<br/>
-      <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media, itp. w zależności od elementów, które usuwasz, przestaną działać i mogą spowodować niestabilność systemu, 
+      <span style="color: Red; font-weight: bold;">Uwaga:</span> wszystkie elementy, media, itp. w zależności od elementów, które usuwasz, przestaną działać i mogą spowodować niestabilność systemu,
       więc odinstalowuj z uwagą. W przypadku problemów skontaktuj się z autorem pakietu.]]></key>
     <key alias="packageUpgradeDownload">Pobierz aktualizację z repozytorium</key>
     <key alias="packageUpgradeHeader">Aktualizuj pakiet</key>
@@ -941,7 +942,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="nodePublish">%0% został opublikowany</key>
     <key alias="nodePublishAll">%0% oraz podstrony zostały opublikowane</key>
     <key alias="publishAll">Publikuj %0% ze wszytkimi podstronami</key>
-    <key alias="publishHelp"><![CDATA[Kliknij <em> OK </ em>, aby publikować <strong>% 0% </ strong> i spowodować upublicznienie całej zawartości.<br/><br/> 
+    <key alias="publishHelp"><![CDATA[Kliknij <em> OK </ em>, aby publikować <strong>% 0% </ strong> i spowodować upublicznienie całej zawartości.<br/><br/>
       Możesz opublikować tą stronę wraz ze wszystkimi podstronami zaznaczając poniżej <em>publikuj wszystkie węzły pochodne</em>
       ]]></key>
   </area>
@@ -959,8 +960,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
   <area alias="imagecropper">
     <key alias="reset">Resetuj</key>
-    <key alias="defineCrop">Zdefiniuj przycięcie</key>
-    <key alias="defineCropDescription">Ustaw alias dla przycięcia, a także jego domyślną szerokość i długość</key>
     <key alias="saveCrop">Zapisz przycięcie</key>
     <key alias="addCrop">Dodaj nowe przycięcie</key>
   </area>
@@ -1283,15 +1282,15 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="mailBody"><![CDATA[
       Witaj %0%
 
-      To jest automatyczny e-mail informujący, że dokument '%1%' 
-      został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%. 
+      To jest automatyczny e-mail informujący, że dokument '%1%'
+      został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%.
 
-      Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować. 
+      Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować.
 
-      Lub zaloguj się do Umbraco, aby zobaczyć wszystkie zadania do tłumaczenia  
+      Lub zaloguj się do Umbraco, aby zobaczyć wszystkie zadania do tłumaczenia
       http://%3%.
 
-      Życzę miłego dnia! 
+      Życzę miłego dnia!
 
       Umbraco robot
     ]]></key>

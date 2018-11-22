@@ -105,10 +105,10 @@ namespace Umbraco.Tests.Services
                 total.AddRange(ServiceContext.ContentService.GetRootContent());
                 foreach (var content in total.ToArray())
                 {
-                    total.AddRange(ServiceContext.ContentService.GetDescendants(content));
+                    total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
-                Current.Logger.Info<ContentServicePerformanceTest>("Returned " + total.Count + " items");
+                Current.Logger.Info<ContentServicePerformanceTest>("Returned {Total} items", total.Count);
             }
         }
 

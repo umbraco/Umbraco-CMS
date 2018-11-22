@@ -373,8 +373,8 @@
     <key alias="databaseUpgrade"><![CDATA[<p>
       Pressione o botão <strong>atualizar</strong> para atualizar seu banco de dados para Umbraco %0%</p>
       <p>
-      Não se preocupe - nenhum conteúdo será removido e tudo estará funcionando depois disto!</p>    
-      
+      Não se preocupe - nenhum conteúdo será removido e tudo estará funcionando depois disto!</p>
+
     ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Seu banco de dados foi atualizado para última versão %0%. <br />Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Seu banco de dados atual está desatualizado! Clique <strong>próximo</strong> para continuar com o assistente de configuração]]></key>
@@ -403,7 +403,7 @@ Para correr Umbraco você vai precisar atualizar as configurações de permissõ
     <key alias="permissionsResolveFolderIssues">Resolvendo problemas de pastas</key>
     <key alias="permissionsResolveFolderIssuesLink">Siga este link para mais informações sobre problemas com ASP.NET e criação de pastas</key>
     <key alias="permissionsSettingUpPermissions">Configurando permissões de pastas</key>
-    <key alias="permissionsText"><![CDATA[Umbraco necessita acesso ler/escrever à certos diretórios para que possa guardar arquivos como fotos e PDFs. 
+    <key alias="permissionsText"><![CDATA[Umbraco necessita acesso ler/escrever à certos diretórios para que possa guardar arquivos como fotos e PDFs.
 Também guarda informações temporárias (cache) para melhorar a performance do seu website.]]></key>
     <key alias="runwayFromScratch">Eu quero começar do zero</key>
     <key alias="runwayFromScratchText"><![CDATA[Seu site está completamente vazio no momento, então isso é perfeito se você deseja começar do zero e criar seus próprios documentos e modelos.
@@ -423,7 +423,7 @@ Se escolher instalar Runway você pode opcionalmente selecionar blocos de constr
         <em>Incluso com Runway:</em> Página Inicial, Começando, Instalando Módulos.<br />
         <em>Módulos Opcionais: </em> Navegação de Topo, Mapa de Site, Contato, Galeria.
         </small>
-      
+
     ]]></key>
     <key alias="runwayWhatIsRunway">O que é Runway</key>
     <key alias="step1">Passo 1/5 Aceitar Licença</key>
@@ -491,13 +491,13 @@ Vá até http://%4%/#/content/content/edit/%5% para editar.
       Saudações do robô Umbraco]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Olá %0%</p>
 
-		  <p>Esta é uma mensagem automatizada para informar que a tarefa <strong>'%1%'</strong> 
+		  <p>Esta é uma mensagem automatizada para informar que a tarefa <strong>'%1%'</strong>
 		  foi completada na página <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  pelo usuário <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -509,7 +509,7 @@ Vá até http://%4%/#/content/content/edit/%5% para editar.
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

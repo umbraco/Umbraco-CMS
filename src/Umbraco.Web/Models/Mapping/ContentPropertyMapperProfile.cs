@@ -24,7 +24,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(tab => tab.Label, expression => expression.MapFrom(@group => @group.Name))
                 .ForMember(tab => tab.IsActive, expression => expression.UseValue(true))
                 .ForMember(tab => tab.Properties, expression => expression.Ignore())
-                .ForMember(tab => tab.Alias, expression => expression.Ignore());
+                .ForMember(tab => tab.Alias, expression => expression.Ignore())
+                .ForMember(tab => tab.Expanded, expression => expression.Ignore());
 
             //FROM Property TO ContentPropertyBasic
             CreateMap<Property, ContentPropertyBasic>().ConvertUsing(contentPropertyBasicConverter);

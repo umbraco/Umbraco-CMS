@@ -14,7 +14,7 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, null, sortOrder: 7)]
     [UmbracoTreeAuthorize(Constants.Trees.PartialViews)]
     [PluginController("UmbracoTrees")]
-    [CoreTree]
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     public class PartialViewsTreeController : FileSystemTreeController
     {
         protected override IFileSystem FileSystem => Current.FileSystems.PartialViewsFileSystem;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Trees
         {
             //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
-            treeNode.Icon = "icon-article";
+            treeNode.Icon = "icon-folder";
         }
     }
 }

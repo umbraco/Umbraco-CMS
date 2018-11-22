@@ -77,10 +77,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     }
     else {
         //so, we usually refernce all editors with the Int ID, but with members we have
-        //a different pattern, adding a route-redirect here to handle this:
-        //isNumber doesnt work here since its seen as a string
-
-        //TODO: Why is this here - I don't understand why this would ever be an integer? This will not work when we support non-umbraco membership providers.
+        //a different pattern, adding a route-redirect here to handle this just in case.
+        //(isNumber doesnt work here since its seen as a string)
+        //The reason this might be an INT is due to the routing used for the member list view
+        //but this is now configured to use the key, so this is just a fail safe
 
         if ($routeParams.id && $routeParams.id.length < 9) {
 

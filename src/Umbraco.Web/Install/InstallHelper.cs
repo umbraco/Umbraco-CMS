@@ -110,7 +110,7 @@ namespace Umbraco.Web.Install
                     UmbracoVersion.Current.Major,
                     UmbracoVersion.Current.Minor,
                     UmbracoVersion.Current.Build,
-                    UmbracoVersion.CurrentComment,
+                    UmbracoVersion.Comment,
                     errorMsg,
                     userAgent,
                     dbProvider);

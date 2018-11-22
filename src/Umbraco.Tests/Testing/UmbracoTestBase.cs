@@ -36,9 +36,10 @@ using Umbraco.Web;
 using Umbraco.Web.Services;
 using Umbraco.Examine;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web._Legacy.Actions;
+
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
 
@@ -205,9 +206,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(f => runtimeStateMock.Object);
 
             // ah...
-            Container.RegisterCollectionBuilder<ActionCollectionBuilder>()
-                .SetProducer(Enumerable.Empty<Type>);
-
+            Container.RegisterCollectionBuilder<ActionCollectionBuilder>();
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 

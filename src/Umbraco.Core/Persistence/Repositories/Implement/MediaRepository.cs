@@ -8,12 +8,12 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -100,7 +100,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 case QueryType.Many:
                     sql = sql.Select<ContentDto>(r =>
                         r.Select(x => x.NodeDto)
-                         .Select(x => x.ContentVersionDto));
+                         .Select(x => x.ContentVersionDto))
+
+                        // ContentRepositoryBase expects a variantName field to order by name
+                        // for now, just return the plain invariant node name
+                        // fixme media should support variants !!
+                        .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
                     break;
             }
 

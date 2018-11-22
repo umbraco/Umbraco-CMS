@@ -55,6 +55,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [JsonConverter(typeof(StringEnumConverter))]
         public ContentSavedState? State { get; set; }
 
+        [DataMember(Name = "variesByCulture")]
+        public bool VariesByCulture { get; set; }
+
         protected bool Equals(ContentItemBasic other)
         {
             return Id == other.Id;

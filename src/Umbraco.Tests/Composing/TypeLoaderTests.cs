@@ -269,24 +269,10 @@ AnotherContentFinder
         }
 
         [Test]
-        public void Resolves_Actions()
-        {
-            var actions = _typeLoader.GetActions();
-            Assert.AreEqual(34, actions.Count());
-        }
-
-        [Test]
-        public void Resolves_Trees()
-        {
-            var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(1, trees.Count());
-        }
-
-        [Test]
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(43, types.Count());
+            Assert.AreEqual(39, types.Count());
         }
 
         /// <summary>

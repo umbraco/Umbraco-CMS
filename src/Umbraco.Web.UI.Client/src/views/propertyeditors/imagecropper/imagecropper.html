@@ -2,7 +2,6 @@
      ng-controller="Umbraco.PropertyEditors.ImageCropperController">
 
     <ng-form name="imageCropperForm">
-
         <umb-property-file-upload culture="{{model.culture}}"
                                   property-alias="{{model.alias}}"
                                   value="model.value.src"
@@ -16,8 +15,6 @@
                 <div ng-if="currentCrop" style="float:left; max-width: 100%;" class="clearfix">
                     <div class="umb-cropper__container">
 
-                        <i ng-click="done()" class="icon icon-delete btn-round umb-close-cropper"></i>
-
                         <div>
                             <umb-image-crop height="{{currentCrop.height}}"
                                             width="{{currentCrop.width}}"
@@ -28,23 +25,26 @@
                             </umb-image-crop>
                         </div>
 
-                        <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
-                           ng-click="currentCrop.coordinates = undefined; done()">
-                            <localize key="imagecropper_reset">Reset</localize>
-                        </a>
+                        <div class="button-drawer">
+                            <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                            <button class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
+                            <button class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
+                        </div>
+
                     </div>
                 </div>
 
                 <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
                     <umb-image-gravity src="imageSrc"
                                        center="model.value.focalPoint"
-                                       on-value-changed="focalPointChanged(left, top)">
+                                       on-value-changed="focalPointChanged(left, top)"
+                                       on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
                     </umb-image-gravity>
                     <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
-            
+
                 
-                <ul ng-if="!imageSrc.endsWith('.svg')" class="umb-sortable-thumbnails cropList clearfix">
+                <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 
                         <umb-image-thumbnail center="model.value.focalPoint"

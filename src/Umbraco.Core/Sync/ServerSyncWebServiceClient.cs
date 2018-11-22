@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Services;
 using Umbraco.Core.IO;
 
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Sync
     /// The client Soap service for making distrubuted cache calls between servers
     /// </summary>
     [WebServiceBinding(Name = "CacheRefresherSoap", Namespace = "http://umbraco.org/webservices/")]
+    [Obsolete("Legacy load balancing is obsolete and should be removed")]
     internal class ServerSyncWebServiceClient : System.Web.Services.Protocols.SoapHttpClientProtocol
     {
 

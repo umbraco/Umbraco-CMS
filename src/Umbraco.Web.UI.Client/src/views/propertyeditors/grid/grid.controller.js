@@ -2,14 +2,8 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
     function (
         $scope,
-        $http,
-        assetsService,
         localizationService,
-        $rootScope,
-        dialogService,
         gridService,
-        mediaResource,
-        imageHelper,
         $timeout,
         umbRequestHelper,
         angularHelper,
@@ -285,9 +279,11 @@ angular.module("umbraco")
                     event: event,
                     show: true,
                     submit: function(model) {
+                      if (model.selectedItem) {
                         $scope.addControl(model.selectedItem, area, index);
                         $scope.editorOverlay.show = false;
                         $scope.editorOverlay = null;
+                      }
                     }
                 };
             });

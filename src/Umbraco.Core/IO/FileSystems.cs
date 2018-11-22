@@ -35,11 +35,7 @@ namespace Umbraco.Core.IO
         private object _wkfsObject;
 
         private MediaFileSystem _mediaFileSystem;
-
         
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        private IFileSystem _javascriptLibraryFileSystem;
-
         #region Constructor
 
         // DI wants a public ctor
@@ -129,16 +125,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        internal IFileSystem JavaScriptLibraryFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _javascriptLibraryFileSystem;
-            }
-        }
-
         private void EnsureWellKnownFileSystems()
         {
             LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
@@ -154,7 +140,6 @@ namespace Umbraco.Core.IO
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
-            var javaScriptLibraryFileSystem = new PhysicalFileSystem(SystemDirectories.JavaScriptLibrary);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
@@ -162,7 +147,6 @@ namespace Umbraco.Core.IO
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
             _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
-            _javascriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", () => IsScoped());
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             _mediaFileSystem = GetFileSystemProvider<MediaFileSystem>();

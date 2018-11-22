@@ -7,6 +7,9 @@ namespace Umbraco.Core.Migrations
     /// </summary>
     public interface IMigration : IDiscoverable
     {
+        /// <summary>
+        /// Executes the migration.
+        /// </summary>
         void Migrate();
     }
 }

@@ -55,7 +55,7 @@
     <key alias="domainHelp"><![CDATA[
     Geçerli alan adları şunlardır : " umbraco.com ", " www.umbraco.com ", " umbraco.com:8080 " ya da
         " https://www.umbraco.com/ " . <br /> etki /> bir düzey yollar desteklenir <br , örneğin . " umbraco.com/en " . Bununla birlikte,
-        kaçınılmalıdır. Daha yukarıdaki kültür ayarını kullanın 
+        kaçınılmalıdır. Daha yukarıdaki kültür ayarını kullanın
     ]]></key>
     <key alias="inherit">Miras Al</key>
     <key alias="setLanguage">Kültür</key>
@@ -421,7 +421,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>Veritabanı bulunamadı! "Web.config" nin "bağlantı dizesinde" bilgi dosyası doğru olup olmadığını kontrol edin.</p>
               <p>Devam etmek için, (Visual Studio veya sevdiğiniz metin editörü kullanarak) "web.config" dosyasını düzenlemek lütfen, altına gidin "UmbracoDbDSN" adlı anahtarı veritabanınız için bağlantı dizesini eklemek ve dosyayı kaydedin. </p>
               <p>
-              <strong>Tekrar dene</strong>. 
+              <strong>Tekrar dene</strong>.
               <br />
               <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              Burada düzenleme web.config Hakkında Daha Fazla Bilgi.</a></p>]]></key>
@@ -434,7 +434,7 @@
       </p>
       <p>
       Merak etmeyin - hiçbir içerik silinmeyecek ve her şey sonradan çalışmaya devam edecektir!
-      </p>    
+      </p>
       ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Sizin veritabanı son sürüme yükseltilmiş oldu %0%.<br />  <strong>Sonraki</strong> işlem. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
@@ -470,7 +470,7 @@
     ]]></key>
     <key alias="runwayFromScratch">Baştan başlamak istiyorum</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates. 
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
@@ -484,8 +484,8 @@
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However, 
+      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
+        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
@@ -506,9 +506,9 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
+    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
         manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
 To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
@@ -529,6 +529,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">İşinizi kaydetmek için şimdi Yenile</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Pazar</key>
     <key alias="greeting1">Pazartesi </key>
     <key alias="greeting2">Salı</key>
     <key alias="greeting3">Çarşamba</key>
@@ -575,13 +576,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
-		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
+		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong>
 		  has been performed on the page <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -593,7 +594,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

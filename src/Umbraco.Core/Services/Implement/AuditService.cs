@@ -27,11 +27,11 @@ namespace Umbraco.Core.Services.Implement
             _isAvailable = new Lazy<bool>(DetermineIsAvailable);
         }
 
-        public void Add(AuditType type, string comment, int userId, int objectId)
+        public void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                _auditRepository.Save(new AuditItem(objectId, comment, type, userId));
+                _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
                 scope.Complete();
             }
         }

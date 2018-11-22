@@ -15,7 +15,7 @@ namespace Umbraco.Web
                 macro = new Macro(Alias, Alias, string.Empty, MacroTypes.Unknown);
                 Current.Services.MacroService.Save(macro);
             }
-            _returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", macro.Id);
+            _returnUrl = $"developer/Macros/editMacro.aspx?macroID={macro.Id}";
             return true;
         }
 
@@ -29,14 +29,8 @@ namespace Umbraco.Web
 
         private string _returnUrl = "";
 
-        public override string ReturnUrl
-        {
-            get { return _returnUrl; }
-        }
+        public override string ReturnUrl => _returnUrl;
 
-        public override string AssignedApp
-        {
-            get { return Constants.Applications.Packages.ToString(); }
-        }
+        public override string AssignedApp => Constants.Applications.Settings;
     }
 }

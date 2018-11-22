@@ -119,7 +119,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<RenameTrueFalseField>("{517CE9EA-36D7-472A-BF4B-A0D6FB1B8F89}"); // from 7.12.0
             Chain<SetDefaultTagsStorageType>("{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}"); // from 7.12.0
             //Chain<UpdateDefaultMandatoryLanguage>("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}"); // stephan added that one = merge conflict, remove
-            
+
             Chain<FallbackLanguage>("{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // add andy's after others, with a new target state
             From("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}") // and provide a path out of andy's
                 .CopyChain("{39E5B1F7-A50B-437E-B768-1723AEC45B65}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}", "{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // to next
@@ -137,6 +137,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             // resume at {290C18EE-B3DE-4769-84F1-1F467F3F76DA}...
 
             Chain<DropTaskTables>("{6A2C7C1B-A9DB-4EA9-B6AB-78E7D5B722A7}");
+            Chain<FixLockTablePrimaryKey>("{77874C77-93E5-4488-A404-A630907CEEF0}");
+            Chain<AddLogTableColumns>("{8804D8E8-FE62-4E3A-B8A2-C047C2118C38}");
+            Chain<DropPreValueTable>("{23275462-446E-44C7-8C2C-3B8C1127B07D}");
+            Chain<DropDownPropertyEditorsMigration>("{6B251841-3069-4AD5-8AE9-861F9523E8DA}");
+            Chain<TagsMigrationFix>("{EE429F1B-9B26-43CA-89F8-A86017C809A3}");
+            Chain<DropTemplateDesignColumn>("{08919C4B-B431-449C-90EC-2B8445B5C6B1}");
+            Chain<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
 
             //FINAL
 

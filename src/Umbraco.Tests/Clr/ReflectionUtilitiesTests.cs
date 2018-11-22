@@ -13,16 +13,16 @@ namespace Umbraco.Tests.Clr
         [Test]
         public void EmitCtorEmits()
         {
-            var ctor1 = ReflectionUtilities.EmitCtor<Func<Class1>>();
+            var ctor1 = ReflectionUtilities.EmitConstuctor<Func<Class1>>();
             Assert.IsInstanceOf<Class1>(ctor1());
 
-            var ctor2 = ReflectionUtilities.EmitCtor<Func<object>>(declaring: typeof(Class1));
+            var ctor2 = ReflectionUtilities.EmitConstuctor<Func<object>>(declaring: typeof(Class1));
             Assert.IsInstanceOf<Class1>(ctor2());
 
-            var ctor3 = ReflectionUtilities.EmitCtor<Func<int, Class3>>();
+            var ctor3 = ReflectionUtilities.EmitConstuctor<Func<int, Class3>>();
             Assert.IsInstanceOf<Class3>(ctor3(42));
 
-            var ctor4 = ReflectionUtilities.EmitCtor<Func<int, object>>(declaring: typeof(Class3));
+            var ctor4 = ReflectionUtilities.EmitConstuctor<Func<int, object>>(declaring: typeof(Class3));
             Assert.IsInstanceOf<Class3>(ctor4(42));
         }
 
@@ -30,40 +30,40 @@ namespace Umbraco.Tests.Clr
         public void EmitCtorEmitsFromInfo()
         {
             var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, Array.Empty<Type>(), null);
-            var ctor1 = ReflectionUtilities.EmitCtor<Func<Class1>>(ctorInfo);
+            var ctor1 = ReflectionUtilities.EmitConstructor<Func<Class1>>(ctorInfo);
             Assert.IsInstanceOf<Class1>(ctor1());
 
             ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, new[] { typeof(int) }, null);
-            var ctor3 = ReflectionUtilities.EmitCtor<Func<int, object>>(ctorInfo);
+            var ctor3 = ReflectionUtilities.EmitConstructor<Func<int, object>>(ctorInfo);
             Assert.IsInstanceOf<Class1>(ctor3(42));
 
-            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitCtor<Func<string, object>>(ctorInfo));
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitConstructor<Func<string, object>>(ctorInfo));
         }
 
         [Test]
         public void EmitCtorEmitsPrivateCtor()
         {
-            var ctor = ReflectionUtilities.EmitCtor<Func<string, Class3>>();
+            var ctor = ReflectionUtilities.EmitConstuctor<Func<string, Class3>>();
             Assert.IsInstanceOf<Class3>(ctor("foo"));
         }
 
         [Test]
         public void EmitCtorThrowsIfNotFound()
         {
-            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitCtor<Func<bool, Class3>>());
+            Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitConstuctor<Func<bool, Class3>>());
         }
 
         [Test]
         public void EmitCtorThrowsIfInvalid()
         {
             var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, Array.Empty<Type>(), null);
-            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitCtor<Func<Class2>>(ctorInfo));
+            Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitConstructor<Func<Class2>>(ctorInfo));
         }
 
         [Test]
         public void EmitCtorReturnsNull()
         {
-            Assert.IsNull(ReflectionUtilities.EmitCtor<Func<bool, Class3>>(false));
+            Assert.IsNull(ReflectionUtilities.EmitConstuctor<Func<bool, Class3>>(false));
         }
 
         [Test]

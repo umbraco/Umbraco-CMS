@@ -31,6 +31,7 @@ namespace Umbraco.Core
                 public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
                 public const string MediaVersion = TableNamePrefix + "MediaVersion";
+                public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";

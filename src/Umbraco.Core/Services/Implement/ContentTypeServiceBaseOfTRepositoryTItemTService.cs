@@ -344,37 +344,18 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<TItem> GetComposedOf(int id, IEnumerable<TItem> all)
+        {
+            return all.Where(x => x.ContentTypeComposition.Any(y => y.Id == id));
+
+        }
+
         public IEnumerable<TItem> GetComposedOf(int id)
         {
-            //fixme: this is essentially the same as ContentTypeServiceExtensions.GetWhereCompositionIsUsedInContentTypes which loads
-            // all content types to figure this out, this instead makes quite a few queries so should be replaced
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(ReadLockIds);
-
-                // hash set handles duplicates
-                var composed = new HashSet<TItem>(new DelegateEqualityComparer<TItem>(
-                    (x, y) => x.Id == y.Id,
-                    x => x.Id.GetHashCode()));
-
-                var ids = new Stack<int>();
-                ids.Push(id);
-
-                while (ids.Count > 0)
-                {
-                    var i = ids.Pop();
-                    var result = Repository.GetTypesDirectlyComposedOf(i).ToArray();
-
-                    foreach (var c in result)
-                    {
-                        composed.Add(c);
-                        ids.Push(c.Id);
-                    }
-                }
-
-                return composed.ToArray();
-            }
+            // GetAll is cheap, repository has a full dataset cache policy
+            // fixme - still, because it uses the cache, race conditions!
+            var allContentTypes = GetAll(Array.Empty<int>());
+            return GetComposedOf(id, allContentTypes);
         }
 
         public int Count()
@@ -423,7 +404,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 OnSaved(scope, saveEventArgs);
 
-                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
+                Audit(AuditType.Save, userId, item.Id);
                 scope.Complete();
             }
         }
@@ -465,7 +446,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 OnSaved(scope, saveEventArgs);
 
-                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1);
                 scope.Complete();
             }
         }
@@ -523,7 +504,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 OnDeleted(scope, deleteEventArgs);
 
-                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
+                Audit(AuditType.Delete, userId, item.Id);
                 scope.Complete();
             }
         }
@@ -576,7 +557,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 OnDeleted(scope, deleteEventArgs);
 
-                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1);
                 scope.Complete();
             }
         }
@@ -963,9 +944,10 @@ namespace Umbraco.Core.Services.Implement
 
         #region Audit
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId,
+                ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
         }
 
         #endregion

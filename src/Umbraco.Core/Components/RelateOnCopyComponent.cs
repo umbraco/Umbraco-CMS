@@ -1,12 +1,10 @@
 ﻿using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Components
 {
-
     //TODO: This should just exist in the content service/repo!
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class RelateOnCopyComponent : UmbracoComponentBase, IUmbracoCoreComponent
@@ -39,8 +37,9 @@ namespace Umbraco.Core.Components
 
             Current.Services.AuditService.Add(
                 AuditType.Copy,
-                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'",
-                e.Copy.WriterId, e.Copy.Id);
+                e.Copy.WriterId,
+                e.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),
+                $"Copied content with Id: '{e.Copy.Id}' related to original content with Id: '{e.Original.Id}'");
         }
     }
 }

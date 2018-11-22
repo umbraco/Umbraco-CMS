@@ -18,7 +18,7 @@
 
          <umb-editor-container class="form-horizontal">
 
-            <div class="umb-expansion-panel" ng-repeat="group in content.tabs">
+            <div class="umb-expansion-panel" ng-repeat="group in content.tabs track by group.label">
 
                 <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
                     <div>{{ group.label }}</div>

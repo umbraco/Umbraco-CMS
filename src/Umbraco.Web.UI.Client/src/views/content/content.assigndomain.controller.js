@@ -1,21 +1,25 @@
 (function () {
     "use strict";
 
-    function AssignDomainController($scope, localizationService, languageResource, contentResource) {
+    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService) {
         var vm = this;
+        
         vm.closeDialog = closeDialog;
         vm.addDomain = addDomain;
         vm.removeDomain = removeDomain;
         vm.save = save;
-        vm.validateDomain = validateDomain;
         vm.languages = [];
         vm.domains = [];
         vm.language = null;
-        vm.domainPattern = /^(http[s]?:\/\/)?([-\w]+(\.[-\w]+)*)(:\d+)?(\/[-\w]*|-)?$/gi; //TODO: This regex is not working as it should.
+
         function activate() {
-            languageResource.getAll().then(function (langs) {
+
+            vm.loading = true;
+
+            languageResource.getAll().then(langs => {
                 vm.languages = langs;
-                var defLang = langs.filter(function (l) {
+
+                var defLang = langs.filter(l => {
                     return l.isDefault;
                 });
 
@@ -25,7 +29,9 @@
                 else {
                     vm.defaultLanguage = langs[0];
                 }
-                getCultureAndDomains();
+                getCultureAndDomains().then(() => {
+                    vm.loading = false;
+                });
             });
 
             localizationService.localize("assignDomain_inherit").then(function (value) {
@@ -35,11 +41,12 @@
         }
 
         function getCultureAndDomains () {
-            contentResource.getCultureAndDomains($scope.currentNode.id)
+            return contentResource.getCultureAndDomains($scope.currentNode.id)
                 .then(function (data) {
-                    if (data.Language !== "undefined") {
+
+                    if (data.language !== "undefined") {
                         var lang = vm.languages.filter(function (l) {
-                            return matchLanguageById(l, data.Language.Id);
+                            return matchLanguageById(l, data.language.Id);
 
                         });
                         if (lang.length > 0) {
@@ -47,13 +54,13 @@
                         }
                     }
 
-                    vm.domains = data.Domains.map(function (d) {
+                    vm.domains = data.domains.map(function (d) {
                         var matchedLangs = vm.languages.filter(function (lng) {
-                            return matchLanguageById(lng, d.Lang);
+                            return matchLanguageById(lng, d.lang);
                         });
                         return {
-                            Name: d.Name,
-                            Lang: matchedLangs.length > 0 ? matchedLangs[0] : vm.defaultLanguage
+                            name: d.name,
+                            lang: matchedLangs.length > 0 ? matchedLangs[0] : vm.defaultLanguage
                         }
                     });
                 });
@@ -66,13 +73,13 @@
         }
 
         function closeDialog() {
-            $scope.nav.hideDialog();
+            navigationService.hideDialog();
         }
 
         function addDomain() {
             vm.domains.push({
-                Name: '',
-                Lang: vm.defaultLanguage
+                name: '',
+                lang: vm.defaultLanguage
             });
         }
 
@@ -80,44 +87,55 @@
             vm.domains.splice(index, 1);
         }
 
-        function validateDomain() {
-            var valid = true, duplicateTest = {};
-            if (vm.domains.length > 1) {
-
-                vm.domains.map(function (d, index) {
-                    if (d.Name in duplicateTest) {
-                        valid = false;
-                    }
-                    else {
-                        duplicateTest[d.Name] = index;
-                    }
-                });
-            }
-            return valid;
-        }
-
         function save() {
 
+            vm.submitButtonState = "busy";
+
             if (vm.domainForm.$valid) {
+
+                // clear validation messages
+                vm.domains.forEach(domain => {
+                    domain.duplicate = null;
+                    domain.other = null;
+                });
+
                 var data = {
-                    NodeId: $scope.currentNode.id,
-                    Domains: vm.domains.map(function (d) {
+                    nodeId: $scope.currentNode.id,
+                    domains: vm.domains.map(function (d) {
                         return {
-                            Name: d.Name,
-                            Lang: d.Lang.id
+                            name: d.name,
+                            lang: d.lang.id
                         };
                     }),
-                    Language: vm.language != null ? vm.language.id : 0
+                    language: vm.language != null ? vm.language.id : 0
                 };
-                console.log(data);
-                contentResource.saveLanguageAndDomains(data).then(function () {
-                    closeDialog();
+
+                contentResource.saveLanguageAndDomains(data).then(function (response) {
+
+                    // validation is interesting. Check if response is valid
+                    if(response.valid) {
+
+                        vm.submitButtonState = "success";
+
+                    // show validation messages for each domain
+                    } else {
+                        response.domains.forEach(validation => {
+                            vm.domains.forEach(domain => {
+                                if(validation.name === domain.name) {
+                                    domain.duplicate = validation.duplicate;
+                                    domain.other = validation.other;
+                                }
+                            });
+                        });
+                        vm.submitButtonState = "error";
+                    }
+
                 }, function (e) {
-                    console.log(e); //TODO: not sure how best to handle this case
+                    vm.submitButtonState = "error";
                 });
             }
             else {
-                console.log('not valid');
+                vm.submitButtonState = "error";
             }
         }
 

@@ -131,13 +131,10 @@ namespace Umbraco.Web.Editors
                     if (tree == null) continue; //shouldn't occur
 
                     var searchableTreeAttribute = searchableTree.Value.SearchableTree.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
-                    var treeAttribute = tree.GetTreeAttribute();
 
-                    long total;
-
-                    result[treeAttribute.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
+                    result[tree.GetRootNodeDisplayName(Services.TextService)] = new TreeSearchResult
                     {
-                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out total),
+                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
                         TreeAlias = searchableTree.Key,
                         AppAlias = searchableTree.Value.AppAlias,
                         JsFormatterService = searchableTreeAttribute == null ? "" : searchableTreeAttribute.ServiceName,

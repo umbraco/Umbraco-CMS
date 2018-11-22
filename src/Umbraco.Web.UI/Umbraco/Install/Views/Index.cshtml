@@ -45,7 +45,7 @@
 
     <div ng-cloak ng-animate="'fade'" id="fact" class="absolute-center clearfix" ng-show="installer.fact">
         <h2>Did you know</h2>
-        <p ng-bind-html-unsafe="installer.fact"></p>
+        <p ng-bind-html="installer.fact"></p>
     </div>
     
     <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3> 

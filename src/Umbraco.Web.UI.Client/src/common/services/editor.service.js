@@ -26,6 +26,18 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#getNumberOfEditors
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Method to return the number of open editors
+         */
+        function getNumberOfEditors() {
+            return editors.length;
+        };
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#open
          * @methodOf umbraco.services.editorService
          *
@@ -176,6 +188,25 @@
 
         function embed(editor) {
             editor.view = "views/common/infiniteeditors/embed/embed.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#rollback
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a rollback editor in infinite editing.
+         * @param {String} editor.node The node to rollback
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function rollback(editor) {
+            editor.view = "views/common/infiniteeditors/rollback/rollback.html";
             editor.size = "small";
             open(editor);
         }
@@ -472,6 +503,7 @@
 
         var service = {
             getEditors: getEditors,
+            getNumberOfEditors: getNumberOfEditors,
             open: open,
             close: close,
             closeAll: closeAll,
@@ -481,6 +513,7 @@
             copy: copy,
             move: move,
             embed: embed,
+            rollback: rollback,
             linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,

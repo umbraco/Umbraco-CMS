@@ -93,7 +93,7 @@ namespace Umbraco.Web.Routing
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
                 v = "," + v.Replace(" ", "") + ",";
-                return v.Contains(a1) || v.Contains(a2);
+                return v.InvariantContains(a1) || v.InvariantContains(a2);
             }
 
             // fixme - even with Linq, what happens below has to be horribly slow

@@ -55,6 +55,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         public class PropertyValue
         {
+            //TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
+            // class to deal with change tracking which variants have changed
+
             private string _culture;
             private string _segment;
 
@@ -100,6 +103,7 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
+            //TODO: This allows us to track changes for an entire Property, but doesn't allow us to track changes at the variant level
             public readonly PropertyInfo ValuesSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Values);
 
             public readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
@@ -388,21 +392,14 @@ namespace Umbraco.Core.Models
             return PropertyType.IsPropertyValueValid(value);
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Property) base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedEntity = (Property)clone;
 
             //need to manually assign since this is a readonly property
-            clone.PropertyType = (PropertyType) PropertyType.DeepClone();
-
-            //re-enable tracking
-            clone.ResetDirtyProperties(false); // not needed really, since we're not tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity.PropertyType = (PropertyType) PropertyType.DeepClone();
         }
     }
 }

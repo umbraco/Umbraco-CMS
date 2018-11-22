@@ -194,7 +194,9 @@
                 return a.alias === "umbContent";
             });
 
-            contentApp.viewModel = _.omit(variant, 'apps');
+            //The view model for the content app is simply the index of the variant being edited
+            var variantIndex = vm.content.variants.indexOf(variant);
+            contentApp.viewModel = variantIndex;
 
             // make sure the same app it set to active in the new variant
             if(activeAppAlias) {

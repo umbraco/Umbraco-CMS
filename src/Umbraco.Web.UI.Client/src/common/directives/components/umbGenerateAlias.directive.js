@@ -48,7 +48,7 @@ the directive will use {@link umbraco.directives.directive:umbLockedField umbLoc
 **/
 
 angular.module("umbraco.directives")
-    .directive('umbGenerateAlias', function ($timeout, entityResource) {
+    .directive('umbGenerateAlias', function ($timeout, entityResource, localizationService) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/umb-generate-alias.html',
@@ -67,7 +67,21 @@ angular.module("umbraco.directives")
                 var updateAlias = false;
 
                 scope.locked = true;
-                scope.placeholderText = "Enter alias...";
+
+                scope.labels = {
+                    idle: "Enter alias...",
+                    busy: "Generating alias..."
+                };
+                
+                scope.placeholderText = scope.labels.idle;
+                
+                localizationService.localize('placeholders_enterAlias').then(function (value) {
+                    scope.labels.idle = scope.placeholderText = value;
+                });
+
+                localizationService.localize('placeholders_generatingAlias').then(function (value) {
+                    scope.labels.busy = value;
+                });
 
                 function generateAlias(value) {
 
@@ -78,7 +92,7 @@ angular.module("umbraco.directives")
                   if( value !== undefined && value !== "" && value !== null) {
 
                       scope.alias = "";
-                    scope.placeholderText = "Generating Alias...";
+                    scope.placeholderText = scope.labels.busy;
 
                     generateAliasTimeout = $timeout(function () {
                        updateAlias = true;
@@ -92,7 +106,7 @@ angular.module("umbraco.directives")
                   } else {
                     updateAlias = true;
                     scope.alias = "";
-                    scope.placeholderText = "Enter alias...";
+                    scope.placeholderText = scope.labels.idle;
                   }
 
                 }

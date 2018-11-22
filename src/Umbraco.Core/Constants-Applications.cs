@@ -145,6 +145,15 @@
 
             public const string PartialViewMacros = "partialViewMacros";
 
+            public static class Groups
+            {
+                public const string Settings = "settingsGroup";
+
+                public const string Templating = "templatingGroup";
+
+                public const string ThirdParty = "thirdPartyGroup";
+            }
+
             //TODO: Fill in the rest!
         }
     }

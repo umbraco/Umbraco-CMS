@@ -18,7 +18,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // kill unused parentId column
             Delete.ForeignKey("FK_cmsTags_cmsTags").OnTable(Constants.DatabaseSchema.Tables.Tag).Do();
-            Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag);
+            Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag).Do();
         }
     }
+
+    // fixes TagsMigration that... originally failed to properly drop the ParentId column
 }

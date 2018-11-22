@@ -767,7 +767,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     foreach (var r in result)
                     {
                         var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
-                        var name = isInvariant ? r.Name : r.CultureNames["en-US"];
+                        var name = isInvariant ? r.Name : r.CultureInfos["en-US"].Name;
                         var namePrefix = isInvariant ? "INV" : "VAR";
 
                         //ensure the correct name (invariant vs variant) is in the result

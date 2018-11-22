@@ -1,4 +1,4 @@
-function booleanEditorController($scope, $rootScope, assetsService) {
+function booleanEditorController($scope) {
 
     function setupViewModel() {
         $scope.renderModel = {

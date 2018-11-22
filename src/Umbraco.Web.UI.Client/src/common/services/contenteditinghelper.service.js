@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
 
     function isValidIdentifier(id) {
 
@@ -146,7 +146,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.methods) {
                 throw "args.methods is not defined";
             }
-            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish || !args.methods.schedulePublish) {
+            if (!args.methods.saveAndPublish || !args.methods.sendToPublish || !args.methods.unpublish || !args.methods.schedulePublish || !args.methods.publishDescendants) {
                 throw "args.methods does not contain all required defined methods";
             }
 
@@ -188,7 +188,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             hotKey: "ctrl+u",
                             hotKeyWhenHidden: true,
                             alias: "unpublish",
-                            addEllipsis: args.content.variants && args.content.variants.length > 1 ? "true" : "false"
+                            addEllipsis: "true"
                         };
                     case "SCHEDULE":
                         //schedule publish - schedule doesn't have a permission letter so
@@ -198,6 +198,16 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_schedulePublish",
                             handler: args.methods.schedulePublish,
                             alias: "schedulePublish",
+                            addEllipsis: "true"
+                        };
+                    case "PUBLISH_DESCENDANTS":
+                        // Publish descendants - it doesn't have a permission letter so
+                        // the button letter is made unique so it doesn't collide with anything else
+                        return {
+                            letter: ch,
+                            labelKey: "buttons_publishDescendants",
+                            handler: args.methods.publishDescendants,
+                            alias: "publishDescendant",
                             addEllipsis: "true"
                         };
                     default:
@@ -210,7 +220,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
             // Publish, SendToPublish
-            var buttonOrder = ["U", "H", "SCHEDULE"];
+            var buttonOrder = ["U", "H", "SCHEDULE", "PUBLISH_DESCENDANTS"];
 
             //Create the first button (primary button)
             //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
@@ -253,6 +263,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // get picked up by the loop through permissions
                 if( _.contains(args.content.allowedActions, "U")) {
                     buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
+                    buttons.subButtons.push(createButtonDefinition("PUBLISH_DESCENDANTS"));
                 }
 
                 // if we are not creating, then we should add unpublish too,
@@ -421,16 +432,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     "properties",
                     "apps",
                     "createDateFormatted",
-                    "releaseDateYear",
-                    "releaseDateMonth",
-                    "releaseDateDayNumber",
-                    "releaseDateDay",
-                    "releaseDateTime",
-                    "removeDateYear",
-                    "removeDateMonth",
-                    "removeDateDayNumber",
-                    "removeDateDay",
-                    "removeDateTime"
+                    "releaseDate",
+                    "expireDate"
                 ], function (i) {
                     return i === propName;
                 });

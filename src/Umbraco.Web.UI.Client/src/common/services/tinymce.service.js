@@ -990,8 +990,8 @@ function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesh
                         currentTarget.anchor = anchorVal.substring(1);
                     }
 
-                    //locallink detection, we do this here, to avoid poluting the dialogservice
-                    //so the dialog service can just expect to get a node-like structure
+		    //locallink detection, we do this here, to avoid poluting the editorService
+		    //so the editor service can just expect to get a node-like structure
                     if (currentTarget.url.indexOf("localLink:") > 0) {
                         // if the current link has an anchor, it needs to be considered when getting the udi/id
                         // if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace

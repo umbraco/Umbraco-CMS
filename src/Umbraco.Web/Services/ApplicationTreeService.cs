@@ -20,15 +20,19 @@ namespace Umbraco.Web.Services
     {
         private readonly ILogger _logger;
         private readonly CacheHelper _cache;
+        private readonly TypeLoader _typeLoader;
         private Lazy<IEnumerable<ApplicationTree>> _allAvailableTrees;
         internal const string TreeConfigFileName = "trees.config";
         private static string _treeConfig;
         private static readonly object Locker = new object();
+        private readonly Lazy<IReadOnlyCollection<IGrouping<string, string>>> _groupedTrees;
 
-        public ApplicationTreeService(ILogger logger, CacheHelper cache)
+        public ApplicationTreeService(ILogger logger, CacheHelper cache, TypeLoader typeLoader)
         {
             _logger = logger;
             _cache = cache;
+            _typeLoader = typeLoader;
+            _groupedTrees = new Lazy<IReadOnlyCollection<IGrouping<string, string>>>(InitGroupedTrees);
         }
 
         /// <summary>
@@ -281,6 +285,46 @@ namespace Umbraco.Web.Services
             return list.OrderBy(x => x.SortOrder).ToArray();
         }
 
+        public IDictionary<string, IEnumerable<ApplicationTree>> GetGroupedApplicationTrees(string applicationAlias, bool onlyInitialized)
+        {
+            var result = new Dictionary<string, IEnumerable<ApplicationTree>>();
+            var foundTrees = GetApplicationTrees(applicationAlias, onlyInitialized);
+            foreach(var treeGroup in _groupedTrees.Value)
+            {
+                List<ApplicationTree> resultGroup = null;
+                foreach(var tree in foundTrees)
+                { 
+                    foreach(var treeAliasInGroup in treeGroup)
+                    {
+                        if (tree.Alias == treeAliasInGroup)
+                        {
+                            if (resultGroup == null) resultGroup = new List<ApplicationTree>();
+                            resultGroup.Add(tree);
+                        }
+                    }  
+                }
+                if (resultGroup != null)
+                    result[treeGroup.Key ?? string.Empty] = resultGroup; //key cannot be null so make empty string
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a group of all tree groups and their tree aliases
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Used to initialize the <see cref="_groupedTrees"/> field
+        /// </remarks>
+        private IReadOnlyCollection<IGrouping<string, string>> InitGroupedTrees()
+        {
+            var result = GetAll()
+                .Select(x => (treeAlias: x.Alias, treeGroup: x.GetRuntimeType().GetCustomAttribute<CoreTreeAttribute>(false)?.TreeGroup))
+                .GroupBy(x => x.treeGroup, x => x.treeAlias)
+                .ToList();
+            return result;
+        }
+           
         /// <summary>
         /// Loads in the xml structure from disk if one is found, otherwise loads in an empty xml structure, calls the
         /// callback with the xml document and saves the structure back to disk if saveAfterCallback is true.
@@ -401,19 +445,18 @@ namespace Umbraco.Web.Services
         /// </summary>
         private class LazyEnumerableTrees : IEnumerable<ApplicationTree>
         {
-            public LazyEnumerableTrees()
+            public LazyEnumerableTrees(TypeLoader typeLoader)
             {
                 _lazyTrees = new Lazy<IEnumerable<ApplicationTree>>(() =>
                 {
                     var added = new List<string>();
 
                     // Load all Controller Trees by attribute
-                    var types = Current.TypeLoader.GetTypesWithAttribute<TreeController, TreeAttribute>(); // fixme inject
+                    var types = typeLoader.GetTypesWithAttribute<TreeController, TreeAttribute>(); // fixme inject
                     //convert them to ApplicationTree instances
                     var items = types
-                        .Select(x =>
-                                new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
-                        .Select(x => new ApplicationTree(x.Item2.Initialize, x.Item2.SortOrder, x.Item2.ApplicationAlias, x.Item2.Alias, x.Item2.Title, x.Item2.IconClosed, x.Item2.IconOpen, x.Item1.GetFullNameWithAssembly()))
+                        .Select(x => (tree: x, treeAttribute: x.GetCustomAttributes<TreeAttribute>(false).Single()))
+                        .Select(x => new ApplicationTree(x.treeAttribute.Initialize, x.treeAttribute.SortOrder, x.treeAttribute.ApplicationAlias, x.treeAttribute.Alias, x.treeAttribute.Title, x.treeAttribute.IconClosed, x.treeAttribute.IconOpen, x.tree.GetFullNameWithAssembly()))
                         .ToArray();
 
                     added.AddRange(items.Select(x => x.Alias));
@@ -423,7 +466,7 @@ namespace Umbraco.Web.Services
             }
 
             private readonly Lazy<IEnumerable<ApplicationTree>> _lazyTrees;
-
+            
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
             /// </summary>

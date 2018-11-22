@@ -24,7 +24,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "logType")]
         public string LogType { get; set; }
 
+        [DataMember(Name = "entityType")]
+        public string EntityType { get; set; }
+
         [DataMember(Name = "comment")]
         public string Comment { get; set; }
+
+        [DataMember(Name = "parameters")]
+        public string Parameters { get; set; }
     }
 }

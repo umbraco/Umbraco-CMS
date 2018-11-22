@@ -19,13 +19,12 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var currentVersion = UmbracoVersion.Local;
-
-                //fixme - in this case there's a db but the version is cleared which is fine and a normal way to force the upgrader
-                // to execute, but before we would detect the current version via the DB like DatabaseSchemaResult.DetermineInstalledVersion
-                // what now, do we need to?
-                if (currentVersion == null)
-                    currentVersion = new Semver.SemVersion(0); 
+                // fixme - if UmbracoVersion.Local is null?
+                // it means that there is a database but the web.config version is cleared
+                // that was a "normal" way to force the upgrader to execute, and we would detect the current
+                // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
+                // need this now?
+                var currentVersion = (UmbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
 
                 var newVersion = UmbracoVersion.SemanticVersion.ToString();
 

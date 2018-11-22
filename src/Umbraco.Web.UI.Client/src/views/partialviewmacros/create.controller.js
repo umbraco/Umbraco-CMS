@@ -1,10 +1,10 @@
 (function () {
     "use strict";
 
-    function PartialViewMacrosCreateController($scope, codefileResource, macroResource, $location, navigationService, formHelper, localizationService, appState) {
+    function PartialViewMacrosCreateController($scope, codefileResource, $location, navigationService, formHelper, appState) {
 
         var vm = this;
-        var node = $scope.dialogOptions.currentNode;
+        var node = $scope.currentNode;
 
         vm.snippets = [];
         vm.createFolderError = "";
@@ -19,6 +19,7 @@
         vm.createFileWithoutMacro = createFileWithoutMacro;
         vm.showCreateFromSnippet = showCreateFromSnippet;
         vm.createFileFromSnippet = createFileFromSnippet;
+        vm.close = close;
 
         function onInit() {
             codefileResource.getSnippets('partialViewMacros')
@@ -52,28 +53,33 @@
                 }, function (err) {
 
                     vm.createFolderError = err;
-                    
+
                 });
             }
         }
 
         function createFile() {
-            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true");
+            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         }
 
         function createFileWithoutMacro() {
-            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
+            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
             navigationService.hideMenu();
         }
 
         function createFileFromSnippet(snippet) {
-            $location.path("/developer/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
+            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
             navigationService.hideMenu();
         }
 
         function showCreateFromSnippet() {
             vm.showSnippets = true;
+        }
+
+        function close() {
+            const showMenu = true;
+            navigationService.hideDialog(showMenu);
         }
 
         onInit();

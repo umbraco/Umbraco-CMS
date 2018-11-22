@@ -1,6 +1,6 @@
-﻿<div class="umb-package-details">
+﻿<div class="umb-user-details-details">
 
-    <div class="umb-package-details__main-content">
+    <div class="umb-user-details-details__main-content">
 
         <umb-box>
             <ng-form name="userProfileForm">
@@ -8,7 +8,7 @@
 
                 <umb-box-content class="block-form">
 
-                <umb-control-group label="@general_email" required="true" alias="email">
+                    <umb-control-group label="@general_email" required="true" alias="email">
 
                         <input type="email"
                                localize="placeholder"
@@ -17,11 +17,11 @@
                                ng-model="model.user.email"
                                umb-auto-focus
                                name="email"
-                           id="email"
+                               id="email"
                                val-email
-                               required
+                               ng-required="true"
                                val-server-field="Email" />
-                        <span ng-messages="userProfileForm.email.$error" show-validation-on-submit >
+                        <span ng-messages="userProfileForm.email.$error" show-validation-on-submit>
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                             <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
                             <span class="help-inline" ng-message="valServerField">{{userProfileForm.email.errorMsg}}</span>
@@ -37,7 +37,7 @@
                                umb-auto-focus name="username"
                                required
                                val-server-field="Username" />
-                        <span ng-messages="userProfileForm.username.$error" show-validation-on-submit >
+                        <span ng-messages="userProfileForm.username.$error" show-validation-on-submit>
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                             <span class="help-inline" ng-message="valServerField">{{userProfileForm.username.errorMsg}}</span>
                         </span>
@@ -50,7 +50,7 @@
                                 name="culture"
                                 required
                                 val-server-field="Culture"></select>
-                        <span ng-messages="userProfileForm.culture.$error" show-validation-on-submit >
+                        <span ng-messages="userProfileForm.culture.$error" show-validation-on-submit>
                             <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
                             <span class="help-inline" ng-message="valServerField">{{userProfileForm.username.errorMsg}}</span>
                         </span>
@@ -103,8 +103,8 @@
 
                     <a href=""
                        ng-if="!model.user.isCurrentUser"
-                       style="max-width: 100%;"
                        class="umb-node-preview-add"
+                       id="content-start-add"
                        ng-click="model.openContentPicker()"
                        prevent-default>
                         <localize key="general_add">Add</localize>
@@ -129,9 +129,9 @@
 
                     <a href=""
                        ng-if="!model.user.isCurrentUser"
-                       style="max-width: 100%;"
                        class="umb-node-preview-add"
                        ng-click="model.openMediaPicker()"
+                       id="media-start-add"
                        prevent-default>
                         <localize key="general_add">Add</localize>
                     </a>
@@ -173,14 +173,14 @@
         </umb-box>
     </div>
 
-    <div class="umb-package-details__sidebar">
+    <div class="umb-user-details-details__sidebar">
 
         <umb-box>
 
             <umb-box-content>
 
                 <!-- Avatar -->
-                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #d8d7d9;">
+                <div class="umb-user-details-avatar">
                     <ng-form name="avatarForm" class="flex flex-column justify-center items-center">
 
                         <umb-avatar style="margin-bottom: 15px;"
@@ -192,28 +192,28 @@
                         </umb-avatar>
 
                         <umb-progress-bar style="max-width: 120px;"
-                                        ng-if="model.avatarFile.uploadStatus === 'uploading'"
-                                        progress="{{ model.avatarFile.uploadProgress }}"
-                                        size="s">
+                                          ng-if="model.avatarFile.uploadStatus === 'uploading'"
+                                          progress="{{ model.avatarFile.uploadProgress }}"
+                                          size="s">
                         </umb-progress-bar>
 
                         <div class="flex items-center" ng-if="model.avatarFile.uploadStatus !== 'uploading'">
 
                             <a href=""
-                            class="umb-user-group-preview__action"
-                            ngf-select ng-model="filesHolder"
-                            ngf-change="model.changeAvatar($files, $event)"
-                            ngf-multiple="false"
-                            ngf-pattern="{{model.acceptedFileTypes}}"
-                            ngf-max-size="{{ model.maxFileSize }}">
+                               class="umb-user-group-preview__action"
+                               ngf-select ng-model="filesHolder"
+                               ngf-change="model.changeAvatar($files, $event)"
+                               ngf-multiple="false"
+                               ngf-pattern="{{model.acceptedFileTypes}}"
+                               ngf-max-size="{{ model.maxFileSize }}">
                                 <localize key="user_changePhoto">Change photo</localize>
                             </a>
 
                             <a href=""
-                            ng-if="model.user.avatars"
-                            class="umb-user-group-preview__action umb-user-group-preview__action--red"
-                            ng-click="model.clearAvatar()"
-                            prevent-default>
+                               ng-if="model.user.avatars"
+                               class="umb-user-group-preview__action umb-user-group-preview__action--red"
+                               ng-click="model.clearAvatar()"
+                               prevent-default>
                                 <localize key="user_removePhoto">Remove photo</localize>
                             </a>
 
@@ -224,9 +224,9 @@
                 </div>
 
                 <!-- Actions -->
-                <div style="margin-bottom: 20px;">
+                <div class="umb-user-details-actions">
 
-                    <div style="margin-bottom: 10px;">
+                    <div>
                         <umb-button ng-if="model.user.userDisplayState.key === 'Disabled' && !model.user.isCurrentUser"
                                     type="button"
                                     button-style="[success,block]"
@@ -238,7 +238,7 @@
                         </umb-button>
                     </div>
 
-                    <div style="margin-bottom: 10px;">
+                    <div>
                         <umb-button ng-if="model.user.userDisplayState.key === 'LockedOut' && !model.user.isCurrentUser"
                                     type="button"
                                     button-style="[success,block]"
@@ -249,9 +249,8 @@
                                     size="s">
                         </umb-button>
                     </div>
-
-                    <div style="margin-bottom: 10px;">
-                    <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
+                    <div>
+                        <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
                                     type="button"
                                     button-style="[info,block]"
                                     action="model.disableUser()"
@@ -261,30 +260,31 @@
                                     size="s">
                         </umb-button>
                     </div>
-
-                <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
-                                button-style="[info,block]"
-                                action="model.toggleChangePassword()"
-                                label="Change password"
-                                label-key="general_changePassword"
-                                state="changePasswordButtonState"
-                                ng-if="model.changePasswordModel.isChanging === false"
-                                size="s">
-                    </umb-button>
-
-                <umb-button type="button" ng-if="!model.user.lastLoginDate"
-                            button-style="[danger,block]"
-                            action="model.deleteNonLoggedInUser()"
-                            label="Delete"
-                            label-key="user_deleteUser"
-                            state="deleteNotLoggedInUserButtonState"
-                            size="s">
-                </umb-button>
+                    <div>
+                        <umb-button type="button" ng-if="model.changePasswordModel.isChanging === false && model.user.userDisplayState.key !== 'Invited'"
+                                    button-style="[info,block]"
+                                    action="model.toggleChangePassword()"
+                                    label="Change password"
+                                    label-key="general_changePassword"
+                                    state="changePasswordButtonState"
+                                    size="s">
+                        </umb-button>
+                    </div>
+                    <div>
+                        <umb-button type="button" ng-if="!model.user.lastLoginDate"
+                                    button-style="[danger,block]"
+                                    action="model.deleteNonLoggedInUser()"
+                                    label="Delete"
+                                    label-key="user_deleteUser"
+                                    state="deleteNotLoggedInUserButtonState"
+                                    size="s">
+                        </umb-button>
+                    </div>
 
                     <ng-form ng-if="model.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>
 
                         <change-password password-values="model.user.changePassword"
-                                        config="model.changePasswordModel.config">
+                                         config="model.changePasswordModel.config">
                         </change-password>
 
                         <umb-button type="button"
@@ -303,60 +303,60 @@
                 </div>
 
                 <!-- User stats -->
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="general_status">Status</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         <umb-badge style="margin-top: 4px;" size="s" color="{{model.user.userDisplayState.color}}">
                             {{model.user.userDisplayState.name}}
                         </umb-badge>
                     </div>
                 </div>
 
-            <div style="margin-bottom: 10px;" ng-if="model.user.userDisplayState.key === 'Invited' && !model.user.isCurrentUser">
-                <textarea name="resendInviteMessage"
-                    type="text"
-                    class="input-block-level"
-                    localize="placeholder"
-                    placeholder="@placeholders_enterMessage"
-                    ng-model="model.resendInviteMessage"
-                    rows="4">
-                </textarea>                    
-                <umb-button type="button"
-                            button-style="[info,block]"
-                            action="model.resendInvite()"
-                            state="model.resendInviteButtonState"
-                            label="Resend Invite"
-                            label-key="actions_resendInvite"
-                            size="s">
-                </umb-button>
-            </div>
+                <div ng-if="model.user.userDisplayState.key === 'Invited' && !model.user.isCurrentUser">
+                    <textarea name="resendInviteMessage"
+                              type="text"
+                              class="input-block-level"
+                              localize="placeholder"
+                              placeholder="@placeholders_enterMessage"
+                              ng-model="model.resendInviteMessage"
+                              rows="4">
+                </textarea>
+                    <umb-button type="button"
+                                button-style="[info,block]"
+                                action="model.resendInvite()"
+                                state="model.resendInviteButtonState"
+                                label="Resend Invite"
+                                label-key="actions_resendInvite"
+                                size="s">
+                    </umb-button>
+                </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_lastLogin">Last login</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         <span ng-if="model.user.lastLoginDate">{{ model.user.formattedLastLogin }}</span>
                         <span ng-if="!model.user.lastLoginDate">{{ model.user.name | umbWordLimit:1 }} <localize key="user_noLogin">has not logged in yet</localize></span>
                     </div>
                 </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_failedPasswordAttempts">Failed login attempts</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         {{ model.user.failedPasswordAttempts }}
                     </div>
                 </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_lastLockoutDate">Last lockout date</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         <span ng-if="model.user.lastLockoutDate === '0001-01-01T00:00:00'">
                             {{ model.user.name | umbWordLimit:1 }} <localize key="user_noLockouts">hasn't been locked out</localize>
                         </span>
@@ -364,11 +364,11 @@
                     </div>
                 </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_lastPasswordChangeDate">Password is last changed</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         <span ng-if="model.user.lastPasswordChangeDate === '0001-01-01T00:00:00'">
                             <localize key="user_noPasswordChange">The password hasn't been changed</localize>
                         </span>
@@ -376,21 +376,33 @@
                     </div>
                 </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_createDate">User is created</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         {{ model.user.formattedCreateDate }}
                     </div>
                 </div>
 
-                <div class="umb-package-details__information-item">
-                    <div class="umb-package-details__information-item-label">
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
                         <localize key="user_updateDate">User is last updated</localize>:
                     </div>
-                    <div class="umb-package-details__information-item-content">
+                    <div class="umb-user-details-details__information-item-content">
                         {{ model.user.formattedUpdateDate }}
+                    </div>
+                </div>
+
+                <div class="umb-user-details-details__information-item">
+                    <div class="umb-user-details-details__information-item-label">
+                        <localize key="general_id">Id</localize>:
+                    </div>
+                    <div class="umb-user-details-details__information-item-content">
+                        {{ model.user.id }}
+                    </div>
+                    <div class="umb-user-details-details__information-item-content">
+                        <small>{{ model.user.key }}</small>
                     </div>
                 </div>
 

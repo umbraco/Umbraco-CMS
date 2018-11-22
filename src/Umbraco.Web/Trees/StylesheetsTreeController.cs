@@ -4,6 +4,7 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Trees
 {
+    [CoreTree(TreeGroup = Constants.Trees.Groups.Templating)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets", "icon-folder", "icon-folder", sortOrder: 9)]
     public class StylesheetsTreeController : FileSystemTreeController
     {

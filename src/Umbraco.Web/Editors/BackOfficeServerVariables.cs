@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -112,7 +112,6 @@ namespace Umbraco.Web.Editors
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
-                        {"legacyTreeJs", _urlHelper.Action("LegacyTreeJs", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
                         //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
@@ -226,6 +225,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllTypes())
                         },
                         {
+                            "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
+                                controller => controller.GetAllGroups())
+                        },
+                        {
                             "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                 controller => controller.GetCheck())
                         },
@@ -327,6 +330,7 @@ namespace Umbraco.Web.Editors
                         {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
+                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }
                 },
                 {
@@ -419,15 +423,19 @@ namespace Umbraco.Web.Editors
         {
             var app = new Dictionary<string, object>
             {
-                {"assemblyVersion", UmbracoVersion.AssemblyVersion}
+                // add versions - see UmbracoVersion for details & differences
+
+                // the complete application version (eg "8.1.2-alpha.25")
+                { "version", _runtimeState.SemanticVersion.ToSemanticString() }, // fixme that's UmbracoVersion.Version!
+
+                // the assembly version (eg "8.0.0")
+                { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }
             };
 
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
-
-            app.Add("version", version);
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));

@@ -109,11 +109,34 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                    $http.post(umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostMove"),
-                         {
-                             parentId: args.parentId,
-                             id: args.id
+                        {
+                            parentId: args.parentId,
+                            id: args.id
                          }, {responseType: 'text'}),
-                   'Failed to move media');
+                        {
+                        error: function(data){
+                            var errorMsg = 'Failed to move media';
+                            if (data.id !== undefined && data.parentId !== undefined) {
+                                if (data.id === data.parentId) {
+                                    errorMsg = 'Media can\'t be moved into itself';
+                                }
+                            }
+                            else if (data.notifications !== undefined) {
+                                if (data.notifications.length > 0) {
+                                    if (data.notifications[0].header.length > 0) {
+                                        errorMsg = data.notifications[0].header;
+                                    }
+                                    if (data.notifications[0].message.length > 0) {
+                                        errorMsg = errorMsg + ": " + data.notifications[0].message;
+                                    }
+                                }
+                            }
+
+                            return {
+                                errorMsg: errorMsg
+                            };
+                       }
+                   });
         },
 
 

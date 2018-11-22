@@ -95,7 +95,7 @@ namespace Umbraco.Core.Services.Implement
                 _macroRepository.Delete(macro);
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Deleted, this, deleteEventArgs);
-                Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
+                Audit(AuditType.Delete, userId, -1);
 
                 scope.Complete();
             }
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services.Implement
                 _macroRepository.Save(macro);
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1);
 
                 scope.Complete();
             }
@@ -150,9 +150,9 @@ namespace Umbraco.Core.Services.Implement
         //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
         //}
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, "Macro"));
         }
 
         #region Event Handlers

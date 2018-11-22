@@ -353,7 +353,7 @@ namespace Umbraco.Core.Services.Implement
 
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataType.Id);
+                Audit(AuditType.Save, userId, dataType.Id);
                 scope.Complete();
             }
         }
@@ -398,7 +398,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, -1);
+                Audit(AuditType.Save, userId, -1);
 
                 scope.Complete();
             }
@@ -456,15 +456,15 @@ namespace Umbraco.Core.Services.Implement
 
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Deleted, this, deleteEventArgs);
-                Audit(AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataType.Id);
+                Audit(AuditType.Delete, userId, dataType.Id);
 
                 scope.Complete();
             }
         }
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, int userId, int objectId)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
         }
 
         #region Event Handlers

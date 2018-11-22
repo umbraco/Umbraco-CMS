@@ -27,7 +27,13 @@ namespace Umbraco.Web.PropertyEditors
 
             // handle multiple
             if (editorValues.TryGetValue("multiple", out var multipleObj))
-                output.Multiple = multipleObj.TryConvertTo<bool>();
+            {
+                var convertBool = multipleObj.TryConvertTo<bool>();
+                if (convertBool.Success)
+                {
+                    output.Multiple = convertBool.Result;
+                }
+            }   
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;
@@ -56,7 +62,10 @@ namespace Umbraco.Web.PropertyEditors
 
         public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration configuration)
         {
-            var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => x.Value) ?? new object();
+            // map to what the editor expects
+            var i = 1;
+            var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ?? new object();
+            
             var multiple = configuration?.Multiple ?? false;
 
             return new Dictionary<string, object>

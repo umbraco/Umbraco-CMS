@@ -576,7 +576,6 @@ namespace Umbraco.Core.Packaging
             {
                 //this is experimental and undocumented...
                 path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
-                path = path.Replace("[$UMBRACOCLIENT]", SystemDirectories.UmbracoClient);
                 path = path.Replace("[$CONFIG]", SystemDirectories.Config);
                 path = path.Replace("[$DATA]", SystemDirectories.Data);
             }

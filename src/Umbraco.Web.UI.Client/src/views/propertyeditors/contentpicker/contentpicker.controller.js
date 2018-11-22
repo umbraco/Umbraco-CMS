@@ -282,7 +282,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     });
 
     /** Syncs the renderModel based on the actual model.value and returns a promise */
-    function syncRenderModel() {
+    function syncRenderModel(doValidation) {
 
         var valueIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -324,7 +324,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
                         });
 
-                    validate();
+                    if (doValidation) {
+                        validate();
+                    }
+                    
                     setSortingState($scope.renderModel);
                     return $q.when(true);
                 });
@@ -344,14 +347,19 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                     }
                 }
 
-                validate();
+                if (doValidation) {
+                    validate();
+                }
+
                 setSortingState($scope.renderModel);
                 return $q.when(true);
             }
         }
         else {
             $scope.renderModel = [];
-            validate();
+            if (validate) {
+                validate();
+            }
             setSortingState($scope.renderModel);
             return $q.when(true);
         }
@@ -425,7 +433,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        syncRenderModel().then(function () {
+        syncRenderModel(false).then(function () {
             //everything is loaded, start the watch on the model
             startWatch();
             subscribe();

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Expressions.Create;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -35,23 +34,23 @@ namespace Umbraco.Core.Services.Implement
 
         private void Initialize()
         {
-            // all this cannot be achieved via an UmbracoPlan migration since it needs to
-            // run before any migration, in order to figure out the current plan's state.
-            // (does not prevent us from using a migration to do it, though)
+            // the key/value service is entirely self-managed, because it is used by the
+            // upgrader and anything we might change need to happen before everything else
+
+            // if already running 8, either following an upgrade or an install,
+            // then everything should be ok (the table should exist, etc)
+
+            if (UmbracoVersion.LocalVersion.Major >= 8)
+                return;
+
+            // else we are upgrading from 7, we can assume that the locks table
+            // exists, but we need to create everything for key/value
 
             using (var scope = _scopeProvider.CreateScope())
             {
-                // assume that if the lock object for key/value exists, then everything is ok
-                if (scope.Database.Exists<LockDto>(Constants.Locks.KeyValues))
-                {
-                    scope.Complete();
-                    return;
-                }
-
                 var context = new MigrationContext(scope.Database, _logger);
                 var initMigration = new InitializeMigration(context);
                 initMigration.Migrate();
-
                 scope.Complete();
             }
         }
@@ -59,7 +58,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// A custom migration that executes standalone during the Initialize phase of this service.
         /// </summary>
-        private class InitializeMigration : MigrationBase
+        internal class InitializeMigration : MigrationBase
         {
             public InitializeMigration(IMigrationContext context)
                 : base(context)
@@ -67,26 +66,47 @@ namespace Umbraco.Core.Services.Implement
 
             public override void Migrate()
             {
+                // as long as we are still running 7 this migration will be invoked,
+                // but due to multiple restarts during upgrades, maybe the table
+                // exists already
+                if (TableExists(Constants.DatabaseSchema.Tables.KeyValue))
+                    return;
+
+                Logger.Info<KeyValueService>("Creating KeyValue structure.");
+
+                // the locks table was initially created with an identity (auto-increment) primary key,
+                // but we don't want this, especially as we are about to insert a new row into the table,
+                // so here we drop that identity
+                DropLockTableIdentity();
+
+                // insert the lock object for key/value
+                Insert.IntoTable(Constants.DatabaseSchema.Tables.Lock).Row(new {id = Constants.Locks.KeyValues, name = "KeyValues", value = 1}).Do();
+
+                // create the key-value table
+                Create.Table<KeyValueDto>().Do();
+            }
+
+            private void DropLockTableIdentity()
+            {
+                // one cannot simply drop an identity, that requires a bit of work
+
                 // create a temp. id column and copy values
                 Alter.Table(Constants.DatabaseSchema.Tables.Lock).AddColumn("nid").AsInt32().Nullable().Do();
                 Execute.Sql("update umbracoLock set nid = id").Do();
+
                 // drop the id column entirely (cannot just drop identity)
                 Delete.PrimaryKey("PK_umbracoLock").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
                 Delete.Column("id").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
+
                 // recreate the id column without identity and copy values
                 Alter.Table(Constants.DatabaseSchema.Tables.Lock).AddColumn("id").AsInt32().Nullable().Do();
                 Execute.Sql("update umbracoLock set id = nid").Do();
+
                 // drop the temp. id column
                 Delete.Column("nid").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
+
                 // complete the primary key
                 Alter.Table(Constants.DatabaseSchema.Tables.Lock).AlterColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoLock").Do();
-
-                // insert the key-value lock
-                Insert.IntoTable(Constants.DatabaseSchema.Tables.Lock).Row(new {id = Constants.Locks.KeyValues, name = "KeyValues", value = 1}).Do();
-
-                // create the key-value table if it's not there
-                if (TableExists(Constants.DatabaseSchema.Tables.KeyValue) == false)
-                    Create.Table<KeyValueDto>().Do();
             }
         }
 
@@ -168,6 +188,23 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets a value directly from the database, no scope, nothing.
+        /// </summary>
+        /// <remarks>Used by <see cref="Runtime.CoreRuntime"/> to determine the runtime state.</remarks>
+        internal static string GetValue(IUmbracoDatabase database, string key)
+        {
+            // not 8 yet = no key/value table, no value
+            if (UmbracoVersion.LocalVersion.Major < 8)
+                return null;
+
+            var sql = database.SqlContext.Sql()
+                .Select<KeyValueDto>()
+                .From<KeyValueDto>()
+                .Where<KeyValueDto>(x => x.Key == key);
+            return database.FirstOrDefault<KeyValueDto>(sql)?.Value;
         }
     }
 }

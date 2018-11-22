@@ -53,6 +53,12 @@ namespace Umbraco.Core.PropertyEditors
             throw new InvalidCastException($"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
         }
 
+        /// <summary>
+        /// Converts a configuration object into a serialized database value.
+        /// </summary>
+        public static string ToDatabase(object configuration)
+            => configuration == null ? null : JsonConvert.SerializeObject(configuration, ConfigurationJsonSettings);
+
         /// <inheritdoc />
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();

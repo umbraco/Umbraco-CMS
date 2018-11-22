@@ -4,12 +4,12 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Persistence.Dtos
 {
     [TableName(Constants.DatabaseSchema.Tables.Lock)]
-    [PrimaryKey("id")]
+    [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class LockDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_umbracoLock")]
+        [PrimaryKeyColumn(Name = "PK_umbracoLock", AutoIncrement = false)]
         public int Id { get; set; }
 
         [Column("value")]

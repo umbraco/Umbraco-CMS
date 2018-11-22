@@ -494,8 +494,6 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         private void HandlePublishedContent(PublishedRequest request)
         {
-            const string tracePrefix = "HandlePublishedContent: ";
-
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
             const int maxLoop = 8;

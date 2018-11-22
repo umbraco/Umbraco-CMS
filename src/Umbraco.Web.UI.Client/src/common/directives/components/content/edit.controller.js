@@ -46,7 +46,7 @@
                             $scope.ancestors = anc;
                         });
                     $scope.$watch('culture',
-                        function(value, oldValue) {
+                        function (value, oldValue) {
                             entityResource.getAncestors(content.id, "document", value)
                                 .then(function (anc) {
                                     $scope.ancestors = anc;
@@ -86,8 +86,8 @@
             }
         }
 
-        /** Returns true if the save/publish dialog should be shown when pressing the button */
-        function showSaveOrPublishDialog() {
+        /** Returns true if the content item varies by culture */
+        function isContentCultureVariant() {
             return $scope.content.variants.length > 1;
         }
 
@@ -103,6 +103,17 @@
                     loadContent();
                 }
             }));
+
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {
+                // if this content item uses the updated doc type we need to reload the content item
+                if(args && args.node && args.node.key === $scope.content.key) {
+                    $scope.page.loading = true;
+                    loadContent().then(function() {
+                        $scope.page.loading = false;
+                    });
+                }
+            }));
+            
         }
 
         /**
@@ -146,7 +157,7 @@
 
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
+            if (app && app.alias !== "umbContent" && app.alias !== "umbInfo") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -155,7 +166,7 @@
             }
 
             // create the save button
-            if(_.contains($scope.content.allowedActions, "A")) {
+            if (_.contains($scope.content.allowedActions, "A")) {
                 $scope.page.showSaveButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
@@ -170,7 +181,8 @@
                     saveAndPublish: $scope.saveAndPublish,
                     sendToPublish: $scope.sendToPublish,
                     unpublish: $scope.unpublish,
-                    schedulePublish: $scope.schedule
+                    schedulePublish: $scope.schedule,
+                    publishDescendants: $scope.publishDescendants
                 }
             });
 
@@ -224,7 +236,7 @@
             }
         }
 
-        function checkValidility(){
+        function checkValidility() {
             //Get all controls from the 'contentForm'
             var allControls = $scope.contentForm.$getControls();
 
@@ -233,7 +245,7 @@
 
             //Exclude known formControls 'contentHeaderForm' and 'tabbedContentForm'
             //Check property - $name === "contentHeaderForm"
-            allControls = _.filter(allControls, function(obj){
+            allControls = _.filter(allControls, function (obj) {
                 return obj.$name !== 'contentHeaderForm' && obj.$name !== 'tabbedContentForm' && obj.hasOwnProperty('$submitted');
             });
 
@@ -251,26 +263,26 @@
         }
 
         //Controls is the
-        function recurseFormControls(controls, array){
+        function recurseFormControls(controls, array) {
 
             //Loop over the controls
             for (var i = 0; i < controls.length; i++) {
                 var controlItem = controls[i];
 
                 //Check if the controlItem has a property ''
-                if(controlItem.hasOwnProperty('$submitted')){
+                if (controlItem.hasOwnProperty('$submitted')) {
                     //This item is a form - so lets get the child controls of it & recurse again
                     var childFormControls = controlItem.$getControls();
                     recurseFormControls(childFormControls, array);
                 }
                 else {
                     //We can assume its a field on a form
-                    if(controlItem.hasOwnProperty('$error')){
+                    if (controlItem.hasOwnProperty('$error')) {
                         //Set the validlity of the error/s to be valid
                         //String of keys of error invalid messages
                         var errorKeys = [];
 
-                        for(var key in controlItem.$error){
+                        for (var key in controlItem.$error) {
                             errorKeys.push(key);
                             controlItem.$setValidity(key, true);
                         }
@@ -286,7 +298,7 @@
             return array;
         }
 
-        function resetNestedFieldValiation(array){
+        function resetNestedFieldValiation(array) {
             for (var i = 0; i < array.length; i++) {
                 var item = array[i];
                 //Item is an object containing two props
@@ -294,7 +306,7 @@
                 var fieldControl = item.control;
                 var fieldErrorKeys = item.errorKeys;
 
-                for(var i = 0; i < fieldErrorKeys.length; i++) {
+                for (var i = 0; i < fieldErrorKeys.length; i++) {
                     fieldControl.$setValidity(fieldErrorKeys[i], false);
                 }
             }
@@ -302,7 +314,7 @@
 
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
-            
+
 
             //Used to check validility of nested form - coming from Content Apps mostly
             //Set them all to be invalid
@@ -380,6 +392,34 @@
             }
         }
 
+        function moveNode(node, target) {
+
+            contentResource.move({ "parentId": target.id, "id": node.id })
+                .then(function (path) {
+
+                    // remove the node that we're working on
+                    if ($scope.page.menu.currentNode) {
+                        treeService.removeNode($scope.page.menu.currentNode);
+                    }
+
+                    // sync the destination node
+                    if (!infiniteMode) {
+                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    }
+
+                    $scope.page.buttonRestore = "success";
+                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
+
+                    // reload the node
+                    loadContent();
+
+                }, function (err) {
+                    $scope.page.buttonRestore = "error";
+                    notificationsService.error("Cannot automatically restore this item", err);
+                });
+
+        }
+
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -409,7 +449,7 @@
             });
         }
 
-        $scope.unpublish = function() {
+        $scope.unpublish = function () {
             clearNotifications($scope.content);
             if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
                 var dialog = {
@@ -421,9 +461,9 @@
                     submit: function (model) {
 
                         model.submitButtonState = "busy";
-                        
-                        var selectedVariants = _.filter(model.variants, function(variant) { return variant.save; });
-                        var culturesForUnpublishing = _.map(selectedVariants, function(variant) { return variant.language.culture; });
+
+                        var selectedVariants = _.filter(model.variants, v => v.save && v.language); //ignore invariant
+                        var culturesForUnpublishing = _.map(selectedVariants, v => v.language.culture);
 
                         contentResource.unpublish($scope.content.id, culturesForUnpublishing)
                             .then(function (data) {
@@ -437,8 +477,8 @@
                             }, function (err) {
                                 $scope.page.buttonGroupState = 'error';
                             });
-                        
-                        
+
+
                     },
                     close: function () {
                         overlayService.close();
@@ -447,10 +487,10 @@
                 overlayService.open(dialog);
             }
         };
-        
+
         $scope.sendToPublish = function () {
             clearNotifications($scope.content);
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -464,7 +504,24 @@
                             model.submitButtonState = "busy";
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                            console.log("saving need to happen here");
+                            return performSave({
+                                saveMethod: contentResource.sendToPublish,
+                                action: "sendToPublish",
+                                showNotifications: false
+                            }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
+                                overlayService.close();
+                                return $q.when(data);
+                            }, function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+                                //don't reject, we've handled the error
+                                return $q.when(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -476,10 +533,10 @@
             }
             else {
                 $scope.page.buttonGroupState = "busy";
-                return performSave({ 
-                    saveMethod: contentResource.sendToPublish, 
-                    action: "sendToPublish" 
-                }).then(function(){
+                return performSave({
+                    saveMethod: contentResource.sendToPublish,
+                    action: "sendToPublish"
+                }).then(function () {
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
@@ -489,7 +546,7 @@
 
         $scope.saveAndPublish = function () {
             clearNotifications($scope.content);
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -532,13 +589,14 @@
                 }
             }
             else {
-                //ensure the publish flag is set
+                //ensure the flags are set
+                $scope.content.variants[0].save = true;
                 $scope.content.variants[0].publish = true;
                 $scope.page.buttonGroupState = "busy";
-                return performSave({ 
-                    saveMethod: contentResource.publish, 
-                    action: "publish" 
-                }).then(function(){
+                return performSave({
+                    saveMethod: contentResource.publish,
+                    action: "publish"
+                }).then(function () {
                     $scope.page.buttonGroupState = "success";
                 }, function () {
                     $scope.page.buttonGroupState = "error";
@@ -549,7 +607,7 @@
         $scope.save = function () {
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (showSaveOrPublishDialog()) {
+            if (isContentCultureVariant()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "save" })) {
 
@@ -591,15 +649,17 @@
                 }
             }
             else {
+                //ensure the flags are set
+                $scope.content.variants[0].save = true;
                 $scope.page.saveButtonState = "busy";
                 return performSave({
-                        saveMethod: $scope.saveMethod(),
-                        action: "save" 
-                    }).then(function(){
-                        $scope.page.saveButtonState = "success";
-                    }, function () {
-                        $scope.page.saveButtonState = "error";
-                    });
+                    saveMethod: $scope.saveMethod(),
+                    action: "save"
+                }).then(function () {
+                    $scope.page.saveButtonState = "success";
+                }, function () {
+                    $scope.page.saveButtonState = "error";
+                });
             }
 
         };
@@ -608,6 +668,20 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
+
+                //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
+                let origDates = [];
+                for (let i = 0; i < $scope.content.variants.length; i++) {
+                    origDates.push({
+                        releaseDate: $scope.content.variants[i].releaseDate,
+                        expireDate: $scope.content.variants[i].expireDate
+                    });
+                }
+
+                if (!isContentCultureVariant()) {
+                    //ensure the flags are set
+                    $scope.content.variants[0].save = true;
+                }
 
                 var dialog = {
                     parentScope: $scope,
@@ -618,7 +692,92 @@
                     submit: function (model) {
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
-                        model.submitButtonState = "success";
+
+                        //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                        return performSave({
+                            saveMethod: contentResource.saveSchedule,
+                            action: "schedule",
+                            showNotifications: false
+                        }).then(function (data) {
+                            //show all notifications manually here since we disabled showing them automatically in the save method
+                            formHelper.showNotifications(data);
+                            clearNotifications($scope.content);
+                            overlayService.close();
+                            return $q.when(data);
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //if this is invariant, show the notification errors, else they'll be shown inline with the variant
+                            if (!isContentCultureVariant()) {
+                                formHelper.showNotifications(err.data);
+                            }
+                            model.submitButtonState = "error";
+                            //re-map the dialog model since we've re-bound the properties
+                            dialog.variants = $scope.content.variants;
+                            //don't reject, we've handled the error
+                            return $q.when(err);
+                        });
+
+                    },
+                    close: function () {
+                        overlayService.close();
+                        //restore the dates
+                        for (let i = 0; i < $scope.content.variants.length; i++) {
+                            $scope.content.variants[i].releaseDate = origDates[i].releaseDate;
+                            $scope.content.variants[i].expireDate = origDates[i].expireDate;
+                        }
+                    }
+                };
+                overlayService.open(dialog);
+            }
+        };
+
+        $scope.publishDescendants = function() {
+            clearNotifications($scope.content);
+            //before we launch the dialog we want to execute all client side validations first
+            if (formHelper.submitForm({ scope: $scope, action: "publishDescendants" })) {
+
+                if (!isContentCultureVariant()) {
+                    //ensure the flags are set
+                    $scope.content.variants[0].save = true;
+                    $scope.content.variants[0].publish = true;
+                }
+
+                var dialog = {
+                    parentScope: $scope,
+                    view: "views/content/overlays/publishdescendants.html",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabelKey: "buttons_publishDescendants",
+                    submit: function (model) {
+                        model.submitButtonState = "busy";
+                        clearNotifications($scope.content);
+
+                        //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                        return performSave({
+                            saveMethod: function (content, create, files, showNotifications) {
+                                return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
+                            },
+                            action: "publishDescendants",
+                            showNotifications: false
+                        }).then(function (data) {
+                            //show all notifications manually here since we disabled showing them automatically in the save method
+                            formHelper.showNotifications(data);
+                            clearNotifications($scope.content);
+                            overlayService.close();
+                            return $q.when(data);
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //if this is invariant, show the notification errors, else they'll be shown inline with the variant
+                            if (!isContentCultureVariant()) {
+                                formHelper.showNotifications(err.data);
+                            }
+                            model.submitButtonState = "error";
+                            //re-map the dialog model since we've re-bound the properties
+                            dialog.variants = $scope.content.variants;
+                            //don't reject, we've handled the error
+                            return $q.when(err);
+                        });
+
                     },
                     close: function () {
                         overlayService.close();
@@ -746,37 +905,9 @@
          * Call back when a content app changes
          * @param {any} app
          */
-        $scope.appChanged = function(app) {
+        $scope.appChanged = function (app) {
             createButtons($scope.content, app);
         };
-
-        function moveNode(node, target) {
-
-            contentResource.move({ "parentId": target.id, "id": node.id })
-                .then(function (path) {
-
-                    // remove the node that we're working on
-                    if ($scope.page.menu.currentNode) {
-                        treeService.removeNode($scope.page.menu.currentNode);
-                    }
-
-                    // sync the destination node
-                    if (!infiniteMode) {
-                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
-                    }
-
-                    $scope.page.buttonRestore = "success";
-                    notificationsService.success("Successfully restored " + node.name + " to " + target.name);
-
-                    // reload the node
-                    loadContent();
-
-                }, function (err) {
-                    $scope.page.buttonRestore = "error";
-                    notificationsService.error("Cannot automatically restore this item", err);
-                });
-
-        }
 
         // methods for infinite editing
         $scope.close = function () {

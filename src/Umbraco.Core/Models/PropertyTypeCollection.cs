@@ -13,11 +13,13 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract]
+    //TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged, IDeepCloneable
     {
         [IgnoreDataMember]
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
+        //fixme: This doesn't seem to be used
         [IgnoreDataMember]
         internal Action OnAdd;
 

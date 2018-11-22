@@ -6,21 +6,22 @@ var wrap = require("gulp-wrap-js");
 var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
-const babel = require("gulp-babel");
+var babel = require("gulp-babel");
 var runSequence = require('run-sequence');
-const imagemin = require('gulp-imagemin');
+var imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 // js
-const eslint = require('gulp-eslint');
+var eslint = require('gulp-eslint');
 
 //Less + css
 var postcss = require('gulp-postcss');
 var less = require('gulp-less');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
+var cleanCss = require("gulp-clean-css");
 
 // Documentation
 var gulpDocs = require('gulp-ngdocs');
@@ -49,14 +50,14 @@ function processJs(files, out) {
 }
 
 function processLess(files, out) {
-
     var processors = [
          autoprefixer,
-         cssnano({zindex: false}),
+         cssnano({zindex: false})
     ];
 
     return gulp.src(files)
         .pipe(less())
+        .pipe(cleanCss())
         .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(root + targets.css));
@@ -158,10 +159,13 @@ gulp.task('dependencies', function () {
                 "./node_modules/ace-builds/src-min-noconflict/ext-settings_menu.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
+                "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
             ],
             "base": "./node_modules/ace-builds"
         },
@@ -311,7 +315,7 @@ gulp.task('dependencies', function () {
             "src":  [
                 "./node_modules/moment/min/moment.min.js",
                 "./node_modules/moment/min/moment-with-locales.js",
-                "./node_modules/moment/min/moment-with-locales.min.js",
+                "./node_modules/moment/min/moment-with-locales.min.js"
             ],
             "base": "./node_modules/moment/min"
         },

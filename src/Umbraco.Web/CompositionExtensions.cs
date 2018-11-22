@@ -3,13 +3,15 @@ using LightInject;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Macros;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Features;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -32,7 +34,15 @@ namespace Umbraco.Core.Components
         /// <returns></returns>
         internal static ActionCollectionBuilder Actions(this Composition composition)
             => composition.Container.GetInstance<ActionCollectionBuilder>();
-        
+
+        /// <summary>
+        /// Gets the content apps collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <returns></returns>
+        public static ContentAppDefinitionCollectionBuilder ContentApps(this Composition composition)
+            => composition.Container.GetInstance<ContentAppDefinitionCollectionBuilder>();
+
         /// <summary>
         /// Gets the content finders collection builder.
         /// </summary>
@@ -48,6 +58,9 @@ namespace Umbraco.Core.Components
         /// <returns></returns>
         internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
             => composition.Container.GetInstance<EditorValidatorCollectionBuilder>();
+
+        public static UmbracoFeatures Features(this Composition composition)
+            => composition.Container.GetInstance<UmbracoFeatures>();
 
         /// <summary>
         /// Gets the filtered controller factories collection builder.

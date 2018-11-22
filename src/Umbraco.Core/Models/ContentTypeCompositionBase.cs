@@ -115,6 +115,27 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets the property types obtained via composition.
+        /// </summary>
+        /// <remarks>
+        /// <para>Gets them raw, ie with their original variation.</para>
+        /// </remarks>
+        [IgnoreDataMember]
+        internal IEnumerable<PropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
+
+        private IEnumerable<PropertyType> GetRawComposedPropertyTypes(bool start = true)
+        {
+            var propertyTypes = ContentTypeComposition
+                .Cast<ContentTypeCompositionBase>()
+                .SelectMany(x => start ? x.GetRawComposedPropertyTypes(false) : x.CompositionPropertyTypes);
+
+            if (!start)
+                propertyTypes = propertyTypes.Union(PropertyTypes);
+
+            return propertyTypes;
+        }
+
+        /// <summary>
         /// Adds a content type to the composition.
         /// </summary>
         /// <param name="contentType">The content type to add.</param>
@@ -290,20 +311,15 @@ namespace Umbraco.Core.Models
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (ContentTypeCompositionBase)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //need to manually assign since this is an internal field and will not be automatically mapped
-            clone.RemovedContentTypeKeyTracker = new List<int>();
-            clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedEntity = (ContentTypeCompositionBase)clone;
+            
+            //need to manually assign since this is an internal field and will not be automatically mapped
+            clonedEntity.RemovedContentTypeKeyTracker = new List<int>();
+            clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
         }
     }
 }

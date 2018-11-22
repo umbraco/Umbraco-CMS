@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
                 Assert.That(macro.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4
-                Assert.Greater(macro.Properties.Single().Id, 0);
+                Assert.Greater(macro.Properties.Values.Single().Id, 0);
             }
         }
 
@@ -268,15 +268,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.Save(macro);
 
-
                 // Assert
-                Assert.Greater(macro.Properties.First().Id, 0); //ensure id is returned
+                Assert.Greater(macro.Properties.Values.First().Id, 0); //ensure id is returned
                 var result = repository.Get(1);
-                Assert.Greater(result.Properties.First().Id, 0);
-                Assert.AreEqual(1, result.Properties.Count());
-                Assert.AreEqual("new1", result.Properties.First().Alias);
-                Assert.AreEqual("New1", result.Properties.First().Name);
-                Assert.AreEqual(3, result.Properties.First().SortOrder);
+                Assert.Greater(result.Properties.Values.First().Id, 0);
+                Assert.AreEqual(1, result.Properties.Values.Count());
+                Assert.AreEqual("new1", result.Properties.Values.First().Alias);
+                Assert.AreEqual("New1", result.Properties.Values.First().Name);
+                Assert.AreEqual(3, result.Properties.Values.First().SortOrder);
 
             }
         }
@@ -298,10 +297,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 var result = repository.Get(macro.Id);
-                Assert.AreEqual(1, result.Properties.Count());
-                Assert.AreEqual("blah1", result.Properties.First().Alias);
-                Assert.AreEqual("New1", result.Properties.First().Name);
-                Assert.AreEqual(4, result.Properties.First().SortOrder);
+                Assert.AreEqual(1, result.Properties.Values.Count());
+                Assert.AreEqual("blah1", result.Properties.Values.First().Alias);
+                Assert.AreEqual("New1", result.Properties.Values.First().Name);
+                Assert.AreEqual(4, result.Properties.Values.First().SortOrder);
 
             }
         }
@@ -325,7 +324,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 result = repository.Get(macro.Id);
-                Assert.AreEqual(0, result.Properties.Count());
+                Assert.AreEqual(0, result.Properties.Values.Count());
 
             }
         }
@@ -355,8 +354,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 var result = repository.Get(macro.Id);
 
-                Assert.AreEqual(1, result.Properties.Count());
-                Assert.AreEqual("blah2", result.Properties.Single().Alias);
+                Assert.AreEqual(1, result.Properties.Values.Count());
+                Assert.AreEqual("blah2", result.Properties.Values.Single().Alias);
 
             }
         }
@@ -382,8 +381,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 var result = repository.Get(1);
-                Assert.AreEqual("new1", result.Properties.First().Alias);
-                Assert.AreEqual("this is a new name", result.Properties.First().Name);
+                Assert.AreEqual("new1", result.Properties.Values.First().Alias);
+                Assert.AreEqual("this is a new name", result.Properties.Values.First().Name);
 
             }
         }
@@ -408,7 +407,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 var result = repository.Get(1);
-                Assert.AreEqual("newAlias", result.Properties.First().Alias);
+                Assert.AreEqual("newAlias", result.Properties.Values.First().Alias);
             }
         }
 

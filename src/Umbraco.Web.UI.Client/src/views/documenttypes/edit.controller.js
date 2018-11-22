@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];
@@ -48,7 +48,8 @@
             "shortcuts_toggleListView",
             "shortcuts_toggleAllowAsRoot",
             "shortcuts_addChildNode",
-            "shortcuts_addTemplate"
+            "shortcuts_addTemplate",
+            "shortcuts_toggleAllowCultureVariants"
         ];
 
         onInit();
@@ -81,6 +82,7 @@
             vm.labels.allowAsRoot = values[11];
             vm.labels.addChildNode = values[12];
             vm.labels.addTemplate = values[13];
+            vm.labels.allowCultureVariants = values[14];
 
             var buttons = [
                 {
@@ -161,6 +163,10 @@
                         {
                             "description": vm.labels.addChildNode,
                             "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+                        },
+                        {
+                            "description": vm.labels.allowCultureVariants,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                         }
                     ]
                 },
@@ -290,14 +296,14 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            saveInternal();
+            saveInternal().then(angular.noop, angular.noop);
         }
 
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
         function saveInternal() {
 
-            // only save if there is no overlays open
-            if (overlayHelper.getNumberOfOverlays() === 0) {
+            // only save if there are no dialogs open
+            if (overlayHelper.getNumberOfOverlays() === 0 && (editorService.getNumberOfEditors() === 0 || infiniteMode)) {
 
                 vm.page.saveButtonState = "busy";
 
@@ -457,9 +463,11 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            navigationService.syncTree({ tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                vm.currentNode = syncArgs.node;
-            });
+            const args = { tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true };
+            navigationService.syncTree(args)
+                .then(function (syncArgs) {
+                    vm.currentNode = syncArgs.node;
+                });
         }
 
         function close() {
@@ -477,6 +485,15 @@
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
+        });
+
+        // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowedTemplates.length + vm.contentType.isContainer", function (newVal, oldVal) {
+            if (oldVal === undefined) {
+                // still initializing, ignore
+                return;
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
         });
     }
 

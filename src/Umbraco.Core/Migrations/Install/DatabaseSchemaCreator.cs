@@ -81,7 +81,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (ConsentDto),
             typeof (AuditEntryDto),
             typeof (ContentVersionCultureVariationDto),
-            typeof (DocumentCultureVariationDto)
+            typeof (DocumentCultureVariationDto),
+            typeof (ContentScheduleDto)
         };
 
         /// <summary>
@@ -334,16 +335,60 @@ namespace Umbraco.Core.Migrations.Install
 
         #region Utilities
 
+        /// <summary>
+        /// Returns whether a table with the specified <paramref name="tableName"/> exists in the database.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
+        /// <example>
+        /// <code>
+        /// if (schemaHelper.TableExist("MyTable"))
+        /// {
+        ///     // do something when the table exists
+        /// }
+        /// </code>
+        /// </example>
         public bool TableExists(string tableName)
         {
             return SqlSyntax.DoesTableExist(_database, tableName);
         }
 
+        /// <summary>
+        /// Returns whether the table for the specified <typeparamref name="T"/> exists in the database.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <returns><c>true</c> if the table exists; otherwise <c>false</c>.</returns>
+        /// <example>
+        /// <code>
+        /// if (schemaHelper.TableExist&lt;MyDto&gt;)
+        /// {
+        ///     // do something when the table exists
+        /// }
+        /// </code>
+        /// </example>
+        /// <remarks>
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// </remarks>
         public bool TableExists<T>()        {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             return table != null && TableExists(table.Name);        }
 
-        // this is used in tests
+        /// <summary>
+        /// Creates a new table in the database based on the type of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
+        /// <remarks>
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// 
+        /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
+        /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
+        /// not do anything if the parameter is <c>false</c>.
+        /// </remarks>
         internal void CreateTable<T>(bool overwrite = false)
             where T : new()
         {
@@ -351,6 +396,21 @@ namespace Umbraco.Core.Migrations.Install
             CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _logger));
         }
 
+        /// <summary>
+        /// Creates a new table in the database for the specified <paramref name="modelType"/>.
+        /// </summary>
+        /// <param name="overwrite">Whether the table should be overwritten if it already exists.</param>
+        /// <param name="modelType">The the representing the table.</param>
+        /// <param name="dataCreation"></param>
+        /// <remarks>
+        /// If <paramref name="modelType"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from
+        /// that  attribute will be used for the table name. If the attribute is not present, the name
+        /// <paramref name="modelType"/> will be used instead.
+        /// 
+        /// If a table with the same name already exists, the <paramref name="overwrite"/> parameter will determine
+        /// whether the table is overwritten. If <c>true</c>, the table will be overwritten, whereas this method will
+        /// not do anything if the parameter is <c>false</c>.
+        /// </remarks>
         public void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
         {
             var tableDefinition = DefinitionFactory.GetTableDefinition(modelType, SqlSyntax);
@@ -364,6 +424,8 @@ namespace Umbraco.Core.Migrations.Install
             var tableExist = TableExists(tableName);
             if (overwrite && tableExist)
             {
+                _logger.Info<DatabaseSchemaCreator>("Table '{TableName}' already exists, but will be recreated", tableName);
+
                 DropTable(tableName);
                 tableExist = false;
             }
@@ -417,12 +479,38 @@ namespace Umbraco.Core.Migrations.Install
                     }
 
                     transaction.Complete();
+
+                    if (overwrite)
+                    {
+                        _logger.Info<Database>("Table '{TableName}' was recreated", tableName);
+                    }
+                    else
+                    {
+                        _logger.Info<Database>("New table '{TableName}' was created", tableName);
+                    }
                 }
             }
-
-            _logger.Info<DatabaseSchemaCreator>("Created table '{TableName}'", tableName);
+            else
+            {
+                // The table exists and was not recreated/overwritten.
+                _logger.Info<Database>("Table '{TableName}' already exists - no changes were made", tableName);
+            }
         }
 
+        /// <summary>
+        /// Drops the table for the specified <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type representing the DTO/table.</typeparam>
+        /// <example>
+        /// <code>
+        /// schemaHelper.DropTable&lt;MyDto&gt;);
+        /// </code>
+        /// </example>
+        /// <remarks>
+        /// If <typeparamref name="T"/> has been decorated with an <see cref="TableNameAttribute"/>, the name from that
+        /// attribute will be used for the table name. If the attribute is not present, the name
+        /// <typeparamref name="T"/> will be used instead.
+        /// </remarks>
         public void DropTable(string tableName)
         {
             var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));

@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Services
             macro.Properties["blah1"].EditorAlias = "new";
             macro.Properties.Remove("blah3");
 
-            var allPropKeys = macro.Properties.Select(x => new { x.Alias, x.Key }).ToArray();
+            var allPropKeys = macro.Properties.Values.Select(x => new { x.Alias, x.Key }).ToArray();
 
             macroService.Save(macro);
 
@@ -228,10 +228,10 @@ namespace Umbraco.Tests.Services
             macroService.Save(macro);
 
             var result1 = macroService.GetById(macro.Id);
-            Assert.AreEqual(4, result1.Properties.Count());
+            Assert.AreEqual(4, result1.Properties.Values.Count());
 
             //simulate clearing the sections
-            foreach (var s in result1.Properties.ToArray())
+            foreach (var s in result1.Properties.Values.ToArray())
             {
                 result1.Properties.Remove(s.Alias);
             }
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Services
 
             //re-get
             result1 = macroService.GetById(result1.Id);
-            Assert.AreEqual(2, result1.Properties.Count());
+            Assert.AreEqual(2, result1.Properties.Values.Count());
 
         }
 

@@ -236,9 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // fast way of getting an id for an isoCode - avoiding cloning
         // _codeIdMap is rebuilt whenever PerformGetAll runs
-        public int? GetIdByIsoCode(string isoCode) => GetIdByIsoCode(isoCode, throwOnNotFound: true);
-
-        private int? GetIdByIsoCode(string isoCode, bool throwOnNotFound)
+        public int? GetIdByIsoCode(string isoCode, bool throwOnNotFound = true)
         {
             if (isoCode == null) return null;
 
@@ -254,14 +252,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
-            return 0;
-        }
 
+            return null;
+        }
+        
         // fast way of getting an isoCode for an id - avoiding cloning
         // _idCodeMap is rebuilt whenever PerformGetAll runs
-        public string GetIsoCodeById(int? id) => GetIsoCodeById(id, throwOnNotFound: true);
-
-        private string GetIsoCodeById(int? id, bool throwOnNotFound)
+        public string GetIsoCodeById(int? id, bool throwOnNotFound = true)
         {
             if (id == null) return null;
 
@@ -277,6 +274,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+
             return null;
         }
 

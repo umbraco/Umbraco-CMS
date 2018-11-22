@@ -15,50 +15,6 @@
             <delete assembly="Umbraco.Web" type="macroTasks" />
         </tasks>
     </nodeType>
-    <nodeType alias="initmemberGroup">
-        <header>membergroup</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <create assembly="Umbraco.Web" type="MemberGroupTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="memberGroups">
-        <header>membergroup</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <delete assembly="Umbraco.Web" type="MemberGroupTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="initstylesheets">
-        <header>Stylesheet</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <create assembly="Umbraco.Web" type="StylesheetTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="stylesheetsFolder">
-        <header>Stylesheet</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <create assembly="Umbraco.Web" type="StylesheetTasks" />
-            <delete assembly="Umbraco.Web" type="StylesheetTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="stylesheet">
-        <header>Stylesheet editor egenskab</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <create assembly="Umbraco.Web" type="stylesheetPropertyTasks" />
-            <delete assembly="Umbraco.Web" type="StylesheetTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="stylesheetProperty">
-        <header>Stylesheet editor egenskab</header>
-        <usercontrol>/create/simple.ascx</usercontrol>
-        <tasks>
-            <delete assembly="Umbraco.Web" type="stylesheetPropertyTasks" />
-        </tasks>
-    </nodeType>
     <nodeType alias="initpackager">
         <header>Package</header>
         <usercontrol>/create/simple.ascx</usercontrol>

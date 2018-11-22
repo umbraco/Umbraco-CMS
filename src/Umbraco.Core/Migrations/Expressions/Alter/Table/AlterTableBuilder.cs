@@ -2,6 +2,9 @@
 using NPoco;
 using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
+using Umbraco.Core.Migrations.Expressions.Create.Expressions;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Alter.Table
@@ -87,6 +90,21 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         public IAlterTableColumnOptionBuilder PrimaryKey()
         {
             CurrentColumn.IsPrimaryKey = true;
+
+            // see notes in CreateTableBuilder
+            if (Expression.DatabaseType.IsMySql() == false)
+            {
+                var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
+                {
+                    Constraint =
+                    {
+                        TableName = Expression.TableName,
+                        Columns = new[] { CurrentColumn.Name }
+                    }
+                };
+                Expression.Expressions.Add(expression);
+            }
+
             return this;
         }
 
@@ -94,6 +112,22 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         {
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
+
+            // see notes in CreateTableBuilder
+            if (Expression.DatabaseType.IsMySql() == false)
+            {
+                var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
+                {
+                    Constraint =
+                    {
+                        ConstraintName = primaryKeyName,
+                        TableName = Expression.TableName,
+                        Columns = new[] { CurrentColumn.Name }
+                    }
+                };
+                Expression.Expressions.Add(expression);
+            }
+
             return this;
         }
 
@@ -121,8 +155,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
-                TableName = Expression.TableName,
-                IsUnique = true
+                TableName = Expression.TableName,               
+                IndexType = IndexTypes.UniqueNonClustered
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition

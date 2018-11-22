@@ -628,7 +628,7 @@ namespace Umbraco.Tests.Services.Importing
 
             // Assert
             Assert.That(macros.Any(), Is.True);
-            Assert.That(macros.First().Properties.Any(), Is.True);
+            Assert.That(macros.First().Properties.Values.Any(), Is.True);
 
             var allMacros = ServiceContext.MacroService.GetAll().ToList();
             foreach (var macro in macros)

@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors.Binders
 {
@@ -26,7 +18,6 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class ContentItemBinder : IModelBinder
     {
-        private readonly ServiceContext _services;
         private readonly ContentModelBinderHelper _modelBinderHelper;
 
         public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
@@ -35,9 +26,11 @@ namespace Umbraco.Web.Editors.Binders
 
         public ContentItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _services = services;
+            Services = services;
             _modelBinderHelper = new ContentModelBinderHelper();
         }
+
+        protected ServiceContext Services { get; }
 
         /// <summary>
         /// Creates the model from the request and binds it to the context
@@ -78,14 +71,14 @@ namespace Umbraco.Web.Editors.Binders
             return true;
         }
 
-        private IContent GetExisting(ContentItemSave model)
+        protected virtual IContent GetExisting(ContentItemSave model)
         {
-            return _services.ContentService.GetById(model.Id);
+            return Services.ContentService.GetById(model.Id);
         }
 
         private IContent CreateNew(ContentItemSave model)
         {
-            var contentType = _services.ContentTypeService.Get(model.ContentTypeAlias);
+            var contentType = Services.ContentTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No content type found with alias " + model.ContentTypeAlias);

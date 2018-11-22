@@ -19,5 +19,13 @@ namespace Umbraco.Web.Trees
                 .OrderBy(x => x.Name)
                 .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false));
         }
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+            //check if there are any groups
+            root.HasChildren = Services.MemberGroupService.GetAll().Any();
+            return root;
+        }
     }
 }

@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             //update the properties if they've changed
             var macro = (Macro)entity;
-            if (macro.IsPropertyDirty("Properties") || macro.Properties.Any(x => x.IsDirty()))
+            if (macro.IsPropertyDirty("Properties") || macro.Properties.Values.Any(x => x.IsDirty()))
             {
                 var ids = dto.MacroPropertyDtos.Where(x => x.Id > 0).Select(x => x.Id).ToArray();
                 if (ids.Length > 0)
@@ -173,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var aliases = new Dictionary<string, string>();
                 foreach (var propDto in dto.MacroPropertyDtos)
                 {
-                    var prop = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                    var prop = macro.Properties.Values.FirstOrDefault(x => x.Id == propDto.Id);
                     if (prop == null) throw new Exception("oops: property.");
                     if (propDto.Id == 0 || prop.IsPropertyDirty("Alias"))
                     {
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     else
                     {
                         // update
-                        var property = macro.Properties.FirstOrDefault(x => x.Id == propDto.Id);
+                        var property = macro.Properties.Values.FirstOrDefault(x => x.Id == propDto.Id);
                         if (property == null) throw new Exception("oops: property.");
                         if (property.IsDirty())
                             Database.Update(propDto);

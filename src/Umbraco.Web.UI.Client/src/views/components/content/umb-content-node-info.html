@@ -2,7 +2,7 @@
 
     <div class="umb-package-details__main-content">
 
-        <umb-box data-element="node-info-urls">
+        <umb-box ng-if="node.urls" data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
@@ -41,15 +41,27 @@
         </umb-box>
 
         <umb-box data-element="node-info-history">
-            <umb-box-header title-key="general_history"></umb-box-header>
+
+            <umb-box-header
+                title-key="general_history">
+                <umb-button
+                    type="button"
+                    button-style="outline"
+                    action="openRollback()"
+                    label-key="actions_rollback"
+                    size="xs"
+                    add-ellipsis="true">
+                </umb-button>
+            </umb-box-header>
+
             <umb-box-content class="block-form">
 
                 <div style="position: relative;">
 
-                    <div ng-if="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
-                    <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
+                    <div ng-show="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                    <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
 
-                    <div ng-if="auditTrail.length === 0" style="padding: 10px;">
+                    <div ng-show="auditTrail.length === 0" style="padding: 10px;">
                         <umb-empty-state position="center"
                                          size="small">
                             <localize key="content_noChanges"></localize>
@@ -58,7 +70,7 @@
 
                     <div class="history">
 
-                        <div ng-if="auditTrail.length > 1" class="history-line"></div>
+                        <div ng-show="auditTrail.length > 1" class="history-line"></div>
 
                         <div class="history-item" ng-repeat="item in auditTrail">
 
@@ -88,7 +100,7 @@
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
                                 <span>
-                                    <localize key="auditTrails_{{ item.logType | lowercase }}">{{ item.comment }}</localize>
+                                    <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
 
                                 
@@ -119,14 +131,14 @@
 
                 <umb-control-group data-element="node-info-status" label="@general_status">
                     <div ng-repeat="status in publishStatus" style="margin-bottom: 5px;">
-                        <span ng-if="status.culture"><em>{{status.culture}}: </em></span>
+                        <span ng-show="status.culture"><em>{{status.culture}}: </em></span>
                         <umb-badge size="xs" color="{{status.color}}">
                             {{status.label}}
                         </umb-badge>
                     </div>
                 </umb-control-group>
 
-                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
+                <umb-control-group ng-show="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
@@ -150,13 +162,13 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
-                        <a href="" ng-if="allowChangeTemplate" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
+                        <a href="" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
                         </a>
                     </div>
                 </umb-control-group>
 
-                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
+                <umb-control-group ng-show="node.id !== 0" data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>

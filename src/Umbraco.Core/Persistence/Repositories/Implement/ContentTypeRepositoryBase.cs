@@ -119,7 +119,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
-
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             //Cannot add a duplicate content type type
@@ -234,7 +233,6 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
-
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             // ensure the alias is not used already
@@ -270,8 +268,8 @@ AND umbracoNode.id <> @id",
             // 1. Find content based on the current ContentType: entity.Id
             // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
             // 3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
-            var compositionBase = entity as ContentTypeCompositionBase;
-            if (compositionBase != null && compositionBase.RemovedContentTypeKeyTracker != null &&
+            if (entity is ContentTypeCompositionBase compositionBase &&
+                compositionBase.RemovedContentTypeKeyTracker != null &&
                 compositionBase.RemovedContentTypeKeyTracker.Any())
             {
                 //TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
@@ -314,7 +312,7 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            // delete the allowed content type entries before re-inserting the collectino of allowed content types
+            // delete the allowed content type entries before re-inserting the collection of allowed content types
             Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { entity.Id });
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
@@ -326,9 +324,11 @@ AND umbracoNode.id <> @id",
                 });
             }
 
-            // delete property types
-            // ... by excepting entries from db with entries from collections
-            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
+            // Delete property types ... by excepting entries from db with entries from collections.
+            // We check if the entity's own PropertyTypes has been modified and then also check
+            // any of the property groups PropertyTypes has been modified.
+            // This specifically tells us if any property type collections have changed.
+            if (entity.IsPropertyDirty("PropertyTypes") || entity.PropertyGroups.Any(x => x.IsPropertyDirty("PropertyTypes")))
             {
                 var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { entity.Id });
                 var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
@@ -338,10 +338,11 @@ AND umbracoNode.id <> @id",
                     DeletePropertyType(entity.Id, item);
             }
 
-            // delete tabs
-            // ... by excepting entries from db with entries from collections
+            // Delete tabs ... by excepting entries from db with entries from collections.
+            // We check if the entity's own PropertyGroups has been modified.
+            // This specifically tells us if the property group collections have changed.
             List<int> orphanPropertyTypeIds = null;
-            if (entity.IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
+            if (entity.IsPropertyDirty("PropertyGroups"))
             {
                 // todo
                 // we used to try to propagate tabs renaming downstream, relying on ParentId, but
@@ -406,40 +407,34 @@ AND umbracoNode.id <> @id",
             }
 
             //check if the content type variation has been changed
-            var ctVariationChanging = entity.IsPropertyDirty("Variations");
-            if (ctVariationChanging)
+            var contentTypeVariationDirty = entity.IsPropertyDirty("Variations");
+            var oldContentTypeVariation = (ContentVariation) dtoPk.Variations;
+            var newContentTypeVariation = entity.Variations;
+            var contentTypeVariationChanging = contentTypeVariationDirty && oldContentTypeVariation != newContentTypeVariation;
+            if (contentTypeVariationChanging)
             {
-                //we've already looked up the previous version of the content type so we know it's previous variation state
-                MoveVariantData(entity, (ContentVariation)dtoPk.Variations, entity.Variations);
+                MoveContentTypeVariantData(entity, oldContentTypeVariation, newContentTypeVariation);
                 Clear301Redirects(entity);
                 ClearScheduledPublishing(entity);
-            }   
+            }
 
-            //track any content type/property types that are changing variation which will require content updates
-            var propertyTypeVariationChanges = new Dictionary<int, ContentVariation>();
+            // collect property types that have a dirty variation
+            List<PropertyType> propertyTypeVariationDirty = null;
 
-            // insert or update properties
-            // all of them, no-group and in-groups
+            // note: this only deals with *local* property types, we're dealing w/compositions later below
             foreach (var propertyType in entity.PropertyTypes)
             {
-                //if the content type variation isn't changing track if any property type is changing
-                if (!ctVariationChanging)
+                if (contentTypeVariationChanging)
                 {
-                    if (propertyType.IsPropertyDirty("Variations"))
+                    // content type is changing
+                    switch (newContentTypeVariation)
                     {
-                        propertyTypeVariationChanges[propertyType.Id] = propertyType.Variations;
-                    }   
-                }
-                else
-                {
-                    switch(entity.Variations)
-                    {
-                        case ContentVariation.Nothing:
-                            //if the content type is changing to Nothing, then all property type's must change to nothing
+                        case ContentVariation.Nothing: // changing to Nothing
+                            // all property types must change to Nothing
                             propertyType.Variations = ContentVariation.Nothing;
                             break;
-                        case ContentVariation.Culture:
-                            //we don't need to modify the property type in this case
+                        case ContentVariation.Culture: // changing to Culture
+                            // all property types can remain Nothing
                             break;
                         case ContentVariation.CultureAndSegment:
                         case ContentVariation.Segment:
@@ -448,15 +443,65 @@ AND umbracoNode.id <> @id",
                     }
                 }
 
-                var groupId = propertyType.PropertyGroupId?.Value ?? default(int);
+                // then, track each property individually
+                if (propertyType.IsPropertyDirty("Variations"))
+                {
+                    // allocate the list only when needed
+                    if (propertyTypeVariationDirty == null)
+                        propertyTypeVariationDirty = new List<PropertyType>();
+
+                    propertyTypeVariationDirty.Add(propertyType);
+                }
+            }
+
+            // figure out dirty property types that have actually changed
+            // before we insert or update properties, so we can read the old variations
+            var propertyTypeVariationChanges = propertyTypeVariationDirty != null
+                ? GetPropertyVariationChanges(propertyTypeVariationDirty)
+                : null;
+
+            // deal with composition property types
+            // add changes for property types obtained via composition, which change due
+            // to this content type variations change
+            if (contentTypeVariationChanging)
+            {
+                // must use RawComposedPropertyTypes here: only those types that are obtained
+                // via composition, with their original variations (ie not filtered by this
+                // content type variations - we need this true value to make decisions.
+
+                foreach (var propertyType in ((ContentTypeCompositionBase) entity).RawComposedPropertyTypes)
+                {
+                    if (propertyType.VariesBySegment() || newContentTypeVariation.VariesBySegment())
+                        throw new NotSupportedException(); // TODO: support this
+
+                    if (propertyType.Variations == ContentVariation.Culture)
+                    {
+                        if (propertyTypeVariationChanges == null)
+                            propertyTypeVariationChanges = new Dictionary<int, (ContentVariation, ContentVariation)>();
+
+                        // if content type moves to Culture, property type becomes Culture here again
+                        // if content type moves to Nothing, property type becomes Nothing here
+                        if (newContentTypeVariation == ContentVariation.Culture)
+                            propertyTypeVariationChanges[propertyType.Id] = (ContentVariation.Nothing, ContentVariation.Culture);
+                        else if (newContentTypeVariation == ContentVariation.Nothing)
+                            propertyTypeVariationChanges[propertyType.Id] = (ContentVariation.Culture, ContentVariation.Nothing);
+                    }
+                }
+            }
+
+            // insert or update properties
+            // all of them, no-group and in-groups
+            foreach (var propertyType in entity.PropertyTypes)
+            {
                 // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
-                if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default(int))
+                if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
                     AssignDataTypeFromPropertyEditor(propertyType);
 
                 // validate the alias
                 ValidateAlias(propertyType);
 
                 // insert or update property
+                var groupId = propertyType.PropertyGroupId?.Value ?? default;
                 var propertyTypeDto = PropertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType, entity.Id);
                 var typeId = propertyType.HasIdentity
                     ? Database.Update(propertyTypeDto)
@@ -467,37 +512,99 @@ AND umbracoNode.id <> @id",
                     typeId = propertyType.Id;
 
                 // not an orphan anymore
-                if (orphanPropertyTypeIds != null)
-                    orphanPropertyTypeIds.Remove(typeId);
+                orphanPropertyTypeIds?.Remove(typeId);
             }
 
-            //check if any property types were changing variation
-            if (propertyTypeVariationChanges.Count > 0)
-            {
-                var changes = new Dictionary<int, (ContentVariation, ContentVariation)>();
+            // must restrict property data changes to impacted content types - if changing a composing
+            // type, some composed types (those that do not vary) are not impacted and should be left
+            // unchanged
+            //
+            // getting 'all' from the cache policy is prone to race conditions - fast but dangerous
+            //var all = ((FullDataSetRepositoryCachePolicy<TEntity, int>)CachePolicy).GetAllCached(PerformGetAll);
+            var all = PerformGetAll();
 
-                //now get the current property type variations for the changed ones so that we know which variation they
-                //are going from and to
-                var from = Database.Dictionary<int, byte>(Sql()
-                    .Select<PropertyTypeDto>(x => x.Id, x => x.Variations)
-                    .From<PropertyTypeDto>()
-                    .WhereIn<PropertyTypeDto>(x => x.Id, propertyTypeVariationChanges.Keys));
+            var impacted = GetImpactedContentTypes(entity, all);
 
-                foreach (var f in from)
-                {
-                    changes[f.Key] = (propertyTypeVariationChanges[f.Key], (ContentVariation)f.Value);
-                }
-
-                //perform the move
-                MoveVariantData(changes);
-            }
-
+            // if some property types have actually changed, move their variant data
+            if (propertyTypeVariationChanges != null)
+                MovePropertyTypeVariantData(propertyTypeVariationChanges, impacted);
 
             // deal with orphan properties: those that were in a deleted tab,
             // and have not been re-mapped to another tab or to 'generic properties'
             if (orphanPropertyTypeIds != null)
                 foreach (var id in orphanPropertyTypeIds)
                     DeletePropertyType(entity.Id, id);
+        }
+
+        private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
+        {
+            var impact = new List<IContentTypeComposition>();
+            var set = new List<IContentTypeComposition> { contentType };
+
+            var tree = new Dictionary<int, List<IContentTypeComposition>>();
+            foreach (var x in all)
+            foreach (var y in x.ContentTypeComposition)
+            {
+                if (!tree.TryGetValue(y.Id, out var list))
+                    list = tree[y.Id] = new List<IContentTypeComposition>();
+                list.Add(x);
+            }
+
+            var nset = new List<IContentTypeComposition>();
+            do
+            {
+                impact.AddRange(set);
+
+                foreach (var x in set)
+                {
+                    if (!tree.TryGetValue(x.Id, out var list)) continue;
+                    nset.AddRange(list.Where(y => y.VariesByCulture()));
+                }
+
+                set = nset;
+                nset = new List<IContentTypeComposition>();
+            } while (set.Count > 0);
+
+            return impact;
+        }
+
+        // gets property types that have actually changed, and the corresponding changes
+        // returns null if no property type has actually changed
+        private Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> GetPropertyVariationChanges(IEnumerable<PropertyType> propertyTypes)
+        {
+            var propertyTypesL = propertyTypes.ToList();
+
+            // select the current variations (before the change) from database
+            var selectCurrentVariations = Sql()
+                .Select<PropertyTypeDto>(x => x.Id, x => x.Variations)
+                .From<PropertyTypeDto>()
+                .WhereIn<PropertyTypeDto>(x => x.Id, propertyTypesL.Select(x => x.Id));
+
+            var oldVariations = Database.Dictionary<int, byte>(selectCurrentVariations);
+
+            // build a dictionary of actual changes
+            Dictionary<int, (ContentVariation, ContentVariation)> changes = null;
+
+            foreach (var propertyType in propertyTypesL)
+            {
+                // new property type, ignore
+                if (!oldVariations.TryGetValue(propertyType.Id, out var oldVariationB))
+                    continue;
+                var oldVariation = (ContentVariation) oldVariationB; // NPoco cannot fetch directly
+
+                // only those property types that *actually* changed
+                var newVariation = propertyType.Variations;
+                if (oldVariation == newVariation)
+                    continue;
+
+                // allocate the dictionary only when needed
+                if (changes == null)
+                    changes = new Dictionary<int, (ContentVariation, ContentVariation)>();
+
+                changes[propertyType.Id] = (oldVariation, newVariation);
+            }
+
+            return changes;
         }
 
         /// <summary>
@@ -526,28 +633,39 @@ AND umbracoNode.id <> @id",
         }
 
         /// <summary>
-        /// Moves variant data for property type changes
+        /// Gets the default language identifier.
         /// </summary>
-        /// <param name="propertyTypeChanges"></param>
-        private void MoveVariantData(IDictionary<int, (ContentVariation, ContentVariation)> propertyTypeChanges)
+        private int GetDefaultLanguageId()
         {
-            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefault));
+            var selectDefaultLanguageId = Sql()
+                .Select<LanguageDto>(x => x.Id)
+                .From<LanguageDto>()
+                .Where<LanguageDto>(x => x.IsDefault);
+
+            return Database.First<int>(selectDefaultLanguageId);
+        }
+
+        /// <summary>
+        /// Moves variant data for property type variation changes.
+        /// </summary>
+        private void MovePropertyTypeVariantData(IDictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> propertyTypeChanges, IEnumerable<IContentTypeComposition> impacted)
+        {
+            var defaultLanguageId = GetDefaultLanguageId();
+            var impactedL = impacted.Select(x => x.Id).ToList();
 
             //Group by the "To" variation so we can bulk update in the correct batches
-            foreach(var g in propertyTypeChanges.GroupBy(x => x.Value.Item2))
+            foreach(var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
             {
-                var propertyTypeIds = g.Select(s => s.Key).ToList();
+                var propertyTypeIds = grouping.Select(x => x.Key).ToList();
+                var toVariation = grouping.Key;
 
-                //the ContentVariation that the data is moving "To"
-                var toVariantType = g.Key;
-
-                switch(toVariantType)
+                switch (toVariation)
                 {
                     case ContentVariation.Culture:
-                        MovePropertyDataToVariantCulture(defaultLangId, propertyTypeIds: propertyTypeIds);
+                        CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.Nothing:
-                        MovePropertyDataToVariantNothing(defaultLangId, propertyTypeIds: propertyTypeIds);
+                        CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
                         break;
                     case ContentVariation.CultureAndSegment:
                     case ContentVariation.Segment:
@@ -558,24 +676,17 @@ AND umbracoNode.id <> @id",
         }
 
         /// <summary>
-        /// Moves variant data for a content type variation change
+        /// Moves variant data for a content type variation change.
         /// </summary>
-        /// <param name="contentType"></param>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        private void MoveVariantData(IContentTypeComposition contentType, ContentVariation from, ContentVariation to)
+        private void MoveContentTypeVariantData(IContentTypeComposition contentType, ContentVariation fromVariation, ContentVariation toVariation)
         {
-            var defaultLangId = Database.First<int>(Sql().Select<LanguageDto>(x => x.Id).From<LanguageDto>().Where<LanguageDto>(x => x.IsDefault));
+            var defaultLanguageId = GetDefaultLanguageId();
 
-            var sqlPropertyTypeIds = Sql().Select<PropertyTypeDto>(x => x.Id).From<PropertyTypeDto>().Where<PropertyTypeDto>(x => x.ContentTypeId == contentType.Id);
-            switch (to)
+            switch (toVariation)
             {
                 case ContentVariation.Culture:
-                    //move the property data
 
-                    MovePropertyDataToVariantCulture(defaultLangId, sqlPropertyTypeIds: sqlPropertyTypeIds);
-
-                    //now we need to move the names
+                    //move the names
                     //first clear out any existing names that might already exists under the default lang
                     //there's 2x tables to update
 
@@ -585,10 +696,11 @@ AND umbracoNode.id <> @id",
                         .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
                         .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
                         .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
-                        .Where<ContentVersionCultureVariationDto>(x => x.LanguageId == defaultLangId);
+                        .Where<ContentVersionCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
                     var sqlDelete = Sql()
                         .Delete<ContentVersionCultureVariationDto>()
                         .WhereIn<ContentVersionCultureVariationDto>(x => x.Id, sqlSelect);
+
                     Database.Execute(sqlDelete);
 
                     //clear out the documentCultureVariation table
@@ -596,10 +708,11 @@ AND umbracoNode.id <> @id",
                         .From<DocumentCultureVariationDto>()
                         .InnerJoin<ContentDto>().On<ContentDto, DocumentCultureVariationDto>(x => x.NodeId, x => x.NodeId)
                         .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
-                        .Where<DocumentCultureVariationDto>(x => x.LanguageId == defaultLangId);
+                        .Where<DocumentCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
                     sqlDelete = Sql()
                         .Delete<DocumentCultureVariationDto>()
                         .WhereIn<DocumentCultureVariationDto>(x => x.Id, sqlSelect);
+
                     Database.Execute(sqlDelete);
 
                     //now we need to insert names into these 2 tables based on the invariant data
@@ -607,32 +720,31 @@ AND umbracoNode.id <> @id",
                     //insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
                     var cols = Sql().Columns<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
                     sqlSelect = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
-                        .Append($", {defaultLangId}") //default language ID
+                        .Append($", {defaultLanguageId}") //default language ID
                         .From<ContentVersionDto>()
                         .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
                         .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
                     var sqlInsert = Sql($"INSERT INTO {ContentVersionCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+
                     Database.Execute(sqlInsert);
 
                     //insert rows into the documentCultureVariation table
                     cols = Sql().Columns<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
                     sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
                         .AndSelect<NodeDto>(x => x.Text)
-                        .Append($", 1, {defaultLangId}") //make Available + default language ID
+                        .Append($", 1, {defaultLanguageId}") //make Available + default language ID
                         .From<DocumentDto>()
                         .InnerJoin<NodeDto>().On<NodeDto, DocumentDto>(x => x.NodeId, x => x.NodeId)
                         .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
                         .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
                     sqlInsert = Sql($"INSERT INTO {DocumentCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+
                     Database.Execute(sqlInsert);
 
                     break;
                 case ContentVariation.Nothing:
-                    //move the property data
 
-                    MovePropertyDataToVariantNothing(defaultLangId, sqlPropertyTypeIds: sqlPropertyTypeIds);
-
-                    //we dont need to move the names! this is because we always keep the invariant names with the name of the default language.
+                    //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
 
                     //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
                     // if we want these SQL statements back, look into GIT history
@@ -646,73 +758,102 @@ AND umbracoNode.id <> @id",
         }
 
         /// <summary>
-        /// This will move all property data from variant to invariant
+        /// Copies property data from one language to another.
         /// </summary>
-        /// <param name="defaultLangId"></param>
-        /// <param name="propertyTypeIds">Optional list of property type ids of the properties to be updated</param>
-        /// <param name="sqlPropertyTypeIds">Optional SQL statement used for the sub-query to select the properties type ids for the properties to be updated</param>
-        private void MovePropertyDataToVariantNothing(int defaultLangId, IReadOnlyCollection<int> propertyTypeIds = null, Sql<ISqlContext> sqlPropertyTypeIds = null)
+        /// <param name="sourceLanguageId">The source language (can be null ie invariant).</param>
+        /// <param name="targetLanguageId">The target language (can be null ie invariant)</param>
+        /// <param name="propertyTypeIds">The property type identifiers.</param>
+        /// <param name="contentTypeIds">The content type identifiers.</param>
+        private void CopyPropertyData(int? sourceLanguageId, int? targetLanguageId, IReadOnlyCollection<int> propertyTypeIds, IReadOnlyCollection<int> contentTypeIds = null)
         {
-            //first clear out any existing property data that might already exists under the default lang
+            // fixme - should we batch then?
+            var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
+            if (whereInArgsCount > 2000)
+                throw new NotSupportedException("Too many property/content types.");
+
+            //first clear out any existing property data that might already exists under the target language
             var sqlDelete = Sql()
-                .Delete<PropertyDataDto>()
-                .Where<PropertyDataDto>(x => x.LanguageId == null);
-            if (sqlPropertyTypeIds != null)
-                sqlDelete.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, sqlPropertyTypeIds);
-            if (propertyTypeIds != null)
-                sqlDelete.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+                .Delete<PropertyDataDto>();
+
+            // not ok for SqlCe (no JOIN in DELETE)
+            //if (contentTypeIds != null)
+            //    sqlDelete
+            //        .From<PropertyDataDto>()
+            //        .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pdata, cversion) => pdata.VersionId == cversion.Id)
+            //        .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((cversion, c) => cversion.NodeId == c.NodeId);
+
+            Sql<ISqlContext> inSql = null;
+            if (contentTypeIds != null)
+            {
+                inSql = Sql()
+                    .Select<ContentVersionDto>(x => x.Id)
+                    .From<ContentVersionDto>()
+                    .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((cversion, c) => cversion.NodeId == c.NodeId)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+                sqlDelete.WhereIn<PropertyDataDto>(x => x.VersionId, inSql);
+            }
+
+            // NPoco cannot turn the clause into IS NULL with a nullable parameter - deal with it
+            if (targetLanguageId == null)
+                sqlDelete.Where<PropertyDataDto>(x => x.LanguageId == null);
+            else
+                sqlDelete.Where<PropertyDataDto>(x => x.LanguageId == targetLanguageId);
+
+            sqlDelete
+                .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+
+            // see note above, not ok for SqlCe
+            //if (contentTypeIds != null)
+            //    sqlDelete
+            //        .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
             Database.Execute(sqlDelete);
 
-            //now insert all property data into the default language that exists under the invariant lang
+            //now insert all property data into the target language that exists under the source language
+            var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
             var cols = Sql().Columns<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue, x => x.LanguageId);
             var sqlSelectData = Sql().Select<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue)
-                        .Append(", NULL") //null language ID
-                        .From<PropertyDataDto>()
-                        .Where<PropertyDataDto>(x => x.LanguageId == defaultLangId);
-            if (sqlPropertyTypeIds != null)
-                sqlSelectData.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, sqlPropertyTypeIds);
-            if (propertyTypeIds != null)
-                sqlSelectData.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+                .Append(", " + targetLanguageIdS) //default language ID
+                .From<PropertyDataDto>();
+
+            if (contentTypeIds != null)
+                sqlSelectData
+                    .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((pdata, cversion) => pdata.VersionId == cversion.Id)
+                    .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>((cversion, c) => cversion.NodeId == c.NodeId);
+
+            // NPoco cannot turn the clause into IS NULL with a nullable parameter - deal with it
+            if (sourceLanguageId == null)
+                sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId == null);
+            else
+                sqlSelectData.Where<PropertyDataDto>(x => x.LanguageId == sourceLanguageId);
+
+            sqlSelectData
+                .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+
+            if (contentTypeIds != null)
+                sqlSelectData
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
 
             var sqlInsert = Sql($"INSERT INTO {PropertyDataDto.TableName} ({cols})").Append(sqlSelectData);
 
             Database.Execute(sqlInsert);
-        }
 
-        /// <summary>
-        /// This will move all property data from invariant to variant
-        /// </summary>
-        /// <param name="defaultLangId"></param>
-        /// <param name="propertyTypeIds">Optional list of property type ids of the properties to be updated</param>
-        /// <param name="sqlPropertyTypeIds">Optional SQL statement used for the sub-query to select the properties type ids for the properties to be updated</param>
-        private void MovePropertyDataToVariantCulture(int defaultLangId, IReadOnlyCollection<int> propertyTypeIds = null, Sql<ISqlContext> sqlPropertyTypeIds = null)
-        {
-            //first clear out any existing property data that might already exists under the default lang
-            var sqlDelete = Sql()
-                .Delete<PropertyDataDto>()                
-                .Where<PropertyDataDto>(x => x.LanguageId == defaultLangId);
-            if (sqlPropertyTypeIds != null)
-                sqlDelete.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, sqlPropertyTypeIds);
-            if (propertyTypeIds != null)
-                sqlDelete.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
+            // when copying from Culture, keep the original values around in case we want to go back
+            // when copying from Nothing, kill the original values, we don't want them around
+            if (sourceLanguageId == null)
+            {
+                sqlDelete = Sql()
+                    .Delete<PropertyDataDto>();
 
-            Database.Execute(sqlDelete);
+                if (contentTypeIds != null)
+                    sqlDelete.WhereIn<PropertyDataDto>(x => x.VersionId, inSql);
 
-            //now insert all property data into the default language that exists under the invariant lang
-            var cols = Sql().Columns<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue, x => x.LanguageId);
-            var sqlSelectData = Sql().Select<PropertyDataDto>(x => x.VersionId, x => x.PropertyTypeId, x => x.Segment, x => x.IntegerValue, x => x.DecimalValue, x => x.DateValue, x => x.VarcharValue, x => x.TextValue)
-                        .Append($", {defaultLangId}") //default language ID
-                        .From<PropertyDataDto>()
-                        .Where<PropertyDataDto>(x => x.LanguageId == null);
-            if (sqlPropertyTypeIds != null)
-                sqlSelectData.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, sqlPropertyTypeIds);
-            if (propertyTypeIds != null)
-                sqlSelectData.WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
-            
-            var sqlInsert = Sql($"INSERT INTO {PropertyDataDto.TableName} ({cols})").Append(sqlSelectData);
+                sqlDelete
+                    .Where<PropertyDataDto>(x => x.LanguageId == null)
+                    .WhereIn<PropertyDataDto>(x => x.PropertyTypeId, propertyTypeIds);
 
-            Database.Execute(sqlInsert);
+                Database.Execute(sqlDelete);
+            }
         }
 
         private void DeletePropertyType(int contentTypeId, int propertyTypeId)
@@ -846,24 +987,6 @@ AND umbracoNode.id <> @id",
                     Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<TEntity> GetTypesDirectlyComposedOf(int id)
-        {
-            //fixme - this will probably be more efficient to simply load all content types and do the calculation, see GetWhereCompositionIsUsedInContentTypes
-
-            var sql = Sql()
-                .SelectAll()
-                .From<NodeDto>()
-                .InnerJoin<ContentType2ContentTypeDto>()
-                .On<NodeDto, ContentType2ContentTypeDto>(left => left.NodeId, right => right.ChildId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<ContentType2ContentTypeDto>(x => x.ParentId == id);
-            var dtos = Database.Fetch<NodeDto>(sql);
-            return dtos.Any()
-                ? GetMany(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
-                : Enumerable.Empty<TEntity>();
         }
 
         internal static class ContentTypeQueryMapper

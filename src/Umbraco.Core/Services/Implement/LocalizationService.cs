@@ -245,7 +245,7 @@ namespace Umbraco.Core.Services.Implement
                 EnsureDictionaryItemLanguageCallback(dictionaryItem);
                 scope.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem, false));
 
-                Audit(AuditType.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
+                Audit(AuditType.Save, "Save DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
                 scope.Complete();
             }
         }
@@ -271,7 +271,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedDictionaryItem, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
+                Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
 
                 scope.Complete();
             }
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedLanguage, this, saveEventArgs);
 
-                Audit(AuditType.Save, "Save Language performed by user", userId, language.Id);
+                Audit(AuditType.Save, "Save Language", userId, language.Id, ObjectTypes.GetName(UmbracoObjectTypes.Language));
 
                 scope.Complete();
             }
@@ -429,14 +429,14 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(DeletedLanguage, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, "Delete Language performed by user", userId, language.Id);
+                Audit(AuditType.Delete, "Delete Language", userId, language.Id, ObjectTypes.GetName(UmbracoObjectTypes.Language));
                 scope.Complete();
             }
         }
 
-        private void Audit(AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId, string entityType)
         {
-            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
         }
 
         /// <summary>

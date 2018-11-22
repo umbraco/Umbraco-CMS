@@ -145,6 +145,7 @@
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
     <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
     <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="sort">Brugeren har sorteret de underliggende sider</key>
     <key alias="smallCopy">Kopieret</key>
     <key alias="smallPublish">Udgivet</key>
     <key alias="smallMove">Flyttet</key>
@@ -154,6 +155,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+    <key alias="smallSort">Sorteret</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -207,7 +209,7 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
-    <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
+    <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
@@ -254,10 +256,14 @@
   <area alias="media">
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
-    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade.</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
+    <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -279,6 +285,7 @@
     <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
+    <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -421,6 +428,8 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="enterAlias">Indtast alias...</key>
+    <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Tilladte typer</key>
@@ -530,6 +539,7 @@
     <key alias="hide">Skjul</key>
     <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
+    <key alias="id">Id</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
@@ -720,6 +730,7 @@
     <key alias="renewSession">Forny for at gemme dine ændringer</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Så er det søndag!</key>
     <key alias="greeting1">Smil, det er mandag!</key>
     <key alias="greeting2">Hurra, det er tirsdag!</key>
     <key alias="greeting3">Hvilken herlig onsdag!</key>
@@ -917,6 +928,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="updateEditCrop">Acceptér</key>
+    <key alias="undoEditCrop">Fortryd</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
@@ -1029,12 +1042,19 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Bruger CSS-syntaks f.eks. h1, .redheader, .blueTex</key>
+    <key alias="editorRules">Teksteditor-styles</key>
+    <key alias="editorRulesHelp">Definér de styles, der skal være tilgængelige i teksteditoren for dette stylesheet</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Bruger CSS-syntaks, f.eks. "h1" eller ".redheader"</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
-    <key alias="nameHelp">Navn der identificerer CSS-egenskaben i tekstredigeringsværktøjet</key>
-    <key alias="preview">Forhåndsvisning</key>
+    <key alias="overlayTitleAddRule">Tilføj style</key>
+    <key alias="overlayTitleEditRule">Redigér style</key>
+    <key alias="nameHelp">Det navn der vises i teksteditoren</key>
     <key alias="styles">Styles</key>
+    <key alias="stylesHelp">Den CSS der skal anvendes i teksteditoren, f.eks. "color:red;"</key>
+    <key alias="tabCode">Kode</key>
+    <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>

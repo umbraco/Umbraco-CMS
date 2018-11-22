@@ -13,7 +13,9 @@
 
             public const int Textbox = -88;
             public const int Boolean = -49;
-            public const int Datetime = -36;
+            public const int DateTime = -36;
+            public const int DropDownSingle = -39;
+            public const int DropDownMultiple = -42;
 
             public const int DefaultContentListView = -95;
             public const int DefaultMediaListView = -96;

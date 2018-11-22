@@ -24,6 +24,49 @@ namespace Umbraco.Core
         #region IContent
 
         /// <summary>
+        /// Gets the current status of the Content
+        /// </summary>
+        public static ContentStatus GetStatus(this IContent content, string culture = null)
+        {
+            if (content.Trashed)
+                return ContentStatus.Trashed;
+
+            if (!content.ContentType.VariesByCulture())
+                culture = string.Empty;
+            else if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
+
+            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+                return ContentStatus.Expired;
+
+            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+                return ContentStatus.AwaitingRelease;
+
+            if (content.Published)
+                return ContentStatus.Published;
+
+            return ContentStatus.Unpublished;
+        }
+
+        /// <summary>
+        /// Gets the cultures that have been flagged for unpublishing.
+        /// </summary>
+        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
+        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        {
+            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
+                return Array.Empty<string>();
+
+            var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
+            return culturesChanging
+                .Where(x => !content.IsCulturePublished(x) && // is not published anymore
+                            content.WasCulturePublished(x))   // but was published before
+                .ToList();
+        }
+
+        /// <summary>
         /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
         /// </summary>
         /// <param name="entity"></param>
@@ -37,103 +80,8 @@ namespace Umbraco.Core
             return dirty.WasPropertyDirty("Published") && entity.Published;
         }
 
-        /// <summary>
-        /// Returns a list of the current contents ancestors, not including the content itself.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
-        public static IEnumerable<IContent> Ancestors(this IContent content, IContentService contentService)
-        {
-            return contentService.GetAncestors(content);
-        }
-
-        /// <summary>
-        /// Returns a list of the current contents children.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
-        public static IEnumerable<IContent> Children(this IContent content, IContentService contentService)
-        {
-            return contentService.GetChildren(content.Id);
-        }
-
-        /// <summary>
-        /// Returns a list of the current contents descendants, not including the content itself.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
-        public static IEnumerable<IContent> Descendants(this IContent content, IContentService contentService)
-        {
-            return contentService.GetDescendants(content);
-        }
-
-        /// <summary>
-        /// Returns the parent of the current content.
-        /// </summary>
-        /// <param name="content">Current content</param>
-        /// <param name="contentService"></param>
-        /// <returns>An <see cref="IContent"/> object</returns>
-        public static IContent Parent(this IContent content, IContentService contentService)
-        {
-            return contentService.GetById(content.ParentId);
-        }
-
         #endregion
 
-        #region IMedia
-
-        /// <summary>
-        /// Returns a list of the current medias ancestors, not including the media itself.
-        /// </summary>
-        /// <param name="media">Current media</param>
-        /// <param name="mediaService"></param>
-        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
-        public static IEnumerable<IMedia> Ancestors(this IMedia media, IMediaService mediaService)
-        {
-            return mediaService.GetAncestors(media);
-        }
-
-
-        /// <summary>
-        /// Returns a list of the current medias children.
-        /// </summary>
-        /// <param name="media">Current media</param>
-        /// <param name="mediaService"></param>
-        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
-        public static IEnumerable<IMedia> Children(this IMedia media, IMediaService mediaService)
-        {
-            return mediaService.GetChildren(media.Id);
-        }
-
-
-        /// <summary>
-        /// Returns a list of the current medias descendants, not including the media itself.
-        /// </summary>
-        /// <param name="media">Current media</param>
-        /// <param name="mediaService"></param>
-        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
-        public static IEnumerable<IMedia> Descendants(this IMedia media, IMediaService mediaService)
-        {
-            return mediaService.GetDescendants(media);
-        }
-
-
-        /// <summary>
-        /// Returns the parent of the current media.
-        /// </summary>
-        /// <param name="media">Current media</param>
-        /// <param name="mediaService"></param>
-        /// <returns>An <see cref="IMedia"/> object</returns>
-        public static IMedia Parent(this IMedia media, IMediaService mediaService)
-        {
-            return mediaService.GetById(media.ParentId);
-        }
-
-        #endregion
-        
         /// <summary>
         /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
@@ -179,29 +127,7 @@ namespace Umbraco.Core
             }
             return false;
         }
-
-        /// <summary>
-        /// Returns the children for the content base item
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is a bit of a hack because we need to type check!
-        /// </remarks>
-        internal static IEnumerable<IContentBase> Children(IContentBase content, ServiceContext services)
-        {
-            if (content is IContent)
-            {
-                return services.ContentService.GetChildren(content.Id);
-            }
-            if (content is IMedia)
-            {
-                return services.MediaService.GetChildren(content.Id);
-            }
-            return null;
-        }
-
+        
         /// <summary>
         /// Returns properties that do not belong to a group
         /// </summary>

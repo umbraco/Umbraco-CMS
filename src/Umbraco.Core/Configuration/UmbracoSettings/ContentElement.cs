@@ -81,12 +81,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationProperty("loginBackgroundImage")]
         internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
-        [ConfigurationProperty("StripUdiAttributes")]
-        internal InnerTextConfigurationElement<bool> StripUdiAttributes
-        {
-            get { return GetOptionalTextElement("StripUdiAttributes", true); }
-        }
-
 
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
@@ -142,7 +136,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool IContentSection.EnableInheritedMediaTypes => EnableInheritedMediaTypes;
 
-        bool IContentSection.StripUdiAttributes => StripUdiAttributes;
         
         string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
     }

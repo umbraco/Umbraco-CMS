@@ -33,8 +33,7 @@
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
-        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -46,9 +45,7 @@
 </head>
 <body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController" class="login-only">
 
-    <div data-backdrop="false" class="modal hide login-overlay" aria-hidden="false" style="display: block;">
-        <div ng-include="'views/common/dialogs/login.html'"></div>
-    </div>
+    <umb-login on-login="loginAndRedirect()"></umb-login>
 
     <umb-notifications></umb-notifications>
 

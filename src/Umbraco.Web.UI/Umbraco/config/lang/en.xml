@@ -41,7 +41,6 @@
     <key alias="sendToTranslate">Send To Translation</key>
     <key alias="setGroup">Set group</key>
     <key alias="sort">Sort</key>
-    <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
     <key alias="setPermissions">Set permissions</key>
@@ -66,6 +65,7 @@
     <key alias="move">Allow access to move a node</key>
     <key alias="protect">Allow access to set and change public access for a node</key>
     <key alias="publish">Allow access to publish a node</key>
+    <key alias="unpublish">Allow access to unpublish a node</key>
     <key alias="rights">Allow access to change permissions for a node</key>
     <key alias="rollback">Allow access to roll back a node to a previous state</key>
     <key alias="sendtopublish">Allow access to send a node for approval before publishing</key>
@@ -94,8 +94,10 @@
         should be avoided. Better use the culture setting above.]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
-    <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]></key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+        </key>
     <key alias="setDomains">Domains</key>
   </area>
   <area alias="buttons">
@@ -139,24 +141,30 @@
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
-    <key alias="delete">Delete Content performed by user</key>
-    <key alias="unpublish">Unpublish performed by user</key>
-    <key alias="publish">Save and Publish performed by user</key>
-    <key alias="save">Save Content performed by user</key>
-    <key alias="move">Move Content performed by user</key>
-    <key alias="copy">Copy Content performed by user</key>
-    <key alias="rollback">Content rollback performed by user</key>
-    <key alias="sendtopublish">Content Send To Publish performed by user</key>
-    <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+    <key alias="delete">Content deleted</key>
+    <key alias="unpublish">Content unpublished</key>
+    <key alias="publish">Content saved and Published</key>
+    <key alias="publishvariant">Content saved and published for languages: %0% </key>
+    <key alias="save">Content saved</key>
+    <key alias="savevariant">Content saved for languages: %0%</key>
+    <key alias="move">Content moved</key>
+    <key alias="copy">Content copied</key>
+    <key alias="rollback">Content rolled back</key>
+    <key alias="sendtopublish">Content sent for publishing</key>
+    <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
+    <key alias="sort">Sort child items performed by user</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
+    <key alias="smallPublishVariant">Publish</key>
     <key alias="smallMove">Move</key>
     <key alias="smallSave">Save</key>
+    <key alias="smallSaveVariant">Save</key>
     <key alias="smallDelete">Delete</key>
     <key alias="smallUnpublish">Unpublish</key>
     <key alias="smallRollBack">Rollback</key>
     <key alias="smallSendToPublish">Send To Publish</key>
-    <key alias="smallSendToTranslate">Send To Translation</key>
+    <key alias="smallSendToPublishVariant">Send To Publish</key>
+    <key alias="smallSort">Sort</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -266,6 +274,10 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -282,12 +294,13 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
-    <key alias="newJavascriptFile">New javascript file</key>
+        <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
     <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
     <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
+    <key alias="newStyleSheetFile">New style sheet file</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -440,6 +453,8 @@
     <key alias="enterMessage">Enter a message...</key>
     <key alias="usernameHint">Your username is usually your email</key>
     <key alias="anchor">#value or ?key=value</key>
+        <key alias="enterAlias">Enter alias...</key>
+        <key alias="generatingAlias">Generating alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child node types</key>
@@ -557,6 +572,7 @@
     <key alias="hide">Hide</key>
     <key alias="history">History</key>
     <key alias="icon">Icon</key>
+        <key alias="id">Id</key>
     <key alias="import">Import</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
@@ -608,7 +624,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -671,6 +687,7 @@
     <key alias="moveLineDown">Move Lines Down</key>
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
+    <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background colour</key>
@@ -687,9 +704,11 @@
     <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
     <key alias="databaseFound">Your database has been found and is identified as</key>
     <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseInstall"><![CDATA[
+        <key alias="databaseInstall">
+            <![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>
+        </key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
@@ -801,6 +820,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday </key>
     <key alias="greeting2">Happy tubular Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
@@ -933,10 +953,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       Go to http://%4%/#/content/content/edit/%5% to edit.
 
+      %6%
+
       Have a nice day!
 
       Cheers from the Umbraco robot
     ]]></key>
+    <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
     <key alias="mailBodyHtml"><![CDATA[
         <html>
 			<head>
@@ -992,9 +1015,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 														</table>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<h3>Update summary:</h3>
-															<table style="width: 100%;">
-																 %6%
-															</table>
+															%6%
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Have a nice day!<br /><br />
@@ -1015,6 +1036,9 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
 		</html>
 	]]></key>
+    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
+        %0%
+    ]]></key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
   </area>
@@ -1101,7 +1125,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using Umbraco's member groups.]]></key>
+        <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
     <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
@@ -1165,11 +1189,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-    <key alias="reset">Reset</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
+        <key alias="reset">Reset crop</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
+        <key alias="updateEditCrop">Done</key>
+        <key alias="undoEditCrop">Undo edits</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -1258,6 +1282,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
     <key alias="editMediaSaved">Media saved</key>
+        <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
@@ -1302,12 +1327,19 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
+    <key alias="editorRules">Rich text editor styles</key>
+    <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
-    <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="preview">Preview</key>
+    <key alias="nameHelp">The name displayed in the editor style selector</key>
+    <key alias="overlayTitleAddRule">Add style</key>
+    <key alias="overlayTitleEditRule">Edit style</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Uses CSS syntax, e.g. "h1" or ".redHeader"</key>
     <key alias="styles">Styles</key>
+    <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
+    <key alias="tabCode">Code</key>
+    <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>
@@ -1470,6 +1502,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsDescription">Allow editors to create content of this type in different languages</key>
+    <key alias="allowVaryByCulture">Allow varying by culture</key>
   </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Building models</key>
@@ -1583,6 +1618,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Templates</key>
     <key alias="users">Users</key>
+        <key alias="settingsGroup">Settings</key>
+        <key alias="templatingGroup">Templating</key>
+        <key alias="thirdPartyGroup">Third Party</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>

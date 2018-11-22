@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -79,27 +85,26 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(null, new string[] { })]
         public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
         {
-            var converter = new DropdownListMultipleValueConverter();
-            var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
-            var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
+            var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
+            mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
+                .Returns(new PublishedDataType(123, "test", new Lazy<object>(() => new DropDownFlexibleConfiguration
+                    {
+                        Multiple = true
+                    })));
+
+            var publishedPropType = new PublishedPropertyType(
+                new PublishedContentType(1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+                new PropertyType("test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
+                new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
+                Mock.Of<IPublishedModelFactory>(), mockPublishedContentTypeFactory.Object);
+
+            var converter = new FlexibleDropdownPropertyValueConverter();
+            var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);
+            var result = converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);
 
             Assert.AreEqual(expected, result);
         }
-
-        [TestCase("100", new[] { 100 })]
-        [TestCase("100,200", new[] { 100, 200 })]
-        [TestCase("100 , 200, 300 ", new[] { 100, 200, 300 })]
-        [TestCase("", new int[] { })]
-        [TestCase(null, new int[] { })]
-        public void CanConvertDropdownListMultipleWithKeysPropertyEditor(object value, IEnumerable<int> expected)
-        {
-            var converter = new DropdownListMultipleWithKeysValueConverter();
-            var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
-            var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
-
-            Assert.AreEqual(expected, result);
-        }
-
+        
         [TestCase("1", 1)]
         [TestCase("1", 1)]
         [TestCase("0", 0)]

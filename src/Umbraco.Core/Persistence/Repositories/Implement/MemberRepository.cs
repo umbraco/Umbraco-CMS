@@ -6,12 +6,12 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -114,9 +114,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 case QueryType.Single:
                 case QueryType.Many:
                     sql = sql.Select<MemberDto>(r =>
-                        r.Select(x => x.ContentVersionDto)
-                         .Select(x => x.ContentDto, r1 =>
-                            r1.Select(x => x.NodeDto)));
+                            r.Select(x => x.ContentVersionDto)
+                                .Select(x => x.ContentDto, r1 =>
+                                    r1.Select(x => x.NodeDto)))
+
+                        // ContentRepositoryBase expects a variantName field to order by name
+                        // so get it here, though for members it's just the plain node name
+                        .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
                     break;
             }
 
