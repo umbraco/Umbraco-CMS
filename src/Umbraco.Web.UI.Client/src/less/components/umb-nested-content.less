@@ -209,26 +209,6 @@
     width: 99%;
 }
 
-.usky-grid.umb-nested-content__node-type-picker {
-    .cell-tools-menu {
-        position: relative;
-        transform: translate(-50%, -25%);
-    }
-
-    .elements li {
-        &:hover {
-            i {
-                color: @white !important;
-            }
-        }
-
-        i {
-            // make sure the item icons shown are in the correct color according to their doc type icon instead of the grid editor item color
-            color: unset;
-        }
-    }
-}
-
 // this resolves the layout issue introduced in nested content in 7.12 with the addition of the input for link anchors
 // the attribute selector ensures the change only applies to the linkpicker overlay
 .form-horizontal .umb-nested-content--narrow [ng-controller*="Umbraco.Overlays.LinkPickerController"] .controls-row {

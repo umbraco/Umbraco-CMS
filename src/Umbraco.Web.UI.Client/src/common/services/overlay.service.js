@@ -16,7 +16,7 @@
 
             // prevent two open overlays at the same time
             if(currentOverlay) {
-                return;
+                close();
             }
 
             var backdropOptions = {};
@@ -44,9 +44,21 @@
             eventsService.emit("appState.overlay", null);
         }
 
+        function ysod(error) {
+            const overlay = {
+                view: "views/common/overlays/ysod/ysod.html",
+                error: error,
+                close: function() {
+                    close();
+                }
+            };
+            open(overlay);
+        }
+
         var service = {
             open: open,
-            close: close
+            close: close,
+            ysod: ysod
         };
 
         return service;

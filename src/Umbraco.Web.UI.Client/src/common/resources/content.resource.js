@@ -23,7 +23,7 @@
   * </pre>
   **/
 
-function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHelper) {
+function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files, restApiUrl, showNotifications) {
@@ -607,10 +607,7 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            if (!options.cultureName) {
-                // must send a culture to the content API to handle variant data correctly
-                options.cultureName = $routeParams.mculture;
-            }
+            
             //converts the value to a js bool
             function toBool(v) {
                 if (angular.isNumber(v)) {
@@ -732,6 +729,18 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
+        publishWithDescendants: function (content, isNew, force, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+
+            var action = "publishWithDescendants";
+            if (force === true) {
+                action += "Force";
+            }
+
+            return saveContentItem(content, action + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
 
         /**
           * @ngdoc method
@@ -764,6 +773,27 @@ function contentResource($q, $http, $routeParams, umbDataFormatter, umbRequestHe
                 "contentApiBaseUrl",
                 "PostSave");
             return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#saveSchedule
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Saves changes made to a content item, and saves the publishing schedule
+          *
+          * @param {Object} content The content item object with changes applied
+          * @param {Bool} isNew set to true to create a new item or to update an existing
+          * @param {Array} files collection of files for the document
+          * @returns {Promise} resourcePromise object containing the saved content item.
+          *
+          */
+        saveSchedule: function (content, isNew, files, showNotifications) {
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "schedule" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
         /**

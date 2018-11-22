@@ -17,6 +17,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Trees
 {
@@ -112,7 +113,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (Security.CurrentUser.HasPathAccess(item, Services.EntityService, RecycleBinId) == false)
+            if (!Security.CurrentUser.HasMediaPathAccess(item, Services.EntityService))
             {
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
@@ -162,5 +163,12 @@ namespace Umbraco.Web.Trees
         {
             return _treeSearcher.ExamineSearch(Umbraco, query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
+
+        internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
+            // Not pretty having to cast the service, but it is the only way to get to use an internal method that we
+            // do not want to make public on the interface. Unfortunately also prevents this from being unit tested.
+            // See this issue for details on why we need this:
+            // https://github.com/umbraco/Umbraco-CMS/issues/3457
+            => ((EntityService)Services.EntityService).GetMediaChildrenWithoutPropertyData(entityId).ToList();
     }
 }

@@ -22,10 +22,6 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Alias { get; set; }
 
-        [Column("design")]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string Design { get; set; }
-
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }

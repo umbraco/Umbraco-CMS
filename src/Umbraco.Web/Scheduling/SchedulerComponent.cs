@@ -26,7 +26,6 @@ namespace Umbraco.Web.Scheduling
     {
         private IRuntimeState _runtime;
         private IContentService _contentService;
-        private IUserService _userService;
         private IAuditService _auditService;
         private ILogger _logger;
         private ProfilingLogger _proflog;
@@ -53,7 +52,6 @@ namespace Umbraco.Web.Scheduling
         {
             _runtime = runtime;
             _contentService = contentService;
-            _userService = userService;
             _contentPublishingService = contentPublishingService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
@@ -121,7 +119,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger, _userService, _contentPublishingService);
+            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger);
             _publishingRunner.TryAdd(task);
             return task;
         }

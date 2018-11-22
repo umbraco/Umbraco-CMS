@@ -37,6 +37,10 @@ namespace Umbraco.Web.Models.Mapping
             var nameResolver = new NameResolver(contentTypeService);
             var contentSavedStateResolver = new ContentSavedStateResolver<ContentPropertyDisplay>(contentTypeService);
             var contentBasicSavedStateResolver = new ContentBasicSavedStateResolver<ContentPropertyBasic>(contentTypeService);
+
+            var schedPublishReleaseDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Release);
+            var schedPublishExpireDateResolver = new ScheduledPublishDateResolver(ContentScheduleAction.Expire);
+
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ConstructUsing((content, context)=>GetInitialContentItemDisplay(content, context, contentTypeService))
@@ -66,6 +70,8 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IContent, ContentVariantDisplay>()
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
+                .ForMember(dest => dest.ReleaseDate, opt => opt.ResolveUsing(schedPublishReleaseDateResolver))
+                .ForMember(dest => dest.ExpireDate, opt => opt.ResolveUsing(schedPublishExpireDateResolver))
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())

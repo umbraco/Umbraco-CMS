@@ -180,7 +180,7 @@ namespace Umbraco.Web.Templates
         /// </param>
         /// <returns></returns>
         /// <remarks>
-        /// To acheive this we temporarily change the output text writer of the current HttpResponse, then
+        /// To achieve this we temporarily change the output text writer of the current HttpResponse, then
         ///   execute the controller via the handler which innevitably writes the result to the text writer
         ///   that has been assigned to the response. Then we change the response textwriter back to the original
         ///   before continuing .

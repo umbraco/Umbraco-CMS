@@ -20,7 +20,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
-    [OutgoingDateTimeFormat]
+    [JsonDateTimeFormatAttribute]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
@@ -106,7 +106,7 @@ namespace Umbraco.Web.Editors
 
         protected virtual void HandleInvalidModelState(IErrorModel display)
         {
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            //lastly, if it is not valid, add the modelstate to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();
@@ -148,7 +148,9 @@ namespace Umbraco.Web.Editors
             string header = "speechBubbles/operationCancelledHeader",
             string message = "speechBubbles/operationCancelledText",
             bool localizeHeader = true,
-            bool localizeMessage = true)
+            bool localizeMessage = true,
+            string[] headerParams = null,
+            string[] messageParams = null)
         {
             //if there's already a default event message, don't add our default one
             //fixme inject
@@ -156,8 +158,8 @@ namespace Umbraco.Web.Editors
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(
-                localizeHeader ? Services.TextService.Localize(header) : header,
-                localizeMessage ? Services.TextService.Localize(message): message);
+                localizeHeader ? Services.TextService.Localize(header, headerParams) : header,
+                localizeMessage ? Services.TextService.Localize(message, messageParams): message);
         }
     }
 }

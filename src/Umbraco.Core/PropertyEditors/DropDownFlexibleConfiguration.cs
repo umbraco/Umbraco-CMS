@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Core.PropertyEditors
 {
     internal class DropDownFlexibleConfiguration : ValueListConfiguration
     {

@@ -24,6 +24,49 @@ namespace Umbraco.Core
         #region IContent
 
         /// <summary>
+        /// Gets the current status of the Content
+        /// </summary>
+        public static ContentStatus GetStatus(this IContent content, string culture = null)
+        {
+            if (content.Trashed)
+                return ContentStatus.Trashed;
+
+            if (!content.ContentType.VariesByCulture())
+                culture = string.Empty;
+            else if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
+
+            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+                return ContentStatus.Expired;
+
+            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+                return ContentStatus.AwaitingRelease;
+
+            if (content.Published)
+                return ContentStatus.Published;
+
+            return ContentStatus.Unpublished;
+        }
+
+        /// <summary>
+        /// Gets the cultures that have been flagged for unpublishing.
+        /// </summary>
+        /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
+        internal static IReadOnlyList<string> GetCulturesUnpublishing(this IContent content)
+        {
+            if (!content.Published || !content.ContentType.VariesByCulture() || !content.IsPropertyDirty("PublishCultureInfos"))
+                return Array.Empty<string>();
+
+            var culturesChanging = content.CultureInfos.Where(x => x.Value.IsDirty()).Select(x => x.Key);
+            return culturesChanging
+                .Where(x => !content.IsCulturePublished(x) && // is not published anymore
+                            content.WasCulturePublished(x))   // but was published before
+                .ToList();
+        }
+
+        /// <summary>
         /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
         /// </summary>
         /// <param name="entity"></param>

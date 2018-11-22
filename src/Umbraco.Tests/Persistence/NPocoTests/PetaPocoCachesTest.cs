@@ -129,9 +129,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetRootContent();
 
-            contentService.GetContentForExpiration();
+            contentService.GetContentForExpiration(DateTime.Now);
 
-            contentService.GetContentForRelease();
+            contentService.GetContentForRelease(DateTime.Now);
 
             ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(-1))
             {

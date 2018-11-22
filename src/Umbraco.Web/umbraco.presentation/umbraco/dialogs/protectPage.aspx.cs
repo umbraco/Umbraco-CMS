@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using System.Web.Security;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
@@ -417,7 +418,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             var content = Services.ContentService.GetById(pageId);
             var text = content == null ? "" : content.Name;
-            feedback_text.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { text });
+            feedback_text.Text = HttpUtility.HtmlEncode(Services.TextService.Localize("publicAccess/paIsProtected", new[] { text }));
 
             p_setup.Visible = false;
             p_feedback.Visible = true;
@@ -438,7 +439,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             var content = Services.ContentService.GetById(pageId);
             var text = content == null ? "" : content.Name;
-            feedback_text.Text = Services.TextService.Localize("publicAccess/paIsRemoved", new[] { text });
+            feedback_text.Text = HttpUtility.HtmlEncode(Services.TextService.Localize("publicAccess/paIsRemoved", new[] { text }));
             p_feedback.Visible = true;
 
 

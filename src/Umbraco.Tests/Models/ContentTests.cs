@@ -23,6 +23,7 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
+
     [TestFixture]
     public class ContentTests : UmbracoTestBase
     {
@@ -238,11 +239,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
             content.TemplateId = 88;
@@ -299,11 +299,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.SortOrder = 5;
             content.TemplateId = 88;
             content.Trashed = false;
@@ -324,11 +323,10 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.ContentTypeId, content.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, content.CreateDate);
             Assert.AreEqual(clone.CreatorId, content.CreatorId);
-            Assert.AreEqual(clone.ExpireDate, content.ExpireDate);
             Assert.AreEqual(clone.Key, content.Key);
             Assert.AreEqual(clone.Level, content.Level);
             Assert.AreEqual(clone.Path, content.Path);
-            Assert.AreEqual(clone.ReleaseDate, content.ReleaseDate);
+            Assert.IsTrue(clone.ContentSchedule.Equals(content.ContentSchedule));
             Assert.AreEqual(clone.Published, content.Published);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
@@ -404,11 +402,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
             content.SortOrder = 5;
             content.TemplateId = 88;
 
@@ -424,12 +421,11 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Id)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreateDate)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.CreatorId)));
-            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ExpireDate)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
-            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ReleaseDate)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
+            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ContentSchedule)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.UpdateDate)));
@@ -472,11 +468,10 @@ namespace Umbraco.Tests.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ReleaseDate = DateTime.Now;
+            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
             content.TemplateId = 88;

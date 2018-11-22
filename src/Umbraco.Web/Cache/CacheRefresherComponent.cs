@@ -222,26 +222,9 @@ namespace Umbraco.Web.Cache
 
         internal static void HandleEvents(IEnumerable<IEventDefinition> events)
         {
-            // fixme remove this in v8, this is a backwards compat hack and is needed because when we are using Deploy, the events will be raised on a background
-            //thread which means that cache refreshers will also execute on a background thread and in many cases developers may be using UmbracoContext.Current in their
-            //cache refresher handlers, so before we execute all of the events, we'll ensure a context
-            UmbracoContext tempContext = null;
-            if (UmbracoContext.Current == null)
-            {
-                var httpContext = new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
-                tempContext = UmbracoContext.EnsureContext(
-                    Current.UmbracoContextAccessor,
-                    httpContext,
-                    null,
-                    new WebSecurity(httpContext, Current.Services.UserService, UmbracoConfig.For.GlobalSettings()),
-                    UmbracoConfig.For.UmbracoSettings(),
-                    Current.UrlProviders,
-                    UmbracoConfig.For.GlobalSettings(),
-                    Current.Container.GetInstance<IVariationContextAccessor>(),
-                    true);
-            }
-
-            try
+            // ensure we run with an UmbracoContext, because this may run in a background task,
+            // yet developers may be using the 'current' UmbracoContext in the event handlers
+            using (UmbracoContext.EnsureContext())
             {
                 foreach (var e in events)
                 {
@@ -250,10 +233,6 @@ namespace Umbraco.Web.Cache
 
                     handler.Invoke(null, new[] { e.Sender, e.Args });
                 }
-            }
-            finally
-            {
-                tempContext?.Dispose();
             }
         }
 
