@@ -1,0 +1,82 @@
+<div ng-controller="Umbraco.Editors.Content.ProtectController as vm">
+    <div class="umb-dialog-body form-horizontal" ng-cloak>
+        <div class="umb-pane">
+
+            <div ng-show="error">
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
+            </div>
+
+            <umb-load-indicator ng-show="vm.loading">
+            </umb-load-indicator>
+
+            <umb-pane ng-show="vm.step === 'type'">
+                <p class="abstract" ng-hide="success">
+                    <localize key="publicAccess_paHowWould">Choose how to restrict access to the page</localize> <strong>{{currentNode.name}}</strong>
+                </p>
+
+                <div class="pa-select-type">
+                    <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
+
+                    <label for="protectionTypeUser">
+                        <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
+                        <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password.</localize></p>
+                    </label>
+                </div>
+
+                <div class="pa-select-type">
+                    <input id="protectionTypeRole" type="radio" name="protectionType" value="role" ng-model="vm.type">
+
+                    <label for="protectionTypeRole">
+                        <h5 class="pa-access-header"><localize key="publicAccess_paAdvanced">Role based protection</localize></h5>
+                        <p><localize key="publicAccess_paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</localize></p>
+                    </label>
+                </div>
+            </umb-pane>
+
+            <umb-pane ng-show="vm.step === 'user'">
+                TODO: user config
+            </umb-pane>
+
+            <umb-pane ng-show="vm.step === 'role' && !vm.groups.length">
+                <p><localize key="publicAccess_paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication.</localize></p>
+            </umb-pane>
+
+            <umb-pane ng-show="vm.step === 'role' && vm.groups.length">
+                TODO: role config
+            </umb-pane>
+
+            <!--<pre>{{vm | json}}</pre>-->
+
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <umb-button
+            type="button"
+            button-style="link"
+            action="vm.close()"
+            label-key="general_close">
+        </umb-button>
+
+        <umb-button
+            ng-hide="vm.step !== 'type'"
+            type="button" 
+            action="vm.next()"
+            button-style="success"
+            label-key="general_next">
+        </umb-button>
+
+        <umb-button
+            ng-show="vm.step !== 'type'"
+            type="button" 
+            action="vm.save()"
+            state="vm.saveButtonState"
+            button-style="success"
+            label-key="buttons_save"
+            disabled="vm.buttonState === 'busy' || !TODO">
+        </umb-button>
+    </div>
+</div>
