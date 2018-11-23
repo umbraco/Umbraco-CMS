@@ -461,7 +461,7 @@ namespace Umbraco.Core
         /// </remarks>
         /// <param name="connectionString"></param>
         /// <param name="providerName"></param>
-        private void SaveConnectionString(string connectionString, string providerName)
+        internal void SaveConnectionString(string connectionString, string providerName)
         {
             //Set the connection string for the new datalayer
             var connectionStringSettings = string.IsNullOrEmpty(providerName)
