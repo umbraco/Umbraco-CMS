@@ -273,30 +273,30 @@
     <area alias="bulk">
         <key alias="done">Hecho</key>
 
-        <key alias="deleteditam">Borrado %0% elemento</key>
-        <key alias="deleteditams">Borrados %0% elementos</key>
-        <key alias="deleteditamOfItem">Borrado %0% de %1% elemento</key>
-        <key alias="deleteditamOfItems">Borrados %0% de %1% elementos</key>
+        <key alias="deletedItem">Borrado %0% elemento</key>
+        <key alias="deletedItems">Borrados %0% elementos</key>
+        <key alias="deletedItemOfItem">Borrado %0% de %1% elemento</key>
+        <key alias="deletedItemOfItems">Borrados %0% de %1% elementos</key>
 
-        <key alias="publisheditam">Publicado %0% elemento</key>
-        <key alias="publisheditams">Publicados %0% elementos</key>
-        <key alias="publisheditamOfItem">Publicado %0% de %1% elemento</key>
-        <key alias="publisheditamOfItems">Publicados %0% de %1% elementos</key>
+        <key alias="publishedItem">Publicado %0% elemento</key>
+        <key alias="publishedItems">Publicados %0% elementos</key>
+        <key alias="publishedItemOfItem">Publicado %0% de %1% elemento</key>
+        <key alias="publishedItemOfItems">Publicados %0% de %1% elementos</key>
 
-        <key alias="unpublisheditam">Ocultar %0% elemento</key>
-        <key alias="unpublisheditams">Ocultar %0% elementos</key>
-        <key alias="unpublisheditamOfItem">Ocultado %0% de %1% elemento</key>
-        <key alias="unpublisheditamOfItems">Ocultados %0% de %1% elementos</key>
+        <key alias="unpublishedItem">Ocultar %0% elemento</key>
+        <key alias="unpublishedItems">Ocultar %0% elementos</key>
+        <key alias="unpublishedItemOfItem">Ocultado %0% de %1% elemento</key>
+        <key alias="unpublishedItemOfItems">Ocultados %0% de %1% elementos</key>
 
-        <key alias="moveditam">Mover %0% elemento</key>
-        <key alias="moveditams">Mover %0% elementos</key>
-        <key alias="moveditamOfItem">Movido %0% de %1% elemento</key>
-        <key alias="moveditamOfItems">Movidos %0% de %1% elementos</key>
+        <key alias="movedItem">Mover %0% elemento</key>
+        <key alias="movedItems">Mover %0% elementos</key>
+        <key alias="movedItemOfItem">Movido %0% de %1% elemento</key>
+        <key alias="movedItemOfItems">Movidos %0% de %1% elementos</key>
 
-        <key alias="copieditam">Copiar %0% elemento</key>
-        <key alias="copieditams">Copiar %0% elementos</key>
-        <key alias="copieditamOfItem">Copiado %0% de %1% elemento</key>
-        <key alias="copieditamOfItems">Copiado %0% de %1% elementos</key>
+        <key alias="copiedItem">Copiar %0% elemento</key>
+        <key alias="copiedItems">Copiar %0% elementos</key>
+        <key alias="copiedItemOfItem">Copiado %0% de %1% elemento</key>
+        <key alias="copiedItemOfItems">Copiado %0% de %1% elementos</key>
     </area>
     <area alias="defaultdialogs">
         <key alias="nodeNameLinkPicker">Título del vínculo</key>
@@ -319,7 +319,7 @@
         <key alias="insertlink">Insertar enlace</key>
         <key alias="insertMacro">Insertar macro</key>
         <key alias="inserttable">Insertar tabla</key>
-        <key alias="lasteditad">Última edición</key>
+        <key alias="lastEdited">Última edición</key>
         <key alias="link">Enlace</key>
         <key alias="linkinternal">Enlace interno</key>
         <key alias="linklocaltip">Al usar enlaces locales, insertar "#" delante del enlace</key>
@@ -1020,13 +1020,13 @@
         <key alias="noColors">No has configurado ningún color</key>
     </area>
     <area alias="contentPicker">
-        <key alias="pickedTrasheditam">Has seleccionado un elemento borrado o en la papelera de reciclaje</key>
-        <key alias="pickedTrasheditams">Has seleccionado unos elementos borrados o en la papelera de reciclaje</key>
+        <key alias="pickedTrashedItem">Has seleccionado un elemento borrado o en la papelera de reciclaje</key>
+        <key alias="pickedTrashedItems">Has seleccionado unos elementos borrados o en la papelera de reciclaje</key>
     </area>
     <area alias="mediaPicker">
-        <key alias="pickedTrasheditam">Has seleccionado un elemento borrado o en la papelera de reciclaje</key>
-        <key alias="pickedTrasheditams">Has seleccionado unos elementos borrados o en la papelera de reciclaje</key>
-        <key alias="deleteditam">Elemento borrado</key>
+        <key alias="pickedTrashedItem">Has seleccionado un elemento borrado o en la papelera de reciclaje</key>
+        <key alias="pickedTrashedItems">Has seleccionado unos elementos borrados o en la papelera de reciclaje</key>
+        <key alias="deletedItem">Elemento borrado</key>
     </area>
     <area alias="relatedlinks">
         <key alias="enterExternal">añadir un enlace externo</key>
