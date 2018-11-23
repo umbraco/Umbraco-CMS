@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Web;
-using System.Web.Script.Serialization;
-using System.Web.UI;
-using Semver;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -113,14 +108,18 @@ namespace Umbraco.Web.Install
                     {
                         // check that it's a valid Guid
                         if (installId == Guid.Empty)
+                        {
                             installId = Guid.NewGuid();
+                        }
                     }
                 }
                 installCookie.SetValue(installId.ToString());
 
                 string dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
+                {
                     dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+                }
 
                 org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
                 check.Install(installId,
@@ -149,6 +148,16 @@ namespace Umbraco.Web.Install
             get
             {
                 var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+
+                if (_umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings)
+                    && !_umbContext.Application.DatabaseContext.SqlSyntax.GetTablesInSchema(_umbContext.Application.DatabaseContext.Database).Any())
+                {
+                    GlobalSettings.ConfigurationStatus = string.Empty;
+                    _umbContext.Application.DatabaseContext.SaveConnectionString(string.Empty, string.Empty);
+
+                    return true;
+                }
+
                 if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false)
                 {
@@ -193,7 +202,9 @@ namespace Umbraco.Web.Install
         internal IEnumerable<Package> GetStarterKits()
         {
             if (_httpClient == null)
+            {
                 _httpClient = new HttpClient();
+            }
 
             var packages = new List<Package>();
             try
