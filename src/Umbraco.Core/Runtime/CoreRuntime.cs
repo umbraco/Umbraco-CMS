@@ -14,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
@@ -32,16 +31,11 @@ namespace Umbraco.Core.Runtime
         private BootLoader _bootLoader;
         private RuntimeState _state;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
-        /// </summary>
-        public CoreRuntime()
-        { }
-
         /// <inheritdoc/>
         public virtual void Boot(IContainer container)
         {
-            container.ConfigureUmbracoCore(); // also sets Current.Container
+            // assign current container
+            Current.Container = container;
 
             // register the essential stuff,
             // ie the global application logger
@@ -109,13 +103,6 @@ namespace Umbraco.Core.Runtime
                     // throw a BootFailedException for every requests.
                 }
             }
-
-            //fixme
-            // after Umbraco has started there is a scope in "context" and that context is
-            // going to stay there and never get destroyed nor reused, so we have to ensure that
-            // everything is cleared
-            //var sa = container.GetInstance<IDatabaseScopeAccessor>();
-            //sa.Scope?.Dispose();
         }
 
         /// <summary>

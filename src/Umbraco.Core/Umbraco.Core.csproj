@@ -165,7 +165,7 @@
     <Compile Include="Components\IUmbracoCoreComponent.cs" />
     <Compile Include="Components\IUmbracoUserComponent.cs" />
     <Compile Include="Components\RequireComponentAttribute.cs" />
-    <Compile Include="Components\RequiredComponentAttribute.cs" />
+    <Compile Include="Components\RequiredByComponentAttribute.cs" />
     <Compile Include="Components\RuntimeLevelAttribute.cs" />
     <Compile Include="Components\UmbracoComponentBase.cs" />
     <Compile Include="Components\UmbracoCoreComponentBase.cs" />

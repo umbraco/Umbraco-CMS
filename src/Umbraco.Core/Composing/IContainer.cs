@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Core.Composing
 {

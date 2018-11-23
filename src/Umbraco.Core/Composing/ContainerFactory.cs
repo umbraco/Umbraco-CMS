@@ -50,10 +50,6 @@ namespace Umbraco.Core.Composing
             if (container == null)
                 throw new Exception($"Container factory '{configuredTypeName}' did not return an IContainer implementation.");
 
-            // self-register the container - this is where it should happen
-            // but - we do NOT want to do it!
-            //container.RegisterInstance(container);
-
             return container;
         }
     }

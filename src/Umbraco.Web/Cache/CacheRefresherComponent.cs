@@ -29,7 +29,7 @@ namespace Umbraco.Web.Cache
     /// Installs listeners on service events in order to refresh our caches.
     /// </summary>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    [RequiredComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
+    [RequiredByComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
     public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();

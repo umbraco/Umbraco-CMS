@@ -19,13 +19,13 @@ namespace Umbraco.Core.Components
     /// </remarks>
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    public class RequiredComponentAttribute : Attribute
+    public class RequiredByComponentAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequiredComponentAttribute"/> class.
+        /// Initializes a new instance of the <see cref="RequiredByComponentAttribute"/> class.
         /// </summary>
         /// <param name="requiringType">The type of the required component.</param>
-        public RequiredComponentAttribute(Type requiringType)
+        public RequiredByComponentAttribute(Type requiringType)
         {
             if (typeof(IUmbracoComponent).IsAssignableFrom(requiringType) == false)
                 throw new ArgumentException($"Type {requiringType.FullName} is invalid here because it does not implement {typeof(IUmbracoComponent).FullName}.");

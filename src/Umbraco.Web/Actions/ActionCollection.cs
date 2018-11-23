@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
@@ -11,16 +7,11 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Actions
 {
-    public class ActionCollection : IBuilderCollection<IAction>
+    public class ActionCollection : BuilderCollectionBase<IAction>
     {
-        private Func<IEnumerable<Type>> _producer;
-        private readonly object _locker = new object();
-        private IAction[] _items;
-
-        internal ActionCollection(Func<IEnumerable<Type>> producer)
-        {
-            _producer = producer;
-        }
+        public ActionCollection(IEnumerable<IAction> items)
+            : base(items)
+        { }
 
         internal T GetAction<T>()
             where T : IAction
@@ -30,66 +21,19 @@ namespace Umbraco.Web.Actions
 
         internal IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
         {
-            var all = this.ToArray();
-            return letters.Select(x => all.FirstOrDefault(y => y.Letter.ToString(CultureInfo.InvariantCulture) == x))
+            return letters
+                .Where(x => x.Length == 1)
+                .Select(x => this.FirstOrDefault(y => y.Letter == x[0]))
                 .WhereNotNull()
-                .ToArray();
+                .ToList();
         }
 
-        private IAction[] Items
-        {
-            get
-            {
-                lock (_locker)
-                {
-                    if (_items != null) return _items;
-                    // fixme
-                    // why is this not a builder collection base anymore?
-                    // 
-                    var actions = new List<IAction>();
-                    foreach (var type in _producer())
-                    {
-                        var getter = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                        var instance = getter == null
-                            ? Activator.CreateInstance(type) as IAction
-                            : getter.GetValue(null, null) as IAction;
-                        if (instance == null) continue;
-                        actions.Add(instance);
-                    }
-
-                    return _items = actions.ToArray();
-                }
-            }
-        }
-
-        internal void Reset(Func<IEnumerable<Type>> producer)
-        {
-            lock (_locker)
-            {
-                _items = null;
-                _producer = producer;
-            }
-        }
-
-        public int Count => Items.Length;
-
-        public IEnumerator<IAction> GetEnumerator()
-        {
-            return ((IEnumerable<IAction>) Items).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        
         internal IReadOnlyList<IAction> FromEntityPermission(EntityPermission entityPermission)
         {
             return entityPermission.AssignedPermissions
                 .Where(x => x.Length == 1)
-                .Select(x => x.ToCharArray()[0])
-                .SelectMany(c => this.Where(x => x.Letter == c))
-                .Where(action => action != null)
+                .SelectMany(x => this.Where(y => y.Letter == x[0]))
+                .WhereNotNull()
                 .ToList();
         }
     }

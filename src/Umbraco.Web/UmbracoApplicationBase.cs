@@ -58,12 +58,9 @@ namespace Umbraco.Web
         {
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
-            // create the container for the application, and configure.
+            // create the container for the application, and boot
             // the boot manager is responsible for registrations
             var container = GetContainer();
-            Current.Container = container; // fixme NOT HERE OR WHAT?
-
-            // get runtime & boot
             _runtime = GetRuntime();
             _runtime.Boot(container);
         }

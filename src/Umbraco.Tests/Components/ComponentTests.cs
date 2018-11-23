@@ -296,7 +296,7 @@ namespace Umbraco.Tests.Components
         public class Component12 : TestComponentBase, IUmbracoCoreComponent
         { }
 
-        [RequiredComponent(typeof(Component1))]
+        [RequiredByComponent(typeof(Component1))]
         public class Component13 : TestComponentBase
         { }
 
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Components
         public class Component20 : TestComponentBase
         { }
 
-        [RequiredComponent(typeof(Component20))]
+        [RequiredByComponent(typeof(Component20))]
         public class Component21 : TestComponentBase
         { }
 
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Components
         { }
 
         // should insert itself between 22 and anything i23
-        [RequiredComponent(typeof(IComponent23))]
+        [RequiredByComponent(typeof(IComponent23))]
         //[RequireComponent(typeof(Component22))] - not needed, implement i23
         public class Component25 : TestComponentBase, IComponent23
         { }

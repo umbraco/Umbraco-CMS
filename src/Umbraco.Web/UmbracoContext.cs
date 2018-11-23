@@ -5,13 +5,13 @@ using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
-using LightInject;
 
 namespace Umbraco.Web
 {

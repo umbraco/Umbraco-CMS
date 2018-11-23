@@ -135,7 +135,7 @@ namespace Umbraco.Core.Components
                     text.AppendLine("  -> " + attribute.RequiredType + (attribute.Weak.HasValue
                         ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
                         : ""));
-                foreach (var attribute in type.GetCustomAttributes<RequiredComponentAttribute>())
+                foreach (var attribute in type.GetCustomAttributes<RequiredByComponentAttribute>())
                     text.AppendLine("  -< " + attribute.RequiringType);
                 foreach (var i in type.GetInterfaces())
                 {
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Components
                         text.AppendLine("    -> " + attribute.RequiredType + (attribute.Weak.HasValue
                             ? (attribute.Weak.Value ? " (weak)" : (" (strong" + (requirements.ContainsKey(attribute.RequiredType) ? ", missing" : "") + ")"))
                             : ""));
-                    foreach (var attribute in i.GetCustomAttributes<RequiredComponentAttribute>())
+                    foreach (var attribute in i.GetCustomAttributes<RequiredByComponentAttribute>())
                         text.AppendLine("    -< " + attribute.RequiringType);
                 }
                 if (kvp.Value != null)
@@ -221,7 +221,7 @@ namespace Umbraco.Core.Components
                         if (requirements[type] == null) requirements[type] = new List<Type>();
                         requirements[type].AddRange(implems);
                     }
-                    else if (attr.Weak == false) // if explicitely set to !weak, is strong, else is weak
+                    else if (attr.Weak == false) // if explicitly set to !weak, is strong, else is weak
                         throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
                 }
                 // requiring a class = require that the component is enabled
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Components
                         if (requirements[type] == null) requirements[type] = new List<Type>();
                         requirements[type].Add(attr.RequiredType);
                     }
-                    else if (attr.Weak != true) // if not explicitely set to weak, is strong
+                    else if (attr.Weak != true) // if not explicitly set to weak, is strong
                         throw new Exception($"Broken component dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
                 }
             }
@@ -244,8 +244,8 @@ namespace Umbraco.Core.Components
             // get 'required' attributes
             // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
             var requiredAttributes = type
-                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredComponentAttribute>()) // those marking interfaces
-                .Concat(type.GetCustomAttributes<RequiredComponentAttribute>()); // those marking the component
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredByComponentAttribute>()) // those marking interfaces
+                .Concat(type.GetCustomAttributes<RequiredByComponentAttribute>()); // those marking the component
 
             foreach (var attr in requiredAttributes)
             {
@@ -275,7 +275,7 @@ namespace Umbraco.Core.Components
 
         private void InstantiateComponents(IEnumerable<Type> types)
         {
-            using (_proflog.DebugDuration<BootLoader>("Instanciating components.", "Instanciated components."))
+            using (_proflog.DebugDuration<BootLoader>("Instantiating components.", "Instantiated components."))
             {
                 _components = types.Select(x => (IUmbracoComponent) Activator.CreateInstance(x)).ToArray();
             }
@@ -309,7 +309,7 @@ namespace Umbraco.Core.Components
                     var componentType = component.GetType();
                     var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                         .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false && x.IsStatic == false);
-                    using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialised {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         foreach (var initializer in initializers)
                         {
