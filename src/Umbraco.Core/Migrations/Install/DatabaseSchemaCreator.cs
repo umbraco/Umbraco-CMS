@@ -81,7 +81,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (ConsentDto),
             typeof (AuditEntryDto),
             typeof (ContentVersionCultureVariationDto),
-            typeof (DocumentCultureVariationDto)
+            typeof (DocumentCultureVariationDto),
+            typeof (ContentScheduleDto)
         };
 
         /// <summary>
@@ -423,7 +424,7 @@ namespace Umbraco.Core.Migrations.Install
             var tableExist = TableExists(tableName);
             if (overwrite && tableExist)
             {
-                _logger.Info<DatabaseSchemaCreator>($"Table '{tableName}' already exists, but will be recreated");
+                _logger.Info<DatabaseSchemaCreator>("Table '{TableName}' already exists, but will be recreated", tableName);
 
                 DropTable(tableName);
                 tableExist = false;
@@ -481,18 +482,18 @@ namespace Umbraco.Core.Migrations.Install
 
                     if (overwrite)
                     {
-                        _logger.Info<Database>($"Table '{tableName}' was recreated");
+                        _logger.Info<Database>("Table '{TableName}' was recreated", tableName);
                     }
                     else
                     {
-                        _logger.Info<Database>($"New table '{tableName}' was created");
+                        _logger.Info<Database>("New table '{TableName}' was created", tableName);
                     }
                 }
             }
             else
             {
                 // The table exists and was not recreated/overwritten.
-                _logger.Info<Database>($"Table '{tableName}' already exists - no changes were made");
+                _logger.Info<Database>("Table '{TableName}' already exists - no changes were made", tableName);
             }
         }
 

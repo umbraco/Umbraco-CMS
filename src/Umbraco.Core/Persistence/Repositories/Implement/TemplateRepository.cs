@@ -178,7 +178,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             template.Path = nodeDto.Path;
 
             //now do the file work
-            SaveFile(template, dto);
+            SaveFile(template);
 
             template.ResetDirtyProperties();
 
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
             //now do the file work
-            SaveFile((Template) entity, dto, originalAlias);
+            SaveFile((Template) entity, originalAlias);
 
             entity.ResetDirtyProperties();
 
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 template.GetFileContent = file => GetFileContent((Template) file, false);
         }
 
-        private void SaveFile(Template template, TemplateDto dto, string originalAlias = null)
+        private void SaveFile(Template template, string originalAlias = null)
         {
             string content;
 
@@ -272,10 +272,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // once content has been set, "template on disk" are not "on disk" anymore
             template.Content = content;
             SetVirtualPath(template);
-
-            if (dto.Design == content) return;
-            dto.Design = content;
-            Database.Update(dto); // though... we don't care about the db value really??!!
         }
 
         protected override void PersistDeletedItem(ITemplate entity)

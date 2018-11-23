@@ -209,7 +209,7 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
-    <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
+    <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
@@ -260,6 +260,10 @@
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
+    <key alias="moveFailed">Flytning af mediet fejlede</key>
+    <key alias="copyFailed">Kopiering af mediet fejlede</key>
+    <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
+    <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -281,6 +285,7 @@
     <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
+    <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -1037,12 +1042,19 @@ Mange hilsner fra Umbraco robotten
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Bruger CSS-syntaks f.eks. h1, .redheader, .blueTex</key>
+    <key alias="editorRules">Teksteditor-styles</key>
+    <key alias="editorRulesHelp">Definér de styles, der skal være tilgængelige i teksteditoren for dette stylesheet</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Bruger CSS-syntaks, f.eks. "h1" eller ".redheader"</key>
     <key alias="editstylesheet">Rediger stylesheet</key>
     <key alias="editstylesheetproperty">Rediger CSS-egenskab</key>
-    <key alias="nameHelp">Navn der identificerer CSS-egenskaben i tekstredigeringsværktøjet</key>
-    <key alias="preview">Forhåndsvisning</key>
+    <key alias="overlayTitleAddRule">Tilføj style</key>
+    <key alias="overlayTitleEditRule">Redigér style</key>
+    <key alias="nameHelp">Det navn der vises i teksteditoren</key>
     <key alias="styles">Styles</key>
+    <key alias="stylesHelp">Den CSS der skal anvendes i teksteditoren, f.eks. "color:red;"</key>
+    <key alias="tabCode">Kode</key>
+    <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>

@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IProfile GetProfile(string username)
         {
-            var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.UserName == username), false);
+            var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Login == username), false);
             return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
         }
 

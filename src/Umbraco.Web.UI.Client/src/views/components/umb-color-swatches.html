@@ -6,7 +6,7 @@
                 <i class="icon icon-check small"></i>
             </div>
             <div class="umb-color-box__label" ng-if="useLabel">
-                <div class="umb-color-box__name truncate">{{ color.label }}</div>
+                <div class="umb-color-box__name truncate">{{ color.label || color.value }}</div>
                 <div class="umb-color-box__description">#{{ color.value }}</div>
             </div>
         </div>

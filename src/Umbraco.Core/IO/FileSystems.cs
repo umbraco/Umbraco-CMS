@@ -32,7 +32,6 @@ namespace Umbraco.Core.IO
         private readonly List<ShadowWrapper> _shadowWrappers = new List<ShadowWrapper>();
         private readonly object _shadowLocker = new object();
         private static Guid _shadowCurrentId = Guid.Empty; // static - unique!!
-
         #region Constructor
 
         // DI wants a public ctor

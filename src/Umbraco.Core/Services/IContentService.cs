@@ -79,24 +79,9 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Gets documents of a given document type.
-        /// </summary>
-        IEnumerable<IContent> GetByType(int documentTypeId);
-
-        /// <summary>
         /// Gets documents at a given level.
         /// </summary>
         IEnumerable<IContent> GetByLevel(int level);
-
-        /// <summary>
-        /// Gets child documents of a given parent.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId);
-
-        /// <summary>
-        /// Gets child documents of a document, (partially) matching a name.
-        /// </summary>
-        IEnumerable<IContent> GetChildren(int parentId, string name);
 
         /// <summary>
         /// Gets the parent of a document.
@@ -117,16 +102,6 @@ namespace Umbraco.Core.Services
         /// Gets ancestor documents of a document.
         /// </summary>
         IEnumerable<IContent> GetAncestors(IContent content);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(int id);
-
-        /// <summary>
-        /// Gets descendant documents of a document.
-        /// </summary>
-        IEnumerable<IContent> GetDescendants(IContent content);
 
         /// <summary>
         /// Gets all versions of a document.
@@ -157,31 +132,30 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetRootContent();
 
         /// <summary>
-        /// Gets documents with an expiration date greater then today.
+        /// Gets documents having an expiration date before (lower than, or equal to) a specified date.
         /// </summary>
-        IEnumerable<IContent> GetContentForExpiration();
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForExpiration(DateTime date);
 
         /// <summary>
-        /// Gets documents with a release date greater then today.
+        /// Gets documents having a release date before (lower than, or equal to) a specified date.
         /// </summary>
-        IEnumerable<IContent> GetContentForRelease();
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForRelease(DateTime date);
 
         /// <summary>
         /// Gets documents in the recycle bin.
         /// </summary>
-        IEnumerable<IContent> GetContentInRecycleBin();
-
-        /// <summary>
-        /// Gets child documents of a parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="filter">Search text filter.</param>
-        /// <param name="ordering">Ordering infos.</param>
-        IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            string filter = null, Ordering ordering = null);
+        IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets child documents of a parent.
@@ -193,20 +167,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
-
-        /// <summary>
-        /// Gets descendant documents of a given parent.
-        /// </summary>
-        /// <param name="id">The parent identifier.</param>
-        /// <param name="pageIndex">The page number.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of documents.</param>
-        /// <param name="orderBy">A field to order by.</param>
-        /// <param name="orderDirection">The ordering direction.</param>
-        /// <param name="filter">Search text filter.</param>
-        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+            IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -220,7 +181,31 @@ namespace Umbraco.Core.Services
         /// <param name="orderBySystemField">A flag indicating whether the ordering field is a system field.</param>
         /// <param name="filter">Query filter.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+            IQuery<IContent> filter = null, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents of a content content
+        /// </summary>
+        /// <param name="contentTypeId">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets paged documents for specified content types
+        /// </summary>
+        /// <param name="contentTypeIds">The page number.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Search text filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter, Ordering ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.
@@ -337,12 +322,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
 
         #endregion
 
@@ -380,31 +365,57 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="culture">A culture, or "*" for all cultures.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
         /// <remarks>
         /// <para>Unless specified, all cultures are re-published. Otherwise, one culture can be specified. To act on more
-        /// that one culture, see the other overload of this method.</para>
+        /// than one culture, see the other overloads of this method.</para>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published.</para>
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// </remarks>
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="cultures">The cultures to publish.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
         /// <remarks>
         /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
         /// only those documents that are already published, are republished. When <c>true</c>, all documents are
-        /// published.</para>
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
+        /// </remarks>
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = 0);
+
+        /// <summary>
+        /// Saves and publishes a document branch.
+        /// </summary>
+        /// <param name="content">The root document.</param>
+        /// <param name="force">A value indicating whether to force-publish documents that are not already published.</param>
+        /// <param name="shouldPublish">A function determining cultures to publish.</param>
+        /// <param name="publishCultures">A function publishing cultures.</param>
+        /// <param name="userId">The identifier of the user performing the operation.</param>
+        /// <remarks>
+        /// <para>The <paramref name="force"/> parameter determines which documents are published. When <c>false</c>,
+        /// only those documents that are already published, are republished. When <c>true</c>, all documents are
+        /// published. The root of the branch is always published, regardless of <paramref name="force"/>.</para>
         /// <para>The <paramref name="editing"/> parameter is a function which determines whether a document has
-        /// values to publish (else there is no need to publish it). If one wants to publish only a selection of
+        /// changes to publish (else there is no need to publish it). If one wants to publish only a selection of
         /// cultures, one may want to check that only properties for these cultures have changed. Otherwise, other
         /// cultures may trigger an unwanted republish.</para>
         /// <para>The <paramref name="publishCultures"/> parameter is a function to execute to publish cultures, on
         /// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
         /// whether the cultures could be published.</para>
         /// </remarks>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
+            Func<IContent, HashSet<string>> shouldPublish,
+            Func<IContent, HashSet<string>, bool> publishCultures,
+            int userId = 0);
 
         /// <summary>
         /// Unpublishes a document.
@@ -416,7 +427,7 @@ namespace Umbraco.Core.Services
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
         /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
-        UnpublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
+        PublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.
@@ -438,7 +449,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Publishes and unpublishes scheduled documents.
         /// </summary>
-        IEnumerable<PublishResult> PerformScheduledPublish();
+        IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 
         #endregion
 

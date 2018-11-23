@@ -282,7 +282,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     });
 
     /** Syncs the renderModel based on the actual model.value and returns a promise */
-    function syncRenderModel(validate) {
+    function syncRenderModel(doValidation) {
 
         var valueIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -324,7 +324,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
                         });
 
-                    if (validate) {
+                    if (doValidation) {
                         validate();
                     }
                     
@@ -347,7 +347,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                     }
                 }
 
-                if (validate) {
+                if (doValidation) {
                     validate();
                 }
 
@@ -357,7 +357,9 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
         else {
             $scope.renderModel = [];
-            validate();
+            if (validate) {
+                validate();
+            }
             setSortingState($scope.renderModel);
             return $q.when(true);
         }

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
+function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService) {
 
     /**
      * Used to toggle UI elements during delete operations
@@ -62,7 +62,7 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                dialogService.ysodDialog(err);
+                overlayService.ysod(err);
             }
         });
 

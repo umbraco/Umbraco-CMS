@@ -113,7 +113,8 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private IEnumerable<IContentType> RemoveInvalidByChildrenDocumentTypesFromAlternatives(IEnumerable<IContentType> documentTypes)
         {
-            var docTypeIdsOfChildren = _content.Children(Services.ContentService)
+            //fixme Should do proper paging here ... when this is refactored we will
+            var docTypeIdsOfChildren = Services.ContentService.GetPagedChildren(_content.Id, 0, int.MaxValue, out var total)
                 .Select(x => x.ContentType.Id)
                 .Distinct()
                 .ToList();

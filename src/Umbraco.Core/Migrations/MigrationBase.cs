@@ -62,42 +62,65 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Executes the migration.
+        /// </summary>
         public abstract void Migrate();
+
+        /// <inheritdoc />
+        void IMigration.Migrate()
+        {
+            Migrate();
+
+            // ensure there is no building expression
+            // ie we did not forget to .Do() an expression
+            if (Context.BuildingExpression)
+                throw new IncompleteMigrationExpressionException("The migration has run, but leaves an expression that has not run.");
+        }
+
+        // ensures we are not already building,
+        // ie we did not forget to .Do() an expression
+        private T BeginBuild<T>(T builder)
+        {
+            if (Context.BuildingExpression)
+                throw new IncompleteMigrationExpressionException("Cannot create a new expression: the previous expression has not run.");
+            Context.BuildingExpression = true;
+            return builder;
+        }
 
         /// <summary>
         /// Builds an Alter expression.
         /// </summary>
-        public IAlterBuilder Alter => new AlterBuilder(Context);
+        public IAlterBuilder Alter => BeginBuild(new AlterBuilder(Context));
 
         /// <summary>
         /// Builds a Create expression.
         /// </summary>
-        public ICreateBuilder Create => new CreateBuilder(Context);
+        public ICreateBuilder Create => BeginBuild(new CreateBuilder(Context));
 
         /// <summary>
         /// Builds a Delete expression.
         /// </summary>
-        public IDeleteBuilder Delete => new DeleteBuilder(Context);
+        public IDeleteBuilder Delete => BeginBuild(new DeleteBuilder(Context));
 
         /// <summary>
         /// Builds an Execute expression.
         /// </summary>
-        public IExecuteBuilder Execute => new ExecuteBuilder(Context);
+        public IExecuteBuilder Execute => BeginBuild(new ExecuteBuilder(Context));
 
         /// <summary>
         /// Builds an Insert expression.
         /// </summary>
-        public IInsertBuilder Insert => new InsertBuilder(Context);
+        public IInsertBuilder Insert => BeginBuild(new InsertBuilder(Context));
 
         /// <summary>
         /// Builds a Rename expression.
         /// </summary>
-        public IRenameBuilder Rename => new RenameBuilder(Context);
+        public IRenameBuilder Rename => BeginBuild(new RenameBuilder(Context));
 
         /// <summary>
         /// Builds an Update expression.
         /// </summary>
-        public IUpdateBuilder Update => new UpdateBuilder(Context);
+        public IUpdateBuilder Update => BeginBuild(new UpdateBuilder(Context));
     }
 }

@@ -29,6 +29,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.ContentApps;
@@ -51,7 +52,7 @@ using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
-using Umbraco.Web._Legacy.Actions;
+
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -135,7 +136,7 @@ namespace Umbraco.Web.Runtime
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             composition.Container.RegisterCollectionBuilder<ActionCollectionBuilder>()
-                .SetProducer(() => typeLoader.GetActions());
+                .Add(() => typeLoader.GetTypes<IAction>());
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(typeLoader.GetSurfaceControllers());
             composition.Container.RegisterInstance(surfaceControllerTypes);

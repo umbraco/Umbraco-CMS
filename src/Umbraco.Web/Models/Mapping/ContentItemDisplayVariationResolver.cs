@@ -52,6 +52,18 @@ namespace Umbraco.Web.Models.Mapping
                     variant.Name = source.GetCultureName(x.IsoCode);
                 }
 
+                //Put the default language first in the list & then sort rest by a-z
+                var defaultLang = variants.SingleOrDefault(x => x.Language.IsDefault);
+
+                //Remove the default lang from the list for now
+                variants.Remove(defaultLang);
+
+                //Sort the remaining languages a-z
+                variants = variants.OrderBy(x => x.Name).ToList();
+
+                //Insert the default lang as the first item
+                variants.Insert(0, defaultLang);
+
                 return variants;
             }
             return result;

@@ -148,14 +148,14 @@
     <key alias="delete">Content deleted</key>
     <key alias="unpublish">Content unpublished</key>
     <key alias="publish">Content saved and Published</key>
-    <key alias="publishvariant">Content cultures %0% saved and published</key>
+    <key alias="publishvariant">Content saved and published for languages: %0% </key>
     <key alias="save">Content saved</key>
-    <key alias="savevariant">Content cultures %0% saved</key>
+    <key alias="savevariant">Content saved for languages: %0%</key>
     <key alias="move">Content moved</key>
     <key alias="copy">Content copied</key>
     <key alias="rollback">Content rolled back</key>
     <key alias="sendtopublish">Content sent for publishing</key>
-    <key alias="sendtopublishvariant">Content cultures %0% sent for publishing</key>
+    <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
@@ -293,6 +293,11 @@
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
+        <key alias="moveFailed">Failed to move media</key>
+        <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
+        <key alias="copyFailed">Failed to copy media</key>
+        <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
+        <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -309,12 +314,14 @@
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
-        <key alias="newJavascriptFile">New JavaScript file</key>
+    <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
     <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
     <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
     <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
+    <key alias="newStyleSheetFile">New style sheet file</key>
+    <key alias="newRteStyleSheetFile">New Rich Text Editor style sheet file</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -330,6 +337,8 @@
     <key alias="discardChanges">Discard changes</key>
     <key alias="unsavedChanges">You have unsaved changes</key>
     <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="confirmListViewPublish">Publishing will make the selected items visible on the site.</key>
+    <key alias="confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</key>
     <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
   </area>
   <area alias="bulk">
@@ -638,7 +647,7 @@
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
     <key alias="search">Search</key>
-    <key alias="searchNoResult">Sorry, we cannot find what you are looking for</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
@@ -965,10 +974,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       Go to http://%4%/#/content/content/edit/%5% to edit.
 
+      %6%
+
       Have a nice day!
 
       Cheers from the Umbraco robot
     ]]></key>
+    <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
     <key alias="mailBodyHtml"><![CDATA[
         <html>
 			<head>
@@ -1024,9 +1036,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 														</table>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<h3>Update summary:</h3>
-															<table style="width: 100%;">
-																 %6%
-															</table>
+															%6%
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Have a nice day!<br /><br />
@@ -1047,6 +1057,9 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
 		</html>
 	]]></key>
+    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
+        %0%
+    ]]></key>
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
     <key alias="notifications">Notifications</key>
   </area>
@@ -1150,6 +1163,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
+    <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
+    <key alias="contentPublishedFailedIsTrashed"><![CDATA[
+      %0% could not be published because the item is in the recycle bin.
+    ]]></key>
     <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
     ]]></key>
@@ -1157,7 +1174,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% could not be published because the item has expired.
     ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
-      %0% could not be published because these properties:  %1%  did not pass validation rules.
+      %0% could not be published because some properties did not pass validation rules.
     ]]></key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% could not be published, a 3rd party add-in cancelled the action.
@@ -1197,8 +1214,6 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="imagecropper">
         <key alias="reset">Reset crop</key>
-    <key alias="defineCrop">Define crop</key>
-    <key alias="defineCropDescription">Give the crop an alias and its default width and height</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
         <key alias="updateEditCrop">Done</key>
@@ -1264,7 +1279,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
-    <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
@@ -1278,12 +1292,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="dataTypeSaved">Datatype saved</key>
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
-    <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and is visible on the website</key>
+    <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
     <key alias="editVariantPublishedText">%0% published and visible on the website</key>
+    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
+    <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
     <key alias="editVariantSavedText">%0% saved</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
@@ -1291,7 +1307,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editMediaSaved">Media saved</key>
     <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
-        <key alias="editMemberGroupSaved">Member group saved</key>
+    <key alias="editMemberGroupSaved">Member group saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
     <key alias="editStylesheetSaved">Stylesheet saved</key>
     <key alias="editTemplateSaved">Template saved</key>
@@ -1336,14 +1352,28 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
+    <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
+    <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not published</key>
+    <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
+    <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
+    <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
   </area>
   <area alias="stylesheet">
-    <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
+    <key alias="editorRules">Rich text editor styles</key>
+    <key alias="editorRulesHelp">Define the styles that should be available in the rich text editor for this stylesheet</key>
     <key alias="editstylesheet">Edit stylesheet</key>
     <key alias="editstylesheetproperty">Edit stylesheet property</key>
-    <key alias="nameHelp">Name to identify the style property in the rich text editor  </key>
-    <key alias="preview">Preview</key>
+    <key alias="nameHelp">The name displayed in the editor style selector</key>
+    <key alias="overlayTitleAddRule">Add style</key>
+    <key alias="overlayTitleEditRule">Edit style</key>
+    <key alias="selector">Selector</key>
+    <key alias="selectorHelp">Uses CSS syntax, e.g. "h1" or ".redHeader"</key>
     <key alias="styles">Styles</key>
+    <key alias="stylesHelp">The CSS that should be applied in the rich text editor, e.g. "color:red;"</key>
+    <key alias="tabCode">Code</key>
+    <key alias="tabRules">Rich Text Editor</key>
+    <key alias="preview">Preview</key>
+    <key alias="previewHelp">How the text will look like in the rich text editor.</key>
   </area>
   <area alias="template">
     <key alias="edittemplate">Edit template</key>

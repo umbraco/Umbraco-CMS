@@ -960,8 +960,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Reiniciar</key>
-    <key alias="defineCrop">Definir corte</key>
-    <key alias="defineCropDescription">Da al corte un alias y su anchura y altura por defecto</key>
     <key alias="saveCrop">Guardar corte</key>
     <key alias="addCrop">Añadir nuevo corte</key>
   </area>

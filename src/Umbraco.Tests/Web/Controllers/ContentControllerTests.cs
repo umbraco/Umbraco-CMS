@@ -22,7 +22,7 @@ using Umbraco.Web;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web._Legacy.Actions;
+
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.PropertyEditors;
@@ -30,6 +30,7 @@ using System;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Trees;
 using System.Globalization;
+using Umbraco.Web.Actions;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -53,10 +54,10 @@ namespace Umbraco.Tests.Web.Controllers
                 {
                     new EntityPermission(0, 123, new[]
                     {
-                        ActionBrowse.Instance.Letter.ToString(),
-                        ActionUpdate.Instance.Letter.ToString(),
-                        ActionPublish.Instance.Letter.ToString(),
-                        ActionNew.Instance.Letter.ToString()
+                        ActionBrowse.ActionLetter.ToString(),
+                        ActionUpdate.ActionLetter.ToString(),
+                        ActionPublish.ActionLetter.ToString(),
+                        ActionNew.ActionLetter.ToString()
                     }),
                 })));
 

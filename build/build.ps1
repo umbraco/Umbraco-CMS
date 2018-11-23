@@ -43,14 +43,6 @@
 
     $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
 
-    Write-Host "Update UmbracoVersion.cs"
-    $this.ReplaceFileText("$($this.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs", `
-      "(\d+)\.(\d+)\.(\d+)(.(\d+))?", `
-      "$release")
-    $this.ReplaceFileText("$($this.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs", `
-      "CurrentComment => `"(.+)`"", `
-      "CurrentComment => `"$($semver.PreRelease)`"")
-
     Write-Host "Update IIS Express port in csproj"
     $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
     $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
@@ -69,7 +61,7 @@
     $global:node_nodepath = $this.ClearEnvVar("NODEPATH")
     $global:node_npmcache = $this.ClearEnvVar("NPM_CONFIG_CACHE")
     $global:node_npmprefix = $this.ClearEnvVar("NPM_CONFIG_PREFIX")
-    
+
     # https://github.com/gruntjs/grunt-contrib-connect/issues/235
     $this.SetEnvVar("NODE_NO_HTTP2", "1")
   })
@@ -81,7 +73,7 @@
     $this.SetEnvVar("NODEPATH", $node_nodepath)
     $this.SetEnvVar("NPM_CONFIG_CACHE", $node_npmcache)
     $this.SetEnvVar("NPM_CONFIG_PREFIX", $node_npmprefix)
-    
+
     $ignore = $this.ClearEnvVar("NODE_NO_HTTP2")
   })
 
@@ -434,7 +426,7 @@
     Write-Host "Prepare Azure Gallery"
     $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
   })
-  
+
   $ubuild.DefineMethod("Build",
   {
     $error.Clear()

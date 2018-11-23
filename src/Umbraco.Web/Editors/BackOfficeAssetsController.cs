@@ -10,18 +10,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
     {
-        private readonly IFileSystem _jsFileSystem;
-
-        public BackOfficeAssetsController()
-        {
-            _jsFileSystem = new PhysicalFileSystem(SystemDirectories.JavaScriptLibrary);
-        }
+        private readonly IFileSystem _jsLibFileSystem = new PhysicalFileSystem(SystemDirectories.Umbraco + IOHelper.DirSepChar + "lib");
 
         [HttpGet]
         public IEnumerable<string> GetSupportedMomentLocales()
         {
             const string momentLocaleFolder = "moment";
-            var cultures = _jsFileSystem.GetFiles(momentLocaleFolder, "*.js").ToList();
+            var cultures = _jsLibFileSystem.GetFiles(momentLocaleFolder, "*.js").ToList();
             for (var i = 0; i < cultures.Count; i++)
             {
                 cultures[i] = cultures[i]

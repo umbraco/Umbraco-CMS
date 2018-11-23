@@ -392,21 +392,14 @@ namespace Umbraco.Core.Models
             return PropertyType.IsPropertyValueValid(value);
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Property) base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedEntity = (Property)clone;
 
             //need to manually assign since this is a readonly property
-            clone.PropertyType = (PropertyType) PropertyType.DeepClone();
-
-            //re-enable tracking
-            clone.ResetDirtyProperties(false); // not needed really, since we're not tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity.PropertyType = (PropertyType) PropertyType.DeepClone();
         }
     }
 }

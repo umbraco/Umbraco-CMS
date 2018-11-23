@@ -7,10 +7,11 @@ using NPoco;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
+
     public class DataTypeMigration : MigrationBase
     {
         public DataTypeMigration(IMigrationContext context)
@@ -79,10 +80,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                 Database.Update(dataType);
             }
-
-            // drop preValues table
-            // FIXME keep it around for now
-            //Delete.Table("cmsDataTypePreValues");
         }
 
         [TableName("cmsDataTypePreValues")]

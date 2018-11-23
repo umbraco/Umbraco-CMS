@@ -3,7 +3,7 @@
 angular.module('umbraco')
     .controller("Umbraco.PrevalueEditors.TreePickerController",
 
-    function ($scope, dialogService, entityResource, $log, iconHelper, editorService) {
+    function ($scope, entityResource, iconHelper, editorService) {
         $scope.renderModel = [];
         $scope.ids = [];
 

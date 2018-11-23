@@ -159,7 +159,7 @@ namespace Umbraco.Core.Models.Entities
             }
         }
 
-        public virtual object DeepClone()
+        public object DeepClone()
         {
             // memberwise-clone (ie shallow clone) the entity
             var unused = Key; // ensure that 'this' has a key, before cloning
@@ -169,20 +169,29 @@ namespace Umbraco.Core.Models.Entities
             clone.InstanceId = Guid.NewGuid();
 #endif
 
-            // clear changes (ensures the clone has its own dictionaries)
-            // then disable change tracking
-            clone.ResetDirtyProperties(false);
+            //disable change tracking while we deep clone IDeepCloneable properties
             clone.DisableChangeTracking();
 
             // deep clone ref properties that are IDeepCloneable
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
 
-            // clear changes again (just to be sure, because we were not tracking)
-            // then enable change tracking
+            PerformDeepClone(clone);
+
+            // clear changes (ensures the clone has its own dictionaries)
             clone.ResetDirtyProperties(false);
+
+            //re-enable change tracking
             clone.EnableChangeTracking();
 
             return clone;
+        }
+
+        /// <summary>
+        /// Used by inheritors to modify the DeepCloning logic
+        /// </summary>
+        /// <param name="clone"></param>
+        protected virtual void PerformDeepClone(object clone)
+        {
         }
     }
 }

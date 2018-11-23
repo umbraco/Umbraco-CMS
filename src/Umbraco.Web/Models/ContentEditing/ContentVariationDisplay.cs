@@ -62,6 +62,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
+        [DataMember(Name = "releaseDate")]
+        public DateTime? ReleaseDate { get; set; }
+
+        [DataMember(Name = "expireDate")]
+        public DateTime? ExpireDate { get; set; }
+
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>

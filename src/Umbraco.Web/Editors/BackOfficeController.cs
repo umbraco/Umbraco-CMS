@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -20,17 +19,13 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-
-using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
-using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
 
@@ -46,6 +41,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly ManifestParser _manifestParser;
         private readonly UmbracoFeatures _features;
+        private readonly IRuntimeState _runtimeState;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
@@ -53,17 +49,12 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        //public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features)
-        //{
-        //    _manifestParser = manifestParser;
-        //    _features = features;
-        //}
-
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;
+            _runtimeState = runtimeState;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -106,7 +97,7 @@ namespace Umbraco.Web.Editors
 
             if (parts.Length != 2)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -115,7 +106,7 @@ namespace Umbraco.Web.Editors
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -123,14 +114,14 @@ namespace Umbraco.Web.Editors
             int intId;
             if (int.TryParse(id, out intId) == false)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
             var identityUser = await UserManager.FindByIdAsync(intId);
             if (identityUser == null)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: " + id);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction("Default");
             }
 
@@ -138,7 +129,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
+                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
@@ -201,11 +192,8 @@ namespace Umbraco.Web.Editors
         {
             var initJs = new JsInitialization(_manifestParser);
             var initCss = new CssInitialization(_manifestParser);
-
-            //get the legacy ActionJs file references to append as well
-            var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
-
-            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
             var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
@@ -265,7 +253,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState, _features, GlobalSettings);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
@@ -397,7 +385,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -420,7 +408,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '" + loginInfo.Login.LoginProvider + "' have refused the login based on the OnExternalLogin method. Affected user id: '" + user.Id + "'");
+                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 
@@ -523,50 +511,7 @@ namespace Umbraco.Web.Editors
             }
             return true;
         }
-
-        internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
-        {
-            var blockList = new List<string>();
-            var urlList = new List<string>();
-            foreach (var jsFile in values)
-            {
-                var isJsPath = jsFile.DetectIsJavaScriptPath();
-                if (isJsPath.Success)
-
-                {
-                    urlList.Add(isJsPath.Result);
-                }
-                else
-                {
-                    blockList.Add(isJsPath.Result);
-                }
-            }
-
-            switch (type)
-            {
-                case LegacyJsActionType.JsBlock:
-                    return blockList;
-                case LegacyJsActionType.JsUrl:
-                    return urlList;
-            }
-
-            return blockList;
-        }
-
-        /// <summary>
-        /// Renders out all JavaScript references that have been declared in IActions
-        /// </summary>
-        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
-        {
-            return GetLegacyActionJsForActions(type, Action.GetJavaScriptFileReferences());
-        }
-
-        internal enum LegacyJsActionType
-        {
-            JsBlock,
-            JsUrl
-        }
-
+        
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

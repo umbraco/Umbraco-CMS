@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
@@ -28,10 +29,14 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IDictionary<string, string> GetAllCultures()
         {
-            return
-                CultureInfo.GetCultures(CultureTypes.AllCultures)
-                    .Where(x => !x.Name.IsNullOrWhiteSpace())
-                    .OrderBy(x => x.DisplayName).ToDictionary(x => x.Name, x => x.DisplayName);
+            // get cultures - new-ing instances to get proper display name,
+            // in the current culture, and not the cached one
+            // (see notes in Language class about culture info names)
+            return CultureInfo.GetCultures(CultureTypes.AllCultures)
+                .Where(x => !x.Name.IsNullOrWhiteSpace())
+                .Select(x => new CultureInfo(x.Name)) // important!
+                .OrderBy(x => x.DisplayName)
+                .ToDictionary(x => x.Name, x => x.DisplayName);
         }
 
         /// <summary>

@@ -133,8 +133,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (registered)
                 {
-                    var localContentDbPath = HostingEnvironment.MapPath("~/App_Data/NuCache.Content.db");
-                    var localMediaDbPath = HostingEnvironment.MapPath("~/App_Data/NuCache.Media.db");
+                    var localContentDbPath = IOHelper.MapPath("~/App_Data/NuCache.Content.db");
+                    var localMediaDbPath = IOHelper.MapPath("~/App_Data/NuCache.Media.db");
                     _localDbExists = System.IO.File.Exists(localContentDbPath) && System.IO.File.Exists(localMediaDbPath);
 
                     // if both local dbs exist then GetTree will open them, else new dbs will be created

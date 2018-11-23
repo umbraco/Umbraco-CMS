@@ -175,13 +175,17 @@ namespace Umbraco.Examine
             if (e.IndexItem.ValueSet.Values.TryGetValue("key", out var key) && e.IndexItem.ValueSet.Values.ContainsKey("__key") == false)
             {
                 //double __ prefix means it will be indexed as culture invariant
-                e.IndexItem.ValueSet.Values["__key"] = new List<object> { key };
+                e.IndexItem.ValueSet.Values["__key"] = key;
             }
 
             if (e.IndexItem.ValueSet.Values.TryGetValue("email", out var email) && e.IndexItem.ValueSet.Values.ContainsKey("_searchEmail") == false)
             {
-                //will be indexed as full text (the default anaylyzer)
-                e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { email?.ToString().Replace(".", " ").Replace("@", " ") };
+                if (email.Count > 0)
+                {
+                    //will be indexed as full text (the default anaylyzer)
+                    e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { email[0]?.ToString().Replace(".", " ").Replace("@", " ") };
+                }
+                
             }
         }
 

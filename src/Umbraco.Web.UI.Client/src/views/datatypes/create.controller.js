@@ -13,7 +13,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.currentNode;
     var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
@@ -41,7 +41,13 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
         $location.search('create', null);
         $location.path("/" + section + "/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
+
+    $scope.close = function() {
+        const showMenu = true;
+        navigationService.hideDialog(showMenu);
+    };
+    
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DataType.CreateController", DataTypeCreateController);

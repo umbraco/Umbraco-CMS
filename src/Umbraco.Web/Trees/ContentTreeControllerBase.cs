@@ -14,7 +14,10 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using System.Globalization;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
+
 
 namespace Umbraco.Web.Trees
 {
@@ -134,7 +137,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (HasPathAccess(id, queryStrings) == false)
                 {
-                    Logger.Warn<ContentTreeControllerBase>("User " + Security.CurrentUser.Username + " does not have access to node with id " + id);
+                    Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
                     return nodes;
                 }
 
@@ -206,11 +209,18 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
+                result = GetChildrenFromEntityService(entityId).ToArray();
             }
 
             return result;
         }
+
+        /// <summary>
+        /// Abstract method to fetch the entities from the entity service
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        internal abstract IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId);
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -230,7 +240,9 @@ namespace Umbraco.Web.Trees
         protected bool HasPathAccess(IUmbracoEntity entity, FormDataCollection queryStrings)
         {
             if (entity == null) return false;
-            return Security.CurrentUser.HasPathAccess(entity, Services.EntityService, RecycleBinId);
+            return RecycleBinId == Constants.System.RecycleBinContent
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
         }
 
         /// <summary>
@@ -347,8 +359,12 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
-                menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new MenuItem("emptyRecycleBin", Services.TextService)
+                {
+                    Icon = "trash",
+                    OpensDialog = true
+                });
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
 
@@ -381,13 +397,16 @@ namespace Umbraco.Web.Trees
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            var actions = global::Umbraco.Web._Legacy.Actions.Action.FromEntityPermission(permission)
+            //fixme: inject
+            var actions = Current.Actions.FromEntityPermission(permission)
                 .ToList();
+
+            var actionDelete = Current.Actions.GetAction<ActionDelete>();
 
             // A user is allowed to delete their own stuff
             var tryGetCurrentUserId = Security.GetUserId();
-            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(ActionDelete.Instance) == false)
-                actions.Add(ActionDelete.Instance);
+            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(actionDelete) == false)
+                actions.Add(actionDelete);
 
             return actions.Select(x => new MenuItem(x));
         }

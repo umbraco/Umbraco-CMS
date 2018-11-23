@@ -21,28 +21,15 @@ namespace Umbraco.Tests.PropertyEditors
     /// Tests for the base classes of ValueEditors and PreValueEditors that are used for Property Editors that edit
     /// multiple values such as the drop down list, check box list, color picker, etc....
     /// </summary>
+    /// <remarks>
+    /// Mostly this used to test the we'd store INT Ids in the Db but publish STRING values or sometimes the INT values
+    /// to cache. Now we always just deal with strings and we'll keep the tests that show that.
+    /// </remarks>
     [TestFixture]
     public class MultiValuePropertyEditorTests 
     {
-        //TODO: Test the other formatting methods for the drop down classes
-
         [Test]
-        public void DropDownMultipleValueEditor_With_Keys_Format_Data_For_Cache()
-        {
-            var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var editor = new PublishValuesMultipleValueEditor(true, Mock.Of<ILogger>(), new DataEditorAttribute("key", "nam", "view"));
-
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
-            var prop = new Property(1, new PropertyType(dataType));
-            prop.SetValue("1234,4567,8910");
-
-            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
-
-            Assert.AreEqual("1234,4567,8910", result);
-        }
-
-        [Test]
-        public void DropDownMultipleValueEditor_No_Keys_Format_Data_For_Cache()
+        public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
             var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()))
             {
@@ -61,7 +48,7 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
             var prop = new Property(1, new PropertyType(dataType));
-            prop.SetValue("1234,4567,8910");
+            prop.SetValue("Value 1,Value 2,Value 3");
 
             var valueEditor = dataType.Editor.GetValueEditor();
             ((DataValueEditor) valueEditor).Configuration = dataType.Configuration;
@@ -90,7 +77,7 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
             var prop = new Property(1, new PropertyType(dataType));
-            prop.SetValue("1234");
+            prop.SetValue("Value 2");
 
             var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
 

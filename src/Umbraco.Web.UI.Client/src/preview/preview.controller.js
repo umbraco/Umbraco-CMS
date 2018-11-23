@@ -5,7 +5,7 @@
 
 var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
 
-    .controller("previewController", function ($scope, $http, $window, $timeout, $location, dialogService) {
+    .controller("previewController", function ($scope, $window, $location) {
         
         //gets a real query string value
         function getParameterByName(name, url) {

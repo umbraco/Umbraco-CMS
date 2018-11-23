@@ -324,8 +324,6 @@
     <Content Include="Umbraco\Developer\RelationTypes\Images\Refresh.gif" />
     <Content Include="Umbraco\Developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
-    <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -344,7 +342,6 @@
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
-    <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
@@ -422,7 +419,6 @@
     </None>
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
-    <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
     <Content Include="Umbraco\Create\simple.ascx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
@@ -432,10 +428,6 @@
       <SubType>Form</SubType>
     </Content>
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\Webservices\ajax.js" />
-    <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
-    <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
-    <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
     <Content Include="Umbraco\Masterpages\default.Master" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>

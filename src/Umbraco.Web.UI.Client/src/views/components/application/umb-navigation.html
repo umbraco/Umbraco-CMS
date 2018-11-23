@@ -11,7 +11,7 @@
                     <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !page.languageSelectorIsOpen, 'icon-navigation-up': page.languageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>
                 </div>
                 <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
-                    <a class="umb-language-picker__dropdown-item" ng-class="{'umb-language-picker__dropdown-item--current': language.active}" ng-click="selectLanguage(language)" ng-repeat="language in languages" href="">{{language.name}}</a>
+                    <a class="umb-language-picker__dropdown-item" ng-class="{'umb-language-picker__dropdown-item--current': language.active, 'bold': language.isDefault}" ng-click="selectLanguage(language)" ng-repeat="language in languages" href="">{{language.name}}</a>
                 </div>
             </div>
 
@@ -27,7 +27,7 @@
         <div class="offset6" id="navOffset" style="z-index: 10">
 
             <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-show="showContextMenu" ng-animate="'slide'">
+            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-if="showContextMenu" ng-animate="'slide'">
                 <umb-context-menu
                     menu-dialog-title="{{menuDialogTitle}}"
                     current-section="{{currentSection}}"
@@ -36,15 +36,13 @@
                 </umb-context-menu>
             </div>
 
+            <umb-context-dialog
+                ng-if="showContextMenuDialog"
+                title="menuDialogTitle"
+                current-node="menuNode"
+                view="dialogTemplateUrl">
+            </umb-context-dialog>
 
-            <!-- Tree dialogs -->
-            <div id="dialog" class='umb-modalcolumn fill shadow' ng-show="showContextMenuDialog" ng-animate="'slide'">
-                <div class='umb-modalcolumn-header'>
-                    <h1>{{menuDialogTitle}}</h1>
-                </div>
-                <div class='umb-modalcolumn-body'>
-                </div>
-            </div>
         </div>
     </div>
 

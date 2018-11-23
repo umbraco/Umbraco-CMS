@@ -76,6 +76,7 @@ namespace Umbraco.Core.Models
         /// <para>Returns <c>false</c> for the invariant culture, in order to be consistent
         /// with <seealso cref="AvailableCultures"/>, even though the invariant culture is
         /// always available.</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
         /// </remarks>
         bool IsCultureAvailable(string culture);
 

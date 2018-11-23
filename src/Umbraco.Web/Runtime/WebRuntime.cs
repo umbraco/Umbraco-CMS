@@ -1,10 +1,10 @@
 ﻿using System.Web;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime
 {
@@ -14,6 +14,7 @@ namespace Umbraco.Web.Runtime
     /// <remarks>On top of CoreRuntime, handles all of the web-related runtime aspects of Umbraco.</remarks>
     public class WebRuntime : CoreRuntime
     {
+        private readonly UmbracoApplicationBase _umbracoApplication;
         private IProfiler _webProfiler;
 
         /// <summary>
@@ -21,8 +22,10 @@ namespace Umbraco.Web.Runtime
         /// </summary>
         /// <param name="umbracoApplication"></param>
         public WebRuntime(UmbracoApplicationBase umbracoApplication)
-            : base(umbracoApplication)
-        { }
+            : base()
+        {
+            _umbracoApplication = umbracoApplication;
+        }
 
         /// <inheritdoc/>
         public override void Boot(IContainer container)
@@ -50,6 +53,10 @@ namespace Umbraco.Web.Runtime
         /// <inheritdoc/>
         public override void Compose(IContainer container)
         {
+            // some components may want to initialize with the UmbracoApplicationBase
+            // well, they should not - we should not do this
+            // TODO remove this eventually.
+            container.RegisterInstance(_umbracoApplication);
             base.Compose(container);
 
             container.Register<UmbracoInjectedModule>();
