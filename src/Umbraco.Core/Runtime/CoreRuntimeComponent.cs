@@ -107,8 +107,6 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop factory
             composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
-
-            composition.Container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

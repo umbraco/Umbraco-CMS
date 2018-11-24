@@ -2,6 +2,7 @@
 using System.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.IO.MediaPathSchemes;
 
 namespace Umbraco.Core.Composing.Composers
 {
@@ -13,34 +14,45 @@ namespace Umbraco.Core.Composing.Composers
          *
          * Create a component and use it to modify the composition by adding something like:
          *
-         *   composition.Container.RegisterSingleton<IFileSystem>("media", factory => ...);
+         *   composition.Container.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
+         *       factory => new PhysicalFileSystem("~/somewhere"));
          *
-         * where the ... part returns the new underlying filesystem, as an IFileSystem.
+         * return whatever supporting filesystem you like.
          *
          *
          * HOW TO IMPLEMENT MY OWN FILESYSTEM
          * ----------------------------------
          *
-         * Declare your filesystem interface:
-         *
-         *   public interface IMyFileSystem : IFileSystem
-         *   { }
-         *
          * Create your filesystem class:
          *
-         *   [FileSystem("my")]
-         *   public class MyFileSystem : FileSystemWrapper, IFormsFileSystem
+         *   public class MyFileSystem : FileSystemWrapper
          *   {
-         *       public FormsFileSystem(IFileSystem innerFileSystem)
+         *       public MyFileSystem(IFileSystem innerFileSystem)
          *           : base(innerFileSystem)
          *       { }
          *   }
          *
-         *  Register both the underlying filesystem, and your filesystem, in a component:
+         * Note that the ctor parameter MUST be named innerFileSystem. fixme oh yea?
+         * The ctor can have more parameters that will be resolved by the container.
          *
-         *    composition.Container.RegisterSingleton<IFileSystem>("my", factory => ...);
-         *    composition.Container.RegisterSingleton<IMyFileSystem>(factory =>
-         *        factory.GetInstance<FileSystems>().GetFileSystem<MyFileSystem>();
+         * Register your filesystem, in a component:
+         *
+         *    composition.Container.RegisterFileSystem<MyFileSystem>(
+         *        factory => new PhysicalFileSystem("~/my"));
+         *
+         * And that's it, you can inject MyFileSystem wherever it's needed.
+         *
+         *
+         * You can also declare a filesystem interface:
+         *
+         *   public interface IMyFileSystem : IFileSystem
+         *   { }
+         *
+         * Make the class implement the interface, then
+         * register your filesystem, in a component:
+         *
+         *    composition.Container.RegisterFileSystem<IMyFileSystem, MyFileSystem>(
+         *        factory => new PhysicalFileSystem("~/my"));
          *
          * And that's it, you can inject IMyFileSystem wherever it's needed.
          *
@@ -53,14 +65,6 @@ namespace Umbraco.Core.Composing.Composers
          * compared to creating your own physical filesystem, ensures that your filesystem
          * would participate into such transactions.
          *
-         * Also note that in order for things to work correctly, all filesystems should
-         * be instantiated before shadowing - so if registering a new filesystem in a
-         * component, it's a good idea to initialize it. This would be enough (in the
-         * component):
-         *
-         *   public void Initialize(IMyFileSystem fs)
-         *   { }
-         *
          *
          */
 
@@ -70,34 +74,19 @@ namespace Umbraco.Core.Composing.Composers
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            //container.RegisterSingleton<FileSystems>();
             container.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(new { container} ));
 
             // register IFileSystems, which gives access too all filesystems
             container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
-            // register IMediaFileSystem with its actual, underlying filesystem factory
-            container.RegisterSingleton<IMediaFileSystem>(factory => factory.GetInstance<FileSystems>().GetFileSystem<MediaFileSystem>(MediaInnerFileSystemFactory));
+            // register the scheme for media paths
+            container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+
+            // register the IMediaFileSystem implementation with a supporting filesystem
+            container.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
+                factory => new PhysicalFileSystem("~/media"));
 
             return container;
-        }
-
-        private static IFileSystem MediaInnerFileSystemFactory()
-        {
-            // for the time being, we still use the FileSystemProvider config file
-            // but, detect if ppl are trying to use it to change the "provider"
-
-            var virtualRoot = "~/media";
-
-            var config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
-            var p = config?.Providers["media"];
-            if (p == null) return new PhysicalFileSystem(virtualRoot);
-
-            if (!string.IsNullOrWhiteSpace(p.Type) && p.Type != "Umbraco.Core.IO.PhysicalFileSystem, Umbraco.Core")
-                throw new InvalidOperationException("Setting a provider type in FileSystemProviders.config is not supported anymore, see FileSystemsComposer for help.");
-
-            virtualRoot = p?.Parameters["virtualRoot"]?.Value ?? "~/media";
-            return new PhysicalFileSystem(virtualRoot);
         }
     }
 }

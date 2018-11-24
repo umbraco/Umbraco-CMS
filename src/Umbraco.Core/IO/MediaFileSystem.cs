@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -17,23 +19,20 @@ namespace Umbraco.Core.IO
     /// </summary>
     public class MediaFileSystem : FileSystemWrapper, IMediaFileSystem
     {
+        private readonly IMediaPathScheme _mediaPathScheme;
+        private readonly IContentSection _contentConfig;
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
         /// </summary>
-        public MediaFileSystem(IFileSystem innerFileSystem)
+        public MediaFileSystem(IFileSystem innerFileSystem, IContentSection contentConfig, IMediaPathScheme mediaPathScheme, ILogger logger)
             : base(innerFileSystem)
         {
-            ContentConfig = Current.Container.GetInstance<IContentSection>();
-            Logger = Current.Container.GetInstance<ILogger>();
-            MediaPathScheme = Current.Container.GetInstance<IMediaPathScheme>();
-            MediaPathScheme.Initialize(this);
+            _contentConfig = contentConfig;
+            _mediaPathScheme = mediaPathScheme;
+            _logger = logger;
         }
-
-        private IMediaPathScheme MediaPathScheme { get; }
-
-        private IContentSection ContentConfig { get; }
-
-        private ILogger Logger { get; }
 
         /// <inheritoc />
         public void DeleteMediaFiles(IEnumerable<string> files)
@@ -51,13 +50,13 @@ namespace Umbraco.Core.IO
                     if (FileExists(file) == false) return;
                     DeleteFile(file);
 
-                    var directory = MediaPathScheme.GetDeleteDirectory(file);
+                    var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
                     if (!directory.IsNullOrWhiteSpace())
                         DeleteDirectory(directory, true);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<MediaFileSystem>(e, "Failed to delete media file '{File}'.", file);
+                    _logger.Error<MediaFileSystem>(e, "Failed to delete media file '{File}'.", file);
                 }
             });
         }
@@ -71,7 +70,7 @@ namespace Umbraco.Core.IO
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
 
-            return MediaPathScheme.GetFilePath(cuid, puid, filename);
+            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
 
         /// <inheritoc />
@@ -81,7 +80,7 @@ namespace Umbraco.Core.IO
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
 
-            return MediaPathScheme.GetFilePath(cuid, puid, filename, prevpath);
+            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }
 
         #endregion
@@ -124,6 +123,6 @@ namespace Umbraco.Core.IO
             return filepath;
         }
 
-        #endregion       
+        #endregion
     }
 }

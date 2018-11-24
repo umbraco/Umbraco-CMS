@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Composing
 {
@@ -167,6 +168,8 @@ namespace Umbraco.Core.Composing
             // more expensive to build and cache a dynamic method ctor than to simply invoke the ctor, as we do
             // here - this can be discussed
 
+            // TODO: we currently try the ctor with most parameters, but we could want to fall back to others
+
             var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
             if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
 
@@ -177,10 +180,50 @@ namespace Umbraco.Core.Composing
             {
                 // no! IsInstanceOfType is not ok here
                 // ReSharper disable once UseMethodIsInstanceOfType
+                // fixme so we just ignore the names?
                 var arg = args?.Values.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
                 ctorArgs[i++] = arg ?? container.GetInstance(parameter.ParameterType);
             }
             return ctor.Invoke(ctorArgs);
+        }
+
+        /// <summary>
+        /// Registers a filesystem.
+        /// </summary>
+        /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
+        /// <typeparam name="TImplementing">The implementing type.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
+        /// <returns>The container.</returns>
+        public static IContainer RegisterFileSystem<TFileSystem, TImplementing>(this IContainer container, Func<IContainer, IFileSystem> supportingFileSystemFactory)
+            where TImplementing : FileSystemWrapper, TFileSystem
+        {
+            container.RegisterSingleton<TFileSystem>(factory =>
+            {
+                var fileSystems = factory.GetInstance<FileSystems>();
+                return fileSystems.GetFileSystem<TImplementing>(supportingFileSystemFactory(factory));
+            });
+
+            return container;
+        }
+
+        /// <summary>
+        /// Registers a filesystem.
+        /// </summary>
+        /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
+        /// <returns>The container.</returns>
+        public static IContainer RegisterFileSystem<TFileSystem>(this IContainer container, Func<IContainer, IFileSystem> supportingFileSystemFactory)
+            where TFileSystem : FileSystemWrapper
+        {
+            container.RegisterSingleton(factory =>
+            {
+                var fileSystems = factory.GetInstance<FileSystems>();
+                return fileSystems.GetFileSystem<TFileSystem>(supportingFileSystemFactory(factory));
+            });
+
+            return container;
         }
     }
 }

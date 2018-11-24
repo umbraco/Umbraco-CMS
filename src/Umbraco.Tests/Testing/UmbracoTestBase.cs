@@ -295,7 +295,13 @@ namespace Umbraco.Tests.Testing
 
             // register filesystems
             Container.RegisterSingleton(factory => TestObjects.GetFileSystemsMock());
-            Container.RegisterSingleton<IMediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+
+            var logger = Mock.Of<ILogger>();
+            var scheme = Mock.Of<IMediaPathScheme>();
+            var config = Mock.Of<IContentSection>();
+
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            Container.RegisterSingleton<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
             Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();

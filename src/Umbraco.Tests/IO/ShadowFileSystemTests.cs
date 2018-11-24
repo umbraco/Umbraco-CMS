@@ -398,7 +398,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IContainer>();
             var fileSystems = new FileSystems(container, logger) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>(() => phy);
+            var fs = fileSystems.GetFileSystem<FS>(phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -491,7 +491,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IContainer>();
             var fileSystems = new FileSystems(container, logger) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>(() => phy);
+            var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -544,7 +544,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IContainer>();
             var fileSystems = new FileSystems(container, logger) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>(() => phy);
+            var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper)fs.InnerFileSystem;
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))

@@ -12,11 +12,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
         /// <inheritdoc />
-        public void Initialize(IFileSystem filesystem)
-        { }
-
-        /// <inheritdoc />
-        public string GetFilePath(Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
             // assumes that cuid and puid keys can be trusted - and that a single property type
             // for a single content cannot store two different files with the same name
@@ -25,7 +21,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(string filepath)
+        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath)
         {
             return Path.GetDirectoryName(filepath);
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
@@ -13,7 +12,7 @@ namespace Umbraco.Core.IO
         private readonly IContainer _container;
         private readonly ILogger _logger;
 
-        private readonly ConcurrentDictionary<string, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<string, Lazy<IFileSystem>>();
+        private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
         // wrappers for shadow support
         private ShadowWrapper _macroPartialFileSystem;
@@ -170,18 +169,17 @@ namespace Umbraco.Core.IO
         /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
         /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
         /// </remarks>
-        public TFileSystem GetFileSystem<TFileSystem>(Func<IFileSystem> innerFileSystemFactory)
+        public TFileSystem GetFileSystem<TFileSystem>(IFileSystem supporting)
             where TFileSystem : FileSystemWrapper
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
-            var name = typeof(TFileSystem).FullName;
-            if (name == null) throw new Exception("panic!");
-
-            return (TFileSystem) _filesystems.GetOrAdd(name, _ => new Lazy<IFileSystem>(() =>
+            return (TFileSystem) _filesystems.GetOrAdd(typeof(TFileSystem), _ => new Lazy<IFileSystem>(() =>
             {
-                var innerFileSystem = innerFileSystemFactory();
-                var shadowWrapper = CreateShadowWrapper(innerFileSystem, "typed/" + name);
+                var name = typeof(TFileSystem).FullName;
+                if (name == null) throw new Exception("panic!");
+
+                var shadowWrapper = CreateShadowWrapper(supporting, "typed/" + name);
                 return _container.CreateInstance<TFileSystem>(new { innerFileSystem = shadowWrapper });
             })).Value;
         }
@@ -194,19 +192,6 @@ namespace Umbraco.Core.IO
         // shadowing is thread-safe, but entering and exiting shadow mode is not, and there is only one
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
-        // shadow applies to well-known filesystems *only* - at the moment, any other filesystem that would
-        // be created directly (via ctor) or via GetFileSystem<T> is *not* shadowed.
-
-        // shadow must be enabled in an app event handler before anything else ie before any filesystem
-        // is actually created and used - after, it is too late - enabling shadow has a negligible perfs
-        // impact.
-        // NO! by the time an app event handler is instantiated it is already too late, see note in ctor.
-        //internal void EnableShadow()
-        //{
-        //    if (_mvcViewsFileSystem != null) // test one of the fs...
-        //        throw new InvalidOperationException("Cannot enable shadow once filesystems have been created.");
-        //    _shadowEnabled = true;
-        //}
 
         internal ICompletable Shadow(Guid id)
         {
