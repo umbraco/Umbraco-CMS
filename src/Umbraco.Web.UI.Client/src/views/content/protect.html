@@ -1,82 +1,151 @@
 <div ng-controller="Umbraco.Editors.Content.ProtectController as vm">
-    <div class="umb-dialog-body form-horizontal" ng-cloak>
-        <div class="umb-pane">
+    <form name="vm.protectForm" novalidate>
+        <div class="umb-dialog-body form-horizontal" ng-cloak>
+            <umb-pane>
 
-            <div ng-show="error">
-                <div class="alert alert-error">
-                    <div><strong>{{error.errorMsg}}</strong></div>
-                    <div>{{error.data.message}}</div>
-                </div>
-            </div>
-
-            <umb-load-indicator ng-show="vm.loading">
-            </umb-load-indicator>
-
-            <umb-pane ng-show="vm.step === 'type'">
-                <p class="abstract" ng-hide="success">
-                    <localize key="publicAccess_paHowWould">Choose how to restrict access to the page</localize> <strong>{{currentNode.name}}</strong>
-                </p>
-
-                <div class="pa-select-type">
-                    <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
-
-                    <label for="protectionTypeUser">
-                        <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
-                        <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password.</localize></p>
-                    </label>
+                <div ng-show="error">
+                    <div class="alert alert-error">
+                        <div><strong>{{error.errorMsg}}</strong></div>
+                        <div>{{error.data.message}}</div>
+                    </div>
                 </div>
 
-                <div class="pa-select-type">
-                    <input id="protectionTypeRole" type="radio" name="protectionType" value="role" ng-model="vm.type">
+                <umb-load-indicator ng-show="vm.loading">
+                </umb-load-indicator>
 
-                    <label for="protectionTypeRole">
-                        <h5 class="pa-access-header"><localize key="publicAccess_paAdvanced">Role based protection</localize></h5>
-                        <p><localize key="publicAccess_paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</localize></p>
-                    </label>
+                <div ng-show="!vm.step && !vm.loading">
+                    <p class="abstract" ng-hide="success">
+                        <localize key="publicAccess_paHowWould" tokens="[currentNode.name]">Choose how to restrict access to this page</localize>
+                    </p>
+
+                    <div class="pa-select-type">
+                        <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
+
+                        <label for="protectionTypeUser">
+                            <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
+                            <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password</localize></p>
+                        </label>
+                    </div>
+
+                    <div class="pa-select-type">
+                        <input id="protectionTypeRole" type="radio" name="protectionType" value="role" ng-model="vm.type">
+
+                        <label for="protectionTypeRole">
+                            <h5 class="pa-access-header"><localize key="publicAccess_paAdvanced">Role based protection</localize></h5>
+                            <p><localize key="publicAccess_paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups</localize></p>
+                        </label>
+                    </div>
                 </div>
+
+                <div ng-show="vm.step && !vm.loading && !vm.removing">
+                    <div ng-if="vm.step === 'user'">
+                        <p><localize key="publicAccess_paSetLogin" tokens="[currentNode.name]">Set the login and password for this page</localize></p>
+                        <umb-control-group label="@general_login">
+                            <input type="text" name="userName" ng-model="vm.userName" class="-full-width-input" required />
+                        </umb-control-group>
+                        <umb-control-group label="@general_password">
+                            <!-- TODO KJAC: get password regex from server -->
+                            <input type="password" name="password" ng-model="vm.password" class="-full-width-input" required pattern="^....$" />
+                        </umb-control-group>
+                    </div>
+
+                    <div ng-show="vm.step === 'role' && !vm.groups.length">
+                        <p><localize key="publicAccess_paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</localize></p>
+                    </div>
+
+                    <div ng-show="vm.step === 'role' && vm.groups.length">
+                        <p><localize key="publicAccess_paSelectRoles" tokens="[currentNode.name]">Pick the roles who have access to this page</localize></p>
+                        <umb-control-group ng-repeat="group in vm.groups | orderBy:'name'" label="{{group.name}}">
+                            <umb-toggle checked="group.selected"
+                                        on-click="vm.toggle(group, $event)"
+                                        hide-icons="true">
+                            </umb-toggle>
+                        </umb-control-group>
+                    </div>
+
+                    <div ng-show="vm.step === 'user' || vm.groups.length">
+                        <p><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
+                        <umb-control-group label="@publicAccess_paLoginPage" description="@publicAccess_paLoginPageHelp">
+                            <a href ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add" prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+                            <umb-node-preview ng-show="vm.loginPage"
+                                              icon="vm.loginPage.icon"
+                                              name="vm.loginPage.name"
+                                              allow-remove="true"
+                                              on-remove="vm.loginPage = null">
+                            </umb-node-preview>
+                        </umb-control-group>
+                        <umb-control-group label="@publicAccess_paErrorPage" description="@publicAccess_paErrorPageHelp">
+                            <a href ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add" prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+                            <umb-node-preview ng-show="vm.errorPage"
+                                              icon="vm.errorPage.icon"
+                                              name="vm.errorPage.name"
+                                              allow-remove="true"
+                                              on-remove="vm.errorPage = null">
+                            </umb-node-preview>
+                        </umb-control-group>
+                    </div>
+                </div>
+
+                <div ng-show="vm.removing">
+                    <p><localize key="publicAccess_paRemoveProtectionConfirm" tokens="[currentNode.name]">Are you sure you want to remove the protection from this page?</localize></p>
+                </div>
+
+                <!--<pre>{{vm | json}}</pre>-->
+
             </umb-pane>
-
-            <umb-pane ng-show="vm.step === 'user'">
-                TODO: user config
-            </umb-pane>
-
-            <umb-pane ng-show="vm.step === 'role' && !vm.groups.length">
-                <p><localize key="publicAccess_paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication.</localize></p>
-            </umb-pane>
-
-            <umb-pane ng-show="vm.step === 'role' && vm.groups.length">
-                TODO: role config
-            </umb-pane>
-
-            <!--<pre>{{vm | json}}</pre>-->
-
         </div>
-    </div>
 
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <umb-button
-            type="button"
-            button-style="link"
-            action="vm.close()"
-            label-key="general_close">
-        </umb-button>
+        <div class="umb-dialog-footer umb-btn-toolbar" ng-hide="vm.loading || vm.removing">
+            <umb-button type="button"
+                        button-style="link"
+                        action="vm.close()"
+                        label-key="general_close">
+            </umb-button>
 
-        <umb-button
-            ng-hide="vm.step !== 'type'"
-            type="button" 
-            action="vm.next()"
-            button-style="success"
-            label-key="general_next">
-        </umb-button>
+            <umb-button ng-hide="vm.step"
+                        type="button"
+                        action="vm.next()"
+                        button-style="success"
+                        label-key="general_next"
+                        disabled="vm.loading || !vm.type">
+            </umb-button>
 
-        <umb-button
-            ng-show="vm.step !== 'type'"
-            type="button" 
-            action="vm.save()"
-            state="vm.saveButtonState"
-            button-style="success"
-            label-key="buttons_save"
-            disabled="vm.buttonState === 'busy' || !TODO">
-        </umb-button>
-    </div>
+            <umb-button ng-show="vm.canRemove"
+                        type="button"
+                        action="vm.remove()"
+                        button-style="warning"
+                        label-key="publicAccess_paRemoveProtection"
+                        disabled="vm.loading">
+            </umb-button>
+
+            <umb-button ng-show="vm.step"
+                        type="button"
+                        action="vm.save()"
+                        state="vm.saveButtonState"
+                        button-style="success"
+                        label-key="buttons_save"
+                        disabled="vm.buttonState === 'busy' || !vm.isValid()">
+            </umb-button>
+        </div>
+
+        <div class="umb-dialog-footer umb-btn-toolbar" ng-show="vm.removing">
+            <umb-button type="button"
+                        button-style="link"
+                        action="vm.close()"
+                        label-key="buttons_confirmActionCancel">
+            </umb-button>
+
+            <umb-button type="button"
+                        action="vm.removeConfirm()"
+                        state="vm.saveButtonState"
+                        button-style="success"
+                        label-key="buttons_confirmActionConfirm"
+                        disabled="vm.buttonState === 'busy'">
+            </umb-button>
+        </div>
+    </form>
 </div>

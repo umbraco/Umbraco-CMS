@@ -940,6 +940,62 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to roll back content item with id " + contentId
             );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getPublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getPublicAccess(contentId)
+          *    .then(function(publicAccess) {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
+        getPublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to get public access for content item with id " + contentId
+            );
+        },
+
+        // TODO KJAC: ngdoc this
+        updatePublicAccess: function (contentId, userName, password, roles, loginPageId, errorPageId) {
+            var publicAccess = {
+                contentId: contentId,
+                loginPageId: loginPageId,
+                errorPageId: errorPageId
+            };
+            if (userName && password) {
+                publicAccess.userName = userName;
+                publicAccess.password = password;
+            }
+            else if (angular.isArray(roles) && roles.length) {
+                publicAccess.roles = roles;
+            }
+            else {
+                throw "must supply either userName/password or roles";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
+                ),
+                "Failed to update public access for content item with id " + contentId
+            );
         }
 
     };

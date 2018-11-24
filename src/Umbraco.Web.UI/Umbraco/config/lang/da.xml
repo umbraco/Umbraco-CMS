@@ -872,20 +872,22 @@ Mange hilsner fra Umbraco robotten
     <key alias="removeSpecialFormattering">Indsæt, men fjern formattering som ikke bør være på en webside (Anbefales)</key>
   </area>
   <area alias="publicAccess">
+    <!-- TODO KJAC: clean up unused translations -->
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
     <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
     <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
-    <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
-    <key alias="paIsProtected">%0% er nu beskyttet</key>
-    <key alias="paIsRemoved">Beskyttelse fjernet fra %0%</key>
+    <key alias="paHowWould"><![CDATA[Vælg hvordan siden <strong>%0%</strong> skal beskyttes]]></key>
+    <!--<key alias="paIsProtected">%0% er nu beskyttet</key>
+    <key alias="paIsRemoved">Beskyttelse fjernet fra %0%</key>-->
     <key alias="paLoginPage">Log ind-side</key>
     <key alias="paLoginPageHelp">Vælg siden der indeholder log ind-formularen</key>
-    <key alias="paRemoveProtection">Fjern beskyttelse</key>
+    <key alias="paRemoveProtection">Fjern beskyttelse...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Er du sikker på at du vil fjerne beskyttelsen fra siden <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Vælg siderne der indeholder log ind-formularer og fejlmeddelelser</key>
-    <key alias="paSelectRoles">Vælg de roller der har adgang til denne side</key>
-    <key alias="paSetLogin">Indstil login og kodeord for denne side</key>
+    <key alias="paSelectRoles"><![CDATA[Vælg de roller der har adgang til siden <strong>%0%</strong>]]></key>
+    <key alias="paSetLogin"><![CDATA[Indstil login og kodeord for siden <strong>%0%</strong>]]></key>
     <key alias="paSimple">Enkel brugerbeskyttelse</key>
     <key alias="paSimpleHelp">Hvis du blot ønsker at opsætte simpel beskyttelse ved hjælp af et enkelt login og kodeord</key>
   </area>
