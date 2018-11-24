@@ -12,9 +12,6 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class ContainerExtensions
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>> ArgumentPropertyGetters
-            = new ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>>();
-
         /// <summary>
         /// Gets an instance of a service.
         /// </summary>
@@ -55,34 +52,8 @@ namespace Umbraco.Core.Composing
         /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
         /// <para>The arguments are used as dependencies by the container.</para>
         /// </remarks>
-        public static T CreateInstance<T>(this IContainer container, IDictionary<string, object> args)
+        public static T CreateInstance<T>(this IContainer container, params object[] args)
             => (T) container.CreateInstance(typeof(T), args);
-
-        /// <summary>
-        /// Creates an instance with arguments.
-        /// </summary>
-        /// <typeparam name="T">The type of the instance.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="args">Arguments.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>
-        /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
-        /// <para>The arguments are used as dependencies by the container.</para>
-        /// </remarks>
-        public static T CreateInstance<T>(this IContainer container, object args)
-        {
-            var typeOfArgs = args.GetType();
-            var getters = ArgumentPropertyGetters.GetOrAdd(typeOfArgs, type =>
-                args.GetType()
-                    .GetProperties()
-                    .ToDictionary(x => x.Name, x => ReflectionUtilities.EmitMethodUnsafe<Func<object, object>>(x.GetMethod)));
-
-            var argsDictionary = new Dictionary<string, object>();
-            foreach (var (name, getter) in getters)
-                argsDictionary[name] = getter(args);
-
-            return (T) container.CreateInstance(typeof(T), argsDictionary);
-        }
 
         /// <summary>
         /// Registers a service with an implementation type.
@@ -140,7 +111,7 @@ namespace Umbraco.Core.Composing
 
             // register the builder
             // use a factory so we don't have to self-register the container
-            container.RegisterSingleton(factory => factory.CreateInstance<TBuilder>(new Dictionary<string, object> {{ "container", container }} ));
+            container.RegisterSingleton(factory => factory.CreateInstance<TBuilder>(container));
 
             // initialize and return the builder
             return container.GetInstance<TBuilder>();
@@ -158,7 +129,7 @@ namespace Umbraco.Core.Composing
         /// <para>The arguments are used as dependencies by the container. Other dependencies
         /// are retrieved from the container.</para>
         /// </remarks>
-        public static object CreateInstance(this IContainer container, Type type, IDictionary<string, object> args)
+        public static object CreateInstance(this IContainer container, Type type, params object[] args)
         {
             // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
             // including the most annoying one, which is that it does not work on singletons (hard to fix)
@@ -180,8 +151,7 @@ namespace Umbraco.Core.Composing
             {
                 // no! IsInstanceOfType is not ok here
                 // ReSharper disable once UseMethodIsInstanceOfType
-                // fixme so we just ignore the names?
-                var arg = args?.Values.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
+                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
                 ctorArgs[i++] = arg ?? container.GetInstance(parameter.ParameterType);
             }
             return ctor.Invoke(ctorArgs);

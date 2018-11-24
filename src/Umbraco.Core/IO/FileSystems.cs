@@ -180,7 +180,7 @@ namespace Umbraco.Core.IO
                 if (name == null) throw new Exception("panic!");
 
                 var shadowWrapper = CreateShadowWrapper(supporting, "typed/" + name);
-                return _container.CreateInstance<TFileSystem>(new { innerFileSystem = shadowWrapper });
+                return _container.CreateInstance<TFileSystem>(shadowWrapper);
             })).Value;
         }
 

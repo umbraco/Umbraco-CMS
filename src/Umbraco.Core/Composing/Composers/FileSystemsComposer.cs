@@ -32,7 +32,6 @@ namespace Umbraco.Core.Composing.Composers
          *       { }
          *   }
          *
-         * Note that the ctor parameter MUST be named innerFileSystem. fixme oh yea?
          * The ctor can have more parameters that will be resolved by the container.
          *
          * Register your filesystem, in a component:
@@ -74,7 +73,7 @@ namespace Umbraco.Core.Composing.Composers
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            container.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(new { container} ));
+            container.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(container));
 
             // register IFileSystems, which gives access too all filesystems
             container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
