@@ -64,7 +64,7 @@
                     </div>
 
                     <div ng-show="vm.step === 'user' || vm.groups.length">
-                        <p><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
+                        <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
                         <umb-control-group label="@publicAccess_paLoginPage" description="@publicAccess_paLoginPageHelp">
                             <a href ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add" prevent-default>
                                 <localize key="general_add">Add</localize>
