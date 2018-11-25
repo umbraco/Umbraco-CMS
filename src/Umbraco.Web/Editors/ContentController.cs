@@ -2246,9 +2246,9 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            Services.PublicAccessService.Save(entry);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Services.PublicAccessService.Save(entry).Success
+                ? Request.CreateResponse(HttpStatusCode.OK)
+                : Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
         // set up public access using username and password
@@ -2273,6 +2273,27 @@ namespace Umbraco.Web.Editors
             // TODO KJAC: implement
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
+        [HttpPost]
+        public HttpResponseMessage RemovePublicAccess(int contentId)
+        {
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            return Services.PublicAccessService.Delete(entry).Success
+                ? Request.CreateResponse(HttpStatusCode.OK)
+                : Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
     }
 }

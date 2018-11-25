@@ -879,8 +879,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould"><![CDATA[Vælg hvordan siden <strong>%0%</strong> skal beskyttes]]></key>
-    <!--<key alias="paIsProtected">%0% er nu beskyttet</key>
-    <key alias="paIsRemoved">Beskyttelse fjernet fra %0%</key>-->
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> er nu beskyttet]]></key>
+    <key alias="paIsRemoved"><![CDATA[Beskyttelse fjernet fra <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Log ind-side</key>
     <key alias="paLoginPageHelp">Vælg siden der indeholder log ind-formularen</key>
     <key alias="paRemoveProtection">Fjern beskyttelse...</key>

@@ -1131,8 +1131,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
     <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
-    <!--<key alias="paIsProtected">%0% is now protected</key>
-    <key alias="paIsRemoved">Protection removed from %0%</key>-->
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> is now protected]]></key>
+    <key alias="paIsRemoved"><![CDATA[Protection removed from <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Login Page</key>
     <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
     <key alias="paRemoveProtection">Remove protection...</key>

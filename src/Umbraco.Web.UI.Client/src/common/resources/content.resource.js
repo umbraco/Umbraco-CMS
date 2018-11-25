@@ -996,8 +996,38 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to update public access for content item with id " + contentId
             );
-        }
+        },
 
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#removePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Removes the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.removePublicAccess(contentId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @returns {Promise} resourcePromise object that's resolved once the public access has been removed
+          *
+          */
+        removePublicAccess: function (contentId) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "RemovePublicAccess", {
+                        contentId: contentId
+                    })
+                ),
+                "Failed to remove public access for content item with id " + contentId
+            );
+        }
     };
 }
 

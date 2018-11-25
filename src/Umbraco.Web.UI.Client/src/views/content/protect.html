@@ -1,12 +1,12 @@
 <div ng-controller="Umbraco.Editors.Content.ProtectController as vm">
     <form name="vm.protectForm" novalidate>
         <div class="umb-dialog-body form-horizontal" ng-cloak>
-            <umb-pane>
+            <umb-pane ng-hide="vm.success">
 
-                <div ng-show="error">
+                <div ng-show="vm.error">
                     <div class="alert alert-error">
-                        <div><strong>{{error.errorMsg}}</strong></div>
-                        <div>{{error.data.message}}</div>
+                        <div><strong>{{vm.error.errorMsg}}</strong></div>
+                        <div>{{vm.error.data.message}}</div>
                     </div>
                 </div>
 
@@ -97,16 +97,26 @@
                 <!--<pre>{{vm | json}}</pre>-->
 
             </umb-pane>
+
+            <umb-pane ng-show="vm.success">
+                <div class="alert alert-success" ng-bind-html="vm.success.message"></div>
+                <umb-button type="button"
+                            action="vm.close()"
+                            button-style="success"
+                            label-key="general_ok">
+                </umb-button>
+            </umb-pane>
         </div>
 
-        <div class="umb-dialog-footer umb-btn-toolbar" ng-hide="vm.loading || vm.removing">
-            <umb-button type="button"
+        <div class="umb-dialog-footer umb-btn-toolbar" ng-hide="vm.loading || vm.success">
+            <umb-button ng-hide="vm.removing"
+                        type="button"
                         button-style="link"
                         action="vm.close()"
                         label-key="general_close">
             </umb-button>
 
-            <umb-button ng-hide="vm.step"
+            <umb-button ng-hide="vm.step  || vm.removing"
                         type="button"
                         action="vm.next()"
                         button-style="success"
@@ -114,7 +124,7 @@
                         disabled="vm.loading || !vm.type">
             </umb-button>
 
-            <umb-button ng-show="vm.canRemove"
+            <umb-button ng-show="vm.canRemove && !vm.removing"
                         type="button"
                         action="vm.remove()"
                         button-style="warning"
@@ -122,7 +132,7 @@
                         disabled="vm.loading">
             </umb-button>
 
-            <umb-button ng-show="vm.step"
+            <umb-button ng-show="vm.step && !vm.removing"
                         type="button"
                         action="vm.save()"
                         state="vm.saveButtonState"
@@ -130,16 +140,16 @@
                         label-key="buttons_save"
                         disabled="vm.buttonState === 'busy' || !vm.isValid()">
             </umb-button>
-        </div>
 
-        <div class="umb-dialog-footer umb-btn-toolbar" ng-show="vm.removing">
-            <umb-button type="button"
+            <umb-button ng-show="vm.removing"
+                        type="button"
                         button-style="link"
                         action="vm.close()"
                         label-key="buttons_confirmActionCancel">
             </umb-button>
 
-            <umb-button type="button"
+            <umb-button ng-show="vm.removing"
+                        type="button"
                         action="vm.removeConfirm()"
                         state="vm.saveButtonState"
                         button-style="success"

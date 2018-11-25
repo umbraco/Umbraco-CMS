@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentProtectController($scope, $routeParams, contentResource, memberGroupResource, navigationService, editorService) {
+    function ContentProtectController($scope, $routeParams, contentResource, memberGroupResource, navigationService, localizationService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -90,7 +90,11 @@
             var roles = _.map(selectedGroups, function(group) { return group.name; });
             contentResource.updatePublicAccess(id, vm.userName, vm.password, roles, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
-                    vm.saveButtonState = "success";
+                    localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
+                        vm.success = {
+                            message: value
+                        };
+                    });
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
                 }, function (error) {
                     vm.error = error;
@@ -147,7 +151,19 @@
 
         function removeConfirm() {
             vm.saveButtonState = "busy";
-            // TODO KJAC: remove protection from the page
+            contentResource.removePublicAccess(id).then(
+                function () {
+                    localizationService.localize("publicAccess_paIsRemoved", [$scope.currentNode.name]).then(function(value) {
+                        vm.success = {
+                            message: value
+                        };
+                    });
+                    navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
+                }, function (error) {
+                    vm.error = error;
+                    vm.saveButtonState = "error";
+                }
+            );
         }
 
         onInit();
