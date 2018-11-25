@@ -25,11 +25,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
 	    });
 
-	    var node = $scope.currentNode;
+	    $scope.source = _.clone($scope.currentNode);
 
         function treeLoadedHandler(args) {
-            if (node && node.path) {
-                $scope.dialogTreeApi.syncTree({ path: node.path, activate: false });
+            if ($scope.source && $scope.source.path) {
+                $scope.dialogTreeApi.syncTree({ path: $scope.source.path, activate: false });
             }
         }
 
@@ -107,7 +107,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        $scope.busy = true;
 	        $scope.error = false;
 
-	        contentResource.copy({ parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relateToOriginal, recursive: $scope.recursive })
+	        contentResource.copy({ parentId: $scope.target.id, id: $scope.source.id, relateToOriginal: $scope.relateToOriginal, recursive: $scope.recursive })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
