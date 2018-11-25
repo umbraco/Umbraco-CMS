@@ -104,6 +104,8 @@
         }
 
         function close() {
+            // ensure that we haven't set a locked state on the dialog before closing it
+            navigationService.allowHideDialog(true);
             navigationService.hideDialog();
         }
 
