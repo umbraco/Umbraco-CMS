@@ -1146,19 +1146,20 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Role based protection</key>
-    <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups.</key>
+    <key alias="paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups</key>
     <key alias="paAdvancedNoGroups">You need to create a membergroup before you can use role-based authentication</key>
     <key alias="paErrorPage">Error Page</key>
     <key alias="paErrorPageHelp">Used when people are logged on, but do not have access</key>
-    <key alias="paHowWould">Choose how to restrict access to this page</key>
-    <key alias="paIsProtected">%0% is now protected</key>
-    <key alias="paIsRemoved">Protection removed from %0%</key>
+    <key alias="paHowWould"><![CDATA[Choose how to restrict access to the page <strong>%0%</strong>]]></key>
+    <key alias="paIsProtected"><![CDATA[<strong>%0%</strong> is now protected]]></key>
+    <key alias="paIsRemoved"><![CDATA[Protection removed from <strong>%0%</strong>]]></key>
     <key alias="paLoginPage">Login Page</key>
     <key alias="paLoginPageHelp">Choose the page that contains the login form</key>
-    <key alias="paRemoveProtection">Remove Protection</key>
+    <key alias="paRemoveProtection">Remove protection...</key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Are you sure you want to remove the protection from the page <strong>%0%</strong>?]]></key>
     <key alias="paSelectPages">Select the pages that contain login form and error messages</key>
-    <key alias="paSelectRoles">Pick the roles who have access to this page</key>
-    <key alias="paSetLogin">Set the login and password for this page</key>
+    <key alias="paSelectRoles"><![CDATA[Pick the roles who have access to the page <strong>%0%</strong>]]></key>
+    <key alias="paSetLogin"><![CDATA[Set the login and password for the page <strong>%0%</strong>]]></key>
     <key alias="paSimple">Single user protection</key>
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>

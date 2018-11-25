@@ -973,7 +973,31 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             );
         },
 
-        // TODO KJAC: ngdoc this
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#updatePublicAccess
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Sets or updates the public access protection for a content item
+          *
+          * ##usage
+          * <pre>
+          * contentResource.updatePublicAccess(contentId, userName, password, roles, loginPageId, errorPageId)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId The content Id
+          * @param {String} userName The name of the user that should have access (if using specific user protection)
+          * @param {String} password The password for the user that should have access (if using specific user protection)
+          * @param {Array} roles The roles that should have access (if using role based protection)
+          * @param {Int} loginPageId The Id of the login page
+          * @param {Int} errorPageId The Id of the error page
+          * @returns {Promise} resourcePromise object containing the public access protection
+          *
+          */
         updatePublicAccess: function (contentId, userName, password, roles, loginPageId, errorPageId) {
             var publicAccess = {
                 contentId: contentId,
