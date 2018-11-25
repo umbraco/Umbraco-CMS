@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentProtectController($scope, $routeParams, contentResource, memberGroupResource, navigationService, localizationService) {
+    function ContentProtectController($scope, $routeParams, contentResource, memberGroupResource, navigationService, localizationService, editorService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -112,37 +112,31 @@
         }
 
         function pickLoginPage() {
-            // TODO KJAC: temporary test values until we fix the content picker
-            if (!vm.loginPage) {
-                vm.loginPage = { id: 1092 };
-            }
-
-            //editorService.contentPicker({
-            //    submit: function(model) {
-            //        console.log("I picked", model)
-            //        editorService.close();
-            //    },
-            //    close: function () {
-            //        editorService.close();
-            //    }
-            //});
+            pickPage(vm.loginPage);
         }
 
         function pickErrorPage() {
-            // TODO KJAC: temporary test values until we fix the content picker
-            if (!vm.errorPage) {
-                vm.errorPage = { id: 1093 };
-            }
+            pickPage(vm.errorPage);
+        }
 
-            //editorService.contentPicker({
-            //    submit: function(model) {
-            //        console.log("I picked", model)
-            //        editorService.close();
-            //    },
-            //    close: function () {
-            //        editorService.close();
-            //    }
-            //});
+        function pickPage(page) {
+            navigationService.allowHideDialog(false);
+            editorService.contentPicker({
+                submit: function (model) {
+                    if (page === vm.loginPage) {
+                        vm.loginPage = model.selection[0];
+                    }
+                    else {
+                        vm.errorPage = model.selection[0];
+                    }
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                },
+                close: function () {
+                    editorService.close();
+                    navigationService.allowHideDialog(true);
+                }
+            });
         }
 
         function remove() {
@@ -167,7 +161,6 @@
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Content.ProtectController", ContentProtectController);
