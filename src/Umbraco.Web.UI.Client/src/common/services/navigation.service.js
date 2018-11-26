@@ -13,7 +13,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
+function navigationService($routeParams, $location, $q, $timeout, $injector, eventsService, umbModelMapper, treeService, appState) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -311,7 +311,6 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
          * @param {String} args.tree the tree alias to sync to
          * @param {Array} args.path the path to sync the tree to
          * @param {Boolean} args.forceReload optional, specifies whether to force reload the node data from the server even if it already exists in the tree currently
-         * @param {Boolean} args.activate optional, specifies whether to set the synced node to be the active node, this will default to true if not specified
          */
         syncTree: function (args) {
             if (!args) {
@@ -332,6 +331,8 @@ function navigationService($rootScope, $routeParams, $location, $q, $timeout, $i
         /**
             Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
             have to set an active tree and then sync, the new API does this in one method by using syncTree
+
+            TODO: Delete this if not required
         */
         _syncPath: function(path, forceReload) {
             return navReadyPromise.promise.then(function () {
