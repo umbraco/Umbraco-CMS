@@ -359,7 +359,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             return new CacheValues
             {
-                Values = searchResult.Fields,
+                Values = searchResult.Values,
                 FromExamine = true
             };
         }

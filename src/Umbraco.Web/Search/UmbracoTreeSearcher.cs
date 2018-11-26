@@ -278,14 +278,14 @@ namespace Umbraco.Web.Search
                 }
 
                 var searchResult = results.First(x => x.Id == m.Id.ToString());
-                if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
+                if (searchResult.Values.ContainsKey("email") && searchResult.Values["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Fields["email"];
+                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Values["email"];
                 }
-                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
+                if (searchResult.Values.ContainsKey("__key") && searchResult.Values["__key"] != null)
                 {
                     Guid key;
-                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
+                    if (Guid.TryParse(searchResult.Values["__key"], out key))
                     {
                         m.Key = key;
                     }

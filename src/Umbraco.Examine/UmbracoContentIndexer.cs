@@ -31,8 +31,8 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndexer : UmbracoExamineIndexer
     {
-        protected IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
-        protected IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
+        public IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
+        public IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected ILocalizationService LanguageService { get; }

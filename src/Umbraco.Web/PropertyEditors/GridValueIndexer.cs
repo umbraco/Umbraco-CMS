@@ -10,6 +10,7 @@ using Umbraco.Examine;
 namespace Umbraco.Web.PropertyEditors
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Umbraco.Core.Models;
 
     /// <summary>
@@ -19,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
         {
-            var result = new Dictionary<string, object[]>();
+            var result = new List<KeyValuePair<string, object[]>>();
 
             var val = property.GetValue(culture, segment);
 
@@ -28,44 +29,40 @@ namespace Umbraco.Web.PropertyEditors
             {
                 try
                 {
-                    //TODO: We should deserialize this to Umbraco.Core.Models.GridValue instead of doing the below
-                    var json = JsonConvert.DeserializeObject<JObject>(rawVal);
+                    var gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
 
-                    //check if this is formatted for grid json
-                    if (json.HasValues && json.TryGetValue("name", out _) && json.TryGetValue("sections", out _))
+                    //get all values and put them into a single field (using JsonPath)
+                    var sb = new StringBuilder();
+                    foreach (var row in gridVal.Sections.SelectMany(x => x.Rows))
                     {
-                        //get all values and put them into a single field (using JsonPath)
-                        var sb = new StringBuilder();
-                        foreach (var row in json.SelectTokens("$.sections[*].rows[*]"))
+                        var rowName = row.Name;
+
+                        foreach (var control in row.Areas.SelectMany(x => x.Controls))
                         {
-                            var rowName = row["name"].Value<string>();
-                            var areaVals = row.SelectTokens("$.areas[*].controls[*].value");
+                            var controlVal = control.Value;
 
-                            foreach (var areaVal in areaVals)
+                            //TODO: If it's not a string, then it's a json formatted value -
+                            // we cannot really index this in a smart way since it could be 'anything'
+                            if (controlVal.Type == JTokenType.String)
                             {
-                                //TODO: If it's not a string, then it's a json formatted value -
-                                // we cannot really index this in a smart way since it could be 'anything'
-                                if (areaVal.Type == JTokenType.String)
-                                {
-                                    var str = areaVal.Value<string>();
-                                    str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
-                                    sb.Append(str);
-                                    sb.Append(" ");
+                                var str = controlVal.Value<string>();
+                                str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
+                                sb.Append(str);
+                                sb.Append(" ");
 
-                                    //add the row name as an individual field
-                                    result.Add($"{property.Alias}.{rowName}", new[] { str });
-                                }
+                                //add the row name as an individual field
+                                result.Add(new KeyValuePair<string, object[]>($"{property.Alias}.{rowName}", new[] { str }));
                             }
                         }
+                    }
 
-                        if (sb.Length > 0)
-                        {
-                            //First save the raw value to a raw field
-                            result.Add($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { rawVal });
+                    if (sb.Length > 0)
+                    {
+                        //First save the raw value to a raw field
+                        result.Add(new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
-                            //index the property with the combined/cleaned value
-                            result.Add(property.Alias, new[] { sb.ToString() });
-                        }
+                        //index the property with the combined/cleaned value
+                        result.Add(new KeyValuePair<string, object[]>(property.Alias, new[] { sb.ToString() }));
                     }
                 }
                 catch (InvalidCastException)

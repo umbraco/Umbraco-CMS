@@ -87,7 +87,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var currentSort = 0;
             foreach (var searchResult in results)
             {
-                var sort = int.Parse(searchResult.Fields["sortOrder"]);
+                var sort = int.Parse(searchResult.Values["sortOrder"]);
                 if (currentSort >= sort)
                 {
                     return false;

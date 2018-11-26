@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -16,7 +17,7 @@ namespace Umbraco.Examine
 
         protected void AddPropertyValue(Property property, string culture, string segment, IDictionary<string, object[]> values)
         {
-            var editor = _propertyEditors[property.Alias];
+            var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
 
             var indexVals = editor.ValueIndexer.GetIndexValues(property, culture, segment);
@@ -34,11 +35,24 @@ namespace Umbraco.Examine
                         case null:
                             continue;
                         case string strVal:
-                            if (strVal.IsNullOrWhiteSpace()) return;
-                            values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                            {
+                                if (strVal.IsNullOrWhiteSpace()) return;
+                                var key = $"{keyVal.Key}{cultureSuffix}";
+                                if (values.TryGetValue(key, out var v))
+                                    values[key] = new List<object>(v) { val }.ToArray();
+                                else
+                                    values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                            }
                             break;
                         default:
-                            values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                            {
+                                var key = $"{keyVal.Key}{cultureSuffix}";
+                                if (values.TryGetValue(key, out var v))
+                                    values[key] = new List<object>(v) { val }.ToArray();
+                                else
+                                    values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                            }
+                            
                             break;
                     }
                 }

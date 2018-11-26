@@ -10,6 +10,11 @@ using Umbraco.Tests.Testing;
 using Umbraco.Examine;
 using Umbraco.Core.PropertyEditors;
 using LightInject;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -21,6 +26,98 @@ namespace Umbraco.Tests.UmbracoExamine
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
     {
+
+        [Test]
+        public void Index_Property_Data_With_Value_Indexer()
+        {
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(
+                ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (indexer.ProcessNonAsync())
+            {
+                indexer.EnsureIndex(true);
+
+                var contentType = MockedContentTypes.CreateBasicContentType();
+                contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext)
+                {
+                    Alias = "grid",
+                    Name = "Grid",
+                    PropertyEditorAlias = Core.Constants.PropertyEditors.Aliases.Grid
+                });
+                var content = MockedContent.CreateBasicContent(contentType);
+                content.Id = 555;
+                content.Path = "-1,555";
+                var gridVal = new GridValue
+                {
+                    Name = "n1",
+                    Sections = new List<GridValue.GridSection>
+                    {
+                        new GridValue.GridSection
+                        {
+                            Grid = "g1",
+                            Rows = new List<GridValue.GridRow>
+                            {
+                                new GridValue.GridRow
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Name = "row1",
+                                    Areas = new List<GridValue.GridArea>
+                                    {
+                                        new GridValue.GridArea
+                                        {
+                                            Grid = "g2",
+                                            Controls = new List<GridValue.GridControl>
+                                            {
+                                                new GridValue.GridControl
+                                                {
+                                                    Editor = new GridValue.GridEditor
+                                                    {
+                                                        Alias = "editor1",
+                                                        View = "view1"
+                                                    },
+                                                    Value = "value1"
+                                                },
+                                                new GridValue.GridControl
+                                                {
+                                                    Editor = new GridValue.GridEditor
+                                                    {
+                                                        Alias = "editor1",
+                                                        View = "view1"
+                                                    },
+                                                    Value = "value2"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                var json = JsonConvert.SerializeObject(gridVal);
+                content.Properties["grid"].SetValue(json);
+
+
+                var valueSet = indexer.ContentValueSetBuilder.GetValueSets(content);
+                indexer.IndexItems(valueSet);
+
+                var searcher = indexer.GetSearcher();
+
+                var results = searcher.Search(searcher.CreateCriteria().Id(555).Compile());
+                Assert.AreEqual(1, results.TotalItemCount);
+
+                var result = results.First();
+                Assert.IsTrue(result.Values.ContainsKey("grid.row1"));
+                Assert.AreEqual("value1", result.AllValues["grid.row1"][0]);
+                Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
+                Assert.IsTrue(result.Values.ContainsKey("grid"));
+                Assert.AreEqual("value1 value2 ", result["grid"]);
+                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineIndexer.RawFieldPrefix}grid"));
+                Assert.AreEqual(json, result[$"{UmbracoExamineIndexer.RawFieldPrefix}grid"]);
+            }
+        }
 
         [Test]
         public void Rebuild_Index()
@@ -98,7 +195,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
                 //ensure it's indexed
-                indexer.IndexItems(new []{ node.ConvertToValueSet(IndexTypes.Media) });
+                indexer.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
                 //it will not exist because it exists under 2222
                 var results = searcher.Search(searcher.CreateCriteria().Id(2112).Compile());
@@ -140,7 +237,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
                 //ensure it's indexed
-                indexer1.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
+                indexer1.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
 
 

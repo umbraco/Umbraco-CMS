@@ -39,8 +39,11 @@ namespace Umbraco.Examine
             }
 
             //must have a 'path'
-            if (valueSet.Values.ContainsKey(PathKey) == false) return false;
-            var path = valueSet.Values[PathKey]?[0].ToString() ?? string.Empty;
+            if (!valueSet.Values.TryGetValue(PathKey, out var pathValues)) return false;
+            if (pathValues.Count == 0) return false;
+            if (pathValues[0] == null) return false;
+            if (pathValues[0].ToString().IsNullOrWhiteSpace()) return false;
+            var path = pathValues[0].ToString();
 
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
