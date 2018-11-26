@@ -38,22 +38,6 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// Gets the default ISqlSyntaxProvider objects.
-        /// </summary>
-        /// <param name="logger">A logger.</param>
-        /// <param name="lazyScopeProvider">A (lazy) scope provider.</param>
-        /// <returns>The default ISqlSyntaxProvider objects.</returns>
-        public IEnumerable<ISqlSyntaxProvider> GetDefaultSqlSyntaxProviders(ILogger logger, Lazy<IScopeProvider> lazyScopeProvider = null)
-        {
-            return new ISqlSyntaxProvider[]
-            {
-                new MySqlSyntaxProvider(logger),
-                new SqlCeSyntaxProvider(),
-                new SqlServerSyntaxProvider(lazyScopeProvider ?? new Lazy<IScopeProvider>(() => null))
-            };
-        }
-
-        /// <summary>
         /// Gets an UmbracoDatabase.
         /// </summary>
         /// <param name="logger">A logger.</param>
@@ -77,7 +61,7 @@ namespace Umbraco.Tests.TestHelpers
         /// that can begin a transaction.</remarks>
         public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
         {
-            var syntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)); // do NOT try to get the server's version!
+            var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase(connection, sqlContext, logger);
@@ -241,7 +225,7 @@ namespace Umbraco.Tests.TestHelpers
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Container.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, GetDefaultSqlSyntaxProviders(logger), logger, mappers);
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }
 
             fileSystems = fileSystems ?? new FileSystems(Current.Container, logger);

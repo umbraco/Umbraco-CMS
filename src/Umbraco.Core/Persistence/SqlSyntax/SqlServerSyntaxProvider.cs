@@ -11,29 +11,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server.
     /// </summary>
-    [SqlSyntaxProvider(Constants.DbProviderNames.SqlServer)]
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        // IUmbracoDatabaseFactory to be lazily injected
-        public SqlServerSyntaxProvider(Lazy<IScopeProvider> lazyScopeProvider)
-        {
-            _serverVersion = new Lazy<ServerVersionInfo>(() =>
-            {
-                var scopeProvider = lazyScopeProvider.Value;
-                if (scopeProvider == null)
-                    throw new InvalidOperationException("Failed to determine Sql Server version (no scope provider).");
-                using (var scope = scopeProvider.CreateScope())
-                {
-                    var version = DetermineVersion(scope.Database);
-                    scope.Complete();
-                    return version;
-                }
-            });
-        }
-
-        private readonly Lazy<ServerVersionInfo> _serverVersion;
-
-        internal ServerVersionInfo ServerVersion => _serverVersion.Value;
+        internal ServerVersionInfo ServerVersion { get; private set; }
 
         internal enum VersionName
         {
@@ -62,19 +42,31 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         internal class ServerVersionInfo
         {
-            public string Edition { get; set; }
-            public string InstanceName { get; set; }
-            public string ProductVersion { get; set; }
-            public VersionName ProductVersionName { get; private set; }
-            public EngineEdition EngineEdition { get; set; }
-            public bool IsAzure => EngineEdition == EngineEdition.Azure;
-            public string MachineName { get; set; }
-            public string ProductLevel { get; set; }
-
-            public void Initialize()
+            public ServerVersionInfo()
             {
-                ProductVersionName = MapProductVersion(ProductVersion);
+                ProductVersionName = VersionName.Unknown;
+                EngineEdition = EngineEdition.Unknown;
             }
+
+            public ServerVersionInfo(string edition, string instanceName, string productVersion, EngineEdition engineEdition, string machineName, string productLevel)
+            {
+                Edition = edition;
+                InstanceName = instanceName;
+                ProductVersion = productVersion;
+                ProductVersionName = MapProductVersion(ProductVersion);
+                EngineEdition = engineEdition;
+                MachineName = machineName;
+                ProductLevel = productLevel;
+            }
+
+            public string Edition { get; }
+            public string InstanceName { get; }
+            public string ProductVersion { get; }
+            public VersionName ProductVersionName { get; }
+            public EngineEdition EngineEdition { get; }
+            public bool IsAzure => EngineEdition == EngineEdition.Azure;
+            public string MachineName { get; }
+            public string ProductLevel { get; }
         }
 
         private static VersionName MapProductVersion(string productVersion)
@@ -105,8 +97,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        private static ServerVersionInfo DetermineVersion(IUmbracoDatabase database)
+        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName)
         {
+            var factory = DbProviderFactories.GetFactory(providerName);
+            var connection = factory.CreateConnection();
+
+            if (connection == null)
+                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
+
             // Edition: "Express Edition", "Windows Azure SQL Database..."
             // EngineEdition: 1/Desktop 2/Standard 3/Enterprise 4/Express 5/Azure
             // ProductLevel: RTM, SPx, CTP...
@@ -123,44 +121,28 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     SERVERPROPERTY('ResourceLastUpdateDateTime') ResourceLastUpdateDateTime,
     SERVERPROPERTY('ProductLevel') ProductLevel;";
 
-            try
-            {
-                var version = database.Fetch<ServerVersionInfo>(sql).First();
-                version.Initialize();
-                return version;
-            }
-            catch (Exception e)
-            {
-                // can't ignore, really
-                throw new Exception("Failed to determine Sql Server version (see inner exception).", e);
-            }
-        }
-
-        internal static VersionName GetVersionName(string connectionString, string providerName)
-        {
-            var factory = DbProviderFactories.GetFactory(providerName);
-            var connection = factory.CreateConnection();
-
-            if (connection == null)
-                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
-
             connection.ConnectionString = connectionString;
+            ServerVersionInfo version;
             using (connection)
             {
                 try
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT SERVERPROPERTY('ProductVersion');";
-                    var productVersion = command.ExecuteScalar().ToString();
+                    command.CommandText = sql;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        version = new ServerVersionInfo(reader.GetString(0), reader.GetString(2), reader.GetString(3), (EngineEdition) reader.GetInt32(5), reader.GetString(7), reader.GetString(9));
+                    }
                     connection.Close();
-                    return MapProductVersion(productVersion);
                 }
                 catch
                 {
-                    return VersionName.Unknown;
+                    version = new ServerVersionInfo(); // all unknown
                 }
             }
+
+            return ServerVersion = version;
         }
 
         /// <summary>

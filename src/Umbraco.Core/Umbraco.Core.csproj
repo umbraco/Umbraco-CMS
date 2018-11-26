@@ -155,7 +155,7 @@
     <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
     <Compile Include="Collections\TypeList.cs" />
-    <Compile Include="Components\BootLoader.cs" />
+    <Compile Include="Components\Components.cs" />
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
     <Compile Include="Components\DisableComponentAttribute.cs" />
@@ -335,6 +335,7 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\IProfilingLogger.cs" />
     <Compile Include="Logging\LogHttpRequest.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
@@ -1222,7 +1223,6 @@
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="Persistence\SqlTemplate.cs" />

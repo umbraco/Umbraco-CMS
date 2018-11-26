@@ -47,7 +47,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<ManifestParser>();
 
             // register our predefined validators
-            composition.Container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
+            composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
                 .Add<RequiredValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedValueValidator>()
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Runtime
                 .Add<DecimalValidator>();
 
             // properties and parameters derive from data editors
-            composition.Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>()
+            composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetDataEditors());
             composition.Container.RegisterSingleton<PropertyEditorCollection>();
             composition.Container.RegisterSingleton<ParameterEditorCollection>();
@@ -83,13 +83,13 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
-            composition.Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetCacheRefreshers());
 
-            composition.Container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
 
-            composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
             composition.Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
@@ -97,10 +97,10 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
-            composition.Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
+            composition.GetCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
 
             composition.Container.RegisterSingleton<IMigrationBuilder>(factory => new MigrationBuilder(composition.Container));

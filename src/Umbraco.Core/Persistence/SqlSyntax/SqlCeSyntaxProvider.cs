@@ -4,14 +4,12 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    [SqlSyntaxProvider(Constants.DbProviderNames.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)

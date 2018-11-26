@@ -16,25 +16,12 @@ namespace Umbraco.Core.Composing
     {
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();
-        private Func<IEnumerable<TItem>, TCollection> _collectionCtor;
         private Type[] _registeredTypes;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionBuilderBase{TBuilder, TCollection,TItem}"/>
-        /// class with a service container.
-        /// </summary>
-        /// <param name="container">A container.</param>
-        protected CollectionBuilderBase(IContainer container)
-        {
-            Container = container;
-            // ReSharper disable once DoNotCallOverridableMethodsInConstructor
-            Initialize();
-        }
 
         /// <summary>
         /// Gets the container.
         /// </summary>
-        protected IContainer Container { get; }
+        protected IContainer Container { get; private set; }
 
         /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).
@@ -44,17 +31,13 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the builder.
         /// </summary>
-        /// <remarks>This is called by the constructor and, by default, registers the
-        /// collection automatically.</remarks>
-        protected virtual void Initialize()
+        /// <remarks>By default, this registers the collection automatically.</remarks>
+        public virtual void Initialize(IContainer container)
         {
-            // compile the auto-collection constructor
-            // can be null, if no ctor found, and then assume CreateCollection has been overriden
-            _collectionCtor = ReflectionUtilities.EmitConstructor<Func<IEnumerable<TItem>, TCollection>>(mustExist: false);
+            if (Container != null)
+                throw new InvalidOperationException("This builder has already been initialized.");
 
-            // we just don't want to support re-registering collections here
-            if (Container.GetRegistered<TCollection>().Any())
-                throw new InvalidOperationException("Collection builders cannot be registered once the collection itself has been registered.");
+            Container = container;
 
             // register the collection
             Container.Register(_ => CreateCollection(), CollectionLifetime);
@@ -131,8 +114,7 @@ namespace Umbraco.Core.Composing
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
         public virtual TCollection CreateCollection()
         {
-            if (_collectionCtor == null) throw new InvalidOperationException("Collection auto-creation is not possible.");
-            return _collectionCtor(CreateItems());
+            return Container.CreateInstance<TCollection>(CreateItems());
         }
 
         protected Type EnsureType(Type type, string action)

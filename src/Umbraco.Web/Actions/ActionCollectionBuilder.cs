@@ -7,10 +7,6 @@ namespace Umbraco.Web.Actions
 {
     internal class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>
     {
-        public ActionCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override ActionCollectionBuilder This => this;
 
         protected override IEnumerable<IAction> CreateItems()

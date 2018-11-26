@@ -3,6 +3,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -33,6 +34,7 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
@@ -44,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers
                 false);
             container.RegisterInstance(pluginManager);
 
-            container.RegisterCollectionBuilder<MapperCollectionBuilder>()
+            composition.GetCollectionBuilder<MapperCollectionBuilder>()
                 .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
             Mappers = container.GetInstance<IMapperCollection>();
 

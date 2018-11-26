@@ -27,10 +27,8 @@ namespace Umbraco.Tests.Components
 
             var mock = new Mock<IContainer>();
 
-            var testObjects = new TestObjects(null);
             var logger = Mock.Of<ILogger>();
-            var s = testObjects.GetDefaultSqlSyntaxProviders(logger);
-            var f = new UmbracoDatabaseFactory(s, logger, new MapperCollection(Enumerable.Empty<BaseMapper>()));
+            var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             var fs = new FileSystems(mock.Object, logger);
             var p = new ScopeProvider(f, fs, logger);
 
@@ -47,13 +45,15 @@ namespace Umbraco.Tests.Components
         public void Boot1A()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Component1, Component2, Component3, Component4>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - goes away with RuntimeLevel.Unknown
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Unknown);
+            components.Compose();
             AssertTypeArray(TypeArray<Component1, Component4, Component2>(), Composed);
         }
 
@@ -61,13 +61,15 @@ namespace Umbraco.Tests.Components
         public void Boot1B()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Component1, Component2, Component3, Component4>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - stays with RuntimeLevel.Run
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Run);
+            components.Compose();
             AssertTypeArray(TypeArray<Component1, Component4, Component2, Component3>(), Composed);
         }
 
@@ -75,12 +77,14 @@ namespace Umbraco.Tests.Components
         public void Boot2()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Component20, Component21>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 21 is required by 20
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component20, Component21>(), RuntimeLevel.Unknown);
+            components.Compose();
             AssertTypeArray(TypeArray<Component21, Component20>(), Composed);
         }
 
@@ -88,14 +92,16 @@ namespace Umbraco.Tests.Components
         public void Boot3()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var loader = new BootLoader(container);
+            var types = TypeArray<Component22, Component24, Component25>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // i23 requires 22
             // 24, 25 implement i23
             // 25 required by i23
             // => reorder components accordingly
-            loader.Boot(TypeArray<Component22, Component24, Component25>(), RuntimeLevel.Unknown);
+            components.Compose();
             AssertTypeArray(TypeArray<Component22, Component25, Component24>(), Composed);
         }
 
@@ -103,15 +109,17 @@ namespace Umbraco.Tests.Components
         public void BrokenRequire()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = TypeArray<Component1, Component2, Component3>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             try
             {
                 // 2 is Core and requires 4
                 // 4 is missing
                 // => throw
-                thing.Boot(TypeArray < Component1, Component2, Component3>(), RuntimeLevel.Unknown);
+                components.Compose();
                 Assert.Fail("Expected exception.");
             }
             catch (Exception e)
@@ -124,14 +132,16 @@ namespace Umbraco.Tests.Components
         public void BrokenRequired()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = TypeArray<Component2, Component4, Component13>();
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             // 2 is Core and requires 4
             // 13 is required by 1
             // 1 is missing
             // => reorder components accordingly
-            thing.Boot(TypeArray<Component2, Component4, Component13>(), RuntimeLevel.Unknown);
+            components.Compose();
             AssertTypeArray(TypeArray<Component4, Component2, Component13>(), Composed);
         }
 
@@ -142,11 +152,14 @@ namespace Umbraco.Tests.Components
             {
                 m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
             });
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component1), typeof(Component5) };
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
             Initialized.Clear();
-            thing.Boot(new[] { typeof(Component1), typeof(Component5) }, RuntimeLevel.Unknown);
+            components.Compose();
+            components.Initialize();
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component1), Composed[0]);
             Assert.AreEqual(typeof(Component5), Composed[1]);
@@ -158,10 +171,12 @@ namespace Umbraco.Tests.Components
         public void Requires1()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component6), typeof(Component7), typeof(Component8) };
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component6), Composed[0]);
             Assert.AreEqual(typeof(Component8), Composed[1]);
@@ -171,10 +186,12 @@ namespace Umbraco.Tests.Components
         public void Requires2A()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component9), typeof(Component2), typeof(Component4) };
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component4), Composed[0]);
             Assert.AreEqual(typeof(Component2), Composed[1]);
@@ -185,10 +202,13 @@ namespace Umbraco.Tests.Components
         public void Requires2B()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component9), typeof(Component2), typeof(Component4) };
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Run);
+            components.Compose();
+            components.Initialize();
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Component4), Composed[0]);
             Assert.AreEqual(typeof(Component2), Composed[1]);
@@ -199,24 +219,29 @@ namespace Umbraco.Tests.Components
         public void WeakDependencies()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component10) };
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component10) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Component10), Composed[0]);
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Component11) };
+            components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }, RuntimeLevel.Unknown));
+            Assert.Throws<Exception>(() => components.Compose());
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Component2) };
+            components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }, RuntimeLevel.Unknown));
+            Assert.Throws<Exception>(() => components.Compose());
 
-            thing = new BootLoader(container);
+            types = new[] { typeof(Component12) };
+            components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component12) }, RuntimeLevel.Unknown);
+            components.Compose();
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Component12), Composed[0]);
         }
@@ -225,10 +250,12 @@ namespace Umbraco.Tests.Components
         public void DisableMissing()
         {
             var container = MockContainer();
+            var composition = new Composition(container, RuntimeLevel.Unknown);
 
-            var thing = new BootLoader(container);
+            var types = new[] { typeof(Component6), typeof(Component8) }; // 8 disables 7 which is not in the list
+            var components = new Core.Components.Components(composition, types, Mock.Of<IProfilingLogger>());
             Composed.Clear();
-            thing.Boot(new[] { typeof(Component6), typeof(Component8) }, RuntimeLevel.Unknown); // 8 disables 7 which is not in the list
+            components.Compose();
             Assert.AreEqual(2, Composed.Count);
             Assert.AreEqual(typeof(Component6), Composed[0]);
             Assert.AreEqual(typeof(Component8), Composed[1]);

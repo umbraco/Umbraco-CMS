@@ -5,10 +5,6 @@ namespace Umbraco.Web.HealthCheck
 {
     internal class HealthCheckNotificationMethodCollectionBuilder : LazyCollectionBuilderBase<HealthCheckNotificationMethodCollectionBuilder, HealthCheckNotificationMethodCollection, IHealthCheckNotificationMethod>
     {
-        public HealthCheckNotificationMethodCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override HealthCheckNotificationMethodCollectionBuilder This => this;
     }
 }

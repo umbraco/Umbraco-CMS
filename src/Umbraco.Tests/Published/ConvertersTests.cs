@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -172,9 +173,9 @@ namespace Umbraco.Tests.Published
         {
             Current.Reset();
             var container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-
-            Current.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()
                 .Append<SimpleConverter3B>();
 

@@ -17,76 +17,67 @@ namespace Umbraco.Core
     internal class RuntimeState : IRuntimeState
     {
         private readonly ILogger _logger;
-        private readonly Lazy<IServerRegistrar> _serverRegistrar;
-        private readonly Lazy<MainDom> _mainDom;
         private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private RuntimeLevel _level;
+        private Lazy<MainDom> _mainDom;
+        private Lazy<IServerRegistrar> _serverRegistrar;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         /// <param name="logger">A logger.</param>
-        /// <param name="serverRegistrar">A (lazy) server registrar.</param>
-        /// <param name="mainDom">A (lazy) MainDom.</param>
-        public RuntimeState(ILogger logger, Lazy<IServerRegistrar> serverRegistrar, Lazy<MainDom> mainDom, IUmbracoSettingsSection settings, IGlobalSettings globalSettings)
+        /// <param name="settings">Umbraco settings.</param>
+        /// <param name="globalSettings">Global settings.</param>
+        public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
+            Lazy<MainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar)
         {
             _logger = logger;
-            _serverRegistrar = serverRegistrar;
-            _mainDom = mainDom;
             _settings = settings;
             _globalSettings = globalSettings;
+            _mainDom = mainDom;
+            _serverRegistrar = serverRegistrar;
         }
 
+        /// <summary>
+        /// Gets the server registrar.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is NOT exposed in the interface.</para>
+        /// </remarks>
         private IServerRegistrar ServerRegistrar => _serverRegistrar.Value;
 
         /// <summary>
         /// Gets the application MainDom.
         /// </summary>
-        /// <remarks>This is NOT exposed in the interface as MainDom is internal.</remarks>
+        /// <remarks>
+        /// <para>This is NOT exposed in the interface as MainDom is internal.</para>
+        /// </remarks>
         public MainDom MainDom => _mainDom.Value;
 
-        /// <summary>
-        /// Gets the version of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public Version Version => UmbracoVersion.Current;
 
-        /// <summary>
-        /// Gets the version comment of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public string VersionComment => UmbracoVersion.Comment;
 
-        /// <summary>
-        /// Gets the semantic version of the executing code.
-        /// </summary>
+        /// <inheritdoc />
         public SemVersion SemanticVersion => UmbracoVersion.SemanticVersion;
 
-        /// <summary>
-        /// Gets a value indicating whether the application is running in debug mode.
-        /// </summary>
+        /// <inheritdoc />
         public bool Debug { get; } = GlobalSettings.DebugMode;
 
-        /// <summary>
-        /// Gets a value indicating whether the runtime is the current main domain.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
 
-        /// <summary>
-        /// Get the server's current role.
-        /// </summary>
+        /// <inheritdoc />
         public ServerRole ServerRole => ServerRegistrar.GetCurrentServerRole();
 
-        /// <summary>
-        /// Gets the Umbraco application url.
-        /// </summary>
-        /// <remarks>This is eg "http://www.example.com".</remarks>
+        /// <inheritdoc />
         public Uri ApplicationUrl { get; private set; }
 
-        /// <summary>
-        /// Gets the Umbraco application virtual path.
-        /// </summary>
-        /// <remarks>This is either "/" or eg "/virtual".</remarks>
+        /// <inheritdoc />
         public string ApplicationVirtualPath { get; } = HttpRuntime.AppDomainAppVirtualPath;
 
         /// <inheritdoc />
@@ -95,9 +86,7 @@ namespace Umbraco.Core
         /// <inheritdoc />
         public string FinalMigrationState { get; internal set; }
 
-        /// <summary>
-        /// Gets the runtime level of execution.
-        /// </summary>
+        /// <inheritdoc />
         public RuntimeLevel Level
         {
             get => _level;
@@ -137,9 +126,7 @@ namespace Umbraco.Core
             return _runLevel.WaitHandle.WaitOne(timeout);
         }
 
-        /// <summary>
-        /// Gets the exception that caused the boot to fail.
-        /// </summary>
+        /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -51,21 +52,23 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override void Compose(IContainer container)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
+            var container = composition.Container;
+
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
             container.RegisterInstance(_umbracoApplication);
-            base.Compose(container);
+        }
 
-            container.Register<UmbracoInjectedModule>();
+        #region Getters
 
-            // replace CoreRuntime's IProfiler registration
-            container.RegisterSingleton(_ => _webProfiler);
+        protected override IProfiler GetProfiler() => new WebProfiler();
 
-            // replace CoreRuntime's CacheHelper registration
-            container.RegisterSingleton(_ => new CacheHelper(
+        protected override CacheHelper GetAppCaches() => new CacheHelper(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
@@ -75,26 +78,7 @@ namespace Umbraco.Web.Runtime
                 new IsolatedRuntimeCache(type =>
                     // we need to have the dep clone runtime cache provider to ensure
                     // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-
-            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
-        }
-
-        #region Getters
-
-        //protected override IProfiler GetProfiler() => new WebProfiler();
-
-        //protected override CacheHelper GetApplicationCache() => new CacheHelper(
-        //        // we need to have the dep clone runtime cache provider to ensure
-        //        // all entities are cached properly (cloned in and cloned out)
-        //        new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
-        //        new StaticCacheProvider(),
-        //        // we need request based cache when running in web-based context
-        //        new HttpRequestCacheProvider(),
-        //        new IsolatedRuntimeCache(type =>
-        //            // we need to have the dep clone runtime cache provider to ensure
-        //            // all entities are cached properly (cloned in and cloned out)
-        //            new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
         #endregion
     }

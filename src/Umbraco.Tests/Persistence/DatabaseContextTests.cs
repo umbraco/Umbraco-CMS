@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
-            _databaseFactory = new UmbracoDatabaseFactory(_sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()));
         }
 
         [TearDown]
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // re-create the database factory and database context with proper connection string
-            _databaseFactory = new UmbracoDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
+            _databaseFactory = new UmbracoDatabaseFactory(connString, Constants.DbProviderNames.SqlCe, _logger, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()));
 
             // create application context
             //var appCtx = new ApplicationContext(

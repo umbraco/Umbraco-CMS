@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Xml;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core._Legacy.PackageActions;
 
@@ -14,8 +16,9 @@ namespace Umbraco.Tests.Composing
         public void PackageActionCollectionBuilderWorks()
         {
             var container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());
 
             var actions = Current.PackageActions;

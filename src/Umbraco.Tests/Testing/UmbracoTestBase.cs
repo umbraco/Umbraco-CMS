@@ -76,6 +76,8 @@ namespace Umbraco.Tests.Testing
         // test feature, and no test "base" class should be. only actual test feature classes
         // should be marked with that attribute.
 
+        protected Composition Composition { get; private set; }
+
         protected IContainer Container { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
@@ -116,6 +118,7 @@ namespace Umbraco.Tests.Testing
             Reset();
 
             Container = Current.Container = ContainerFactory.Create();
+            Composition = new Composition(Container, RuntimeLevel.Run);
 
             TestObjects = new TestObjects(Container);
 
@@ -189,7 +192,7 @@ namespace Umbraco.Tests.Testing
             // web
             Container.Register(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Container.RegisterSingleton<PublishedRouter>();
-            Container.RegisterCollectionBuilder<ContentFinderCollectionBuilder>();
+            Composition.GetCollectionBuilder<ContentFinderCollectionBuilder>();
             Container.Register<IContentLastChanceFinder, TestLastChanceFinder>();
             Container.Register<IVariationContextAccessor, TestVariationContextAccessor>();
         }
@@ -202,14 +205,14 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(f => runtimeStateMock.Object);
 
             // ah...
-            Container.RegisterCollectionBuilder<ActionCollectionBuilder>();
-            Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            Composition.GetCollectionBuilder<ActionCollectionBuilder>();
+            Composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // register empty content apps collection
-            Container.RegisterCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+            Composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
         }
 
         protected virtual void ComposeCacheHelper()
@@ -307,20 +310,17 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // register application stuff (database factory & context, services...)
-            Container.RegisterCollectionBuilder<MapperCollectionBuilder>()
-                .AddCore();
+            Composition.GetCollectionBuilder<MapperCollectionBuilder>()
+                .AddCoreMappers();
 
             Container.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
-            var sqlSyntaxProviders = TestObjects.GetDefaultSqlSyntaxProviders(Logger);
-            Container.RegisterSingleton<ISqlSyntaxProvider>(_ => sqlSyntaxProviders.OfType<SqlCeSyntaxProvider>().First());
             Container.RegisterSingleton<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
-                sqlSyntaxProviders,
                 Logger,
-                Mock.Of<IMapperCollection>()));
+                new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>())));
             Container.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
-            Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
+            Composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Container.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
@@ -333,12 +333,11 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
-            Container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+            Composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
             Container.RegisterSingleton<ManifestParser>();
 
             // note - don't register collections, use builders
-            Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>();
-            var temp = Container.GetInstance<DataEditorCollectionBuilder>();
+            Composition.GetCollectionBuilder<DataEditorCollectionBuilder>();
             Container.RegisterSingleton<PropertyEditorCollection>();
             Container.RegisterSingleton<ParameterEditorCollection>();
         }

@@ -4,10 +4,6 @@ namespace Umbraco.Web.HealthCheck
 {
     public class HealthCheckCollectionBuilder : LazyCollectionBuilderBase<HealthCheckCollectionBuilder, HealthCheckCollection, HealthCheck>
     {
-        public HealthCheckCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override HealthCheckCollectionBuilder This => this;
 
         // note: in v7 they were per-request, not sure why?

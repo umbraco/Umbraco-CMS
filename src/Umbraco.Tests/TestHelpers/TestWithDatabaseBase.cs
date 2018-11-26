@@ -76,7 +76,7 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register(factory => PublishedSnapshotService);
             Container.Register(factory => DefaultCultureAccessor);
 
-            Container.GetInstance<DataEditorCollectionBuilder>()
+            Composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(f => f.GetInstance<TypeLoader>().GetDataEditors());
 
@@ -85,10 +85,9 @@ namespace Umbraco.Tests.TestHelpers
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();
 
-                var sqlSyntaxProviders = new[] { new SqlCeSyntaxProvider() };
                 var logger = f.GetInstance<ILogger>();
                 var mappers = f.GetInstance<IMapperCollection>();
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), sqlSyntaxProviders, logger, mappers);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), logger, new Lazy<IMapperCollection>(() => mappers));
                 factory.ResetForTests();
                 return factory;
             });

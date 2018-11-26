@@ -4,10 +4,6 @@ namespace Umbraco.Core.PropertyEditors
 {
     public class DataEditorCollectionBuilder : LazyCollectionBuilderBase<DataEditorCollectionBuilder, DataEditorCollection, IDataEditor>
     {
-        public DataEditorCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override DataEditorCollectionBuilder This => this;
     }
 }

@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Components
 {
@@ -12,6 +14,8 @@ namespace Umbraco.Core.Components
     /// may cause issues.</remarks>
     public class Composition
     {
+        private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Composition"/> class.
         /// </summary>
@@ -33,5 +37,26 @@ namespace Umbraco.Core.Components
         /// Gets the runtime level.
         /// </summary>
         public RuntimeLevel RuntimeLevel { get; }
+
+        /// <summary>
+        /// Gets a collection builder (and registers the collection).
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <returns>The collection builder.</returns>
+        public TBuilder GetCollectionBuilder<TBuilder>()
+            where TBuilder: ICollectionBuilder, new()
+        {
+            var typeOfBuilder = typeof(TBuilder);
+
+            if (_builders.TryGetValue(typeOfBuilder, out var o))
+                return (TBuilder) o;
+
+            var builder = new TBuilder();
+            builder.Initialize(Container);
+
+            _builders[typeOfBuilder] = builder;
+
+            return builder;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.IO;
@@ -30,11 +31,12 @@ namespace Umbraco.Tests.Scoping
             DoThing3 = null;
 
             var container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
             _testObjects = new TestObjects(container);
 
             Current.Container.RegisterSingleton(factory => new FileSystems(container, factory.TryGetInstance<ILogger>()));
-            Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();
+            composition.GetCollectionBuilder<MapperCollectionBuilder>();
 
             SettingsForTests.Reset(); // ensure we have configuration
         }

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -67,8 +68,9 @@ namespace Umbraco.Tests.PropertyEditors
             try
             {
                 var container = Current.Container = ContainerFactory.Create();
+                var composition = new Composition(container, RuntimeLevel.Run);
 
-                container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+                composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
                 var logger = Mock.Of<ILogger>();
                 var scheme = Mock.Of<IMediaPathScheme>();

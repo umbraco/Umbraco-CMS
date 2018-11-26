@@ -3,9 +3,20 @@
     /// <summary>
     /// Represents a collection builder.
     /// </summary>
+    public interface ICollectionBuilder
+    {
+        /// <summary>
+        /// Initializes a new instance of the builder, and registers the collection.
+        /// </summary>
+        void Initialize(IContainer container);
+    }
+
+    /// <summary>
+    /// Represents a collection builder.
+    /// </summary>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
-    public interface ICollectionBuilder<out TCollection, TItem>
+    public interface ICollectionBuilder<out TCollection, TItem> : ICollectionBuilder
         where TCollection : IBuilderCollection<TItem>
     {
         /// <summary>

@@ -18,19 +18,12 @@ namespace Umbraco.Core.Composing
         private readonly List<Func<IContainer, IEnumerable<Type>>> _producers2 = new List<Func<IContainer, IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LazyCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
-        /// </summary>
-        protected LazyCollectionBuilderBase(IContainer container)
-            : base(container)
-        { }
-
         protected abstract TBuilder This { get; }
 
         /// <summary>
         /// Clears all types in the collection.
         /// </summary>
-        /// <returns>The buidler.</returns>
+        /// <returns>The builder.</returns>
         public TBuilder Clear()
         {
             Configure(types =>

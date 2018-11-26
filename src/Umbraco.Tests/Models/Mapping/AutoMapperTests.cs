@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Models.Mapping
             Container.Register(_ => manifestBuilder);
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
-            Container.GetInstance<DataEditorCollectionBuilder>()
+            Composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(typeListProducerList);
         }

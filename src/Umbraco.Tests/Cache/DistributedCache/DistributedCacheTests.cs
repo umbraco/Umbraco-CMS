@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
 
@@ -21,11 +22,12 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Setup()
         {
             var container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
             container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
             container.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
 
-            container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();

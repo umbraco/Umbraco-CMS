@@ -74,9 +74,11 @@ namespace Umbraco.Tests.Runtimes
                 return new DebugDiagnosticsLogger();
             }
 
-            public override void Compose(IContainer container)
+            public override void Compose(Composition composition)
             {
-                base.Compose(container);
+                base.Compose(composition);
+
+                var container = composition.Container;
 
                 // the application's profiler and profiling logger are
                 // registered by CoreRuntime.Compose() but can be
@@ -100,7 +102,7 @@ namespace Umbraco.Tests.Runtimes
 
             // pretend we have the proper migration
             // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
-            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
             {
                 return true;
             }
@@ -122,7 +124,7 @@ namespace Umbraco.Tests.Runtimes
             // runs with only one single component
             // UmbracoCoreComponent will be force-added too
             // and that's it
-            protected override IEnumerable<Type> GetComponentTypes()
+            protected override IEnumerable<Type> GetComponentTypes(TypeLoader typeLoader)
             {
                 return new[] { typeof(TestComponent) };
             }

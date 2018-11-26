@@ -9,10 +9,6 @@ namespace Umbraco.Web.ContentApps
 {
     public class ContentAppDefinitionCollectionBuilder : OrderedCollectionBuilderBase<ContentAppDefinitionCollectionBuilder, ContentAppDefinitionCollection, IContentAppDefinition>
     {
-        public ContentAppDefinitionCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override ContentAppDefinitionCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation

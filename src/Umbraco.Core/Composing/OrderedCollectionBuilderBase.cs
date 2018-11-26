@@ -13,20 +13,12 @@ namespace Umbraco.Core.Composing
         where TBuilder : OrderedCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
-        /// </summary>
-        /// <param name="container"></param>
-        protected OrderedCollectionBuilderBase(IContainer container)
-            : base (container)
-        { }
-
         protected abstract TBuilder This { get; }
 
         /// <summary>
         /// Clears all types in the collection.
         /// </summary>
-        /// <returns>The buidler.</returns>
+        /// <returns>The builder.</returns>
         public TBuilder Clear()
         {
             Configure(types => types.Clear());

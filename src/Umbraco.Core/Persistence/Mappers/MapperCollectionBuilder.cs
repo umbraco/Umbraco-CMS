@@ -4,15 +4,11 @@ namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollectionBuilder : LazyCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
-        public MapperCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         protected override MapperCollectionBuilder This => this;
 
-        protected override void Initialize()
+        public override void Initialize(IContainer container)
         {
-            base.Initialize();
+            base.Initialize(container);
 
             // default initializer registers
             // - service MapperCollectionBuilder, returns MapperCollectionBuilder
@@ -23,7 +19,7 @@ namespace Umbraco.Core.Persistence.Mappers
             Container.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
         }
 
-        public MapperCollectionBuilder AddCore()
+        public MapperCollectionBuilder AddCoreMappers()
         {
             Add<AccessMapper>();
             Add<AuditItemMapper>();

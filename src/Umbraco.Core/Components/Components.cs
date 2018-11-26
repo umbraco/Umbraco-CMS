@@ -13,25 +13,26 @@ namespace Umbraco.Core.Components
 {
     // note: this class is NOT thread-safe in any ways
 
-    internal class BootLoader
+    internal class Components
     {
-        private readonly IContainer _container;
-        private readonly ProfilingLogger _proflog;
-        private readonly ILogger _logger;
+        private readonly Composition _composition;
+        private readonly IProfilingLogger _logger;
+        private readonly IEnumerable<Type> _componentTypes;
         private IUmbracoComponent[] _components;
-        private bool _booted;
 
         private const int LogThresholdMilliseconds = 100;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BootLoader"/> class.
+        /// Initializes a new instance of the <see cref="Components"/> class.
         /// </summary>
-        /// <param name="container">The application container.</param>
-        public BootLoader(IContainer container)
+        /// <param name="composition">The composition.</param>
+        /// <param name="componentTypes">The component types.</param>
+        /// <param name="logger">A profiling logger.</param>
+        public Components(Composition composition, IEnumerable<Type> componentTypes, IProfilingLogger logger)
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
-            _proflog = container.GetInstance<ProfilingLogger>();
-            _logger = container.GetInstance<ILogger>();
+            _composition = composition ?? throw new ArgumentNullException(nameof(composition));
+            _componentTypes = componentTypes ?? throw new ArgumentNullException(nameof(componentTypes));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private class EnableInfo
@@ -40,44 +41,42 @@ namespace Umbraco.Core.Components
             public int Weight = -1;
         }
 
-        public void Boot(IEnumerable<Type> componentTypes, RuntimeLevel level)
+        public void Compose()
         {
-            if (_booted) throw new InvalidOperationException("Can not boot, has already booted.");
-
-            var orderedComponentTypes = PrepareComponentTypes(componentTypes, level);
+            var orderedComponentTypes = PrepareComponentTypes();
 
             InstantiateComponents(orderedComponentTypes);
-            ComposeComponents(level);
+            ComposeComponents();
+        }
 
-            using (var scope = _container.GetInstance<IScopeProvider>().CreateScope())
+        public void Initialize()
+        {
+            using (var scope = _composition.Container.GetInstance<IScopeProvider>().CreateScope())
             {
                 InitializeComponents();
                 scope.Complete();
             }
-
-            // rejoice!
-            _booted = true;
         }
 
-        private IEnumerable<Type> PrepareComponentTypes(IEnumerable<Type> componentTypes, RuntimeLevel level)
+        private IEnumerable<Type> PrepareComponentTypes()
         {
-            using (_proflog.DebugDuration<BootLoader>("Preparing component types.", "Prepared component types."))
+            using (_logger.DebugDuration<Components>("Preparing component types.", "Prepared component types."))
             {
-                return PrepareComponentTypes2(componentTypes, level);
+                return PrepareComponentTypes2();
             }
         }
 
-        private IEnumerable<Type> PrepareComponentTypes2(IEnumerable<Type> componentTypes, RuntimeLevel level)
+        private IEnumerable<Type> PrepareComponentTypes2()
         {
             // create a list, remove those that cannot be enabled due to runtime level
-            var componentTypeList = componentTypes
+            var componentTypeList = _componentTypes
                 .Where(x =>
                 {
                     // use the min level specified by the attribute if any
                     // otherwise, user components have Run min level, anything else is Unknown (always run)
                     var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
                     var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
-                    return level >= minLevel;
+                    return _composition.RuntimeLevel >= minLevel;
                 })
                 .ToList();
 
@@ -107,15 +106,15 @@ namespace Umbraco.Core.Components
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
-                _logger.Error<BootLoader>(e, "Failed to sort components.");
+                _logger.Info<Components>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
+                _logger.Error<Components>(e, "Failed to sort components.");
                 throw;
             }
 
             // bit verbose but should help for troubleshooting
             var text = "Ordered Components: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComponentTypes) + Environment.NewLine;
             Console.WriteLine(text);
-            _logger.Debug<BootLoader>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
+            _logger.Debug<Components>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
 
             return sortedComponentTypes;
         }
@@ -275,23 +274,23 @@ namespace Umbraco.Core.Components
 
         private void InstantiateComponents(IEnumerable<Type> types)
         {
-            using (_proflog.DebugDuration<BootLoader>("Instantiating components.", "Instantiated components."))
+            using (_logger.DebugDuration<Components>("Instantiating components.", "Instantiated components."))
             {
+                // fixme is there a faster way?
                 _components = types.Select(x => (IUmbracoComponent) Activator.CreateInstance(x)).ToArray();
             }
         }
 
-        private void ComposeComponents(RuntimeLevel level)
+        private void ComposeComponents()
         {
-            using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
+            using (_logger.DebugDuration<Components>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
-                var composition = new Composition(_container, level);
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
-                    using (_proflog.DebugDuration<BootLoader>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_logger.DebugDuration<Components>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        component.Compose(composition);
+                        component.Compose(_composition);
                     }
                 }
             }
@@ -301,15 +300,15 @@ namespace Umbraco.Core.Components
         {
             // use a container scope to ensure that PerScope instances are disposed
             // components that require instances that should not survive should register them with PerScope lifetime
-            using (_proflog.DebugDuration<BootLoader>($"Initializing components. (log when >{LogThresholdMilliseconds}ms)", "Initialized components."))
-            using (_container.BeginScope())
+            using (_logger.DebugDuration<Components>($"Initializing components. (log when >{LogThresholdMilliseconds}ms)", "Initialized components."))
+            using (_composition.Container.BeginScope())
             {
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
                     var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                         .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false && x.IsStatic == false);
-                    using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_logger.DebugDuration<Components>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         foreach (var initializer in initializers)
                         {
@@ -329,7 +328,7 @@ namespace Umbraco.Core.Components
 
             try
             {
-                param = _container.TryGetInstance(parameterType);
+                param = _composition.Container.TryGetInstance(parameterType);
             }
             catch (Exception e)
             {
@@ -342,19 +341,13 @@ namespace Umbraco.Core.Components
 
         public void Terminate()
         {
-            if (_booted == false)
-            {
-                _proflog.Logger.Warn<BootLoader>("Cannot terminate, has not booted.");
-                return;
-            }
-
-            using (_proflog.DebugDuration<BootLoader>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
+            using (_logger.DebugDuration<Components>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
                 for (var i = _components.Length - 1; i >= 0; i--) // terminate components in reverse order
                 {
                     var component = _components[i];
                     var componentType = component.GetType();
-                    using (_proflog.DebugDuration<BootLoader>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_logger.DebugDuration<Components>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         component.Terminate();
                     }

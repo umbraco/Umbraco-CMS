@@ -15,9 +15,9 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
 {
@@ -28,8 +28,18 @@ namespace Umbraco.Core.Runtime
     /// should be possible to use this runtime in console apps.</remarks>
     public class CoreRuntime : IRuntime
     {
-        private BootLoader _bootLoader;
+        private Components.Components _components;
         private RuntimeState _state;
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        protected ILogger Logger { get; private set; }
+
+        /// <summary>
+        /// Gets the profiling logger.
+        /// </summary>
+        protected IProfilingLogger ProfilingLogger { get; private set; }
 
         /// <inheritdoc/>
         public virtual void Boot(IContainer container)
@@ -37,30 +47,52 @@ namespace Umbraco.Core.Runtime
             // assign current container
             Current.Container = container;
 
-            // register the essential stuff,
-            // ie the global application logger
-            // (profiler etc depend on boot manager)
+            // create and register the essential services
+            // ie the bare minimum required to boot
+
+            var composition = new Composition(container, RuntimeLevel.Boot);
+
+            // loggers
             var logger = GetLogger();
             container.RegisterInstance(logger);
-            // now it is ok to use Current.Logger
+            Logger = logger;
+            var profiler = GetProfiler();
+            container.RegisterInstance(profiler);
+            var profilingLogger = new ProfilingLogger(logger, profiler);
+            container.RegisterInstance<IProfilingLogger>(profilingLogger);
+            ProfilingLogger = profilingLogger;
 
-            ConfigureUnhandledException(logger);
-            ConfigureAssemblyResolve(logger);
+            // application environment
+            ConfigureUnhandledException();
+            ConfigureAssemblyResolve();
+            ConfigureApplicationRootPath();
 
-            Compose(container);
+            // application caches
+            var appCaches = GetAppCaches();
+            container.RegisterInstance(appCaches);
+            var runtimeCache = appCaches.RuntimeCache;
+            container.RegisterInstance(runtimeCache);
 
-            // prepare essential stuff
+            // database factory
+            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(container.GetInstance<IMapperCollection>));
+            container.RegisterSingleton(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
-            var path = GetApplicationRootPath();
-            if (string.IsNullOrWhiteSpace(path) == false)
-                IOHelper.SetRootDirectory(path);
+            // type loader
+            var globalSettings = UmbracoConfig.For.GlobalSettings();
+            var typeLoader = new TypeLoader(runtimeCache, globalSettings, profilingLogger);
+            container.RegisterInstance(typeLoader);
 
-            _state = (RuntimeState) container.GetInstance<IRuntimeState>();
-            _state.Level = RuntimeLevel.Boot;
+            // runtime state
+            _state = new RuntimeState(logger,
+                UmbracoConfig.For.UmbracoSettings(), UmbracoConfig.For.GlobalSettings(),
+                new Lazy<MainDom>(container.GetInstance<MainDom>),
+                new Lazy<IServerRegistrar>(container.GetInstance<IServerRegistrar>))
+            {
+                Level = RuntimeLevel.Boot
+            };
+            container.RegisterInstance(_state);
 
-            Logger = container.GetInstance<ILogger>();
-            Profiler = container.GetInstance<IProfiler>();
-            ProfilingLogger = container.GetInstance<ProfilingLogger>();
+            Compose(composition);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -76,18 +108,33 @@ namespace Umbraco.Core.Runtime
                 "Booted.",
                 "Boot failed."))
             {
-                // throws if not full-trust
-                new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
-
                 try
                 {
-                    Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                    // throws if not full-trust
+                    new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
 
-                    AquireMainDom(container);
-                    DetermineRuntimeLevel(container);
-                    var componentTypes = ResolveComponentTypes();
-                    _bootLoader = new BootLoader(container);
-                    _bootLoader.Boot(componentTypes, _state.Level);
+                    logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+
+                    var mainDom = AquireMainDom();
+                    container.RegisterInstance(mainDom);
+
+                    DetermineRuntimeLevel(databaseFactory);
+
+                    var componentTypes = ResolveComponentTypes(typeLoader);
+                    _components = new Components.Components(composition, componentTypes, profilingLogger);
+
+                    _components.Compose();
+
+                    // no Current.Container only Current.Factory?
+                    //factory = register.Compile();
+
+                    // fixme at that point we can start actually getting things from the container
+                    // but, ideally, not before = need to detect everything we use!!
+
+                    // at that point, getting things from the container is ok
+                    // fixme split IRegistry vs IFactory
+
+                    _components.Initialize();
                 }
                 catch (Exception e)
                 {
@@ -105,15 +152,7 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected virtual ILogger GetLogger()
-        {
-            return SerilogLogger.CreateWithDefaultConfiguration();
-        }
-
-        protected virtual void ConfigureUnhandledException(ILogger logger)
+        protected virtual void ConfigureUnhandledException()
         {
             //take care of unhandled exceptions - there is nothing we can do to
             // prevent the launch process to go down but at least we can try
@@ -126,33 +165,40 @@ namespace Umbraco.Core.Runtime
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                logger.Error<CoreRuntime>(exception, msg);
+                Logger.Error<CoreRuntime>(exception, msg);
             };
         }
 
-        protected virtual void ConfigureAssemblyResolve(ILogger logger)
+        protected virtual void ConfigureAssemblyResolve()
         {
             // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
             // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
-                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stack overflow
                 if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
                     return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
                 return null;
             };
         }
 
-
-        private void AquireMainDom(IContainer container)
+        protected virtual void ConfigureApplicationRootPath()
         {
-            using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
+            var path = GetApplicationRootPath();
+            if (string.IsNullOrWhiteSpace(path) == false)
+                IOHelper.SetRootDirectory(path);
+        }
+
+        private MainDom AquireMainDom()
+        {
+            using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    var mainDom = container.GetInstance<MainDom>();
+                    var mainDom = new MainDom(Logger);
                     mainDom.Acquire();
+                    return mainDom;
                 }
                 catch
                 {
@@ -163,38 +209,38 @@ namespace Umbraco.Core.Runtime
         }
 
         // internal for tests
-        internal void DetermineRuntimeLevel(IContainer container)
+        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
                 try
                 {
-                    var dbfactory = container.GetInstance<IUmbracoDatabaseFactory>();
-                    SetRuntimeStateLevel(dbfactory, Logger);
+                    _state.Level = DetermineRuntimeLevel2(databaseFactory);
 
-                    Logger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
+                    ProfilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel}", _state.Level);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {
-                        Logger.Debug<CoreRuntime>("Configure database factory for upgrades.");
-                        dbfactory.ConfigureForUpgrade();
+                        ProfilingLogger.Debug<CoreRuntime>("Configure database factory for upgrades.");
+                        databaseFactory.ConfigureForUpgrade();
                     }
                 }
                 catch
                 {
+                    _state.Level = RuntimeLevel.BootFailed;
                     timer.Fail();
                     throw;
                 }
             }
         }
 
-        private IEnumerable<Type> ResolveComponentTypes()
+        private IEnumerable<Type> ResolveComponentTypes(TypeLoader typeLoader)
         {
             using (var timer = ProfilingLogger.TraceDuration<CoreRuntime>("Resolving component types.", "Resolved."))
             {
                 try
                 {
-                    return GetComponentTypes();
+                    return GetComponentTypes(typeLoader);
                 }
                 catch
                 {
@@ -209,97 +255,56 @@ namespace Umbraco.Core.Runtime
         {
             using (ProfilingLogger.DebugDuration<CoreRuntime>("Terminating Umbraco.", "Terminated."))
             {
-                _bootLoader?.Terminate();
+                _components?.Terminate();
             }
         }
 
         /// <summary>
         /// Composes the runtime.
         /// </summary>
-        public virtual void Compose(IContainer container)
+        public virtual void Compose(Composition composition)
         {
+            var container = composition.Container;
+
             // compose the very essential things that are needed to bootstrap, before anything else,
             // and only these things - the rest should be composed in runtime components
-
-            // register basic things
-            container.RegisterSingleton<IProfiler, LogProfiler>();
-            container.RegisterSingleton<ProfilingLogger>();
-            container.RegisterSingleton<IRuntimeState, RuntimeState>();
+            // FIXME should be essentially empty! move all to component!
 
             container.ComposeConfiguration();
-
-            // register caches
-            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
-            // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // will be overriden later or
-            container.RegisterSingleton(_ => new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-            container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
-
-            // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
-
-            // register syntax providers - required by database factory - GetAllInstances<ISqlSyntaxProvider> or an IEnumerable can get them
-            container.Register<MySqlSyntaxProvider>();
-            container.Register<SqlCeSyntaxProvider>();
-            container.Register<SqlServerSyntaxProvider>();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
-            ComposeMapperCollection(mapperCollectionBuilder);
-
-            // register database factory - required to check for migrations
-            // will be initialized with syntax providers and a logger, and will try to configure
-            // from the default connection string name, if possible, else will remain non-configured
-            // until properly configured (eg when installing)
-            container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            container.RegisterSingleton(f => f.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            composition.GetCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
 
             // register the scope provider
             container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
             container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
             container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
-
-            // register MainDom
-            container.RegisterSingleton<MainDom>();
         }
 
-        protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)
-        {
-            builder.AddCore();
-        }
-
-        private void SetRuntimeStateLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        private RuntimeLevel DetermineRuntimeLevel2(IUmbracoDatabaseFactory databaseFactory)
         {
             var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = _state.SemanticVersion; // the executing code version
             var connect = false;
 
-            // we don't know yet
-            _state.Level = RuntimeLevel.Unknown;
-
             if (localVersion == null)
             {
                 // there is no local version, we are not installed
-                logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
-                _state.Level = RuntimeLevel.Install;
+                Logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
+                return RuntimeLevel.Install;
             }
-            else if (localVersion < codeVersion)
+
+            if (localVersion < codeVersion)
             {
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
-                logger.Debug<CoreRuntime>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
-                _state.Level = RuntimeLevel.Upgrade;
+                Logger.Debug<CoreRuntime>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
             }
             else if (localVersion > codeVersion)
             {
-                logger.Warn<CoreRuntime>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
-                _state.Level = RuntimeLevel.BootFailed;
+                Logger.Warn<CoreRuntime>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
 
                 // in fact, this is bad enough that we want to throw
                 throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
@@ -308,13 +313,9 @@ namespace Umbraco.Core.Runtime
             {
                 // local version *does* match code version, but the database is not configured
                 // install (again? this is a weird situation...)
-                logger.Debug<CoreRuntime>("Database is not configured, need to install Umbraco.");
-                _state.Level = RuntimeLevel.Install;
+                Logger.Debug<CoreRuntime>("Database is not configured, need to install Umbraco.");
+                return RuntimeLevel.Install;
             }
-
-            // install? not going to test anything else
-            if (_state.Level == RuntimeLevel.Install)
-                return;
 
             // else, keep going,
             // anything other than install wants a database - see if we can connect
@@ -323,15 +324,14 @@ namespace Umbraco.Core.Runtime
             {
                 connect = databaseFactory.CanConnect;
                 if (connect) break;
-                logger.Debug<CoreRuntime>("Could not immediately connect to database, trying again.");
+                Logger.Debug<CoreRuntime>("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
 
             if (connect == false)
             {
                 // cannot connect to configured database, this is bad, fail
-                logger.Debug<CoreRuntime>("Could not connect to database.");
-                _state.Level = RuntimeLevel.BootFailed;
+                Logger.Debug<CoreRuntime>("Could not connect to database.");
 
                 // in fact, this is bad enough that we want to throw
                 throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
@@ -347,20 +347,19 @@ namespace Umbraco.Core.Runtime
             bool noUpgrade;
             try
             {
-                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory, logger);
+                noUpgrade = EnsureUmbracoUpgradeState(databaseFactory);
             }
             catch (Exception e)
             {
                 // can connect to the database but cannot check the upgrade state... oops
-                logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
+                Logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
                 throw new BootFailedException("Could not check the upgrade state.", e);
             }
 
             if (noUpgrade)
             {
                 // the database version matches the code & files version, all clear, can run
-                _state.Level = RuntimeLevel.Run;
-                return;
+                return RuntimeLevel.Run;
             }
 
             // the db version does not match... but we do have a migration table
@@ -368,11 +367,11 @@ namespace Umbraco.Core.Runtime
 
             // although the files version matches the code version, the database version does not
             // which means the local files have been upgraded but not the database - need to upgrade
-            logger.Debug<CoreRuntime>("Has not reached the final upgrade step, need to upgrade Umbraco.");
-            _state.Level = RuntimeLevel.Upgrade;
+            Logger.Debug<CoreRuntime>("Has not reached the final upgrade step, need to upgrade Umbraco.");
+            return RuntimeLevel.Upgrade;
         }
 
-        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
         {
             var umbracoPlan = new UmbracoPlan();
             var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
@@ -384,31 +383,53 @@ namespace Umbraco.Core.Runtime
                 _state.FinalMigrationState = umbracoPlan.FinalState;
             }
 
-            logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");
+            Logger.Debug<CoreRuntime>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", _state.FinalMigrationState, _state.CurrentMigrationState ?? "<null>");
 
             return _state.CurrentMigrationState == _state.FinalMigrationState;
         }
-
-        #region Locals
-
-        protected ILogger Logger { get; private set; }
-
-        protected IProfiler Profiler { get; private set; }
-
-        protected ProfilingLogger ProfilingLogger { get; private set; }
-
-        #endregion
 
         #region Getters
 
         // getters can be implemented by runtimes inheriting from CoreRuntime
 
-        // fixme - inject! no Current!
-        protected virtual IEnumerable<Type> GetComponentTypes() => Current.TypeLoader.GetTypes<IUmbracoComponent>();
+        /// <summary>
+        /// Gets all component types.
+        /// </summary>
+        protected virtual IEnumerable<Type> GetComponentTypes(TypeLoader typeLoader)
+            => typeLoader.GetTypes<IUmbracoComponent>();
+
+        /// <summary>
+        /// Gets a logger.
+        /// </summary>
+        protected virtual ILogger GetLogger()
+            => SerilogLogger.CreateWithDefaultConfiguration();
+
+        /// <summary>
+        /// Gets a profiler.
+        /// </summary>
+        protected virtual IProfiler GetProfiler()
+            => new LogProfiler(ProfilingLogger);
+
+        /// <summary>
+        /// Gets the application caches.
+        /// </summary>
+        protected virtual CacheHelper GetAppCaches()
+        {
+            // need the deep clone runtime cache provider to ensure entities are cached properly, ie
+            // are cloned in and cloned out - no request-based cache here since no web-based context,
+            // is overriden by the web runtime
+
+            return new CacheHelper(
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+                new StaticCacheProvider(),
+                NullCacheProvider.Instance,
+                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+        }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.
         // override and return the absolute path to the Umbraco site/solution, if needed
-        protected virtual string GetApplicationRootPath() => null;
+        protected virtual string GetApplicationRootPath()
+            => null;
 
         #endregion
     }

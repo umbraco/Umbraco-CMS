@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Services
             // pfew - see note in ScopedNuCacheTests?
             Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
             Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
+            Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
         }
 

@@ -98,26 +98,6 @@ namespace Umbraco.Core.Composing
             => container.RegisterAuto(typeof(TServiceBase));
 
         /// <summary>
-        /// Registers and instantiates a collection builder.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
-        /// <returns>A collection builder of the specified type.</returns>
-        public static TBuilder RegisterCollectionBuilder<TBuilder>(this IContainer container)
-        {
-            // make sure it's not already registered
-            // we just don't want to support re-registering collection builders
-            if (container.GetRegistered<TBuilder>().Any())
-                throw new InvalidOperationException("Collection builders should be registered only once.");
-
-            // register the builder
-            // use a factory so we don't have to self-register the container
-            container.RegisterSingleton(factory => factory.CreateInstance<TBuilder>(container));
-
-            // initialize and return the builder
-            return container.GetInstance<TBuilder>();
-        }
-
-        /// <summary>
         /// Creates an instance of a service, with arguments.
         /// </summary>
         /// <param name="container"></param>

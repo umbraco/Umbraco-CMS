@@ -14,13 +14,6 @@ namespace Umbraco.Web.Tour
     {
         private readonly HashSet<BackOfficeTourFilter> _instances = new HashSet<BackOfficeTourFilter>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TourFilterCollectionBuilder"/> class.
-        /// </summary>
-        public TourFilterCollectionBuilder(IContainer container)
-            : base(container)
-        { }
-
         /// <inheritdoc />
         protected override IEnumerable<BackOfficeTourFilter> CreateItems(/*params object[] args*/)
         {

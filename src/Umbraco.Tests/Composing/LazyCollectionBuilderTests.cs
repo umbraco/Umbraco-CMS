@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Composing
@@ -33,8 +34,9 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesTypes()
         {
             var container = CreateContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<TestCollectionBuilder>()
+            composition.GetCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -56,8 +58,9 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesProducers()
         {
             var container = CreateContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<TestCollectionBuilder>()
+            composition.GetCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
@@ -78,8 +81,9 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
             var container = CreateContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<TestCollectionBuilder>()
+            composition.GetCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -101,8 +105,9 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
             var container = CreateContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<TestCollectionBuilder>()
+            composition.GetCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
 
                 // illegal, does not implement the interface!
@@ -122,8 +127,9 @@ namespace Umbraco.Tests.Composing
         public void LazyCollectionBuilderCanExcludeTypes()
         {
             var container = CreateContainer();
+            var composition = new Composition(container, RuntimeLevel.Run);
 
-            container.RegisterCollectionBuilder<TestCollectionBuilder>()
+            composition.GetCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();
@@ -162,10 +168,6 @@ namespace Umbraco.Tests.Composing
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilder : LazyCollectionBuilderBase<TestCollectionBuilder, TestCollection, ITestInterface>
         {
-            public TestCollectionBuilder(IContainer container)
-                : base(container)
-            { }
-
             protected override TestCollectionBuilder This => this;
 
             protected override Lifetime CollectionLifetime => Lifetime.Transient; // transient

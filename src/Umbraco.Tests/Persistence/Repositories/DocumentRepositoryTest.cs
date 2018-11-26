@@ -670,7 +670,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void AliasRegexTest()
         {
-            var regex = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null)).AliasRegex;
+            var regex = new SqlServerSyntaxProvider().AliasRegex;
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             var matches = regex.Matches(sql);
