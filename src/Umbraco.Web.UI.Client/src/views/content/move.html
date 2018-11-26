@@ -13,13 +13,13 @@
                 <div class="alert alert-success">
                     <strong>{{currentNode.name}}</strong> was moved underneath&nbsp;<strong>{{target.name}}</strong>
                 </div>
-                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+                <button class="btn btn-primary" ng-click="close()">Ok</button>
             </div>
 
             <p class="abstract" ng-hide="success">
                 <localize key="actions_chooseWhereToMove">Choose where to move</localize>
                 <strong>{{currentNode.name}}</strong>
-                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>                
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
             <div class="umb-loader-wrapper" ng-show="busy">
@@ -29,7 +29,7 @@
             <div ng-hide="success">
 
                 <div ng-hide="miniListView">
-                    <umb-tree-search-box 
+                    <umb-tree-search-box
                         hide-search-callback="hideSearch"
                         search-callback="onSearchResults"
                         search-from-id="{{searchInfo.searchFromId}}"
