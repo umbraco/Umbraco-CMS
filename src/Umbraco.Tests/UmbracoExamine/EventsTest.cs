@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Examine;
+using LightInject;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -16,7 +18,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Events_Ignoring_Node()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
                 //make parent id 999 so all are ignored
                 options: new UmbracoContentIndexerOptions(false, false, 999)))
             using (indexer.ProcessNonAsync())

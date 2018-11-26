@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.UmbracoExamine
             ProfilingLogger profilingLogger,
             Directory luceneDir,
             ISqlContext sqlContext,
+            PropertyEditorCollection propertyEditors,
             Analyzer analyzer = null,
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -179,14 +181,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
             var i = new UmbracoContentIndexer(
                 "testIndexer",
-                Enumerable.Empty<FieldDefinition>(),
+                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 luceneDir,
                 analyzer,
                 profilingLogger,
-                //fixme: need a property editor collection here
-                new ContentValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
-                //fixme: need a property editor collection here
-                new MediaValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
+                new ContentValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, userService),
+                new MediaValueSetBuilder(propertyEditors, new[] { new DefaultUrlSegmentProvider() }, userService),
                 contentService,
                 mediaService,
                 languageService,

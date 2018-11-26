@@ -23,6 +23,7 @@ using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -113,7 +114,8 @@ namespace Umbraco.Tests.PublishedContent
         public void Ensure_Children_Sorted_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             {
 
                 indexer.RebuildIndex();
@@ -138,7 +140,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Do_Not_Find_In_Recycle_Bin()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
                 //include unpublished content since this uses the 'internal' indexer, it's up to the media cache to filter
                 options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
@@ -184,7 +186,8 @@ namespace Umbraco.Tests.PublishedContent
         public void Children_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -209,7 +212,8 @@ namespace Umbraco.Tests.PublishedContent
         public void Descendants_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -234,7 +238,8 @@ namespace Umbraco.Tests.PublishedContent
         public void DescendantsOrSelf_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -259,7 +264,8 @@ namespace Umbraco.Tests.PublishedContent
         public void Ancestors_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -281,7 +287,8 @@ namespace Umbraco.Tests.PublishedContent
         public void AncestorsOrSelf_With_Examine()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();

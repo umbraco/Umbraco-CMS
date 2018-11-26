@@ -8,6 +8,8 @@ using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
+using Umbraco.Core.PropertyEditors;
+using LightInject;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -24,7 +26,8 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Rebuild_Index()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -46,7 +49,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Protected_Content_Not_Indexed()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>()))
             using (indexer.ProcessNonAsync())
             using (var searcher = ((LuceneSearcher)indexer.GetSearcher()).GetLuceneSearcher())
             {
@@ -77,7 +80,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
                 //make parent id 1116
                 options: new UmbracoContentIndexerOptions(false, false, 1116)))
             using (indexer.ProcessNonAsync())
@@ -119,7 +122,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Move_Media_To_Non_Indexable_ParentID()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
                 //make parent id 2222
                 options: new UmbracoContentIndexerOptions(false, false, 2222)))
             using (indexer1.ProcessNonAsync())
@@ -169,7 +172,8 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Reindex_Content()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>(),
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -209,7 +213,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, Container.GetInstance<PropertyEditorCollection>()))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
