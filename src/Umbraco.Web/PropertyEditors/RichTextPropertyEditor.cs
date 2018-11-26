@@ -6,6 +6,7 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors
@@ -31,6 +32,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
+        public override IValueIndexer ValueIndexer => new RichTextValueIndexer();
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
@@ -88,6 +90,21 @@ namespace Umbraco.Web.PropertyEditors
 
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
                 return parsed;
+            }
+        }
+
+        internal class RichTextValueIndexer : IValueIndexer
+        {
+            public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture)
+            {
+                var val = property.GetValue(culture);
+
+                if (!(val is string strVal)) yield break;
+
+                //index the stripped html values
+                yield return new KeyValuePair<string, object[]>(property.Alias, new[] { strVal.StripHtml() });
+                //store the raw value
+                yield return new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { strVal });
             }
         }
     }
