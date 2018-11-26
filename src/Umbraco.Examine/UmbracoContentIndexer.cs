@@ -31,7 +31,8 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndexer : UmbracoExamineIndexer
     {
-        protected UmbracoValueSetBuilder ValueSetBuilder { get; }
+        protected IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
+        protected IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected ILocalizationService LanguageService { get; }
@@ -50,7 +51,8 @@ namespace Umbraco.Examine
             MediaService = Current.Services.MediaService;
             LanguageService = Current.Services.LocalizationService;
 
-            ValueSetBuilder = new UmbracoValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
+            ContentValueSetBuilder = new ContentValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
+            MediaValueSetBuilder = new MediaValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
 
             InitializeQueries(Current.SqlContext);
         }
@@ -75,7 +77,8 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
-            UmbracoValueSetBuilder valueSetBuilder,
+            IValueSetBuilder<IContent> contentValueSetBuilder,
+            IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IContentService contentService,
             IMediaService mediaService,
             ILocalizationService languageService,
@@ -91,7 +94,8 @@ namespace Umbraco.Examine
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
             ParentId = options.ParentId;
-            ValueSetBuilder = valueSetBuilder ?? throw new ArgumentNullException(nameof(valueSetBuilder));
+            ContentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
+            MediaValueSetBuilder = mediaValueSetBuilder ?? throw new ArgumentNullException(nameof(mediaValueSetBuilder));
             ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
@@ -286,7 +290,7 @@ namespace Umbraco.Examine
                             content = descendants.ToArray();
                         }
 
-                        IndexItems(ValueSetBuilder.GetValueSets(content));
+                        IndexItems(ContentValueSetBuilder.GetValueSets(content));
 
                         pageIndex++;
                     } while (content.Length == pageSize);
@@ -321,7 +325,7 @@ namespace Umbraco.Examine
                             media = descendants.ToArray();
                         }
 
-                        IndexItems(ValueSetBuilder.GetValueSets(media));
+                        IndexItems(MediaValueSetBuilder.GetValueSets(media));
 
                         pageIndex++;
                     } while (media.Length == pageSize);

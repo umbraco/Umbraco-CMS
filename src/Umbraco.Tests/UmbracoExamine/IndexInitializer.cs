@@ -184,7 +184,9 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer,
                 profilingLogger,
                 //fixme: need a property editor collection here
-                new UmbracoValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
+                new ContentValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
+                //fixme: need a property editor collection here
+                new MediaValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
                 contentService,
                 mediaService,
                 languageService,

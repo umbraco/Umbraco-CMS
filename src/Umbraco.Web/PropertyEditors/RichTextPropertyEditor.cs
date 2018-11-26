@@ -95,9 +95,9 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RichTextValueIndexer : IValueIndexer
         {
-            public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture)
+            public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
             {
-                var val = property.GetValue(culture);
+                var val = property.GetValue(culture, segment);
 
                 if (!(val is string strVal)) yield break;
 

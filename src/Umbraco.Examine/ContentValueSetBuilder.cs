@@ -8,15 +8,16 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Examine
 {
-    public class UmbracoValueSetBuilder
+    public class ContentValueSetBuilder : BaseValueSetBuilder, IValueSetBuilder<IContent>
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private readonly IUserService _userService;
 
-        public UmbracoValueSetBuilder(PropertyEditorCollection propertyEditors,
+        public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IUserService userService)
+            : base(propertyEditors)
         {
             _propertyEditors = propertyEditors;
             _urlSegmentProviders = urlSegmentProviders;
@@ -84,12 +85,12 @@ namespace Umbraco.Examine
                 {
                     if (!property.PropertyType.VariesByCulture())
                     {
-                        AddPropertyValue(null, property, values);
+                        AddPropertyValue(property, null, null, values);
                     }
                     else
                     {
                         foreach (var culture in c.AvailableCultures)
-                            AddPropertyValue(culture.ToLowerInvariant(), property, values);
+                            AddPropertyValue(property, culture.ToLowerInvariant(), null, values);
                     }
                 }
 
@@ -98,105 +99,6 @@ namespace Umbraco.Examine
                 yield return vs;
             }
         }
-
-        public IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
-        {
-            foreach (var m in media)
-            {
-                var urlValue = m.GetUrlSegment(_urlSegmentProviders);
-                var values = new Dictionary<string, object[]>
-                {
-                    {"icon", new object[] {m.ContentType.Icon}},
-                    {"id", new object[] {m.Id}},
-                    {"key", new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
-                    {"level", new object[] {m.Level}},
-                    {"creatorID", new object[] {m.CreatorId}},
-                    {"sortOrder", new object[] {m.SortOrder}},
-                    {"createDate", new object[] {m.CreateDate}},
-                    {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"urlName", new object[] {urlValue}},
-                    {"path", new object[] {m.Path}},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"creatorName", new object[] {m.GetCreatorProfile(_userService).Name}}
-                };
-
-                foreach (var property in m.Properties)
-                {
-                    AddPropertyValue(null, property, values);
-                }
-
-                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);
-
-                yield return vs;
-            }
-        }
-
-        public IEnumerable<ValueSet> GetValueSets(params IMember[] members)
-        {
-            foreach (var m in members)
-            {
-                var values = new Dictionary<string, object[]>
-                {
-                    {"icon", new object[] {m.ContentType.Icon}},
-                    {"id", new object[] {m.Id}},
-                    {"key", new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
-                    {"level", new object[] {m.Level}},
-                    {"creatorID", new object[] {m.CreatorId}},
-                    {"sortOrder", new object[] {m.SortOrder}},
-                    {"createDate", new object[] {m.CreateDate}},
-                    {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"path", new object[] {m.Path}},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"loginName", new object[] {m.Username}},
-                    {"email", new object[] {m.Email}},
-                };
-
-                foreach (var property in m.Properties)
-                {
-                    AddPropertyValue(null, property, values);
-                }
-
-                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Content, m.ContentType.Alias, values);
-
-                yield return vs;
-            }
-        }
-
-        private void AddPropertyValue(string culture, Property property, IDictionary<string, object[]> values)
-        {
-            var editor = _propertyEditors[property.Alias];
-            if (editor == null) return;
-
-            var indexVals = editor.ValueIndexer.GetIndexValues(property, culture);
-            foreach(var keyVal in indexVals)
-            {
-                if (keyVal.Key.IsNullOrWhiteSpace()) continue;
-
-                var cultureSuffix = culture == null ? string.Empty : "_" + culture;
-
-                foreach(var val in keyVal.Value)
-                {
-                    switch (val)
-                    {
-                        //only add the value if its not null or empty (we'll check for string explicitly here too)
-                        case null:
-                            continue;
-                        case string strVal:
-                            if (strVal.IsNullOrWhiteSpace()) return;
-                            values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
-                            break;
-                        default:
-                            values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
-                            break;
-                    }
-                }
-            }
-
-            
-        }
     }
+
 }

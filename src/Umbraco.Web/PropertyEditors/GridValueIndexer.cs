@@ -17,11 +17,11 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridValueIndexer : IValueIndexer
     {
-        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture)
+        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
         {
             var result = new Dictionary<string, object[]>();
 
-            var val = property.GetValue(culture);
+            var val = property.GetValue(culture, segment);
 
             //if there is a value, it's a string and it's detected as json
             if (val is string rawVal && rawVal.DetectIsJson())

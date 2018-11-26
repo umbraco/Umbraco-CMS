@@ -53,13 +53,18 @@
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseValueSetBuilder.cs" />
     <Compile Include="Config\ConfigIndexCriteria.cs" />
     <Compile Include="Config\ConfigIndexField.cs" />
     <Compile Include="Config\IndexFieldCollectionExtensions.cs" />
     <Compile Include="Config\IndexSet.cs" />
     <Compile Include="Config\IndexSetCollection.cs" />
     <Compile Include="Config\IndexSets.cs" />
+    <Compile Include="ContentValueSetBuilder.cs" />
     <Compile Include="IUmbracoIndexer.cs" />
+    <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="MediaValueSetBuilder.cs" />
+    <Compile Include="MemberValueSetBuilder.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
@@ -73,7 +78,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="UmbracoValueSetBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">

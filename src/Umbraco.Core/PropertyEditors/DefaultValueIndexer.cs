@@ -8,9 +8,9 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class DefaultValueIndexer : IValueIndexer
     {
-        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture)
+        public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
         {
-            yield return new KeyValuePair<string, object[]>(property.Alias, new[] { property.GetValue(culture) });
+            yield return new KeyValuePair<string, object[]>(property.Alias, new[] { property.GetValue(culture, segment) });
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoExamineIndexer
     {
-        private readonly UmbracoValueSetBuilder _valueSetBuilder;
+        private readonly IValueSetBuilder<IMember> _valueSetBuilder;
         private readonly IMemberService _memberService;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Umbraco.Examine
         public UmbracoMemberIndexer()
         {
             _memberService = Current.Services.MemberService;
-            _valueSetBuilder = new UmbracoValueSetBuilder(Current.PropertyEditors, null, null);
+            _valueSetBuilder = new MemberValueSetBuilder(Current.PropertyEditors);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
-            UmbracoValueSetBuilder valueSetBuilder,
+            IValueSetBuilder<IMember> valueSetBuilder,
             IMemberService memberService,
             IValueSetValidator validator = null) :
             base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)

@@ -27,6 +27,7 @@ using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
+using LightInject;
 
 namespace Umbraco.Web.Search
 {
@@ -38,7 +39,9 @@ namespace Umbraco.Web.Search
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private IExamineManager _examineManager;
-        private UmbracoValueSetBuilder _valueSetBuilder;
+        private IValueSetBuilder<IContent> _contentValueSetBuilder;
+        private IValueSetBuilder<IMedia> _mediaValueSetBuilder;
+        private IValueSetBuilder<IMember> _memberValueSetBuilder;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
@@ -58,15 +61,28 @@ namespace Umbraco.Web.Search
             base.Compose(composition);
 
             composition.Container.RegisterSingleton<IUmbracoIndexesBuilder, UmbracoIndexesBuilder>();
+            composition.Container.RegisterSingleton<ContentValueSetBuilder>();
+            composition.Container.RegisterSingleton<IValueSetBuilder<IContent>, ContentValueSetBuilder>();
+            composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
+            composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         }
 
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, UmbracoValueSetBuilder valueSetBuilder)
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
+            IExamineManager examineManager, ProfilingLogger profilingLogger,
+            IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IValueSetBuilder<IContent> contentValueSetBuilder,
+            IValueSetBuilder<IMedia> mediaValueSetBuilder,
+            IValueSetBuilder<IMember> memberValueSetBuilder)
         {
             _services = services;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
             _urlSegmentProviders = urlSegmentProviders;
-            _valueSetBuilder = valueSetBuilder;
+
+            _contentValueSetBuilder = contentValueSetBuilder;
+            _mediaValueSetBuilder = mediaValueSetBuilder;
+            _memberValueSetBuilder = memberValueSetBuilder;
 
             //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown
@@ -679,7 +695,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
             {
-                var valueSet = examineComponent._valueSetBuilder.GetValueSets(content);
+                var valueSet = examineComponent._contentValueSetBuilder.GetValueSets(content);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
@@ -710,7 +726,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = examineComponent._valueSetBuilder.GetValueSets(media);
+                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
@@ -740,7 +756,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = examineComponent._valueSetBuilder.GetValueSets(member);
+                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),

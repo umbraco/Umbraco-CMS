@@ -14,6 +14,7 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Search
 {
@@ -25,7 +26,9 @@ namespace Umbraco.Web.Search
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesBuilder(ProfilingLogger profilingLogger,
-            UmbracoValueSetBuilder valueSetBuilder,
+            IValueSetBuilder<IContent> contentValueSetBuilder,
+            IValueSetBuilder<IMedia> mediaValueSetBuilder,
+            IValueSetBuilder<IMember> memberValueSetBuilder,
             IContentService contentService,
             IMediaService mediaService,
             ILocalizationService languageService,
@@ -34,7 +37,9 @@ namespace Umbraco.Web.Search
             ISqlContext sqlContext)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
-            ValueSetBuilder = valueSetBuilder ?? throw new System.ArgumentNullException(nameof(valueSetBuilder));
+            ContentValueSetBuilder = contentValueSetBuilder ?? throw new System.ArgumentNullException(nameof(contentValueSetBuilder));
+            MediaValueSetBuilder = mediaValueSetBuilder ?? throw new System.ArgumentNullException(nameof(mediaValueSetBuilder));
+            MemberValueSetBuilder = memberValueSetBuilder ?? throw new System.ArgumentNullException(nameof(memberValueSetBuilder));
             ContentService = contentService ?? throw new System.ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new System.ArgumentNullException(nameof(mediaService));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
@@ -44,7 +49,9 @@ namespace Umbraco.Web.Search
         }
 
         protected ProfilingLogger ProfilingLogger { get; }
-        protected UmbracoValueSetBuilder ValueSetBuilder { get; }
+        protected IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
+        protected IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
+        protected IValueSetBuilder<IMember> MemberValueSetBuilder { get; }
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected ILocalizationService LanguageService { get; }
@@ -84,7 +91,7 @@ namespace Umbraco.Web.Search
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(name),
                 analyzer,
-                ProfilingLogger, ValueSetBuilder,
+                ProfilingLogger, ContentValueSetBuilder, MediaValueSetBuilder,
                 ContentService, MediaService, LanguageService, SqlContext,
                 GetContentValueSetValidator(options),
                 options);
@@ -100,7 +107,7 @@ namespace Umbraco.Web.Search
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
-                ProfilingLogger, ValueSetBuilder, MemberService,
+                ProfilingLogger, MemberValueSetBuilder, MemberService,
                 GetMemberValueSetValidator());
             return index;
         }
