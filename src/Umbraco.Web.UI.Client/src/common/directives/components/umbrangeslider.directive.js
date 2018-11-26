@@ -1,3 +1,62 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbRangeSlider
+@restrict E
+@scope
+
+@description
+<b>Added in Umbraco version 8.0</b>
+This directive is a wrapper of the noUiSlider library. Use it to render a slider.
+For extra details about options and events take a look here: https://refreshless.com/nouislider/
+
+<h3>Markup example</h3>
+<pre>
+	<div ng-controller="My.Controller as vm">
+
+        <umb-range-slider 
+            ng-model="vm.value"
+            on-end="vm.slideEnd(values)">
+        </umb-range-slider>
+
+	</div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+	(function () {
+		"use strict";
+
+		function Controller() {
+
+            var vm = this;
+
+            vm.value = [10];
+
+            vm.slideEnd = slideEnd;
+
+            function slideEnd(values) {
+            	// handle change
+            }
+
+        }
+
+		angular.module("umbraco").controller("My.Controller", Controller);
+
+	})();
+</pre>
+
+@param {object} ngModel (<code>binding</code>): Value for the slider.
+@param {object} options (<code>binding</code>): Config object for the date picker.
+@param {callback} onSetup (<code>callback</code>): onSetup gets triggered when the slider is initialized
+@param {callback} onUpdate (<code>callback</code>): onUpdate fires every time the slider values are changed.
+@param {callback} onSlide (<code>callback</code>): onSlide gets triggered when the handle is being dragged.
+@param {callback} onSet (<code>callback</code>): onSet will trigger every time a slider stops changing.
+@param {callback} onChange (<code>callback</code>): onChange fires when a user stops sliding, or when a slider value is changed by 'tap'.
+@param {callback} onStart (<code>callback</code>): onStart fires when a handle is clicked (mousedown, or the equivalent touch events).
+@param {callback} onEnd (<code>callback</code>): onEnd fires when a handle is released (mouseup etc), or when a slide is canceled due to other reasons.
+**/
+
+
 (function() {
 	'use strict';
 
