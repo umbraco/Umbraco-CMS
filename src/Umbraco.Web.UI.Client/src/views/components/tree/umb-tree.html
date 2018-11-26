@@ -1,7 +1,7 @@
 <ul class="umb-tree" ng-class="{'hide-options': hideoptions === 'true'}">
 
     <li ng-if="!tree.root.containsGroups">
-        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">
+        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader === 'true'" on-right-click="altSelect(tree.root, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(tree.root, $event)" class="umb-tree-root-link" data-element="tree-root-link">
                     <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(tree.root)"></i>
@@ -25,7 +25,8 @@
     <!-- REPEAT for each group in the tree -->
     <li ng-if="tree.root.containsGroups"
         ng-repeat="group in tree.root.children">
-        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(group)" ng-hide="hideheader" on-right-click="altSelect(group, $event)">
+
+        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(group)" ng-hide="hideheader === 'true'" on-right-click="altSelect(group, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(group, $event)" class="umb-tree-root-link" data-element="tree-root-link">
                     <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(group)"></i>
