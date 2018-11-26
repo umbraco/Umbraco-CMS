@@ -3,6 +3,7 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
     /// <summary>
     /// Represents a data editor.
     /// </summary>
@@ -65,5 +66,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</para>
         /// </remarks>
         IConfigurationEditor GetConfigurationEditor();
+
+        IValueIndexer ValueIndexer { get; }
     }
 }

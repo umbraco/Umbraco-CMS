@@ -22,6 +22,7 @@ using Umbraco.Examine.Config;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Examine.LuceneEngine;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Examine
 {
@@ -30,12 +31,11 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndexer : UmbracoExamineIndexer
     {
+        protected UmbracoValueSetBuilder ValueSetBuilder { get; }
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
-        protected IUserService UserService { get; }
         protected ILocalizationService LanguageService { get; }
 
-        private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private int? _parentId;
 
         #region Constructors
@@ -48,10 +48,9 @@ namespace Umbraco.Examine
         {
             ContentService = Current.Services.ContentService;
             MediaService = Current.Services.MediaService;
-            UserService = Current.Services.UserService;
             LanguageService = Current.Services.LocalizationService;
 
-            _urlSegmentProviders = Current.UrlSegmentProviders;
+            ValueSetBuilder = new UmbracoValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
 
             InitializeQueries(Current.SqlContext);
         }
@@ -66,9 +65,7 @@ namespace Umbraco.Examine
         /// <param name="profilingLogger"></param>
         /// <param name="contentService"></param>
         /// <param name="mediaService"></param>
-        /// <param name="userService"></param>
         /// <param name="sqlContext"></param>
-        /// <param name="urlSegmentProviders"></param>
         /// <param name="validator"></param>
         /// <param name="options"></param>
         /// <param name="indexValueTypes"></param>
@@ -78,12 +75,11 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
+            UmbracoValueSetBuilder valueSetBuilder,
             IContentService contentService,
             IMediaService mediaService,
-            IUserService userService,
             ILocalizationService languageService,
             ISqlContext sqlContext,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
@@ -95,12 +91,10 @@ namespace Umbraco.Examine
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
             ParentId = options.ParentId;
-
+            ValueSetBuilder = valueSetBuilder ?? throw new ArgumentNullException(nameof(valueSetBuilder));
             ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-            UserService = userService ?? throw new ArgumentNullException(nameof(userService));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-            _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             InitializeQueries(sqlContext);
         }
@@ -292,7 +286,7 @@ namespace Umbraco.Examine
                             content = descendants.ToArray();
                         }
 
-                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, content));
+                        IndexItems(ValueSetBuilder.GetValueSets(content));
 
                         pageIndex++;
                     } while (content.Length == pageSize);
@@ -327,7 +321,7 @@ namespace Umbraco.Examine
                             media = descendants.ToArray();
                         }
 
-                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, media));
+                        IndexItems(ValueSetBuilder.GetValueSets(media));
 
                         pageIndex++;
                     } while (media.Length == pageSize);
@@ -336,146 +330,7 @@ namespace Umbraco.Examine
             }
         }
 
-        /// <summary>
-        /// Creates a collection of <see cref="ValueSet"/> for a <see cref="IContent"/> collection
-        /// </summary>
-        /// <param name="urlSegmentProviders"></param>
-        /// <param name="userService"></param>
-        /// <param name="content"></param>
-        /// <returns>Yield returns <see cref="ValueSet"/></returns>
-        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IContent[] content)
-        {
-            //TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
-            // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
-            // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
-            // references and then each array is an array of `FieldValue[]` and values are assigned accordingly. Not sure if it will make a difference or not.
-
-            foreach (var c in content)
-            {
-                var isVariant = c.ContentType.VariesByCulture();
-
-                var urlValue = c.GetUrlSegment(urlSegmentProviders); //Always add invariant urlName
-                var values = new Dictionary<string, object[]>
-                {
-                    {"icon", new [] {c.ContentType.Icon}},
-                    {PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //Always add invariant published value
-                    {"id", new object[] {c.Id}},
-                    {"key", new object[] {c.Key}},
-                    {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
-                    {"level", new object[] {c.Level}},
-                    {"creatorID", new object[] {c.CreatorId}},
-                    {"sortOrder", new object[] {c.SortOrder}},
-                    {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
-                    {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
-                    {"nodeName", new object[] {c.Name}},            //Always add invariant nodeName
-                    {"urlName", new object[] {urlValue}},           //Always add invariant urlName
-                    {"path", new object[] {c.Path}},
-                    {"nodeType", new object[] {c.ContentType.Id}},
-                    {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
-                    {"writerName", new object[] {c.GetWriterProfile(userService)?.Name ?? "??"}},
-                    {"writerID", new object[] {c.WriterId}},
-                    {"template", new object[] {c.Template?.Id ?? 0}},
-                    {$"{SpecialFieldPrefix}VariesByCulture", new object[] {0}},
-                };
-
-                if (isVariant)
-                {
-                    values[$"{SpecialFieldPrefix}VariesByCulture"] = new object[] { 1 };
-
-                    foreach(var culture in c.AvailableCultures)
-                    {
-                        var variantUrl = c.GetUrlSegment(urlSegmentProviders, culture);
-                        var lowerCulture = culture.ToLowerInvariant();
-                        values[$"urlName_{lowerCulture}"] = new object[] { variantUrl };
-                        values[$"nodeName_{lowerCulture}"] = new object[] { c.GetCultureName(culture) };
-                        values[$"{PublishedFieldName}_{lowerCulture}"] = new object[] { c.IsCulturePublished(culture) ? 1 : 0 };
-                        values[$"updateDate_{lowerCulture}"] = new object[] { c.GetUpdateDate(culture) };
-                    }
-                }
-
-                foreach (var property in c.Properties)
-                {
-                    if (!property.PropertyType.VariesByCulture())
-                    {
-                        AddPropertyValue(null, c, property, values);
-                    }
-                    else
-                    {
-                        foreach (var culture in c.AvailableCultures)
-                            AddPropertyValue(culture.ToLowerInvariant(), c, property, values);
-                    }
-                }
-
-                var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
-
-                yield return vs;
-            }
-        }
-
-        private static void AddPropertyValue(string culture, IContent c, Property property, IDictionary<string, object[]> values)
-        {
-            var val = property.GetValue(culture);
-            var cultureSuffix = culture == null ? string.Empty : "_" + culture;
-            switch (val)
-            {
-                //only add the value if its not null or empty (we'll check for string explicitly here too)
-                case null:
-                    return;
-                case string strVal:
-                    if (strVal.IsNullOrWhiteSpace()) return;
-                    values.Add($"{property.Alias}{cultureSuffix}", new[] { val });
-                    break;
-                default:
-                    values.Add($"{property.Alias}{cultureSuffix}", new[] { val });
-                    break;
-            }
-        }
-
-        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IMedia[] media)
-        {
-            foreach (var m in media)
-            {
-                var urlValue = m.GetUrlSegment(urlSegmentProviders);
-                var values = new Dictionary<string, object[]>
-                {
-                    {"icon", new object[] {m.ContentType.Icon}},
-                    {"id", new object[] {m.Id}},
-                    {"key", new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
-                    {"level", new object[] {m.Level}},
-                    {"creatorID", new object[] {m.CreatorId}},
-                    {"sortOrder", new object[] {m.SortOrder}},
-                    {"createDate", new object[] {m.CreateDate}},
-                    {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"urlName", new object[] {urlValue}},
-                    {"path", new object[] {m.Path}},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"creatorName", new object[] {m.GetCreatorProfile(userService).Name}}
-                };
-
-                foreach (var property in m.Properties)
-                {
-                    //only add the value if its not null or empty (we'll check for string explicitly here too)
-                    var val = property.GetValue();
-                    switch (val)
-                    {
-                        case null:
-                            continue;
-                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
-                            values.Add(property.Alias, new[] { val });
-                            break;
-                        default:
-                            values.Add(property.Alias, new[] { val });
-                            break;
-                    }
-                }
-
-                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);
-
-                yield return vs;
-            }
-        }
+        
 
 
         #endregion

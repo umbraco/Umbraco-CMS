@@ -183,12 +183,12 @@ namespace Umbraco.Tests.UmbracoExamine
                 luceneDir,
                 analyzer,
                 profilingLogger,
+                //fixme: need a property editor collection here
+                new UmbracoValueSetBuilder(null, new[] { new DefaultUrlSegmentProvider() }, userService),
                 contentService,
                 mediaService,
-                userService,
                 languageService,
                 sqlContext,
-                new[] {new DefaultUrlSegmentProvider()},
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
                 options);
 

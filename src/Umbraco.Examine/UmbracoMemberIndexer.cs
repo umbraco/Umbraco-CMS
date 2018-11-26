@@ -23,6 +23,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoExamineIndexer
     {
+        private readonly UmbracoValueSetBuilder _valueSetBuilder;
         private readonly IMemberService _memberService;
 
         /// <summary>
@@ -32,6 +33,7 @@ namespace Umbraco.Examine
         public UmbracoMemberIndexer()
         {
             _memberService = Current.Services.MemberService;
+            _valueSetBuilder = new UmbracoValueSetBuilder(Current.PropertyEditors, null, null);
         }
 
         /// <summary>
@@ -50,10 +52,12 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
+            UmbracoValueSetBuilder valueSetBuilder,
             IMemberService memberService,
             IValueSetValidator validator = null) :
             base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
         {
+            _valueSetBuilder = valueSetBuilder ?? throw new ArgumentNullException(nameof(valueSetBuilder));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         }
 
@@ -99,7 +103,7 @@ namespace Umbraco.Examine
                     {
                         members = _memberService.GetAll(pageIndex, pageSize, out _, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
 
-                        IndexItems(GetValueSets(members));
+                        IndexItems(_valueSetBuilder.GetValueSets(members));
 
                         pageIndex++;
                     } while (members.Length == pageSize);
@@ -112,58 +116,14 @@ namespace Umbraco.Examine
                 {
                     members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
 
-                    IndexItems(GetValueSets(members));
+                    IndexItems(_valueSetBuilder.GetValueSets(members));
 
                     pageIndex++;
                 } while (members.Length == pageSize);
             }
         }
 
-        public static IEnumerable<ValueSet> GetValueSets(params IMember[] members)
-        {
-            foreach (var m in members)
-            {
-                var values = new Dictionary<string, object[]>
-                {
-                    {"icon", new object[] {m.ContentType.Icon}},
-                    {"id", new object[] {m.Id}},
-                    {"key", new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
-                    {"level", new object[] {m.Level}},
-                    {"creatorID", new object[] {m.CreatorId}},
-                    {"sortOrder", new object[] {m.SortOrder}},
-                    {"createDate", new object[] {m.CreateDate}},
-                    {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"path", new object[] {m.Path}},
-                    {"nodeType", new object[] {m.ContentType.Id}},
-                    {"loginName", new object[] {m.Username}},
-                    {"email", new object[] {m.Email}},
-                };
-
-                foreach (var property in m.Properties)
-                {
-                    //only add the value if its not null or empty (we'll check for string explicitly here too)
-                    var val = property.GetValue();
-                    switch (val)
-                    {
-                        case null:
-                            continue;
-                        case string strVal:
-                            if (strVal.IsNullOrWhiteSpace()) continue;
-                            values.Add(property.Alias, new[] { val });
-                            break;
-                        default:
-                            values.Add(property.Alias, new[] { val });
-                            break;
-                    }
-                }
-
-                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Content, m.ContentType.Alias, values);
-
-                yield return vs;
-            }
-        }
+        
 
         /// <summary>
         /// Ensure some custom values are added to the index

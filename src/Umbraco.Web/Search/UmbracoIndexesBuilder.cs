@@ -25,35 +25,32 @@ namespace Umbraco.Web.Search
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesBuilder(ProfilingLogger profilingLogger,
+            UmbracoValueSetBuilder valueSetBuilder,
             IContentService contentService,
             IMediaService mediaService,
-            IUserService userService,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService,
-            ISqlContext sqlContext,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            ISqlContext sqlContext)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
+            ValueSetBuilder = valueSetBuilder ?? throw new System.ArgumentNullException(nameof(valueSetBuilder));
             ContentService = contentService ?? throw new System.ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new System.ArgumentNullException(nameof(mediaService));
-            UserService = userService ?? throw new System.ArgumentNullException(nameof(userService));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
             SqlContext = sqlContext ?? throw new System.ArgumentNullException(nameof(sqlContext));
-            UrlSegmentProviders = urlSegmentProviders ?? throw new System.ArgumentNullException(nameof(urlSegmentProviders));
         }
 
         protected ProfilingLogger ProfilingLogger { get; }
+        protected UmbracoValueSetBuilder ValueSetBuilder { get; }
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
-        protected IUserService UserService { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
         protected ISqlContext SqlContext { get; }
-        protected IEnumerable<IUrlSegmentProvider> UrlSegmentProviders { get; }
 
         public const string InternalIndexPath = "Internal";
         public const string ExternalIndexPath = "External";
@@ -87,7 +84,8 @@ namespace Umbraco.Web.Search
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(name),
                 analyzer,
-                ProfilingLogger, ContentService, MediaService, UserService, LanguageService, SqlContext, UrlSegmentProviders,
+                ProfilingLogger, ValueSetBuilder,
+                ContentService, MediaService, LanguageService, SqlContext,
                 GetContentValueSetValidator(options),
                 options);
             return index;
@@ -102,7 +100,7 @@ namespace Umbraco.Web.Search
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
-                ProfilingLogger, MemberService,
+                ProfilingLogger, ValueSetBuilder, MemberService,
                 GetMemberValueSetValidator());
             return index;
         }

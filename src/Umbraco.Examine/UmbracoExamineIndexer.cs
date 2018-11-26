@@ -419,30 +419,6 @@ namespace Umbraco.Examine
                 e.IndexItem.ValueSet.Set(IndexPathFieldName, path);
             }
 
-            //strip html of all users fields if we detect it has HTML in it.
-            //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
-            //the value of the field 'as-is'.
-            foreach (var value in e.IndexItem.ValueSet.Values.ToList()) //ToList here to make a diff collection else we'll get collection modified errors
-            {
-                if (value.Value == null) continue;
-
-                if (value.Value.Count > 0)
-                {
-                    if (value.Value.First() is string str)
-                    {
-                        if (XmlHelper.CouldItBeXml(str))
-                        {
-                            //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
-                            e.IndexItem.ValueSet.Values[string.Concat(RawFieldPrefix, value.Key)] = new List<object> { str };
-
-                            //now replace the original value with the stripped html
-                            //TODO: This should be done with an analzer?!
-                            e.IndexItem.ValueSet.Values[value.Key] = new List<object> { str.StripHtml() };
-                        }
-                    }
-                }
-            }
-
             //icon
             if (e.IndexItem.ValueSet.Values.TryGetValue("icon", out var icon) && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {

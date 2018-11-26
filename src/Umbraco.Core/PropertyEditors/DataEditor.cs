@@ -154,6 +154,11 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
+        /// Returns the value indexer for this editor
+        /// </summary>
+        public virtual IValueIndexer ValueIndexer => new DefaultValueIndexer();
+
+        /// <summary>
         /// Creates a value editor instance.
         /// </summary>
         /// <returns></returns>

@@ -38,6 +38,7 @@ namespace Umbraco.Web.Search
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private IExamineManager _examineManager;
+        private UmbracoValueSetBuilder _valueSetBuilder;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
@@ -59,12 +60,13 @@ namespace Umbraco.Web.Search
             composition.Container.RegisterSingleton<IUmbracoIndexesBuilder, UmbracoIndexesBuilder>();
         }
 
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services, IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, UmbracoValueSetBuilder valueSetBuilder)
         {
             _services = services;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
             _urlSegmentProviders = urlSegmentProviders;
+            _valueSetBuilder = valueSetBuilder;
 
             //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown
@@ -113,8 +115,6 @@ namespace Umbraco.Web.Search
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
                 return;
-
-            BindGridToExamine(profilingLogger.Logger, examineManager, propertyEditors);
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
@@ -197,26 +197,7 @@ namespace Umbraco.Web.Search
                 }
             }
         }
-
-        //TODO: Change this to use a native way of indexing data: https://github.com/umbraco/Umbraco-CMS/issues/3531
-        private static void BindGridToExamine(ILogger logger, IExamineManager examineManager, IEnumerable propertyEditors)
-        {
-            //bind the grid property editors - this is a hack until http://issues.umbraco.org/issue/U4-8437
-            try
-            {
-                var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
-                if (grid != null)
-                {
-                    foreach (var i in examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>())
-                        i.DocumentWriting += grid.DocumentWriting;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error<ExamineComponent>(ex, "Failed to bind grid property editor.");
-            }
-        }
-
+        
         #region Cache refresher updated event handlers
         private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
@@ -698,7 +679,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
             {
-                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, content);
+                var valueSet = examineComponent._valueSetBuilder.GetValueSets(content);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
@@ -729,7 +710,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, media);
+                var valueSet = examineComponent._valueSetBuilder.GetValueSets(media);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
@@ -759,7 +740,7 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = UmbracoMemberIndexer.GetValueSets(member);
+                var valueSet = examineComponent._valueSetBuilder.GetValueSets(member);
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),

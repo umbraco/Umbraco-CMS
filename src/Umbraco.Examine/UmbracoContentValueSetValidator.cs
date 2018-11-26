@@ -7,6 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Used to validate a ValueSet for content - based on permissions, parent id, etc....
     /// </summary>

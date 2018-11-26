@@ -159,6 +159,7 @@
     <Compile Include="ContentApps\ContentInfoContentAppDefinition.cs" />
     <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
+    <Compile Include="PropertyEditors\GridValueIndexer.cs" />
     <Compile Include="Search\IUmbracoIndexesBuilder.cs" />
     <Compile Include="Search\UmbracoIndexesBuilder.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
