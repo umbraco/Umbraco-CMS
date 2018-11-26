@@ -35,6 +35,7 @@ namespace Umbraco.Web.Models.Trees
             CssClasses = new List<string>();
              //default
             Icon = "icon-folder-close";
+            Path = "-1";
         }
 
         [DataMember(Name = "parentId", IsRequired = true)]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -21,7 +22,7 @@ namespace Umbraco.Web.Trees
     [AngularJsonOnlyConfiguration]
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
-    {        
+    {
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>
@@ -184,6 +185,7 @@ namespace Umbraco.Web.Trees
                 //assign the route path based on the root node, this means it will route there when the section is navigated to
                 //and no dashboards will be available for this section
                 sectionRoot.RoutePath = rootNode.Result.RoutePath;
+                sectionRoot.Path = rootNode.Result.Path;
 
                 foreach (var d in rootNode.Result.AdditionalData)
                 {
