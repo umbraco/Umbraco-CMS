@@ -808,10 +808,10 @@ namespace Umbraco.Core.Persistence
 		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args)
 		{
 			string sqlCount, sqlPage;
-			BuildPageQueries<T>((page-1)*itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+            BuildPageQueries<T>(itemsPerPage.Equals(int.MaxValue) ? 0 : (page - 1) * itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
 
-			// Save the one-time command time out and use it for both queries
-			int saveTimeout = OneTimeCommandTimeout;
+            // Save the one-time command time out and use it for both queries
+            int saveTimeout = OneTimeCommandTimeout;
 
 			// Setup the paged result
 			var result = new Page<T>();

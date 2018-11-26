@@ -47,6 +47,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
 
             if (query == null) query = new Query<IAuditItem>();
+            var queryHasWhereClause = query.GetWhereClauses().Any();
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
 
@@ -65,8 +66,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     filterSql.Append(string.Format("({0})", filterClaus.Item1), filterClaus.Item2);
                     first = false;
                 }
-
-                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+                
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql, queryHasWhereClause);
             }
 
             if (auditTypeFilter.Length > 0)
@@ -82,8 +83,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     filterSql.Append("(logHeader = @logHeader)", new {logHeader = filterClaus.ToString() });
                     first = false;
                 }
-
-                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql);
+                
+                translatedQuery = GetFilteredSqlForPagedResults(translatedQuery, filterSql, queryHasWhereClause || hasCustomFilter);
             }
 
             if (orderDirection == Direction.Descending)
@@ -96,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = pagedResult.TotalItems;
 
             var pages = pagedResult.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
+                dto => new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
 
             //Mapping the DateStamp
             for (int i = 0; i < pages.Length; i++)
@@ -169,14 +170,17 @@ namespace Umbraco.Core.Persistence.Repositories
         }
         #endregion
 
-        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql)
+        private Sql GetFilteredSqlForPagedResults(Sql sql, Sql filterSql, bool hasWhereClause)
         {
             Sql filteredSql;
 
             // Apply filter
             if (filterSql != null)
             {
-                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+                //ensure we don't append a WHERE if there is already one
+                var sqlFilter = hasWhereClause
+                    ? " AND " + filterSql.SQL.TrimStart(" AND ")
+                    : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
                 // instance a couple of times to get the parameter order correct, for some reason the first
