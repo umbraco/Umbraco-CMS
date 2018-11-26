@@ -21,7 +21,6 @@
     "animejs": "2.2.0",
     "bootstrap-social": "4.8.0",
     "clipboard": "2.0.0",
-    "codemirror": "5.3.0",
     "diff": "3.4.0",
     "flatpickr": "4.5.2",
     "font-awesome": "4.7.0",
@@ -33,9 +32,8 @@
     "lazyload-js": "1.0.0",
     "moment": "2.10.6",
     "ng-file-upload": "12.2.13",
-    "npm": "^6.4.1",
     "signalr": "2.3.0",
-    "tinymce": "4.7.13",
+    "tinymce": "4.8.3",
     "typeahead.js": "0.10.5",
     "underscore": "1.9.1"
   },
