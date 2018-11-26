@@ -25,6 +25,7 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger)
         { }
 
+        //TODO: Change this to use a native way of indexing data: https://github.com/umbraco/Umbraco-CMS/issues/3531
         internal void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
             foreach (var value in e.ValueSet.Values)

@@ -178,12 +178,6 @@ namespace Umbraco.Examine
         public bool SupportProtectedContent { get; protected set; }
 
         /// <summary>
-        /// Determines if the manager will call the indexing methods when content is saved or deleted as
-        /// opposed to cache being updated.
-        /// </summary>
-        public bool SupportUnpublishedContent { get; protected set; }
-
-        /// <summary>
         /// If set this will filter the content items allowed to be indexed
         /// </summary>
         public int? ParentId

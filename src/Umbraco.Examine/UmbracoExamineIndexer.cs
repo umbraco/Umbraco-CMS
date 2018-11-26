@@ -57,7 +57,7 @@ namespace Umbraco.Examine
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndexer : LuceneIndexer
+    public abstract class UmbracoExamineIndexer : LuceneIndexer, IUmbracoIndexer
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -190,6 +190,14 @@ namespace Umbraco.Examine
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
+
+        /// <summary>
+        /// When set to true data will not be deleted from the index if the data is being unpublished (not deleted)
+        /// </summary>
+        /// <remarks>
+        /// Generally used only for published content
+        /// </remarks>
+        public bool SupportUnpublishedContent { get; protected set; } = false;
 
         /// <summary>
         /// the supported indexable types

@@ -106,7 +106,7 @@ namespace Umbraco.Web.Search
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredIndexers = examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
             profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
@@ -198,6 +198,7 @@ namespace Umbraco.Web.Search
             }
         }
 
+        //TODO: Change this to use a native way of indexing data: https://github.com/umbraco/Umbraco-CMS/issues/3531
         private static void BindGridToExamine(ILogger logger, IExamineManager examineManager, IEnumerable propertyEditors)
         {
             //bind the grid property editors - this is a hack until http://issues.umbraco.org/issue/U4-8437
@@ -369,7 +370,7 @@ namespace Umbraco.Web.Search
                 //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
                 foreach (var id in ci.Value.removedIds)
                 {
-                    foreach (var index in _examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>())
+                    foreach (var index in _examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>())
                     {
                         var searcher = index.GetSearcher();
 
@@ -762,7 +763,7 @@ namespace Umbraco.Web.Search
 
                 examineComponent._examineManager.IndexItems(
                     valueSet.ToArray(),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
+                    examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
                         //ensure that only the providers are flagged to listen execute
                         .Where(x => x.EnableDefaultEventHandler));
             }
@@ -790,10 +791,10 @@ namespace Umbraco.Web.Search
             {
                 examineComponent._examineManager.DeleteFromIndexes(
                     id.ToString(CultureInfo.InvariantCulture),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
+                    examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
                         // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                         // otherwise if keepIfUnpublished == false then remove from all indexes
-                        .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
+                        .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
                         .Where(x => x.EnableDefaultEventHandler));
             }
         }
