@@ -4,84 +4,12 @@
 
     /** configure some defaults on init */
     function configureDefaults() {
-
-        $scope.model.config.orientation = $scope.model.config.orientation ? $scope.model.config.orientation : "horizontal";
         $scope.model.config.enableRange = $scope.model.config.enableRange ? Object.toBoolean($scope.model.config.enableRange) : false;
         $scope.model.config.initVal1 = $scope.model.config.initVal1 ? parseFloat($scope.model.config.initVal1) : 0;
         $scope.model.config.initVal2 = $scope.model.config.initVal2 ? parseFloat($scope.model.config.initVal2) : 0;
         $scope.model.config.minVal = $scope.model.config.minVal ? parseFloat($scope.model.config.minVal) : 0;
         $scope.model.config.maxVal = $scope.model.config.maxVal ? parseFloat($scope.model.config.maxVal) : 100;
         $scope.model.config.step = $scope.model.config.step ? parseFloat($scope.model.config.step) : 1;
-
-
-        if (!$scope.model.config.handle) {
-            $scope.model.config.handle = "round";
-        }
-
-        if (!$scope.model.config.reversed) {
-            $scope.model.config.reversed = false;
-        }
-        else {
-            $scope.model.config.reversed = Object.toBoolean($scope.model.config.reversed);
-        }
-
-        if (!$scope.model.config.tooltip) {
-            $scope.model.config.tooltip = "show";
-        }
-
-        if (!$scope.model.config.tooltipSplit) {
-            $scope.model.config.tooltipSplit = false;
-        }
-        else {
-            $scope.model.config.tooltipSplit = Object.toBoolean($scope.model.config.tooltipSplit);
-        }
-
-        if ($scope.model.config.tooltipFormat) {
-            $scope.model.config.formatter = function (value) {
-                if (angular.isArray(value) && $scope.model.config.enableRange) {
-                    return $scope.model.config.tooltipFormat.replace("{0}", value[0]).replace("{1}", value[1]);
-                } else {
-                    return $scope.model.config.tooltipFormat.replace("{0}", value);
-                }
-            }
-        }
-
-        if (!$scope.model.config.ticks) {
-            $scope.model.config.ticks = [];
-        }
-        else if (angular.isString($scope.model.config.ticks)) {
-            // returns comma-separated string to an array, e.g. [0, 100, 200, 300, 400]
-            $scope.model.config.ticks = _.map($scope.model.config.ticks.split(','), function (item) {
-                return parseInt(item.trim());
-            });
-        }
-
-        if (!$scope.model.config.ticksPositions) {
-            $scope.model.config.ticksPositions = [];
-        }
-        else if (angular.isString($scope.model.config.ticksPositions)) {
-            // returns comma-separated string to an array, e.g. [0, 30, 60, 70, 90, 100]
-            $scope.model.config.ticksPositions = _.map($scope.model.config.ticksPositions.split(','), function (item) {
-                return parseInt(item.trim());
-            });
-        }
-
-        if (!$scope.model.config.ticksLabels) {
-            $scope.model.config.ticksLabels = [];
-        }
-        else if (angular.isString($scope.model.config.ticksLabels)) {
-            // returns comma-separated string to an array, e.g. ['$0', '$100', '$200', '$300', '$400']
-            $scope.model.config.ticksLabels = _.map($scope.model.config.ticksLabels.split(','), function (item) {
-                return item.trim();
-            });
-        }
-
-        if (!$scope.model.config.ticksSnapBounds) {
-            $scope.model.config.ticksSnapBounds = 0;
-        }
-        else {
-            $scope.model.config.ticksSnapBounds = parseFloat($scope.model.config.ticksSnapBounds);
-        }
     }
 
     function getValueForSlider(val) {
@@ -138,20 +66,7 @@
         var slider = $element.find('.slider-item').bootstrapSlider({
             max: $scope.model.config.maxVal,
             min: $scope.model.config.minVal,
-            orientation: $scope.model.config.orientation,
-            selection: $scope.model.config.reversed ? "after" : "before",
             step: $scope.model.config.step,
-            precision: $scope.model.config.precision,
-            tooltip: $scope.model.config.tooltip,
-            tooltip_split: $scope.model.config.tooltipSplit,
-            tooltip_position: $scope.model.config.tooltipPosition,
-            handle: $scope.model.config.handle,
-            reversed: $scope.model.config.reversed,
-            ticks: $scope.model.config.ticks,
-            ticks_positions: $scope.model.config.ticksPositions,
-            ticks_labels: $scope.model.config.ticksLabels,
-            ticks_snap_bounds: $scope.model.config.ticksSnapBounds,
-            formatter: $scope.model.config.formatter,
             range: $scope.model.config.enableRange,
             //set the slider val - we cannot do this with data- attributes when using ranges
             value: sliderVal
