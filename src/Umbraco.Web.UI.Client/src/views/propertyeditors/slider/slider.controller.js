@@ -216,8 +216,18 @@
             "range": {
                 "min": min,
                 "max": max
+            },
+            "pips": {
+                mode: 'steps',
+                density: 100,
+                filter: filterPips
             }
         };
+
+        function filterPips(value, type) {
+            // show a pip for min and maximum value
+            return value === $scope.model.config.minVal || value === $scope.model.config.maxVal ? 1 : -1;
+        }
 
         //tell the assetsService to load the bootstrap slider
         //libs from the plugin folder
