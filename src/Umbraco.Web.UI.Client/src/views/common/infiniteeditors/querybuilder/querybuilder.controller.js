@@ -15,9 +15,7 @@
         vm.conditions = [];
 
         vm.datePickerConfig = {
-            pickDate: true,
-            pickTime: false,
-            format: "YYYY-MM-DD"
+            dateFormat: "Y-m-d"
         };
 
         vm.chooseSource = chooseSource;
@@ -180,9 +178,10 @@
             throttledFunc();
         }
 
-        function datePickerChange(event, filter) {
-            if (event.date && event.date.isValid()) {
-                filter.constraintValue = event.date.format(vm.datePickerConfig.format);
+        function datePickerChange(date, filter) {
+            const momentDate = moment(date);
+            if (momentDate && momentDate.isValid()) {
+                filter.constraintValue = momentDate.format(vm.datePickerConfig.format);
                 throttledFunc();
             }
         }

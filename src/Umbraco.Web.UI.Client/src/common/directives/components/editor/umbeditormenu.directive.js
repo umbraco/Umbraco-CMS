@@ -1,50 +1,63 @@
-(function() {
-   'use strict';
+(function () {
+    'use strict';
 
-   function EditorMenuDirective($injector, treeService, navigationService, umbModelMapper, appState) {
+    function EditorMenuDirective($injector, treeService, navigationService, umbModelMapper, appState) {
 
-      function link(scope, el, attr, ctrl) {
+        function link(scope, el, attr, ctrl) {
 
-         //adds a handler to the context menu item click, we need to handle this differently
-         //depending on what the menu item is supposed to do.
-         scope.executeMenuItem = function (action) {
-             navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
-         };
+            scope.dropdown = {
+                isOpen: false
+            };
 
-         //callback method to go and get the options async
-         scope.getOptions = function () {
+            function onInit() {
 
-             if (!scope.currentNode) {
-                 return;
-             }
+                getOptions();
 
-             //when the options item is selected, we need to set the current menu item in appState (since this is synonymous with a menu)
-             appState.setMenuState("currentNode", scope.currentNode);
+            }
 
-             if (!scope.actions) {
-                 treeService.getMenu({ treeNode: scope.currentNode })
-                     .then(function (data) {
-                         scope.actions = data.menuItems;
-                     });
-             }
-         };
+            //adds a handler to the context menu item click, we need to handle this differently
+            //depending on what the menu item is supposed to do.
+            scope.executeMenuItem = function (action) {
+                navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
+                scope.dropdown.isOpen = false;
+            };
 
-      }
+            //callback method to go and get the options async
+            function getOptions() {
 
-      var directive = {
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/editor/umb-editor-menu.html',
-         link: link,
-         scope: {
-            currentNode: "=",
-            currentSection: "@"
-         }
-      };
+                if (!scope.currentNode) {
+                    return;
+                }
 
-      return directive;
-   }
+                //when the options item is selected, we need to set the current menu item in appState (since this is synonymous with a menu)
+                appState.setMenuState("currentNode", scope.currentNode);
 
-   angular.module('umbraco.directives').directive('umbEditorMenu', EditorMenuDirective);
+                if (!scope.actions) {
+                    treeService.getMenu({ treeNode: scope.currentNode })
+                        .then(function (data) {
+                            scope.actions = data.menuItems;
+                        });
+                }
+            };
+
+            onInit();
+
+        }
+
+        var directive = {
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/editor/umb-editor-menu.html',
+            link: link,
+            scope: {
+                currentNode: "=",
+                currentSection: "@"
+            }
+        };
+
+        return directive;
+    }
+
+    angular.module('umbraco.directives').directive('umbEditorMenu', EditorMenuDirective);
 
 })();
