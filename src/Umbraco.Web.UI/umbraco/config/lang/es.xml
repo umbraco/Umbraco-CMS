@@ -1855,7 +1855,7 @@
         <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Email de notificación has sido configurado como <strong>%0%</strong>.]]></key>
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[El email de notificación está todavía configurado en tuvalor por defecto: <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Los resultados de los Chequeos de Salud de Umbraco programados para ejecutarse el %0% a las %1% son:</p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Status de los Chequeos de Salud de Umbraco</key>
+        <key alias="scheduledHealthCheckEmailSubject">Status de los Chequeos de Salud de Umbraco: %0%</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Desactivar URL tracker</key>
