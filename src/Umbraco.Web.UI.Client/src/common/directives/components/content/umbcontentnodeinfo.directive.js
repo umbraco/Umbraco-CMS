@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource) {
+    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
         function link(scope, element, attrs, umbVariantContentCtrl) {
 
@@ -32,7 +32,9 @@
                     "content_unpublished", 
                     "content_published",
                     "content_publishedPendingChanges",
-                    "content_notCreated"
+                    "content_notCreated",
+                    "prompt_unsavedChanges",
+                    "prompt_doctypeChangeWarning"
                 ];
 
                 localizationService.localizeMany(keys)
@@ -42,6 +44,8 @@
                         labels.published = data[2];
                         labels.publishedPendingChanges = data[3];
                         labels.notCreated = data[4];
+                        labels.unsavedChanges = data[5];
+                        labels.doctypeChangeWarning = data[6];
 
                         setNodePublishStatus(scope.node);
 
@@ -84,7 +88,36 @@
             };
 
             scope.openDocumentType = function (documentType) {
-                var editor = {
+
+                const variantIsDirty = _.some(scope.node.variants, function(variant) {
+                    return variant.isDirty;
+                });
+
+                // add confirmation dialog before opening the doc type editor
+                if(variantIsDirty) {
+                    const confirm = {
+                        title: labels.unsavedChanges,
+                        view: "default",
+                        content: labels.doctypeChangeWarning,
+                        submitButtonLabelKey: "general_continue",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function() {
+                            openDocTypeEditor(documentType);
+                            overlayService.close();
+                        },
+                        close: function() {
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(confirm);
+                } else {
+                    openDocTypeEditor(documentType);
+                }
+
+            };
+
+            function openDocTypeEditor(documentType) {
+                const editor = {
                     id: documentType.id,
                     submit: function(model) {
                         const args = { node: scope.node };
@@ -96,7 +129,7 @@
                     }
                 };
                 editorService.documentTypeEditor(editor);
-            };
+            }
 
             scope.openTemplate = function () {
                 var templateEditor = {
