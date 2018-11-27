@@ -10,6 +10,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
+
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class EventsTest : ExamineBaseTest
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
-                
+
                 var contentService = new ExamineDemoDataContentService();
                 //get a node from the data repo
                 var node = contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -33,9 +34,9 @@ namespace Umbraco.Tests.UmbracoExamine
                                           .First();
 
                 var valueSet = node.ConvertToValueSet(IndexTypes.Content);
-                indexer.IndexItems(new[] {valueSet});
+                indexer.IndexItems(new[] { valueSet });
 
-                var found = searcher.Search(searcher.CreateCriteria().Id((string) node.Attribute("id")).Compile());
+                var found = searcher.Search(searcher.CreateCriteria().Id((string)node.Attribute("id")).Compile());
 
                 Assert.AreEqual(0, found.TotalItemCount);
             }

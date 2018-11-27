@@ -31,6 +31,8 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndexer : UmbracoExamineIndexer
     {
+        public const string VariesByCultureFieldName = UmbracoExamineIndexer.SpecialFieldPrefix + "VariesByCulture";
+
         public IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
         public IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
         protected IContentService ContentService { get; }
@@ -304,10 +306,6 @@ namespace Umbraco.Examine
                         mediaParentId = ParentId.Value;
                     }
 
-                    // merge note: 7.5 changes this to use mediaService.GetPagedXmlEntries but we cannot merge the
-                    // change here as mediaService does not provide access to Xml in v8 - and actually Examine should
-                    // not assume that Umbraco provides Xml at all.
-
                     IMedia[] media;
 
                     do
@@ -334,9 +332,77 @@ namespace Umbraco.Examine
             }
         }
 
-        
+        //TODO: We want to make a public method that iterates a data set, potentially with callbacks so that we can iterate
+        // a single data set once but populate multiple indexes with it. This is for Startup performance when no indexes exist.
+        // This could be used for any indexer of type UmbracoContentIndexer - BUT that means we need to make another interface
+        // for content indexers since UmbracoContentIndexer is strongly tied to lucene, so maybe we have a more generic interface
+        // or add to the current IUmbracoIndexer interface
 
 
         #endregion
+    }
+
+    public class ContentIndexDataSource
+    {
+        public ContentIndexDataSource(bool supportUnpublishedContent, int? parentId,
+            IContentService contentService, ISqlContext sqlContext,
+            IValueSetBuilder<IContent> contentValueSetBuilder)
+        {
+            SupportUnpublishedContent = supportUnpublishedContent;
+            ParentId = parentId;
+            ContentService = contentService;
+            _contentValueSetBuilder = contentValueSetBuilder;
+            if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
+            _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
+
+        }
+
+        public bool SupportUnpublishedContent { get; }
+        public int? ParentId { get; }
+        public IContentService ContentService { get; }
+
+        /// <summary>
+        /// This is a static query, it's parameters don't change so store statically
+        /// </summary>
+        private static IQuery<IContent> _publishedQuery;
+        private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
+
+        public void Index(params IIndexer[] indexes)
+        {
+            const int pageSize = 10000;
+            var pageIndex = 0;
+
+            var contentParentId = -1;
+            if (ParentId.HasValue && ParentId.Value > 0)
+            {
+                contentParentId = ParentId.Value;
+            }
+            IContent[] content;
+
+            do
+            {
+                long total;
+
+                IEnumerable<IContent> descendants;
+                if (SupportUnpublishedContent)
+                {
+                    descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
+                }
+                else
+                {
+                    //add the published filter
+                    //note: We will filter for published variants in the validator
+                    descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total,
+                        _publishedQuery, Ordering.By("Path", Direction.Ascending));
+                }
+
+                content = descendants.ToArray();
+
+                foreach(var index in indexes)
+                    index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
+
+                pageIndex++;
+            } while (content.Length == pageSize);
+        }
     }
 }

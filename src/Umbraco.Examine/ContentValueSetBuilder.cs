@@ -63,12 +63,12 @@ namespace Umbraco.Examine
                     {"writerName", new object[] {c.GetWriterProfile(_userService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
                     {"template", new object[] {c.Template?.Id ?? 0}},
-                    {$"{UmbracoExamineIndexer.SpecialFieldPrefix}VariesByCulture", new object[] {0}},
+                    {UmbracoContentIndexer.VariesByCultureFieldName, new object[] {0}},
                 };
 
                 if (isVariant)
                 {
-                    values[$"{UmbracoExamineIndexer.SpecialFieldPrefix}VariesByCulture"] = new object[] { 1 };
+                    values[UmbracoContentIndexer.VariesByCultureFieldName] = new object[] { 1 };
 
                     foreach (var culture in c.AvailableCultures)
                     {

@@ -206,6 +206,7 @@
     <Compile Include="Testing\Objects\Accessors\TestUmbracoContextAccessor.cs" />
     <Compile Include="CoreThings\UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
+    <Compile Include="UmbracoExamine\UmbracoContentValueSetValidatorTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -463,7 +464,6 @@
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
     <Compile Include="UmbracoExamine\SearchTests.cs" />
-    <Compile Include="UmbracoExamine\TestDataService.cs" />
     <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
