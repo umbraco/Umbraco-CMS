@@ -274,10 +274,17 @@ namespace Umbraco.Core.Components
 
         private void InstantiateComponents(IEnumerable<Type> types)
         {
+            IUmbracoComponent InstantiateComponent(Type type)
+            {
+                var ctor = type.GetConstructor(Array.Empty<Type>());
+                if (ctor == null)
+                    throw new InvalidOperationException($"Component {type.FullName} does not have a parameter-less.");
+                return (IUmbracoComponent) ctor.Invoke(Array.Empty<object>());
+            }
+
             using (_logger.DebugDuration<Components>("Instantiating components.", "Instantiated components."))
             {
-                // fixme is there a faster way?
-                _components = types.Select(x => (IUmbracoComponent) Activator.CreateInstance(x)).ToArray();
+                _components = types.Select(InstantiateComponent).ToArray();
             }
         }
 
