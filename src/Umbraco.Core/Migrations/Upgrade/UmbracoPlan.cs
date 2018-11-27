@@ -144,6 +144,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<TagsMigrationFix>("{EE429F1B-9B26-43CA-89F8-A86017C809A3}");
             Chain<DropTemplateDesignColumn>("{08919C4B-B431-449C-90EC-2B8445B5C6B1}");
             Chain<TablesForScheduledPublishing>("{7EB0254C-CB8B-4C75-B15B-D48C55B449EB}");
+            Chain<DropTaskTables>("{648A2D5F-7467-48F8-B309-E99CEEE00E2A}"); // fixed version
 
             //FINAL
 
