@@ -181,7 +181,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-            
+
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
