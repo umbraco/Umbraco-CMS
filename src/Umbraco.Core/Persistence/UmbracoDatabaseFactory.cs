@@ -28,7 +28,6 @@ namespace Umbraco.Core.Persistence
         private readonly ILogger _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        private SqlContext _sqlContext;
         private DatabaseFactory _npocoDatabaseFactory;
         private IPocoDataFactory _pocoDataFactory;
         private string _connectionString;
@@ -130,7 +129,7 @@ namespace Umbraco.Core.Persistence
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
                 || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
             {
-                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(_connectionString, _providerName).ProductVersionName;
+                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(_connectionString, _providerName, _logger).ProductVersionName;
             }
             else
             {
@@ -156,7 +155,7 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
-        public ISqlContext SqlContext => _sqlContext ?? (_sqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers.Value));
+        public ISqlContext SqlContext { get; private set; }
 
         /// <inheritdoc />
         public void ConfigureForUpgrade()
@@ -208,6 +207,8 @@ namespace Umbraco.Core.Persistence
                     .WithFluentConfig(config)); // with proper configuration
 
                 if (_npocoDatabaseFactory == null) throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
+
+                SqlContext = new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;

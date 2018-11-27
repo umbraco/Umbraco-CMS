@@ -101,7 +101,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void TearDown()
         {
-            var profilingLogger = Container.TryGetInstance<ProfilingLogger>();
+            var profilingLogger = Container.TryGetInstance<IProfilingLogger>();
             var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // fixme move that one up
             try
             {

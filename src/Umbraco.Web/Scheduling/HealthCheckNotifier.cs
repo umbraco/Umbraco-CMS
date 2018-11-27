@@ -15,12 +15,12 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly ILogger _logger;
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
 
         public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IRuntimeState runtimeState,
-            ILogger logger, ProfilingLogger proflog)
+            ILogger logger, IProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;

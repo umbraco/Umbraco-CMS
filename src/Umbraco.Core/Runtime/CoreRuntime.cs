@@ -52,8 +52,6 @@ namespace Umbraco.Core.Runtime
             // create and register the essential services
             // ie the bare minimum required to boot
 
-            var composition = new Composition(container, RuntimeLevel.Boot);
-
             // loggers
             var logger = GetLogger();
             container.RegisterInstance(logger);
@@ -93,7 +91,10 @@ namespace Umbraco.Core.Runtime
             {
                 Level = RuntimeLevel.Boot
             };
-            container.RegisterInstance(_state);
+            container.RegisterInstance<IRuntimeState>(_state);
+
+            // create the composition
+            var composition = new Composition(container, typeLoader, RuntimeLevel.Boot);
 
             // register runtime-level services
             Compose(composition);

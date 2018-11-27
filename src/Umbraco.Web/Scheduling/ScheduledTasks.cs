@@ -21,11 +21,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
 
         public ScheduledTasks(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IUmbracoSettingsSection settings, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IUmbracoSettingsSection settings, ILogger logger, IProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Scheduling
                 {
                     BaseAddress = _runtime.ApplicationUrl
                 };
-            
+
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             //TODO: pass custom the authorization header, currently these aren't really secured!

@@ -30,13 +30,13 @@ namespace Umbraco.Web.Editors
         public DashboardController()
         { }
 
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
         { }
 
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
-        
+
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")

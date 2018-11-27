@@ -28,7 +28,7 @@ namespace Umbraco.Web.Scheduling
         private IContentService _contentService;
         private IAuditService _auditService;
         private ILogger _logger;
-        private ProfilingLogger _proflog;
+        private IProfilingLogger _proflog;
         private IScopeProvider _scopeProvider;
         private HealthCheckCollection _healthChecks;
         private HealthCheckNotificationMethodCollection _notifications;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Scheduling
         public void Initialize(IRuntimeState runtime,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
+            IScopeProvider scopeProvider, ILogger logger, IProfilingLogger proflog)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Scheduling
 
         private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecks healthCheckConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            ILogger logger, ProfilingLogger proflog)
+            ILogger logger, IProfilingLogger proflog)
         {
             // If first run time not set, start with just small delay after application start
             int delayInMilliseconds;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Scoping;
 
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName)
+        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, ILogger logger)
         {
             var factory = DbProviderFactories.GetFactory(providerName);
             var connection = factory.CreateConnection();
@@ -132,12 +133,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     command.CommandText = sql;
                     using (var reader = command.ExecuteReader())
                     {
+                        reader.Read();
                         version = new ServerVersionInfo(reader.GetString(0), reader.GetString(2), reader.GetString(3), (EngineEdition) reader.GetInt32(5), reader.GetString(7), reader.GetString(9));
                     }
                     connection.Close();
                 }
-                catch
+                catch (Exception e)
                 {
+                    logger.Error<UmbracoDatabaseFactory>(e, "Failed to detected SqlServer version.");
                     version = new ServerVersionInfo(); // all unknown
                 }
             }

@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
         {
         }
@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
                 if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
                     return UserState.Invited;
                 */
-                if (identityUser != null && !identityUser.IsApproved) 
+                if (identityUser != null && !identityUser.IsApproved)
                 {
                     var user = Services.UserService.GetByUsername(identityUser.UserName);
                     //also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password

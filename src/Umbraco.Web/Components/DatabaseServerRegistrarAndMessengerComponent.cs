@@ -57,7 +57,7 @@ namespace Umbraco.Web.Components
                 var runtime = ContainerExtensions.GetInstance<IRuntimeState>(factory);
                 var databaseFactory = ContainerExtensions.GetInstance<IUmbracoDatabaseFactory>(factory);
                 var globalSettings = ContainerExtensions.GetInstance<IGlobalSettings>(factory);
-                var proflog = ContainerExtensions.GetInstance<ProfilingLogger>(factory);
+                var proflog = ContainerExtensions.GetInstance<IProfilingLogger>(factory);
                 var scopeProvider = ContainerExtensions.GetInstance<IScopeProvider>(factory);
                 var sqlContext = ContainerExtensions.GetInstance<ISqlContext>(factory);
 

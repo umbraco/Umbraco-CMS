@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Routing
                 container.RegisterInstance<ILogger>(logger);
                 var profiler = Mock.Of<IProfiler>();
                 container.RegisterInstance<IProfiler>(profiler);
-                container.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
+                container.RegisterInstance<IProfilingLogger>(new ProfilingLogger(logger, profiler));
 
                 base.Boot(container);
             }
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
                 : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
             {
             }

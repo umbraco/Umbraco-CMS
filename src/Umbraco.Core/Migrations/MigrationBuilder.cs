@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations
@@ -15,7 +14,7 @@ namespace Umbraco.Core.Migrations
 
         public IMigration Build(Type migrationType, IMigrationContext context)
         {
-            return (IMigration) _container.CreateInstance(migrationType, new Dictionary<string, object>{{"context", context}});
+            return (IMigration) _container.CreateInstance(migrationType, context);
         }
     }
 }

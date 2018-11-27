@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
             Assert.IsInstanceOf<TestProfiler>(Current.Profiler);
         }
 
-        private static ProfilingLogger GetTestProfilingLogger()
+        private static IProfilingLogger GetTestProfilingLogger()
         {
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();

@@ -567,7 +567,7 @@ namespace Umbraco.Web.Macros
         private static readonly Regex HrefRegex = new Regex("href=\"([^\"]*)\"",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, ProfilingLogger plogger)
+        public static string GetRenderedMacro(int macroId, Hashtable elements, Hashtable attributes, int pageId, IMacroService macroService, IProfilingLogger plogger)
         {
             var m = macroService.GetById(macroId);
             if (m == null) return string.Empty;

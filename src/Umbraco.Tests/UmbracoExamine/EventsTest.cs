@@ -22,7 +22,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
-                
+
                 var contentService = new ExamineDemoDataContentService();
                 //get a node from the data repo
                 var node = contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")

@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly ServiceContext _services;
-        private readonly ProfilingLogger _profilingLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
 
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             ServiceContext services,
-            ProfilingLogger proflog,
+            IProfilingLogger proflog,
             Func<string, IEnumerable<string>> getRolesForLogin = null)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Routing
             _services = services ?? throw new ArgumentNullException(nameof(services));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            _logger = proflog.Logger;
+            _logger = proflog;
 
             GetRolesForLogin = getRolesForLogin ?? (s => Roles.Provider.GetRolesForUser(s));
         }

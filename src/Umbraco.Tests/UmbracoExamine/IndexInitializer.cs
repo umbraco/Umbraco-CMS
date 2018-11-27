@@ -29,7 +29,7 @@ namespace Umbraco.Tests.UmbracoExamine
     internal static class IndexInitializer
     {
         public static UmbracoContentIndexer GetUmbracoIndexer(
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             Directory luceneDir,
             ISqlContext sqlContext,
             Analyzer analyzer = null,

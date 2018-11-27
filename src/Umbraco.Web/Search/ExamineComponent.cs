@@ -49,7 +49,7 @@ namespace Umbraco.Web.Search
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, IProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
         {
             _services = services;
             _urlSegmentProviders = urlSegmentProviderCollection;
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Search
                 var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
                 return simpleFsLockFactory;
             };
-            
+
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = mainDom.Register(() =>
             {
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
+                profilingLogger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers();
@@ -88,17 +88,17 @@ namespace Umbraco.Web.Search
                 return; //exit, do not continue
             }
 
-            profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            profilingLogger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
             var registeredIndexers = examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
 
-            profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            profilingLogger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
                 return;
 
-            BindGridToExamine(profilingLogger.Logger, examineManager, propertyEditors);
+            BindGridToExamine(profilingLogger, examineManager, propertyEditors);
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
@@ -107,9 +107,9 @@ namespace Umbraco.Web.Search
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
 
-            EnsureUnlocked(profilingLogger.Logger, examineManager);
+            EnsureUnlocked(profilingLogger, examineManager);
 
-            RebuildIndexesOnStartup(profilingLogger.Logger);
+            RebuildIndexesOnStartup(profilingLogger);
         }
 
         /// <summary>
@@ -333,9 +333,9 @@ namespace Umbraco.Web.Search
 
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
-                        
+
             var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
-           
+
             foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (!changedIds.TryGetValue(payload.ItemType, out var idLists))
@@ -545,7 +545,7 @@ namespace Umbraco.Web.Search
                         var total = long.MaxValue;
                         while(page * pageSize < total)
                         {
-                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, 
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total,
                                 //order by shallowest to deepest, this allows us to check it's published state without checking every item
                                 ordering: Ordering.By("Path", Direction.Ascending));
 
@@ -642,7 +642,7 @@ namespace Umbraco.Web.Search
             if (actions != null)
                 actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
             else
-                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);            
+                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);
         }
 
         private class DeferedActions
@@ -686,7 +686,7 @@ namespace Umbraco.Web.Search
             private readonly bool? _supportUnpublished;
 
             public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
-            {                
+            {
                 _examineComponent = examineComponent;
                 _content = content;
                 _supportUnpublished = supportUnpublished;

@@ -17,11 +17,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IAuditService _auditService;
         private readonly IUmbracoSettingsSection _settings;
         private readonly ILogger _logger;
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, IAuditService auditService, IUmbracoSettingsSection settings, IScopeProvider scopeProvider, ILogger logger, IProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;

@@ -86,10 +86,6 @@ namespace Umbraco.Web.Runtime
             container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
             container.RegisterSingleton<IVariationContextAccessor, HttpContextVariationContextAccessor>();
 
-            var typeLoader = container.GetInstance<TypeLoader>();
-            var logger = container.GetInstance<ILogger>();
-            var proflog = container.GetInstance<ProfilingLogger>();
-
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -126,14 +122,14 @@ namespace Umbraco.Web.Runtime
             // configure the container for web
             container.ConfigureForWeb();
             composition
-                .ComposeMvcControllers(typeLoader, GetType().Assembly)
-                .ComposeApiControllers(typeLoader, GetType().Assembly);
+                .ComposeMvcControllers(GetType().Assembly)
+                .ComposeApiControllers(GetType().Assembly);
 
             composition.GetCollectionBuilder<SearchableTreeCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
+                .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
             composition.GetCollectionBuilder<EditorValidatorCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<IEditorValidator>());
+                .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
 
             composition.GetCollectionBuilder<TourFilterCollectionBuilder>();
 
@@ -143,12 +139,12 @@ namespace Umbraco.Web.Runtime
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             composition.GetCollectionBuilder<ActionCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<IAction>());
+                .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(typeLoader.GetSurfaceControllers());
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
             container.RegisterInstance(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(typeLoader.GetUmbracoApiControllers());
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(composition.TypeLoader.GetUmbracoApiControllers());
             container.RegisterInstance(umbracoApiControllerTypes);
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -156,7 +152,7 @@ namespace Umbraco.Web.Runtime
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
             // (the limited one, defined in Core, is there for tests) - same for others
-            container.GetInstance<PropertyValueConverterCollectionBuilder>()
+            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
@@ -189,10 +185,10 @@ namespace Umbraco.Web.Runtime
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.GetCollectionBuilder<HealthCheckCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<HealthCheck.HealthCheck>());
+                .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
             composition.GetCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
-                .Add(() => typeLoader.GetTypes<HealthCheck.NotificationMethods.IHealthCheckNotificationMethod>());
+                .Add(() => composition.TypeLoader.GetTypes<HealthCheck.NotificationMethods.IHealthCheckNotificationMethod>());
 
             // auto-register views
             container.RegisterAuto(typeof(UmbracoViewPage<>));

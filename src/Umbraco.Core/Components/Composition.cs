@@ -20,7 +20,16 @@ namespace Umbraco.Core.Components
         /// Initializes a new instance of the <see cref="Composition"/> class.
         /// </summary>
         /// <param name="container">A container.</param>
+        /// <param name="typeLoader">The type loader.</param>
         /// <param name="level">The runtime level.</param>
+        public Composition(IContainer container, TypeLoader typeLoader, RuntimeLevel level)
+        {
+            Container = container;
+            TypeLoader = typeLoader;
+            RuntimeLevel = level;
+        }
+
+        // fixme / tests
         public Composition(IContainer container, RuntimeLevel level)
         {
             Container = container;
@@ -32,6 +41,11 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <remarks>Use with care!</remarks>
         public IContainer Container { get; }
+
+        /// <summary>
+        /// Gets the type loader.
+        /// </summary>
+        public TypeLoader TypeLoader { get; }
 
         /// <summary>
         /// Gets the runtime level.

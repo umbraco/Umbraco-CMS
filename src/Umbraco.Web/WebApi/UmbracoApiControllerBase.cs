@@ -67,7 +67,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets or sets the runtime state.
@@ -103,14 +103,14 @@ namespace Umbraco.Web.WebApi
                   Current.Container.GetInstance<ServiceContext>(),
                   Current.Container.GetInstance<CacheHelper>(),
                   Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<ProfilingLogger>(),
+                  Current.Container.GetInstance<IProfilingLogger>(),
                   Current.Container.GetInstance<IRuntimeState>()
             )
         {
         }
 
         // fixme - Inject fewer things? (Aggregate more)
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;

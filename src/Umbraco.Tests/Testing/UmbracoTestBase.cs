@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Testing
 
         protected IProfiler Profiler => Container.GetInstance<IProfiler>();
 
-        protected virtual ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
+        protected virtual IProfilingLogger ProfilingLogger => Container.GetInstance<IProfilingLogger>();
 
         protected CacheHelper CacheHelper => Container.GetInstance<CacheHelper>();
 
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Testing
                 Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
             }
 
-            Container.RegisterSingleton(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
+            Container.RegisterSingleton<IProfilingLogger>(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
         }
 
         protected virtual void ComposeWeb()
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.Testing
 
         private static TypeLoader CreateCommonPluginManager(IContainer f)
         {
-            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
+            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<IProfilingLogger>(), false)
             {
                 AssembliesToScan = new[]
                 {

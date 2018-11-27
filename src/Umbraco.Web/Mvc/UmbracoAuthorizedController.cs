@@ -20,7 +20,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoAuthorizedController()
         { }
 
-        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
             : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
         { }
     }

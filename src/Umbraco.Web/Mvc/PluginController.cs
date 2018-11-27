@@ -60,7 +60,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the membership helper.
@@ -95,12 +95,12 @@ namespace Umbraco.Web.Mvc
                   Current.Container.GetInstance<ServiceContext>(),
                   Current.Container.GetInstance<CacheHelper>(),
                   Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<ProfilingLogger>()
+                  Current.Container.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
         {
             UmbracoContext = umbracoContext;
             DatabaseFactory = databaseFactory;

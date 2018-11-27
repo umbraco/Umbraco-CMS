@@ -58,7 +58,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; set; }
+        public IProfilingLogger ProfilingLogger { get; set; }
 
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
@@ -85,12 +85,12 @@ namespace Umbraco.Web.Mvc
                   Current.Container.GetInstance<ServiceContext>(),
                   Current.Container.GetInstance<CacheHelper>(),
                   Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<ProfilingLogger>()
+                  Current.Container.GetInstance<IProfilingLogger>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;

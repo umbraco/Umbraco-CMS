@@ -250,7 +250,7 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <returns>The hash.</returns>
         // internal for tests
-        internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
+        internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
         {
             using (logger.TraceDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {

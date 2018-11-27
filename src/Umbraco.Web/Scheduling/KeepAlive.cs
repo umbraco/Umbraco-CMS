@@ -13,10 +13,10 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private static HttpClient _httpClient;
-        private readonly ProfilingLogger _proflog;
+        private readonly IProfilingLogger _proflog;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, ILogger logger, ProfilingLogger proflog)
+            IRuntimeState runtime, ILogger logger, IProfilingLogger proflog)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;

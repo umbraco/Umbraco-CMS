@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Composing
     {
         protected TypeLoader TypeLoader { get; private set; }
 
-        protected ProfilingLogger ProfilingLogger { get; private set; }
+        protected IProfilingLogger ProfilingLogger { get; private set; }
 
         [SetUp]
         public void Initialize()

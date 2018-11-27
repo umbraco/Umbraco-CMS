@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Components
             var p = new ScopeProvider(f, fs, logger);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
 
