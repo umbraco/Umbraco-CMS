@@ -87,6 +87,8 @@
                 var editor = {
                     id: documentType.id,
                     submit: function(model) {
+                        const args = { node: scope.node };
+                        eventsService.emit('editors.content.reload', args);
                         editorService.close();
                     },
                     close: function() {
