@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $routeParams, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
+    function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService) {
 
         function link(scope, element, attrs, umbVariantContentCtrl) {
 
@@ -17,10 +17,13 @@
 
             function onInit() {
 
+                // if there are any infinite editors open we are in infinite editing
+                scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
+
                 userService.getCurrentUser().then(function(user){
                         // only allow change of media type if user has access to the settings sections
                         angular.forEach(user.sections, function(section){
-                            if(section.alias === "settings") {
+                            if(section.alias === "settings" && !scope.isInfiniteMode) {
                                 scope.allowChangeDocumentType = true;
                                 scope.allowChangeTemplate = true;
                             }
