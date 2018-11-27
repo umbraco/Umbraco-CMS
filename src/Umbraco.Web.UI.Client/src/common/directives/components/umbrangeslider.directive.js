@@ -129,7 +129,7 @@ For extra details about options and events take a look here: https://refreshless
                 sliderInstance.noUiSlider.set(ctrl.ngModel);
             }
 
-            // destroy the flatpickr instance when the dom element is removed
+            // destroy the slider instance when the dom element is removed
 			angular.element(element).on('$destroy', function() {
                 sliderInstance.noUiSlider.off();
             });
