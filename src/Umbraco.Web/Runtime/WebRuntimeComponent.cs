@@ -70,12 +70,12 @@ namespace Umbraco.Web.Runtime
 
             container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
-            container.ComposeWebMappingProfiles();
+            composition.ComposeWebMappingProfiles();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that
-            container.ComposeInstaller();
+            composition.ComposeInstaller();
 
             // register membership stuff
             container.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
@@ -125,8 +125,9 @@ namespace Umbraco.Web.Runtime
 
             // configure the container for web
             container.ConfigureForWeb();
-            container.ComposeMvcControllers(typeLoader, GetType().Assembly);
-            container.ComposeApiControllers(typeLoader, GetType().Assembly);
+            composition
+                .ComposeMvcControllers(typeLoader, GetType().Assembly)
+                .ComposeApiControllers(typeLoader, GetType().Assembly);
 
             composition.GetCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!

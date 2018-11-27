@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Repositories;
+﻿using Umbraco.Core.Components;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Core.Composing.Composers
@@ -8,8 +9,10 @@ namespace Umbraco.Core.Composing.Composers
     /// </summary>
     public static class RepositoriesComposer
     {
-        public static IContainer ComposeRepositories(this IContainer container)
+        public static Composition ComposeRepositories(this Composition composition)
         {
+            var container = composition.Container;
+
             // repositories
             container.RegisterSingleton<IAuditRepository, AuditRepository>();
             container.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
@@ -47,7 +50,7 @@ namespace Umbraco.Core.Composing.Composers
             container.RegisterSingleton<IScriptRepository, ScriptRepository>();
             container.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
 
-            return container;
+            return composition;
         }
     }
 }

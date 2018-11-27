@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using System.Web.UI;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -75,7 +71,7 @@ namespace Umbraco.Web.UI.Controls
         /// <summary>
         /// Gets the ProfilingLogger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; }
+        public IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Umbraco.Core.Components;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Composing.Composers
@@ -6,10 +7,11 @@ namespace Umbraco.Core.Composing.Composers
 {
     public static class CoreMappingProfilesComposer
     {
-        public static IContainer ComposeCoreMappingProfiles(this IContainer container)
+        public static Composition ComposeCoreMappingProfiles(this Composition composition)
         {
+            var container = composition.Container;
             container.Register<Profile, IdentityMapperProfile>();
-            return container;
+            return composition;
         }
     }
 }

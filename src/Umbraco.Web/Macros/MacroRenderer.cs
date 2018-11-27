@@ -27,11 +27,11 @@ namespace Umbraco.Web.Macros
 {
     public class MacroRenderer
     {
-        private readonly ProfilingLogger _plogger;
+        private readonly IProfilingLogger _plogger;
 
         // todo: there are many more things that would need to be injected in here
 
-        public MacroRenderer(ProfilingLogger plogger)
+        public MacroRenderer(IProfilingLogger plogger)
         {
             _plogger = plogger;
         }
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Macros
                 var key = member?.ProviderUserKey;
                 if (key == null) return;
             }
-            
+
             // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.ControlId = macroContent.Control.ID;
@@ -304,7 +304,7 @@ namespace Umbraco.Web.Macros
             {
                 Exceptions.Add(e);
 
-                _plogger.Logger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
+                _plogger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {
@@ -362,7 +362,7 @@ namespace Umbraco.Web.Macros
                         "Executed PartialView.",
                         () => ExecutePartialView(model),
                         () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
-                    
+
                 case MacroTypes.UserControl:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",

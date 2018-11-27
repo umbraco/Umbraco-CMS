@@ -23,7 +23,6 @@ namespace Umbraco.Web.Runtime
         /// </summary>
         /// <param name="umbracoApplication"></param>
         public WebRuntime(UmbracoApplicationBase umbracoApplication)
-            : base()
         {
             _umbracoApplication = umbracoApplication;
         }

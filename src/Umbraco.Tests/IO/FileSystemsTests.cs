@@ -4,6 +4,7 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
@@ -28,13 +29,14 @@ namespace Umbraco.Tests.IO
             SettingsForTests.ConfigureSettings(config);
 
             _container = Current.Container = ContainerFactory.Create();
+            var composition = new Composition(_container, RuntimeLevel.Run);
 
             _container.Register(_ => Mock.Of<ILogger>());
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
             _container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
-            _container.ComposeFileSystems();
+            composition.ComposeFileSystems();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

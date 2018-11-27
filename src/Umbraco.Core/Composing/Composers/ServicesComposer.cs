@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -12,8 +13,10 @@ namespace Umbraco.Core.Composing.Composers
 {
     public static class ServicesComposer
     {
-        public static IContainer ComposeServices(this IContainer container)
+        public static Composition ComposeServices(this Composition composition)
         {
+            var container = composition.Container;
+
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context
             container.RegisterSingleton<IEventMessagesFactory, TransientEventMessagesFactory>();
@@ -60,7 +63,7 @@ namespace Umbraco.Core.Composing.Composers
             container.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
             container.RegisterSingleton<ISectionService, EmptySectionService>();
 
-            return container;
+            return composition;
         }
 
         private static LocalizedTextServiceFileSources SourcesFactory(IContainer container)

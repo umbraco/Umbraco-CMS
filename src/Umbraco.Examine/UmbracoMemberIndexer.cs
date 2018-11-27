@@ -49,7 +49,7 @@ namespace Umbraco.Examine
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             IValueSetValidator validator,
             IMemberService memberService) :
             base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)

@@ -31,7 +31,7 @@ namespace Umbraco.Web
 
             public static void SuspendDocumentCache()
             {
-                Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), "Suspend document cache.");
+                Current.Logger.Info(typeof (PageCacheRefresher), "Suspend document cache.");
                 _suspended = true;
             }
 
@@ -39,7 +39,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), "Resume document cache (reload:{Tried}).", _tried);
+                Current.Logger.Info(typeof (PageCacheRefresher), "Resume document cache (reload:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -65,7 +65,7 @@ namespace Umbraco.Web
 
             public static void SuspendIndexers()
             {
-                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Suspend indexers.");
+                Current.Logger.Info(typeof (ExamineEvents), "Suspend indexers.");
                 _suspended = true;
             }
 
@@ -73,7 +73,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
+                Current.Logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -93,13 +93,13 @@ namespace Umbraco.Web
 
             public static void Suspend()
             {
-                Current.ProfilingLogger.Logger.Info(typeof (ScheduledPublishing), "Suspend scheduled publishing.");
+                Current.Logger.Info(typeof (ScheduledPublishing), "Suspend scheduled publishing.");
                 _suspended = true;
             }
 
             public static void Resume()
             {
-                Current.ProfilingLogger.Logger.Info(typeof (ScheduledPublishing), "Resume scheduled publishing.");
+                Current.Logger.Info(typeof (ScheduledPublishing), "Resume scheduled publishing.");
                 _suspended = false;
             }
         }

@@ -75,7 +75,7 @@ namespace Umbraco.Examine
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             IContentService contentService,
             IMediaService mediaService,
             IUserService userService,
@@ -212,7 +212,7 @@ namespace Umbraco.Examine
             var filtered = c.RawQuery(rawQuery);
             var results = searcher.Search(filtered);
 
-            ProfilingLogger.Logger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+            ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
             //need to queue a delete item for each one found
             foreach (var r in results)

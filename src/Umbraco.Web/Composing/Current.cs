@@ -120,7 +120,7 @@ namespace Umbraco.Web.Composing
 
         internal static EditorValidatorCollection EditorValidators
             => Container.GetInstance<EditorValidatorCollection>();
-        
+
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
             => Container.GetInstance<UmbracoApiControllerTypeCollection>();
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web.Composing
 
         public static IProfiler Profiler => CoreCurrent.Profiler;
 
-        public static ProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
+        public static IProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
 
         public static CacheHelper ApplicationCache => CoreCurrent.ApplicationCache;
 

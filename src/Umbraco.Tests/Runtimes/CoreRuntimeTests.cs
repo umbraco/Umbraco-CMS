@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Web.Hosting;
 using Examine;
 using Moq;
@@ -7,9 +8,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -17,13 +21,18 @@ using Umbraco.Web;
 namespace Umbraco.Tests.Runtimes
 {
     [TestFixture]
-    [Ignore("cannot work until we refactor IUmbracoDatabaseFactory vs UmbracoDatabaseFactory")]
     public class CoreRuntimeTests
     {
         [SetUp]
         public void SetUp()
         {
             TestComponent.Reset();
+
+            // cannot boot runtime without some configuration
+            var umbracoSettings = SettingsForTests.GenerateMockUmbracoSettings();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            SettingsForTests.ConfigureSettings(umbracoSettings);
+            SettingsForTests.ConfigureSettings(globalSettings);
         }
 
         public void TearDown()
@@ -38,12 +47,29 @@ namespace Umbraco.Tests.Runtimes
             {
                 app.HandleApplicationStart(app, new EventArgs());
 
+                var e = app.Runtime.State.BootFailedException;
+                var m = "";
+                switch (e)
+                {
+                    case null:
+                        m = "";
+                        break;
+                    case BootFailedException bfe when bfe.InnerException != null:
+                        m = "BootFailed: " + bfe.InnerException.GetType() + " " + bfe.InnerException.Message + " " + bfe.InnerException.StackTrace;
+                        break;
+                    default:
+                        m = e.GetType() + " " + e.Message + " " + e.StackTrace;
+                        break;
+                }
+
+                Assert.AreNotEqual(RuntimeLevel.BootFailed, app.Runtime.State.Level, m);
                 Assert.IsTrue(TestComponent.Ctored);
                 Assert.IsTrue(TestComponent.Composed);
                 Assert.IsTrue(TestComponent.Initialized1);
                 Assert.IsTrue(TestComponent.Initialized2);
                 Assert.IsNotNull(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<DebugDiagnosticsLogger>(TestComponent.ProfilingLogger.Logger);
+                Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
+                Assert.IsInstanceOf<DebugDiagnosticsLogger>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
 
                 // note: components are NOT disposed after boot
 
@@ -57,42 +83,23 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
+            public IRuntime Runtime { get; private set; }
+
             protected override IRuntime GetRuntime()
             {
-                return new TestRuntime();
+                return Runtime = new TestRuntime();
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            // the application's logger is created by the application
-            // through GetLogger, that custom application can override
-            protected override ILogger GetLogger()
-            {
-                //return Mock.Of<ILogger>();
-                return new DebugDiagnosticsLogger();
-            }
-
-            public override void Compose(Composition composition)
-            {
-                base.Compose(composition);
-
-                var container = composition.Container;
-
-                // the application's profiler and profiling logger are
-                // registered by CoreRuntime.Compose() but can be
-                // overriden afterwards - they haven't been resolved yet
-                container.RegisterSingleton<IProfiler>(_ => new TestProfiler());
-                container.RegisterSingleton(factory => new ProfilingLogger(factory.GetInstance<ILogger>(), factory.GetInstance<IProfiler>()));
-
-                // must override the database factory
-                container.RegisterSingleton(_ => GetDatabaseFactory());
-            }
+            protected override ILogger GetLogger() => new DebugDiagnosticsLogger();
+            protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            private static IUmbracoDatabaseFactory GetDatabaseFactory()
+            protected internal override IUmbracoDatabaseFactory GetDatabaseFactory()
             {
                 var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);
@@ -105,6 +112,26 @@ namespace Umbraco.Tests.Runtimes
             protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory)
             {
                 return true;
+            }
+
+            // because we don't even have the core runtime component,
+            // there are a few required stuff that we need to compose
+            public override void Compose(Composition composition)
+            {
+                base.Compose(composition);
+
+                var scopeProvider = Mock.Of<IScopeProvider>();
+                Mock.Get(scopeProvider)
+                    .Setup(x => x.CreateScope(
+                        It.IsAny<IsolationLevel>(),
+                        It.IsAny<RepositoryCacheMode>(),
+                        It.IsAny<IEventDispatcher>(),
+                        It.IsAny<bool?>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>()))
+                    .Returns(Mock.Of<IScope>());
+
+                composition.Container.RegisterInstance(scopeProvider);
             }
 
             private MainDom _mainDom;
@@ -139,7 +166,7 @@ namespace Umbraco.Tests.Runtimes
             public static bool Initialized1;
             public static bool Initialized2;
             public static bool Terminated;
-            public static ProfilingLogger ProfilingLogger;
+            public static IProfilingLogger ProfilingLogger;
 
             public static void Reset()
             {
@@ -172,7 +199,7 @@ namespace Umbraco.Tests.Runtimes
                 Initialized2 = true;
             }
 
-            public void Initialize(ProfilingLogger proflog)
+            public void Initialize(IProfilingLogger proflog)
             {
                 ProfilingLogger = proflog;
             }

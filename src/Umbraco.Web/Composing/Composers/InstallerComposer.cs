@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
 
@@ -6,8 +7,10 @@ namespace Umbraco.Web.Composing.Composers
 {
     public static class InstallerComposer
     {
-        public static IContainer ComposeInstaller(this IContainer container)
+        public static Composition ComposeInstaller(this Composition composition)
         {
+            var container = composition.Container;
+
             // register the installer steps
 
             container.Register<NewInstallStep>(Lifetime.Scope);
@@ -28,7 +31,7 @@ namespace Umbraco.Web.Composing.Composers
             container.Register<InstallStepCollection>();
             container.Register<InstallHelper>();
 
-            return container;
+            return composition;
         }
     }
 }

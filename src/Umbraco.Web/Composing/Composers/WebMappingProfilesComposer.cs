@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -10,8 +11,10 @@ namespace Umbraco.Web.Composing.Composers
 {
     public static class WebMappingProfilesComposer
     {
-        public static IContainer ComposeWebMappingProfiles(this IContainer container)
+        public static Composition ComposeWebMappingProfiles(this Composition composition)
         {
+            var container = composition.Container;
+
             //register the profiles
             container.Register<Profile, AuditMapperProfile>();
             container.Register<Profile, CodeFileMapperProfile>();
@@ -44,7 +47,7 @@ namespace Umbraco.Web.Composing.Composers
             container.Register<MediaAppResolver>();
             container.Register<ContentAppResolver>();
 
-            return container;
+            return composition;
         }
     }
 }

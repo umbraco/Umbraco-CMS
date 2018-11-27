@@ -14,6 +14,11 @@ namespace Umbraco.Core
         void Boot(IContainer container);
 
         /// <summary>
+        /// Gets the runtime state.
+        /// </summary>
+        IRuntimeState State { get; }
+
+        /// <summary>
         /// Terminates the runtime.
         /// </summary>
         void Terminate();

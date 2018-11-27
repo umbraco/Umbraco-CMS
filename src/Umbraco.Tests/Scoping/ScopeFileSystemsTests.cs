@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Scoping
             if (!withApplication) return;
 
             // re-register with actual media fs
-            Container.ComposeFileSystems();
+            Composition.ComposeFileSystems();
         }
 
         public override void TearDown()

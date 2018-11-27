@@ -6,7 +6,6 @@ using System.Web;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -15,7 +14,6 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 
@@ -30,6 +28,7 @@ namespace Umbraco.Core.Runtime
     {
         private Components.Components _components;
         private RuntimeState _state;
+        private IContainer _container;
 
         /// <summary>
         /// Gets the logger.
@@ -41,11 +40,14 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected IProfilingLogger ProfilingLogger { get; private set; }
 
+        /// <inheritdoc />
+        public IRuntimeState State => _state;
+
         /// <inheritdoc/>
         public virtual void Boot(IContainer container)
         {
             // assign current container
-            Current.Container = container;
+            Current.Container = _container = container;
 
             // create and register the essential services
             // ie the bare minimum required to boot
@@ -74,8 +76,9 @@ namespace Umbraco.Core.Runtime
             container.RegisterInstance(runtimeCache);
 
             // database factory
-            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(container.GetInstance<IMapperCollection>));
-            container.RegisterSingleton(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            var databaseFactory = GetDatabaseFactory();
+            container.RegisterInstance(databaseFactory);
+            container.RegisterSingleton(factory => databaseFactory.SqlContext);
 
             // type loader
             var globalSettings = UmbracoConfig.For.GlobalSettings();
@@ -92,6 +95,7 @@ namespace Umbraco.Core.Runtime
             };
             container.RegisterInstance(_state);
 
+            // register runtime-level services
             Compose(composition);
 
             // the boot loader boots using a container scope, so anything that is PerScope will
@@ -125,14 +129,10 @@ namespace Umbraco.Core.Runtime
 
                     _components.Compose();
 
-                    // no Current.Container only Current.Factory?
-                    //factory = register.Compile();
-
-                    // fixme at that point we can start actually getting things from the container
-                    // but, ideally, not before = need to detect everything we use!!
-
-                    // at that point, getting things from the container is ok
-                    // fixme split IRegistry vs IFactory
+                    // fixme split Container into Register and Factory
+                    // we should have a Current.Factory not a Current.Container
+                    // we should compile the register into a factory *now*
+                    // using the factory before this point should just throw
 
                     _components.Initialize();
                 }
@@ -264,23 +264,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         public virtual void Compose(Composition composition)
         {
-            var container = composition.Container;
-
-            // compose the very essential things that are needed to bootstrap, before anything else,
-            // and only these things - the rest should be composed in runtime components
-            // FIXME should be essentially empty! move all to component!
-
-            container.ComposeConfiguration();
-
-            // register persistence mappers - required by database factory so needs to be done here
-            // means the only place the collection can be modified is in a runtime - afterwards it
-            // has been frozen and it is too late
-            composition.GetCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
-
-            // register the scope provider
-            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+            // nothing
         }
 
         private RuntimeLevel DetermineRuntimeLevel2(IUmbracoDatabaseFactory databaseFactory)
@@ -430,6 +414,13 @@ namespace Umbraco.Core.Runtime
         // override and return the absolute path to the Umbraco site/solution, if needed
         protected virtual string GetApplicationRootPath()
             => null;
+
+        /// <summary>
+        /// Gets the database factory.
+        /// </summary>
+        /// <remarks>This is strictly internal, for tests only.</remarks>
+        protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
+            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(_container.GetInstance<IMapperCollection>));
 
         #endregion
     }

@@ -76,7 +76,7 @@ namespace Umbraco.Examine
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
-            ProfilingLogger profilingLogger,
+            IProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
@@ -114,7 +114,7 @@ namespace Umbraco.Examine
             new FieldDefinition(IconFieldName, FieldDefinitionTypes.Raw)
         };
 
-        protected ProfilingLogger ProfilingLogger { get; }
+        protected IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Overridden to ensure that the umbraco system field definitions are in place
@@ -162,7 +162,7 @@ namespace Umbraco.Examine
         /// </remarks>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            ProfilingLogger.Logger.Debug(GetType(), "{IndexerName} indexer initializing", name);
+            ProfilingLogger.Debug(GetType(), "{IndexerName} indexer initializing", name);
 
             if (config["enableDefaultEventHandler"] != null && bool.TryParse(config["enableDefaultEventHandler"], out var enabled))
             {
@@ -253,7 +253,7 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                ProfilingLogger.Logger.Debug(GetType(), "Rebuilding index");
+                ProfilingLogger.Debug(GetType(), "Rebuilding index");
                 using (new SafeCallContext())
                 {
                     base.RebuildIndex();
@@ -334,7 +334,7 @@ namespace Umbraco.Examine
         /// <param name="ex"></param>
         protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Logger.Error(GetType(), ex.InnerException, ex.Message);
+            ProfilingLogger.Error(GetType(), ex.InnerException, ex.Message);
             base.OnIndexingError(ex);
         }
 
@@ -359,7 +359,7 @@ namespace Umbraco.Examine
                 }
             }
 
-            ProfilingLogger.Logger.Debug(GetType(),
+            ProfilingLogger.Debug(GetType(),
                 "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
                 docArgs.ValueSet.Id,
                 docArgs.ValueSet.Category,
@@ -374,7 +374,7 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, IndexItem item, IndexWriter writer)
         {
-            ProfilingLogger.Logger.Debug(GetType(),
+            ProfilingLogger.Debug(GetType(),
                 "AddDocument {DocumentId} with type {DocumentItemType}",
                 item.ValueSet.Id,
                 item.ValueSet.ItemType);

@@ -225,8 +225,9 @@ namespace Umbraco.Tests.Testing
         {
             if (configure == false) return;
 
-            Container.ComposeCoreMappingProfiles();
-            Container.ComposeWebMappingProfiles();
+            Composition
+                .ComposeCoreMappingProfiles()
+                .ComposeWebMappingProfiles();
         }
 
         protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
@@ -285,7 +286,7 @@ namespace Umbraco.Tests.Testing
             SettingsForTests.ConfigureSettings(globalSettings);
 
             // default Datalayer/Repositories/SQL/Database/etc...
-            Container.ComposeRepositories();
+            Composition.ComposeRepositories();
 
             // register basic stuff that might need to be there for some container resolvers to work
             Container.RegisterSingleton(factory => umbracoSettings);
@@ -326,7 +327,7 @@ namespace Umbraco.Tests.Testing
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Container.RegisterSingleton(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
-            Container.ComposeServices();
+            Composition.ComposeServices();
 
             // composition root is doing weird things, fix
             Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();

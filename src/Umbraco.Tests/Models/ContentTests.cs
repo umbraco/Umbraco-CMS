@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Models
             base.Compose();
 
             Container.Register(_ => Mock.Of<ILogger>());
-            Container.ComposeFileSystems();
+            Composition.ComposeFileSystems();
 
             Container.Register(_ => Mock.Of<IDataTypeService>());
             Container.Register(_ => Mock.Of<IContentSection>());

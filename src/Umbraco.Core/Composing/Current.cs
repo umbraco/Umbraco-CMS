@@ -31,7 +31,7 @@ namespace Umbraco.Core.Composing
         private static IShortStringHelper _shortStringHelper;
         private static ILogger _logger;
         private static IProfiler _profiler;
-        private static ProfilingLogger _profilingLogger;
+        private static IProfilingLogger _profilingLogger;
         private static IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Umbraco.Core.Composing
             => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
                 ?? new LogProfiler(Logger));
 
-        public static ProfilingLogger ProfilingLogger
-            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
+        public static IProfilingLogger ProfilingLogger
+            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<IProfilingLogger>())
                ?? new ProfilingLogger(Logger, Profiler);
 
         public static IRuntimeState RuntimeState

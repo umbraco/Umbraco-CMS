@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Services.Importing
             if (!withApplication) return;
 
             // re-register with actual media fs
-            Container.ComposeFileSystems();
+            Composition.ComposeFileSystems();
         }
 
         [Test]

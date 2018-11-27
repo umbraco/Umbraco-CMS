@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Components;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Composing.Composers
@@ -8,8 +9,10 @@ namespace Umbraco.Core.Composing.Composers
     /// </summary>
     public static class ConfigurationComposer
     {
-        public static IContainer ComposeConfiguration(this IContainer container)
+        public static Composition ComposeConfiguration(this Composition composition)
         {
+            var container = composition.Container;
+
             container.Register(factory => UmbracoConfig.For.UmbracoSettings());
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
@@ -18,7 +21,7 @@ namespace Umbraco.Core.Composing.Composers
 
             // fixme - other sections we need to add?
 
-            return container;
+            return composition;
         }
     }
 }

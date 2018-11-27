@@ -1,6 +1,4 @@
-﻿using System;
-using System.Configuration;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Components;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 
@@ -67,8 +65,10 @@ namespace Umbraco.Core.Composing.Composers
          *
          */
 
-        public static IContainer ComposeFileSystems(this IContainer container)
+        public static Composition ComposeFileSystems(this Composition composition)
         {
+            var container = composition.Container;
+
             // register FileSystems, which manages all filesystems
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Composing.Composers
             container.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
                 factory => new PhysicalFileSystem("~/media"));
 
-            return container;
+            return composition;
         }
     }
 }

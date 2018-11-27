@@ -16,6 +16,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
@@ -33,11 +34,25 @@ namespace Umbraco.Core.Runtime
         {
             base.Compose(composition);
 
+            var container = composition.Container;
+
             // composers
-            composition.Container.ComposeRepositories();
-            composition.Container.ComposeServices();
-            composition.Container.ComposeCoreMappingProfiles();
-            composition.Container.ComposeFileSystems();
+            composition
+                .ComposeConfiguration()
+                .ComposeRepositories()
+                .ComposeServices()
+                .ComposeCoreMappingProfiles()
+                .ComposeFileSystems();
+
+            // register persistence mappers - required by database factory so needs to be done here
+            // means the only place the collection can be modified is in a runtime - afterwards it
+            // has been frozen and it is too late
+            composition.GetCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
+
+            // register the scope provider
+            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
+            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
 
             // register database builder
             // *not* a singleton, don't want to keep it around
@@ -79,7 +94,7 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
-                    factory.GetInstance<ProfilingLogger>(),
+                    factory.GetInstance<IProfilingLogger>(),
                     factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
