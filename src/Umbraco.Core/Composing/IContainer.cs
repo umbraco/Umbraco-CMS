@@ -62,13 +62,6 @@ namespace Umbraco.Core.Composing
         IEnumerable<TService> GetAllInstances<TService>();
 
         /// <summary>
-        /// Gets registrations for a service.
-        /// </summary>
-        /// <param name="serviceType">The type of the service.</param>
-        /// <returns>The registrations for the service.</returns>
-        IEnumerable<Registration> GetRegistered(Type serviceType);
-
-        /// <summary>
         /// Releases an instance.
         /// </summary>
         /// <param name="instance">The instance.</param>
@@ -76,7 +69,7 @@ namespace Umbraco.Core.Composing
         /// See https://stackoverflow.com/questions/14072208 and http://kozmic.net/2010/08/27/must-i-release-everything-when-using-windsor/,
         /// you only need to release instances you specifically resolved, and even then, if done right, that might never be needed. For
         /// instance, LightInject does not require this and does not support it - should work with scopes.
-        /// </remarks> 
+        /// </remarks>
         void Release(object instance);
 
         #endregion

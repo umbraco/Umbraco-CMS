@@ -34,14 +34,6 @@ namespace Umbraco.Core.Composing
             => (T) container.TryGetInstance(typeof(T));
 
         /// <summary>
-        /// Gets registrations for a service.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service.</typeparam>
-        /// <returns>The registrations for the service.</returns>
-        public static IEnumerable<Registration> GetRegistered<TService>(this IContainer container)
-            => container.GetRegistered(typeof(TService));
-
-        /// <summary>
         /// Creates an instance with arguments.
         /// </summary>
         /// <typeparam name="T">The type of the instance.</typeparam>

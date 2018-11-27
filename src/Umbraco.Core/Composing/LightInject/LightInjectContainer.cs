@@ -118,10 +118,6 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.GetAllInstances(type);
 
         /// <inheritdoc />
-        public IEnumerable<Registration> GetRegistered(Type type)
-            => Container.AvailableServices.Where(x => x.ServiceType == type).Select(x => new Registration(x.ServiceType, x.ServiceName));
-
-        /// <inheritdoc />
         public void Release(object instance)
         {
             // nothing to release with LightInject
