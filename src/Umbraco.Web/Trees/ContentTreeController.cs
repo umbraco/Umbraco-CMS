@@ -255,7 +255,8 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
             menu.Items.Add<ActionRestore>(ui.Text("actions", ActionRestore.Instance.Alias));
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true);
 
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
