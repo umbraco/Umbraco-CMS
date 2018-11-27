@@ -13,11 +13,18 @@
                 </p>
 
                 <!-- IMAGE -->
-                <img ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}" alt="" ng-show="media.thumbnail" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                <img ng-if="media.thumbnail"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
+                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- SVG -->
-                <img ng-class="{'trashed': media.trashed}" ng-if="media.metaData.umbracoExtension.Value === 'svg'" ng-src="{{media.metaData.umbracoFile.Value}}" alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
-                <img ng-class="{'trashed': media.trashed}" ng-if="media.extension === 'svg'" ng-src="{{media.file}}" alt="" />
+                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.metaData.umbracoFile.Value}}"
+                     alt="" title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
+                <img ng-if="!media.thumbnail && media.metaData.umbracoExtension.Value !== 'svg' && media.extension === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.file}}"
+                     alt=""
+                     title="{{media.trashed ? 'Trashed: ' + media.name : media.name}}" />
 
                 <!-- FILE -->
                 <div ng-class="{'trashed': media.trashed}" class="umb-icon-holder" ng-hide="media.thumbnail || media.metaData.umbracoExtension.Value === 'svg' || media.extension === 'svg'">

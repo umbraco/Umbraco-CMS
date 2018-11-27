@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
 
             if (query == null) query = new Query<IAuditItem>();
-            
+
             var queryHasWhereClause = query.GetWhereClauses().Any();
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var filterSql = new Sql();
                 foreach (var filterClause in customFilterWheres)
-                {                   
+                {
                     filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
                 }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var filterSql = new Sql();
                 foreach (var filterClause in auditTypeFilter)
-                {                   
+                {
                     filterSql.Append("AND (logHeader = @logHeader)", new { logHeader = filterClause.ToString() });
                 }
 
@@ -80,14 +80,14 @@ namespace Umbraco.Core.Persistence.Repositories
             if (orderDirection == Direction.Descending)
                 translatedQuery.OrderByDescending("Datestamp");
             else
-                translatedQuery.OrderBy("Datestamp");            
+                translatedQuery.OrderBy("Datestamp");
 
             // Get page of results and total count
             var pagedResult = Database.Page<LogDto>(pageIndex + 1, pageSize, translatedQuery);
             totalRecords = pagedResult.TotalItems;
 
             var pages = pagedResult.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
+                dto => new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId)).ToArray();
 
             //Mapping the DateStamp
             for (var i = 0; i < pages.Length; i++)
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IEnumerable<IAuditItem> PerformGetByQuery(IQuery<IAuditItem> query)
         {
             throw new NotImplementedException();
-        }        
+        }
 
         protected override string GetBaseWhereClause()
         {
@@ -167,7 +167,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Apply filter
             if (filterSql != null)
             {
-               	//ensure we don't append a WHERE if there is already one
+                //ensure we don't append a WHERE if there is already one
                 var sqlFilter = hasWhereClause
                     ? filterSql.SQL
                     : " WHERE " + filterSql.SQL.TrimStart("AND ");

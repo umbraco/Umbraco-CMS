@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -268,7 +269,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            feedback_text.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text);
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text));
 
             p_setup.Visible = false;
             p_feedback.Visible = true;
@@ -287,7 +288,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             Access.RemoveProtection(pageId);
 
-            feedback_text.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text);
+            feedback_text.Text = HttpUtility.HtmlEncode(ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text));
             p_feedback.Visible = true;
 
             var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
