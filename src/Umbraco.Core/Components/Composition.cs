@@ -29,8 +29,8 @@ namespace Umbraco.Core.Components
             RuntimeLevel = level;
         }
 
-        // fixme / tests
-        public Composition(IContainer container, RuntimeLevel level)
+        // used for tests
+        internal Composition(IContainer container, RuntimeLevel level)
         {
             Container = container;
             RuntimeLevel = level;
