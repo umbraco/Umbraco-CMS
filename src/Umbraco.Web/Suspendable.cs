@@ -1,6 +1,7 @@
 ﻿using System;
 using Examine;
 using Examine.Providers;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
@@ -63,24 +64,23 @@ namespace Umbraco.Web
                 }
             }
 
-            public static void SuspendIndexers()
+            public static void SuspendIndexers(ILogger logger)
             {
-                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Suspend indexers.");
+                logger.Info(typeof (ExamineEvents), "Suspend indexers.");
                 _suspended = true;
             }
 
-            public static void ResumeIndexers()
+            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger)
             {
                 _suspended = false;
 
-                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
+                logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
 
                 //TODO: when resuming do we always want a full rebuild of all indexes?
-                // fixme - can we inject these somehow?
-                ExamineComponent.RebuildIndexes(ExamineManager.Instance, Current.Logger, false);
+                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
             }
         }
 

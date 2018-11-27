@@ -26,39 +26,33 @@ namespace Umbraco.Web.Search
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesBuilder(ProfilingLogger profilingLogger,
-            IValueSetBuilder<IContent> contentValueSetBuilder,
-            IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
-            IContentService contentService,
-            IMediaService mediaService,
+            ContentIndexPopulator contentIndexPopulator,
+            PublishedContentIndexPopulator publishedContentIndexPopulator,
+            MediaIndexPopulator mediaIndexPopulator,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
-            IMemberService memberService,
-            ISqlContext sqlContext)
+            IMemberService memberService)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
-            ContentValueSetBuilder = contentValueSetBuilder ?? throw new System.ArgumentNullException(nameof(contentValueSetBuilder));
-            MediaValueSetBuilder = mediaValueSetBuilder ?? throw new System.ArgumentNullException(nameof(mediaValueSetBuilder));
             MemberValueSetBuilder = memberValueSetBuilder ?? throw new System.ArgumentNullException(nameof(memberValueSetBuilder));
-            ContentService = contentService ?? throw new System.ArgumentNullException(nameof(contentService));
-            MediaService = mediaService ?? throw new System.ArgumentNullException(nameof(mediaService));
+            ContentIndexPopulator = contentIndexPopulator;
+            PublishedContentIndexPopulator = publishedContentIndexPopulator;
+            MediaIndexPopulator = mediaIndexPopulator;
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
-            SqlContext = sqlContext ?? throw new System.ArgumentNullException(nameof(sqlContext));
         }
 
         protected ProfilingLogger ProfilingLogger { get; }
-        protected IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
-        protected IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
         protected IValueSetBuilder<IMember> MemberValueSetBuilder { get; }
-        protected IContentService ContentService { get; }
-        protected IMediaService MediaService { get; }
+        protected ContentIndexPopulator ContentIndexPopulator { get; }
+        protected PublishedContentIndexPopulator PublishedContentIndexPopulator { get; }
+        protected MediaIndexPopulator MediaIndexPopulator { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
-        protected ISqlContext SqlContext { get; }
-
+        
         public const string InternalIndexPath = "Internal";
         public const string ExternalIndexPath = "External";
         public const string MembersIndexPath = "Members";
@@ -72,27 +66,26 @@ namespace Umbraco.Web.Search
         /// Creates the Umbraco indexes
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, IIndexer> Create()
+        public IEnumerable<IIndexer> Create()
         {
-            return new Dictionary<string, IIndexer>
+            return new []
             {
-                [InternalIndexPath] = CreateContentIndex(InternalIndexPath, new UmbracoContentIndexerOptions(true, true, null), new CultureInvariantWhitespaceAnalyzer()),
-                [ExternalIndexPath] = CreateContentIndex(ExternalIndexPath, new UmbracoContentIndexerOptions(false, false, null), new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30)),
-                [MembersIndexPath] = CreateMemberIndex()
+                CreateContentIndex(InternalIndexPath, new UmbracoContentIndexerOptions(true, true, null), new CultureInvariantWhitespaceAnalyzer()),
+                CreateContentIndex(ExternalIndexPath, new UmbracoContentIndexerOptions(false, false, null), new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30)),
+                CreateMemberIndex()
             };
         }
 
         private IIndexer CreateContentIndex(string name, UmbracoContentIndexerOptions options, Analyzer analyzer)
         {
-            
             var index = new UmbracoContentIndexer(
                 $"{name}Indexer",
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(name),
                 analyzer,
-                ProfilingLogger, ContentValueSetBuilder, MediaValueSetBuilder,
-                ContentService, MediaService, LanguageService, SqlContext,
+                ProfilingLogger,
+                LanguageService, 
                 GetContentValueSetValidator(options),
                 options);
             return index;
@@ -100,14 +93,13 @@ namespace Umbraco.Web.Search
 
         private IIndexer CreateMemberIndex()
         {
-            var appData = Path.Combine(IOHelper.MapPath(SystemDirectories.Data), "TEMP", "ExamineIndexes", MembersIndexPath);
             var index = new UmbracoMemberIndexer(
                 $"{MembersIndexPath}Indexer",
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
                 GetFileSystemLuceneDirectory(MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
-                ProfilingLogger, MemberValueSetBuilder, MemberService,
+                ProfilingLogger, 
                 GetMemberValueSetValidator());
             return index;
         }

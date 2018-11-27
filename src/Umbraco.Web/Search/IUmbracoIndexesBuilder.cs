@@ -5,6 +5,6 @@ namespace Umbraco.Web.Search
 {
     internal interface IUmbracoIndexesBuilder
     {
-        IReadOnlyDictionary<string, IIndexer> Create();
+        IEnumerable<IIndexer> Create();
     }
 }

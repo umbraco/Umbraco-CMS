@@ -42,6 +42,8 @@ namespace Umbraco.Web.Search
         private IValueSetBuilder<IContent> _contentValueSetBuilder;
         private IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private IValueSetBuilder<IMember> _memberValueSetBuilder;
+        private ContentIndexPopulator _contentIndexPopulator;
+        private MediaIndexPopulator _mediaIndexPopulator;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
@@ -49,7 +51,6 @@ namespace Umbraco.Web.Search
         private ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
         private static readonly object _rebuildLocker = new object();
-        private IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -60,8 +61,11 @@ namespace Umbraco.Web.Search
         {
             base.Compose(composition);
 
+            composition.Container.RegisterSingleton<ContentIndexPopulator>();
+            composition.Container.RegisterSingleton<PublishedContentIndexPopulator>();
+            composition.Container.RegisterSingleton<MediaIndexPopulator>();
+            composition.Container.RegisterSingleton<IndexRebuilder>();
             composition.Container.RegisterSingleton<IUmbracoIndexesBuilder, UmbracoIndexesBuilder>();
-            composition.Container.RegisterSingleton<ContentValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IContent>, ContentValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
@@ -69,17 +73,19 @@ namespace Umbraco.Web.Search
 
         internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
             IExamineManager examineManager, ProfilingLogger profilingLogger,
-            IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder, ServiceContext services,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder,
+            IndexRebuilder indexRebuilder, ServiceContext services,
             IValueSetBuilder<IContent> contentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
-            IValueSetBuilder<IMember> memberValueSetBuilder)
+            IValueSetBuilder<IMember> memberValueSetBuilder,
+            ContentIndexPopulator contentIndexPopulator, PublishedContentIndexPopulator publishedContentIndexPopulator,
+            MediaIndexPopulator mediaIndexPopulator)
         {
             _services = services;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
-            _urlSegmentProviders = urlSegmentProviders;
-
+            _contentIndexPopulator = contentIndexPopulator;
+            _mediaIndexPopulator = mediaIndexPopulator;
             _contentValueSetBuilder = contentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
@@ -111,7 +117,7 @@ namespace Umbraco.Web.Search
                 profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers();
+                Suspendable.ExamineEvents.SuspendIndexers(profilingLogger.Logger);
                 _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
@@ -119,7 +125,7 @@ namespace Umbraco.Web.Search
             //create the indexes and register them with the manager
             foreach(var index in indexBuilder.Create())
             {
-                _examineManager.AddIndexer(index.Key, index.Value);
+                _examineManager.AddIndexer(index);
             }
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
@@ -141,7 +147,7 @@ namespace Umbraco.Web.Search
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
-            RebuildIndexes(examineManager, profilingLogger.Logger, true, 5000);
+            RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
         }
         
 
@@ -149,7 +155,7 @@ namespace Umbraco.Web.Search
         /// Called to rebuild empty indexes on startup
         /// </summary>
         /// <param name="logger"></param>
-        public static void RebuildIndexes(IExamineManager examineManager, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
             //TODO: need a way to disable rebuilding on startup
 
@@ -163,7 +169,7 @@ namespace Umbraco.Web.Search
 
                 logger.Info<ExamineComponent>("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(examineManager, logger, onlyEmptyIndexes, waitMilliseconds);
+                var task = new RebuildOnStartupTask(indexRebuilder, logger, onlyEmptyIndexes, waitMilliseconds);
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
@@ -695,14 +701,15 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
             {
-                var valueSet = examineComponent._contentValueSetBuilder.GetValueSets(content);
+                var valueSet = examineComponent._contentValueSetBuilder.GetValueSets(content).ToList();
 
-                examineComponent._examineManager.IndexItems(
-                    valueSet.ToArray(),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
-                        // only for the specified indexers
-                        .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
-                        .Where(x => x.EnableDefaultEventHandler));
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                    // only for the specified indexers
+                    .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
+                    .Where(x => x.EnableDefaultEventHandler))
+                {
+                    index.IndexItems(valueSet);
+                }
             }
         }
 
@@ -726,15 +733,16 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media);
+                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                examineComponent._examineManager.IndexItems(
-                    valueSet.ToArray(),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
-                        // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
-                        // then only index this for indexers supporting unpublished media
-                        .Where(x => isPublished || (x.SupportUnpublishedContent))
-                        .Where(x => x.EnableDefaultEventHandler));
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                    // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
+                    // then only index this for indexers supporting unpublished media
+                    .Where(x => isPublished || (x.SupportUnpublishedContent))
+                    .Where(x => x.EnableDefaultEventHandler))
+                {
+                    index.IndexItems(valueSet);
+                }
             }
         }
 
@@ -756,13 +764,13 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member);
-
-                examineComponent._examineManager.IndexItems(
-                    valueSet.ToArray(),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
-                        //ensure that only the providers are flagged to listen execute
-                        .Where(x => x.EnableDefaultEventHandler));
+                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                    //ensure that only the providers are flagged to listen execute
+                    .Where(x => x.EnableDefaultEventHandler))
+                {
+                    index.IndexItems(valueSet);
+                }
             }
         }
 
@@ -786,13 +794,15 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {
-                examineComponent._examineManager.DeleteFromIndexes(
-                    id.ToString(CultureInfo.InvariantCulture),
-                    examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
-                        // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
-                        // otherwise if keepIfUnpublished == false then remove from all indexes
-                        .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
-                        .Where(x => x.EnableDefaultEventHandler));
+                var strId = id.ToString(CultureInfo.InvariantCulture);
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
+                    // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
+                    // otherwise if keepIfUnpublished == false then remove from all indexes
+                    .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
+                    .Where(x => x.EnableDefaultEventHandler))
+                {
+                    index.DeleteFromIndex(strId);
+                }
             }
         }
         #endregion
@@ -802,15 +812,15 @@ namespace Umbraco.Web.Search
         /// </summary>
         private class RebuildOnStartupTask : IBackgroundTask
         {
-            private readonly IExamineManager _examineManager;
+            private readonly IndexRebuilder _indexRebuilder;
             private readonly ILogger _logger;
             private readonly bool _onlyEmptyIndexes;
             private readonly int _waitMilliseconds;
 
-            public RebuildOnStartupTask(IExamineManager examineManager, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+            public RebuildOnStartupTask(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
-                _examineManager = examineManager;
-                _logger = logger;
+                _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
+                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _onlyEmptyIndexes = onlyEmptyIndexes;
                 _waitMilliseconds = waitMilliseconds;
             }
@@ -843,7 +853,6 @@ namespace Umbraco.Web.Search
             /// <summary>
             /// Used to rebuild indexes on startup or cold boot
             /// </summary>
-            /// <param name="onlyEmptyIndexes"></param>
             private void RebuildIndexes()
             {
                 //do not attempt to do this if this has been disabled since we are not the main dom.
@@ -853,20 +862,8 @@ namespace Umbraco.Web.Search
                 if (_waitMilliseconds > 0)
                     Thread.Sleep(_waitMilliseconds);
 
-                EnsureUnlocked(_logger, _examineManager);
-
-                if (_onlyEmptyIndexes)
-                {
-                    foreach (var indexer in _examineManager.IndexProviders.Values.Where(x => x.IsIndexNew()))
-                    {
-                        indexer.RebuildIndex();
-                    }
-                }
-                else
-                {
-                    //do all of them
-                    _examineManager.RebuildIndexes();
-                }
+                EnsureUnlocked(_logger, _indexRebuilder.ExamineManager);
+                _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
             }
         }
     }

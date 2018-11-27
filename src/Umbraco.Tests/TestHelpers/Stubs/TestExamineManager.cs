@@ -9,26 +9,16 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         private readonly ConcurrentDictionary<string, IIndexer> _indexers = new ConcurrentDictionary<string, IIndexer>();
         private readonly ConcurrentDictionary<string, ISearcher> _searchers = new ConcurrentDictionary<string, ISearcher>();
 
-        public void AddIndexer(string name, IIndexer indexer)
+        public void AddIndexer(IIndexer indexer)
         {
-            _indexers.TryAdd(name, indexer);
+            _indexers.TryAdd(indexer.Name, indexer);
         }
 
-        public void AddSearcher(string name, ISearcher searcher)
+        public void AddSearcher(ISearcher searcher)
         {
-            _searchers.TryAdd(name, searcher);
+            _searchers.TryAdd(searcher.Name, searcher);
         }
-
-        public void DeleteFromIndexes(string nodeId)
-        {
-            //noop
-        }
-
-        public void DeleteFromIndexes(string nodeId, IEnumerable<IIndexer> providers)
-        {
-            //noop
-        }
-
+        
         public void Dispose()
         {
             //noop
@@ -39,29 +29,9 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             return _indexers.TryGetValue(indexerName, out var indexer) ? indexer : null;
         }
 
-        public ISearcher GetRegisteredSearcher(string searcherName)
+        public ISearcher GetSearcher(string searcherName)
         {
             return _searchers.TryGetValue(searcherName, out var indexer) ? indexer : null;
-        }
-
-        public void IndexAll(string indexCategory)
-        {
-            //noop
-        }
-
-        public void IndexItems(ValueSet[] nodes)
-        {
-            //noop
-        }
-
-        public void IndexItems(ValueSet[] nodes, IEnumerable<IIndexer> providers)
-        {
-            //noop
-        }
-
-        public void RebuildIndexes()
-        {
-            //noop
         }
 
         public IReadOnlyDictionary<string, IIndexer> IndexProviders => _indexers;

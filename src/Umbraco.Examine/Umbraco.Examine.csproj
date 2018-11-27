@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="1.0.0-beta032" />
+    <PackageReference Include="Examine" Version="1.0.0-beta034" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.4" />
   </ItemGroup>
@@ -56,15 +56,24 @@
     <Compile Include="BaseValueSetBuilder.cs" />
     <Compile Include="Config\ConfigIndexCriteria.cs" />
     <Compile Include="Config\ConfigIndexField.cs" />
+    <Compile Include="Config\IndexFieldCollection.cs" />
     <Compile Include="Config\IndexFieldCollectionExtensions.cs" />
     <Compile Include="Config\IndexSet.cs" />
     <Compile Include="Config\IndexSetCollection.cs" />
     <Compile Include="Config\IndexSets.cs" />
+    <Compile Include="ContentIndexPopulator.cs" />
     <Compile Include="ContentValueSetBuilder.cs" />
+    <Compile Include="IIndexPopulator.cs" />
+    <Compile Include="IndexRebuilder.cs" />
+    <Compile Include="IUmbracoContentIndexer.cs" />
     <Compile Include="IUmbracoIndexer.cs" />
+    <Compile Include="IUmbracoMediaIndexer.cs" />
     <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
+    <Compile Include="MemberIndexPopulator.cs" />
     <Compile Include="MemberValueSetBuilder.cs" />
+    <Compile Include="PublishedContentIndexPopulator.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />

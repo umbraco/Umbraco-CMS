@@ -165,7 +165,9 @@ namespace Umbraco.Web.Editors
 
                 try
                 {
-                    indexer.RebuildIndex();
+                    //TODO: Rebuilding isn't build directly into an index, we need a new IRebuildIndex or similar interface that can be registered
+                    throw new NotImplementedException("Implement rebuilding!");
+                    //indexer.RebuildIndex();
                 }
                 catch (Exception ex)
                 {

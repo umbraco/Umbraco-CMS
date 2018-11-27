@@ -166,11 +166,6 @@ namespace Umbraco.Examine
         /// </remarks>
         public bool SupportUnpublishedContent { get; protected set; } = false;
 
-        /// <summary>
-        /// the supported indexable types
-        /// </summary>
-        protected abstract IEnumerable<string> SupportedTypes { get; }
-
         protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
 
         /// <summary>
@@ -271,53 +266,6 @@ namespace Umbraco.Examine
 
         #endregion
 
-
-        /// <summary>
-        /// override to check if we can actually initialize.
-        /// </summary>
-        /// <remarks>
-        /// This check is required since the base examine lib will try to rebuild on startup
-        /// </remarks>
-        public override void RebuildIndex()
-        {
-            if (CanInitialize())
-            {
-                ProfilingLogger.Logger.Debug(GetType(), "Rebuilding index");
-                using (new SafeCallContext())
-                {
-                    base.RebuildIndex();
-                }
-            }
-        }
-
-        /// <summary>
-        /// override to check if we can actually initialize.
-        /// </summary>
-        /// <remarks>
-        /// This check is required since the base examine lib will try to rebuild on startup
-        /// </remarks>
-        public override void IndexAll(string type)
-        {
-            if (CanInitialize())
-            {
-                using (new SafeCallContext())
-                {
-                    base.IndexAll(type);
-                }
-            }
-        }
-
-        public override void IndexItems(IEnumerable<ValueSet> nodes)
-        {
-            if (CanInitialize())
-            {
-                using (new SafeCallContext())
-                {
-                    base.IndexItems(nodes);
-                }
-            }
-        }
-
         /// <summary>
         /// override to check if we can actually initialize.
         /// </summary>
@@ -344,17 +292,6 @@ namespace Umbraco.Examine
             // only affects indexers that are config file based, if an index was created via code then
             // this has no effect, it is assumed the index would not be created if it could not be initialized
             return _configBased == false || Current.RuntimeState.Level == RuntimeLevel.Run;
-        }
-
-        /// <summary>
-        /// Reindexes all supported types
-        /// </summary>
-        protected override void PerformIndexRebuild()
-        {
-            foreach (var t in SupportedTypes)
-            {
-                IndexAll(t);
-            }
         }
 
         /// <summary>

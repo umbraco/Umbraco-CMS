@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using Examine;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Examine.LuceneEngine.Indexing;
@@ -14,29 +12,17 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
 using Umbraco.Examine.Config;
-using IContentService = Umbraco.Core.Services.IContentService;
-using IMediaService = Umbraco.Core.Services.IMediaService;
 using Examine.LuceneEngine;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Examine
 {
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndexer : UmbracoExamineIndexer
+    public class UmbracoContentIndexer : UmbracoExamineIndexer, IUmbracoContentIndexer, IUmbracoMediaIndexer
     {
         public const string VariesByCultureFieldName = UmbracoExamineIndexer.SpecialFieldPrefix + "VariesByCulture";
-
-        public IValueSetBuilder<IMedia> MediaValueSetBuilder { get; }
-        public IValueSetBuilder<IContent> ContentValueSetBuilder { get; }
-        protected IContentService ContentService { get; }
-        protected IMediaService MediaService { get; }
         protected ILocalizationService LanguageService { get; }
 
         private int? _parentId;
@@ -49,14 +35,7 @@ namespace Umbraco.Examine
         [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoContentIndexer()
         {
-            ContentService = Current.Services.ContentService;
-            MediaService = Current.Services.MediaService;
             LanguageService = Current.Services.LocalizationService;
-
-            ContentValueSetBuilder = new ContentValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
-            MediaValueSetBuilder = new MediaValueSetBuilder(Current.PropertyEditors, Current.UrlSegmentProviders, Current.Services.UserService);
-
-            InitializeQueries(Current.SqlContext);
         }
 
         /// <summary>
@@ -67,9 +46,6 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
-        /// <param name="contentService"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="sqlContext"></param>
         /// <param name="validator"></param>
         /// <param name="options"></param>
         /// <param name="indexValueTypes"></param>
@@ -79,12 +55,7 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
-            IValueSetBuilder<IContent> contentValueSetBuilder,
-            IValueSetBuilder<IMedia> mediaValueSetBuilder,
-            IContentService contentService,
-            IMediaService mediaService,
             ILocalizationService languageService,
-            ISqlContext sqlContext,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
@@ -96,21 +67,9 @@ namespace Umbraco.Examine
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
             ParentId = options.ParentId;
-            ContentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
-            MediaValueSetBuilder = mediaValueSetBuilder ?? throw new ArgumentNullException(nameof(mediaValueSetBuilder));
-            ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-            MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-
-            InitializeQueries(sqlContext);
         }
 
-        private void InitializeQueries(ISqlContext sqlContext)
-        {
-            if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
-            if (_publishedQuery == null)
-                _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
-        }
 
         #endregion
 
@@ -133,16 +92,17 @@ namespace Umbraco.Examine
         /// <exception cref="T:System.InvalidOperationException">
         /// An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
         /// </exception>
-
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void Initialize(string name, NameValueCollection config)
         {
+            base.Initialize(name, config);
+
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
             if (config["supportUnpublished"] != null && bool.TryParse(config["supportUnpublished"], out var supportUnpublished))
                 SupportUnpublishedContent = supportUnpublished;
             else
                 SupportUnpublishedContent = false;
-
 
             //check if there's a flag specifying to support protected content,
             //if not, set to false;
@@ -151,8 +111,6 @@ namespace Umbraco.Examine
             else
                 SupportProtectedContent = false;
 
-            base.Initialize(name, config);
-
             //now we need to build up the indexer options so we can create our validator
             int? parentId = null;
             if (IndexSetName.IsNullOrWhiteSpace() == false)
@@ -160,11 +118,15 @@ namespace Umbraco.Examine
                 var indexSet = IndexSets.Instance.Sets[IndexSetName];
                 parentId = indexSet.IndexParentId;
             }
+
             ValueSetValidator = new UmbracoContentValueSetValidator(
-                new UmbracoContentIndexerOptions(SupportUnpublishedContent, SupportProtectedContent, parentId),
+                new UmbracoContentIndexerOptions(
+                    SupportUnpublishedContent, SupportProtectedContent, parentId,
+                    ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes),
                 //Using a singleton here, we can't inject this when using config based providers and we don't use this
                 //anywhere else in this class
                 Current.Services.PublicAccessService);
+
         }
 
         #endregion
@@ -185,8 +147,6 @@ namespace Umbraco.Examine
             get => _parentId ?? ConfigIndexCriteria?.ParentNodeId;
             protected set => _parentId = value;
         }
-
-        protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Content, IndexTypes.Media};
 
         #endregion
 
@@ -245,164 +205,7 @@ namespace Umbraco.Examine
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
 
-        /// <summary>
-        /// This is a static query, it's parameters don't change so store statically
-        /// </summary>
-        private static IQuery<IContent> _publishedQuery;
-
-        protected override void PerformIndexAll(string type)
-        {
-            const int pageSize = 10000;
-            var pageIndex = 0;
-
-            switch (type)
-            {
-                case IndexTypes.Content:
-                    var contentParentId = -1;
-                    if (ParentId.HasValue && ParentId.Value > 0)
-                    {
-                        contentParentId = ParentId.Value;
-                    }
-                    IContent[] content;
-
-                    do
-                    {
-                        long total;
-
-                        IEnumerable<IContent> descendants;
-                        if (SupportUnpublishedContent)
-                        {
-                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
-                        }
-                        else
-                        {
-                            //add the published filter
-                            descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total,
-                                _publishedQuery, Ordering.By("Path", Direction.Ascending));
-                        }
-
-                        //if specific types are declared we need to post filter them
-                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
-                        {
-                            content = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(x.ContentType.Alias)).ToArray();
-                        }
-                        else
-                        {
-                            content = descendants.ToArray();
-                        }
-
-                        IndexItems(ContentValueSetBuilder.GetValueSets(content));
-
-                        pageIndex++;
-                    } while (content.Length == pageSize);
-
-                    break;
-                case IndexTypes.Media:
-                    var mediaParentId = -1;
-
-                    if (ParentId.HasValue && ParentId.Value > 0)
-                    {
-                        mediaParentId = ParentId.Value;
-                    }
-
-                    IMedia[] media;
-
-                    do
-                    {
-                        var descendants = MediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _);
-
-                        //if specific types are declared we need to post filter them
-                        //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
-                        {
-                            media = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(x.ContentType.Alias)).ToArray();
-                        }
-                        else
-                        {
-                            media = descendants.ToArray();
-                        }
-
-                        IndexItems(MediaValueSetBuilder.GetValueSets(media));
-
-                        pageIndex++;
-                    } while (media.Length == pageSize);
-
-                    break;
-            }
-        }
-
-        //TODO: We want to make a public method that iterates a data set, potentially with callbacks so that we can iterate
-        // a single data set once but populate multiple indexes with it. This is for Startup performance when no indexes exist.
-        // This could be used for any indexer of type UmbracoContentIndexer - BUT that means we need to make another interface
-        // for content indexers since UmbracoContentIndexer is strongly tied to lucene, so maybe we have a more generic interface
-        // or add to the current IUmbracoIndexer interface
-
 
         #endregion
-    }
-
-    public class ContentIndexDataSource
-    {
-        public ContentIndexDataSource(bool supportUnpublishedContent, int? parentId,
-            IContentService contentService, ISqlContext sqlContext,
-            IValueSetBuilder<IContent> contentValueSetBuilder)
-        {
-            SupportUnpublishedContent = supportUnpublishedContent;
-            ParentId = parentId;
-            ContentService = contentService;
-            _contentValueSetBuilder = contentValueSetBuilder;
-            if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
-            _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
-
-        }
-
-        public bool SupportUnpublishedContent { get; }
-        public int? ParentId { get; }
-        public IContentService ContentService { get; }
-
-        /// <summary>
-        /// This is a static query, it's parameters don't change so store statically
-        /// </summary>
-        private static IQuery<IContent> _publishedQuery;
-        private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
-
-        public void Index(params IIndexer[] indexes)
-        {
-            const int pageSize = 10000;
-            var pageIndex = 0;
-
-            var contentParentId = -1;
-            if (ParentId.HasValue && ParentId.Value > 0)
-            {
-                contentParentId = ParentId.Value;
-            }
-            IContent[] content;
-
-            do
-            {
-                long total;
-
-                IEnumerable<IContent> descendants;
-                if (SupportUnpublishedContent)
-                {
-                    descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
-                }
-                else
-                {
-                    //add the published filter
-                    //note: We will filter for published variants in the validator
-                    descendants = ContentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total,
-                        _publishedQuery, Ordering.By("Path", Direction.Ascending));
-                }
-
-                content = descendants.ToArray();
-
-                foreach(var index in indexes)
-                    index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
-
-                pageIndex++;
-            } while (content.Length == pageSize);
-        }
     }
 }

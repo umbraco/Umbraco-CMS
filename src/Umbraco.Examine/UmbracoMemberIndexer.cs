@@ -23,17 +23,12 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoExamineIndexer
     {
-        private readonly IValueSetBuilder<IMember> _valueSetBuilder;
-        private readonly IMemberService _memberService;
-
         /// <summary>
         /// Constructor for config/provider based indexes
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoMemberIndexer()
         {
-            _memberService = Current.Services.MemberService;
-            _valueSetBuilder = new MemberValueSetBuilder(Current.PropertyEditors);
         }
 
         /// <summary>
@@ -44,7 +39,6 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="profilingLogger"></param>
         /// <param name="validator"></param>
-        /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndexer(
             string name, 
@@ -52,13 +46,9 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
-            IValueSetBuilder<IMember> valueSetBuilder,
-            IMemberService memberService,
             IValueSetValidator validator = null) :
             base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
         {
-            _valueSetBuilder = valueSetBuilder ?? throw new ArgumentNullException(nameof(valueSetBuilder));
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         }
 
 
@@ -75,55 +65,6 @@ namespace Umbraco.Examine
 
             return base.CreateFieldValueTypes(indexValueTypesFactory);
         }
-
-        /// <inheritdoc />
-        protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Member};
-
-        /// <summary>
-        /// Reindex all members
-        /// </summary>
-        /// <param name="type"></param>
-        protected override void PerformIndexAll(string type)
-        {
-            //This only supports members
-            if (SupportedTypes.Contains(type) == false)
-                return;
-
-            const int pageSize = 1000;
-            var pageIndex = 0;
-
-            IMember[] members;
-
-            if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
-            {
-                //if there are specific node types then just index those
-                foreach (var nodeType in ConfigIndexCriteria.IncludeItemTypes)
-                {
-                    do
-                    {
-                        members = _memberService.GetAll(pageIndex, pageSize, out _, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
-
-                        IndexItems(_valueSetBuilder.GetValueSets(members));
-
-                        pageIndex++;
-                    } while (members.Length == pageSize);
-                }
-            }
-            else
-            {
-                //no node types specified, do all members
-                do
-                {
-                    members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
-
-                    IndexItems(_valueSetBuilder.GetValueSets(members));
-
-                    pageIndex++;
-                } while (members.Length == pageSize);
-            }
-        }
-
-        
 
         /// <summary>
         /// Ensure some custom values are added to the index

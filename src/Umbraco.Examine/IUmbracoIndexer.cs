@@ -2,6 +2,7 @@
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// A Marker interface for defining an Umbraco indexer
     /// </summary>
