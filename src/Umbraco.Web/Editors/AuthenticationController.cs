@@ -40,27 +40,27 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
-
-        //fixme inject these
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-        {
-            get { return _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager()); }
-        }
-        protected BackOfficeSignInManager SignInManager
-        {
-            get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
-        }
 
+        /// <summary>
+        /// Initializes a new instance of the new <see cref="AuthenticationController"/> class with auto dependencies.
+        /// </summary>
         public AuthenticationController()
-        {
-        }
+        { }
 
-        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
-        {
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class with all its dependencies.
+        /// </summary>
+        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
+        { }
+
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
+            ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
+
+        protected BackOfficeSignInManager SignInManager => _signInManager
+            ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());
 
         /// <summary>
         /// Returns the configuration for the backoffice user membership provider - used to configure the change password dialog

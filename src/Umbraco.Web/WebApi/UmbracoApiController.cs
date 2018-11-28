@@ -13,11 +13,18 @@ namespace Umbraco.Web.WebApi
     /// </summary>
     public abstract class UmbracoApiController : UmbracoApiControllerBase, IDiscoverable
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoApiController"/> with auto dependencies.
+        /// </summary>
+        /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoApiController()
         { }
 
-        protected UmbracoApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
+        /// <summary>
+        /// Initialize a new instance of the <see cref="UmbracoApiController"/> with all its dependencies.
+        /// </summary>
+        protected UmbracoApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         { }
     }
 }

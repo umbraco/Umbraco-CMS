@@ -27,11 +27,17 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardController"/> with auto dependencies.
+        /// </summary>
         public DashboardController()
         { }
 
-        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
-            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
+        /// </summary>
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, IProfilingLogger logger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, applicationCache, logger, runtimeState)
         { }
 
         //we have just one instance of HttpClient shared for the entire application
