@@ -34,6 +34,8 @@
     "lazyload-js": "1.0.0",
     "moment": "2.10.6",
     "ng-file-upload": "12.2.13",
+    "nouislider": "12.1.0",
+    "npm": "^6.4.1",
     "signalr": "2.3.0",
     "tinymce": "4.8.3",
     "typeahead.js": "0.10.5",

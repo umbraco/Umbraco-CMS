@@ -342,6 +342,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/ng-file-upload/dist"
         },
         {
+            "name": "nouislider",
+            "src":  [
+                "./node_modules/nouislider/distribute/nouislider.min.js",
+                "./node_modules/nouislider/distribute/nouislider.min.css"
+            ],
+            "base": "./node_modules/nouislider/distribute"
+        },
+        {
             "name": "signalr",
             "src":  ["./node_modules/signalr/jquery.signalR.js"],
             "base": "./node_modules/signalr"
