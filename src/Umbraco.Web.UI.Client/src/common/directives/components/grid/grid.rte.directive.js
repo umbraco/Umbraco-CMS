@@ -363,11 +363,18 @@ angular.module("umbraco.directives")
                             //};
 
                              
-                            var tabShownListener = eventsService.on("valTab.tabShown", function (e, args) {
-                                //the tab has been shown, trigger the mceAutoResize (as it could have timed out before the tab was shown)
-                                if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-                                    tinyMceEditor.execCommand('mceAutoResize', false, null, null);
+                            var tabShownListener = eventsService.on("app.tabChange", function (e, args) {
+
+                                var tabId = args.id;
+                                var myTabId = element.closest(".umb-tab-pane").attr("rel");
+
+                                if (String(tabId) === myTabId) {
+                                    //the tab has been shown, trigger the mceAutoResize (as it could have timed out before the tab was shown)
+                                    if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+                                        tinyMceEditor.execCommand('mceAutoResize', false, null, null);
+                                    }
                                 }
+                                
                             });
                            
                             //listen for formSubmitting event (the result is callback used to remove the event subscription)
