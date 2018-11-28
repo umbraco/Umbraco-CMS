@@ -8,7 +8,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Examine
 {
-    public class MediaValueSetBuilder : BaseValueSetBuilder, IValueSetBuilder<IMedia>
+    public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     {
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private readonly IUserService _userService;
@@ -22,7 +22,8 @@ namespace Umbraco.Examine
             _userService = userService;
         }
 
-        public IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
+        /// <inheritdoc />
+        public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
         {
             foreach (var m in media)
             {

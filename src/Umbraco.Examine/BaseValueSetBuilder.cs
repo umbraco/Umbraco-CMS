@@ -1,19 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Examine
 {
-    public abstract class BaseValueSetBuilder 
+
+    /// <inheritdoc />
+    public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
+        where TContent : IContentBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
 
-        public BaseValueSetBuilder(PropertyEditorCollection propertyEditors)
+        protected BaseValueSetBuilder(PropertyEditorCollection propertyEditors)
         {
             _propertyEditors = propertyEditors ?? throw new System.ArgumentNullException(nameof(propertyEditors));
         }
+
+        /// <inheritdoc />
+        public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
         protected void AddPropertyValue(Property property, string culture, string segment, IDictionary<string, object[]> values)
         {
@@ -57,8 +64,6 @@ namespace Umbraco.Examine
                     }
                 }
             }
-
-
         }
     }
 

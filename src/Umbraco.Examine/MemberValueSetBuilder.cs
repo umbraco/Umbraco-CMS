@@ -7,14 +7,15 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Examine
 {
 
-    public class MemberValueSetBuilder : BaseValueSetBuilder, IValueSetBuilder<IMember>
+    public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
     {
         public MemberValueSetBuilder(PropertyEditorCollection propertyEditors)
             : base(propertyEditors)
         {
         }
 
-        public IEnumerable<ValueSet> GetValueSets(params IMember[] members)
+        /// <inheritdoc />
+        public override IEnumerable<ValueSet> GetValueSets(params IMember[] members)
         {
             foreach (var m in members)
             {

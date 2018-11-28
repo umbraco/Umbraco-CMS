@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,17 +16,13 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
-using LightInject;
 
 namespace Umbraco.Web.Search
 {
@@ -42,15 +37,13 @@ namespace Umbraco.Web.Search
         private IValueSetBuilder<IContent> _contentValueSetBuilder;
         private IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private IValueSetBuilder<IMember> _memberValueSetBuilder;
-        private ContentIndexPopulator _contentIndexPopulator;
-        private MediaIndexPopulator _mediaIndexPopulator;
         private static bool _disableExamineIndexing = false;
         private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
         private IScopeProvider _scopeProvider;
         private ServiceContext _services;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
-        private static readonly object _rebuildLocker = new object();
+        private static readonly object RebuildLocker = new object();
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -77,15 +70,11 @@ namespace Umbraco.Web.Search
             IndexRebuilder indexRebuilder, ServiceContext services,
             IValueSetBuilder<IContent> contentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
-            IValueSetBuilder<IMember> memberValueSetBuilder,
-            ContentIndexPopulator contentIndexPopulator, PublishedContentIndexPopulator publishedContentIndexPopulator,
-            MediaIndexPopulator mediaIndexPopulator)
+            IValueSetBuilder<IMember> memberValueSetBuilder)
         {
             _services = services;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
-            _contentIndexPopulator = contentIndexPopulator;
-            _mediaIndexPopulator = mediaIndexPopulator;
             _contentValueSetBuilder = contentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
@@ -149,17 +138,20 @@ namespace Umbraco.Web.Search
 
             RebuildIndexes(indexRebuilder, profilingLogger.Logger, true, 5000);
         }
-        
+
 
         /// <summary>
         /// Called to rebuild empty indexes on startup
         /// </summary>
+        /// <param name="indexRebuilder"></param>
         /// <param name="logger"></param>
+        /// <param name="onlyEmptyIndexes"></param>
+        /// <param name="waitMilliseconds"></param>
         public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
             //TODO: need a way to disable rebuilding on startup
 
-            lock(_rebuildLocker)
+            lock(RebuildLocker)
             {
                 if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
                 {

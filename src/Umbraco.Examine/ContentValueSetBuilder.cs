@@ -8,9 +8,8 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Examine
 {
-    public class ContentValueSetBuilder : BaseValueSetBuilder, IValueSetBuilder<IContent>
+    public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>
     {
-        private readonly PropertyEditorCollection _propertyEditors;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private readonly IUserService _userService;
 
@@ -19,19 +18,12 @@ namespace Umbraco.Examine
             IUserService userService)
             : base(propertyEditors)
         {
-            _propertyEditors = propertyEditors;
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
         }
 
-        /// <summary>
-        /// Creates a collection of <see cref="ValueSet"/> for a <see cref="IContent"/> collection
-        /// </summary>
-        /// <param name="urlSegmentProviders"></param>
-        /// <param name="userService"></param>
-        /// <param name="content"></param>
-        /// <returns>Yield returns <see cref="ValueSet"/></returns>
-        public IEnumerable<ValueSet> GetValueSets(params IContent[] content)
+        /// <inheritdoc />
+        public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
         {
             //TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
