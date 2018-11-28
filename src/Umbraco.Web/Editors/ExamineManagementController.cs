@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Examine;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Search;
 
@@ -37,13 +38,9 @@ namespace Umbraco.Web.Editors
         /// Get the details for indexers
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
+        public IEnumerable<ExamineIndexModel> GetIndexerDetails()
         {
-            return _examineManager.IndexProviders.Select(CreateModel).OrderBy(x =>
-            {
-                //order by name , but strip the "Indexer" from the end if it exists
-                return x.Name.TrimEnd("Indexer");
-            });
+            return _examineManager.IndexProviders.Select(CreateModel).OrderBy(x => x.Name.TrimEnd("Indexer"));
         }
 
         /// <summary>
@@ -122,7 +119,7 @@ namespace Umbraco.Web.Editors
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
+        public ExamineIndexModel PostCheckRebuildIndex(string indexerName)
         {
             var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
             if (msg.IsSuccessStatusCode)
@@ -186,66 +183,32 @@ namespace Umbraco.Web.Editors
             return msg;
         }
 
-        private ExamineIndexerModel CreateModel(KeyValuePair<string, IIndexer> indexerKeyVal)
+        
+
+        private ExamineIndexModel CreateModel(KeyValuePair<string, IIndexer> indexerKeyVal)
         {
             var indexer = indexerKeyVal.Value;
             var indexName = indexerKeyVal.Key;
-            var indexerModel = new ExamineIndexerModel
+
+            if (!(indexer is IIndexDiagnostics indexDiag))
+                indexDiag = new GenericIndexDiagnostics(indexer);
+
+
+            var isHealth = indexDiag.IsHealthy();
+            var properties = new Dictionary<string, object>
             {
-                FieldDefinitions = indexer.FieldDefinitionCollection,
-                Name = indexName
+                [nameof(IIndexDiagnostics.DocumentCount)] = indexDiag.DocumentCount,
+                [nameof(IIndexDiagnostics.FieldCount)] = indexDiag.FieldCount,
             };
+            foreach (var p in indexDiag.Metadata)
+                properties[p.Key] = p.Value;
 
-            var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
-                                  //ignore these properties
-                                  .Where(x => new[] { "IndexerData", "Description", "WorkingFolder" }
-                                                  .InvariantContains(x.Name) == false)
-                                  .OrderBy(x => x.Name);
-
-            foreach (var p in props)
+            var indexerModel = new ExamineIndexModel
             {
-                var val = p.GetValue(indexer, null);
-                if (val == null)
-                {
-                    // Do not warn for new new attribute that is optional
-                    if (string.Equals(p.Name, "DirectoryFactory", StringComparison.InvariantCultureIgnoreCase) == false)
-                    {
-                        Logger
-                            .Warn<ExamineManagementController
-                            >("Property value was null when setting up property on indexer: " + indexName +
-                              " property: " + p.Name);
-                    }
-
-                    val = string.Empty;
-                }
-
-                indexerModel.ProviderProperties.Add(p.Name, val.ToString());
-            }
-
-            if (indexer is LuceneIndexer luceneIndexer)
-            {
-                indexerModel.IsLuceneIndex = true;
-
-                if (luceneIndexer.IndexExists())
-                {
-                    indexerModel.IsHealthy = luceneIndexer.IsHealthy(out var indexError);
-
-                    if (indexerModel.IsHealthy == false)
-                    {
-                        //we cannot continue at this point
-                        indexerModel.Error = indexError.ToString();
-                        return indexerModel;
-                    }
-
-                    indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
-                    indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
-                }
-                else
-                {
-                    indexerModel.DocumentCount = 0;
-                    indexerModel.FieldCount = 0;
-                }
-            }
+                Name = indexName,
+                HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
+                ProviderProperties = properties
+            };
 
             return indexerModel;
         }

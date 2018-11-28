@@ -160,6 +160,7 @@
     <Compile Include="ContentApps\ListViewContentAppDefinition.cs" />
     <Compile Include="Models\Mapping\ScheduledPublishDateResolver.cs" />
     <Compile Include="PropertyEditors\GridValueIndexer.cs" />
+    <Compile Include="Search\GenericIndexDiagnostics.cs" />
     <Compile Include="Search\IUmbracoIndexesBuilder.cs" />
     <Compile Include="Search\UmbracoIndexesBuilder.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
@@ -993,8 +994,7 @@
     <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
-    <Compile Include="Search\ExamineIndexerModel.cs" />
-    <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="Search\ExamineIndexModel.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">

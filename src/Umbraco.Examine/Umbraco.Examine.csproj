@@ -63,6 +63,8 @@
     <Compile Include="Config\IndexSets.cs" />
     <Compile Include="ContentIndexPopulator.cs" />
     <Compile Include="ContentValueSetBuilder.cs" />
+    <Compile Include="ExamineExtensions.cs" />
+    <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />

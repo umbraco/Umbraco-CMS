@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Indexing;
+using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Xml;
@@ -24,7 +25,7 @@ namespace Umbraco.Examine
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndexer : LuceneIndexer, IUmbracoIndexer
+    public abstract class UmbracoExamineIndexer : LuceneIndexer, IUmbracoIndexer, IIndexDiagnostics
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -77,6 +78,10 @@ namespace Umbraco.Examine
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
         {
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
+
+            //try to set the value of `LuceneIndexFolder` for diagnostic reasons
+            if (luceneDirectory is FSDirectory fsDir)
+                LuceneIndexFolder = fsDir.Directory;
         }
 
         private readonly bool _configBased = false;
@@ -348,5 +353,57 @@ namespace Umbraco.Examine
                 indexSet.ExcludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
                 indexSet.IndexParentId);
         }
+
+        #region IIndexDiagnostics
+
+        public int DocumentCount
+        {
+            get
+            {
+                try
+                {
+                    return this.GetIndexDocumentCount();
+                }
+                catch (AlreadyClosedException)
+                {
+                    ProfilingLogger.Logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                    return 0;
+                }
+            }
+        }
+
+        public int FieldCount
+        {
+            get
+            {
+                try
+                {
+                    return this.GetIndexFieldCount();
+                }
+                catch (AlreadyClosedException)
+                {
+                    ProfilingLogger.Logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexFieldCount, the writer is already closed");
+                    return 0;
+                }
+            }
+        }
+
+        public Attempt<string> IsHealthy()
+        {
+            var isHealthy = this.IsHealthy(out var indexError);
+            return isHealthy ? Attempt<string>.Succeed() : Attempt.Fail(indexError.Message);
+        }
+
+        public virtual IReadOnlyDictionary<string, object> Metadata => new Dictionary<string, object>
+        {
+            [nameof(CommitCount)] = CommitCount,
+            [nameof(DefaultAnalyzer)] = DefaultAnalyzer.GetType(),
+            [nameof(DirectoryFactory)] = DirectoryFactory,
+            [nameof(EnableDefaultEventHandler)] = EnableDefaultEventHandler,
+            [nameof(LuceneIndexFolder)] = LuceneIndexFolder?.ToString(),
+            [nameof(SupportSoftDelete)] = SupportSoftDelete
+        };
+
+        #endregion
     }
 }

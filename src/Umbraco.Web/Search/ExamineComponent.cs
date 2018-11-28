@@ -26,7 +26,6 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
 {
-
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>
