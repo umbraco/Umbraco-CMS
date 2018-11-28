@@ -254,6 +254,10 @@ angular.module("umbraco")
 
                     // Update model on keypress
                     editor.on('KeyUp', function (e) {
+                        // Do nothing if Ctrl+C was pressed
+                        if (e.ctrlKey && e.keyCode === 67) {
+                            return;
+                        }
                         syncContent(editor);
                     });
 
