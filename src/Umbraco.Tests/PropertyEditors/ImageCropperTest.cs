@@ -69,11 +69,12 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = ContainerFactory.Create();
-                Current.Factory = container;
+                var container = RegisterFactory.Create();
                 var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
                 composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+
+                Current.Factory = container.CreateFactory();
 
                 var logger = Mock.Of<ILogger>();
                 var scheme = Mock.Of<IMediaPathScheme>();

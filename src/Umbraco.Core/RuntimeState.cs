@@ -20,16 +20,13 @@ namespace Umbraco.Core
         private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
+        private readonly Lazy<MainDom> _mainDom;
+        private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private RuntimeLevel _level;
-        private Lazy<MainDom> _mainDom;
-        private Lazy<IServerRegistrar> _serverRegistrar;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        /// <param name="logger">A logger.</param>
-        /// <param name="settings">Umbraco settings.</param>
-        /// <param name="globalSettings">Global settings.</param>
         public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
             Lazy<MainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar)
         {

@@ -34,12 +34,12 @@ namespace Umbraco.Tests.TestHelpers
 
             var sqlSyntax = new SqlCeSyntaxProvider();
 
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
+            var container = RegisterFactory.Create();
+            
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
-            container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
+            container.RegisterSingleton<ILogger>(_ => Mock.Of<ILogger>());
+            container.RegisterSingleton<IProfiler>(_ => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var pluginManager = new TypeLoader(NullCacheProvider.Instance,
@@ -50,7 +50,10 @@ namespace Umbraco.Tests.TestHelpers
 
             composition.GetCollectionBuilder<MapperCollectionBuilder>()
                 .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
-            Mappers = container.GetInstance<IMapperCollection>();
+
+            var factory = Current.Factory = container.CreateFactory();
+
+            Mappers = factory.GetInstance<IMapperCollection>();
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());

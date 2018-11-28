@@ -27,8 +27,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
-            Container.RegisterSingleton<IProfilingLogger, ProfilingLogger>();
+            Composition.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            Composition.RegisterSingleton<IProfilingLogger, ProfilingLogger>();
         }
 
         protected override void Initialize()

@@ -28,7 +28,7 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override void Boot(IContainer container)
+        public override void Boot(IRegister register)
         {
             // create and start asap to profile boot
             var debug = GlobalSettings.DebugMode;
@@ -44,10 +44,10 @@ namespace Umbraco.Web.Runtime
                 _webProfiler = new VoidProfiler();
             }
 
-            base.Boot(container);
+            base.Boot(register);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
-            container.EnablePerWebRequestScope();
+            register.EnablePerWebRequestScope();
         }
 
         /// <inheritdoc/>

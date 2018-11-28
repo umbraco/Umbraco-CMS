@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         private IUmbracoSettingsSection _umbracoSettings;

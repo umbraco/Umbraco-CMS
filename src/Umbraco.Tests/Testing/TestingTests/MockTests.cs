@@ -53,11 +53,11 @@ namespace Umbraco.Tests.Testing.TestingTests
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
             // unless we can inject them in MembershipHelper, we need need this
-            Container.Register(_ => Mock.Of<IMemberService>());
-            Container.Register(_ => Mock.Of<IMemberTypeService>());
-            Container.Register(_ => Mock.Of<IUserService>());
-            Container.Register(_ => CacheHelper.Disabled);
-            Container.Register<ServiceContext>();
+            Composition.Register(_ => Mock.Of<IMemberService>());
+            Composition.Register(_ => Mock.Of<IMemberTypeService>());
+            Composition.Register(_ => Mock.Of<IUserService>());
+            Composition.Register(_ => CacheHelper.Disabled);
+            Composition.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(umbracoContext,

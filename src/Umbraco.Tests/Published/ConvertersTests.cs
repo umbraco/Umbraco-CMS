@@ -174,9 +174,9 @@ namespace Umbraco.Tests.Published
         public void SimpleConverter3Test()
         {
             Current.Reset();
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = RegisterFactory.Create();
+
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()
@@ -187,7 +187,9 @@ namespace Umbraco.Tests.Published
                 typeof (PublishedSnapshotTestObjects.TestElementModel1), typeof (PublishedSnapshotTestObjects.TestElementModel2),
                 typeof (PublishedSnapshotTestObjects.TestContentModel1), typeof (PublishedSnapshotTestObjects.TestContentModel2),
             });
-            container.Register(f => factory);
+            register.Register(f => factory);
+
+            Current.Factory = register.CreateFactory();
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -196,7 +198,7 @@ namespace Umbraco.Tests.Published
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
-            container.Register(f => publishedSnapshotAccessorMock.Object);
+            register.Register(f => publishedSnapshotAccessorMock.Object);
 
             var converters = Current.Factory.GetInstance<PropertyValueConverterCollection>();
 

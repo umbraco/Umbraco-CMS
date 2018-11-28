@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IDictionaryRepository CreateRepository()
         {
-            return Container.GetInstance<IDictionaryRepository>();
+            return Factory.GetInstance<IDictionaryRepository>();
         }
 
         [Test]
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var languageRepository = Container.GetInstance<ILanguageRepository>();
+                var languageRepository = Factory.GetInstance<ILanguageRepository>();
                 var repository = CreateRepository();
 
                 var language = languageRepository.Get(1);

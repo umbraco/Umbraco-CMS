@@ -18,7 +18,7 @@ namespace Umbraco.Tests.CoreThings
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
 
             // fixme - base should do it!
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
+            Composition.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(settings));
         }
 
         [Test]

@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
                 : base(umbracoApplication)
             { }
 
-            public override void Boot(IContainer container)
+            public override void Boot(IRegister container)
             {
                 // do it before anything else - this is the only place where it's possible
                 var logger = Mock.Of<ILogger>();
@@ -68,13 +68,13 @@ namespace Umbraco.Tests.Routing
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Current.TypeLoader.GetSurfaceControllers());
-            Container.RegisterInstance(surfaceControllerTypes);
+            var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
+            Composition.RegisterInstance(surfaceControllerTypes);
 
-            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.TypeLoader.GetUmbracoApiControllers());
-            Container.RegisterInstance(umbracoApiControllerTypes);
+            var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
+            Composition.RegisterInstance(umbracoApiControllerTypes);
 
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
 
         public override void TearDown()

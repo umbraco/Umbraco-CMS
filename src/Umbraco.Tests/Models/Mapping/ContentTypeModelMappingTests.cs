@@ -55,13 +55,13 @@ namespace Umbraco.Tests.Models.Mapping
             var dataEditors = new DataEditorCollection(editors);
             _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
-            Container.RegisterSingleton(f => _editorsMock.Object);
+            Composition.RegisterSingleton(f => _editorsMock.Object);
 
-            Container.RegisterSingleton(_ => _contentTypeService.Object);
-            Container.RegisterSingleton(_ => _contentService.Object);
-            Container.RegisterSingleton(_ => _dataTypeService.Object);
-            Container.RegisterSingleton(_ => _entityService.Object);
-            Container.RegisterSingleton(_ => _fileService.Object);
+            Composition.RegisterSingleton(_ => _contentTypeService.Object);
+            Composition.RegisterSingleton(_ => _contentService.Object);
+            Composition.RegisterSingleton(_ => _dataTypeService.Object);
+            Composition.RegisterSingleton(_ => _entityService.Object);
+            Composition.RegisterSingleton(_ => _fileService.Object);
         }
 
         [Test]

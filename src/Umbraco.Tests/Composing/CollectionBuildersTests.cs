@@ -5,9 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.Composing
@@ -15,7 +13,7 @@ namespace Umbraco.Tests.Composing
     [TestFixture]
     public class CollectionBuildersTests
     {
-        private IContainer _container;
+        private IRegister _register;
         private IFactory _factory;
         private Composition _composition;
 
@@ -24,10 +22,10 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            _container = ContainerFactory.Create();
-            _factory = _container;
-            Current.Factory = _container;
-            _composition = new Composition(_container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            _register = RegisterFactory.Create();
+            _factory = _register.CreateFactory(); // fixme only works w/LightInject - would require we reorg tests!
+            Current.Factory = _factory;
+            _composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
         }
 
         [TearDown]
@@ -35,8 +33,8 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            _container.Dispose();
-            _container = null;
+            _register.DisposeIfDisposable();
+            _register = null;
         }
 
         [Test]
@@ -301,10 +299,10 @@ namespace Umbraco.Tests.Composing
             // but the container manages the scope, so to test the scope
             // the collection must come from the container
 
-            var col1 = _container.GetInstance<TestCollection>();
+            var col1 = _factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = _container.GetInstance<TestCollection>();
+            var col2 = _factory.GetInstance<TestCollection>();
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
             AssertSameCollection(col1, col2);
@@ -321,10 +319,10 @@ namespace Umbraco.Tests.Composing
             // but the container manages the scope, so to test the scope
             // the collection must come from the container
 
-            var col1 = _container.GetInstance<TestCollection>();
+            var col1 = _factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = _container.GetInstance<TestCollection>();
+            var col2 = _factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
             AssertNotSameCollection(col1, col2);
@@ -355,10 +353,10 @@ namespace Umbraco.Tests.Composing
 
             TestCollection col1A, col1B;
 
-            using (_container.BeginScope())
+            using (_factory.BeginScope())
             {
-                col1A = _container.GetInstance<TestCollection>();
-                col1B = _container.GetInstance<TestCollection>();
+                col1A = _factory.GetInstance<TestCollection>();
+                col1B = _factory.GetInstance<TestCollection>();
             }
 
             AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
@@ -367,9 +365,9 @@ namespace Umbraco.Tests.Composing
 
             TestCollection col2;
 
-            using (_container.BeginScope())
+            using (_factory.BeginScope())
             {
-                col2 = _container.GetInstance<TestCollection>();
+                col2 = _factory.GetInstance<TestCollection>();
             }
 
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));

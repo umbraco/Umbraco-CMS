@@ -27,11 +27,9 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
         }
 
-        private IContainer CreateContainer()
+        private IRegister CreateRegister()
         {
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
-            return container;
+            return RegisterFactory.Create();
         }
 
         // note
@@ -41,7 +39,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void LazyCollectionBuilderHandlesTypes()
         {
-            var container = CreateContainer();
+            var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<TestCollectionBuilder>()
@@ -50,13 +48,15 @@ namespace Umbraco.Tests.Composing
                 .Add<TransientObject3>()
                 .Add<TransientObject1>();
 
-            var values = container.GetInstance<TestCollection>();
+            var factory = composition.CreateFactory();
+
+            var values = factory.GetInstance<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = container.GetInstance<TestCollection>();
+            var other = factory.GetInstance<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void LazyCollectionBuilderHandlesProducers()
         {
-            var container = CreateContainer();
+            var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<TestCollectionBuilder>()
@@ -73,13 +73,15 @@ namespace Umbraco.Tests.Composing
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var values = container.GetInstance<TestCollection>();
+            var factory = composition.CreateFactory();
+
+            var values = factory.GetInstance<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = container.GetInstance<TestCollection>();
+            var other = factory.GetInstance<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -88,7 +90,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
-            var container = CreateContainer();
+            var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<TestCollectionBuilder>()
@@ -97,13 +99,15 @@ namespace Umbraco.Tests.Composing
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var values = container.GetInstance<TestCollection>();
+            var factory = composition.CreateFactory();
+
+            var values = factory.GetInstance<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = container.GetInstance<TestCollection>();
+            var other = factory.GetInstance<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -112,7 +116,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
-            var container = CreateContainer();
+            var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<TestCollectionBuilder>()
@@ -124,17 +128,19 @@ namespace Umbraco.Tests.Composing
                 // legal so far...
                 .Add(() => new[] { typeof(TransientObject4)  });
 
+            var factory = composition.CreateFactory();
+
             Assert.Throws<InvalidOperationException>(() =>
             {
                 // but throws here when trying to register the types
-                var values = container.GetInstance<TestCollection>();
+                var values = factory.GetInstance<TestCollection>();
             });
         }
 
         [Test]
         public void LazyCollectionBuilderCanExcludeTypes()
         {
-            var container = CreateContainer();
+            var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<TestCollectionBuilder>()
@@ -142,7 +148,9 @@ namespace Umbraco.Tests.Composing
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();
 
-            var values = container.GetInstance<TestCollection>();
+            var factory = composition.CreateFactory();
+
+            var values = factory.GetInstance<TestCollection>();
 
             Assert.AreEqual(2, values.Count());
             Assert.IsFalse(values.Select(x => x.GetType())
@@ -150,7 +158,7 @@ namespace Umbraco.Tests.Composing
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }));
 
-            var other = container.GetInstance<TestCollection>();
+            var other = factory.GetInstance<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient

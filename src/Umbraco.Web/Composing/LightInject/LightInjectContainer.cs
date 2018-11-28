@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Web.Http;
 using LightInject;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Web.Composing.LightInject
 {
     /// <summary>
-    /// Implements <see cref="IContainer"/> with LightInject.
+    /// Implements DI with LightInject.
     /// </summary>
     public class LightInjectContainer : Core.Composing.LightInject.LightInjectContainer
     {
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Composing.LightInject
             => new LightInjectContainer(CreateServiceContainer());
 
         /// <inheritdoc />
-        public override IContainer ConfigureForWeb()
+        public override void ConfigureForWeb()
         {
             // IoC setup for LightInject for MVC/WebApi
             // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
@@ -34,8 +33,6 @@ namespace Umbraco.Web.Composing.LightInject
             Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
             Container.EnableWebApi(GlobalConfiguration.Configuration);
-
-            return this;
         }
     }
 }

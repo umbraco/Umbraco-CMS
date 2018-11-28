@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Web.Mvc
                 true);
 
             var controller = new TestSurfaceController(umbracoContext);
-            Container.Register(_ => umbracoContext);
+            Composition.Register(_ => umbracoContext);
 
             Assert.IsNotNull(controller.Umbraco);
         }

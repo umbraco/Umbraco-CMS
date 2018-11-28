@@ -7,7 +7,7 @@ namespace Umbraco.Core.Composing
     /// <summary>
     /// Creates the container.
     /// </summary>
-    public static class ContainerFactory
+    public static class RegisterFactory
     {
         // cannot use typeof().AssemblyQualifiedName on the web container - we don't reference it
         // a normal Umbraco site should run on the web container, but an app may run on the core one
@@ -19,11 +19,13 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <remarks>
         /// To override the default LightInjectContainer, add an appSetting named umbracoContainerType with
-        /// a fully qualified type name to a class with a static method "Create" returning an IContainer.
+        /// a fully qualified type name to a class with a static method "Create" returning an IRegister.
         /// </remarks>
-        public static IContainer Create()
+        public static IRegister Create()
         {
             Type type;
+
+            // fixme naming / container?
 
             var configuredTypeName = ConfigurationManager.AppSettings["umbracoContainerType"];
             if (configuredTypeName.IsNullOrWhiteSpace())
@@ -46,9 +48,9 @@ namespace Umbraco.Core.Composing
             if (factoryMethod == null)
                 throw new Exception($"Container factory class '{configuredTypeName}' does not have a public static method named Create.");
 
-            var container = factoryMethod.Invoke(null, Array.Empty<object>()) as IContainer;
+            var container = factoryMethod.Invoke(null, Array.Empty<object>()) as IRegister;
             if (container == null)
-                throw new Exception($"Container factory '{configuredTypeName}' did not return an IContainer implementation.");
+                throw new Exception($"Container factory '{configuredTypeName}' did not return an IRegister implementation.");
 
             return container;
         }

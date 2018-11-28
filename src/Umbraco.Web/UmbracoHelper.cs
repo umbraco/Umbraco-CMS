@@ -156,7 +156,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory));
+            ?? (_membershipHelper = Current.Factory.GetInstance<MembershipHelper>());
 
         /// <summary>
         /// Gets the url provider.

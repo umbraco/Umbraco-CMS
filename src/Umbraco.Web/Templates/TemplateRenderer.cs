@@ -41,7 +41,7 @@ namespace Umbraco.Web.Templates
         }
 
         // todo - inject!
-        private PublishedRouter PublishedRouter => RegisterExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Factory);
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
 
 
         /// <summary>

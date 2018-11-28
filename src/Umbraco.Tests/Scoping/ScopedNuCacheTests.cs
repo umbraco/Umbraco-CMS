@@ -44,8 +44,8 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // fixme - and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Container.RegisterSingleton<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Composition.RegisterSingleton<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
+            Composition.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

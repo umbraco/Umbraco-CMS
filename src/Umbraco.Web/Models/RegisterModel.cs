@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models
             CreatePersistentLoginCookie = true;
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
+                var helper = Current.Factory.GetInstance<MembershipHelper>();
                 var model = helper.CreateRegistrationModel(MemberTypeAlias);
                 MemberProperties = model.MemberProperties;
             }

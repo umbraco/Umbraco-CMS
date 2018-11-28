@@ -22,7 +22,7 @@ namespace Umbraco.Tests.TreesAndSections
         protected override void Compose()
         {
             base.Compose();
-            Container.Register<ISectionService, SectionService>();
+            Composition.Register<ISectionService, SectionService>();
         }
 
         public override void SetUp()

@@ -10,8 +10,8 @@ namespace Umbraco.Core
         /// <summary>
         /// Boots the runtime.
         /// </summary>
-        /// <param name="container">The application container.</param>
-        void Boot(IContainer container);
+        /// <param name="register">The application register.</param>
+        void Boot(IRegister register);
 
         /// <summary>
         /// Gets the runtime state.

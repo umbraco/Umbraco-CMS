@@ -23,12 +23,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Container.RegisterSingleton(_ => GetServiceContext());
+            Composition.RegisterSingleton(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()
         {
-            var serviceContext = TestObjects.GetServiceContextMock(Container);
+            var serviceContext = TestObjects.GetServiceContextMock(Factory);
             MockLocalizationService(serviceContext);
             return serviceContext;
         }

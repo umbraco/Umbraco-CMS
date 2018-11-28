@@ -30,7 +30,7 @@ namespace Umbraco.Web.UI.Controls
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
-            Members = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
+            Members = Current.Factory.GetInstance<MembershipHelper>();
 
             // fixme inject somehow
             Logger = Current.Logger;

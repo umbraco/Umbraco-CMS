@@ -34,7 +34,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
 
-            var converters = Container.GetInstance<PropertyValueConverterCollection>();
+            var converters = Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>())) { Id = 1 });

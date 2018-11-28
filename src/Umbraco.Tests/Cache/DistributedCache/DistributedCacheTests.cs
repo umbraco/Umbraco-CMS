@@ -24,12 +24,12 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = RegisterFactory.Create();
+            Current.Factory = register.CreateFactory(); // fixme only for LightInject
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
-            container.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
+            register.Register<IServerRegistrar>(_ => new TestServerRegistrar());
+            register.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
 
             composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();

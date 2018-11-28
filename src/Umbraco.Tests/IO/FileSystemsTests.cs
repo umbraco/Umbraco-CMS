@@ -21,7 +21,8 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class FileSystemsTests
     {
-        private IContainer _container;
+        private IRegister _register;
+        private IFactory _factory;
 
         [SetUp]
         public void Setup()
@@ -30,16 +31,18 @@ namespace Umbraco.Tests.IO
             var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
 
-            _container = ContainerFactory.Create();
-            Current.Factory = _container;
-            var composition = new Composition(_container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            _register = RegisterFactory.Create();
 
-            _container.Register(_ => Mock.Of<ILogger>());
-            _container.Register(_ => Mock.Of<IDataTypeService>());
-            _container.Register(_ => Mock.Of<IContentSection>());
-            _container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+            var composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+
+            composition.Register(_ => Mock.Of<ILogger>());
+            composition.Register(_ => Mock.Of<IDataTypeService>());
+            composition.Register(_ => Mock.Of<IContentSection>());
+            composition.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
             composition.ComposeFileSystems();
+
+            _factory = composition.CreateFactory();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
@@ -53,37 +56,37 @@ namespace Umbraco.Tests.IO
             FileSystems.Reset();
 
             Current.Reset();
-            _container.Dispose();
+            _register.DisposeIfDisposable();
         }
 
-        private FileSystems FileSystems => _container.GetInstance<FileSystems>();
+        private FileSystems FileSystems => _factory.GetInstance<FileSystems>();
 
         [Test]
         public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = _container.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void Can_Get_IMediaFileSystem()
         {
-            var fileSystem = _container.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void IMediaFileSystem_Is_Singleton()
         {
-            var fileSystem1 = _container.GetInstance<IMediaFileSystem>();
-            var fileSystem2 = _container.GetInstance<IMediaFileSystem>();
+            var fileSystem1 = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem2 = _factory.GetInstance<IMediaFileSystem>();
             Assert.AreSame(fileSystem1, fileSystem2);
         }
 
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            var fs = _container.GetInstance<IMediaFileSystem>();
+            var fs = _factory.GetInstance<IMediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
             var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);

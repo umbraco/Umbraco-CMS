@@ -34,13 +34,13 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Container.RegisterSingleton(_ => GetServiceContext());
+            Composition.RegisterSingleton(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()
         {
             // get the mocked service context to get the mocked domain service
-            var serviceContext = TestObjects.GetServiceContextMock(Container);
+            var serviceContext = TestObjects.GetServiceContextMock(Factory);
 
             //setup mock domain service
             var domainService = Mock.Get(serviceContext.DomainService);

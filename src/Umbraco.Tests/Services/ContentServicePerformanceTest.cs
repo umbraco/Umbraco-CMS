@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Services
         protected override void Compose()
         {
             base.Compose();
-            Container.Register<IProfiler, TestProfiler>();
+            Composition.Register<IProfiler, TestProfiler>();
         }
 
         [Test]

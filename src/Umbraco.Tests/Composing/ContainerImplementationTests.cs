@@ -11,45 +11,49 @@ namespace Umbraco.Tests.Composing
     [TestFixture]
     public class ContainerImplementationTests // FIXME merge into ContainerTests or ContainerConformingTests
     {
-        private IContainer CreateContainer() => ContainerFactory.Create();
+        private IRegister CreateRegister() => RegisterFactory.Create();
 
         [Test]
         public void CanRegisterSingletonInterface()
         {
-            var container = CreateContainer();
-            container.RegisterSingleton<ITestInterface, TestClass1>();
-            var s1 = container.GetInstance<ITestInterface>();
-            var s2 = container.GetInstance<ITestInterface>();
+            var register = CreateRegister();
+            register.RegisterSingleton<ITestInterface, TestClass1>();
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<ITestInterface>();
+            var s2 = factory.GetInstance<ITestInterface>();
             Assert.AreSame(s1, s2);
         }
 
         [Test]
         public void CanRegisterSingletonClass()
         {
-            var container = CreateContainer();
-            container.RegisterSingleton<TestClass1>();
-            var s1 = container.GetInstance<TestClass1>();
-            var s2 = container.GetInstance<TestClass1>();
+            var register = CreateRegister();
+            register.RegisterSingleton<TestClass1>();
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<TestClass1>();
+            var s2 = factory.GetInstance<TestClass1>();
             Assert.AreSame(s1, s2);
         }
 
         [Test]
         public void CanReRegisterSingletonInterface()
         {
-            var container = CreateContainer();
-            container.RegisterSingleton<ITestInterface, TestClass1>();
-            container.RegisterSingleton<ITestInterface, TestClass2>();
-            var s = container.GetInstance<ITestInterface>();
+            var register = CreateRegister();
+            register.RegisterSingleton<ITestInterface, TestClass1>();
+            register.RegisterSingleton<ITestInterface, TestClass2>();
+            var factory = register.CreateFactory();
+            var s = factory.GetInstance<ITestInterface>();
             Assert.IsInstanceOf<TestClass2>(s);
         }
 
         [Test]
         public void CanRegisterSingletonWithCreate()
         {
-            var container = CreateContainer();
-            container.RegisterSingleton(c => c.CreateInstance<TestClass3>(new TestClass1()));
-            var s1 = container.GetInstance<TestClass3>();
-            var s2 = container.GetInstance<TestClass3>();
+            var register = CreateRegister();
+            register.RegisterSingleton(c => c.CreateInstance<TestClass3>(new TestClass1()));
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<TestClass3>();
+            var s2 = factory.GetInstance<TestClass3>();
             Assert.AreSame(s1, s2);
         }
 

@@ -54,12 +54,12 @@ namespace Umbraco.Web.Components
         {
             composition.SetServerMessenger(factory =>
             {
-                var runtime = RegisterExtensions.GetInstance<IRuntimeState>(factory);
-                var databaseFactory = RegisterExtensions.GetInstance<IUmbracoDatabaseFactory>(factory);
-                var globalSettings = RegisterExtensions.GetInstance<IGlobalSettings>(factory);
-                var proflog = RegisterExtensions.GetInstance<IProfilingLogger>(factory);
-                var scopeProvider = RegisterExtensions.GetInstance<IScopeProvider>(factory);
-                var sqlContext = RegisterExtensions.GetInstance<ISqlContext>(factory);
+                var runtime = factory.GetInstance<IRuntimeState>();
+                var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
+                var globalSettings = factory.GetInstance<IGlobalSettings>();
+                var proflog = factory.GetInstance<IProfilingLogger>();
+                var scopeProvider = factory.GetInstance<IScopeProvider>();
+                var sqlContext = factory.GetInstance<ISqlContext>();
 
                 return new BatchedDatabaseServerMessenger(
                     runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,

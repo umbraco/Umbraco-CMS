@@ -28,7 +28,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             base.Compose();
 
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
     }
 }

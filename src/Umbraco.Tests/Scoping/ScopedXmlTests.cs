@@ -32,8 +32,8 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // fixme - and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Composition.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }

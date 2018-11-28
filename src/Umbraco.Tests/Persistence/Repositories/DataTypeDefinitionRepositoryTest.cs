@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private IDataTypeRepository CreateRepository()
         {
-            return Container.GetInstance<IDataTypeRepository>();
+            return Factory.GetInstance<IDataTypeRepository>();
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)

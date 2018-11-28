@@ -41,11 +41,11 @@ namespace Umbraco.Tests.Models
         {
             base.Compose();
 
-            Container.Register(_ => Mock.Of<ILogger>());
+            Composition.Register(_ => Mock.Of<ILogger>());
             Composition.ComposeFileSystems();
 
-            Container.Register(_ => Mock.Of<IDataTypeService>());
-            Container.Register(_ => Mock.Of<IContentSection>());
+            Composition.Register(_ => Mock.Of<IDataTypeService>());
+            Composition.Register(_ => Mock.Of<IContentSection>());
         }
 
         [Test]

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Strings
             base.SetUp();
 
             // fixme - in "compose"?
-            Container.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
+            Composition.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
         }
 
         [Test]

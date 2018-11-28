@@ -12,7 +12,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
-using Umbraco.Web.ContentApps;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -25,13 +24,13 @@ namespace Umbraco.Tests.Manifest
         public void Setup()
         {
             Current.Reset();
-            var container = Mock.Of<IContainer>();
-            Current.Factory = container;
+            var factory = Mock.Of<IFactory>();
+            Current.Factory = factory;
 
             var serviceContext = new ServiceContext(
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(container)
+            Mock.Get(factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {

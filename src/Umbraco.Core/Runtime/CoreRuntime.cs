@@ -27,8 +27,8 @@ namespace Umbraco.Core.Runtime
     public class CoreRuntime : IRuntime
     {
         private Components.Components _components;
+        private IFactory _factory;
         private RuntimeState _state;
-        private IContainer _container;
 
         /// <summary>
         /// Gets the logger.
@@ -44,22 +44,19 @@ namespace Umbraco.Core.Runtime
         public IRuntimeState State => _state;
 
         /// <inheritdoc/>
-        public virtual void Boot(IContainer container)
+        public virtual void Boot(IRegister register)
         {
-            // assign current container
-            Current.Factory = _container = container;
-
             // create and register the essential services
             // ie the bare minimum required to boot
 
             // loggers
             var logger = GetLogger();
-            container.RegisterInstance(logger);
+            register.RegisterInstance(logger);
             Logger = logger;
             var profiler = GetProfiler();
-            container.RegisterInstance(profiler);
+            register.RegisterInstance(profiler);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            container.RegisterInstance<IProfilingLogger>(profilingLogger);
+            register.RegisterInstance<IProfilingLogger>(profilingLogger);
             ProfilingLogger = profilingLogger;
 
             // application environment
@@ -69,32 +66,34 @@ namespace Umbraco.Core.Runtime
 
             // application caches
             var appCaches = GetAppCaches();
-            container.RegisterInstance(appCaches);
+            register.RegisterInstance(appCaches);
             var runtimeCache = appCaches.RuntimeCache;
-            container.RegisterInstance(runtimeCache);
+            register.RegisterInstance(runtimeCache);
 
             // database factory
             var databaseFactory = GetDatabaseFactory();
-            container.RegisterInstance(databaseFactory);
-            container.RegisterSingleton(factory => databaseFactory.SqlContext);
+            register.RegisterInstance(databaseFactory);
+            register.RegisterSingleton(_ => databaseFactory.SqlContext);
 
             // type loader
             var globalSettings = UmbracoConfig.For.GlobalSettings();
             var typeLoader = new TypeLoader(runtimeCache, globalSettings, profilingLogger);
-            container.RegisterInstance(typeLoader);
+            register.RegisterInstance(typeLoader);
 
             // runtime state
+            // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
+            // as the second one captures the current value (null) and therefore fails
             _state = new RuntimeState(logger,
                 UmbracoConfig.For.UmbracoSettings(), UmbracoConfig.For.GlobalSettings(),
-                new Lazy<MainDom>(container.GetInstance<MainDom>),
-                new Lazy<IServerRegistrar>(container.GetInstance<IServerRegistrar>))
+                new Lazy<MainDom>(() => _factory.GetInstance<MainDom>()),
+                new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
             {
                 Level = RuntimeLevel.Boot
             };
-            container.RegisterInstance<IRuntimeState>(_state);
+            register.RegisterInstance<IRuntimeState>(_state);
 
             // create the composition
-            var composition = new Composition(container, typeLoader, profilingLogger, RuntimeLevel.Boot);
+            var composition = new Composition(register, typeLoader, profilingLogger, RuntimeLevel.Boot);
 
             // register runtime-level services
             Compose(composition);
@@ -121,7 +120,7 @@ namespace Umbraco.Core.Runtime
                     logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                     var mainDom = AquireMainDom();
-                    container.RegisterInstance(mainDom);
+                    register.RegisterInstance(mainDom);
 
                     DetermineRuntimeLevel(databaseFactory);
 
@@ -130,13 +129,9 @@ namespace Umbraco.Core.Runtime
 
                     _components.Compose();
 
-                    // fixme split Container into Register and Factory
-                    // we should have a Current.Factory not a Current.Container
-                    // we should compile the register into a factory *now*
-                    // using the factory before this point should just throw
-                    IFactory factory = container;
+                    _factory = Current.Factory = register.CreateFactory();
 
-                    _components.Initialize(factory);
+                    _components.Initialize(_factory);
                 }
                 catch (Exception e)
                 {
@@ -422,7 +417,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(_container.GetInstance<IMapperCollection>));
+            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()));
 
         #endregion
     }

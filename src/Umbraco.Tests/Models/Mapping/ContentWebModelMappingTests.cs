@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.Compose();
 
-            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
+            Composition.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]

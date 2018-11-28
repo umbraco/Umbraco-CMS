@@ -23,11 +23,11 @@ namespace Umbraco.Web
         protected abstract IRuntime GetRuntime();
 
         /// <summary>
-        /// Gets the application container.
+        /// Gets the application register.
         /// </summary>
-        protected virtual IContainer GetContainer()
+        protected virtual IRegister GetContainer()
         {
-            return ContainerFactory.Create();
+            return RegisterFactory.Create();
         }
 
         // events - in the order they trigger

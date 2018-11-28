@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using System.Threading;
 using LightInject;
 
 namespace Umbraco.Core.Composing.LightInject
 {
     /// <summary>
-    /// Implements <see cref="IContainer"/> with LightInject.
+    /// Implements DI with LightInject.
     /// </summary>
-    public class LightInjectContainer : IContainer
+    public class LightInjectContainer : IRegister, IFactory, IDisposable
     {
         private int _disposed;
 
@@ -98,6 +97,9 @@ namespace Umbraco.Core.Composing.LightInject
 
             Container.Dispose();
         }
+
+        /// <inheritdoc />
+        public IFactory CreateFactory() => this;
 
         #region Factory
 
@@ -246,18 +248,15 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.BeginScope();
 
         /// <inheritdoc />
-        public virtual IContainer ConfigureForWeb()
-        {
-            return this;
-        }
+        public virtual void ConfigureForWeb()
+        { }
 
         /// <inheritdoc />
-        public IContainer EnablePerWebRequestScope()
+        public void EnablePerWebRequestScope()
         {
             if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
-            return this;
         }
 
         private class AssemblyScanner : IAssemblyScanner

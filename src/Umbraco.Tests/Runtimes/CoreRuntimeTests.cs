@@ -136,10 +136,10 @@ namespace Umbraco.Tests.Runtimes
 
             private MainDom _mainDom;
 
-            public override void Boot(IContainer container)
+            public override void Boot(IRegister container)
             {
                 base.Boot(container);
-                _mainDom = container.GetInstance<MainDom>();
+                _mainDom = Current.Factory.GetInstance<MainDom>();
             }
 
             public override void Terminate()

@@ -78,12 +78,16 @@ namespace Umbraco.Core.Components
             => _register.RegisterAuto(serviceBaseType);
 
         /// <inheritdoc />
-        public IContainer ConfigureForWeb()
+        public void ConfigureForWeb()
             => _register.ConfigureForWeb();
 
         /// <inheritdoc />
-        public IContainer EnablePerWebRequestScope()
+        public void EnablePerWebRequestScope()
             => _register.EnablePerWebRequestScope();
+
+        /// <inheritdoc />
+        public IFactory CreateFactory()
+            => _register.CreateFactory();
 
         #endregion
 

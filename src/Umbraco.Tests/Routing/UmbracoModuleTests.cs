@@ -39,8 +39,8 @@ namespace Umbraco.Tests.Routing
             (
                 globalSettings,
                 Mock.Of<IUmbracoContextAccessor>(),
-                Container.GetInstance<IPublishedSnapshotService>(),
-                Container.GetInstance<IUserService>(),
+                Factory.GetInstance<IPublishedSnapshotService>(),
+                Factory.GetInstance<IUserService>(),
                 new UrlProviderCollection(new IUrlProvider[0]),
                 runtime,
                 logger,

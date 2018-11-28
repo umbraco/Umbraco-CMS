@@ -109,8 +109,8 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoViewPage()
             : this(
-                RegisterExtensions.GetInstance<ServiceContext>(Current.Factory),
-                RegisterExtensions.GetInstance<CacheHelper>(Current.Factory)
+                Current.Factory.GetInstance<ServiceContext>(),
+                Current.Factory.GetInstance<CacheHelper>()
             )
         {
         }

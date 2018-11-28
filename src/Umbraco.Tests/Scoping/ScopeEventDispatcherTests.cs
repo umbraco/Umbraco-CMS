@@ -32,14 +32,16 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = RegisterFactory.Create();
 
-            _testObjects = new TestObjects(container);
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            container.RegisterSingleton(factory => new FileSystems(container, factory.TryGetInstance<ILogger>()));
+            _testObjects = new TestObjects(register);
+
+            register.RegisterSingleton(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>()));
             composition.GetCollectionBuilder<MapperCollectionBuilder>();
+
+            Current.Factory = register.CreateFactory();
 
             SettingsForTests.Reset(); // ensure we have configuration
         }

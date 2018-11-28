@@ -17,8 +17,8 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = ContainerFactory.Create();
-            Current.Factory = container;
+            var container = RegisterFactory.Create();
+            Current.Factory = container.CreateFactory(); // fixme only for LightInject
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<PackageActionCollectionBuilder>()

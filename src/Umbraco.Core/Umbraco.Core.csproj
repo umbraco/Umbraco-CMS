@@ -177,13 +177,15 @@
     <Compile Include="Composing\Composers\FileSystemsComposer.cs" />
     <Compile Include="Composing\Composers\RepositoriesComposer.cs" />
     <Compile Include="Composing\Composers\ServicesComposer.cs" />
-    <Compile Include="Composing\ContainerFactory.cs" />
+    <Compile Include="Composing\FactoryExtensions.cs" />
+    <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
-    <Compile Include="Composing\IContainer.cs" />
     <Compile Include="Composing\IDiscoverable.cs" />
+    <Compile Include="Composing\IFactory.cs" />
+    <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\Lifetime.cs" />
     <Compile Include="Composing\LightInject\LightInjectExtensions.cs" />

@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByIdPath(Container.GetInstance<IUmbracoSettingsSection>().WebRouting, Logger);
+            var lookup = new ContentFinderByIdPath(Factory.GetInstance<IUmbracoSettingsSection>().WebRouting, Logger);
 
 
             var result = lookup.TryFindContent(frequest);

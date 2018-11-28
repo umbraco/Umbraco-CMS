@@ -20,8 +20,8 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Container.RegisterSingleton(_ => Mock.Of<IDomainService>());
-            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.RegisterSingleton(_ => Mock.Of<IDomainService>());
+            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         void SetDomains1()

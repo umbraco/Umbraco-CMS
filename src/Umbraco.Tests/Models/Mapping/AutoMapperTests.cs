@@ -24,11 +24,11 @@ namespace Umbraco.Tests.Models.Mapping
             var manifestBuilder = new ManifestParser(
                 CacheHelper.Disabled.RuntimeCache,
                 new ManifestValueValidatorCollection(Enumerable.Empty<IManifestValueValidator>()),
-                Logger)
+                Composition.Logger)
             {
                 Path = TestHelper.CurrentAssemblyDirectory
             };
-            Container.Register(_ => manifestBuilder);
+            Composition.Register(_ => manifestBuilder);
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
             Composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void AssertConfigurationIsValid()
         {
-            var profiles = Container.GetAllInstances<Profile>().ToArray();
+            var profiles = Factory.GetAllInstances<Profile>().ToArray();
 
             var config = new MapperConfiguration(cfg =>
             {

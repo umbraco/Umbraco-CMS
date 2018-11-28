@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
+                var helper = Current.Factory.GetInstance<MembershipHelper>();
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }

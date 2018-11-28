@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
         {
             base.Compose();
 
-            Container.RegisterSingleton(factory => Mock.Of<ILocalizedTextService>());
+            Composition.RegisterSingleton(factory => Mock.Of<ILocalizedTextService>());
         }
 
         /// <summary>

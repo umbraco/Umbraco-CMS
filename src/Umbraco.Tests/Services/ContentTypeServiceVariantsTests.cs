@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // pfew - see note in ScopedNuCacheTests?
-            Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Composition.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Services
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeService>());
             //var documentRepository = Mock.Of<IDocumentRepository>();
-            var documentRepository = Container.GetInstance<IDocumentRepository>();
+            var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(),
-                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
+                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

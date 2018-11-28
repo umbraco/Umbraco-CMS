@@ -1,171 +1,92 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Provides extension methods to the <see cref="IContainer"/> class.
+    /// Provides extension methods to the <see cref="IRegister"/> class.
     /// </summary>
     public static class RegisterExtensions
     {
         /// <summary>
-        /// Gets an instance of a service.
-        /// </summary>
-        /// <typeparam name="T">The type of the service.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        public static T GetInstance<T>(this IFactory container)
-            => (T) container.GetInstance(typeof(T));
-
-        /// <summary>
-        /// Tries to get an instance of a service.
-        /// </summary>
-        /// <typeparam name="T">The type of the service.</typeparam>
-        /// <returns>An instance of the specified type, or null.</returns>
-        /// <remarks>Returns null if the container does not know how to get an instance
-        /// of the specified type. Throws an exception if the container does know how
-        /// to get an instance of the specified type, but failed to do so.</remarks>
-        public static T TryGetInstance<T>(this IFactory container)
-            => (T) container.TryGetInstance(typeof(T));
-
-        /// <summary>
-        /// Creates an instance with arguments.
-        /// </summary>
-        /// <typeparam name="T">The type of the instance.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="args">Arguments.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>
-        /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
-        /// <para>The arguments are used as dependencies by the container.</para>
-        /// </remarks>
-        public static T CreateInstance<T>(this IFactory container, params object[] args)
-            => (T) container.CreateInstance(typeof(T), args);
-
-        /// <summary>
         /// Registers a service with an implementation type.
         /// </summary>
-        public static void Register<TService, TImplementing>(this IRegister container, Lifetime lifetime = Lifetime.Transient)
-            => container.Register(typeof(TService), typeof(TImplementing), lifetime);
+        public static void Register<TService, TImplementing>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
+            => register.Register(typeof(TService), typeof(TImplementing), lifetime);
 
         /// <summary>
         /// Registers a service as its own implementation.
         /// </summary>
-        public static void Register<TService>(this IRegister container, Lifetime lifetime = Lifetime.Transient)
-            => container.Register(typeof(TService), lifetime);
+        public static void Register<TService>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
+            => register.Register(typeof(TService), lifetime);
 
         /// <summary>
         /// Registers a singleton service as its own implementation.
         /// </summary>
-        public static void RegisterSingleton<TService>(this IRegister container)
-            => container.Register(typeof(TService), Lifetime.Singleton);
+        public static void RegisterSingleton<TService>(this IRegister register)
+            => register.Register(typeof(TService), Lifetime.Singleton);
 
         /// <summary>
         /// Registers a singleton service with an implementation type.
         /// </summary>
-        public static void RegisterSingleton<TService, TImplementing>(this IRegister container)
-            => container.Register(typeof(TService), typeof(TImplementing), Lifetime.Singleton);
+        public static void RegisterSingleton<TService, TImplementing>(this IRegister register)
+            => register.Register(typeof(TService), typeof(TImplementing), Lifetime.Singleton);
 
         /// <summary>
         /// Registers a singleton service with an implementation factory.
         /// </summary>
-        public static void RegisterSingleton<TService>(this IRegister container, Func<IFactory, TService> factory)
-            => container.Register(factory, Lifetime.Singleton);
+        public static void RegisterSingleton<TService>(this IRegister register, Func<IFactory, TService> factory)
+            => register.Register(factory, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a service with an implementing instance.
         /// </summary>
-        public static void RegisterInstance<TService>(this IRegister container, TService instance)
-            => container.RegisterInstance(typeof(TService), instance);
+        public static void RegisterInstance<TService>(this IRegister register, TService instance)
+            => register.RegisterInstance(typeof(TService), instance);
 
         /// <summary>
         /// Registers a base type for auto-registration.
         /// </summary>
-        public static void RegisterAuto<TServiceBase>(this IRegister container)
-            => container.RegisterAuto(typeof(TServiceBase));
-
-        /// <summary>
-        /// Creates an instance of a service, with arguments.
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="type">The type of the instance.</param>
-        /// <param name="args">Named arguments.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>
-        /// <para>The instance type does not need to be registered into the container.</para>
-        /// <para>The arguments are used as dependencies by the container. Other dependencies
-        /// are retrieved from the container.</para>
-        /// </remarks>
-        public static object CreateInstance(this IFactory container, Type type, params object[] args)
-        {
-            // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
-            // including the most annoying one, which is that it does not work on singletons (hard to fix)
-            //return Container.GetInstance(type, args);
-
-            // this method is essentially used to build singleton instances, so it is assumed that it would be
-            // more expensive to build and cache a dynamic method ctor than to simply invoke the ctor, as we do
-            // here - this can be discussed
-
-            // TODO: we currently try the ctor with most parameters, but we could want to fall back to others
-
-            var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
-            if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
-
-            var ctorParameters = ctor.GetParameters();
-            var ctorArgs = new object[ctorParameters.Length];
-            var i = 0;
-            foreach (var parameter in ctorParameters)
-            {
-                // no! IsInstanceOfType is not ok here
-                // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
-                ctorArgs[i++] = arg ?? container.GetInstance(parameter.ParameterType);
-            }
-            return ctor.Invoke(ctorArgs);
-        }
+        public static void RegisterAuto<TServiceBase>(this IRegister register)
+            => register.RegisterAuto(typeof(TServiceBase));
 
         /// <summary>
         /// Registers a filesystem.
         /// </summary>
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
         /// <typeparam name="TImplementing">The implementing type.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="register">The register.</param>
         /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
-        /// <returns>The container.</returns>
-        public static IRegister RegisterFileSystem<TFileSystem, TImplementing>(this IRegister container, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        /// <returns>The register.</returns>
+        public static IRegister RegisterFileSystem<TFileSystem, TImplementing>(this IRegister register, Func<IFactory, IFileSystem> supportingFileSystemFactory)
             where TImplementing : FileSystemWrapper, TFileSystem
         {
-            container.RegisterSingleton<TFileSystem>(factory =>
+            register.RegisterSingleton<TFileSystem>(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
                 return fileSystems.GetFileSystem<TImplementing>(supportingFileSystemFactory(factory));
             });
 
-            return container;
+            return register;
         }
 
         /// <summary>
         /// Registers a filesystem.
         /// </summary>
         /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
-        /// <param name="container">The container.</param>
+        /// <param name="register">The register.</param>
         /// <param name="supportingFileSystemFactory">A factory method creating the supporting filesystem.</param>
-        /// <returns>The container.</returns>
-        public static IRegister RegisterFileSystem<TFileSystem>(this IRegister container, Func<IFactory, IFileSystem> supportingFileSystemFactory)
+        /// <returns>The register.</returns>
+        public static IRegister RegisterFileSystem<TFileSystem>(this IRegister register, Func<IFactory, IFileSystem> supportingFileSystemFactory)
             where TFileSystem : FileSystemWrapper
         {
-            container.RegisterSingleton(factory =>
+            register.RegisterSingleton(factory =>
             {
                 var fileSystems = factory.GetInstance<FileSystems>();
                 return fileSystems.GetFileSystem<TFileSystem>(supportingFileSystemFactory(factory));
             });
 
-            return container;
+            return register;
         }
     }
 }
