@@ -284,7 +284,7 @@ gulp.task('dependencies', function () {
         },
         {
             "name": "jquery-migrate",
-            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.min.js"],
+            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.js"],
             "base": "./node_modules/jquery-migrate/dist"
         },
         {
