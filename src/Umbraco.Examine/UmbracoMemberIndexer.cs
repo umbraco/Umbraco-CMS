@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using Examine;
 using Examine.LuceneEngine;
@@ -51,11 +52,16 @@ namespace Umbraco.Examine
         {
         }
 
+        public override void Initialize(string name, NameValueCollection config)
+        {
+            base.Initialize(name, config);
+
+            ValueSetValidator = new MemberValueSetValidator(ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
+        }
 
         /// <summary>
         /// Overridden to ensure that the umbraco system field definitions are in place
         /// </summary>
-        /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
         protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)

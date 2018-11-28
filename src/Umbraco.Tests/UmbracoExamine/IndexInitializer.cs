@@ -151,7 +151,7 @@ namespace Umbraco.Tests.UmbracoExamine
             Directory luceneDir,
             Analyzer analyzer = null,
             ILocalizationService languageService = null,
-            UmbracoContentIndexerOptions options = null)
+            IValueSetValidator validator = null)
         {
             if (languageService == null)
                 languageService = GetMockLocalizationService();
@@ -159,8 +159,8 @@ namespace Umbraco.Tests.UmbracoExamine
             if (analyzer == null)
                 analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
-            if (options == null)
-                options = new UmbracoContentIndexerOptions(false, false, null);
+            if (validator == null)
+                validator = new ContentValueSetValidator(false);
             
             var i = new UmbracoContentIndexer(
                 "testIndexer",
@@ -169,8 +169,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer,
                 profilingLogger,
                 languageService,
-                new ContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-                options);
+                validator);
 
             i.IndexingError += IndexingError;
 

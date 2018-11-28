@@ -33,8 +33,8 @@ namespace Umbraco.Tests.UmbracoExamine
             var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Container.GetInstance<PropertyEditorCollection>());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, 
-                options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.CreateIndex();
@@ -126,8 +126,8 @@ namespace Umbraco.Tests.UmbracoExamine
             var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, 
-                options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
                 contentRebuilder.RegisterIndex(indexer.Name);
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 1116
-                options: new UmbracoContentIndexerOptions(false, false, 1116)))
+                validator: new ContentValueSetValidator(false, 1116)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 2222
-                options: new UmbracoContentIndexerOptions(false, false, 2222)))
+                validator: new ContentValueSetValidator(false, 2222)))
             using (indexer1.ProcessNonAsync())
             {
                 var searcher = indexer1.GetSearcher();
@@ -283,7 +283,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext);
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
-                options: new UmbracoContentIndexerOptions(true, false, null)))
+                validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
                 rebuilder.RegisterIndex(indexer.Name);

@@ -74,13 +74,13 @@
     <Compile Include="MediaValueSetBuilder.cs" />
     <Compile Include="MemberIndexPopulator.cs" />
     <Compile Include="MemberValueSetBuilder.cs" />
+    <Compile Include="MemberValueSetValidator.cs" />
     <Compile Include="PublishedContentIndexPopulator.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoContentIndexer.cs" />
-    <Compile Include="UmbracoContentIndexerOptions.cs" />
     <Compile Include="ContentValueSetValidator.cs" />
     <Compile Include="UmbracoExamineIndexer.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
@@ -88,6 +88,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ValueSetValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -22,10 +23,8 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndexer : UmbracoExamineIndexer, IUmbracoContentIndexer, IUmbracoMediaIndexer
     {
-        public const string VariesByCultureFieldName = UmbracoExamineIndexer.SpecialFieldPrefix + "VariesByCulture";
+        public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
-
-        private int? _parentId;
 
         #region Constructors
 
@@ -36,6 +35,8 @@ namespace Umbraco.Examine
         public UmbracoContentIndexer()
         {
             LanguageService = Current.Services.LocalizationService;
+
+            //note: The validator for this config based indexer is set in the Initialize method
         }
 
         /// <summary>
@@ -46,8 +47,8 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
+        /// <param name="languageService"></param>
         /// <param name="validator"></param>
-        /// <param name="options"></param>
         /// <param name="indexValueTypes"></param>
         public UmbracoContentIndexer(
             string name,
@@ -57,19 +58,15 @@ namespace Umbraco.Examine
             ProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IValueSetValidator validator,
-            UmbracoContentIndexerOptions options,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
             : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
-            if (options == null) throw new ArgumentNullException(nameof(options));
-
-            SupportProtectedContent = options.SupportProtectedContent;
-            SupportUnpublishedContent = options.SupportUnpublishedContent;
-            ParentId = options.ParentId;
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-        }
 
+            if (validator is ContentValueSetValidator contentValueSetValidator)
+                SupportSoftDelete = contentValueSetValidator.SupportUnpublishedContent;
+        }
 
         #endregion
 
@@ -97,19 +94,19 @@ namespace Umbraco.Examine
         {
             base.Initialize(name, config);
 
+            var supportUnpublished = false;
+            var supportProtected = false;
+
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
-            if (config["supportUnpublished"] != null && bool.TryParse(config["supportUnpublished"], out var supportUnpublished))
-                SupportUnpublishedContent = supportUnpublished;
-            else
-                SupportUnpublishedContent = false;
+            if (config["supportUnpublished"] != null)
+                bool.TryParse(config["supportUnpublished"], out supportUnpublished);
 
             //check if there's a flag specifying to support protected content,
             //if not, set to false;
-            if (config["supportProtected"] != null && bool.TryParse(config["supportProtected"], out var supportProtected))
-                SupportProtectedContent = supportProtected;
-            else
-                SupportProtectedContent = false;
+            if (config["supportProtected"] != null)
+                bool.TryParse(config["supportProtected"], out supportProtected);
+
 
             //now we need to build up the indexer options so we can create our validator
             int? parentId = null;
@@ -120,32 +117,13 @@ namespace Umbraco.Examine
             }
 
             ValueSetValidator = new ContentValueSetValidator(
-                new UmbracoContentIndexerOptions(
-                    SupportUnpublishedContent, SupportProtectedContent, parentId,
-                    ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes),
+                supportUnpublished, supportProtected,
                 //Using a singleton here, we can't inject this when using config based providers and we don't use this
                 //anywhere else in this class
-                Current.Services.PublicAccessService);
+                Current.Services.PublicAccessService,
+                parentId, ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes);
 
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// By default this is false, if set to true then the indexer will include indexing content that is flagged as publicly protected.
-        /// This property is ignored if SupportUnpublishedContent is set to true.
-        /// </summary>
-        public bool SupportProtectedContent { get; protected set; }
-
-        /// <summary>
-        /// If set this will filter the content items allowed to be indexed
-        /// </summary>
-        public int? ParentId
-        {
-            get => _parentId ?? ConfigIndexCriteria?.ParentNodeId;
-            protected set => _parentId = value;
+            SupportSoftDelete = supportUnpublished;
         }
 
         #endregion

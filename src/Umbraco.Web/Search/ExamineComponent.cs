@@ -695,9 +695,9 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._contentValueSetBuilder.GetValueSets(content).ToList();
 
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
                     // only for the specified indexers
-                    .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
+                    .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportSoftDelete)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.IndexItems(valueSet);
@@ -727,10 +727,10 @@ namespace Umbraco.Web.Search
             {
                 var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
                     // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
                     // then only index this for indexers supporting unpublished media
-                    .Where(x => isPublished || (x.SupportUnpublishedContent))
+                    .Where(x => isPublished || (x.SupportSoftDelete))
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.IndexItems(valueSet);
@@ -790,7 +790,7 @@ namespace Umbraco.Web.Search
                 foreach (var index in examineComponent._examineManager.IndexProviders.Values.OfType<IUmbracoIndexer>()
                     // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                     // otherwise if keepIfUnpublished == false then remove from all indexes
-                    .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
+                    .Where(x => keepIfUnpublished == false || x.SupportSoftDelete == false)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.DeleteFromIndex(strId);

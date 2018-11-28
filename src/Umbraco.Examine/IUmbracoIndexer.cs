@@ -14,11 +14,8 @@ namespace Umbraco.Examine
         bool EnableDefaultEventHandler { get; }
 
         /// <summary>
-        /// When set to true data will not be deleted from the index if the data is being unpublished (not deleted)
+        /// When set to true data will not be deleted from the index if the data is being soft deleted (unpublished or trashed)
         /// </summary>
-        /// <remarks>
-        /// Generally used only for published content
-        /// </remarks>
-        bool SupportUnpublishedContent { get; }
+        bool SupportSoftDelete { get; }
     }
 }

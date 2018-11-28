@@ -9,31 +9,45 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
-
     /// <summary>
     /// Used to validate a ValueSet for content/media - based on permissions, parent id, etc....
     /// </summary>
-    public class ContentValueSetValidator : IValueSetValidator
+    public class ContentValueSetValidator : ValueSetValidator
     {
-        private readonly UmbracoContentIndexerOptions _options;
         private readonly IPublicAccessService _publicAccessService;
 
         private const string PathKey = "path";
-        private static readonly IEnumerable<string> ValidIndexTypes = new[] {IndexTypes.Content, IndexTypes.Media};
+        private static readonly IEnumerable<string> ValidCategories = new[] {IndexTypes.Content, IndexTypes.Media};
+        protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
 
-        public ContentValueSetValidator(UmbracoContentIndexerOptions options, IPublicAccessService publicAccessService)
+        public bool SupportUnpublishedContent { get; }
+        public bool SupportProtectedContent { get; }
+        public int? ParentId { get; }
+
+        public ContentValueSetValidator(bool supportUnpublishedContent, int? parentId = null,
+            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            : this(supportUnpublishedContent, true, null, parentId, includeItemTypes, excludeItemTypes)
         {
-            _options = options;
+        }
+
+        public ContentValueSetValidator(bool supportUnpublishedContent, bool supportProtectedContent,
+            IPublicAccessService publicAccessService, int? parentId = null,
+            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            : base(includeItemTypes, excludeItemTypes, null, null)
+        {
+            SupportUnpublishedContent = supportUnpublishedContent;
+            SupportProtectedContent = supportProtectedContent;
+            ParentId = parentId;
             _publicAccessService = publicAccessService;
         }
 
-        public bool Validate(ValueSet valueSet)
+        public override bool Validate(ValueSet valueSet)
         {
-            if (!ValidIndexTypes.Contains(valueSet.Category))
+            if (!ValidCategories.Contains(valueSet.Category))
                 return false;
 
             //check for published content
-            if (valueSet.Category == IndexTypes.Content && !_options.SupportUnpublishedContent)
+            if (valueSet.Category == IndexTypes.Content && !SupportUnpublishedContent)
             {
                 if (!valueSet.Values.TryGetValue(UmbracoExamineIndexer.PublishedFieldName, out var published))
                     return false;
@@ -70,36 +84,28 @@ namespace Umbraco.Examine
 
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
             if (valueSet.Category == IndexTypes.Content
-                && !_options.SupportProtectedContent
+                && !SupportProtectedContent
                 && _publicAccessService.IsProtected(path))
             {
                 return false;
             }
 
             //check if this document is a descendent of the parent
-            if (_options.ParentId.HasValue && _options.ParentId.Value > 0)
+            if (ParentId.HasValue && ParentId.Value > 0)
             {
-                if (!path.Contains(string.Concat(",", _options.ParentId.Value, ",")))
+                if (!path.Contains(string.Concat(",", ParentId.Value, ",")))
                     return false;
             }
 
             //check for recycle bin
-            if (!_options.SupportUnpublishedContent)
+            if (!SupportUnpublishedContent)
             {
                 var recycleBinId = valueSet.Category == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
                 if (path.Contains(string.Concat(",", recycleBinId, ",")))
                     return false;
             }
 
-            //check if this document is of a correct type of node type alias
-            if (_options.IncludeContentTypes != null && !_options.IncludeContentTypes.Contains(valueSet.ItemType))
-                return false;
-
-            //if this node type is part of our exclusion list
-            if (_options.ExcludeContentTypes != null && _options.ExcludeContentTypes.Contains(valueSet.ItemType))
-                return false;
-
-            return true;
+            return base.Validate(valueSet);
         }
     }
 }

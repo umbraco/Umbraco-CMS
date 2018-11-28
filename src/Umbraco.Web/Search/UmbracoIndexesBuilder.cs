@@ -42,11 +42,6 @@ namespace Umbraco.Web.Search
         protected IMemberService MemberService { get; }
 
         /// <summary>
-        /// By default these are the member fields we index
-        /// </summary>
-        public static readonly string[] DefaultMemberIndexFields = new[] { "id", "nodeName", "updateDate", "writerName", "loginName", "email", "nodeTypeAlias" };
-
-        /// <summary>
         /// Creates the Umbraco indexes
         /// </summary>
         /// <returns></returns>
@@ -54,24 +49,37 @@ namespace Umbraco.Web.Search
         {
             return new []
             {
-                CreateContentIndex(Constants.UmbracoIndexes.InternalIndexName, Constants.UmbracoIndexes.InternalIndexPath, new UmbracoContentIndexerOptions(true, true, null), new CultureInvariantWhitespaceAnalyzer()),
-                CreateContentIndex(Constants.UmbracoIndexes.ExternalIndexName, Constants.UmbracoIndexes.ExternalIndexPath, new UmbracoContentIndexerOptions(false, false, null), new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30)),
+                CreateInternalIndex(),
+                CreateExternalIndex(),
                 CreateMemberIndex()
             };
         }
 
-        private IIndexer CreateContentIndex(string name, string path, UmbracoContentIndexerOptions options, Analyzer analyzer)
+        private IIndexer CreateInternalIndex()
         {
             var index = new UmbracoContentIndexer(
-                name,
+                Constants.UmbracoIndexes.InternalIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(path),
-                analyzer,
+                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
+                new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 LanguageService, 
-                GetContentValueSetValidator(options),
-                options);
+                GetContentValueSetValidator());
+            return index;
+        }
+
+        private IIndexer CreateExternalIndex()
+        {
+            var index = new UmbracoContentIndexer(
+                Constants.UmbracoIndexes.ExternalIndexName,
+                //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
+                UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
+                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
+                new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
+                ProfilingLogger,
+                LanguageService,
+                GetPublishedContentValueSetValidator());
             return index;
         }
 
@@ -102,9 +110,14 @@ namespace Umbraco.Web.Search
             return luceneDir;
         }
 
-        public virtual IValueSetValidator GetContentValueSetValidator(UmbracoContentIndexerOptions options)
+        public virtual IValueSetValidator GetContentValueSetValidator()
         {
-            return new ContentValueSetValidator(options, PublicAccessService);
+            return new ContentValueSetValidator(true, true, PublicAccessService);
+        }
+
+        public virtual IValueSetValidator GetPublishedContentValueSetValidator()
+        {
+            return new ContentValueSetValidator(false, false, PublicAccessService);
         }
 
         /// <summary>
@@ -113,18 +126,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public virtual IValueSetValidator GetMemberValueSetValidator()
         {
-            //This validator is used purely to filter the value set
-            return new ValueSetValidatorDelegate(valueSet =>
-            {
-                
-                foreach(var key in valueSet.Values.Keys.ToList())
-                {
-                    if (!DefaultMemberIndexFields.InvariantContains(key))
-                        valueSet.Values.Remove(key); //remove any value with a key that doesn't match our list
-                }
-                
-                return true;
-            });
+            return new MemberValueSetValidator();
         }
         
     }

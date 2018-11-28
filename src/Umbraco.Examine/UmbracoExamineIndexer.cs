@@ -54,23 +54,6 @@ namespace Umbraco.Examine
         {
             ProfilingLogger = Current.ProfilingLogger;
             _configBased = true;
-
-            //This is using the config so we'll validate based on that
-            ValueSetValidator = new ValueSetValidatorDelegate(set =>
-            {
-
-                //check if this document is of a correct type of node type alias
-                if (ConfigIndexCriteria.IncludeItemTypes.Any())
-                    if (!ConfigIndexCriteria.IncludeItemTypes.Contains(set.ItemType))
-                        return false;
-
-                //if this node type is part of our exclusion list, do not validate
-                if (ConfigIndexCriteria.ExcludeItemTypes.Any())
-                    if (ConfigIndexCriteria.ExcludeItemTypes.Contains(set.ItemType))
-                        return false;
-
-                return true;
-            });
         }
 
         /// <summary>
@@ -135,7 +118,6 @@ namespace Umbraco.Examine
         /// <summary>
         /// Overridden to ensure that the umbraco system field definitions are in place
         /// </summary>
-        /// <param name="x"></param>
         /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
         protected override FieldValueTypeCollection CreateFieldValueTypes(IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
@@ -158,13 +140,7 @@ namespace Umbraco.Examine
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
 
-        /// <summary>
-        /// When set to true data will not be deleted from the index if the data is being unpublished (not deleted)
-        /// </summary>
-        /// <remarks>
-        /// Generally used only for published content
-        /// </remarks>
-        public bool SupportUnpublishedContent { get; protected set; } = false;
+        public bool SupportSoftDelete { get; protected set; } = false;
 
         protected ConfigIndexCriteria ConfigIndexCriteria { get; private set; }
 
