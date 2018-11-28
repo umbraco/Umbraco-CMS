@@ -582,12 +582,12 @@ Opens an overlay to show a custom YSOD. </br>
 
             var overlayIndex = overlayNumber - 1;
             var indentSize = overlayIndex * 20;
-            var overlayWidth = el.context.clientWidth;
+            var overlayWidth = el[0].clientWidth;
 
             el.css('width', overlayWidth - indentSize);
             
             if(scope.position === "center" && overlayIndex > 0 || scope.position === "target" && overlayIndex > 0) {
-               var overlayTopPosition = el.context.offsetTop;
+               var overlayTopPosition = el[0].offsetTop;
                el.css('top', overlayTopPosition + indentSize);
             }
 
@@ -621,8 +621,8 @@ Opens an overlay to show a custom YSOD. </br>
                mousePositionClickY = scope.model.event.pageY;
 
                // element size
-               elementHeight = el.context.clientHeight;
-               elementWidth = el.context.clientWidth;
+               elementHeight = el[0].clientHeight;
+               elementWidth = el[0].clientWidth;
 
                // move element to this position
                position.left = mousePositionClickX - (elementWidth / 2);
