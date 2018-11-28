@@ -500,7 +500,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             overlayNumber = overlayHelper.registerOverlay();
 
-            $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
+            $(document).on("keydown.overlay-" + overlayNumber, function(event) {
 
                if (event.which === 27) {
 
@@ -557,7 +557,7 @@ Opens an overlay to show a custom YSOD. </br>
 
                overlayHelper.unregisterOverlay();
 
-               $(document).unbind("keydown.overlay-" + overlayNumber);
+               $(document).off("keydown.overlay-" + overlayNumber);
 
                isRegistered = false;
             }
