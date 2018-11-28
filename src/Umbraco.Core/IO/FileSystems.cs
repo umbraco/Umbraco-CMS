@@ -9,7 +9,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems : IFileSystems
     {
-        private readonly IContainer _container;
+        private readonly IFactory _container;
         private readonly ILogger _logger;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
@@ -34,7 +34,7 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IContainer container, ILogger logger)
+        public FileSystems(IFactory container, ILogger logger)
         {
             _container = container;
             _logger = logger;

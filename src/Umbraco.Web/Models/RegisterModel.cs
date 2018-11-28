@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Security;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Models
 {
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models
             CreatePersistentLoginCookie = true;
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
+                var helper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
                 var model = helper.CreateRegistrationModel(MemberTypeAlias);
                 MemberProperties = model.MemberProperties;
             }

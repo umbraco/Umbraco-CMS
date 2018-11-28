@@ -64,11 +64,9 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            var container = composition.Container;
+            composition.Register<UmbracoInjectedModule>();
 
-            container.Register<UmbracoInjectedModule>();
-
-            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+            composition.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
             composition.ComposeWebMappingProfiles();
 
@@ -78,49 +76,49 @@ namespace Umbraco.Web.Runtime
             composition.ComposeInstaller();
 
             // register membership stuff
-            container.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
-            container.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            container.Register<MembershipHelper>();
+            composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
+            composition.Register<MembershipHelper>();
 
             // register accessors for cultures
-            container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            container.RegisterSingleton<IVariationContextAccessor, HttpContextVariationContextAccessor>();
+            composition.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
+            composition.RegisterSingleton<IVariationContextAccessor, HttpContextVariationContextAccessor>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            container.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
+            composition.RegisterSingleton<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
-            container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
+            composition.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-            container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+            composition.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register
             // a way to inject the UmbracoContext - and register it per-request to be more efficient
             //TODO: stop doing this
-            container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
+            composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.Request);
 
             // register the umbraco helper
-            container.RegisterSingleton<UmbracoHelper>();
+            composition.RegisterSingleton<UmbracoHelper>();
 
             // register distributed cache
-            container.RegisterSingleton(f => new DistributedCache());
+            composition.RegisterSingleton(f => new DistributedCache());
 
             // replace some services
-            container.RegisterSingleton<IEventMessagesFactory, DefaultEventMessagesFactory>();
-            container.RegisterSingleton<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
-            container.RegisterSingleton<ISectionService, SectionService>();
+            composition.RegisterSingleton<IEventMessagesFactory, DefaultEventMessagesFactory>();
+            composition.RegisterSingleton<IEventMessagesAccessor, HybridEventMessagesAccessor>();
+            composition.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
+            composition.RegisterSingleton<ISectionService, SectionService>();
 
-            container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
+            composition.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
             // configure the container for web
-            container.ConfigureForWeb();
+            composition.ConfigureForWeb();
             composition
                 .ComposeMvcControllers(GetType().Assembly)
                 .ComposeApiControllers(GetType().Assembly);
@@ -133,7 +131,7 @@ namespace Umbraco.Web.Runtime
 
             composition.GetCollectionBuilder<TourFilterCollectionBuilder>();
 
-            container.RegisterSingleton<UmbracoFeatures>();
+            composition.RegisterSingleton<UmbracoFeatures>();
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
@@ -142,10 +140,10 @@ namespace Umbraco.Web.Runtime
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
-            container.RegisterInstance(surfaceControllerTypes);
+            composition.RegisterInstance(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(composition.TypeLoader.GetUmbracoApiControllers());
-            container.RegisterInstance(umbracoApiControllerTypes);
+            composition.RegisterInstance(umbracoApiControllerTypes);
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
@@ -167,7 +165,7 @@ namespace Umbraco.Web.Runtime
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
-            container.RegisterSingleton<IContentLastChanceFinder, ContentFinderByLegacy404>();
+            composition.RegisterSingleton<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
             composition.GetCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
@@ -179,9 +177,9 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
-            container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
+            composition.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
 
-            container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
+            composition.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.GetCollectionBuilder<HealthCheckCollectionBuilder>()
@@ -191,17 +189,17 @@ namespace Umbraco.Web.Runtime
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.NotificationMethods.IHealthCheckNotificationMethod>());
 
             // auto-register views
-            container.RegisterAuto(typeof(UmbracoViewPage<>));
+            composition.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register published router
-            container.RegisterSingleton<PublishedRouter>();
-            container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
+            composition.RegisterSingleton<PublishedRouter>();
+            composition.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
 
             // register preview SignalR hub
-            container.RegisterSingleton(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
+            composition.RegisterSingleton(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
 
             // register properties fallback
-            container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            composition.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
             composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>()

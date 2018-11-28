@@ -23,7 +23,7 @@ namespace Umbraco.Web.Editors
             if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
                 return result;
 
-            var filters = Current.Container.GetInstance<TourFilterCollection>().ToList(); // fixme inject
+            var filters = Current.Factory.GetInstance<TourFilterCollection>().ToList(); // fixme inject
 
             //get all filters that will be applied to all tour aliases
             var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();

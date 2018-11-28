@@ -88,6 +88,13 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
+        /// Initializes a new, test/blank, instance of the <see cref="TypeLoader"/> class.
+        /// </summary>
+        /// <remarks>The initialized instance cannot get types.</remarks>
+        internal TypeLoader()
+        { }
+
+        /// <summary>
         /// Gets or sets the set of assemblies to scan.
         /// </summary>
         /// <remarks>
@@ -514,6 +521,9 @@ namespace Umbraco.Core.Composing
         /// <remarks>Caching is disabled when using specific assemblies.</remarks>
         public IEnumerable<Type> GetTypes<T>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
         {
+            if (_logger == null)
+                throw new InvalidOperationException("Cannot get types from a test/blank type loader.");
+
             // do not cache anything from specific assemblies
             cache &= specificAssemblies == null;
 
@@ -553,6 +563,9 @@ namespace Umbraco.Core.Composing
         public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
+            if (_logger == null)
+                throw new InvalidOperationException("Cannot get types from a test/blank type loader.");
+
             // do not cache anything from specific assemblies
             cache &= specificAssemblies == null;
 
@@ -592,6 +605,9 @@ namespace Umbraco.Core.Composing
         public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
+            if (_logger == null)
+                throw new InvalidOperationException("Cannot get types from a test/blank type loader.");
+
             // do not cache anything from specific assemblies
             cache &= specificAssemblies == null;
 

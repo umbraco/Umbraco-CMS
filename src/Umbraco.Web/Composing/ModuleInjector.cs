@@ -21,7 +21,7 @@ namespace Umbraco.Web.Composing
             try
             {
                 // using the service locator here - no other way, really
-                Module = Current.Container.GetInstance<TModule>();
+                Module = Current.Factory.GetInstance<TModule>();
             }
             catch
             {
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Composing
 
                 try
                 {
-                    runtimeState = Current.Container.GetInstance<IRuntimeState>();
+                    runtimeState = Current.Factory.GetInstance<IRuntimeState>();
                 }
                 catch { /* don't make it worse */ }
 

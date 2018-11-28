@@ -7,13 +7,13 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -94,7 +94,7 @@ namespace Umbraco.Web
             }
             if (cacheByMember)
             {
-                var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
+                var helper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
                 var currentMember = helper.GetCurrentMember();
                 cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
             }

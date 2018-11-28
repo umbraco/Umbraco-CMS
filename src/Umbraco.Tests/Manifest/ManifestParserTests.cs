@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Manifest
         {
             Current.Reset();
             var container = Mock.Of<IContainer>();
-            Current.Container = container;
+            Current.Factory = container;
 
             var serviceContext = new ServiceContext(
                 localizedTextService: Mock.Of<ILocalizedTextService>());

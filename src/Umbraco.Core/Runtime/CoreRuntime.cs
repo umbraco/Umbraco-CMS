@@ -47,7 +47,7 @@ namespace Umbraco.Core.Runtime
         public virtual void Boot(IContainer container)
         {
             // assign current container
-            Current.Container = _container = container;
+            Current.Factory = _container = container;
 
             // create and register the essential services
             // ie the bare minimum required to boot
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Runtime
             container.RegisterInstance<IRuntimeState>(_state);
 
             // create the composition
-            var composition = new Composition(container, typeLoader, RuntimeLevel.Boot);
+            var composition = new Composition(container, typeLoader, profilingLogger, RuntimeLevel.Boot);
 
             // register runtime-level services
             Compose(composition);
@@ -134,8 +134,9 @@ namespace Umbraco.Core.Runtime
                     // we should have a Current.Factory not a Current.Container
                     // we should compile the register into a factory *now*
                     // using the factory before this point should just throw
+                    IFactory factory = container;
 
-                    _components.Initialize();
+                    _components.Initialize(factory);
                 }
                 catch (Exception e)
                 {

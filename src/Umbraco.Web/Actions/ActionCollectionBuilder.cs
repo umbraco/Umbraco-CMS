@@ -9,9 +9,9 @@ namespace Umbraco.Web.Actions
     {
         protected override ActionCollectionBuilder This => this;
 
-        protected override IEnumerable<IAction> CreateItems()
+        protected override IEnumerable<IAction> CreateItems(IFactory factory)
         {
-            var items = base.CreateItems().ToList();
+            var items = base.CreateItems(factory).ToList();
 
             //validate the items, no actions should exist that do not either expose notifications or permissions
             var invalidItems = items.Where(x => !x.CanBePermissionAssigned && !x.ShowInNotifier).ToList();

@@ -72,7 +72,7 @@ namespace Umbraco.Web.Scheduling
 
             public static MainDomHook Create(Action install, Action release)
             {
-                return new MainDomHook(Core.Composing.Current.Container.GetInstance<MainDom>(), install, release);
+                return new MainDomHook(Core.Composing.Current.Factory.GetInstance<MainDom>(), install, release);
             }
 
             public static MainDomHook CreateForTest(Action install, Action release)

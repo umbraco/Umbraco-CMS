@@ -627,7 +627,7 @@ namespace Umbraco.Web.Routing
             {
                 _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Page is protected, check for access");
 
-                var membershipHelper = Current.Container.GetInstance<MembershipHelper>();
+                var membershipHelper = Current.Factory.GetInstance<MembershipHelper>();
 
                 if (membershipHelper.IsLoggedIn() == false)
                 {

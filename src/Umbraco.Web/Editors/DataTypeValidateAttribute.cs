@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
         public PropertyEditorCollection PropertyEditors { get; }
 
         public DataTypeValidateAttribute()
-            : this(Current.Container.GetInstance<IDataTypeService>(), Current.Container.GetInstance<PropertyEditorCollection>())
+            : this(Current.Factory.GetInstance<IDataTypeService>(), Current.Factory.GetInstance<PropertyEditorCollection>())
         {
         }
 

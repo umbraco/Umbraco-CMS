@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Components
 {
@@ -12,35 +13,32 @@ namespace Umbraco.Core.Components
     /// avoid accessing the container. This is because everything needs to be properly registered and with
     /// the proper lifecycle. These methods will take care of it. Directly registering into the container
     /// may cause issues.</remarks>
-    public class Composition
+    public class Composition : IRegister
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
+        private readonly IRegister _register;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Composition"/> class.
         /// </summary>
-        /// <param name="container">A container.</param>
-        /// <param name="typeLoader">The type loader.</param>
+        /// <param name="register">A register.</param>
+        /// <param name="typeLoader">A type loader.</param>
+        /// <param name="logger">A logger.</param>
         /// <param name="level">The runtime level.</param>
-        public Composition(IContainer container, TypeLoader typeLoader, RuntimeLevel level)
+        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, RuntimeLevel level)
         {
-            Container = container;
+            _register = register;
             TypeLoader = typeLoader;
+            Logger = logger;
             RuntimeLevel = level;
         }
 
-        // used for tests
-        internal Composition(IContainer container, RuntimeLevel level)
-        {
-            Container = container;
-            RuntimeLevel = level;
-        }
+        #region Services
 
         /// <summary>
-        /// Gets the container.
+        /// Gets the logger.
         /// </summary>
-        /// <remarks>Use with care!</remarks>
-        public IContainer Container { get; }
+        public IProfilingLogger Logger { get; }
 
         /// <summary>
         /// Gets the type loader.
@@ -51,6 +49,45 @@ namespace Umbraco.Core.Components
         /// Gets the runtime level.
         /// </summary>
         public RuntimeLevel RuntimeLevel { get; }
+
+        #endregion
+
+        #region IRegister
+
+        /// <inheritdoc />
+        public object ConcreteContainer => _register.ConcreteContainer;
+
+        /// <inheritdoc />
+        public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
+            => _register.Register(serviceType, lifetime);
+
+        /// <inheritdoc />
+        public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
+            => _register.Register(serviceType, implementingType, lifetime);
+
+        /// <inheritdoc />
+        public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            => _register.Register(factory, lifetime);
+
+        /// <inheritdoc />
+        public void RegisterInstance(Type serviceType, object instance)
+            => _register.RegisterInstance(serviceType, instance);
+
+        /// <inheritdoc />
+        public void RegisterAuto(Type serviceBaseType)
+            => _register.RegisterAuto(serviceBaseType);
+
+        /// <inheritdoc />
+        public IContainer ConfigureForWeb()
+            => _register.ConfigureForWeb();
+
+        /// <inheritdoc />
+        public IContainer EnablePerWebRequestScope()
+            => _register.EnablePerWebRequestScope();
+
+        #endregion
+
+        #region Collection Builders
 
         /// <summary>
         /// Gets a collection builder (and registers the collection).
@@ -66,11 +103,13 @@ namespace Umbraco.Core.Components
                 return (TBuilder) o;
 
             var builder = new TBuilder();
-            builder.Initialize(Container);
+            builder.Initialize(_register);
 
             _builders[typeOfBuilder] = builder;
 
             return builder;
         }
+
+        #endregion
     }
 }

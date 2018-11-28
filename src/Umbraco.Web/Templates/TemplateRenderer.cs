@@ -10,10 +10,10 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Templates
 {
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Templates
         }
 
         // todo - inject!
-        private PublishedRouter PublishedRouter => ContainerExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Container);
+        private PublishedRouter PublishedRouter => RegisterExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Factory);
 
 
         /// <summary>

@@ -11,6 +11,8 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
 using LightInject;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -40,9 +42,9 @@ namespace Umbraco.Tests.PublishedContent
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreatePluginManager(IContainer f)
+        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreatePluginManager(f);
+            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan

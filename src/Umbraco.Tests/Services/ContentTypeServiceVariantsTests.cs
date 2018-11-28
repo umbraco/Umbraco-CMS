@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Services
             Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
             Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()

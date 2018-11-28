@@ -4,10 +4,12 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
@@ -28,8 +30,9 @@ namespace Umbraco.Tests.IO
             var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
 
-            _container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(_container, RuntimeLevel.Run);
+            _container = ContainerFactory.Create();
+            Current.Factory = _container;
+            var composition = new Composition(_container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             _container.Register(_ => Mock.Of<ILogger>());
             _container.Register(_ => Mock.Of<IDataTypeService>());

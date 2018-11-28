@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Cache.DistributedCache
@@ -21,8 +24,9 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
-            var container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(container, RuntimeLevel.Run);
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
             container.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());

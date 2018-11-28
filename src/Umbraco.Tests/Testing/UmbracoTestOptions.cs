@@ -26,13 +26,13 @@
             NewSchemaPerTest
         }
 
-        public enum PluginManager
+        public enum TypeLoader
         {
-            // the default, global plugin manager for tests
+            // the default, global type loader for tests
             Default,
-            // create one plugin manager for the feature
+            // create one type loader for the feature
             PerFixture,
-            // create one plugin manager for each test
+            // create one type loader for each test
             PerTest
         }
     }

@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Composing
     // complies with Umbraco's requirements.
 
     [TestFixture]
-    public class ContainerImplementationTests
+    public class ContainerImplementationTests // FIXME merge into ContainerTests or ContainerConformingTests
     {
         private IContainer CreateContainer() => ContainerFactory.Create();
 

@@ -3,6 +3,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -12,6 +13,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 
@@ -30,12 +32,13 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(container, RuntimeLevel.Run);
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             _testObjects = new TestObjects(container);
 
-            Current.Container.RegisterSingleton(factory => new FileSystems(container, factory.TryGetInstance<ILogger>()));
+            container.RegisterSingleton(factory => new FileSystems(container, factory.TryGetInstance<ILogger>()));
             composition.GetCollectionBuilder<MapperCollectionBuilder>();
 
             SettingsForTests.Reset(); // ensure we have configuration

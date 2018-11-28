@@ -5,15 +5,15 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -109,8 +109,8 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoViewPage()
             : this(
-                ContainerExtensions.GetInstance<ServiceContext>(Current.Container),
-                ContainerExtensions.GetInstance<CacheHelper>(Current.Container)
+                RegisterExtensions.GetInstance<ServiceContext>(Current.Factory),
+                RegisterExtensions.GetInstance<CacheHelper>(Current.Factory)
             )
         {
         }

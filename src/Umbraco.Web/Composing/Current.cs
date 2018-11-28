@@ -53,10 +53,10 @@ namespace Umbraco.Web.Composing
         }
 
         /// <summary>
-        /// Gets the DI container.
+        /// Gets the factory.
         /// </summary>
-        public static IContainer Container
-            => CoreCurrent.Container;
+        public static IFactory Factory
+            => CoreCurrent.Factory;
 
         #region Temp & Special
 
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Composing
             get
             {
                 if (_umbracoContextAccessor != null) return _umbracoContextAccessor;
-                return _umbracoContextAccessor = Container.GetInstance<IUmbracoContextAccessor>();
+                return _umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
             }
             set => _umbracoContextAccessor = value; // for tests
         }
@@ -92,46 +92,46 @@ namespace Umbraco.Web.Composing
             => UmbracoContextAccessor.UmbracoContext;
 
         public static DistributedCache DistributedCache
-            => Container.GetInstance<DistributedCache>();
+            => Factory.GetInstance<DistributedCache>();
 
         public static IPublishedSnapshot PublishedSnapshot
-            => Container.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
+            => Factory.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
 
         public static EventMessages EventMessages
-            => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
+            => Factory.GetInstance<IEventMessagesFactory>().GetOrDefault();
 
         public static UrlProviderCollection UrlProviders
-            => Container.GetInstance<UrlProviderCollection>();
+            => Factory.GetInstance<UrlProviderCollection>();
 
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
-            => Container.GetInstance<HealthCheckCollectionBuilder>();
+            => Factory.GetInstance<HealthCheckCollectionBuilder>();
 
         internal static ActionCollectionBuilder ActionCollectionBuilder
-            => Container.GetInstance<ActionCollectionBuilder>();
+            => Factory.GetInstance<ActionCollectionBuilder>();
 
         public static ActionCollection Actions
-            => Container.GetInstance<ActionCollection>();
+            => Factory.GetInstance<ActionCollection>();
 
         public static ContentFinderCollection ContentFinders
-            => Container.GetInstance<ContentFinderCollection>();
+            => Factory.GetInstance<ContentFinderCollection>();
 
         public static IContentLastChanceFinder LastChanceContentFinder
-            => Container.GetInstance<IContentLastChanceFinder>();
+            => Factory.GetInstance<IContentLastChanceFinder>();
 
         internal static EditorValidatorCollection EditorValidators
-            => Container.GetInstance<EditorValidatorCollection>();
+            => Factory.GetInstance<EditorValidatorCollection>();
 
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
-            => Container.GetInstance<UmbracoApiControllerTypeCollection>();
+            => Factory.GetInstance<UmbracoApiControllerTypeCollection>();
 
         internal static SurfaceControllerTypeCollection SurfaceControllerTypes
-            => Container.GetInstance<SurfaceControllerTypeCollection>();
+            => Factory.GetInstance<SurfaceControllerTypeCollection>();
 
         public static FilteredControllerFactoryCollection FilteredControllerFactories
-            => Container.GetInstance<FilteredControllerFactoryCollection>();
+            => Factory.GetInstance<FilteredControllerFactoryCollection>();
 
         internal static IPublishedSnapshotService PublishedSnapshotService
-            => Container.GetInstance<IPublishedSnapshotService>();
+            => Factory.GetInstance<IPublishedSnapshotService>();
 
         #endregion
 

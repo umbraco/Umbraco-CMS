@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Scoping
             Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
             Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
         [TearDown]
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Scoping
         //  xmlStore.Xml - the actual main xml document
         //  publishedContentCache.GetXml() - the captured xml
 
-        private static XmlStore XmlStore => (Current.Container.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
+        private static XmlStore XmlStore => (Current.Factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
         private static XmlDocument XmlMaster => XmlStore.Xml;
         private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 

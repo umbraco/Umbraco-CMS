@@ -26,14 +26,6 @@ namespace Umbraco.Web.WebApi
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
-        // note
-        // properties marked as [Inject] below will be property-injected (vs constructor-injected) in
-        // order to keep the constuctor as light as possible, so that ppl implementing eg a SurfaceController
-        // don't need to implement complex constructors + need to refactor them each time we change ours.
-        // this means that these properties have a setter.
-        // what can go wrong?
-        // fixme remove that comment?!
-
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
@@ -97,19 +89,21 @@ namespace Umbraco.Web.WebApi
 
         protected UmbracoApiControllerBase()
             : this(
-                  Current.Container.GetInstance<IGlobalSettings>(),
-                  Current.Container.GetInstance<UmbracoContext>(),
-                  Current.Container.GetInstance<ISqlContext>(),
-                  Current.Container.GetInstance<ServiceContext>(),
-                  Current.Container.GetInstance<CacheHelper>(),
-                  Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<IProfilingLogger>(),
-                  Current.Container.GetInstance<IRuntimeState>()
+                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext,
+                  Current.Factory.GetInstance<ISqlContext>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<ILogger>(),
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<IRuntimeState>()
             )
         {
         }
 
         // fixme - Inject fewer things? (Aggregate more)
+        // fixme - inject the context accessor not the context itself?
+        // fixme - profiling logger is logger, merge!
         protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
         {
             GlobalSettings = globalSettings;

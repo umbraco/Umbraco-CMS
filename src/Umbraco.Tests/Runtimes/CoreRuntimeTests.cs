@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Runtimes
                         It.IsAny<bool>()))
                     .Returns(Mock.Of<IScope>());
 
-                composition.Container.RegisterInstance(scopeProvider);
+                composition.RegisterInstance(scopeProvider);
             }
 
             private MainDom _mainDom;
@@ -183,8 +183,8 @@ namespace Umbraco.Tests.Runtimes
             {
                 base.Compose(composition);
 
-                composition.Container.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
-                composition.Container.RegisterSingleton<IExamineManager, TestExamineManager>();
+                composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
+                composition.RegisterSingleton<IExamineManager, TestExamineManager>();
 
                 Composed = true;
             }

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets the container.
         /// </summary>
-        protected IContainer Container { get; private set; }
+        protected IRegister Container { get; private set; }
 
         /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Composing
         /// Initializes a new instance of the builder.
         /// </summary>
         /// <remarks>By default, this registers the collection automatically.</remarks>
-        public virtual void Initialize(IContainer container)
+        public virtual void Initialize(IRegister container)
         {
             if (Container != null)
                 throw new InvalidOperationException("This builder has already been initialized.");
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Composing
             Container = container;
 
             // register the collection
-            Container.Register(_ => CreateCollection(), CollectionLifetime);
+            Container.Register(factory => CreateCollection(factory), CollectionLifetime);
         }
 
         /// <summary>
@@ -98,12 +98,12 @@ namespace Umbraco.Core.Composing
         /// Creates the collection items.
         /// </summary>
         /// <returns>The collection items.</returns>
-        protected virtual IEnumerable<TItem> CreateItems()
+        protected virtual IEnumerable<TItem> CreateItems(IFactory factory)
         {
             RegisterTypes(); // will do it only once
 
             return _registeredTypes // respect order
-                .Select(x => (TItem) Container.GetInstance(x))
+                .Select(x => (TItem) factory.GetInstance(x))
                 .ToArray(); // safe
         }
 
@@ -112,9 +112,9 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
-        public virtual TCollection CreateCollection()
+        public virtual TCollection CreateCollection(IFactory factory)
         {
-            return Container.CreateInstance<TCollection>(CreateItems());
+            return factory.CreateInstance<TCollection>(CreateItems(factory));
         }
 
         protected Type EnsureType(Type type, string action)

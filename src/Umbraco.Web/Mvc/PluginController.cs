@@ -90,12 +90,12 @@ namespace Umbraco.Web.Mvc
 
         protected PluginController()
             : this(
-                  Current.Container.GetInstance<UmbracoContext>(),
-                  Current.Container.GetInstance<IUmbracoDatabaseFactory>(),
-                  Current.Container.GetInstance<ServiceContext>(),
-                  Current.Container.GetInstance<CacheHelper>(),
-                  Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<ILogger>(),
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }

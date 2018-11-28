@@ -79,26 +79,6 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        ///  Appends types to the collections.
-        /// </summary>
-        /// <param name="types">The types to append.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Append(Func<IContainer, IEnumerable<Type>> types)
-        {
-            Configure(list =>
-            {
-                foreach (var type in types(Container))
-                {
-                    // would be detected by CollectionBuilderBase when registering, anyways, but let's fail fast
-                    EnsureType(type, "register");
-                    if (list.Contains(type)) list.Remove(type);
-                    list.Add(type);
-                }
-            });
-            return This;
-        }
-
-        /// <summary>
         /// Appends a type after another type.
         /// </summary>
         /// <typeparam name="TAfter">The other type.</typeparam>

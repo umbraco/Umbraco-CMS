@@ -23,7 +23,7 @@ namespace Umbraco.Web.Components
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.Container.RegisterSingleton<Notifier>();
+            composition.RegisterSingleton<Notifier>();
         }
 
         public void Initialize(INotificationService notificationService, Notifier notifier, ActionCollection actions)
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Components
 
             //Send notifications for the delete action
             ContentService.Deleted += (sender, args) => notifier.Notify(actions.GetAction<ActionDelete>(), args.DeletedEntities.ToArray());
-            
+
             //Send notifications for the unpublish action
             ContentService.Unpublished += (sender, args) => notifier.Notify(actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
         }
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Components
 
             // in this case there's nothing to report since if the root is sorted we can't report on a fake entity.
             // this is how it was in v7, we can't report on root changes because you can't subscribe to root changes.
-            if (parentId[0] <= 0) return; 
+            if (parentId[0] <= 0) return;
 
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
@@ -191,5 +191,5 @@ namespace Umbraco.Web.Components
         }
     }
 
-    
+
 }

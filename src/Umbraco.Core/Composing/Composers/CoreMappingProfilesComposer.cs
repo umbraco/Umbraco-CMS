@@ -9,8 +9,7 @@ namespace Umbraco.Core.Composing.Composers
     {
         public static Composition ComposeCoreMappingProfiles(this Composition composition)
         {
-            var container = composition.Container;
-            container.Register<Profile, IdentityMapperProfile>();
+            composition.Register<Profile, IdentityMapperProfile>();
             return composition;
         }
     }

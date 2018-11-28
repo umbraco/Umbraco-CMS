@@ -2,12 +2,12 @@
 using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.UI.Pages;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.UI.Controls
 {
@@ -30,7 +30,7 @@ namespace Umbraco.Web.UI.Controls
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
             Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
-            Members = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
+            Members = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
 
             // fixme inject somehow
             Logger = Current.Logger;

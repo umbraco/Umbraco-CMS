@@ -55,12 +55,10 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            var container = composition.Container;
-
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
-            container.RegisterInstance(_umbracoApplication);
+            composition.RegisterInstance(_umbracoApplication);
         }
 
         #region Getters

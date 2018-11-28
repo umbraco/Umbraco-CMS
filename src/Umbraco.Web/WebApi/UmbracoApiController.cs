@@ -14,12 +14,10 @@ namespace Umbraco.Web.WebApi
     public abstract class UmbracoApiController : UmbracoApiControllerBase, IDiscoverable
     {
         protected UmbracoApiController()
-        {
-        }
+        { }
 
         protected UmbracoApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, IProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
-        {
-        }
+        { }
     }
 }

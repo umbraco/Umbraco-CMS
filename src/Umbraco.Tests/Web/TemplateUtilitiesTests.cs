@@ -37,11 +37,11 @@ namespace Umbraco.Tests.Web
             var serviceContext = new ServiceContext(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IContainer>();
+            var container = new Mock<IFactory>();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
                 new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-            Current.Container = container.Object;
+            Current.Factory = container.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 

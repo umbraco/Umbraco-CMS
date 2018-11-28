@@ -67,22 +67,20 @@ namespace Umbraco.Core.Composing.Composers
 
         public static Composition ComposeFileSystems(this Composition composition)
         {
-            var container = composition.Container;
-
             // register FileSystems, which manages all filesystems
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            container.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(container));
+            composition.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
+            composition.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
             // register the scheme for media paths
-            container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+            composition.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
 
             // register the IMediaFileSystem implementation with a supporting filesystem
-            container.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
+            composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(
                 factory => new PhysicalFileSystem("~/media"));
 
             return composition;

@@ -20,17 +20,76 @@ namespace Umbraco.Core.Composing
     //   IEnumerable of the service, nameless, returns them all
 
     /// <summary>
-    /// Defines a container for Umbraco.
+    /// Defines a service register for Umbraco.
     /// </summary>
-    public interface IContainer : IDisposable
+    public interface IRegister
     {
         /// <summary>
         /// Gets the concrete container.
         /// </summary>
         object ConcreteContainer { get; }
 
-        #region Factory
+        /// <summary>
+        /// Registers a service as its own implementation.
+        /// </summary>
+        void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient);
 
+        /// <summary>
+        /// Registers a service with an implementation type.
+        /// </summary>
+        void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with an implementation factory.
+        /// </summary>
+        void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with an implementing instance.
+        /// </summary>
+        void RegisterInstance(Type serviceType, object instance);
+
+        /// <summary>
+        /// Registers a base type for auto-registration.
+        /// </summary>
+        /// <remarks>
+        /// <para>Auto-registration means that anytime the container is asked to create an instance
+        /// of a type deriving from <paramref name="serviceBaseType"/>, it will first register that
+        /// type automatically.</para>
+        /// <para>This can be used for instance for views or controllers. Then, one just needs to
+        /// register a common base class or interface, and the container knows how to create instances.</para>
+        /// </remarks>
+        void RegisterAuto(Type serviceBaseType);
+
+        #region Control
+
+        /// <summary>
+        /// Configures the container for web support.
+        /// </summary>
+        /// <returns>The container.</returns>
+        /// <remarks>
+        /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
+        /// process, where anything "scoped" should not be linked to a web request.</para>
+        /// </remarks>
+        IContainer ConfigureForWeb();
+
+        /// <summary>
+        /// Enables per-request scope.
+        /// </summary>
+        /// <returns>The container.</returns>
+        /// <remarks>
+        /// <para>Ties scopes to web requests.</para>
+        /// </remarks>
+        IContainer EnablePerWebRequestScope();
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Defines a service factory for Umbraco.
+    /// </summary>
+    public interface IFactory
+    {
         /// <summary>
         /// Gets an instance of a service.
         /// </summary>
@@ -72,46 +131,6 @@ namespace Umbraco.Core.Composing
         /// </remarks>
         void Release(object instance);
 
-        #endregion
-
-        #region Registry
-
-        /// <summary>
-        /// Registers a service as its own implementation.
-        /// </summary>
-        void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
-        /// Registers a service with an implementation type.
-        /// </summary>
-        void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
-        /// Registers a service with an implementation factory.
-        /// </summary>
-        void Register<TService>(Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
-        /// Registers a service with an implementing instance.
-        /// </summary>
-        void RegisterInstance(Type serviceType, object instance);
-
-        /// <summary>
-        /// Registers a base type for auto-registration.
-        /// </summary>
-        /// <remarks>
-        /// <para>Auto-registration means that anytime the container is asked to create an instance
-        /// of a type deriving from <paramref name="serviceBaseType"/>, it will first register that
-        /// type automatically.</para>
-        /// <para>This can be used for instance for views or controllers. Then, one just needs to
-        /// register a common base class or interface, and the container knows how to create instances.</para>
-        /// </remarks>
-        void RegisterAuto(Type serviceBaseType);
-
-        #endregion
-
-        #region Control
-
         /// <summary>
         /// Begins a scope.
         /// </summary>
@@ -120,26 +139,11 @@ namespace Umbraco.Core.Composing
         /// <para>Scopes can be nested. Each instance is disposed individually.</para>
         /// </remarks>
         IDisposable BeginScope();
-
-        /// <summary>
-        /// Configures the container for web support.
-        /// </summary>
-        /// <returns>The container.</returns>
-        /// <remarks>
-        /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
-        /// process, where anything "scoped" should not be linked to a web request.</para>
-        /// </remarks>
-        IContainer ConfigureForWeb();
-
-        /// <summary>
-        /// Enables per-request scope.
-        /// </summary>
-        /// <returns>The container.</returns>
-        /// <remarks>
-        /// <para>Ties scopes to web requests.</para>
-        /// </remarks>
-        IContainer EnablePerWebRequestScope();
-
-        #endregion
     }
+
+    /// <summary>
+    /// Defines a container for Umbraco.
+    /// </summary>
+    public interface IContainer : IRegister, IFactory, IDisposable // fixme kill?
+    { }
 }

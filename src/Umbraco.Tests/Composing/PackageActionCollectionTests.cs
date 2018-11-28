@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core._Legacy.PackageActions;
 
 namespace Umbraco.Tests.Composing
@@ -15,8 +17,9 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(container, RuntimeLevel.Run);
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());

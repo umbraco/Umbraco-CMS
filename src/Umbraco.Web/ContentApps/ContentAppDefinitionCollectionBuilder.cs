@@ -12,22 +12,22 @@ namespace Umbraco.Web.ContentApps
         protected override ContentAppDefinitionCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation
-        public override ContentAppDefinitionCollection CreateCollection()
+        public override ContentAppDefinitionCollection CreateCollection(IFactory factory)
         {
             // get the logger just-in-time - see note below for manifest parser
-            var logger = Container.GetInstance<ILogger>();
+            var logger = factory.GetInstance<ILogger>();
 
-            return new ContentAppDefinitionCollection(CreateItems(), logger);
+            return new ContentAppDefinitionCollection(CreateItems(factory), logger);
         }
 
-        protected override IEnumerable<IContentAppDefinition> CreateItems()
+        protected override IEnumerable<IContentAppDefinition> CreateItems(IFactory factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = Container.GetInstance<ManifestParser>();
+            var manifestParser = factory.GetInstance<ManifestParser>();
 
-            return base.CreateItems().Concat(manifestParser.Manifest.ContentApps);
+            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps);
         }
     }
 }

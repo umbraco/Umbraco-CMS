@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Scoping
             Container.RegisterSingleton<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
             Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
         public override void TearDown()

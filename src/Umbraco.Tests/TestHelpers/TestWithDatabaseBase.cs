@@ -78,7 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
-                .Add(f => f.GetInstance<TypeLoader>().GetDataEditors());
+                .Add(() => Composition.TypeLoader.GetDataEditors());
 
             Container.RegisterSingleton(f =>
             {

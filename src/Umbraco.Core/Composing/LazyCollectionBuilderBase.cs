@@ -14,8 +14,7 @@ namespace Umbraco.Core.Composing
         where TBuilder : LazyCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : IBuilderCollection<TItem>
     {
-        private readonly List<Func<IEnumerable<Type>>> _producers1 = new List<Func<IEnumerable<Type>>>();
-        private readonly List<Func<IContainer, IEnumerable<Type>>> _producers2 = new List<Func<IContainer, IEnumerable<Type>>>();
+        private readonly List<Func<IEnumerable<Type>>> _producers = new List<Func<IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();
 
         protected abstract TBuilder This { get; }
@@ -29,9 +28,8 @@ namespace Umbraco.Core.Composing
             Configure(types =>
             {
                 types.Clear();
-                _producers1.Clear();
-                _producers2.Clear();
-                _excluded.Clear();
+                _producers.Clear();
+               _excluded.Clear();
             });
             return This;
         }
@@ -107,21 +105,7 @@ namespace Umbraco.Core.Composing
         {
             Configure(types =>
             {
-                _producers1.Add(producer);
-            });
-            return This;
-        }
-
-        /// <summary>
-        /// Adds a types producer to the collection.
-        /// </summary>
-        /// <param name="producer">The types producer.</param>
-        /// <returns>The builder.</returns>
-        public TBuilder Add(Func<IContainer, IEnumerable<Type>> producer)
-        {
-            Configure(types =>
-            {
-                _producers2.Add(producer);
+                _producers.Add(producer);
             });
             return This;
         }
@@ -160,8 +144,7 @@ namespace Umbraco.Core.Composing
         protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
         {
             return types
-                .Union(_producers1.SelectMany(x => x()))
-                .Union(_producers2.SelectMany(x => x(Container)))
+                .Union(_producers.SelectMany(x => x()))
                 .Distinct()
                 .Select(x => EnsureType(x, "register"))
                 .Except(_excluded);

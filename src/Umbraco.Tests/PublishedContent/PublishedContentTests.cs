@@ -10,6 +10,8 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
 using Moq;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -24,7 +26,7 @@ namespace Umbraco.Tests.PublishedContent
     /// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
     /// </summary>
     [TestFixture]
-    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
+    [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
     public class PublishedContentTests : PublishedContentTestBase
     {
         protected override void Compose()
@@ -71,9 +73,9 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        protected override TypeLoader CreatePluginManager(IContainer f)
+        protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreatePluginManager(f);
+            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
 
             // this is so the model factory looks into the test assembly
             pluginManager.AssembliesToScan = pluginManager.AssembliesToScan

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Core;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Umbraco.Core.Composing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Models
 {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
+                var helper = RegisterExtensions.GetInstance<MembershipHelper>(Current.Factory);
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }

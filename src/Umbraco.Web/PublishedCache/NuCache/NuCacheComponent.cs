@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.Components;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -12,11 +11,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             // register the NuCache database data source
-            composition.Container.Register<IDataSource, DatabaseDataSource>();
+            composition.Register<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
-            composition.Container.Register(factory => new PublishedSnapshotService.Options());
+            composition.Register(factory => new PublishedSnapshotService.Options());
             composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // add the NuCache health check (hidden from type finder)

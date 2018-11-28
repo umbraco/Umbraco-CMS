@@ -8,7 +8,7 @@
         /// <summary>
         /// Initializes a new instance of the builder, and registers the collection.
         /// </summary>
-        void Initialize(IContainer container);
+        void Initialize(IRegister container);
     }
 
     /// <summary>
@@ -24,6 +24,6 @@
         /// </summary>
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
-        TCollection CreateCollection();
+        TCollection CreateCollection(IFactory factory);
     }
 }

@@ -49,7 +49,7 @@ namespace Umbraco.Web.Mvc
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
-        private UmbracoFeatures Features => Current.Container.GetInstance<UmbracoFeatures>(); // fixme inject
+        private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // fixme inject
 
         #region IRouteHandler Members
 
@@ -397,7 +397,7 @@ namespace Umbraco.Web.Mvc
                 && routeDef.HasHijackedRoute == false)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
-                var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();
+                var engine = Core.Composing.Current.Factory.GetInstance<PublishedRouter>();
                 request.UpdateOnMissingTemplate(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should

@@ -117,24 +117,35 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = Current.Container = ContainerFactory.Create();
-            Composition = new Composition(Container, RuntimeLevel.Run);
-
-            TestObjects = new TestObjects(Container);
-
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
+            // fixme see CoreRuntime and align!
+            var (logger, profiler) = GetLoggers(Options.Logger);
+            var proflogger = new ProfilingLogger(logger, profiler);
+            var cacheHelper = GetCacheHelper();
+            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            var typeLoader = GetTypeLoader(cacheHelper.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+
+            Container = ContainerFactory.Create();
+            Current.Factory = Container;
+
+            Container.RegisterInstance(typeLoader);
+            Container.RegisterInstance(logger);
+            Container.RegisterInstance(profiler);
+            Container.RegisterInstance<IProfilingLogger>(proflogger);
+            Container.RegisterInstance(cacheHelper);
+            Container.RegisterInstance(cacheHelper.RuntimeCache);
+
+            Composition = new Composition(Container, typeLoader, proflogger, RuntimeLevel.Run);
+            TestObjects = new TestObjects(Container);
             Compose();
             Initialize();
         }
 
         protected virtual void Compose()
         {
-            ComposeLogging(Options.Logger);
-            ComposeCacheHelper();
             ComposeAutoMapper(Options.AutoMapper);
-            ComposePluginManager(Options.PluginManager);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
 
@@ -143,8 +154,7 @@ namespace Umbraco.Tests.Testing
             ComposeWtf();
 
             // not sure really
-            var composition = new Composition(Container, RuntimeLevel.Run);
-            Compose(composition);
+            Compose(Composition);
         }
 
         protected virtual void Compose(Composition composition)
@@ -160,25 +170,35 @@ namespace Umbraco.Tests.Testing
 
         #region Compose
 
-        protected virtual void ComposeLogging(UmbracoTestOptions.Logger option)
+        protected virtual (ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
         {
-            if (option == UmbracoTestOptions.Logger.Mock)
+            ILogger logger;
+            IProfiler profiler;
+
+            switch (option)
             {
-                Container.RegisterSingleton(f => Mock.Of<ILogger>());
-                Container.RegisterSingleton(f => Mock.Of<IProfiler>());
-            }
-            else if (option == UmbracoTestOptions.Logger.Serilog)
-            {
-                Container.RegisterSingleton<ILogger>(f => new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config"))));
-                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
-            }
-            else if (option == UmbracoTestOptions.Logger.Console)
-            {
-                Container.RegisterSingleton<ILogger>(f => new ConsoleLogger());
-                Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
+                case UmbracoTestOptions.Logger.Mock:
+                    logger = Mock.Of<ILogger>();
+                    profiler = Mock.Of<IProfiler>();
+                    break;
+                case UmbracoTestOptions.Logger.Serilog:
+                    logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    profiler = new LogProfiler(logger);
+                    break;
+                case UmbracoTestOptions.Logger.Console:
+                    logger = new ConsoleLogger();
+                    profiler = new LogProfiler(logger);
+                    break;
+                default:
+                    throw new NotSupportedException($"Logger option {option} is not supported.");
             }
 
-            Container.RegisterSingleton<IProfilingLogger>(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
+            return (logger, profiler);
+        }
+
+        protected virtual CacheHelper GetCacheHelper()
+        {
+            return CacheHelper.Disabled;
         }
 
         protected virtual void ComposeWeb()
@@ -215,12 +235,6 @@ namespace Umbraco.Tests.Testing
             Composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
         }
 
-        protected virtual void ComposeCacheHelper()
-        {
-            Container.RegisterSingleton(f => CacheHelper.Disabled);
-            Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
-        }
-
         protected virtual void ComposeAutoMapper(bool configure)
         {
             if (configure == false) return;
@@ -230,32 +244,30 @@ namespace Umbraco.Tests.Testing
                 .ComposeWebMappingProfiles();
         }
 
-        protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
+        protected virtual TypeLoader GetTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
         {
-            Container.RegisterSingleton(f =>
+            switch (option)
             {
-                switch (pluginManager)
-                {
-                    case UmbracoTestOptions.PluginManager.Default:
-                        return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonPluginManager(f));
-                    case UmbracoTestOptions.PluginManager.PerFixture:
-                        return _featureTypeLoader ?? (_featureTypeLoader = CreatePluginManager(f));
-                    case UmbracoTestOptions.PluginManager.PerTest:
-                        return CreatePluginManager(f);
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(pluginManager));
-                }
-            });
+                case UmbracoTestOptions.TypeLoader.Default:
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(runtimeCache, globalSettings, logger));
+                case UmbracoTestOptions.TypeLoader.PerFixture:
+                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(runtimeCache, globalSettings, logger));
+                case UmbracoTestOptions.TypeLoader.PerTest:
+                    return CreateTypeLoader(runtimeCache, globalSettings, logger);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(option));
+            }
         }
 
-        protected virtual TypeLoader CreatePluginManager(IContainer f)
+        protected virtual TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return CreateCommonPluginManager(f);
+            return CreateCommonTypeLoader(runtimeCache, globalSettings, logger);
         }
 
-        private static TypeLoader CreateCommonPluginManager(IContainer f)
+        // common to all tests = cannot be overriden
+        private static TypeLoader CreateCommonTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<IProfilingLogger>(), false)
+            return new TypeLoader(runtimeCache, globalSettings, logger, false)
             {
                 AssembliesToScan = new[]
                 {

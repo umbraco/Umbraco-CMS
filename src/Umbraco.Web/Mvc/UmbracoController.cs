@@ -80,12 +80,12 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoController()
             : this(
-                  Current.Container.GetInstance<IGlobalSettings>(),
-                  Current.Container.GetInstance<UmbracoContext>(),
-                  Current.Container.GetInstance<ServiceContext>(),
-                  Current.Container.GetInstance<CacheHelper>(),
-                  Current.Container.GetInstance<ILogger>(),
-                  Current.Container.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<UmbracoContext>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<CacheHelper>(),
+                  Current.Factory.GetInstance<ILogger>(),
+                  Current.Factory.GetInstance<IProfilingLogger>()
             )
         {
         }

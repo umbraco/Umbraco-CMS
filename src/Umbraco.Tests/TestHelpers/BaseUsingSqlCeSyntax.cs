@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.TestHelpers
@@ -33,8 +34,9 @@ namespace Umbraco.Tests.TestHelpers
 
             var sqlSyntax = new SqlCeSyntaxProvider();
 
-            var container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(container, RuntimeLevel.Run);
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());

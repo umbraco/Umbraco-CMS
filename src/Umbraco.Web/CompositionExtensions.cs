@@ -30,7 +30,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static ActionCollectionBuilder Actions(this Composition composition)
-            => composition.Container.GetInstance<ActionCollectionBuilder>();
+            => composition.GetCollectionBuilder<ActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content apps collection builder.
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentAppDefinitionCollectionBuilder ContentApps(this Composition composition)
-            => composition.Container.GetInstance<ContentAppDefinitionCollectionBuilder>();
+            => composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentFinderCollectionBuilder ContentFinders(this Composition composition)
-            => composition.Container.GetInstance<ContentFinderCollectionBuilder>();
+            => composition.GetCollectionBuilder<ContentFinderCollectionBuilder>();
 
         /// <summary>
         /// Gets the editor validators collection builder.
@@ -54,10 +54,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
-            => composition.Container.GetInstance<EditorValidatorCollectionBuilder>();
-
-        public static UmbracoFeatures Features(this Composition composition)
-            => composition.Container.GetInstance<UmbracoFeatures>();
+            => composition.GetCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the filtered controller factories collection builder.
@@ -65,21 +62,21 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static FilteredControllerFactoryCollectionBuilder FilderedControllerFactory(this Composition composition)
-            => composition.Container.GetInstance<FilteredControllerFactoryCollectionBuilder>();
+            => composition.GetCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the health checks collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
-            => composition.Container.GetInstance<HealthCheckCollectionBuilder>();
+            => composition.GetCollectionBuilder<HealthCheckCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
-            => composition.Container.GetInstance<UrlProviderCollectionBuilder>();
+            => composition.GetCollectionBuilder<UrlProviderCollectionBuilder>();
 
         #endregion
 
@@ -93,7 +90,7 @@ namespace Umbraco.Core.Components
         public static void SetContentLastChanceFinder<T>(this Composition composition)
             where T : IContentLastChanceFinder
         {
-            composition.Container.RegisterSingleton<IContentLastChanceFinder, T>();
+            composition.RegisterSingleton<IContentLastChanceFinder, T>();
         }
 
         /// <summary>
@@ -101,9 +98,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IContainer, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -113,7 +110,7 @@ namespace Umbraco.Core.Components
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
-            composition.Container.RegisterSingleton(_ => finder);
+            composition.RegisterSingleton(_ => finder);
         }
 
         /// <summary>
@@ -134,7 +131,7 @@ namespace Umbraco.Core.Components
         public static void SetPublishedSnapshotService<T>(this Composition composition)
             where T : IPublishedSnapshotService
         {
-            composition.Container.RegisterSingleton<IPublishedSnapshotService, T>();
+            composition.RegisterSingleton<IPublishedSnapshotService, T>();
         }
 
         /// <summary>
@@ -142,9 +139,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IContainer, IPublishedSnapshotService> factory)
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -154,7 +151,7 @@ namespace Umbraco.Core.Components
         /// <param name="service">A published snapshot service.</param>
         public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
         {
-            composition.Container.RegisterSingleton(_ => service);
+            composition.RegisterSingleton(_ => service);
         }
 
         /// <summary>
@@ -165,7 +162,7 @@ namespace Umbraco.Core.Components
         public static void SetSiteDomainHelper<T>(this Composition composition)
             where T : ISiteDomainHelper
         {
-            composition.Container.RegisterSingleton<ISiteDomainHelper, T>();
+            composition.RegisterSingleton<ISiteDomainHelper, T>();
         }
 
         /// <summary>
@@ -173,9 +170,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IContainer, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -185,7 +182,7 @@ namespace Umbraco.Core.Components
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
-            composition.Container.RegisterSingleton(_ => helper);
+            composition.RegisterSingleton(_ => helper);
         }
 
         #endregion

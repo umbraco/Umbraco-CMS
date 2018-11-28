@@ -7,9 +7,9 @@ namespace Umbraco.Web.Mvc
 {
     public class ContainerControllerFactory : DefaultControllerFactory
     {
-        private readonly IContainer _container;
+        private readonly IFactory _container;
 
-        public ContainerControllerFactory(IContainer container)
+        public ContainerControllerFactory(IFactory container)
         {
             _container = container;
         }

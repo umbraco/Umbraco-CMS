@@ -41,6 +41,7 @@ namespace Umbraco.Core.Components
             public int Weight = -1;
         }
 
+
         public void Compose()
         {
             var orderedComponentTypes = PrepareComponentTypes();
@@ -49,11 +50,11 @@ namespace Umbraco.Core.Components
             ComposeComponents();
         }
 
-        public void Initialize()
+        public void Initialize(IFactory factory)
         {
-            using (var scope = _composition.Container.GetInstance<IScopeProvider>().CreateScope())
+            using (var scope = factory.GetInstance<IScopeProvider>().CreateScope())
             {
-                InitializeComponents();
+                InitializeComponents(factory);
                 scope.Complete();
             }
         }
@@ -303,12 +304,12 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private void InitializeComponents()
+        private void InitializeComponents(IFactory factory)
         {
             // use a container scope to ensure that PerScope instances are disposed
             // components that require instances that should not survive should register them with PerScope lifetime
             using (_logger.DebugDuration<Components>($"Initializing components. (log when >{LogThresholdMilliseconds}ms)", "Initialized components."))
-            using (_composition.Container.BeginScope())
+            using (factory.BeginScope())
             {
                 foreach (var component in _components)
                 {
@@ -320,7 +321,7 @@ namespace Umbraco.Core.Components
                         foreach (var initializer in initializers)
                         {
                             var parameters = initializer.GetParameters()
-                                .Select(x => GetParameter(componentType, x.ParameterType))
+                                .Select(x => GetParameter(factory, componentType, x.ParameterType))
                                 .ToArray();
                             initializer.Invoke(component, parameters);
                         }
@@ -329,13 +330,13 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private object GetParameter(Type componentType, Type parameterType)
+        private object GetParameter(IFactory factory, Type componentType, Type parameterType)
         {
             object param;
 
             try
             {
-                param = _composition.Container.TryGetInstance(parameterType);
+                param = factory.TryGetInstance(parameterType);
             }
             catch (Exception e)
             {

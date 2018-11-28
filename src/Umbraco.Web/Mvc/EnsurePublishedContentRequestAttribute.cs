@@ -2,9 +2,9 @@
 using System.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
         // todo - try lazy property injection?
-        private PublishedRouter PublishedRouter => ContainerExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Container);
+        private PublishedRouter PublishedRouter => RegisterExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Factory);
 
         /// <summary>
         /// Exposes an UmbracoHelper

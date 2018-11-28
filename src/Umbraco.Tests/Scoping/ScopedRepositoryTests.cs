@@ -33,19 +33,17 @@ namespace Umbraco.Tests.Scoping
             Container.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
             Container.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
             Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(f => f.TryGetInstance<TypeLoader>().GetCacheRefreshers());
+                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
-        protected override void ComposeCacheHelper()
+        protected override CacheHelper GetCacheHelper()
         {
             // this is what's created core web runtime
-            var cacheHelper = new CacheHelper(
+            return new CacheHelper(
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
-            Container.RegisterSingleton(f => cacheHelper);
-            Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
         }
 
         [TearDown]

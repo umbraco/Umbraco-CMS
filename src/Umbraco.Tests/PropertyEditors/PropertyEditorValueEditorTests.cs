@@ -21,7 +21,8 @@ namespace Umbraco.Tests.PropertyEditors
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
-            var container = Current.Container = ContainerFactory.Create();
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
 
             container.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));

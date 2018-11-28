@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         protected override MapperCollectionBuilder This => this;
 
-        public override void Initialize(IContainer container)
+        public override void Initialize(IRegister container)
         {
             base.Initialize(container);
 

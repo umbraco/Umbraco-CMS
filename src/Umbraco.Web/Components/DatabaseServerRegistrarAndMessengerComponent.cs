@@ -3,6 +3,7 @@ using System.Threading;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -11,11 +12,10 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Components
 {
@@ -54,12 +54,12 @@ namespace Umbraco.Web.Components
         {
             composition.SetServerMessenger(factory =>
             {
-                var runtime = ContainerExtensions.GetInstance<IRuntimeState>(factory);
-                var databaseFactory = ContainerExtensions.GetInstance<IUmbracoDatabaseFactory>(factory);
-                var globalSettings = ContainerExtensions.GetInstance<IGlobalSettings>(factory);
-                var proflog = ContainerExtensions.GetInstance<IProfilingLogger>(factory);
-                var scopeProvider = ContainerExtensions.GetInstance<IScopeProvider>(factory);
-                var sqlContext = ContainerExtensions.GetInstance<ISqlContext>(factory);
+                var runtime = RegisterExtensions.GetInstance<IRuntimeState>(factory);
+                var databaseFactory = RegisterExtensions.GetInstance<IUmbracoDatabaseFactory>(factory);
+                var globalSettings = RegisterExtensions.GetInstance<IGlobalSettings>(factory);
+                var proflog = RegisterExtensions.GetInstance<IProfilingLogger>(factory);
+                var scopeProvider = RegisterExtensions.GetInstance<IScopeProvider>(factory);
+                var sqlContext = RegisterExtensions.GetInstance<ISqlContext>(factory);
 
                 return new BatchedDatabaseServerMessenger(
                     runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,

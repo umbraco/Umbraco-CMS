@@ -11,44 +11,42 @@ namespace Umbraco.Core.Composing.Composers
     {
         public static Composition ComposeRepositories(this Composition composition)
         {
-            var container = composition.Container;
-
             // repositories
-            container.RegisterSingleton<IAuditRepository, AuditRepository>();
-            container.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
-            container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
-            container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
-            container.RegisterSingleton<IDataTypeRepository, DataTypeRepository>();
-            container.RegisterSingleton<IDictionaryRepository, DictionaryRepository>();
-            container.RegisterSingleton<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
-            container.RegisterSingleton<IDocumentRepository, DocumentRepository>();
-            container.RegisterSingleton<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
-            container.RegisterSingleton<IDomainRepository, DomainRepository>();
-            container.RegisterSingleton<IEntityRepository, EntityRepository>();
-            container.RegisterSingleton<IExternalLoginRepository, ExternalLoginRepository>();
-            container.RegisterSingleton<ILanguageRepository, LanguageRepository>();
-            container.RegisterSingleton<IMacroRepository, MacroRepository>();
-            container.RegisterSingleton<IMediaRepository, MediaRepository>();
-            container.RegisterSingleton<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
-            container.RegisterSingleton<IMediaTypeRepository, MediaTypeRepository>();
-            container.RegisterSingleton<IMemberGroupRepository, MemberGroupRepository>();
-            container.RegisterSingleton<IMemberRepository, MemberRepository>();
-            container.RegisterSingleton<IMemberTypeRepository, MemberTypeRepository>();
-            container.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
-            container.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
-            container.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();
-            container.RegisterSingleton<IRelationRepository, RelationRepository>();
-            container.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
-            container.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
-            container.RegisterSingleton<ITagRepository, TagRepository>();
-            container.RegisterSingleton<ITemplateRepository, TemplateRepository>();
-            container.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
-            container.RegisterSingleton<IUserRepository, UserRepository>();
-            container.RegisterSingleton<IConsentRepository, ConsentRepository>();
-            container.RegisterSingleton<IPartialViewMacroRepository, PartialViewMacroRepository>();
-            container.RegisterSingleton<IPartialViewRepository, PartialViewRepository>();
-            container.RegisterSingleton<IScriptRepository, ScriptRepository>();
-            container.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
+            composition.RegisterSingleton<IAuditRepository, AuditRepository>();
+            composition.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
+            composition.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
+            composition.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
+            composition.RegisterSingleton<IDataTypeRepository, DataTypeRepository>();
+            composition.RegisterSingleton<IDictionaryRepository, DictionaryRepository>();
+            composition.RegisterSingleton<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
+            composition.RegisterSingleton<IDocumentRepository, DocumentRepository>();
+            composition.RegisterSingleton<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
+            composition.RegisterSingleton<IDomainRepository, DomainRepository>();
+            composition.RegisterSingleton<IEntityRepository, EntityRepository>();
+            composition.RegisterSingleton<IExternalLoginRepository, ExternalLoginRepository>();
+            composition.RegisterSingleton<ILanguageRepository, LanguageRepository>();
+            composition.RegisterSingleton<IMacroRepository, MacroRepository>();
+            composition.RegisterSingleton<IMediaRepository, MediaRepository>();
+            composition.RegisterSingleton<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
+            composition.RegisterSingleton<IMediaTypeRepository, MediaTypeRepository>();
+            composition.RegisterSingleton<IMemberGroupRepository, MemberGroupRepository>();
+            composition.RegisterSingleton<IMemberRepository, MemberRepository>();
+            composition.RegisterSingleton<IMemberTypeRepository, MemberTypeRepository>();
+            composition.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
+            composition.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
+            composition.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();
+            composition.RegisterSingleton<IRelationRepository, RelationRepository>();
+            composition.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
+            composition.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
+            composition.RegisterSingleton<ITagRepository, TagRepository>();
+            composition.RegisterSingleton<ITemplateRepository, TemplateRepository>();
+            composition.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
+            composition.RegisterSingleton<IUserRepository, UserRepository>();
+            composition.RegisterSingleton<IConsentRepository, ConsentRepository>();
+            composition.RegisterSingleton<IPartialViewMacroRepository, PartialViewMacroRepository>();
+            composition.RegisterSingleton<IPartialViewRepository, PartialViewRepository>();
+            composition.RegisterSingleton<IScriptRepository, ScriptRepository>();
+            composition.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
 
             return composition;
         }

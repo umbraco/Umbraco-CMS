@@ -5,9 +5,9 @@ namespace Umbraco.Core.Migrations
 {
     public class MigrationBuilder : IMigrationBuilder
     {
-        private readonly IContainer _container;
+        private readonly IFactory _container;
 
-        public MigrationBuilder(IContainer container)
+        public MigrationBuilder(IFactory container)
         {
             _container = container;
         }

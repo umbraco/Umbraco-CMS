@@ -36,10 +36,9 @@ namespace Umbraco.Web.Composing.Composers
 
         private static void RegisterControllers<TController>(this Composition composition, Assembly assembly)
         {
-            var container = composition.Container;
             var types = composition.TypeLoader.GetTypes<TController>(specificAssemblies: new[] { assembly });
             foreach (var type in types)
-                container.Register(type, Lifetime.Request);
+                composition.Register(type, Lifetime.Request);
         }
     }
 }

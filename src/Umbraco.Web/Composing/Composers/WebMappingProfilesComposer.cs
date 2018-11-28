@@ -13,39 +13,37 @@ namespace Umbraco.Web.Composing.Composers
     {
         public static Composition ComposeWebMappingProfiles(this Composition composition)
         {
-            var container = composition.Container;
-
             //register the profiles
-            container.Register<Profile, AuditMapperProfile>();
-            container.Register<Profile, CodeFileMapperProfile>();
-            container.Register<Profile, ContentMapperProfile>();
-            container.Register<Profile, ContentPropertyMapperProfile>();
-            container.Register<Profile, ContentTypeMapperProfile>();
-            container.Register<Profile, DataTypeMapperProfile>();
-            container.Register<Profile, EntityMapperProfile>();
-            container.Register<Profile, DictionaryMapperProfile>();
-            container.Register<Profile, MacroMapperProfile>();
-            container.Register<Profile, MediaMapperProfile>();
-            container.Register<Profile, MemberMapperProfile>();
-            container.Register<Profile, RedirectUrlMapperProfile>();
-            container.Register<Profile, RelationMapperProfile>();
-            container.Register<Profile, SectionMapperProfile>();
-            container.Register<Profile, TagMapperProfile>();
-            container.Register<Profile, TemplateMapperProfile>();
-            container.Register<Profile, UserMapperProfile>();
-            container.Register<Profile, LanguageMapperProfile>();
+            composition.Register<Profile, AuditMapperProfile>();
+            composition.Register<Profile, CodeFileMapperProfile>();
+            composition.Register<Profile, ContentMapperProfile>();
+            composition.Register<Profile, ContentPropertyMapperProfile>();
+            composition.Register<Profile, ContentTypeMapperProfile>();
+            composition.Register<Profile, DataTypeMapperProfile>();
+            composition.Register<Profile, EntityMapperProfile>();
+            composition.Register<Profile, DictionaryMapperProfile>();
+            composition.Register<Profile, MacroMapperProfile>();
+            composition.Register<Profile, MediaMapperProfile>();
+            composition.Register<Profile, MemberMapperProfile>();
+            composition.Register<Profile, RedirectUrlMapperProfile>();
+            composition.Register<Profile, RelationMapperProfile>();
+            composition.Register<Profile, SectionMapperProfile>();
+            composition.Register<Profile, TagMapperProfile>();
+            composition.Register<Profile, TemplateMapperProfile>();
+            composition.Register<Profile, UserMapperProfile>();
+            composition.Register<Profile, LanguageMapperProfile>();
 
             //register any resolvers, etc.. that the profiles use
-            container.Register<ContentUrlResolver>();
-            container.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
-            container.Register<TabsAndPropertiesResolver<IContent, ContentVariantDisplay>>();
-            container.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
-            container.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
-            container.Register<MemberTabsAndPropertiesResolver>();
-            container.Register<MemberTreeNodeUrlResolver>();
-            container.Register<MemberBasicPropertiesResolver>();
-            container.Register<MediaAppResolver>();
-            container.Register<ContentAppResolver>();
+            composition.Register<ContentUrlResolver>();
+            composition.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
+            composition.Register<TabsAndPropertiesResolver<IContent, ContentVariantDisplay>>();
+            composition.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
+            composition.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
+            composition.Register<MemberTabsAndPropertiesResolver>();
+            composition.Register<MemberTreeNodeUrlResolver>();
+            composition.Register<MemberBasicPropertiesResolver>();
+            composition.Register<MediaAppResolver>();
+            composition.Register<ContentAppResolver>();
 
             return composition;
         }

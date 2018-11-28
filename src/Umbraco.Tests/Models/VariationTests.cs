@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
 
             Current.Reset();
             var container = Mock.Of<IContainer>();
-            Current.Container = container;
+            Current.Factory = container;
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {

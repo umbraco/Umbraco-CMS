@@ -26,7 +26,7 @@ namespace Umbraco.Core.Composing
     /// </remarks>
     public static class Current
     {
-        private static IContainer _container;
+        private static IFactory _factory;
 
         private static IShortStringHelper _shortStringHelper;
         private static ILogger _logger;
@@ -35,30 +35,30 @@ namespace Umbraco.Core.Composing
         private static IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
-        /// Gets or sets the DI container.
+        /// Gets or sets the factory.
         /// </summary>
-        public static IContainer Container
+        public static IFactory Factory
         {
             get
             {
-                if (_container == null) throw new Exception("No container has been set.");
-                return _container;
+                if (_factory == null) throw new Exception("No factory has been set.");
+                return _factory;
             }
             set
             {
-                if (_container != null) throw new Exception("A container has already been set.");
-                _container = value;
+                if (_factory != null) throw new Exception("A factory has already been set.");
+                _factory = value;
             }
         }
 
-        internal static bool HasContainer => _container != null;
+        internal static bool HasContainer => _factory != null;
 
         // for UNIT TESTS exclusively!
         // resets *everything* that is 'current'
         internal static void Reset()
         {
-            _container?.Dispose();
-            _container = null;
+            _factory.DisposeIfDisposable();
+            _factory = null;
 
             _shortStringHelper = null;
             _logger = null;
@@ -80,89 +80,89 @@ namespace Umbraco.Core.Composing
         // not happen. Will do when we get rid of IShortStringHelper.
 
         public static IShortStringHelper ShortStringHelper
-            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>()
+            => _shortStringHelper ?? (_shortStringHelper = _factory?.TryGetInstance<IShortStringHelper>()
                 ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
 
         public static ILogger Logger
-            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>()
+            => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>()
                 ?? new DebugDiagnosticsLogger());
 
         public static IProfiler Profiler
-            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
+            => _profiler ?? (_profiler = _factory?.TryGetInstance<IProfiler>()
                 ?? new LogProfiler(Logger));
 
         public static IProfilingLogger ProfilingLogger
-            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<IProfilingLogger>())
+            => _profilingLogger ?? (_profilingLogger = _factory?.TryGetInstance<IProfilingLogger>())
                ?? new ProfilingLogger(Logger, Profiler);
 
         public static IRuntimeState RuntimeState
-            => Container.GetInstance<IRuntimeState>();
+            => Factory.GetInstance<IRuntimeState>();
 
         public static TypeLoader TypeLoader
-            => Container.GetInstance<TypeLoader>();
+            => Factory.GetInstance<TypeLoader>();
 
         public static IFileSystems FileSystems
-            => Container.GetInstance<IFileSystems>();
+            => Factory.GetInstance<IFileSystems>();
 
         public static IMediaFileSystem MediaFileSystem
-            => Container.GetInstance<IMediaFileSystem>();
+            => Factory.GetInstance<IMediaFileSystem>();
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
-            => Container.GetInstance<UrlSegmentProviderCollection>();
+            => Factory.GetInstance<UrlSegmentProviderCollection>();
 
         public static CacheRefresherCollection CacheRefreshers
-            => Container.GetInstance<CacheRefresherCollection>();
+            => Factory.GetInstance<CacheRefresherCollection>();
 
         public static DataEditorCollection DataEditors
-            => Container.GetInstance<DataEditorCollection>();
+            => Factory.GetInstance<DataEditorCollection>();
 
         public static PropertyEditorCollection PropertyEditors
-            => Container.GetInstance<PropertyEditorCollection>();
+            => Factory.GetInstance<PropertyEditorCollection>();
 
         public static ParameterEditorCollection ParameterEditors
-            => Container.GetInstance<ParameterEditorCollection>();
+            => Factory.GetInstance<ParameterEditorCollection>();
 
         internal static ManifestValueValidatorCollection ManifestValidators
-            => Container.GetInstance<ManifestValueValidatorCollection>();
+            => Factory.GetInstance<ManifestValueValidatorCollection>();
 
         internal static PackageActionCollection PackageActions
-            => Container.GetInstance<PackageActionCollection>();
+            => Factory.GetInstance<PackageActionCollection>();
 
         internal static PropertyValueConverterCollection PropertyValueConverters
-            => Container.GetInstance<PropertyValueConverterCollection>();
+            => Factory.GetInstance<PropertyValueConverterCollection>();
 
         internal static IPublishedModelFactory PublishedModelFactory
-            => Container.GetInstance<IPublishedModelFactory>();
+            => Factory.GetInstance<IPublishedModelFactory>();
 
         public static IServerMessenger ServerMessenger
-            => Container.GetInstance<IServerMessenger>();
+            => Factory.GetInstance<IServerMessenger>();
 
         public static IServerRegistrar ServerRegistrar
-            => Container.GetInstance<IServerRegistrar>();
+            => Factory.GetInstance<IServerRegistrar>();
 
         public static ICultureDictionaryFactory CultureDictionaryFactory
-            => Container.GetInstance<ICultureDictionaryFactory>();
+            => Factory.GetInstance<ICultureDictionaryFactory>();
 
         public static CacheHelper ApplicationCache
-            => Container.GetInstance<CacheHelper>();
+            => Factory.GetInstance<CacheHelper>();
 
         public static ServiceContext Services
-            => Container.GetInstance<ServiceContext>();
+            => Factory.GetInstance<ServiceContext>();
 
         public static IScopeProvider ScopeProvider
-            => Container.GetInstance<IScopeProvider>();
+            => Factory.GetInstance<IScopeProvider>();
 
         public static ISqlContext SqlContext
-            => Container.GetInstance<ISqlContext>();
+            => Factory.GetInstance<ISqlContext>();
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory
-            => Container.GetInstance<IPublishedContentTypeFactory>();
+            => Factory.GetInstance<IPublishedContentTypeFactory>();
 
         public static IPublishedValueFallback PublishedValueFallback
-            => _publishedValueFallback ?? Container.GetInstance<IPublishedValueFallback>() ?? new NoopPublishedValueFallback();
+            => _publishedValueFallback ?? Factory.GetInstance<IPublishedValueFallback>() ?? new NoopPublishedValueFallback();
 
         public static IVariationContextAccessor VariationContextAccessor
-            => Container.GetInstance<IVariationContextAccessor>();
+            => Factory.GetInstance<IVariationContextAccessor>();
 
         #endregion
     }

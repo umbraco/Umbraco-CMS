@@ -115,7 +115,7 @@ namespace Umbraco.Web
                 UmbracoConfig.For.UmbracoSettings(),
                 Composing.Current.UrlProviders,
                 UmbracoConfig.For.GlobalSettings(),
-                Composing.Current.Container.GetInstance<IVariationContextAccessor>(),
+                Composing.Current.Factory.GetInstance<IVariationContextAccessor>(),
                 true);
 
             // when the context will be disposed, it will be removed from the accessor

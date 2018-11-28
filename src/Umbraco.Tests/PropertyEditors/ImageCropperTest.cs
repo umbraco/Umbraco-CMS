@@ -5,8 +5,10 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -67,8 +69,9 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = Current.Container = ContainerFactory.Create();
-                var composition = new Composition(container, RuntimeLevel.Run);
+                var container = ContainerFactory.Create();
+                Current.Factory = container;
+                var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
                 composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 

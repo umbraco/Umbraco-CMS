@@ -34,8 +34,6 @@ namespace Umbraco.Core.Runtime
         {
             base.Compose(composition);
 
-            var container = composition.Container;
-
             // composers
             composition
                 .ComposeConfiguration()
@@ -50,16 +48,16 @@ namespace Umbraco.Core.Runtime
             composition.GetCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
 
             // register the scope provider
-            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+            composition.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            composition.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
+            composition.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
 
             // register database builder
             // *not* a singleton, don't want to keep it around
-            composition.Container.Register<DatabaseBuilder>();
+            composition.Register<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
-            composition.Container.RegisterSingleton<ManifestParser>();
+            composition.RegisterSingleton<ManifestParser>();
 
             // register our predefined validators
             composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
@@ -72,12 +70,12 @@ namespace Umbraco.Core.Runtime
 
             // properties and parameters derive from data editors
             composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetDataEditors());
-            composition.Container.RegisterSingleton<PropertyEditorCollection>();
-            composition.Container.RegisterSingleton<ParameterEditorCollection>();
+                .Add(() => composition.TypeLoader.GetDataEditors());
+            composition.RegisterSingleton<PropertyEditorCollection>();
+            composition.RegisterSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar 
-            composition.Container.RegisterSingleton<IServerRegistrar>(f =>
+            composition.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
@@ -89,7 +87,7 @@ namespace Umbraco.Core.Runtime
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by either the legacy thing or the db thing in the corresponding
             // components in the web project - fixme - should obsolete the legacy thing
-            composition.Container.RegisterSingleton<IServerMessenger>(factory
+            composition.RegisterSingleton<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
@@ -99,29 +97,29 @@ namespace Umbraco.Core.Runtime
                     true, new DatabaseServerMessengerOptions()));
 
             composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetCacheRefreshers());
+                .Add(() => composition.TypeLoader.GetCacheRefreshers());
 
             composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
-                .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
+                .Add(() => composition.TypeLoader.GetPackageActions());
 
             composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
-                .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
+                .Append(composition.TypeLoader.GetTypes<IPropertyValueConverter>());
 
-            composition.Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            composition.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            composition.Container.RegisterSingleton<IShortStringHelper>(factory
+            composition.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
             composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
             composition.GetCollectionBuilder<PostMigrationCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
+                .Add(() => composition.TypeLoader.GetTypes<IPostMigration>());
 
-            composition.Container.RegisterSingleton<IMigrationBuilder>(factory => new MigrationBuilder(composition.Container));
+            composition.RegisterSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             // by default, register a noop factory
-            composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
+            composition.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

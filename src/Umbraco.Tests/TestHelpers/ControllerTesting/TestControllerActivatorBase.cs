@@ -134,10 +134,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
 
-            //var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            //Umbraco.Web.Composing.Current.UmbracoContextAccessor = umbracoContextAccessor;
             var umbracoContextAccessor = Umbraco.Web.Composing.Current.UmbracoContextAccessor;
-            Current.Container.Register(factory => umbracoContextAccessor.UmbracoContext); // but really, should we inject this?!
 
             var umbCtx = UmbracoContext.EnsureContext(
                 umbracoContextAccessor,

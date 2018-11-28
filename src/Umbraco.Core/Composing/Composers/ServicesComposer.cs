@@ -15,58 +15,56 @@ namespace Umbraco.Core.Composing.Composers
     {
         public static Composition ComposeServices(this Composition composition)
         {
-            var container = composition.Container;
-
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context
-            container.RegisterSingleton<IEventMessagesFactory, TransientEventMessagesFactory>();
+            composition.RegisterSingleton<IEventMessagesFactory, TransientEventMessagesFactory>();
 
             // register the service context
-            container.RegisterSingleton<ServiceContext>();
+            composition.RegisterSingleton<ServiceContext>();
 
             // register the special idk map
-            container.RegisterSingleton<IdkMap>();
+            composition.RegisterSingleton<IdkMap>();
 
             // register the services
-            container.RegisterSingleton<IKeyValueService, KeyValueService>();
-            container.RegisterSingleton<IPublicAccessService, PublicAccessService>();
-            container.RegisterSingleton<IDomainService, DomainService>();
-            container.RegisterSingleton<IAuditService, AuditService>();
-            container.RegisterSingleton<ITagService, TagService>();
-            container.RegisterSingleton<IContentService, ContentService>();
-            container.RegisterSingleton<IUserService, UserService>();
-            container.RegisterSingleton<IMemberService, MemberService>();
-            container.RegisterSingleton<IMediaService, MediaService>();
-            container.RegisterSingleton<IContentTypeService, ContentTypeService>();
-            container.RegisterSingleton<IMediaTypeService, MediaTypeService>();
-            container.RegisterSingleton<IDataTypeService, DataTypeService>();
-            container.RegisterSingleton<IFileService, FileService>();
-            container.RegisterSingleton<ILocalizationService, LocalizationService>();
-            container.RegisterSingleton<IPackagingService, PackagingService>();
-            container.RegisterSingleton<IServerRegistrationService, ServerRegistrationService>();
-            container.RegisterSingleton<IEntityService, EntityService>();
-            container.RegisterSingleton<IRelationService, RelationService>();
-            container.RegisterSingleton<IMacroService, MacroService>();
-            container.RegisterSingleton<IMemberTypeService, MemberTypeService>();
-            container.RegisterSingleton<IMemberGroupService, MemberGroupService>();
-            container.RegisterSingleton<INotificationService, NotificationService>();
-            container.RegisterSingleton<IExternalLoginService, ExternalLoginService>();
-            container.RegisterSingleton<IRedirectUrlService, RedirectUrlService>();
-            container.RegisterSingleton<IConsentService, ConsentService>();
-            container.Register<LocalizedTextServiceFileSources>(SourcesFactory);
-            container.RegisterSingleton<ILocalizedTextService>(factory => new LocalizedTextService(
+            composition.RegisterSingleton<IKeyValueService, KeyValueService>();
+            composition.RegisterSingleton<IPublicAccessService, PublicAccessService>();
+            composition.RegisterSingleton<IDomainService, DomainService>();
+            composition.RegisterSingleton<IAuditService, AuditService>();
+            composition.RegisterSingleton<ITagService, TagService>();
+            composition.RegisterSingleton<IContentService, ContentService>();
+            composition.RegisterSingleton<IUserService, UserService>();
+            composition.RegisterSingleton<IMemberService, MemberService>();
+            composition.RegisterSingleton<IMediaService, MediaService>();
+            composition.RegisterSingleton<IContentTypeService, ContentTypeService>();
+            composition.RegisterSingleton<IMediaTypeService, MediaTypeService>();
+            composition.RegisterSingleton<IDataTypeService, DataTypeService>();
+            composition.RegisterSingleton<IFileService, FileService>();
+            composition.RegisterSingleton<ILocalizationService, LocalizationService>();
+            composition.RegisterSingleton<IPackagingService, PackagingService>();
+            composition.RegisterSingleton<IServerRegistrationService, ServerRegistrationService>();
+            composition.RegisterSingleton<IEntityService, EntityService>();
+            composition.RegisterSingleton<IRelationService, RelationService>();
+            composition.RegisterSingleton<IMacroService, MacroService>();
+            composition.RegisterSingleton<IMemberTypeService, MemberTypeService>();
+            composition.RegisterSingleton<IMemberGroupService, MemberGroupService>();
+            composition.RegisterSingleton<INotificationService, NotificationService>();
+            composition.RegisterSingleton<IExternalLoginService, ExternalLoginService>();
+            composition.RegisterSingleton<IRedirectUrlService, RedirectUrlService>();
+            composition.RegisterSingleton<IConsentService, ConsentService>();
+            composition.Register<LocalizedTextServiceFileSources>(SourcesFactory);
+            composition.RegisterSingleton<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetInstance<ILogger>()));
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
-            container.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
-            container.RegisterSingleton<ISectionService, EmptySectionService>();
+            composition.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
+            composition.RegisterSingleton<ISectionService, EmptySectionService>();
 
             return composition;
         }
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IContainer container)
+        private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {
             var mainLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
             var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));

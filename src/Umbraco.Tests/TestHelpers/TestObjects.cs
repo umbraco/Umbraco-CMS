@@ -205,13 +205,13 @@ namespace Umbraco.Tests.TestHelpers
                 consentService);
         }
 
-        private Lazy<T> GetLazyService<T>(IContainer container, Func<IContainer, T> ctor)
+        private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)
             where T : class
         {
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor(container));
         }
 
-        private T GetRepo<T>(IContainer container)
+        private T GetRepo<T>(IFactory container)
             where T : class, IRepository
         {
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();
@@ -224,11 +224,11 @@ namespace Umbraco.Tests.TestHelpers
                 //var mappersBuilder = new MapperCollectionBuilder(Current.Container); // fixme
                 //mappersBuilder.AddCore();
                 //var mappers = mappersBuilder.CreateCollection();
-                var mappers = Current.Container.GetInstance<IMapperCollection>();
+                var mappers = Current.Factory.GetInstance<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }
 
-            fileSystems = fileSystems ?? new FileSystems(Current.Container, logger);
+            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
             return scopeProvider;
         }

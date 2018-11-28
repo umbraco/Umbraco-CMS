@@ -174,7 +174,7 @@ namespace Umbraco.Core.Composing.LightInject
         }
 
         /// <inheritdoc />
-        public void Register<TService>(Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
         {
             switch (lifetime)
             {

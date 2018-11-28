@@ -24,56 +24,56 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static CacheRefresherCollectionBuilder CacheRefreshers(this Composition composition)
-            => composition.Container.GetInstance<CacheRefresherCollectionBuilder>();
+            => composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>();
 
         /// <summary>
         /// Gets the mappers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static MapperCollectionBuilder Mappers(this Composition composition)
-            => composition.Container.GetInstance<MapperCollectionBuilder>();
+            => composition.GetCollectionBuilder<MapperCollectionBuilder>();
 
         /// <summary>
         /// Gets the package actions collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static PackageActionCollectionBuilder PackageActions(this Composition composition)
-            => composition.Container.GetInstance<PackageActionCollectionBuilder>();
+            => composition.GetCollectionBuilder<PackageActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the data editor collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static DataEditorCollectionBuilder DataEditors(this Composition composition)
-            => composition.Container.GetInstance<DataEditorCollectionBuilder>();
+            => composition.GetCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static PropertyValueConverterCollectionBuilder PropertyValueConverters(this Composition composition)
-            => composition.Container.GetInstance<PropertyValueConverterCollectionBuilder>();
+            => composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url segment providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)
-            => composition.Container.GetInstance<UrlSegmentProviderCollectionBuilder>();
+            => composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the validators collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static ManifestValueValidatorCollectionBuilder Validators(this Composition composition)
-            => composition.Container.GetInstance<ManifestValueValidatorCollectionBuilder>();
+            => composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the post-migrations collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
-            => composition.Container.GetInstance<PostMigrationCollectionBuilder>();
+            => composition.GetCollectionBuilder<PostMigrationCollectionBuilder>();
 
         #endregion
 
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Components
         public static void SetCultureDictionaryFactory<T>(this Composition composition)
             where T : ICultureDictionaryFactory
         {
-            composition.Container.RegisterSingleton<ICultureDictionaryFactory, T>();
+            composition.RegisterSingleton<ICultureDictionaryFactory, T>();
         }
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a culture dictionary factory.</param>
-        public static void SetCultureDictionaryFactory(this Composition composition, Func<IContainer, ICultureDictionaryFactory> factory)
+        public static void SetCultureDictionaryFactory(this Composition composition, Func<IFactory, ICultureDictionaryFactory> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A factory.</param>
         public static void SetCultureDictionaryFactory(this Composition composition, ICultureDictionaryFactory factory)
         {
-            composition.Container.RegisterSingleton(_ => factory);
+            composition.RegisterSingleton(_ => factory);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Components
         public static void SetPublishedContentModelFactory<T>(this Composition composition)
             where T : IPublishedModelFactory
         {
-            composition.Container.RegisterSingleton<IPublishedModelFactory, T>();
+            composition.RegisterSingleton<IPublishedModelFactory, T>();
         }
 
         /// <summary>
@@ -126,9 +126,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, Func<IContainer, IPublishedModelFactory> factory)
+        public static void SetPublishedContentModelFactory(this Composition composition, Func<IFactory, IPublishedModelFactory> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A published content model factory.</param>
         public static void SetPublishedContentModelFactory(this Composition composition, IPublishedModelFactory factory)
         {
-            composition.Container.RegisterSingleton(_ => factory);
+            composition.RegisterSingleton(_ => factory);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Components
         public static void SetServerRegistrar<T>(this Composition composition)
             where T : IServerRegistrar
         {
-            composition.Container.RegisterSingleton<IServerRegistrar, T>();
+            composition.RegisterSingleton<IServerRegistrar, T>();
         }
 
         /// <summary>
@@ -157,9 +157,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server registar.</param>
-        public static void SetServerRegistrar(this Composition composition, Func<IContainer, IServerRegistrar> factory)
+        public static void SetServerRegistrar(this Composition composition, Func<IFactory, IServerRegistrar> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Components
         /// <param name="registrar">A server registrar.</param>
         public static void SetServerRegistrar(this Composition composition, IServerRegistrar registrar)
         {
-            composition.Container.RegisterSingleton(_ => registrar);
+            composition.RegisterSingleton(_ => registrar);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Components
         public static void SetServerMessenger<T>(this Composition composition)
             where T : IServerMessenger
         {
-            composition.Container.Register<IServerMessenger, T>(Lifetime.Singleton);
+            composition.Register<IServerMessenger, T>(Lifetime.Singleton);
         }
 
         /// <summary>
@@ -188,9 +188,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server messenger.</param>
-        public static void SetServerMessenger(this Composition composition, Func<IContainer, IServerMessenger> factory)
+        public static void SetServerMessenger(this Composition composition, Func<IFactory, IServerMessenger> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Components
         /// <param name="registrar">A server messenger.</param>
         public static void SetServerMessenger(this Composition composition, IServerMessenger registrar)
         {
-            composition.Container.RegisterSingleton(_ => registrar);
+            composition.RegisterSingleton(_ => registrar);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Components
         public static void SetShortStringHelper<T>(this Composition composition)
             where T : IShortStringHelper
         {
-            composition.Container.RegisterSingleton<IShortStringHelper, T>();
+            composition.RegisterSingleton<IShortStringHelper, T>();
         }
 
         /// <summary>
@@ -219,9 +219,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a short string helper.</param>
-        public static void SetShortStringHelper(this Composition composition, Func<IContainer, IShortStringHelper> factory)
+        public static void SetShortStringHelper(this Composition composition, Func<IFactory, IShortStringHelper> factory)
         {
-            composition.Container.RegisterSingleton(factory);
+            composition.RegisterSingleton(factory);
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Umbraco.Core.Components
         /// <param name="helper">A short string helper.</param>
         public static void SetShortStringHelper(this Composition composition, IShortStringHelper helper)
         {
-            composition.Container.RegisterSingleton(_ => helper);
+            composition.RegisterSingleton(_ => helper);
         }
 
         #endregion

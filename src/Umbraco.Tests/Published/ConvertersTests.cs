@@ -4,8 +4,10 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -172,8 +174,9 @@ namespace Umbraco.Tests.Published
         public void SimpleConverter3Test()
         {
             Current.Reset();
-            var container = Current.Container = ContainerFactory.Create();
-            var composition = new Composition(container, RuntimeLevel.Run);
+            var container = ContainerFactory.Create();
+            Current.Factory = container;
+            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()
@@ -184,7 +187,7 @@ namespace Umbraco.Tests.Published
                 typeof (PublishedSnapshotTestObjects.TestElementModel1), typeof (PublishedSnapshotTestObjects.TestElementModel2),
                 typeof (PublishedSnapshotTestObjects.TestContentModel1), typeof (PublishedSnapshotTestObjects.TestContentModel2),
             });
-            Current.Container.Register(f => factory);
+            container.Register(f => factory);
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -193,9 +196,9 @@ namespace Umbraco.Tests.Published
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
-            Current.Container.Register(f => publishedSnapshotAccessorMock.Object);
+            container.Register(f => publishedSnapshotAccessorMock.Object);
 
-            var converters = Current.Container.GetInstance<PropertyValueConverterCollection>();
+            var converters = Current.Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 },
