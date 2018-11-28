@@ -2575,8 +2575,18 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
 
-                    Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     uow.Commit();
+
+                    if (publishStatus.StatusType == PublishStatusType.Success)
+                    {
+                        Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    }
+                    else
+                    {
+                        Audit(uow, AuditType.Save, "Save performed by user", userId, content.Id);
+                    }
+                    uow.Commit();
+
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }
