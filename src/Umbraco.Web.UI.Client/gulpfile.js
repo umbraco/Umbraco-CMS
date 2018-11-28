@@ -288,6 +288,11 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery-ui-dist"
         },
         {
+            "name": "jquery-ui-touch-punch",
+            "src":  ["./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"],
+            "base": "./node_modules/jquery-ui-touch-punch"
+        },
+        {
             "name": "lazyload-js",
             "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
             "base": "./node_modules/lazyload-js"

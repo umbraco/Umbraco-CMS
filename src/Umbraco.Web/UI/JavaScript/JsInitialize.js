@@ -1,7 +1,7 @@
 ﻿[
     'lib/jquery/jquery.min.js',
     'lib/jquery-ui/jquery-ui.min.js',
-    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
+    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js',
 
     'lib/angular/angular.js',
     'lib/underscore/underscore-min.js',
