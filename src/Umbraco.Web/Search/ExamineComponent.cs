@@ -829,7 +829,6 @@ namespace Umbraco.Web.Search
 
             public void Dispose()
             {
-                throw new NotImplementedException();
             }
 
             public void Run()

@@ -1,11 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Examine;
+using Lucene.Net.Util;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
-    public class MemberIndexPopulator: IIndexPopulator
+    public class MemberIndexPopulator : IndexPopulator
     {
         private readonly IMemberService _memberService;
         private readonly IValueSetBuilder<IMember> _valueSetBuilder;
@@ -14,8 +16,10 @@ namespace Umbraco.Examine
         {
             _memberService = memberService;
             _valueSetBuilder = valueSetBuilder;
+
+            RegisterIndex(Core.Constants.UmbracoIndexes.MembersIndexName);
         }
-        public void Populate(params IIndexer[] indexes)
+        protected override void PopulateIndexes(IEnumerable<IIndexer> indexes)
         {
             const int pageSize = 1000;
             var pageIndex = 0;
@@ -31,10 +35,11 @@ namespace Umbraco.Examine
 
                 if (members.Length > 0)
                 {
+                    // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
                         index.IndexItems(_valueSetBuilder.GetValueSets(members));
-                }   
-                
+                }
+
                 pageIndex++;
             } while (members.Length == pageSize);
         }

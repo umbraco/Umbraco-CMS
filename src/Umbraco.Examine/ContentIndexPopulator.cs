@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
@@ -13,7 +15,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a content index
     /// </summary>
-    public class ContentIndexPopulator : IIndexPopulator
+    public class ContentIndexPopulator : IndexPopulator
     {
         private readonly IContentService _contentService;
         private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
@@ -54,9 +56,12 @@ namespace Umbraco.Examine
                 _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
             _supportUnpublishedContent = supportUnpublishedContent;
             _parentId = parentId;
+
+            RegisterIndex(Constants.UmbracoIndexes.InternalIndexName);
+            RegisterIndex(Constants.UmbracoIndexes.ExternalIndexName);
         }
 
-        public void Populate(params IIndexer[] indexes)
+        protected override void PopulateIndexes(IEnumerable<IIndexer> indexes)
         {
             const int pageSize = 10000;
             var pageIndex = 0;
@@ -70,22 +75,21 @@ namespace Umbraco.Examine
 
             do
             {
-                long total;
-
                 if (_supportUnpublishedContent)
                 {
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total).ToArray();
+                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
                 }
                 else
                 {
                     //add the published filter
                     //note: We will filter for published variants in the validator
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total,
+                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _,
                         _publishedQuery, Ordering.By("Path", Direction.Ascending)).ToArray();
                 }
 
                 if (content.Length > 0)
                 {
+                    // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
                         index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
                 }

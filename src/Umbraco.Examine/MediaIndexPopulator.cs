@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Examine;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
@@ -8,7 +10,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a media index
     /// </summary>
-    public class MediaIndexPopulator : IIndexPopulator
+    public class MediaIndexPopulator : IndexPopulator
     {
         private readonly int? _parentId;
         private readonly IMediaService _mediaService;
@@ -35,9 +37,12 @@ namespace Umbraco.Examine
             _parentId = parentId;
             _mediaService = mediaService;
             _mediaValueSetBuilder = mediaValueSetBuilder;
+
+            RegisterIndex(Constants.UmbracoIndexes.InternalIndexName);
+            RegisterIndex(Constants.UmbracoIndexes.ExternalIndexName);
         }
 
-        public void Populate(params IIndexer[] indexes)
+        protected override void PopulateIndexes(IEnumerable<IIndexer> indexes)
         {
             const int pageSize = 10000;
             var pageIndex = 0;
@@ -57,6 +62,7 @@ namespace Umbraco.Examine
 
                 if (media.Length > 0)
                 {
+                    // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
                         index.IndexItems(_mediaValueSetBuilder.GetValueSets(media));
                 }
@@ -64,5 +70,6 @@ namespace Umbraco.Examine
                 pageIndex++;
             } while (media.Length == pageSize);
         }
+        
     }
 }

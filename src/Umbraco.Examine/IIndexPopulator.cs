@@ -1,16 +1,15 @@
-﻿using Examine;
+﻿using System.Collections.Generic;
+using Examine;
 
 namespace Umbraco.Examine
 {
-    /// <summary>
-    /// Populates indexes with data
-    /// </summary>
     public interface IIndexPopulator
     {
         /// <summary>
-        /// Populates indexes with data
+        /// Populate indexers 
         /// </summary>
         /// <param name="indexes"></param>
         void Populate(params IIndexer[] indexes);
     }
+    
 }

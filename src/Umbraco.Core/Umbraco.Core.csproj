@@ -313,6 +313,7 @@
     <Compile Include="Constants-PropertyTypeGroups.cs" />
     <Compile Include="Constants-Security.cs" />
     <Compile Include="Constants-System.cs" />
+    <Compile Include="Constants-Indexes.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ContentVariationExtensions.cs" />

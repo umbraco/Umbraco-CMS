@@ -26,36 +26,20 @@ namespace Umbraco.Web.Search
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
         public UmbracoIndexesBuilder(ProfilingLogger profilingLogger,
-            IValueSetBuilder<IMember> memberValueSetBuilder,
-            ContentIndexPopulator contentIndexPopulator,
-            PublishedContentIndexPopulator publishedContentIndexPopulator,
-            MediaIndexPopulator mediaIndexPopulator,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
-            MemberValueSetBuilder = memberValueSetBuilder ?? throw new System.ArgumentNullException(nameof(memberValueSetBuilder));
-            ContentIndexPopulator = contentIndexPopulator;
-            PublishedContentIndexPopulator = publishedContentIndexPopulator;
-            MediaIndexPopulator = mediaIndexPopulator;
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
         }
 
         protected ProfilingLogger ProfilingLogger { get; }
-        protected IValueSetBuilder<IMember> MemberValueSetBuilder { get; }
-        protected ContentIndexPopulator ContentIndexPopulator { get; }
-        protected PublishedContentIndexPopulator PublishedContentIndexPopulator { get; }
-        protected MediaIndexPopulator MediaIndexPopulator { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
-        
-        public const string InternalIndexPath = "Internal";
-        public const string ExternalIndexPath = "External";
-        public const string MembersIndexPath = "Members";
 
         /// <summary>
         /// By default these are the member fields we index
@@ -70,19 +54,19 @@ namespace Umbraco.Web.Search
         {
             return new []
             {
-                CreateContentIndex(InternalIndexPath, new UmbracoContentIndexerOptions(true, true, null), new CultureInvariantWhitespaceAnalyzer()),
-                CreateContentIndex(ExternalIndexPath, new UmbracoContentIndexerOptions(false, false, null), new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30)),
+                CreateContentIndex(Constants.UmbracoIndexes.InternalIndexName, Constants.UmbracoIndexes.InternalIndexPath, new UmbracoContentIndexerOptions(true, true, null), new CultureInvariantWhitespaceAnalyzer()),
+                CreateContentIndex(Constants.UmbracoIndexes.ExternalIndexName, Constants.UmbracoIndexes.ExternalIndexPath, new UmbracoContentIndexerOptions(false, false, null), new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30)),
                 CreateMemberIndex()
             };
         }
 
-        private IIndexer CreateContentIndex(string name, UmbracoContentIndexerOptions options, Analyzer analyzer)
+        private IIndexer CreateContentIndex(string name, string path, UmbracoContentIndexerOptions options, Analyzer analyzer)
         {
             var index = new UmbracoContentIndexer(
-                $"{name}Indexer",
+                name,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(name),
+                GetFileSystemLuceneDirectory(path),
                 analyzer,
                 ProfilingLogger,
                 LanguageService, 
@@ -94,10 +78,10 @@ namespace Umbraco.Web.Search
         private IIndexer CreateMemberIndex()
         {
             var index = new UmbracoMemberIndexer(
-                $"{MembersIndexPath}Indexer",
+                Constants.UmbracoIndexes.MembersIndexName,
                 //fixme - how to deal with languages like in UmbracoContentIndexer.CreateFieldValueTypes
                 UmbracoExamineIndexer.UmbracoIndexFieldDefinitions,
-                GetFileSystemLuceneDirectory(MembersIndexPath),
+                GetFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger, 
                 GetMemberValueSetValidator());
