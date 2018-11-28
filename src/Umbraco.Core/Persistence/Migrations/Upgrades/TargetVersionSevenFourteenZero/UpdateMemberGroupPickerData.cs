@@ -1,12 +1,12 @@
 ﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThirteenZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourteenZero
 {
     /// <summary>
     /// Migrates member group picker properties from NVarchar to NText. See https://github.com/umbraco/Umbraco-CMS/issues/3268.
     /// </summary>
-    [Migration("7.13.0", 1, Constants.System.UmbracoMigrationName)]
+    [Migration("7.14.0", 1, Constants.System.UmbracoMigrationName)]
     public class UpdateMemberGroupPickerData : MigrationBase
     {
         public UpdateMemberGroupPickerData(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
