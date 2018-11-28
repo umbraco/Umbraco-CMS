@@ -293,16 +293,6 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery-ui-dist"
         },
         {
-            "name": "jquery-validate",
-            "src":  ["./node_modules/jquery-validation/dist/jquery.validate.min.js"],
-            "base": "./node_modules/jquery-validation/dist"
-        },
-        {
-            "name": "jquery-validation-unobtrusive",
-            "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
-            "base": "./node_modules/jquery-validation-unobtrusive/dist"
-        },
-        {
             "name": "lazyload-js",
             "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
             "base": "./node_modules/lazyload-js"
