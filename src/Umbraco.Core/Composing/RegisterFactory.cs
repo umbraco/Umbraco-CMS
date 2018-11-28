@@ -25,9 +25,7 @@ namespace Umbraco.Core.Composing
         {
             Type type;
 
-            // fixme naming / container?
-
-            var configuredTypeName = ConfigurationManager.AppSettings["umbracoContainerType"];
+            var configuredTypeName = ConfigurationManager.AppSettings["umbracoRegisterType"];
             if (configuredTypeName.IsNullOrWhiteSpace())
             {
                 // try to get the web LightInject container type,
@@ -37,20 +35,20 @@ namespace Umbraco.Core.Composing
             }
             else
             {
-                // try to get the configured container type
+                // try to get the configured type
                 type = Type.GetType(configuredTypeName);
             }
 
             if (type == null)
-                throw new Exception($"Cannot find container factory class '{configuredTypeName}'.");
+                throw new Exception($"Cannot find register factory class '{configuredTypeName}'.");
 
             var factoryMethod = type.GetMethod("Create", BindingFlags.Public | BindingFlags.Static);
             if (factoryMethod == null)
-                throw new Exception($"Container factory class '{configuredTypeName}' does not have a public static method named Create.");
+                throw new Exception($"Register factory class '{configuredTypeName}' does not have a public static method named Create.");
 
             var container = factoryMethod.Invoke(null, Array.Empty<object>()) as IRegister;
             if (container == null)
-                throw new Exception($"Container factory '{configuredTypeName}' did not return an IRegister implementation.");
+                throw new Exception($"Register factory '{configuredTypeName}' did not return an IRegister implementation.");
 
             return container;
         }

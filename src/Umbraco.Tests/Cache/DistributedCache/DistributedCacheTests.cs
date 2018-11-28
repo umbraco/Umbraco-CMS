@@ -7,7 +7,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -25,7 +24,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         public void Setup()
         {
             var register = RegisterFactory.Create();
-            Current.Factory = register.CreateFactory(); // fixme only for LightInject
+
             var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             register.Register<IServerRegistrar>(_ => new TestServerRegistrar());
@@ -33,6 +32,8 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
             composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
+
+            Current.Factory = register.CreateFactory();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }

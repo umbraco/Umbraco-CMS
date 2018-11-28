@@ -4,16 +4,13 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Components
 {
@@ -52,8 +49,6 @@ namespace Umbraco.Tests.Components
         {
             return new TypeLoader();
         }
-
-        // fixme should we have Composition.Logger, which would be a profiling logger too?
 
         [Test]
         public void Boot1A()

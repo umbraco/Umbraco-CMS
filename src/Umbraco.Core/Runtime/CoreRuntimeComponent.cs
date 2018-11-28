@@ -74,7 +74,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterSingleton<PropertyEditorCollection>();
             composition.RegisterSingleton<ParameterEditorCollection>();
 
-            // register a server registrar, by default it's the db registrar 
+            // register a server registrar, by default it's the db registrar
             composition.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))

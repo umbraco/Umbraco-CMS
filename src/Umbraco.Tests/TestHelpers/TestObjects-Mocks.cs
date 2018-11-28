@@ -55,7 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>A ServiceContext.</returns>
         public ServiceContext GetServiceContextMock(IFactory container = null)
         {
-            // fixme - else tests break - something's wrong
+            // fixme - else some tests break - figure it out
             container = null;
 
             return new ServiceContext(

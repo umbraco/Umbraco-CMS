@@ -120,7 +120,8 @@ namespace Umbraco.Tests.Testing
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
-            // fixme see CoreRuntime and align!
+            // fixme - align to runtimes & components - don't redo everything here
+
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             var cacheHelper = GetCacheHelper();
@@ -203,8 +204,6 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeWeb()
         {
-            //TODO: Should we 'just' register the WebRuntimeComponent?
-
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
@@ -284,7 +283,6 @@ namespace Umbraco.Tests.Testing
 
             // create the file
             // create the schema
-
         }
 
         protected virtual void ComposeApplication(bool withApplication)
@@ -330,7 +328,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterSingleton<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
                 Logger,
-                new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>())));
+                new Lazy<IMapperCollection>(Mock.Of<IMapperCollection>)));
             Composition.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
@@ -404,7 +402,7 @@ namespace Umbraco.Tests.Testing
             // which would lock eg SqlCe .sdf files
             if (Factory?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
             {
-                Core.Scoping.Scope scope;
+                Scope scope;
                 while ((scope = scopeProvider.AmbientScope) != null)
                 {
                     scope.Reset();
@@ -412,11 +410,7 @@ namespace Umbraco.Tests.Testing
                 }
             }
 
-            Current.Reset();
-
-            // fixme what should we dispose? IRegister or IFactory or?
-            //Container?.Dispose();
-            //Container = null;
+            Current.Reset(); // disposes the factory
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();

@@ -116,8 +116,7 @@
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
-    <Compile Include="Composing\ContainerImplementationTests.cs" />
-    <Compile Include="Composing\ContainerTests.cs" />
+    <Compile Include="Composing\ContainerConfirmingTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />

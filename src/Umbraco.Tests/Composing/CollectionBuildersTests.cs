@@ -13,8 +13,6 @@ namespace Umbraco.Tests.Composing
     [TestFixture]
     public class CollectionBuildersTests
     {
-        private IRegister _register;
-        private IFactory _factory;
         private Composition _composition;
 
         [SetUp]
@@ -22,19 +20,14 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            _register = RegisterFactory.Create();
-            _factory = _register.CreateFactory(); // fixme only works w/LightInject - would require we reorg tests!
-            Current.Factory = _factory;
-            _composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
+            var register = RegisterFactory.Create();
+            _composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
         }
 
         [TearDown]
         public void TearDown()
         {
             Current.Reset();
-
-            _register.DisposeIfDisposable();
-            _register = null;
         }
 
         [Test]
@@ -49,7 +42,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsFalse(builder.Has<Resolved3>());
             //Assert.IsFalse(col.ContainsType<Resolved4>()); // does not compile
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
         }
 
@@ -64,7 +58,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsFalse(builder.Has<Resolved1>());
             Assert.IsFalse(builder.Has<Resolved2>());
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col);
         }
 
@@ -75,7 +70,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
 
             Assert.Throws<InvalidOperationException>(() => builder.Clear());
         }
@@ -91,7 +87,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsTrue(builder.Has<Resolved2>());
             Assert.IsFalse(builder.Has<Resolved3>());
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
         }
 
@@ -100,7 +97,8 @@ namespace Umbraco.Tests.Composing
         {
             var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
 
             Assert.Throws<InvalidOperationException>(() =>
                 builder.Append<Resolved1>()
@@ -114,7 +112,9 @@ namespace Umbraco.Tests.Composing
             builder.Append<Resolved1>();
             builder.Append<Resolved1>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1));
         }
 
@@ -122,6 +122,7 @@ namespace Umbraco.Tests.Composing
         public void CannotAppendInvalidTypeToBUilder()
         {
             var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+
             //builder.Append<Resolved4>(); // does not compile
             Assert.Throws<InvalidOperationException>(() =>
                     builder.Append(new[] { typeof (Resolved4) }) // throws
@@ -140,7 +141,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsFalse(builder.Has<Resolved2>());
             Assert.IsFalse(builder.Has<Resolved3>());
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1));
         }
 
@@ -152,7 +154,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved2>()
                 .Remove<Resolved3>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
         }
 
@@ -163,7 +166,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             Assert.Throws<InvalidOperationException>(() =>
                 builder.Remove<Resolved2>() // throws
             );
@@ -181,7 +185,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsTrue(builder.Has<Resolved2>());
             Assert.IsTrue(builder.Has<Resolved3>());
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved3), typeof(Resolved1), typeof(Resolved2));
         }
 
@@ -192,7 +197,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             Assert.Throws<InvalidOperationException>(() =>
                 builder.Insert<Resolved3>() // throws
             );
@@ -206,7 +212,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved2>()
                 .Insert<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
         }
 
@@ -216,7 +223,8 @@ namespace Umbraco.Tests.Composing
             var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
             builder.Insert<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved2));
         }
 
@@ -248,7 +256,8 @@ namespace Umbraco.Tests.Composing
             Assert.IsTrue(builder.Has<Resolved2>());
             Assert.IsTrue(builder.Has<Resolved3>());
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved1), typeof(Resolved3), typeof(Resolved2));
         }
 
@@ -259,7 +268,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             Assert.Throws<InvalidOperationException>(() =>
                 builder.InsertBefore<Resolved2, Resolved3>()
             );
@@ -273,7 +283,8 @@ namespace Umbraco.Tests.Composing
                 .Append<Resolved2>()
                 .InsertBefore<Resolved1, Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
         }
 
@@ -299,10 +310,12 @@ namespace Umbraco.Tests.Composing
             // but the container manages the scope, so to test the scope
             // the collection must come from the container
 
-            var col1 = _factory.GetInstance<TestCollection>();
+            var factory = _composition.CreateFactory();
+
+            var col1 = factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = _factory.GetInstance<TestCollection>();
+            var col2 = factory.GetInstance<TestCollection>();
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
             AssertSameCollection(col1, col2);
@@ -319,10 +332,12 @@ namespace Umbraco.Tests.Composing
             // but the container manages the scope, so to test the scope
             // the collection must come from the container
 
-            var col1 = _factory.GetInstance<TestCollection>();
+            var factory = _composition.CreateFactory();
+
+            var col1 = factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = _factory.GetInstance<TestCollection>();
+            var col2 = factory.GetInstance<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
             AssertNotSameCollection(col1, col2);
@@ -336,7 +351,8 @@ namespace Umbraco.Tests.Composing
                 .Insert<Resolved1>()
                 .InsertBefore<Resolved3, Resolved2>();
 
-            var col1 = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col1 = builder.CreateCollection(factory);
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2), typeof(Resolved3));
         }
 
@@ -353,10 +369,12 @@ namespace Umbraco.Tests.Composing
 
             TestCollection col1A, col1B;
 
-            using (_factory.BeginScope())
+            var factory = _composition.CreateFactory();
+
+            using (factory.BeginScope())
             {
-                col1A = _factory.GetInstance<TestCollection>();
-                col1B = _factory.GetInstance<TestCollection>();
+                col1A = factory.GetInstance<TestCollection>();
+                col1B = factory.GetInstance<TestCollection>();
             }
 
             AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
@@ -365,9 +383,9 @@ namespace Umbraco.Tests.Composing
 
             TestCollection col2;
 
-            using (_factory.BeginScope())
+            using (factory.BeginScope())
             {
-                col2 = _factory.GetInstance<TestCollection>();
+                col2 = factory.GetInstance<TestCollection>();
             }
 
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
@@ -381,7 +399,8 @@ namespace Umbraco.Tests.Composing
                .Add<Resolved1>()
                .Add<Resolved2>();
 
-            var col = builder.CreateCollection(_factory);
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
             AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
         }
 

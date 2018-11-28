@@ -8,7 +8,7 @@ using Umbraco.Core.Composing.LightInject;
 namespace Umbraco.Tests.Composing
 {
     [TestFixture]
-    public class ContainerTests
+    public class ContainerConfirmingTests
     {
         // tests that a container conforms
 
@@ -212,11 +212,60 @@ namespace Umbraco.Tests.Composing
             Assert.AreEqual(2, things. Count());
         }
 
+        [Test]
+        public void CanRegisterSingletonInterface()
+        {
+            var register = GetRegister();
+            register.RegisterSingleton<IThing, Thing1>();
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<IThing>();
+            var s2 = factory.GetInstance<IThing>();
+            Assert.AreSame(s1, s2);
+        }
+
+        [Test]
+        public void CanRegisterSingletonClass()
+        {
+            var register = GetRegister();
+            register.RegisterSingleton<Thing1>();
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<Thing1>();
+            var s2 = factory.GetInstance<Thing1>();
+            Assert.AreSame(s1, s2);
+        }
+
+        [Test]
+        public void CanReRegisterSingletonInterface()
+        {
+            var register = GetRegister();
+            register.RegisterSingleton<IThing, Thing1>();
+            register.RegisterSingleton<IThing, Thing2>();
+            var factory = register.CreateFactory();
+            var s = factory.GetInstance<IThing>();
+            Assert.IsInstanceOf<Thing2>(s);
+        }
+
+        [Test]
+        public void CanRegisterSingletonWithCreate()
+        {
+            var register = GetRegister();
+            register.RegisterSingleton(c => c.CreateInstance<Thing3>(new Thing1()));
+            var factory = register.CreateFactory();
+            var s1 = factory.GetInstance<Thing3>();
+            var s2 = factory.GetInstance<Thing3>();
+            Assert.AreSame(s1, s2);
+        }
+
         public interface IThing { }
 
         public abstract class ThingBase : IThing { }
         public class Thing1 : ThingBase { }
         public class Thing2 : ThingBase { }
+
+        public class Thing3 : ThingBase
+        {
+            public Thing3(Thing1 thing) { }
+        }
 
         public class NeedThings
         {

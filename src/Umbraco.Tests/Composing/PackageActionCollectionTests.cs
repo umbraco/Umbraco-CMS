@@ -18,18 +18,20 @@ namespace Umbraco.Tests.Composing
         public void PackageActionCollectionBuilderWorks()
         {
             var container = RegisterFactory.Create();
-            Current.Factory = container.CreateFactory(); // fixme only for LightInject
+            
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());
 
+            Current.Factory = container.CreateFactory();
+
             var actions = Current.PackageActions;
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there
-            bool hasAction1 = actions.ElementAt(0) is PackageAction1 || actions.ElementAt(1) is PackageAction1;
-            bool hasAction2 = actions.ElementAt(0) is PackageAction2 || actions.ElementAt(1) is PackageAction2;
+            var hasAction1 = actions.ElementAt(0) is PackageAction1 || actions.ElementAt(1) is PackageAction1;
+            var hasAction2 = actions.ElementAt(0) is PackageAction2 || actions.ElementAt(1) is PackageAction2;
             Assert.IsTrue(hasAction1);
             Assert.IsTrue(hasAction2);
         }
