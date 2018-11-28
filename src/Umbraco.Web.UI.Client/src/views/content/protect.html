@@ -18,35 +18,39 @@
                         <localize key="publicAccess_paHowWould" tokens="[currentNode.name]">Choose how to restrict access to this page</localize>
                     </p>
 
-                    <div class="pa-select-type">
-                        <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
+                    <umb-pane>
+                        <div class="pa-select-type">
+                            <input id="protectionTypeUser" type="radio" name="protectionType" value="user" ng-model="vm.type">
 
-                        <label for="protectionTypeUser">
-                            <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
-                            <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password</localize></p>
-                        </label>
-                    </div>
+                            <label for="protectionTypeUser">
+                                <h5 class="pa-access-header"><localize key="publicAccess_paSimple">Single user protection</localize></h5>
+                                <p><localize key="publicAccess_paSimpleHelp">If you just want to setup simple protection using a single login and password</localize></p>
+                            </label>
+                        </div>
 
-                    <div class="pa-select-type">
-                        <input id="protectionTypeRole" type="radio" name="protectionType" value="role" ng-model="vm.type">
+                        <div class="pa-select-type">
+                            <input id="protectionTypeRole" type="radio" name="protectionType" value="role" ng-model="vm.type">
 
-                        <label for="protectionTypeRole">
-                            <h5 class="pa-access-header"><localize key="publicAccess_paAdvanced">Role based protection</localize></h5>
-                            <p><localize key="publicAccess_paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups</localize></p>
-                        </label>
-                    </div>
+                            <label for="protectionTypeRole">
+                                <h5 class="pa-access-header"><localize key="publicAccess_paAdvanced">Role based protection</localize></h5>
+                                <p><localize key="publicAccess_paAdvancedHelp">If you wish to control access to the page using role-based authentication, using Umbraco's member groups</localize></p>
+                            </label>
+                        </div>
+                    </umb-pane>
                 </div>
 
                 <div ng-show="vm.step && !vm.loading && !vm.removing">
                     <div ng-if="vm.step === 'user'">
                         <p><localize key="publicAccess_paSetLogin" tokens="[currentNode.name]">Set the login and password for this page</localize></p>
-                        <umb-control-group label="@general_login">
-                            <input type="text" name="userName" ng-model="vm.userName" class="-full-width-input" required />
-                        </umb-control-group>
-                        <umb-control-group label="@general_password">
-                            <!-- TODO KJAC: get password regex from server -->
-                            <input type="password" name="password" ng-model="vm.password" class="-full-width-input" required pattern="^....$" />
-                        </umb-control-group>
+                        <umb-pane>
+                            <umb-control-group label="@general_login">
+                                <input type="text" name="userName" ng-model="vm.userName" class="-full-width-input" required />
+                            </umb-control-group>
+                            <umb-control-group label="@general_password">
+                                <!-- TODO KJAC: get password regex from server -->
+                                <input type="password" name="password" ng-model="vm.password" class="-full-width-input" required pattern="^....$" />
+                            </umb-control-group>
+                        </umb-pane>
                     </div>
 
                     <div ng-show="vm.step === 'role' && !vm.groups.length">
@@ -55,49 +59,53 @@
 
                     <div ng-show="vm.step === 'role' && vm.groups.length">
                         <p><localize key="publicAccess_paSelectRoles" tokens="[currentNode.name]">Pick the roles who have access to this page</localize></p>
-                        <div ng-repeat="group in vm.groups | orderBy:'name'">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="group.selected"/> {{group.name}}
-                            </label>
-                        </div>
+                        <umb-pane>
+                            <div ng-repeat="group in vm.groups | orderBy:'name'">
+                                <label>
+                                    <input type="checkbox" ng-model="group.selected"/> {{group.name}}
+                                </label>
+                            </div>
+                        </umb-pane>
                     </div>
 
                     <div ng-show="vm.step === 'user' || vm.groups.length">
                         <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
-                        <div class="control-group umb-control-group -no-border">
-                            <div class="umb-el-wrap">
-                                <label>
-                                    <strong><localize key="publicAccess_paLoginPage">Login Page</localize></strong>
-                                    <small><localize key="publicAccess_paLoginPageHelp">Choose the page that contains the login form</localize></small>
-                                </label>
-                                <a href ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add" prevent-default>
-                                    <localize key="general_add">Add</localize>
-                                </a>
-                                <umb-node-preview ng-show="vm.loginPage"
-                                                  icon="vm.loginPage.icon"
-                                                  name="vm.loginPage.name"
-                                                  allow-remove="true"
-                                                  on-remove="vm.loginPage = null">
-                                </umb-node-preview>
+                        <umb-pane>
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label>
+                                        <strong><localize key="publicAccess_paLoginPage">Login Page</localize></strong>
+                                        <small><localize key="publicAccess_paLoginPageHelp">Choose the page that contains the login form</localize></small>
+                                    </label>
+                                    <a href ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add" prevent-default>
+                                        <localize key="general_add">Add</localize>
+                                    </a>
+                                    <umb-node-preview ng-show="vm.loginPage"
+                                                      icon="vm.loginPage.icon"
+                                                      name="vm.loginPage.name"
+                                                      allow-remove="true"
+                                                      on-remove="vm.loginPage = null">
+                                    </umb-node-preview>
+                                </div>
                             </div>
-                        </div>
-                        <div class="control-group umb-control-group">
-                            <div class="umb-el-wrap">
-                                <label>
-                                    <strong><localize key="publicAccess_paErrorPage">Error Page</localize></strong>
-                                    <small><localize key="publicAccess_paErrorPageHelp">Used when people are logged on, but do not have access</localize></small>
-                                </label>
-                                <a href ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add" prevent-default>
-                                    <localize key="general_add">Add</localize>
-                                </a>
-                                <umb-node-preview ng-show="vm.errorPage"
-                                                  icon="vm.errorPage.icon"
-                                                  name="vm.errorPage.name"
-                                                  allow-remove="true"
-                                                  on-remove="vm.errorPage = null">
-                                </umb-node-preview>
+                            <div class="control-group umb-control-group">
+                                <div class="umb-el-wrap">
+                                    <label>
+                                        <strong><localize key="publicAccess_paErrorPage">Error Page</localize></strong>
+                                        <small><localize key="publicAccess_paErrorPageHelp">Used when people are logged on, but do not have access</localize></small>
+                                    </label>
+                                    <a href ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add" prevent-default>
+                                        <localize key="general_add">Add</localize>
+                                    </a>
+                                    <umb-node-preview ng-show="vm.errorPage"
+                                                      icon="vm.errorPage.icon"
+                                                      name="vm.errorPage.name"
+                                                      allow-remove="true"
+                                                      on-remove="vm.errorPage = null">
+                                    </umb-node-preview>
+                                </div>
                             </div>
-                        </div>
+                        </umb-pane>
                     </div>
                 </div>
 
