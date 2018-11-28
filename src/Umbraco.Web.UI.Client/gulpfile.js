@@ -283,11 +283,6 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery/dist"
         },
         {
-            "name": "jquery-migrate",
-            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.js"],
-            "base": "./node_modules/jquery-migrate/dist"
-        },
-        {
             "name": "jquery-ui",
             "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
             "base": "./node_modules/jquery-ui-dist"

@@ -1,8 +1,7 @@
 ﻿[
     'lib/jquery/jquery.min.js',
-    'lib/jquery-migrate/jquery-migrate.js',
-    // 'lib/jquery-ui/jquery-ui.min.js',
-    // 'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
+    'lib/jquery-ui/jquery-ui.min.js',
+    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 
     'lib/angular/angular.js',
     'lib/underscore/underscore-min.js',
@@ -24,7 +23,7 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
-    // 'lib/bootstrap/js/bootstrap.2.3.2.min.js',
+    'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',
