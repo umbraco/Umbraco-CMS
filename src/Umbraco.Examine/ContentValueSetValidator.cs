@@ -11,16 +11,17 @@ namespace Umbraco.Examine
 {
 
     /// <summary>
-    /// Used to validate a ValueSet for content - based on permissions, parent id, etc....
+    /// Used to validate a ValueSet for content/media - based on permissions, parent id, etc....
     /// </summary>
-    public class UmbracoContentValueSetValidator : IValueSetValidator
+    public class ContentValueSetValidator : IValueSetValidator
     {
         private readonly UmbracoContentIndexerOptions _options;
         private readonly IPublicAccessService _publicAccessService;
 
         private const string PathKey = "path";
+        private static readonly IEnumerable<string> ValidIndexTypes = new[] {IndexTypes.Content, IndexTypes.Media};
 
-        public UmbracoContentValueSetValidator(UmbracoContentIndexerOptions options, IPublicAccessService publicAccessService)
+        public ContentValueSetValidator(UmbracoContentIndexerOptions options, IPublicAccessService publicAccessService)
         {
             _options = options;
             _publicAccessService = publicAccessService;
@@ -28,6 +29,9 @@ namespace Umbraco.Examine
 
         public bool Validate(ValueSet valueSet)
         {
+            if (!ValidIndexTypes.Contains(valueSet.Category))
+                return false;
+
             //check for published content
             if (valueSet.Category == IndexTypes.Content && !_options.SupportUnpublishedContent)
             {

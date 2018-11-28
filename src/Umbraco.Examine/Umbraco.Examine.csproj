@@ -81,7 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoContentIndexer.cs" />
     <Compile Include="UmbracoContentIndexerOptions.cs" />
-    <Compile Include="UmbracoContentValueSetValidator.cs" />
+    <Compile Include="ContentValueSetValidator.cs" />
     <Compile Include="UmbracoExamineIndexer.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />

@@ -104,7 +104,7 @@ namespace Umbraco.Web.Search
 
         public virtual IValueSetValidator GetContentValueSetValidator(UmbracoContentIndexerOptions options)
         {
-            return new UmbracoContentValueSetValidator(options, PublicAccessService);
+            return new ContentValueSetValidator(options, PublicAccessService);
         }
 
         /// <summary>

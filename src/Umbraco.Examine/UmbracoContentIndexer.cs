@@ -119,7 +119,7 @@ namespace Umbraco.Examine
                 parentId = indexSet.IndexParentId;
             }
 
-            ValueSetValidator = new UmbracoContentValueSetValidator(
+            ValueSetValidator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(
                     SupportUnpublishedContent, SupportProtectedContent, parentId,
                     ConfigIndexCriteria.IncludeItemTypes, ConfigIndexCriteria.ExcludeItemTypes),

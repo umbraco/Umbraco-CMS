@@ -169,7 +169,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer,
                 profilingLogger,
                 languageService,
-                new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
+                new ContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
                 options);
 
             i.IndexingError += IndexingError;

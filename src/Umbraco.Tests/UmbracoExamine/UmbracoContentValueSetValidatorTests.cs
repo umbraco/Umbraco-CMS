@@ -15,9 +15,27 @@ namespace Umbraco.Tests.UmbracoExamine
     public class UmbracoContentValueSetValidatorTests
     {
         [Test]
+        public void Invalid_Category()
+        {
+            var validator = new ContentValueSetValidator(
+                new UmbracoContentIndexerOptions(true, true, null),
+                Mock.Of<IPublicAccessService>());
+
+            var result = validator.Validate(new ValueSet("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
+            Assert.IsTrue(result);
+
+            result = validator.Validate(new ValueSet("777", IndexTypes.Media, new { hello = "world", path = "-1,555" }));
+            Assert.IsTrue(result);
+
+            result = validator.Validate(new ValueSet("555", "invalid-category", new { hello = "world", path = "-1,555" }));
+            Assert.IsFalse(result);
+
+        }
+
+        [Test]
         public void Must_Have_Path()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, true, null),
                 Mock.Of<IPublicAccessService>());
 
@@ -31,7 +49,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Parent_Id()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, true, 555),
                 Mock.Of<IPublicAccessService>());
 
@@ -51,7 +69,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_List()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, true, includeContentTypes: new List<string> { "include-content" }),
                 Mock.Of<IPublicAccessService>());
 
@@ -68,7 +86,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Exclusion_List()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, true, excludeContentTypes: new List<string> { "exclude-content" }),
                 Mock.Of<IPublicAccessService>());
 
@@ -85,7 +103,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_Exclusion_List()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, true, 
                     includeContentTypes: new List<string> { "include-content", "exclude-content" },
                     excludeContentTypes: new List<string> { "exclude-content" }),
@@ -107,7 +125,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Recycle_Bin()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(false, true, null),
                 Mock.Of<IPublicAccessService>());
 
@@ -133,7 +151,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Published_Only()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(false, true, null),
                 Mock.Of<IPublicAccessService>());
 
@@ -162,7 +180,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Published_Only_With_Variants()
         {
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(false, true, null),
                 Mock.Of<IPublicAccessService>());
 
@@ -222,7 +240,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 .Returns(Attempt.Succeed(new PublicAccessEntry(Guid.NewGuid(), 555, 444, 333, Enumerable.Empty<PublicAccessRule>())));
             publicAccessService.Setup(x => x.IsProtected("-1,777"))
                 .Returns(Attempt.Fail<PublicAccessEntry>());
-            var validator = new UmbracoContentValueSetValidator(
+            var validator = new ContentValueSetValidator(
                 new UmbracoContentIndexerOptions(true, false, null),
                 publicAccessService.Object);
 

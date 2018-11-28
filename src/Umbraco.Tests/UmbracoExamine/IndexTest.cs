@@ -130,6 +130,9 @@ namespace Umbraco.Tests.UmbracoExamine
                 options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
+                contentRebuilder.RegisterIndex(indexer.Name);
+                mediaRebuilder.RegisterIndex(indexer.Name);
+
                 var searcher = indexer.GetSearcher();
 
                 //create the whole thing
@@ -278,12 +281,13 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Reindex_Content()
         {
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(Container.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext);
-
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
+                rebuilder.RegisterIndex(indexer.Name);
+
                 var searcher = indexer.GetSearcher();
 
                 //create the whole thing
