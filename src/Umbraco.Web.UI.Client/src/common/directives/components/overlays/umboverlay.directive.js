@@ -527,7 +527,7 @@ Opens an overlay to show a custom YSOD. </br>
                      var submitOnEnterValue = submitOnEnter ? document.activeElement.getAttribute("overlay-submit-on-enter") : "";
 
                      if(clickableElements.indexOf(activeElementType) === 0) {
-                        document.activeElement.click();
+                        document.activeElement.trigger("click");
                         event.preventDefault();
                      } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
 
