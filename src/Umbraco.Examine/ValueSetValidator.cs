@@ -10,9 +10,9 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performing basic validation of a value set
     /// </summary>
-    public abstract class ValueSetValidator : IValueSetValidator
+    public class ValueSetValidator : IValueSetValidator
     {
-        protected ValueSetValidator(
+        public ValueSetValidator(
             IEnumerable<string> includeItemTypes,
             IEnumerable<string> excludeItemTypes,
             IEnumerable<string> includeFields,
@@ -22,9 +22,10 @@ namespace Umbraco.Examine
             ExcludeItemTypes = excludeItemTypes;
             IncludeFields = includeFields;
             ExcludeFields = excludeFields;
+            ValidIndexCategories = null;
         }
 
-        protected abstract IEnumerable<string> ValidIndexCategories { get; }
+        protected virtual IEnumerable<string> ValidIndexCategories { get; }
 
         /// <summary>
         /// Optional inclusion list of content types to index
@@ -60,7 +61,7 @@ namespace Umbraco.Examine
 
         public virtual bool Validate(ValueSet valueSet)
         {
-            if (!ValidIndexCategories.InvariantContains(valueSet.Category))
+            if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
                 return false;
 
             //check if this document is of a correct type of node type alias

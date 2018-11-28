@@ -85,7 +85,8 @@ namespace Umbraco.Examine
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
             if (valueSet.Category == IndexTypes.Content
                 && !SupportProtectedContent
-                && _publicAccessService.IsProtected(path))
+                //if the service is null we can't look this up so we'll return false
+                && (_publicAccessService == null || _publicAccessService.IsProtected(path)))
             {
                 return false;
             }
