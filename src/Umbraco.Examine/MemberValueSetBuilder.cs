@@ -42,7 +42,7 @@ namespace Umbraco.Examine
                     AddPropertyValue(property, null, null, values);
                 }
 
-                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Content, m.ContentType.Alias, values);
+                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Member, m.ContentType.Alias, values);
 
                 yield return vs;
             }

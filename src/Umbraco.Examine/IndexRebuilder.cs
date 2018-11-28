@@ -21,7 +21,7 @@ namespace Umbraco.Examine
         public void RebuildIndexes(bool onlyEmptyIndexes)
         {
             var indexes = (onlyEmptyIndexes
-                ? ExamineManager.IndexProviders.Values.Where(x => x.IndexExists())
+                ? ExamineManager.IndexProviders.Values.Where(x => !x.IndexExists())
                 : ExamineManager.IndexProviders.Values).ToArray();
 
             foreach(var index in indexes)

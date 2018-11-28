@@ -43,7 +43,7 @@ namespace Umbraco.Examine
 
         public override bool Validate(ValueSet valueSet)
         {
-            if (!ValidCategories.Contains(valueSet.Category))
+            if (!base.Validate(valueSet))
                 return false;
 
             //check for published content
@@ -106,7 +106,7 @@ namespace Umbraco.Examine
                     return false;
             }
 
-            return base.Validate(valueSet);
+            return true;
         }
     }
 }
