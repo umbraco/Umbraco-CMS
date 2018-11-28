@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Published
 
             var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()
                 .Append<SimpleConverter3B>();
 

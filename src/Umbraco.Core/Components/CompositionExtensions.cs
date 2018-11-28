@@ -24,56 +24,56 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static CacheRefresherCollectionBuilder CacheRefreshers(this Composition composition)
-            => composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>();
+            => composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
 
         /// <summary>
         /// Gets the mappers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static MapperCollectionBuilder Mappers(this Composition composition)
-            => composition.GetCollectionBuilder<MapperCollectionBuilder>();
+            => composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
         /// <summary>
         /// Gets the package actions collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static PackageActionCollectionBuilder PackageActions(this Composition composition)
-            => composition.GetCollectionBuilder<PackageActionCollectionBuilder>();
+            => composition.WithCollectionBuilder<PackageActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the data editor collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static DataEditorCollectionBuilder DataEditors(this Composition composition)
-            => composition.GetCollectionBuilder<DataEditorCollectionBuilder>();
+            => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static PropertyValueConverterCollectionBuilder PropertyValueConverters(this Composition composition)
-            => composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            => composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
         /// Gets the url segment providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)
-            => composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
+            => composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the validators collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static ManifestValueValidatorCollectionBuilder Validators(this Composition composition)
-            => composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+            => composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the post-migrations collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
-            => composition.GetCollectionBuilder<PostMigrationCollectionBuilder>();
+            => composition.WithCollectionBuilder<PostMigrationCollectionBuilder>();
 
         #endregion
 

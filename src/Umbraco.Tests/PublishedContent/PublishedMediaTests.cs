@@ -39,7 +39,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
         }

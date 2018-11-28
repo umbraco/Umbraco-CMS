@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Scoping
             // so doing all this mess
             Composition.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
             Composition.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
-            Composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
+            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Composing
             
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());
 
             Current.Factory = container.CreateFactory();

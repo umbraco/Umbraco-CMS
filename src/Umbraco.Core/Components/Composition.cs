@@ -98,7 +98,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
         /// <returns>The collection builder.</returns>
-        public TBuilder GetCollectionBuilder<TBuilder>()
+        public TBuilder WithCollectionBuilder<TBuilder>()
             where TBuilder: ICollectionBuilder, new()
         {
             var typeOfBuilder = typeof(TBuilder);

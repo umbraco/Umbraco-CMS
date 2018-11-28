@@ -30,7 +30,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static ActionCollectionBuilder Actions(this Composition composition)
-            => composition.GetCollectionBuilder<ActionCollectionBuilder>();
+            => composition.WithCollectionBuilder<ActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content apps collection builder.
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentAppDefinitionCollectionBuilder ContentApps(this Composition composition)
-            => composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+            => composition.WithCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static ContentFinderCollectionBuilder ContentFinders(this Composition composition)
-            => composition.GetCollectionBuilder<ContentFinderCollectionBuilder>();
+            => composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
         /// <summary>
         /// Gets the editor validators collection builder.
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         internal static EditorValidatorCollectionBuilder EditorValidators(this Composition composition)
-            => composition.GetCollectionBuilder<EditorValidatorCollectionBuilder>();
+            => composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the filtered controller factories collection builder.
@@ -62,21 +62,21 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         /// <returns></returns>
         public static FilteredControllerFactoryCollectionBuilder FilderedControllerFactory(this Composition composition)
-            => composition.GetCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
+            => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the health checks collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
-            => composition.GetCollectionBuilder<HealthCheckCollectionBuilder>();
+            => composition.WithCollectionBuilder<HealthCheckCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         internal static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
-            => composition.GetCollectionBuilder<UrlProviderCollectionBuilder>();
+            => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         #endregion
 

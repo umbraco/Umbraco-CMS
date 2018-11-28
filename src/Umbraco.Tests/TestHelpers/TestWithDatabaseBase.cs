@@ -76,7 +76,7 @@ namespace Umbraco.Tests.TestHelpers
             Composition.Register(factory => PublishedSnapshotService);
             Composition.Register(factory => DefaultCultureAccessor);
 
-            Composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
+            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(() => Composition.TypeLoader.GetDataEditors());
 

@@ -45,7 +45,7 @@ namespace Umbraco.Core.Runtime
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            composition.GetCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
+            composition.WithCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
 
             // register the scope provider
             composition.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterSingleton<ManifestParser>();
 
             // register our predefined validators
-            composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
+            composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
                 .Add<RequiredValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedValueValidator>()
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Runtime
                 .Add<DecimalValidator>();
 
             // properties and parameters derive from data editors
-            composition.GetCollectionBuilder<DataEditorCollectionBuilder>()
+            composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetDataEditors());
             composition.RegisterSingleton<PropertyEditorCollection>();
             composition.RegisterSingleton<ParameterEditorCollection>();
@@ -96,13 +96,13 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
-            composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetCacheRefreshers());
 
-            composition.GetCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetPackageActions());
 
-            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(composition.TypeLoader.GetTypes<IPropertyValueConverter>());
 
             composition.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
@@ -110,10 +110,10 @@ namespace Umbraco.Core.Runtime
             composition.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
-            composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
 
-            composition.GetCollectionBuilder<PostMigrationCollectionBuilder>()
+            composition.WithCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IPostMigration>());
 
             composition.RegisterSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));

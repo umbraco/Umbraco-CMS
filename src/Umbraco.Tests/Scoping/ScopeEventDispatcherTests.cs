@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Scoping
             _testObjects = new TestObjects(register);
 
             register.RegisterSingleton(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>()));
-            composition.GetCollectionBuilder<MapperCollectionBuilder>();
+            composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             Current.Factory = register.CreateFactory();
 

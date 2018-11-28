@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Testing
             // web
             Composition.Register(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Composition.RegisterSingleton<PublishedRouter>();
-            Composition.GetCollectionBuilder<ContentFinderCollectionBuilder>();
+            Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
             Composition.Register<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.Register<IVariationContextAccessor, TestVariationContextAccessor>();
         }
@@ -224,14 +224,14 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterSingleton(f => runtimeStateMock.Object);
 
             // ah...
-            Composition.GetCollectionBuilder<ActionCollectionBuilder>();
-            Composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            Composition.WithCollectionBuilder<ActionCollectionBuilder>();
+            Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Composition.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Composition.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // register empty content apps collection
-            Composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
+            Composition.WithCollectionBuilder<ContentAppDefinitionCollectionBuilder>();
         }
 
         protected virtual void ComposeAutoMapper(bool configure)
@@ -321,7 +321,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // register application stuff (database factory & context, services...)
-            Composition.GetCollectionBuilder<MapperCollectionBuilder>()
+            Composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
             Composition.RegisterSingleton<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Testing
                 new Lazy<IMapperCollection>(Mock.Of<IMapperCollection>)));
             Composition.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
-            Composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
@@ -344,11 +344,11 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterSingleton<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
-            Composition.GetCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+            Composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
             Composition.RegisterSingleton<ManifestParser>();
 
             // note - don't register collections, use builders
-            Composition.GetCollectionBuilder<DataEditorCollectionBuilder>();
+            Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
             Composition.RegisterSingleton<PropertyEditorCollection>();
             Composition.RegisterSingleton<ParameterEditorCollection>();
         }

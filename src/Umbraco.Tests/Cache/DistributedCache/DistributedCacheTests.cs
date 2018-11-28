@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             register.Register<IServerRegistrar>(_ => new TestServerRegistrar());
             register.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
 
-            composition.GetCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
 
             Current.Factory = register.CreateFactory();

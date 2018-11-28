@@ -123,20 +123,20 @@ namespace Umbraco.Web.Runtime
                 .ComposeMvcControllers(GetType().Assembly)
                 .ComposeApiControllers(GetType().Assembly);
 
-            composition.GetCollectionBuilder<SearchableTreeCollectionBuilder>()
+            composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
-            composition.GetCollectionBuilder<EditorValidatorCollectionBuilder>()
+            composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
 
-            composition.GetCollectionBuilder<TourFilterCollectionBuilder>();
+            composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
             composition.RegisterSingleton<UmbracoFeatures>();
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
-            composition.GetCollectionBuilder<ActionCollectionBuilder>()
+            composition.WithCollectionBuilder<ActionCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(composition.TypeLoader.GetSurfaceControllers());
@@ -150,24 +150,24 @@ namespace Umbraco.Web.Runtime
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
             // (the limited one, defined in Core, is there for tests) - same for others
-            composition.GetCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
-            composition.GetCollectionBuilder<FilteredControllerFactoryCollectionBuilder>()
+            composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>()
                 .Append<RenderControllerFactory>();
 
-            composition.GetCollectionBuilder<UrlProviderCollectionBuilder>()
+            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
             composition.RegisterSingleton<IContentLastChanceFinder, ContentFinderByLegacy404>();
 
-            composition.GetCollectionBuilder<ContentFinderCollectionBuilder>()
+            composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
@@ -182,10 +182,10 @@ namespace Umbraco.Web.Runtime
             composition.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
-            composition.GetCollectionBuilder<HealthCheckCollectionBuilder>()
+            composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
-            composition.GetCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
+            composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.NotificationMethods.IHealthCheckNotificationMethod>());
 
             // auto-register views
@@ -202,7 +202,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
-            composition.GetCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
+            composition.WithCollectionBuilder<ContentAppDefinitionCollectionBuilder>()
                 .Append<ListViewContentAppDefinition>()
                 .Append<ContentEditorContentAppDefinition>()
                 .Append<ContentInfoContentAppDefinition>();

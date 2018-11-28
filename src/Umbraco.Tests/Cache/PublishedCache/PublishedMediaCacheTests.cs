@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             base.Compose();
 
-            Composition.GetCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
         }

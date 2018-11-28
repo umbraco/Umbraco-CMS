@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Composing
             var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<TestCollectionBuilder>()
+            composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Composing
             var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<TestCollectionBuilder>()
+            composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Composing
             var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<TestCollectionBuilder>()
+            composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add<TransientObject2>()
                 .Add<TransientObject3>()
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Composing
             var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<TestCollectionBuilder>()
+            composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
 
                 // illegal, does not implement the interface!
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Composing
             var container = CreateRegister();
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            composition.GetCollectionBuilder<TestCollectionBuilder>()
+            composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();

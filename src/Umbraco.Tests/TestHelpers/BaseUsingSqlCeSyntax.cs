@@ -48,7 +48,7 @@ namespace Umbraco.Tests.TestHelpers
                 false);
             container.RegisterInstance(pluginManager);
 
-            composition.GetCollectionBuilder<MapperCollectionBuilder>()
+            composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
 
             var factory = Current.Factory = container.CreateFactory();

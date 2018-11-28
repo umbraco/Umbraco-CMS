@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void ContainsTypes()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanClearBuilderBeforeCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotClearBuilderOnceCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanAppendToBuilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
             builder.Append<Resolved1>();
             builder.Append<Resolved2>();
 
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotAppendToBuilderOnceCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
 
             var factory = _composition.CreateFactory();
             var col = builder.CreateCollection(factory);
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanAppendDuplicateToBuilderAndDeDuplicate()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
             builder.Append<Resolved1>();
             builder.Append<Resolved1>();
 
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotAppendInvalidTypeToBUilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
 
             //builder.Append<Resolved4>(); // does not compile
             Assert.Throws<InvalidOperationException>(() =>
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanRemoveFromBuilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Remove<Resolved2>();
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanRemoveMissingFromBuilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Remove<Resolved3>();
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotRemoveFromBuilderOnceCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanInsertIntoBuilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Insert<Resolved3>();
@@ -193,7 +193,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotInsertIntoBuilderOnceCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanInsertDuplicateIntoBuilderAndDeDuplicate()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .Insert<Resolved2>();
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanInsertIntoEmptyBuilder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>();
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
             builder.Insert<Resolved2>();
 
             var factory = _composition.CreateFactory();
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotInsertIntoBuilderAtWrongIndex()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanInsertIntoBuilderBefore()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .InsertBefore<Resolved2, Resolved3>();
@@ -264,7 +264,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotInsertIntoBuilderBeforeOnceCollectionIsCreated()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -278,7 +278,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CanInsertDuplicateIntoBuilderBeforeAndDeDuplicate()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>()
                 .InsertBefore<Resolved1, Resolved2>();
@@ -291,7 +291,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void CannotInsertIntoBuilderBeforeMissing()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>();
 
             Assert.Throws<InvalidOperationException>(() =>
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void ScopeBuilderCreatesScopedCollection()
         {
-            _composition.GetCollectionBuilder<TestCollectionBuilder>()
+            _composition.WithCollectionBuilder<TestCollectionBuilder>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -324,7 +324,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void TransientBuilderCreatesTransientCollection()
         {
-            _composition.GetCollectionBuilder<TestCollectionBuilderTransient>()
+            _composition.WithCollectionBuilder<TestCollectionBuilderTransient>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -346,7 +346,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void BuilderRespectsTypesOrder()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilderTransient>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilderTransient>()
                 .Append<Resolved3>()
                 .Insert<Resolved1>()
                 .InsertBefore<Resolved3, Resolved2>();
@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void ScopeBuilderRespectsContainerScope()
         {
-            _composition.GetCollectionBuilder<TestCollectionBuilderScope>()
+            _composition.WithCollectionBuilder<TestCollectionBuilderScope>()
                 .Append<Resolved1>()
                 .Append<Resolved2>();
 
@@ -395,7 +395,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void WeightedBuilderCreatesWeightedCollection()
         {
-            var builder = _composition.GetCollectionBuilder<TestCollectionBuilderWeighted>()
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilderWeighted>()
                .Add<Resolved1>()
                .Add<Resolved2>();
 
