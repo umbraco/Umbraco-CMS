@@ -530,7 +530,7 @@ namespace Umbraco.Core.Composing
             // if not caching, or not IDiscoverable, directly get types
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
-                _logger.Logger.Debug<TypeLoader>("Running a full, non-cached, scan for type {TypeName} (slow).", typeof(T).FullName);
+                _logger.Debug<TypeLoader>("Running a full, non-cached, scan for type {TypeName} (slow).", typeof(T).FullName);
 
                 return GetTypesInternal(
                     typeof (T), null,
@@ -574,7 +574,7 @@ namespace Umbraco.Core.Composing
             // if not caching, or not IDiscoverable, directly get types
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
-                _logger.Logger.Debug<TypeLoader>("Running a full, non-cached, scan for type {TypeName} / attribute {AttributeName} (slow).", typeof(T).FullName, typeof(TAttribute).FullName);
+                _logger.Debug<TypeLoader>("Running a full, non-cached, scan for type {TypeName} / attribute {AttributeName} (slow).", typeof(T).FullName, typeof(TAttribute).FullName);
 
                 return GetTypesInternal(
                     typeof (T), typeof (TAttribute),
@@ -617,7 +617,7 @@ namespace Umbraco.Core.Composing
 
             if (cache == false)
             {
-                _logger.Logger.Debug<TypeLoader>("Running a full, non-cached, scan for types / attribute {AttributeName} (slow).", typeof(TAttribute).FullName);
+                _logger.Debug<TypeLoader>("Running a full, non-cached, scan for types / attribute {AttributeName} (slow).", typeof(TAttribute).FullName);
             }
 
             return GetTypesInternal(

@@ -71,11 +71,11 @@ namespace Umbraco.Web.Composing.Composers
             // scan and register every UmbracoApiController in everything (UmbracoApiController is IDiscoverable and IHttpController)
             var nonUmbracoWebApiControllers = composition.TypeLoader.GetTypes<UmbracoApiController>().Where(x => x.Assembly != umbracoWebAssembly);
             composition.RegisterControllers(nonUmbracoWebApiControllers);
-            
+
             return composition;
         }
 
-        private static void RegisterControllers<TController>(this Composition composition, IEnumerable<Type> controllerTypes)
+        private static void RegisterControllers(this Composition composition, IEnumerable<Type> controllerTypes)
         {
             foreach (var controllerType in controllerTypes)
                 composition.Register(controllerType, Lifetime.Request);
