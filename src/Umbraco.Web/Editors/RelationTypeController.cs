@@ -45,6 +45,30 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Gets a list of object types which can be associated via relations.
+        /// </summary>
+        /// <returns>A list of available object types.</returns>
+        public List<ObjectType> GetRelationObjectTypes()
+        {
+            var objectTypes = new List<ObjectType>
+            {
+                new ObjectType{Id = UmbracoObjectTypes.Document.GetGuid(), Name = UmbracoObjectTypes.Document.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.Media.GetGuid(), Name = UmbracoObjectTypes.Media.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.Member.GetGuid(), Name = UmbracoObjectTypes.Member.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.DocumentType.GetGuid(), Name = UmbracoObjectTypes.DocumentType.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.MediaType.GetGuid(), Name = UmbracoObjectTypes.MediaType.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.MemberType.GetGuid(), Name = UmbracoObjectTypes.MemberType.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.DataType.GetGuid(), Name = UmbracoObjectTypes.DataType.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.MemberGroup.GetGuid(), Name = UmbracoObjectTypes.MemberGroup.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.Stylesheet.GetGuid(), Name = UmbracoObjectTypes.Stylesheet.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.ROOT.GetGuid(), Name = UmbracoObjectTypes.ROOT.GetFriendlyName()},
+                new ObjectType{Id = UmbracoObjectTypes.RecycleBin.GetGuid(), Name = UmbracoObjectTypes.RecycleBin.GetFriendlyName()},
+            };
+
+            return objectTypes;
+        }
+
         public RelationTypeDisplay PostSave(RelationTypeSave relationType)
         {
             var relationTypePersisted = Services.RelationService.GetRelationTypeById(relationType.Key);

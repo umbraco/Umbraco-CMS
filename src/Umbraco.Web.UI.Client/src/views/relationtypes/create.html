@@ -1,9 +1,9 @@
 <div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm" ng-cloak>
     <div class="umb-pane">
-        <form novalidate name="createRelationTypeForm" val-form-manager>
+        <form name="createRelationTypeForm" val-form-manager ng-submit="vm.createRelationType()">
             <!-- Name -->
             <umb-control-group label="Name">
-                <input type="text" name="relationTypeName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                <input type="text" name="relationTypeName" ng-model="vm.relationType.name" class="umb-textstring textstring input-block-level" umb-auto-focus required />
             </umb-control-group>
 
             <!-- Direction -->
@@ -11,13 +11,13 @@
                 <ul class="unstyled">
                     <li>
                         <label class="radio">
-                            <input type="radio" name="relationType-direction" ng-value="false">
+                            <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false">
                             Parent to child
                         </label>
                     </li>
                     <li>
                         <label class="radio">
-                            <input type="radio" name="relationType-direction" ng-value="true">
+                            <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true">
                             Bidirectional
                         </label>
                     </li>
@@ -26,25 +26,21 @@
 
             <!-- Parent -->
             <umb-control-group label="Parent">
-                <select name="relationType-parent" class="umb-property-editor umb-dropdown">
-                    <option>Document</option>
-                    <option>Media</option>
-                    <option>Member</option>
-                    <option>Media Type</option>
-                    <option>Member Type</option>
-                    <option>Document Type</option>
+                <select name="relationType-parent"
+                        ng-model="vm.relationType.parent"
+                        ng-options="objectType.name for objectType in vm.objectTypes track by objectType.id"
+                        class="umb-property-editor umb-dropdown"
+                        required>
                 </select>
             </umb-control-group>
 
             <!-- Child -->
             <umb-control-group label="Child">
-                <select name="relationType-child" class="umb-property-editor umb-dropdown">
-                    <option>Document</option>
-                    <option>Media</option>
-                    <option>Member</option>
-                    <option>Media Type</option>
-                    <option>Member Type</option>
-                    <option>Document Type</option>
+                <select name="relationType-child"
+                        ng-model="vm.relationType.child"
+                        ng-options="objectType.name for objectType in vm.objectTypes track by objectType.id"
+                        class="umb-property-editor umb-dropdown"
+                        required>
                 </select>
             </umb-control-group>
 

@@ -40,6 +40,25 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#getRelationObjectTypes
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Gets a list of Umbraco object types which can be associated with a relation.
+         *
+         * @returns {Object} A collection of Umbraco object types.
+         */
+        getRelationObjectTypes: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "GetRelationObjectTypes")
+                ),
+                "Failed to get object types"
+            );
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.relationTypeResource#save
          * @methodof umbraco.resources.relationTypeResource
          *
