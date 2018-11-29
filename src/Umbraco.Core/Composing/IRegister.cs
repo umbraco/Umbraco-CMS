@@ -67,14 +67,6 @@ namespace Umbraco.Core.Composing
         void ConfigureForWeb();
 
         /// <summary>
-        /// Enables per-request scope.
-        /// </summary>
-        /// <remarks>
-        /// <para>Ties scopes to web requests.</para>
-        /// </remarks>
-        void EnablePerWebRequestScope();
-
-        /// <summary>
         /// Creates the factory.
         /// </summary>
         IFactory CreateFactory();

@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -23,7 +20,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterSingleton(_ => GetServiceContext());
+            Composition.RegisterUnique(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()

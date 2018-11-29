@@ -35,23 +35,23 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var container = RegisterFactory.Create();
-            
+
             var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            container.RegisterSingleton<ILogger>(_ => Mock.Of<ILogger>());
-            container.RegisterSingleton<IProfiler>(_ => Mock.Of<IProfiler>());
+            composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
+            composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var pluginManager = new TypeLoader(NullCacheProvider.Instance,
                 SettingsForTests.GenerateMockGlobalSettings(),
                 logger,
                 false);
-            container.RegisterInstance(pluginManager);
+            composition.RegisterUnique(pluginManager);
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .Add(() => Current.TypeLoader.GetAssignedMapperTypes());
 
-            var factory = Current.Factory = container.CreateFactory();
+            var factory = Current.Factory = composition.CreateFactory();
 
             Mappers = factory.GetInstance<IMapperCollection>();
 

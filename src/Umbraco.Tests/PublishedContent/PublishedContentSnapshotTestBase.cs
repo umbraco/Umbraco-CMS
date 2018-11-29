@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.ObjectModel;
 using System.Web.Routing;
 using Moq;
 using Umbraco.Core.Models.PublishedContent;
@@ -10,7 +9,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -39,7 +37,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
         protected override TypeLoader CreateTypeLoader(IRuntimeCacheProvider runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)

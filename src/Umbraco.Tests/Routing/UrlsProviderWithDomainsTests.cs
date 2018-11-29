@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Composition.RegisterSingleton(_ => Mock.Of<IDomainService>());
+            Composition.RegisterUnique(_ => Mock.Of<IDomainService>());
             Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 

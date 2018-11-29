@@ -48,16 +48,16 @@ namespace Umbraco.Core.Runtime
             composition.WithCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
 
             // register the scope provider
-            composition.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            composition.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            composition.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+            composition.RegisterUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            composition.RegisterUnique<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
+            composition.RegisterUnique<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
 
             // register database builder
             // *not* a singleton, don't want to keep it around
             composition.Register<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
-            composition.RegisterSingleton<ManifestParser>();
+            composition.RegisterUnique<ManifestParser>();
 
             // register our predefined validators
             composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
@@ -71,11 +71,11 @@ namespace Umbraco.Core.Runtime
             // properties and parameters derive from data editors
             composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetDataEditors());
-            composition.RegisterSingleton<PropertyEditorCollection>();
-            composition.RegisterSingleton<ParameterEditorCollection>();
+            composition.RegisterUnique<PropertyEditorCollection>();
+            composition.RegisterUnique<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
-            composition.RegisterSingleton<IServerRegistrar>(f =>
+            composition.RegisterUnique<IServerRegistrar>(f =>
             {
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Runtime
             // by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden by either the legacy thing or the db thing in the corresponding
             // components in the web project - fixme - should obsolete the legacy thing
-            composition.RegisterSingleton<IServerMessenger>(factory
+            composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
@@ -105,9 +105,9 @@ namespace Umbraco.Core.Runtime
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(composition.TypeLoader.GetTypes<IPropertyValueConverter>());
 
-            composition.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            composition.RegisterSingleton<IShortStringHelper>(factory
+            composition.RegisterUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
             composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
@@ -116,10 +116,10 @@ namespace Umbraco.Core.Runtime
             composition.WithCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IPostMigration>());
 
-            composition.RegisterSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
+            composition.RegisterUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             // by default, register a noop factory
-            composition.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
+            composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)

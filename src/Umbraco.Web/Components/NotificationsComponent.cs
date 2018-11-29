@@ -23,7 +23,7 @@ namespace Umbraco.Web.Components
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.RegisterSingleton<Notifier>();
+            composition.RegisterUnique<Notifier>();
         }
 
         public void Initialize(INotificationService notificationService, Notifier notifier, ActionCollection actions)

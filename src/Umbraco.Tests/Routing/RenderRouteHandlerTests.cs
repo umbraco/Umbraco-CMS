@@ -48,17 +48,8 @@ namespace Umbraco.Tests.Routing
                 : base(umbracoApplication)
             { }
 
-            public override void Boot(IRegister container)
-            {
-                // do it before anything else - this is the only place where it's possible
-                var logger = Mock.Of<ILogger>();
-                container.RegisterInstance<ILogger>(logger);
-                var profiler = Mock.Of<IProfiler>();
-                container.RegisterInstance<IProfiler>(profiler);
-                container.RegisterInstance<IProfilingLogger>(new ProfilingLogger(logger, profiler));
-
-                base.Boot(container);
-            }
+            protected override ILogger GetLogger() => Mock.Of<ILogger>();
+            protected override IProfiler GetProfiler() => Mock.Of<IProfiler>();
         }
 
         protected override void Compose()
@@ -69,12 +60,12 @@ namespace Umbraco.Tests.Routing
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
-            Composition.RegisterInstance(surfaceControllerTypes);
+            Composition.RegisterUnique(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
-            Composition.RegisterInstance(umbracoApiControllerTypes);
+            Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            Composition.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
 
         public override void TearDown()

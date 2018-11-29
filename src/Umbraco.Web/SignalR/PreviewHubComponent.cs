@@ -2,7 +2,6 @@
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 
@@ -14,7 +13,7 @@ namespace Umbraco.Web.SignalR
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.RegisterSingleton(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
+            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
         }
 
         // using a lazy arg here means that we won't create the hub until necessary

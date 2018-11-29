@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
@@ -17,12 +13,10 @@ namespace Umbraco.Tests.Strings
     [TestFixture]
     public class StringExtensionsTests : UmbracoTestBase
     {
-        public override void SetUp()
+        protected override void Compose()
         {
-            base.SetUp();
-
-            // fixme - in "compose"?
-            Composition.RegisterSingleton<IShortStringHelper>(_ => new MockShortStringHelper());
+            base.Compose();
+            Composition.RegisterUnique<IShortStringHelper>(_ => new MockShortStringHelper());
         }
 
         [Test]

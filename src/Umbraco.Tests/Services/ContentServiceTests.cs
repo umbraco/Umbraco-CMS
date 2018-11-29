@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
         {
             base.Compose();
 
-            Composition.RegisterSingleton(factory => Mock.Of<ILocalizedTextService>());
+            Composition.RegisterUnique(factory => Mock.Of<ILocalizedTextService>());
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Services
                     c.ContentSchedule.Add(now.AddSeconds(5), null); //release in 5 seconds
                     var r = ServiceContext.ContentService.Save(c);
                     Assert.IsTrue(r.Success, r.Result.ToString());
-                }   
+                }
                 else
                 {
                     c.ContentSchedule.Add(null, now.AddSeconds(5)); //expire in 5 seconds
@@ -315,7 +315,7 @@ namespace Umbraco.Tests.Services
                 variant.Add(c);
             }
 
-            
+
             var runSched = ServiceContext.ContentService.PerformScheduledPublish(
                 now.AddMinutes(1)).ToList(); //process anything scheduled before a minute from now
 
@@ -1305,7 +1305,7 @@ namespace Umbraco.Tests.Services
         public void Can_Unpublish_Content_Variation()
         {
             // Arrange
-            
+
             var langUk = new Language("en-GB") { IsDefault = true };
             var langFr = new Language("fr-FR");
 
@@ -1629,7 +1629,7 @@ namespace Umbraco.Tests.Services
                 foreach (var x in descendants)
                     Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
             }
-            
+
             Console.WriteLine();
 
             // publish parent & its branch
@@ -1983,7 +1983,7 @@ namespace Umbraco.Tests.Services
             var descendants = new List<IContent>();
             while(page * pageSize < total)
                 descendants.AddRange(contentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
-            
+
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
             Assert.AreEqual(3, descendants.Count);

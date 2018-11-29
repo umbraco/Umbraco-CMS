@@ -4,12 +4,10 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.Composers;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
@@ -38,7 +36,7 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
-            composition.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
+            composition.RegisterUnique<IMediaPathScheme, OriginalMediaPathScheme>();
 
             composition.ComposeFileSystems();
 

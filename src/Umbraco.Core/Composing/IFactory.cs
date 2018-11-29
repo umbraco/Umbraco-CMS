@@ -64,5 +64,13 @@ namespace Umbraco.Core.Composing
         /// <para>Scopes can be nested. Each instance is disposed individually.</para>
         /// </remarks>
         IDisposable BeginScope();
+
+        /// <summary>
+        /// Enables per-request scope.
+        /// </summary>
+        /// <remarks>
+        /// <para>Ties scopes to web requests.</para>
+        /// </remarks>
+        void EnablePerWebRequestScope();
     }
 }

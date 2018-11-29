@@ -16,6 +16,7 @@ namespace Umbraco.Core.Components
     public class Composition : IRegister
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
+        private readonly Dictionary<Type, Unique> _uniques = new Dictionary<Type, Unique>();
         private readonly IRegister _register;
 
         /// <summary>
@@ -82,12 +83,86 @@ namespace Umbraco.Core.Components
             => _register.ConfigureForWeb();
 
         /// <inheritdoc />
-        public void EnablePerWebRequestScope()
-            => _register.EnablePerWebRequestScope();
-
-        /// <inheritdoc />
         public IFactory CreateFactory()
-            => _register.CreateFactory();
+        {
+            foreach (var unique in _uniques.Values)
+                unique.RegisterTo(_register);
+
+            return _register.CreateFactory();
+        }
+
+        #endregion
+
+        #region Unique
+
+        /// <summary>
+        /// Registers a unique service.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUnique(Type serviceType, Type implementingType)
+            => _uniques[serviceType] = new Unique(serviceType, implementingType);
+
+        /// <summary>
+        /// Registers a unique service.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUnique(Type serviceType, object instance)
+            => _uniques[serviceType] = new Unique(serviceType, instance);
+
+        /// <summary>
+        /// Registers a unique service.
+        /// </summary>
+        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        public void RegisterUnique<TService>(Func<IFactory, TService> factory)
+            => _uniques[typeof(TService)] = new Unique<TService>(factory);
+
+        private class Unique
+        {
+            private readonly Type _serviceType;
+            private readonly Type _implementingType;
+            private readonly object _instance;
+
+            protected Unique(Type serviceType)
+            {
+                _serviceType = serviceType;
+            }
+
+            public Unique(Type serviceType, Type implementingType)
+                : this(serviceType)
+            {
+                _implementingType = implementingType;
+            }
+
+            public Unique(Type serviceType, object instance)
+                : this(serviceType)
+            {
+                _instance = instance;
+            }
+
+            public virtual void RegisterTo(IRegister register)
+            {
+                if (_implementingType != null)
+                    register.Register(_serviceType, _implementingType, Lifetime.Singleton);
+                else if (_instance != null)
+                    register.RegisterInstance(_serviceType, _instance);
+            }
+        }
+
+        private class Unique<TService> : Unique
+        {
+            private readonly Func<IFactory, TService> _factory;
+
+            public Unique(Func<IFactory, TService> factory)
+                : base(typeof(TService))
+            {
+                _factory = factory;
+            }
+
+            public override void RegisterTo(IRegister register)
+            {
+                register.Register(_factory, Lifetime.Singleton);
+            }
+        }
 
         #endregion
 

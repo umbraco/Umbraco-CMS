@@ -71,13 +71,13 @@ namespace Umbraco.Core.Composing.Composers
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            composition.RegisterSingleton(factory => factory.CreateInstance<FileSystems>(factory));
+            composition.RegisterUnique(factory => factory.CreateInstance<FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
+            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
             // register the scheme for media paths
-            composition.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
+            composition.RegisterUnique<IMediaPathScheme, TwoGuidsMediaPathScheme>();
 
             // register the IMediaFileSystem implementation with a supporting filesystem
             composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>(

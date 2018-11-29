@@ -28,7 +28,7 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override void Boot(IRegister register)
+        public override IFactory Boot(IRegister register)
         {
             // create and start asap to profile boot
             var debug = GlobalSettings.DebugMode;
@@ -44,10 +44,15 @@ namespace Umbraco.Web.Runtime
                 _webProfiler = new VoidProfiler();
             }
 
-            base.Boot(register);
+            var factory = base.Boot(register);
 
-            // now (and only now) is the time to switch over to perWebRequest scopes
-            register.EnablePerWebRequestScope();
+            // now (and only now) is the time to switch over to perWebRequest scopes.
+            // up until that point we may not have a request, and scoped services would
+            // fail to resolve - but we run Initialize within a factory scope - and then,
+            // here, we switch the factory to bind scopes to requests
+            factory.EnablePerWebRequestScope();
+
+            return factory;
         }
 
         /// <inheritdoc/>
@@ -58,7 +63,7 @@ namespace Umbraco.Web.Runtime
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
-            composition.RegisterInstance(_umbracoApplication);
+            composition.RegisterUnique(_umbracoApplication);
         }
 
         #region Getters

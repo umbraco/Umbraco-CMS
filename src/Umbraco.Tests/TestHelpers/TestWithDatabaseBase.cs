@@ -80,7 +80,7 @@ namespace Umbraco.Tests.TestHelpers
                 .Clear()
                 .Add(() => Composition.TypeLoader.GetDataEditors());
 
-            Composition.RegisterSingleton(f =>
+            Composition.RegisterUnique(f =>
             {
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();

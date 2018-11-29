@@ -27,7 +27,7 @@ namespace Umbraco.Web.Composing.LightInject
         public override void ConfigureForWeb()
         {
             // IoC setup for LightInject for MVC/WebApi
-            // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
+            // see comments on MixedLightInjectScopeManagerProvider for explanations of what we are doing here
             if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             Container.EnableMvc(); // does container.EnablePerWebRequestScope()

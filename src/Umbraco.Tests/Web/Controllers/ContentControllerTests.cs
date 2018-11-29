@@ -81,14 +81,14 @@ namespace Umbraco.Tests.Web.Controllers
             var textService = new Mock<ILocalizedTextService>();
             textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("");
 
-            Composition.RegisterSingleton(f => Mock.Of<IContentService>());
-            Composition.RegisterSingleton(f => userServiceMock.Object);
-            Composition.RegisterSingleton(f => entityService.Object);
-            Composition.RegisterSingleton(f => dataTypeService.Object);
-            Composition.RegisterSingleton(f => langService.Object);
-            Composition.RegisterSingleton(f => textService.Object);
-            Composition.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
-            Composition.RegisterSingleton(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
+            Composition.RegisterUnique(f => Mock.Of<IContentService>());
+            Composition.RegisterUnique(f => userServiceMock.Object);
+            Composition.RegisterUnique(f => entityService.Object);
+            Composition.RegisterUnique(f => dataTypeService.Object);
+            Composition.RegisterUnique(f => langService.Object);
+            Composition.RegisterUnique(f => textService.Object);
+            Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
+            Composition.RegisterUnique(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
         }
 
         private MultipartFormDataContent GetMultiPartRequestContent(string json)

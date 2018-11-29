@@ -17,49 +17,49 @@ namespace Umbraco.Core.Composing.Composers
         {
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context
-            composition.RegisterSingleton<IEventMessagesFactory, TransientEventMessagesFactory>();
+            composition.RegisterUnique<IEventMessagesFactory, TransientEventMessagesFactory>();
 
             // register the service context
-            composition.RegisterSingleton<ServiceContext>();
+            composition.RegisterUnique<ServiceContext>();
 
             // register the special idk map
-            composition.RegisterSingleton<IdkMap>();
+            composition.RegisterUnique<IdkMap>();
 
             // register the services
-            composition.RegisterSingleton<IKeyValueService, KeyValueService>();
-            composition.RegisterSingleton<IPublicAccessService, PublicAccessService>();
-            composition.RegisterSingleton<IDomainService, DomainService>();
-            composition.RegisterSingleton<IAuditService, AuditService>();
-            composition.RegisterSingleton<ITagService, TagService>();
-            composition.RegisterSingleton<IContentService, ContentService>();
-            composition.RegisterSingleton<IUserService, UserService>();
-            composition.RegisterSingleton<IMemberService, MemberService>();
-            composition.RegisterSingleton<IMediaService, MediaService>();
-            composition.RegisterSingleton<IContentTypeService, ContentTypeService>();
-            composition.RegisterSingleton<IMediaTypeService, MediaTypeService>();
-            composition.RegisterSingleton<IDataTypeService, DataTypeService>();
-            composition.RegisterSingleton<IFileService, FileService>();
-            composition.RegisterSingleton<ILocalizationService, LocalizationService>();
-            composition.RegisterSingleton<IPackagingService, PackagingService>();
-            composition.RegisterSingleton<IServerRegistrationService, ServerRegistrationService>();
-            composition.RegisterSingleton<IEntityService, EntityService>();
-            composition.RegisterSingleton<IRelationService, RelationService>();
-            composition.RegisterSingleton<IMacroService, MacroService>();
-            composition.RegisterSingleton<IMemberTypeService, MemberTypeService>();
-            composition.RegisterSingleton<IMemberGroupService, MemberGroupService>();
-            composition.RegisterSingleton<INotificationService, NotificationService>();
-            composition.RegisterSingleton<IExternalLoginService, ExternalLoginService>();
-            composition.RegisterSingleton<IRedirectUrlService, RedirectUrlService>();
-            composition.RegisterSingleton<IConsentService, ConsentService>();
+            composition.RegisterUnique<IKeyValueService, KeyValueService>();
+            composition.RegisterUnique<IPublicAccessService, PublicAccessService>();
+            composition.RegisterUnique<IDomainService, DomainService>();
+            composition.RegisterUnique<IAuditService, AuditService>();
+            composition.RegisterUnique<ITagService, TagService>();
+            composition.RegisterUnique<IContentService, ContentService>();
+            composition.RegisterUnique<IUserService, UserService>();
+            composition.RegisterUnique<IMemberService, MemberService>();
+            composition.RegisterUnique<IMediaService, MediaService>();
+            composition.RegisterUnique<IContentTypeService, ContentTypeService>();
+            composition.RegisterUnique<IMediaTypeService, MediaTypeService>();
+            composition.RegisterUnique<IDataTypeService, DataTypeService>();
+            composition.RegisterUnique<IFileService, FileService>();
+            composition.RegisterUnique<ILocalizationService, LocalizationService>();
+            composition.RegisterUnique<IPackagingService, PackagingService>();
+            composition.RegisterUnique<IServerRegistrationService, ServerRegistrationService>();
+            composition.RegisterUnique<IEntityService, EntityService>();
+            composition.RegisterUnique<IRelationService, RelationService>();
+            composition.RegisterUnique<IMacroService, MacroService>();
+            composition.RegisterUnique<IMemberTypeService, MemberTypeService>();
+            composition.RegisterUnique<IMemberGroupService, MemberGroupService>();
+            composition.RegisterUnique<INotificationService, NotificationService>();
+            composition.RegisterUnique<IExternalLoginService, ExternalLoginService>();
+            composition.RegisterUnique<IRedirectUrlService, RedirectUrlService>();
+            composition.RegisterUnique<IConsentService, ConsentService>();
             composition.Register<LocalizedTextServiceFileSources>(SourcesFactory);
-            composition.RegisterSingleton<ILocalizedTextService>(factory => new LocalizedTextService(
+            composition.RegisterUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetInstance<ILogger>()));
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
-            composition.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
-            composition.RegisterSingleton<ISectionService, EmptySectionService>();
+            composition.RegisterUnique<IApplicationTreeService, EmptyApplicationTreeService>();
+            composition.RegisterUnique<ISectionService, EmptySectionService>();
 
             return composition;
         }

@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Tests.Composing
 {
     [TestFixture]
-    public class ContainerConfirmingTests
+    public class ContainerConformingTests
     {
         // tests that a container conforms
 
-        private IRegister GetRegister() => LightInjectContainer.Create();
+        private IRegister GetRegister() => RegisterFactory.Create();
 
         [Test]
         public void CanRegisterAndGet()
@@ -144,9 +143,15 @@ namespace Umbraco.Tests.Composing
         }
 
         [Test]
-        public void SingletonServiceIsUnique()
+        public void SingletonServiceIsUnique() // fixme - but what is LightInject actually doing
         {
             var register = GetRegister();
+
+            // fixme
+            // LightInject is 'unique' per serviceType+serviceName
+            // but that's not how all containers work
+            // and we should not rely on it
+            // if we need unique, use RegisterUnique
 
             // for Core services that ppl may want to redefine in components,
             // it is important to be able to have a unique, singleton implementation,
@@ -174,6 +179,40 @@ namespace Umbraco.Tests.Composing
             // define two implementations
             register.Register<Thing1>(Lifetime.Singleton);
             register.Register<Thing2>(Lifetime.Singleton);
+
+            var factory = register.CreateFactory();
+
+            var things = factory.GetInstance<IEnumerable<IThing>>();
+            Assert.AreEqual(2, things.Count());
+
+            Assert.IsNull(factory.TryGetInstance<IThing>());
+        }
+
+        [Test]
+        public void ActualInstanceIsNotUnique()
+        {
+            var register = GetRegister();
+
+            // define two instances
+            register.RegisterInstance(typeof(Thing1), new Thing1());
+            register.RegisterInstance(typeof(Thing1), new Thing2());
+
+            var factory = register.CreateFactory();
+
+            var things = factory.GetInstance<IEnumerable<IThing>>();
+            Assert.AreEqual(2, things.Count());
+
+            Assert.IsNull(factory.TryGetInstance<IThing>());
+        }
+
+        [Test]
+        public void InterfaceInstanceIsNotUnique()
+        {
+            var register = GetRegister();
+
+            // define two instances
+            register.RegisterInstance(typeof(IThing), new Thing1());
+            register.RegisterInstance(typeof(IThing), new Thing2());
 
             var factory = register.CreateFactory();
 
@@ -216,7 +255,7 @@ namespace Umbraco.Tests.Composing
         public void CanRegisterSingletonInterface()
         {
             var register = GetRegister();
-            register.RegisterSingleton<IThing, Thing1>();
+            register.Register<IThing, Thing1>(Lifetime.Singleton);
             var factory = register.CreateFactory();
             var s1 = factory.GetInstance<IThing>();
             var s2 = factory.GetInstance<IThing>();
@@ -227,7 +266,7 @@ namespace Umbraco.Tests.Composing
         public void CanRegisterSingletonClass()
         {
             var register = GetRegister();
-            register.RegisterSingleton<Thing1>();
+            register.Register<Thing1>(Lifetime.Singleton);
             var factory = register.CreateFactory();
             var s1 = factory.GetInstance<Thing1>();
             var s2 = factory.GetInstance<Thing1>();
@@ -238,8 +277,8 @@ namespace Umbraco.Tests.Composing
         public void CanReRegisterSingletonInterface()
         {
             var register = GetRegister();
-            register.RegisterSingleton<IThing, Thing1>();
-            register.RegisterSingleton<IThing, Thing2>();
+            register.Register<IThing, Thing1>(Lifetime.Singleton);
+            register.Register<IThing, Thing2>(Lifetime.Singleton);
             var factory = register.CreateFactory();
             var s = factory.GetInstance<IThing>();
             Assert.IsInstanceOf<Thing2>(s);
@@ -249,7 +288,7 @@ namespace Umbraco.Tests.Composing
         public void CanRegisterSingletonWithCreate()
         {
             var register = GetRegister();
-            register.RegisterSingleton(c => c.CreateInstance<Thing3>(new Thing1()));
+            register.Register(c => c.CreateInstance<Thing3>(new Thing1()), Lifetime.Singleton);
             var factory = register.CreateFactory();
             var s1 = factory.GetInstance<Thing3>();
             var s2 = factory.GetInstance<Thing3>();

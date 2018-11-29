@@ -33,9 +33,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
-            Composition.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Composition.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
-            Composition.RegisterSingleton<IDataTypeService>(f => dataTypeService);
+            Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
 
         protected override void Initialize()

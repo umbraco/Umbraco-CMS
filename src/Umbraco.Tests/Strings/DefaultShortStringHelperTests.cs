@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Strings
                 }));
 
             // fixme - move to a "compose" thing?
-            Composition.RegisterSingleton<IShortStringHelper>(f => _helper);
+            Composition.RegisterUnique<IShortStringHelper>(f => _helper);
         }
 
         private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);

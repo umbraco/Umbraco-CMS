@@ -38,12 +38,12 @@ namespace Umbraco.Tests.Web.Controllers
 
             // replace the true IUserService implementation with a mock
             // so that each test can configure the service to their liking
-            Composition.RegisterSingleton(f => Mock.Of<IUserService>());
+            Composition.RegisterUnique(f => Mock.Of<IUserService>());
 
             // kill the true IEntityService too
-            Composition.RegisterSingleton(f => Mock.Of<IEntityService>());
+            Composition.RegisterUnique(f => Mock.Of<IEntityService>());
 
-            Composition.RegisterSingleton<UmbracoFeatures>();
+            Composition.RegisterUnique<UmbracoFeatures>();
         }
 
         [Test]

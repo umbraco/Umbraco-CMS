@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -29,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.Compose();
 
-            Composition.RegisterSingleton(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+            Composition.RegisterUnique(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
         }
 
         [Test]

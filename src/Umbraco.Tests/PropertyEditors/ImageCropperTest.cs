@@ -74,7 +74,7 @@ namespace Umbraco.Tests.PropertyEditors
 
                 composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
-                Current.Factory = container.CreateFactory();
+                Current.Factory = composition.CreateFactory();
 
                 var logger = Mock.Of<ILogger>();
                 var scheme = Mock.Of<IMediaPathScheme>();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -35,8 +34,8 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // pfew - see note in ScopedNuCacheTests?
-            Composition.RegisterSingleton<IServerMessenger, LocalServerMessenger>();
-            Composition.RegisterSingleton(f => Mock.Of<IServerRegistrar>());
+            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
             Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }

@@ -25,7 +25,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetContainer()
+        protected virtual IRegister GetRegister()
         {
             return RegisterFactory.Create();
         }
@@ -58,11 +58,11 @@ namespace Umbraco.Web
         {
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
-            // create the container for the application, and boot
+            // create the register for the application, and boot
             // the boot manager is responsible for registrations
-            var container = GetContainer();
+            var register = GetRegister();
             _runtime = GetRuntime();
-            _runtime.Boot(container);
+            _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -28,7 +26,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Path = TestHelper.CurrentAssemblyDirectory
             };
-            Composition.Register(_ => manifestBuilder);
+            Composition.RegisterUnique(_ => manifestBuilder);
 
             Func<IEnumerable<Type>> typeListProducerList = Enumerable.Empty<Type>;
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()

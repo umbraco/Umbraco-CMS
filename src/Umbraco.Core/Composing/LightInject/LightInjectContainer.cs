@@ -145,10 +145,8 @@ namespace Umbraco.Core.Composing.LightInject
                     break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    Container.Register(serviceType, GetLifetime(lifetime));
-                    break;
                 case Lifetime.Singleton:
-                    Container.RegisterSingleton(serviceType);
+                    Container.Register(serviceType, GetLifetime(lifetime));
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
@@ -165,10 +163,8 @@ namespace Umbraco.Core.Composing.LightInject
                     break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    Container.Register(serviceType, implementingType, GetLifetime(lifetime));
-                    break;
                 case Lifetime.Singleton:
-                    Container.RegisterSingleton(serviceType, implementingType);
+                    Container.Register(serviceType, implementingType, GetLifetime(lifetime));
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
@@ -185,10 +181,8 @@ namespace Umbraco.Core.Composing.LightInject
                     break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    Container.Register(f => factory(this), GetLifetime(lifetime));
-                    break;
                 case Lifetime.Singleton:
-                    Container.RegisterSingleton(f => factory(this));
+                    Container.Register(f => factory(this), GetLifetime(lifetime));
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");

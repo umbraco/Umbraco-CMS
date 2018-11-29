@@ -44,19 +44,16 @@ namespace Umbraco.Core.Runtime
         public IRuntimeState State => _state;
 
         /// <inheritdoc/>
-        public virtual void Boot(IRegister register)
+        public virtual IFactory Boot(IRegister register)
         {
             // create and register the essential services
             // ie the bare minimum required to boot
 
             // loggers
             var logger = GetLogger();
-            register.RegisterInstance(logger);
             Logger = logger;
             var profiler = GetProfiler();
-            register.RegisterInstance(profiler);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            register.RegisterInstance<IProfilingLogger>(profilingLogger);
             ProfilingLogger = profilingLogger;
 
             // application environment
@@ -66,19 +63,14 @@ namespace Umbraco.Core.Runtime
 
             // application caches
             var appCaches = GetAppCaches();
-            register.RegisterInstance(appCaches);
             var runtimeCache = appCaches.RuntimeCache;
-            register.RegisterInstance(runtimeCache);
 
             // database factory
             var databaseFactory = GetDatabaseFactory();
-            register.RegisterInstance(databaseFactory);
-            register.RegisterSingleton(_ => databaseFactory.SqlContext);
 
             // type loader
             var globalSettings = UmbracoConfig.For.GlobalSettings();
             var typeLoader = new TypeLoader(runtimeCache, globalSettings, profilingLogger);
-            register.RegisterInstance(typeLoader);
 
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -90,10 +82,19 @@ namespace Umbraco.Core.Runtime
             {
                 Level = RuntimeLevel.Boot
             };
-            register.RegisterInstance<IRuntimeState>(_state);
 
             // create the composition
             var composition = new Composition(register, typeLoader, profilingLogger, RuntimeLevel.Boot);
+
+            composition.RegisterUnique(logger);
+            composition.RegisterUnique(profiler);
+            composition.RegisterUnique<IProfilingLogger>(profilingLogger);
+            composition.RegisterUnique(appCaches);
+            composition.RegisterUnique(runtimeCache);
+            composition.RegisterUnique(databaseFactory);
+            composition.RegisterUnique(_ => databaseFactory.SqlContext);
+            composition.RegisterUnique(typeLoader);
+            composition.RegisterUnique(_state);
 
             // register runtime-level services
             Compose(composition);
@@ -120,7 +121,7 @@ namespace Umbraco.Core.Runtime
                     logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                     var mainDom = AquireMainDom();
-                    register.RegisterInstance(mainDom);
+                    composition.RegisterUnique(mainDom);
 
                     DetermineRuntimeLevel(databaseFactory);
 
@@ -129,7 +130,7 @@ namespace Umbraco.Core.Runtime
 
                     _components.Compose();
 
-                    _factory = Current.Factory = register.CreateFactory();
+                    _factory = Current.Factory = composition.CreateFactory();
 
                     _components.Initialize(_factory);
                 }
@@ -147,6 +148,8 @@ namespace Umbraco.Core.Runtime
                     // throw a BootFailedException for every requests.
                 }
             }
+
+            return _factory;
         }
 
         protected virtual void ConfigureUnhandledException()

@@ -27,13 +27,13 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
             var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
-            register.Register<IServerRegistrar>(_ => new TestServerRegistrar());
-            register.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
+            composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
+            composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());
 
             composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();
 
-            Current.Factory = register.CreateFactory();
+            Current.Factory = composition.CreateFactory();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }

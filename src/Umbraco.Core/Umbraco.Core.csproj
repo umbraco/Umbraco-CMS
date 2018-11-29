@@ -177,6 +177,7 @@
     <Compile Include="Composing\Composers\FileSystemsComposer.cs" />
     <Compile Include="Composing\Composers\RepositoriesComposer.cs" />
     <Compile Include="Composing\Composers\ServicesComposer.cs" />
+    <Compile Include="Composing\CompositionExtensions.cs" />
     <Compile Include="Composing\FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -188,7 +189,6 @@
     <Compile Include="Composing\IRegister.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\Lifetime.cs" />
-    <Compile Include="Composing\LightInject\LightInjectExtensions.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
@@ -573,7 +573,7 @@
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
-    <Compile Include="Exceptions\LightInjectException.cs" />
+    <Compile Include="Composing\LightInject\LightInjectException.cs" />
     <Compile Include="Exceptions\WontImplementException.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="ExpressionHelper.cs" />

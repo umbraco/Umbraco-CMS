@@ -8,7 +8,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web.Features;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside
@@ -80,7 +79,7 @@ namespace Umbraco.Core.Components
 
         #endregion
 
-        #region Singletons
+        #region Uniques
 
         /// <summary>
         /// Sets the content last chance finder.
@@ -90,7 +89,7 @@ namespace Umbraco.Core.Components
         public static void SetContentLastChanceFinder<T>(this Composition composition)
             where T : IContentLastChanceFinder
         {
-            composition.RegisterSingleton<IContentLastChanceFinder, T>();
+            composition.RegisterUnique<IContentLastChanceFinder, T>();
         }
 
         /// <summary>
@@ -100,7 +99,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A function creating a last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
         {
-            composition.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace Umbraco.Core.Components
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
-            composition.RegisterSingleton(_ => finder);
+            composition.RegisterUnique(_ => finder);
         }
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace Umbraco.Core.Components
         public static void SetPublishedSnapshotService<T>(this Composition composition)
             where T : IPublishedSnapshotService
         {
-            composition.RegisterSingleton<IPublishedSnapshotService, T>();
+            composition.RegisterUnique<IPublishedSnapshotService, T>();
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A function creating a published snapshot service.</param>
         public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
         {
-            composition.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace Umbraco.Core.Components
         /// <param name="service">A published snapshot service.</param>
         public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
         {
-            composition.RegisterSingleton(_ => service);
+            composition.RegisterUnique(_ => service);
         }
 
         /// <summary>
@@ -162,7 +161,7 @@ namespace Umbraco.Core.Components
         public static void SetSiteDomainHelper<T>(this Composition composition)
             where T : ISiteDomainHelper
         {
-            composition.RegisterSingleton<ISiteDomainHelper, T>();
+            composition.RegisterUnique<ISiteDomainHelper, T>();
         }
 
         /// <summary>
@@ -172,7 +171,7 @@ namespace Umbraco.Core.Components
         /// <param name="factory">A function creating a helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
         {
-            composition.RegisterSingleton(factory);
+            composition.RegisterUnique(factory);
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace Umbraco.Core.Components
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
-            composition.RegisterSingleton(_ => helper);
+            composition.RegisterUnique(_ => helper);
         }
 
         #endregion

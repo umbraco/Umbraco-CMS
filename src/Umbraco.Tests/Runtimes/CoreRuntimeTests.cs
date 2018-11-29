@@ -131,15 +131,16 @@ namespace Umbraco.Tests.Runtimes
                         It.IsAny<bool>()))
                     .Returns(Mock.Of<IScope>());
 
-                composition.RegisterInstance(scopeProvider);
+                composition.RegisterUnique(scopeProvider);
             }
 
             private MainDom _mainDom;
 
-            public override void Boot(IRegister container)
+            public override IFactory Boot(IRegister container)
             {
-                base.Boot(container);
-                _mainDom = Current.Factory.GetInstance<MainDom>();
+                var factory = base.Boot(container);
+                _mainDom = factory.GetInstance<MainDom>();
+                return factory;
             }
 
             public override void Terminate()
@@ -184,7 +185,7 @@ namespace Umbraco.Tests.Runtimes
                 base.Compose(composition);
 
                 composition.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
-                composition.RegisterSingleton<IExamineManager, TestExamineManager>();
+                composition.RegisterUnique<IExamineManager, TestExamineManager>();
 
                 Composed = true;
             }

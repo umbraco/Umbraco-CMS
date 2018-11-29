@@ -3,7 +3,9 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -22,11 +24,12 @@ namespace Umbraco.Tests.PropertyEditors
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
             var register = RegisterFactory.Create();
+            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), RuntimeLevel.Run);
 
             register.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
 
-            Current.Factory = register.CreateFactory();
+            Current.Factory = composition.CreateFactory();
         }
 
         [TearDown]
