@@ -167,12 +167,12 @@ namespace Umbraco.Tests.UmbracoExamine
                 var protectedQuery = new BooleanQuery();
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndexer.CategoryFieldName, IndexTypes.Content)),
+                        new TermQuery(new Term(LuceneIndex.CategoryFieldName, IndexTypes.Content)),
                         Occur.MUST));
 
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndexer.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
+                        new TermQuery(new Term(LuceneIndex.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
                         Occur.MUST));
 
                 var collector = TopScoreDocCollector.Create(100, true);
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 //create the whole thing
                 rebuilder.Populate(indexer);
 
-                var result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
+                var result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(21, result.TotalItemCount);
 
                 //delete all content
@@ -304,13 +304,13 @@ namespace Umbraco.Tests.UmbracoExamine
 
 
                 //ensure it's all gone
-                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
+                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
                 rebuilder.Populate(indexer);
 
-                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
+                result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(21, result.TotalItemCount);
             }
         }

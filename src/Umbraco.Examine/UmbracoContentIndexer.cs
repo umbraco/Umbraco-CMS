@@ -153,7 +153,7 @@ namespace Umbraco.Examine
             //need to queue a delete item for each one found
             foreach (var r in results)
             {
-                QueueIndexOperation(new IndexOperation(IndexItem.ForId(r.Id),  IndexOperationType.Delete));
+                QueueIndexOperation(new IndexOperation(new ValueSet(r.Id, null), IndexOperationType.Delete));
             }
 
             base.DeleteFromIndex(nodeId);

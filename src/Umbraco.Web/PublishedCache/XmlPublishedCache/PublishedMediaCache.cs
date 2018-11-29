@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // method GetExamineManagerSafe().
         //
         private readonly ISearcher _searchProvider;
-        private readonly IIndexer _indexProvider;
+        private readonly IIndex _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
 

@@ -136,9 +136,9 @@ namespace Umbraco.Web.Models.Mapping
                                   dest.Key = key;
 
                                   //need to set the UDI
-                                  if (src.Values.ContainsKey(LuceneIndexer.CategoryFieldName))
+                                  if (src.Values.ContainsKey(LuceneIndex.CategoryFieldName))
                                   {
-                                      switch (src.Values[LuceneIndexer.CategoryFieldName])
+                                      switch (src.Values[LuceneIndex.CategoryFieldName])
                                       {
                                           case IndexTypes.Member:
                                               dest.Udi = new GuidUdi(Constants.UdiEntityType.Member, dest.Key);
@@ -168,9 +168,9 @@ namespace Umbraco.Web.Models.Mapping
                           }
                           dest.Path = src.Values.ContainsKey(UmbracoExamineIndexer.IndexPathFieldName) ? src.Values[UmbracoExamineIndexer.IndexPathFieldName] : "";
 
-                          if (src.Values.ContainsKey(LuceneIndexer.ItemTypeFieldName))
+                          if (src.Values.ContainsKey(LuceneIndex.ItemTypeFieldName))
                           {
-                              dest.AdditionalData.Add("contentType", src.Values[LuceneIndexer.ItemTypeFieldName]);
+                              dest.AdditionalData.Add("contentType", src.Values[LuceneIndex.ItemTypeFieldName]);
                           }
                       });
 

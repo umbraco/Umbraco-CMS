@@ -9,7 +9,7 @@ namespace Umbraco.Examine
         /// Populate indexers 
         /// </summary>
         /// <param name="indexes"></param>
-        void Populate(params IIndexer[] indexes);
+        void Populate(params IIndex[] indexes);
     }
     
 }

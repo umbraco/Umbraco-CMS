@@ -121,7 +121,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public ExamineIndexModel PostCheckRebuildIndex(string indexerName)
         {
-            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
+            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndex indexer);
             if (msg.IsSuccessStatusCode)
             {
                 var cacheKey = "temp_indexing_op_" + indexerName;
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Editors
                 //if its still there then it's not done
                 return found != null
                            ? null
-                           : CreateModel(new KeyValuePair<string, IIndexer>(indexerName, indexer));
+                           : CreateModel(new KeyValuePair<string, IIndex>(indexerName, indexer));
             }
 
             throw new HttpResponseException(msg);
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage PostRebuildIndex(string indexerName)
         {
-            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
+            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndex indexer);
             if (msg.IsSuccessStatusCode)
             {
                 _logger.Info<ExamineManagementController>("Rebuilding index '{IndexerName}'", indexerName);
@@ -185,7 +185,7 @@ namespace Umbraco.Web.Editors
 
         
 
-        private ExamineIndexModel CreateModel(KeyValuePair<string, IIndexer> indexerKeyVal)
+        private ExamineIndexModel CreateModel(KeyValuePair<string, IIndex> indexerKeyVal)
         {
             var indexer = indexerKeyVal.Value;
             var indexName = indexerKeyVal.Key;
@@ -249,7 +249,7 @@ namespace Umbraco.Web.Editors
         }
 
         private HttpResponseMessage ValidateLuceneIndexer<T>(string indexerName, out T indexer)
-            where T : class, IIndexer
+            where T : class, IIndex
         {
             indexer = null;
 
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
         //static listener so it's not GC'd
         private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
-            var indexer = (LuceneIndexer) sender;
+            var indexer = (LuceneIndex) sender;
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

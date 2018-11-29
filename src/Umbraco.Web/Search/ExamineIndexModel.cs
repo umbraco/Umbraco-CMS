@@ -14,6 +14,9 @@ namespace Umbraco.Web.Search
         [DataMember(Name = "healthStatus")]
         public string HealthStatus { get; set; }
 
+        [DataMember(Name = "isHealthy")]
+        public bool IsHealthy => false;
+
         [DataMember(Name = "providerProperties")]
         public IReadOnlyDictionary<string, object> ProviderProperties { get; set; }
 

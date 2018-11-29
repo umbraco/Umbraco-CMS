@@ -6,10 +6,10 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestExamineManager : IExamineManager
     {
-        private readonly ConcurrentDictionary<string, IIndexer> _indexers = new ConcurrentDictionary<string, IIndexer>();
+        private readonly ConcurrentDictionary<string, IIndex> _indexers = new ConcurrentDictionary<string, IIndex>();
         private readonly ConcurrentDictionary<string, ISearcher> _searchers = new ConcurrentDictionary<string, ISearcher>();
 
-        public void AddIndexer(IIndexer indexer)
+        public void AddIndex(IIndex indexer)
         {
             _indexers.TryAdd(indexer.Name, indexer);
         }
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             //noop
         }
 
-        public IIndexer GetIndexer(string indexerName)
+        public IIndex GetIndex(string indexerName)
         {
             return _indexers.TryGetValue(indexerName, out var indexer) ? indexer : null;
         }
@@ -34,6 +34,6 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             return _searchers.TryGetValue(searcherName, out var indexer) ? indexer : null;
         }
 
-        public IReadOnlyDictionary<string, IIndexer> IndexProviders => _indexers;
+        public IReadOnlyDictionary<string, IIndex> IndexProviders => _indexers;
     }
 }

@@ -28,124 +28,48 @@
                     <div class="umb-healthcheck-group__details-status" ng-repeat="indexer in indexerDetails">
 
                         <div class="umb-healthcheck-group__details-status-icon-container">
-                            <i class="umb-healthcheck-status-icon" ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
+                            <i class="umb-healthcheck-status-icon"
+                               ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
                         </div>
 
                         <div class="umb-healthcheck-group__details-status-content">
                             <div class="umb-healthcheck-group__details-status-text">
-                                <div ng-show="!indexer.isHealthy">
-                                    {{indexer.name}}
-                                </div>
-                                <a class="btn-link -underline" href="" ng-click="toggle(indexer, 'showProperties')" ng-show="indexer.isHealthy">
-                                    {{indexer.name}}
-                                </a>
-                                <div ng-if="!indexer.isHealthy" class="text-error">
+
+                                <div ng-show="!indexer.isHealthy" class="color-red">
                                     The index cannot be read and will need to be rebuilt
                                 </div>
+
+                                <a class="btn-link -underline" href="" ng-click="toggle(indexer, 'showProperties')">
+                                    {{indexer.name}}
+                                </a>
+
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-actions" ng-if="!indexer.isHealthy">
-                                <div class="umb-healthcheck-group__details-status-action">
-                                    <umb-button
-                                        ng-if="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)"
-                                        type="button"
-                                        button-style="success"
-                                        action="rebuildIndex(indexer)"
-                                        label="Rebuild index">
-                                    </umb-button>
-                                </div>
-                            </div>
-
-                            <div class="umb-healthcheck-group__details-status-actions" ng-show="indexer.isHealthy && indexer.showProperties">
+                            <div class="umb-healthcheck-group__details-status-actions" ng-show="indexer.showProperties">
                                 <ul>
                                     <li>
                                         <a href="" ng-click="toggle(indexer, 'showTools')">Index info & tools</a>
-
-                                        <div ng-show="indexer.showTools && indexer.isLuceneIndex">
+                                        <div ng-show="indexer.showTools">
                                             <div>
                                                 <br />
 
-                                                <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)"
-                                                    class="umb-healthcheck-group__details-status-action">
-                                                    <umb-button type="button" button-style="success" action="rebuildIndex(indexer)" label="Rebuild index"></umb-button>
+                                                <div class="umb-healthcheck-group__details-status-action">
+                                                    <umb-button ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)"
+                                                                type="button"
+                                                                button-style="success"
+                                                                action="rebuildIndex(indexer)"
+                                                                label="Rebuild index">
+                                                    </umb-button>
                                                 </div>
 
                                                 <div ng-show="indexer.processingAttempts >= 100">
                                                     The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
                                                 </div>
                                             </div>
-                                            <table class="table table-bordered table-condensed">
-                                                <caption>&nbsp;</caption>
-                                                <tr>
-                                                    <th>Documents in index</th>
-                                                    <td>{{indexer.documentCount}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Fields in index</th>
-                                                    <td>{{indexer.fieldCount}}</td>
-                                                </tr>                                            
-                                            </table>
                                         </div>
                                     </li>
-                                    <li ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0 || indexer.indexCriteria.ExcludeNodeTypes.length > 0 || indexer.indexCriteria.ParentNodeId">
-                                        <a href="" ng-click="toggle(indexer, 'showNodeTypes')">Node types</a>
-                                        <table ng-show="indexer.showNodeTypes" class="table table-bordered table-condensed">
-                                            <tr ng-show="indexer.indexCriteria.IncludeNodeTypes.length > 0">
-                                                <th>Include node types</th>
-                                                <td>{{indexer.indexCriteria.IncludeNodeTypes | json}}</td>
-                                            </tr>
-                                            <tr ng-show="indexer.indexCriteria.ExcludeNodeTypes.length > 0">
-                                                <th>Exclude node types</th>
-                                                <td>{{indexer.indexCriteria.ExcludeNodeTypes | json}}</td>
-                                            </tr>
-                                            <tr ng-show="indexer.indexCriteria.ParentNodeId">
-                                                <th>Parent node id</th>
-                                                <td>{{indexer.indexCriteria.ParentNodeId}}</td>
-                                            </tr>
-                                        </table>
-                                    </li>
-                                    <li ng-show="indexer.indexCriteria.StandardFields.length > 0">
-                                        <a href="" ng-click="toggle(indexer, 'showSystemFields')">System fields</a>
-                                        <table ng-show="indexer.showSystemFields" class="table table-bordered table-condensed">
-                                            <caption>&nbsp;</caption>
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Enable sorting</th>
-                                                    <th>Type</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="field in indexer.indexCriteria.StandardFields">
-                                                    <th>{{field.Name}}</th>
-                                                    <td>{{field.EnableSorting}}</td>
-                                                    <td>{{field.Type}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </li>
-                                    <li ng-show="indexer.indexCriteria.UserFields.length > 0">
-                                        <a href="" ng-click="toggle(indexer, 'showUserFields')">User fields</a>
-                                        <table ng-show="indexer.showUserFields" class="table table-bordered table-condensed">
-                                            <caption>&nbsp;</caption>
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Enable sorting</th>
-                                                    <th>Type</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="field in indexer.indexCriteria.UserFields">
-                                                    <th>{{field.Name}}</th>
-                                                    <td>{{field.EnableSorting}}</td>
-                                                    <td>{{field.Type}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </li>
                                     <li>
-                                        <a href="" ng-click="toggle(indexer, 'showProviderProperties')">Provider properties</a>
+                                        <a href="" ng-click="toggle(indexer, 'showProviderProperties')">Index properties</a>
                                         <table ng-show="indexer.showProviderProperties" class="table table-bordered table-condensed">
                                             <caption>&nbsp;</caption>
                                             <tr ng-repeat="(key, val) in indexer.providerProperties track by $index">

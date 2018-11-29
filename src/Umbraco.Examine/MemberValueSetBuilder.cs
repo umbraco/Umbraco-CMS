@@ -19,9 +19,9 @@ namespace Umbraco.Examine
         {
             foreach (var m in members)
             {
-                var values = new Dictionary<string, object[]>
+                var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", new object[] {m.ContentType.Icon}},
+                    {"icon", m.ContentType.Icon.Yield()},
                     {"id", new object[] {m.Id}},
                     {"key", new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
@@ -30,11 +30,11 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"path", new object[] {m.Path}},
+                    {"nodeName", m.Name.Yield()},
+                    {"path", m.Path.Yield()},
                     {"nodeType", new object[] {m.ContentType.Id}},
-                    {"loginName", new object[] {m.Username}},
-                    {"email", new object[] {m.Email}},
+                    {"loginName", m.Username.Yield()},
+                    {"email", m.Email.Yield()},
                 };
 
                 foreach (var property in m.Properties)

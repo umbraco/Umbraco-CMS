@@ -22,11 +22,11 @@ namespace Umbraco.Examine
         /// </summary>
         public IEnumerable<string> RegisteredIndexes => _registeredIndexes;
 
-        public void Populate(params IIndexer[] indexes)
+        public void Populate(params IIndex[] indexes)
         {
             PopulateIndexes(indexes.Where(x => RegisteredIndexes.Contains(x.Name)));
         }
 
-        protected abstract void PopulateIndexes(IEnumerable<IIndexer> indexes);
+        protected abstract void PopulateIndexes(IEnumerable<IIndex> indexes);
     }
 }

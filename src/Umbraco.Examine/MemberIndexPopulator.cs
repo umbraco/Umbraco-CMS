@@ -19,7 +19,7 @@ namespace Umbraco.Examine
 
             RegisterIndex(Core.Constants.UmbracoIndexes.MembersIndexName);
         }
-        protected override void PopulateIndexes(IEnumerable<IIndexer> indexes)
+        protected override void PopulateIndexes(IEnumerable<IIndex> indexes)
         {
             const int pageSize = 1000;
             var pageIndex = 0;

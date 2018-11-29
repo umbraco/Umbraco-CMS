@@ -25,7 +25,7 @@ namespace Umbraco.Examine
     /// An abstract provider containing the basic functionality to be able to query against
     /// Umbraco data.
     /// </summary>
-    public abstract class UmbracoExamineIndexer : LuceneIndexer, IUmbracoIndexer, IIndexDiagnostics
+    public abstract class UmbracoExamineIndexer : LuceneIndex, IUmbracoIndexer, IIndexDiagnostics
     {
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -82,6 +82,8 @@ namespace Umbraco.Examine
             //try to set the value of `LuceneIndexFolder` for diagnostic reasons
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
+
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger.Logger);
         }
 
         private readonly bool _configBased = false;
@@ -315,15 +317,15 @@ namespace Umbraco.Examine
         /// <summary>
         /// Overridden for logging.
         /// </summary>
-        protected override void AddDocument(Document doc, IndexItem item, IndexWriter writer)
+        protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
             ProfilingLogger.Logger.Debug(GetType(),
                 "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
-                item.ValueSet.Id,
-                item.ValueSet.Category,
-                item.ValueSet.ItemType);
+                valueSet.Id,
+                valueSet.Category,
+                valueSet.ItemType);
 
-            base.AddDocument(doc, item, writer);
+            base.AddDocument(doc, valueSet, writer);
         }
 
         protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
@@ -331,16 +333,16 @@ namespace Umbraco.Examine
             base.OnTransformingIndexValues(e);
 
             //ensure special __Path field
-            var path = e.IndexItem.ValueSet.GetValue("path");
+            var path = e.ValueSet.GetValue("path");
             if (path != null)
             {
-                e.IndexItem.ValueSet.Set(IndexPathFieldName, path);
+                e.ValueSet.Set(IndexPathFieldName, path);
             }
 
             //icon
-            if (e.IndexItem.ValueSet.Values.TryGetValue("icon", out var icon) && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
+            if (e.ValueSet.Values.TryGetValue("icon", out var icon) && e.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {
-                e.IndexItem.ValueSet.Values[IconFieldName] = icon;
+                e.ValueSet.Values[IconFieldName] = icon;
             }
         }
 
@@ -356,53 +358,12 @@ namespace Umbraco.Examine
 
         #region IIndexDiagnostics
 
-        public int DocumentCount
-        {
-            get
-            {
-                try
-                {
-                    return this.GetIndexDocumentCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    ProfilingLogger.Logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexDocumentCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
+        private readonly UmbracoExamineIndexDiagnostics _diagnostics;
 
-        public int FieldCount
-        {
-            get
-            {
-                try
-                {
-                    return this.GetIndexFieldCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    ProfilingLogger.Logger.Warn(typeof(UmbracoContentIndexer), "Cannot get GetIndexFieldCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
-
-        public Attempt<string> IsHealthy()
-        {
-            var isHealthy = this.IsHealthy(out var indexError);
-            return isHealthy ? Attempt<string>.Succeed() : Attempt.Fail(indexError.Message);
-        }
-
-        public virtual IReadOnlyDictionary<string, object> Metadata => new Dictionary<string, object>
-        {
-            [nameof(CommitCount)] = CommitCount,
-            [nameof(DefaultAnalyzer)] = DefaultAnalyzer.GetType(),
-            [nameof(DirectoryFactory)] = DirectoryFactory,
-            [nameof(EnableDefaultEventHandler)] = EnableDefaultEventHandler,
-            [nameof(LuceneIndexFolder)] = LuceneIndexFolder?.ToString(),
-            [nameof(SupportSoftDelete)] = SupportSoftDelete
-        };
+        public int DocumentCount => _diagnostics.DocumentCount;
+        public int FieldCount => _diagnostics.FieldCount;
+        public Attempt<string> IsHealthy() => _diagnostics.IsHealthy();
+        public virtual IReadOnlyDictionary<string, object> Metadata => _diagnostics.Metadata;
 
         #endregion
     }

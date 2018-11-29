@@ -137,7 +137,7 @@ namespace Umbraco.Examine
             var fields = base.GetAllIndexedFields();
             return fields
                 .Where(x => x != UmbracoExamineIndexer.IndexPathFieldName)
-                .Where(x => x != LuceneIndexer.ItemTypeFieldName)
+                .Where(x => x != LuceneIndex.ItemTypeFieldName)
                 .ToArray();
         }
 

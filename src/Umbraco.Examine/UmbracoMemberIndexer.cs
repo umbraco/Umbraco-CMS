@@ -80,10 +80,10 @@ namespace Umbraco.Examine
         {
             base.OnTransformingIndexValues(e);
 
-            if (e.IndexItem.ValueSet.Values.TryGetValue("key", out var key) && e.IndexItem.ValueSet.Values.ContainsKey("__key") == false)
+            if (e.ValueSet.Values.TryGetValue("key", out var key) && e.ValueSet.Values.ContainsKey("__key") == false)
             {
                 //double __ prefix means it will be indexed as culture invariant
-                e.IndexItem.ValueSet.Values["__key"] = key;
+                e.ValueSet.Values["__key"] = key;
             }
 
         }

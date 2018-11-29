@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -14,6 +9,17 @@ namespace Umbraco.Core
     ///</summary>
     public static class EnumerableExtensions
     {
+        /// <summary>
+        /// Wraps this object instance into an IEnumerable{T} consisting of a single item.
+        /// </summary>
+        /// <typeparam name="T"> Type of the object. </typeparam>
+        /// <param name="item"> The instance that will be wrapped. </param>
+        /// <returns> An IEnumerable{T} consisting of a single item. </returns>
+        public static IEnumerable<T> Yield<T>(this T item)
+        {
+            yield return item;
+        }
+
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
             if (source == null)

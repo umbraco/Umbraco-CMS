@@ -28,9 +28,9 @@ namespace Umbraco.Examine
             foreach (var m in media)
             {
                 var urlValue = m.GetUrlSegment(_urlSegmentProviders);
-                var values = new Dictionary<string, object[]>
+                var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", new object[] {m.ContentType.Icon}},
+                    {"icon", m.ContentType.Icon.Yield()},
                     {"id", new object[] {m.Id}},
                     {"key", new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
@@ -39,11 +39,11 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", new object[] {m.Name}},
-                    {"urlName", new object[] {urlValue}},
-                    {"path", new object[] {m.Path}},
+                    {"nodeName", m.Name.Yield()},
+                    {"urlName", urlValue.Yield()},
+                    {"path", m.Path.Yield()},
                     {"nodeType", new object[] {m.ContentType.Id}},
-                    {"creatorName", new object[] {m.GetCreatorProfile(_userService).Name}}
+                    {"creatorName", m.GetCreatorProfile(_userService).Name.Yield()}
                 };
 
                 foreach (var property in m.Properties)

@@ -113,7 +113,7 @@ namespace Umbraco.Web.Search
             //create the indexes and register them with the manager
             foreach(var index in indexBuilder.Create())
             {
-                _examineManager.AddIndexer(index);
+                _examineManager.AddIndex(index);
             }
 
             profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
@@ -192,7 +192,7 @@ namespace Umbraco.Web.Search
 
                 _isConfigured = true;
 
-                foreach (var luceneIndexer in examineManager.IndexProviders.Values.OfType<LuceneIndexer>())
+                foreach (var luceneIndexer in examineManager.IndexProviders.Values.OfType<LuceneIndex>())
                 {
                     //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
                     //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because

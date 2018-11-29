@@ -234,8 +234,8 @@ namespace Umbraco.Web
             if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, indexName);
 
             var indexer = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetIndexer(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetIndexer(indexName);
+                ? Examine.ExamineManager.Instance.GetIndex(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetIndex(indexName);
 
             if (indexer == null) throw new InvalidOperationException("No index found by name " + indexName);
 
@@ -278,7 +278,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Creates an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>.
         /// </summary>
-        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, Examine.ISearcher searcher, Examine.IIndexer indexer)
+        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, Examine.ISearcher searcher, Examine.IIndex indexer)
         {
             var sc = searcher.CreateCriteria();
 

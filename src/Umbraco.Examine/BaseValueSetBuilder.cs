@@ -22,7 +22,7 @@ namespace Umbraco.Examine
         /// <inheritdoc />
         public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-        protected void AddPropertyValue(Property property, string culture, string segment, IDictionary<string, object[]> values)
+        protected void AddPropertyValue(Property property, string culture, string segment, IDictionary<string, IEnumerable<object>> values)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
@@ -48,7 +48,7 @@ namespace Umbraco.Examine
                                 if (values.TryGetValue(key, out var v))
                                     values[key] = new List<object>(v) { val }.ToArray();
                                 else
-                                    values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                                    values.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                             }
                             break;
                         default:
@@ -57,7 +57,7 @@ namespace Umbraco.Examine
                                 if (values.TryGetValue(key, out var v))
                                     values[key] = new List<object>(v) { val }.ToArray();
                                 else
-                                    values.Add($"{keyVal.Key}{cultureSuffix}", new[] { val });
+                                    values.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                             }
                             
                             break;

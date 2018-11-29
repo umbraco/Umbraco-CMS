@@ -35,9 +35,9 @@ namespace Umbraco.Examine
                 var isVariant = c.ContentType.VariesByCulture();
 
                 var urlValue = c.GetUrlSegment(_urlSegmentProviders); //Always add invariant urlName
-                var values = new Dictionary<string, object[]>
+                var values = new Dictionary<string, IEnumerable<object>>
                 {
-                    {"icon", new [] {c.ContentType.Icon}},
+                    {"icon", c.ContentType.Icon.Yield()},
                     {UmbracoExamineIndexer.PublishedFieldName, new object[] {c.Published ? 1 : 0}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
                     {"key", new object[] {c.Key}},
@@ -47,12 +47,12 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {c.SortOrder}},
                     {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
-                    {"nodeName", new object[] {c.Name}},            //Always add invariant nodeName
-                    {"urlName", new object[] {urlValue}},           //Always add invariant urlName
-                    {"path", new object[] {c.Path}},
+                    {"nodeName", c.Name.Yield()},            //Always add invariant nodeName
+                    {"urlName", urlValue.Yield()},           //Always add invariant urlName
+                    {"path", c.Path.Yield()},
                     {"nodeType", new object[] {c.ContentType.Id}},
-                    {"creatorName", new object[] {c.GetCreatorProfile(_userService)?.Name ?? "??"}},
-                    {"writerName", new object[] {c.GetWriterProfile(_userService)?.Name ?? "??"}},
+                    {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
+                    {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"template", new object[] {c.Template?.Id ?? 0}},
                     {UmbracoContentIndexer.VariesByCultureFieldName, new object[] {0}},
@@ -66,8 +66,8 @@ namespace Umbraco.Examine
                     {
                         var variantUrl = c.GetUrlSegment(_urlSegmentProviders, culture);
                         var lowerCulture = culture.ToLowerInvariant();
-                        values[$"urlName_{lowerCulture}"] = new object[] { variantUrl };
-                        values[$"nodeName_{lowerCulture}"] = new object[] { c.GetCultureName(culture) };
+                        values[$"urlName_{lowerCulture}"] = variantUrl.Yield();
+                        values[$"nodeName_{lowerCulture}"] = c.GetCultureName(culture).Yield();
                         values[$"{UmbracoExamineIndexer.PublishedFieldName}_{lowerCulture}"] = new object[] { c.IsCulturePublished(culture) ? 1 : 0 };
                         values[$"updateDate_{lowerCulture}"] = new object[] { c.GetUpdateDate(culture) };
                     }

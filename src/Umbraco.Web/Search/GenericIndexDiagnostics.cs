@@ -13,10 +13,10 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class GenericIndexDiagnostics : IIndexDiagnostics
     {
-        private readonly IIndexer _index;
+        private readonly IIndex _index;
         private static readonly string[] IgnoreProperties = { "Description" };
 
-        public GenericIndexDiagnostics(IIndexer index)
+        public GenericIndexDiagnostics(IIndex index)
         {
             _index = index;
         }

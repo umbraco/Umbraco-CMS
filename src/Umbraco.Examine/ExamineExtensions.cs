@@ -7,7 +7,7 @@ using Lucene.Net.Store;
 namespace Umbraco.Examine
 {
     /// <summary>
-    /// Extension methods for the LuceneIndexer
+    /// Extension methods for the LuceneIndex
     /// </summary>
     internal static class ExamineExtensions
     {
@@ -17,7 +17,7 @@ namespace Umbraco.Examine
         /// <param name="indexer"></param>
         /// <param name="ex">The exception returned if there was an error</param>
         /// <returns></returns>
-        public static bool IsHealthy(this LuceneIndexer indexer, out Exception ex)
+        public static bool IsHealthy(this LuceneIndex indexer, out Exception ex)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="indexer"></param>
         /// <returns></returns>
-        public static int GetIndexDocumentCount(this LuceneIndexer indexer)
+        public static int GetIndexDocumentCount(this LuceneIndex indexer)
         {
             if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
                 return 0;
@@ -56,7 +56,7 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="indexer"></param>
         /// <returns></returns>
-        public static int GetIndexFieldCount(this LuceneIndexer indexer)
+        public static int GetIndexFieldCount(this LuceneIndex indexer)
         {
             if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
                 return 0;

@@ -45,7 +45,7 @@ namespace Umbraco.Web.Search
         /// Creates the Umbraco indexes
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IIndexer> Create()
+        public IEnumerable<IIndex> Create()
         {
             return new []
             {
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Search
             };
         }
 
-        private IIndexer CreateInternalIndex()
+        private IIndex CreateInternalIndex()
         {
             var index = new UmbracoContentIndexer(
                 Constants.UmbracoIndexes.InternalIndexName,
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Search
             return index;
         }
 
-        private IIndexer CreateExternalIndex()
+        private IIndex CreateExternalIndex()
         {
             var index = new UmbracoContentIndexer(
                 Constants.UmbracoIndexes.ExternalIndexName,
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Search
             return index;
         }
 
-        private IIndexer CreateMemberIndex()
+        private IIndex CreateMemberIndex()
         {
             var index = new UmbracoMemberIndexer(
                 Constants.UmbracoIndexes.MembersIndexName,

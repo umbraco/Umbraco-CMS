@@ -6,7 +6,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// A Marker interface for defining an Umbraco media indexer
     /// </summary>
-    public interface IUmbracoMediaIndexer : IIndexer
+    public interface IUmbracoMediaIndexer : IIndex
     {
     }
 }
