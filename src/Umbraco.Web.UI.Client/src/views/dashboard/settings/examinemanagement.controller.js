@@ -1,8 +1,37 @@
-function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeout) {
+function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeout) {
 
-    $scope.indexerDetails = [];
-    $scope.searcherDetails = [];
-    $scope.loading = true;
+    var vm = this;
+
+    vm.indexerDetails = [];
+    vm.searcherDetails = [];
+    vm.loading = true;
+    vm.viewState = "list";
+    vm.selectedIndex = null;
+
+    vm.showIndexInfo = showIndexInfo;
+    vm.showSearcherInfo = showSearcherInfo;
+    vm.search = search;
+    vm.toggle = toggle;
+    vm.rebuildIndex = rebuildIndex;
+    vm.closeSearch = closeSearch;
+    vm.setViewState = setViewState;
+    
+
+    vm.infoOverlay = null;
+
+    function setViewState(state) {
+        vm.viewState = state;
+    }
+
+    function showIndexInfo(index) {
+        vm.selectedIndex = index;
+        setViewState("index-details");
+    }
+
+    function showSearcherInfo(searcher) {
+        vm.selectedSearcher = searcher;
+        setViewState("searcher-details");
+    }
 
     function checkProcessing(indexer, checkActionName) {
         umbRequestHelper.resourcePromise(
@@ -36,7 +65,7 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
             });
     }
 
-    $scope.search = function(searcher, e) {
+    function search(searcher, e) {
         if (e && e.keyCode !== 13) {
             return;
         }
@@ -56,7 +85,7 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
             });
     }
 
-    $scope.toggle = function(provider, propName) {
+    function toggle(provider, propName) {
         if (provider[propName] !== undefined) {
             provider[propName] = !provider[propName];
         } else {
@@ -64,7 +93,7 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
         }
     }
 
-    $scope.rebuildIndex = function(indexer) {
+    function rebuildIndex(indexer) {
         if (confirm("This will cause the index to be rebuilt. " +
             "Depending on how much content there is in your site this could take a while. " +
             "It is not recommended to rebuild an index during times of high website traffic " +
@@ -91,38 +120,42 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
         }
     }
 
-    $scope.closeSearch = function(searcher) {
+    function closeSearch(searcher) {
         searcher.isSearching = true;
     }
 
-    //go get the data
+    function init() {
+        //go get the data
 
-    //combine two promises and execute when they are both done
-    $q.all([
+        //combine two promises and execute when they are both done
+        $q.all([
 
-            //get the indexer details
-            umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetIndexerDetails")),
-                'Failed to retrieve indexer details')
-            .then(function(data) {
-                $scope.indexerDetails = data;
-            }),
+                //get the indexer details
+                umbRequestHelper.resourcePromise(
+                    $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetIndexerDetails")),
+                    'Failed to retrieve indexer details')
+                .then(function (data) {
+                    vm.indexerDetails = data;
+                }),
 
-            //get the searcher details
-            umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetSearcherDetails")),
-                'Failed to retrieve searcher details')
-            .then(function(data) {
-                $scope.searcherDetails = data;
-                for (var s in $scope.searcherDetails) {
-                    $scope.searcherDetails[s].searchType = "text";
-                }
-            })
-        ])
-        .then(function() {
-            //all init loading is complete
-            $scope.loading = false;
-        });
+                //get the searcher details
+                umbRequestHelper.resourcePromise(
+                    $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetSearcherDetails")),
+                    'Failed to retrieve searcher details')
+                .then(function (data) {
+                    vm.searcherDetails = data;
+                    for (var s in vm.searcherDetails) {
+                        vm.searcherDetails[s].searchType = "text";
+                    }
+                })
+            ])
+            .then(function () {
+                //all init loading is complete
+                vm.loading = false;
+            });
+    }
+
+    init();
 }
 
-angular.module("umbraco").controller("Umbraco.Dashboard.ExamineMgmtController", ExamineMgmtController);
+angular.module("umbraco").controller("Umbraco.Dashboard.ExamineManagementController", ExamineManagementController);

@@ -1,210 +1,280 @@
-<div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineMgmtController">
+<div id="examineManagement" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
-    <umb-box>
-        <umb-box-content>
-            <h3 class="bold">Examine Management</h3>
-        </umb-box-content>
-    </umb-box>
+    <div ng-if="vm.viewState === 'list'">
+        <umb-box>
+            <umb-box-content>
+                <h3 class="bold">Examine Management</h3>
+            </umb-box-content>
+        </umb-box>
+    </div>
 
     <div ng-show="loading">
         <umb-load-indicator></umb-load-indicator>
     </div>
 
-    <div ng-hide="loading" class="umb-healthcheck-group__details">
+    <div ng-hide="loading">
+        <div ng-if="vm.viewState === 'list'" class="umb-healthcheck-group__details">
 
-        <div class="umb-healthcheck-group__details-group">
+            <div class="umb-healthcheck-group__details-group">
 
-            <div class="umb-healthcheck-group__details-group-title">
-                <div class="umb-healthcheck-group__details-group-name">Indexers</div>
-            </div>
+                <div class="umb-healthcheck-group__details-group-title">
+                    <div class="umb-healthcheck-group__details-group-name">Indexers</div>
+                </div>
 
-            <div class="umb-healthcheck-group__details-checks">
-                <div class="umb-healthcheck-group__details-check">
-                    <div class="umb-healthcheck-group__details-check-title">
-                        <div class="umb-healthcheck-group__details-check-name">Manage Examine's indexes</div>
-                        <div class="umb-healthcheck-group__details-check-description">Allows you to view the details of each index and provides some tools for managing the indexes</div>
-                    </div>
-
-                    <div class="umb-healthcheck-group__details-status" ng-repeat="indexer in indexerDetails">
-
-                        <div class="umb-healthcheck-group__details-status-icon-container">
-                            <i class="umb-healthcheck-status-icon"
-                               ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
+                <div class="umb-healthcheck-group__details-checks">
+                    <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-healthcheck-group__details-check-title">
+                            <div class="umb-healthcheck-group__details-check-name">Manage Examine's indexes</div>
+                            <div class="umb-healthcheck-group__details-check-description">Allows you to view the details of each index and provides some tools for managing the indexes</div>
                         </div>
 
-                        <div class="umb-healthcheck-group__details-status-content">
-                            <div class="umb-healthcheck-group__details-status-text">
+                        <div class="umb-healthcheck-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
-                                <div ng-show="!indexer.isHealthy" class="color-red">
-                                    The index cannot be read and will need to be rebuilt
+                            <div class="umb-healthcheck-group__details-status-icon-container">
+                                <i class="umb-healthcheck-status-icon"
+                                   ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-healthcheck-group__details-status-text">
+                                    <a class="btn-link -underline" href="" ng-click="vm.showIndexInfo(indexer)">
+                                        {{indexer.name}}
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <br />
+
+            <div class="umb-healthcheck-group__details-group">
+
+                <div class="umb-healthcheck-group__details-group-title">
+                    <div class="umb-healthcheck-group__details-group-name">Searchers</div>
+                </div>
+
+                <div class="umb-healthcheck-group__details-checks">
+                    <div class="umb-healthcheck-group__details-check">
+                        <div class="umb-healthcheck-group__details-check-title">
+                            <div class="umb-healthcheck-group__details-check-name">Configured Searchers</div>
+                            <div class="umb-healthcheck-group__details-check-description">Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</div>
+                        </div>
+
+                        <div class="umb-healthcheck-group__details-status" ng-repeat="searcher in vm.searcherDetails">
+
+                            <div class="umb-healthcheck-group__details-status-icon-container">
+                                <i class="umb-healthcheck-status-icon icon-info"></i>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status-content">
+                                <div class="umb-healthcheck-group__details-status-text">
+                                    <a class="btn-link -underline" href="" ng-click="vm.showSearcherInfo(searcher)">
+                                        {{searcher.name}}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div ng-if="vm.viewState === 'searcher-details'">
+            <!-- TODO: Add searcher properties -->
+            <!-- TODO: Add search tools -->
+        </div>
+
+        <div ng-if="vm.viewState === 'index-details'">
+
+            <umb-editor-sub-header>
+                <umb-editor-sub-header-content-left>
+                    <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                </umb-editor-sub-header-content-left>
+            </umb-editor-sub-header>
+
+
+            <div class="umb-healthcheck-group__details">
+
+                <div class="umb-healthcheck-group__details-group">
+
+                    <div class="umb-healthcheck-group__details-group-title">
+                        <div class="umb-healthcheck-group__details-group-name">{{ vm.selectedIndex.name }}</div>
+                    </div>
+
+                    <div class="umb-healthcheck-group__details-checks">
+
+                        <div class="umb-healthcheck-group__details-check">
+
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Health status</div>
+                                <div class="umb-healthcheck-group__details-check-description">The health status of the index and if it can be read</div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status">
+
+                                <div class="umb-healthcheck-group__details-status-icon-container">
+                                    <i class="umb-healthcheck-status-icon"
+                                       ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
                                 </div>
 
-                                <a class="btn-link -underline" href="" ng-click="toggle(indexer, 'showProperties')">
-                                    {{indexer.name}}
-                                </a>
+                                <div class="umb-healthcheck-group__details-status-content">
 
-                            </div>
-
-                            <div class="umb-healthcheck-group__details-status-actions" ng-show="indexer.showProperties">
-                                <ul>
-                                    <li>
-                                        <a href="" ng-click="toggle(indexer, 'showTools')">Index info & tools</a>
-                                        <div ng-show="indexer.showTools">
-                                            <div>
-                                                <br />
-
-                                                <div class="umb-healthcheck-group__details-status-action">
-                                                    <umb-button ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)"
-                                                                type="button"
-                                                                button-style="success"
-                                                                action="rebuildIndex(indexer)"
-                                                                label="Rebuild index">
-                                                    </umb-button>
-                                                </div>
-
-                                                <div ng-show="indexer.processingAttempts >= 100">
-                                                    The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
-                                                </div>
-                                            </div>
+                                    <div class="umb-healthcheck-group__details-status-text">
+                                        <div>{{vm.selectedIndex.healthStatus}}</div>
+                                        <div ng-show="!vm.selectedIndex" class="color-red">
+                                            The index cannot be read and will need to be rebuilt
                                         </div>
-                                    </li>
-                                    <li>
-                                        <a href="" ng-click="toggle(indexer, 'showProviderProperties')">Index properties</a>
-                                        <table ng-show="indexer.showProviderProperties" class="table table-bordered table-condensed">
-                                            <caption>&nbsp;</caption>
-                                            <tr ng-repeat="(key, val) in indexer.providerProperties track by $index">
-                                                <th>{{key}}</th>
-                                                <td>{{val}}</td>
-                                            </tr>
-                                        </table>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                                        <!--<div ng-if="status.description" ng-bind-html="status.description"></div>-->
+                                    </div>
+                                </div>
 
-                        <div ng-show="indexer.isProcessing">
-                            <div class="umb-healthcheck-group__details-status-overlay"></div>
-                            <umb-load-indicator></umb-load-indicator>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <br />
-
-        <div class="umb-healthcheck-group__details-group">
-
-            <div class="umb-healthcheck-group__details-group-title">
-                <div class="umb-healthcheck-group__details-group-name">Searchers</div>
-            </div>
-
-            <div class="umb-healthcheck-group__details-checks">
-                <div class="umb-healthcheck-group__details-check">
-                    <div class="umb-healthcheck-group__details-check-title">
-                        <div class="umb-healthcheck-group__details-check-name">Search indexes</div>
-                        <div class="umb-healthcheck-group__details-check-description">Allows you to search the indexes and view the searcher properties</div>
-                    </div>
-
-                    <div class="umb-healthcheck-group__details-status" ng-repeat="searcher in searcherDetails">
-
-                        <div class="umb-healthcheck-group__details-status-icon-container">
-                            <i class="umb-healthcheck-status-icon icon-info"></i>
-                        </div>
-
-                        <div class="umb-healthcheck-group__details-status-content">
-                            <div class="umb-healthcheck-group__details-status-text">
-                                <a class="btn-link -underline" href="" ng-click="toggle(searcher, 'showProperties')">
-                                    {{searcher.name}}
-                                </a>
                             </div>
 
-                            <div class="umb-healthcheck-group__details-status-actions" ng-show="searcher.showProperties">
-                                <ul>
-                                    <li class="search-tools">
+                        </div>
 
-                                        <a href="" ng-click="toggle(searcher, 'showTools')">Search tools</a>
+                        <div class="umb-healthcheck-group__details-check">
 
-                                        <div ng-show="searcher.showTools">
-                                            <a class="hide" href="" ng-click="closeSearch(searcher)" ng-show="searcher.isSearching">Hide search results</a>
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Index info</div>
+                                <div class="umb-healthcheck-group__details-check-description">Lists the properties of the index</div>
+                            </div>
 
-                                            <br />
+                            <div class="umb-healthcheck-group__details-status">
 
-                                            <form>
+                                <div class="umb-healthcheck-group__details-status-content">
+
+                                    <table class="table table-bordered table-condensed">
+                                        <caption>&nbsp;</caption>
+                                        <tr ng-repeat="(key, val) in vm.selectedIndex.providerProperties track by $index">
+                                            <th>{{key}}</th>
+                                            <td>{{val}}</td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="umb-healthcheck-group__details-check">
+
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Search</div>
+                                <div class="umb-healthcheck-group__details-check-description">Search the index and view the results</div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status">
+
+                                <div class="umb-healthcheck-group__details-status-content">
+
+                                    <div class="umb-healthcheck-group__details-status-actions">
+                                        <div class="umb-healthcheck-group__details-status-action">
+                                            <ng-form name="searchTools">
+
 
                                                 <div class="row form-search">
-                                                    <div class="span8 input-append">
-                                                        <input type="text" class="search-query" ng-model="searcher.searchText" no-dirty-check />
-                                                        <button type="submit" class="btn btn-info" ng-click="search(searcher)" ng-disabled="searcher.isProcessing">Search</button>
+                                                    <div>
+                                                        <input type="text" class="search-query" ng-model="vm.searchText" no-dirty-check />
+
+                                                        <umb-button ng-disabled="vm.selectedIndex.isProcessing"
+                                                                    type="button"
+                                                                    button-style="success"
+                                                                    action="vm.search(searcher)"
+                                                                    label="Search">
+                                                        </umb-button>
+
+                                                        <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="score">Score</th>
+                                                                    <th class="id">Id</th>
+                                                                    <th>Values</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="result in searcher.searchResults">
+                                                                    <td>{{result.Score}}</td>
+                                                                    <td>{{result.Id}}</td>
+                                                                    <td>
+                                                                        <span ng-repeat="(key,val) in result.Fields track by $index">
+                                                                            <span class=""><em>{{key}}</em>:</span>
+                                                                            <span class="text-info">{{val}}</span>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <label for="{{searcher.name}}-textSearch" class="radio inline">
-                                                        <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" no-dirty-check />
-                                                        Text Search
-                                                    </label>
-                                                    <label for="{{searcher.name}}-luceneSearch" class="radio inline">
-                                                        <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" no-dirty-check />
-                                                        Lucene Search
-                                                    </label>
-                                                </div>
 
-
-                                            </form>
-
-                                            <div class="search-results" ng-show="searcher.isSearching">
-
-                                                <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="indexer.isProcessing">
-                                                    <div class="umb-loader"></div>
-                                                </div>
-
-                                                <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="score">Score</th>
-                                                            <th class="id">Id</th>
-                                                            <th>Values</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr ng-repeat="result in searcher.searchResults">
-                                                            <td>{{result.Score}}</td>
-                                                            <td>{{result.Id}}</td>
-                                                            <td>
-                                                                <span ng-repeat="(key,val) in result.Fields track by $index">
-                                                                    <span class=""><em>{{key}}</em>:</span>
-                                                                    <span class="text-info">{{val}}</span>
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                            </ng-form>
                                         </div>
-                                    </li>
-                                    <li>
-                                        <a href="" ng-click="toggle(searcher, 'showProviderProperties')">Provider properties</a>
-                                        <table ng-show="searcher.showProviderProperties" class="table table-bordered table-condensed">
-                                            <caption>&nbsp;</caption>
-                                            <tr ng-repeat="(key, val) in searcher.providerProperties track by $index">
-                                                <th>{{key}}</th>
-                                                <td>{{val}}</td>
-                                            </tr>
-                                        </table>
-                                    </li>
-                                </ul>
+                                    </div>
+
+                                </div>
+
                             </div>
+
                         </div>
+
+                        <div class="umb-healthcheck-group__details-check">
+
+                            <div class="umb-healthcheck-group__details-check-title">
+                                <div class="umb-healthcheck-group__details-check-name">Tools</div>
+                                <div class="umb-healthcheck-group__details-check-description">Tools to help manage the index</div>
+                            </div>
+
+                            <div class="umb-healthcheck-group__details-status">
+
+                                <div class="umb-healthcheck-group__details-status-content">
+
+                                    <div class="umb-healthcheck-group__details-status-actions">
+                                        <div class="umb-healthcheck-group__details-status-action">
+                                            <ng-form name="indexTools">
+
+                                                <umb-button ng-show="!vm.selectedIndex.isProcessing && (!vm.selectedIndex.processingAttempts || vm.selectedIndex.processingAttempts < 100)"
+                                                            type="button"
+                                                            button-style="success"
+                                                            action="vm.rebuildIndex(indexer)"
+                                                            label="Rebuild index">
+                                                </umb-button>
+
+                                                <div ng-show="vm.selectedIndex.isProcessing">
+                                                    <div class="umb-healthcheck-group__details-status-overlay"></div>
+                                                    <umb-load-indicator></umb-load-indicator>
+                                                </div>
+
+                                                <div ng-show="vm.selectedIndex.processingAttempts >= 100">
+                                                    The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
+                                                </div>
+
+                                            </ng-form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
                     </div>
+
                 </div>
+
             </div>
 
         </div>
-
-
     </div>
-
-
 
 </div>
