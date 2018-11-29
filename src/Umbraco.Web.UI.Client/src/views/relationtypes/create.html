@@ -27,20 +27,20 @@
             <!-- Parent -->
             <umb-control-group label="Parent">
                 <select name="relationType-parent"
-                        ng-model="vm.relationType.parent"
-                        ng-options="objectType.name for objectType in vm.objectTypes track by objectType.id"
+                        ng-model="vm.relationType.parentObjectType"
                         class="umb-property-editor umb-dropdown"
                         required>
+                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
                 </select>
             </umb-control-group>
 
             <!-- Child -->
             <umb-control-group label="Child">
                 <select name="relationType-child"
-                        ng-model="vm.relationType.child"
-                        ng-options="objectType.name for objectType in vm.objectTypes track by objectType.id"
+                        ng-model="vm.relationType.childObjectType"
                         class="umb-property-editor umb-dropdown"
                         required>
+                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
                 </select>
             </umb-control-group>
 

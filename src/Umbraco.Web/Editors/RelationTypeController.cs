@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -69,6 +68,37 @@ namespace Umbraco.Web.Editors
             return objectTypes;
         }
 
+        /// <summary>
+        /// Creates a new relation type.
+        /// </summary>
+        /// <param name="relationType">The relation type to create.</param>
+        /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
+        public HttpResponseMessage PostCreate(RelationTypeSave relationType)
+        {
+            var relationTypePersisted = new Core.Models.RelationType(relationType.ChildObjectType, relationType.ParentObjectType, relationType.Name.ToSafeAlias(true))
+            {
+                Name = relationType.Name,
+                IsBidirectional = relationType.IsBidirectional
+            };
+
+            try
+            {
+                Services.RelationService.Save(relationTypePersisted);
+
+                return Request.CreateResponse(HttpStatusCode.OK, relationTypePersisted.Id);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing relation type.
+        /// </summary>
+        /// <param name="relationType">The relation type to update.</param>
+        /// <returns>A display object containing the updated relation type.</returns>
         public RelationTypeDisplay PostSave(RelationTypeSave relationType)
         {
             var relationTypePersisted = Services.RelationService.GetRelationTypeById(relationType.Key);

@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -10,5 +11,17 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "isBidirectional", IsRequired = true)]
         public bool IsBidirectional { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent object type ID.
+        /// </summary>
+        [DataMember(Name = "parentObjectType", IsRequired = false)]
+        public Guid ParentObjectType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the child object type ID.
+        /// </summary>
+        [DataMember(Name = "childObjectType", IsRequired = false)]
+        public Guid ChildObjectType { get; set; }
     }
 }

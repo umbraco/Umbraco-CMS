@@ -77,6 +77,26 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             );
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#create
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Creates a new relation type.
+         *
+         * @param {Object} relationType The relation type object to create.
+         * @returns {Promise} A resourcePromise object.
+         */
+        create: function (relationType) {
+            var createModel = umbDataFormatter.formatRelationTypePostData(relationType);
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "PostCreate"), createModel),
+                "Failed to create new realtion"
+            );
+        },
+
         deleteById: function (id) {
 
         }

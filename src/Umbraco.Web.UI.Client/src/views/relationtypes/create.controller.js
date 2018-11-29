@@ -1,4 +1,4 @@
-function RelationTypeCreateController($scope, relationTypeResource, navigationService, formHelper, appState) {
+function RelationTypeCreateController($scope, $location, relationTypeResource, navigationService, formHelper, appState, notificationsService) {
     var vm = this;
     vm.relationType = {};
     vm.objectTypes = {};

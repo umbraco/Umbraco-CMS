@@ -441,7 +441,9 @@
                     name: relationType.name,
                     alias: relationType.alias,
                     key : relationType.key,
-                    isBidirectional: relationType.isBidirectional
+                    isBidirectional: relationType.isBidirectional,
+                    parentObjectType: relationType.parentObjectType,
+                    childObjectType: relationType.childObjectType
                 };
 
                 return saveModel;
