@@ -297,23 +297,14 @@ gulp.task('dependencies', function () {
             "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
             "base": "./node_modules/lazyload-js"
         },
-        // TODO: We can optimize here:
-        // we don't have to ship with the moment-with-locales libraries
-        // we lazyload the user locale
         {
             "name": "moment",
-            "src":  [
-                "./node_modules/moment/min/moment.min.js",
-                "./node_modules/moment/min/moment-with-locales.js",
-                "./node_modules/moment/min/moment-with-locales.min.js"
-            ],
+            "src":  ["./node_modules/moment/min/moment.min.js"],
             "base": "./node_modules/moment/min"
         },
         {
             "name": "moment",
-            "src":  [
-                "./node_modules/moment/locale/*.js"
-            ],
+            "src":  ["./node_modules/moment/locale/*.js"],
             "base": "./node_modules/moment/locale"
         },
         {
