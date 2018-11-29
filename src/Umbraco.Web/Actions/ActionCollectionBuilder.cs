@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Composing;
-
 namespace Umbraco.Web.Actions
 {
     internal class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>

@@ -63,6 +63,8 @@
             vm.labels.permissionsSetForGroup = value;
           });
           setViewSate("managePermissions");
+          // hide dropdown
+          vm.groupsDropdownOpen = false;
         }
 
         function assignGroupPermissions(group) {

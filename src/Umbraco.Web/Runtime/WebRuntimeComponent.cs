@@ -121,8 +121,7 @@ namespace Umbraco.Web.Runtime
             composition.ConfigureForWeb();
 
             composition
-                .ComposeMvcControllers(GetType().Assembly)
-                .ComposeApiControllers(GetType().Assembly);
+                .ComposeUmbracoControllers(GetType().Assembly);
 
             composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
