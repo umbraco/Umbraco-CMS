@@ -335,6 +335,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/signalr"
         },
         {
+            "name": "spectrum",
+            "src":  [
+                "./node_modules/spectrum-colorpicker/spectrum.js",
+                "./node_modules/spectrum-colorpicker/spectrum.css"
+            ],
+            "base": "./node_modules/spectrum-colorpicker"
+        },
+        {
             "name": "tinymce",
             "src":  [
                 "./node_modules/tinymce/tinymce.min.js",
