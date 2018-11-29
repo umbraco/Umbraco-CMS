@@ -94,7 +94,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique(databaseFactory);
             composition.RegisterUnique(_ => databaseFactory.SqlContext);
             composition.RegisterUnique(typeLoader);
-            composition.RegisterUnique(_state);
+            composition.RegisterUnique<IRuntimeState>(_state);
 
             // register runtime-level services
             Compose(composition);
@@ -140,6 +140,18 @@ namespace Umbraco.Core.Runtime
                     var bfe = e as BootFailedException ?? new BootFailedException("Boot failed.", e);
                     _state.BootFailedException = bfe;
                     bootTimer.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
+
+                    // if something goes wrong above, we may end up with no factory
+                    // meaning nothing can get the runtime state, etc - so let's try
+                    // to make sure we have a factory
+                    if (_factory == null)
+                    {
+                        try
+                        {
+                            _factory = Current.Factory = composition.CreateFactory();
+                        }
+                        catch { /* yea */ }
+                    }
 
                     // throwing here can cause w3wp to hard-crash and we want to avoid it.
                     // instead, we're logging the exception and setting level to BootFailed.
