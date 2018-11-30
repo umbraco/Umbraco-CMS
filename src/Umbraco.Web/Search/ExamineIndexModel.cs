@@ -20,5 +20,8 @@ namespace Umbraco.Web.Search
         [DataMember(Name = "providerProperties")]
         public IReadOnlyDictionary<string, object> ProviderProperties { get; set; }
 
+        [DataMember(Name = "canRebuild")]
+        public bool CanRebuild { get; set; }
+
     }
 }

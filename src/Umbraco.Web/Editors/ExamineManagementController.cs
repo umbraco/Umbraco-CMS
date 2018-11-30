@@ -25,13 +25,16 @@ namespace Umbraco.Web.Editors
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCacheProvider;
+        private readonly IEnumerable<IIndexPopulator> _populators;
 
         public ExamineManagementController(IExamineManager examineManager, ILogger logger,
-                                           IRuntimeCacheProvider runtimeCacheProvider)
+            IRuntimeCacheProvider runtimeCacheProvider,
+            IEnumerable<IIndexPopulator> populators)
         {
             _examineManager = examineManager;
             _logger = logger;
             _runtimeCacheProvider = runtimeCacheProvider;
+            _populators = populators;
         }
 
         /// <summary>
@@ -113,74 +116,83 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Check if the index has been rebuilt
         /// </summary>
-        /// <param name="indexerName"></param>
+        /// <param name="indexName"></param>
         /// <returns></returns>
         /// <remarks>
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public ExamineIndexModel PostCheckRebuildIndex(string indexerName)
+        public ExamineIndexModel PostCheckRebuildIndex(string indexName)
         {
-            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndex indexer);
-            if (msg.IsSuccessStatusCode)
-            {
-                var cacheKey = "temp_indexing_op_" + indexerName;
-                var found = ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);
+            var validate = ValidateIndex(indexName, out var index);
+            if (!validate.IsSuccessStatusCode)
+                throw new HttpResponseException(validate);
 
-                //if its still there then it's not done
-                return found != null
-                           ? null
-                           : CreateModel(new KeyValuePair<string, IIndex>(indexerName, indexer));
-            }
+            validate = ValidatePopulator(indexName);
+            if (!validate.IsSuccessStatusCode)
+                throw new HttpResponseException(validate);
 
-            throw new HttpResponseException(msg);
+            var cacheKey = "temp_indexing_op_" + indexName;
+            var found = ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);
+
+            //if its still there then it's not done
+            return found != null
+                ? null
+                : CreateModel(new KeyValuePair<string, IIndex>(indexName, index));
+
         }
 
         /// <summary>
-        ///     Rebuilds the index
+        /// Rebuilds the index
         /// </summary>
-        /// <param name="indexerName"></param>
+        /// <param name="indexName"></param>
         /// <returns></returns>
-        public HttpResponseMessage PostRebuildIndex(string indexerName)
+        public HttpResponseMessage PostRebuildIndex(string indexName)
         {
-            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndex indexer);
-            if (msg.IsSuccessStatusCode)
+            var validate = ValidateIndex(indexName, out var index);
+            if (!validate.IsSuccessStatusCode)
+                return validate;
+
+            validate = ValidatePopulator(indexName);
+            if (!validate.IsSuccessStatusCode)
+                return validate;
+
+            _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
+
+            //remove it in case there's a handler there alraedy
+            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
+
+            //now add a single handler
+            index.IndexOperationComplete += Indexer_IndexOperationComplete;
+
+            var cacheKey = "temp_indexing_op_" + index.Name;
+
+            //put temp val in cache which is used as a rudimentary way to know when the indexing is done
+            ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
+
+            try
             {
-                _logger.Info<ExamineManagementController>("Rebuilding index '{IndexerName}'", indexerName);
+                //clear and replace
+                index.CreateIndex();
 
-                //remove it in case there's a handler there alraedy
-                indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+                //populate it
+                foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
+                    populator.Populate(index);
 
-                //now add a single handler
-                indexer.IndexOperationComplete += Indexer_IndexOperationComplete;
-
-                var cacheKey = "temp_indexing_op_" + indexer.Name;
-
-                //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-                ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5),
-                                                              false);
-
-                try
-                {
-                    //TODO: Rebuilding isn't build directly into an index, we need a new IRebuildIndex or similar interface that can be registered
-                    throw new NotImplementedException("Implement rebuilding!");
-                    //indexer.RebuildIndex();
-                }
-                catch (Exception ex)
-                {
-                    //ensure it's not listening
-                    indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                    Logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
-                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                    response.Content =
-                        new
-                            StringContent($"The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
-                    response.ReasonPhrase = "Could Not Rebuild";
-                    return response;
-                }
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
-
-            return msg;
+            catch (Exception ex)
+            {
+                //ensure it's not listening
+                index.IndexOperationComplete -= Indexer_IndexOperationComplete;
+                Logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                response.Content =
+                    new
+                        StringContent($"The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
+                response.ReasonPhrase = "Could Not Rebuild";
+                return response;
+            }
         }
 
         
@@ -207,8 +219,10 @@ namespace Umbraco.Web.Editors
             {
                 Name = indexName,
                 HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
-                ProviderProperties = properties
+                ProviderProperties = properties,
+                CanRebuild = _populators.Any(x => x.IsRegistered(indexName))
             };
+            
 
             return indexerModel;
         }
@@ -248,22 +262,31 @@ namespace Umbraco.Web.Editors
             return response1;
         }
 
-        private HttpResponseMessage ValidateLuceneIndexer<T>(string indexerName, out T indexer)
-            where T : class, IIndex
+        private HttpResponseMessage ValidatePopulator(string indexName)
         {
-            indexer = null;
+            if (_populators.Any(x => x.IsRegistered(indexName)))
+                return Request.CreateResponse(HttpStatusCode.OK);
 
-            if (_examineManager.IndexProviders.ContainsKey(indexerName)
-                && _examineManager.IndexProviders[indexerName] is T casted)
+            var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+            response.Content = new StringContent($"The index {indexName} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
+            response.ReasonPhrase = "Index cannot be rebuilt";
+            return response;
+        }
+
+        private HttpResponseMessage ValidateIndex(string indexName, out IIndex index)
+        {
+            index = null;
+
+            if (_examineManager.IndexProviders.ContainsKey(indexName))
             {
                 //return Ok!
-                indexer = casted;
+                index = _examineManager.GetIndex(indexName);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent($"No indexer found with name = {indexerName} of type {typeof(T)}");
-            response.ReasonPhrase = "Indexer Not Found";
+            response.Content = new StringContent($"No index found with name = {indexName}");
+            response.ReasonPhrase = "Index Not Found";
             return response;
         }
 

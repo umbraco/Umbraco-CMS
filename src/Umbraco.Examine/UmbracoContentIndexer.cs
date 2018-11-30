@@ -130,6 +130,7 @@ namespace Umbraco.Examine
 
         #region Public methods
 
+        /// <inheritdoc />
         /// <summary>
         /// Deletes a node from the index.
         /// </summary>
@@ -138,7 +139,8 @@ namespace Umbraco.Examine
         /// custom Lucene search to find all decendents and create Delete item queues for them too.
         /// </remarks>
         /// <param name="nodeId">ID of the node to delete</param>
-        public override void DeleteFromIndex(string nodeId)
+        /// <param name="onComplete"></param>
+        protected override void PerformDeleteFromIndex(string nodeId, Action<IndexOperationEventArgs> onComplete)
         {
             //find all descendants based on path
             var descendantPath = $@"\-1\,*{nodeId}\,*";
@@ -156,7 +158,7 @@ namespace Umbraco.Examine
                 QueueIndexOperation(new IndexOperation(new ValueSet(r.Id, null), IndexOperationType.Delete));
             }
 
-            base.DeleteFromIndex(nodeId);
+            base.PerformDeleteFromIndex(nodeId, onComplete);
         }
         #endregion
 

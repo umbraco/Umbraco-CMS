@@ -33,11 +33,11 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
         setViewState("searcher-details");
     }
 
-    function checkProcessing(indexer, checkActionName) {
+    function checkProcessing(index, checkActionName) {
         umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
                     checkActionName,
-                    { indexerName: indexer.name })),
+                    { indexName: index.name })),
                 'Failed to check index processing')
             .then(function(data) {
 
@@ -45,19 +45,19 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
 
                     //copy all resulting properties
                     for (var k in data) {
-                        indexer[k] = data[k];
+                        index[k] = data[k];
                     }
-                    indexer.isProcessing = false;
+                    index.isProcessing = false;
                 } else {
                     $timeout(function() {
                             //don't continue if we've tried 100 times
-                            if (indexer.processingAttempts < 100) {
-                                checkProcessing(indexer, checkActionName);
+                            if (index.processingAttempts < 100) {
+                                checkProcessing(index, checkActionName);
                                 //add an attempt
-                                indexer.processingAttempts++;
+                                index.processingAttempts++;
                             } else {
                                 //we've exceeded 100 attempts, stop processing
-                                indexer.isProcessing = false;
+                                index.isProcessing = false;
                             }
                         },
                         1000);
@@ -93,26 +93,26 @@ function ExamineManagementController($scope, umbRequestHelper, $http, $q, $timeo
         }
     }
 
-    function rebuildIndex(indexer) {
+    function rebuildIndex(index) {
         if (confirm("This will cause the index to be rebuilt. " +
             "Depending on how much content there is in your site this could take a while. " +
             "It is not recommended to rebuild an index during times of high website traffic " +
             "or when editors are editing content.")) {
 
-            indexer.isProcessing = true;
-            indexer.processingAttempts = 0;
+            index.isProcessing = true;
+            index.processingAttempts = 0;
 
             umbRequestHelper.resourcePromise(
                     $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
                         "PostRebuildIndex",
-                        { indexerName: indexer.name })),
+                        { indexName: index.name })),
                     'Failed to rebuild index')
                 .then(function() {
 
                     //rebuilding has started, nothing is returned accept a 200 status code.
                     //lets poll to see if it is done.
                     $timeout(function() {
-                            checkProcessing(indexer, "PostCheckRebuildIndex");
+                            checkProcessing(index, "PostCheckRebuildIndex");
                         },
                         1000);
 

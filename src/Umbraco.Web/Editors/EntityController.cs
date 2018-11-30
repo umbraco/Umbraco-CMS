@@ -121,9 +121,8 @@ namespace Umbraco.Web.Editors
                 return result;
 
             var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
-            var searchableTrees = _searchableTreeCollection.AsReadOnlyDictionary();
 
-            foreach (var searchableTree in searchableTrees)
+            foreach (var searchableTree in _searchableTreeCollection.SearchableApplicationTrees)
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {

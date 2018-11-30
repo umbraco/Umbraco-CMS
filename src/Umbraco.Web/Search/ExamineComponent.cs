@@ -22,6 +22,7 @@ using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Scheduling;
 using System.Threading.Tasks;
+using LightInject;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Search
@@ -53,11 +54,23 @@ namespace Umbraco.Web.Search
         {
             base.Compose(composition);
 
-            composition.Container.RegisterSingleton<ContentIndexPopulator>();
-            composition.Container.RegisterSingleton<PublishedContentIndexPopulator>();
-            composition.Container.RegisterSingleton<MediaIndexPopulator>();
+            //fixme: I cannot do this since RegisterSingleton acts like TryRegisterSingleton and only allows one
+            //composition.Container.RegisterSingleton<IIndexPopulator, MemberIndexPopulator>();
+            //composition.Container.RegisterSingleton<IIndexPopulator, ContentIndexPopulator>();
+            //composition.Container.RegisterSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
+            //composition.Container.RegisterSingleton<IIndexPopulator, MediaIndexPopulator>();
+
+            //fixme: Instead i have to do this, but this means that developers adding their own will also need to do this which isn't ideal
+            composition.Container.RegisterMany<IIndexPopulator, PerContainerLifetime>(new[]
+            {
+                typeof(MemberIndexPopulator),
+                typeof(ContentIndexPopulator),
+                typeof(PublishedContentIndexPopulator),
+                typeof(MediaIndexPopulator),
+            });
+
             composition.Container.RegisterSingleton<IndexRebuilder>();
-            composition.Container.RegisterSingleton<IUmbracoIndexesBuilder, UmbracoIndexesBuilder>();
+            composition.Container.RegisterSingleton<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IContent>, ContentValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.Container.RegisterSingleton<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
@@ -65,7 +78,7 @@ namespace Umbraco.Web.Search
 
         internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors,
             IExamineManager examineManager, ProfilingLogger profilingLogger,
-            IScopeProvider scopeProvider, IUmbracoIndexesBuilder indexBuilder,
+            IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             IndexRebuilder indexRebuilder, ServiceContext services,
             IValueSetBuilder<IContent> contentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
@@ -111,7 +124,7 @@ namespace Umbraco.Web.Search
             }
 
             //create the indexes and register them with the manager
-            foreach(var index in indexBuilder.Create())
+            foreach(var index in indexCreator.Create())
             {
                 _examineManager.AddIndex(index);
             }

@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Examine
 {
     public abstract class IndexPopulator : IIndexPopulator
     {
-        private readonly HashSet<string> _registeredIndexes = new HashSet<string>();
+        private readonly ConcurrentHashSet<string> _registeredIndexes = new ConcurrentHashSet<string>();
+
+        public bool IsRegistered(string indexName)
+        {
+            return _registeredIndexes.Contains(indexName);
+        }
 
         /// <summary>
         /// Registers an index for this populator
@@ -17,14 +23,9 @@ namespace Umbraco.Examine
             _registeredIndexes.Add(indexName);
         }
 
-        /// <summary>
-        /// Returns a list of index names that his populate is associated with
-        /// </summary>
-        public IEnumerable<string> RegisteredIndexes => _registeredIndexes;
-
         public void Populate(params IIndex[] indexes)
         {
-            PopulateIndexes(indexes.Where(x => RegisteredIndexes.Contains(x.Name)));
+            PopulateIndexes(indexes.Where(x => IsRegistered(x.Name)));
         }
 
         protected abstract void PopulateIndexes(IEnumerable<IIndex> indexes);

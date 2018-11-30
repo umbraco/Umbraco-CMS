@@ -21,11 +21,11 @@ namespace Umbraco.Web.Search
     /// <summary>
     /// Creates the indexes used by Umbraco
     /// </summary>
-    public class UmbracoIndexesBuilder : IUmbracoIndexesBuilder
+    public class UmbracoIndexesCreator : IUmbracoIndexesCreator
     {
         //TODO: we should inject the different IValueSetValidator so devs can just register them instead of overriding this class?
 
-        public UmbracoIndexesBuilder(ProfilingLogger profilingLogger,
+        public UmbracoIndexesCreator(ProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService)

@@ -183,7 +183,7 @@
                                                     <div>
                                                         <input type="text" class="search-query" ng-model="vm.searchText" no-dirty-check />
 
-                                                        <umb-button ng-disabled="vm.selectedIndex.isProcessing"
+                                                        <umb-button disabled="vm.selectedIndex.isProcessing"
                                                                     type="button"
                                                                     button-style="success"
                                                                     action="vm.search(searcher)"
@@ -229,7 +229,7 @@
 
                             <div class="umb-healthcheck-group__details-check-title">
                                 <div class="umb-healthcheck-group__details-check-name">Tools</div>
-                                <div class="umb-healthcheck-group__details-check-description">Tools to help manage the index</div>
+                                <div class="umb-healthcheck-group__details-check-description">Tools to manage the index</div>
                             </div>
 
                             <div class="umb-healthcheck-group__details-status">
@@ -241,9 +241,10 @@
                                             <ng-form name="indexTools">
 
                                                 <umb-button ng-show="!vm.selectedIndex.isProcessing && (!vm.selectedIndex.processingAttempts || vm.selectedIndex.processingAttempts < 100)"
+                                                            disabled="!vm.selectedIndex.canRebuild"
                                                             type="button"
                                                             button-style="success"
-                                                            action="vm.rebuildIndex(indexer)"
+                                                            action="vm.rebuildIndex(vm.selectedIndex)"
                                                             label="Rebuild index">
                                                 </umb-button>
 
@@ -257,6 +258,10 @@
                                                 </div>
 
                                             </ng-form>
+
+                                            <div class="umb-healthcheck-group__details-status-action-description" ng-show="!vm.selectedIndex.canRebuild">
+                                                This index cannot be rebuilt because it has no assigned <code>IIndexPopulator</code>
+                                            </div>
                                         </div>
                                     </div>
 

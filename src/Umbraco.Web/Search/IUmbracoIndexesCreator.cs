@@ -3,7 +3,10 @@ using Examine;
 
 namespace Umbraco.Web.Search
 {
-    internal interface IUmbracoIndexesBuilder
+    /// <summary>
+    /// Used to create the Umbraco indexes
+    /// </summary>
+    public interface IUmbracoIndexesCreator
     {
         IEnumerable<IIndex> Create();
     }
