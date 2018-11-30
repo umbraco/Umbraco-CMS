@@ -34,9 +34,10 @@ namespace Umbraco.Web.Trees
 
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
             if (relationType == null) return new MenuItemCollection();
+            
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
 
-            //add delete option for all macros
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
+            /*menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
                 //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
                 //use the legacy format
                 .ConvertLegacyMenuItem(new EntitySlim
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Trees
                     Level = 1,
                     ParentId = -1,
                     Name = relationType.Name
-                }, "relationTypes", queryStrings.GetValue<string>("application"));
+                }, "relationTypes", queryStrings.GetValue<string>("application"));*/
 
             return menu;
         }
@@ -56,15 +57,9 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                nodes.AddRange(Services.RelationService
-                .GetAllRelationTypes().Select(rt => CreateTreeNode(
-                    rt.Id.ToString(),
-                    id,
-                    queryStrings,
-                    rt.Name,
-                    "icon-trafic",
-                    false
-                    )));
+                nodes.AddRange(Services.RelationService.GetAllRelationTypes()
+                                       .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,
+                                                                    "icon-trafic", false)));
             }
             return nodes;
         }

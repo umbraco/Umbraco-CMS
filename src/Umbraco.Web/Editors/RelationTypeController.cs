@@ -126,9 +126,23 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        public void DeleteById()
+        /// <summary>
+        /// Deletes a relation type with a given ID.
+        /// </summary>
+        /// <param name="id">The ID of the relation type to delete.</param>
+        /// <returns>A <see cref="HttpResponseMessage"/>.</returns>
+        [HttpPost]
+        [HttpDelete]
+        public HttpResponseMessage DeleteById(int id)
         {
-            throw new NotImplementedException();
+            var relationType = Services.RelationService.GetRelationTypeById(id);
+
+            if(relationType == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            Services.RelationService.Delete(relationType);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }
