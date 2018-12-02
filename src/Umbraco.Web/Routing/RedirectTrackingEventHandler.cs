@@ -192,7 +192,7 @@ namespace Umbraco.Web.Routing
                 if (entityContent == null) continue;
                 foreach (var x in entityContent.DescendantsOrSelf())
                 {
-                    var route = contentCache.GetById(x.Id).Url.TrimEnd("/");
+                    var route = contentCache.GetRouteById(x.Id);
                     if (IsNotRoute(route)) continue;
                     var wk = UnwrapToKey(x);
                     if (wk == null) continue;
