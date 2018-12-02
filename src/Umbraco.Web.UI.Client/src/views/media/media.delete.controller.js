@@ -26,10 +26,14 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             treeService.removeNode($scope.currentNode);
 
             if (rootNode) {
+                //ensure the recycle bin has child nodes now            
                 var recycleBin = treeService.getDescendantNode(rootNode, -21);
                 if (recycleBin) {
-                    // reload the recycle bin
-                    treeService.loadNodeChildren({ node: recycleBin, section: "media" });
+                    recycleBin.hasChildren = true;
+                    //reload the recycle bin if it's already expanded so the deleted item is shown
+                    if (recycleBin.expanded) {
+                        treeService.loadNodeChildren({ node: recycleBin, section: "media" });
+                    }
                 }
             }
             

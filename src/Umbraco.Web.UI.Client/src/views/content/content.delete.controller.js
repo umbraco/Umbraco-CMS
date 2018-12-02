@@ -26,10 +26,14 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             treeService.removeNode($scope.currentNode);
 
             if (rootNode) {
+                //ensure the recycle bin has child nodes now            
                 var recycleBin = treeService.getDescendantNode(rootNode, -20);
                 if (recycleBin) {
-                    // reload the recycle bin
-                    treeService.loadNodeChildren({ node: recycleBin, section: "content" });
+                    recycleBin.hasChildren = true;
+                    //reload the recycle bin if it's already expanded so the deleted item is shown
+                    if (recycleBin.expanded) {
+                        treeService.loadNodeChildren({ node: recycleBin, section: "content" });
+                    }
                 }
             }
 
