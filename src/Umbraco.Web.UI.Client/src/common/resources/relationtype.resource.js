@@ -27,13 +27,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          */
         getById: function (id) {
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "relationTypeApiBaseUrl",
-                        "GetById",
-                        [{ id: id }]
-                    )
-                ),
+                $http.get(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "GetById", [{ id: id }])),
                 "Failed to get item " + id
             );
         },
@@ -97,8 +91,29 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             );
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.relationTypeResource#deleteById
+         * @methodof umbraco.resources.relationTypeResource
+         *
+         * @description
+         * Deletes a relation type with a given ID.
+         *
+         * * ## Usage
+         * <pre>
+         * relationTypeResource.deleteById(1234).then(function() {
+         *    alert('Deleted it!');
+         * });
+         * </pre>
+         *
+         * @param {Int} id The ID of the relation type to delete.
+         * @returns {Promose} resourcePromise object.
+         */
         deleteById: function (id) {
-
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("relationTypeApiBaseUrl", "DeleteById", [{ id: id }])),
+                "Failed to delete item " + id
+            );
         }
 
     };
