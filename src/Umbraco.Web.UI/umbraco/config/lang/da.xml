@@ -32,8 +32,11 @@
     <key alias="rename" version="7.3.0">Omdøb</key>
     <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
+    <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
-    <key alias="toInTheTreeStructureBelow">I træstrukturen nedenfor</key>
+    <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="wasMovedTo">blev flyttet til</key>
+    <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
