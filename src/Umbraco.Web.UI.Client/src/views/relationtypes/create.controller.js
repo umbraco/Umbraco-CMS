@@ -1,3 +1,11 @@
+/**
+ * @ngdoc controller
+ * @name Umbraco.Editors.RelationTypes.CreateController
+ * @function
+ *
+ * @description
+ * The controller for creating relation types.
+ */
 function RelationTypeCreateController($scope, $location, relationTypeResource, navigationService, formHelper, appState, notificationsService) {
     var vm = this;
     vm.relationType = {};

@@ -1,3 +1,11 @@
+/**
+ * @ngdoc controller
+ * @name Umbraco.Editors.RelationTypes.EditController
+ * @function
+ *
+ * @description
+ * The controller for editing relation types.
+ */
 function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper) {
 
     var vm = this;

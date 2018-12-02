@@ -640,9 +640,7 @@
     <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
-    <Compile Include="Models\ContentEditing\Relation.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
-    <Compile Include="Models\ContentEditing\RelationType.cs" />
     <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Models\Mapping\RelationMapperProfile.cs" />

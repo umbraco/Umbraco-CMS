@@ -1,3 +1,11 @@
+/**
+ * @ngdoc controller
+ * @name Umbraco.Editors.RelationTypes.DeleteController
+ * @function
+ *
+ * @description
+ * The controller for deleting relation types.
+ */
 function RelationTypeDeleteController($scope, $location, relationTypeResource, treeService, navigationService, appState) {
 
     var vm = this;

@@ -2,8 +2,6 @@
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Relation = Umbraco.Web.Models.ContentEditing.Relation;
-using RelationType = Umbraco.Web.Models.ContentEditing.RelationType;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -40,12 +38,6 @@ namespace Umbraco.Web.Models.Mapping
 
             // FROM RelationTypeSave to IRelationType
             CreateMap<RelationTypeSave, IRelationType>();
-
-            //FROM IRelationType TO RelationType
-            CreateMap<IRelationType, RelationType>();
-
-            //FROM IRelation TO Relation
-            CreateMap<IRelation, Relation>();
         }
     }
 }

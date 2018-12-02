@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Web.Trees
 {
@@ -36,18 +33,7 @@ namespace Umbraco.Web.Trees
             if (relationType == null) return new MenuItemCollection();
             
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
-
-            /*menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                //Since we haven't implemented anything for relationtypes in angular, this needs to be converted to
-                //use the legacy format
-                .ConvertLegacyMenuItem(new EntitySlim
-                {
-                    Id = relationType.Id,
-                    Level = 1,
-                    ParentId = -1,
-                    Name = relationType.Name
-                }, "relationTypes", queryStrings.GetValue<string>("application"));*/
-
+            
             return menu;
         }
 
