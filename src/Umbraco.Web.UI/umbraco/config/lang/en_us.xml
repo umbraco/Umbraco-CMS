@@ -1040,7 +1040,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="relateToOriginal">Relate copied items to original</key>
     </area>
     <area alias="notifications">
-        <key alias="editNotifications">Edit your notification for %0%</key>
+        <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+        <key alias="notificationsSavedFor">Notification settings saved for</key>
         <key alias="mailBody">
             <![CDATA[
       Hi %0%
@@ -2221,9 +2222,5 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
         <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
         <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
-    </area>
-    <area alias="notify">
-        <key alias="notifySet">Select your notifications for</key>
-        <key alias="notificationsSavedFor">Notification settings saved for </key>
     </area>
 </language>

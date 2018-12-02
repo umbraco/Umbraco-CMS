@@ -3,7 +3,8 @@
         $scope,
         contentResource,
         navigationService,
-        angularHelper) {
+        angularHelper,
+        localizationService) {
         var vm = this;
         var currentForm;
         vm.notifyOptions = [];
@@ -11,13 +12,17 @@
         vm.cancel = cancel;
         vm.message = {
             name: $scope.currentNode.name
-        };;
+        };
+        vm.labels = {};
         function onInit() {
             vm.loading = true;
             contentResource.getNotifySettingsById($scope.currentNode.id).then(function (options) {
                 currentForm = angularHelper.getCurrentForm($scope);
                 vm.loading = false;
                 vm.notifyOptions = options;
+            });
+            localizationService.localize("notifications_editNotifications").then(function(value) {
+                vm.labels.headline = value.replace("%0%", $scope.currentNode.name);
             });
         }
         function cancel() {

@@ -13,12 +13,12 @@
                 </div>
                 <div ng-show="vm.saveSuccces" ng-cloak>
                     <div class="alert alert-success">
-                        <localize key="notify_notificationsSavedFor"></localize><strong> {{currentNode.name}}</strong>
+                        <localize key="notifications_notificationsSavedFor"></localize> <strong>{{currentNode.name}}</strong>
                     </div>
                 </div>
                 <div ng-cloak>
                     <div class="block-form" ng-show="!vm.loading">
-                        <h5><localize key="notify_notifySet">Set your notification for</localize> {{ currentNode.name }}</h5>
+                        <span ng-bind-html="vm.labels.headline"></span>
                         <umb-control-group>
                             <umb-permission ng-repeat="option in vm.notifyOptions"
                                             name="option.name"

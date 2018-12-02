@@ -833,7 +833,8 @@
     <key alias="relateToOriginal">Relater det kopierede element til originalen</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
+    <key alias="editNotifications"><![CDATA[Vælg dine notificeringer for <strong>%0%</strong>]]></key>
+    <key alias="notificationsSavedFor">Notificeringer er gemt for</key>
     <key alias="mailBody">
       <![CDATA[
 Hej %0%

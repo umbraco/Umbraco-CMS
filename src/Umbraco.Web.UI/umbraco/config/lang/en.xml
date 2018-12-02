@@ -1041,7 +1041,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="relateToOriginal">Relate copied items to original</key>
     </area>
     <area alias="notifications">
-        <key alias="editNotifications">Edit your notification for %0%</key>
+        <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
+        <key alias="notificationsSavedFor">Notification settings saved for</key>
         <key alias="mailBody">
             <![CDATA[
       Hi %0%
