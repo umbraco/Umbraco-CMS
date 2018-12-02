@@ -1313,6 +1313,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="undoEditCrop">Undo edits</key>
     </area>
     <area alias="rollback">
+        <key alias="headline">Select a version to compare with the current version</key>
         <key alias="currentVersion">Current version</key>
         <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
         <key alias="documentRolledBack">Document has been rolled back</key>

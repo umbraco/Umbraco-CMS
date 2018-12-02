@@ -1007,6 +1007,7 @@ Mange hilsner fra Umbraco robotten
 
 
   <area alias="rollback">
+    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
