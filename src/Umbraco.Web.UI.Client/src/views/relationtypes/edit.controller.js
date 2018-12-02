@@ -6,7 +6,7 @@
  * @description
  * The controller for editing relation types.
  */
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService) {
 
     var vm = this;
 
@@ -17,10 +17,28 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
     vm.save = saveRelationType;
 
-    if($routeParams.create) {
-        alert("create");
-    } else {
+    init();
+
+    function init() {
         vm.page.loading = true;
+
+        localizationService.localizeMany(["relationType_tabRelationType", "relationType_tabRelations"]).then(function (data) {
+            vm.page.navigation = [
+                {
+                    "name": data[0],
+                    "alias": "relationType",
+                    "icon": "icon-info",
+                    "view": "views/relationTypes/views/relationType.html",
+                    "active": true
+                },
+                {
+                    "name": data[1],
+                    "alias": "relations",
+                    "icon": "icon-trafic",
+                    "view": "views/relationTypes/views/relations.html"
+                }
+            ];
+        });
 
         relationTypeResource.getById($routeParams.id)
             .then(function(data) {

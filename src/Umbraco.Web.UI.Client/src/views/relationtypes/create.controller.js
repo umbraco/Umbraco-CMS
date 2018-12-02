@@ -19,7 +19,7 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
         relationTypeResource.getRelationObjectTypes().then(function (data) {
             vm.objectTypes = data;
         }, function (err) {
-            alert("oh no");
+            notificationsService.error("Could not load form.")
         })
     }
 

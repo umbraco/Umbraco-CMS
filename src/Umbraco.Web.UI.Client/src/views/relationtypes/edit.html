@@ -7,70 +7,13 @@
                 name="vm.relationType.name"
                 alias="vm.relationType.alias"
                 hide-description="true"
-                hide-icon="true">
+                hide-icon="true"
+                navigation="vm.page.navigation">
             </umb-editor-header>
 
             <umb-editor-container class="form-horizontal">
-                <umb-box>
-                    <umb-box-content>
-                        <!-- ID -->
-                        <umb-control-group label="Id">
-                            <div>{{vm.relationType.id}}</div>
-                            <small>{{vm.relationType.key}}</small>
-                        </umb-control-group>
-
-                        <!-- Direction -->
-                        <umb-control-group label="@relationType_direction">
-                            <ul class="unstyled">
-                                <li>
-                                    <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false"> <localize key="relationType_parentToChild">Parent to child</localize>
-                                    </label>
-                                </li>
-                                <li>
-                                    <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true"> <localize key="relationType_bidirectional">Bidirectional</localize>
-                                    </label>
-                                </li>
-                            </ul>
-                        </umb-control-group>
-
-                        <!-- Parent-->
-                        <umb-control-group label="@relationType_parent">
-                            <div>{{vm.relationType.parentObjectTypeName}}</div>
-                        </umb-control-group>
-
-                        <!-- Child -->
-                        <umb-control-group label="@relationType_child">
-                            <div>{{vm.relationType.childObjectTypeName}}</div>
-                        </umb-control-group>
-
-                        <!-- Relation count -->
-                        <umb-control-group label="@relationType_count" ng-if="vm.relationType.relations.length > 0">
-                            <div>{{vm.relationType.relations.length}}</div>
-                        </umb-control-group>
-
-                        <!-- Relations -->
-                        <umb-control-group label="@relationType_relations" ng-if="vm.relationType.relations.length > 0">
-                            <div>
-                                <table class="table">
-                                    <thead>
-                                        <th><localize key="relationType_parent">Parent</localize></th>
-                                        <th><localize key="relationType_child">Child</localize></th>
-                                        <th><localize key="relationType_created">Created</localize></th>
-                                        <th><localize key="relationType_comment">Comment</localize></th>
-                                    </thead>
-                                    <tr ng-repeat="relation in vm.relationType.relations">
-                                        <td>{{relation.parentName}}</td>
-                                        <td>{{relation.childName}}</td>
-                                        <td>{{relation.timestampFormatted}}</td>
-                                        <td>{{relation.comment}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </umb-control-group>
-                    </umb-box-content>
-                </umb-box>
+                <umb-editor-sub-views sub-views="vm.page.navigation" model="vm">
+                </umb-editor-sub-views>
             </umb-editor-container>
 
             <umb-editor-footer>
