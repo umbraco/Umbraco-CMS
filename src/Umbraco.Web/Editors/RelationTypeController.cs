@@ -75,7 +75,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new Core.Models.RelationType(relationType.ChildObjectType, relationType.ParentObjectType, relationType.Name.ToSafeAlias(true))
+            var relationTypePersisted = new RelationType(relationType.ChildObjectType, relationType.ParentObjectType, relationType.Name.ToSafeAlias(true))
             {
                 Name = relationType.Name,
                 IsBidirectional = relationType.IsBidirectional
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
             catch (Exception ex)
             {
                 Logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
-                return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
+                return Request.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
 
@@ -105,7 +105,6 @@ namespace Umbraco.Web.Editors
 
             if (relationTypePersisted == null)
             {
-                // TODO: Translate message
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Relation type does not exist"));
             }
 
