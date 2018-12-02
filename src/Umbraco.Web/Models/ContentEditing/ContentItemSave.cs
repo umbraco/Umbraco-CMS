@@ -40,13 +40,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "templateAlias")]
         public string TemplateAlias { get; set; }
-
-        //TODO: these will need to move to the variant
-        [DataMember(Name = "releaseDate")]
-        public DateTime? ReleaseDate { get; set; }
-        [DataMember(Name = "expireDate")]
-        public DateTime? ExpireDate { get; set; }
-
+        
         #region IContentSave
 
         [DataMember(Name = "action", IsRequired = true)]

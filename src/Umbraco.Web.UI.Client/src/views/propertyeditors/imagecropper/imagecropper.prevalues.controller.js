@@ -1,9 +1,12 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesController",
-	function ($scope, $timeout) {
+	function ($scope) {
 
 	    if (!$scope.model.value) {
 	        $scope.model.value = [];
 	    }
+
+        $scope.editMode = false;
+        $scope.setFocus = false;
 
 	    $scope.remove = function (item, evt) {
 	        evt.preventDefault();
@@ -13,32 +16,57 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	    };
 
 	    $scope.edit = function (item, evt) {
-	        evt.preventDefault();
+            evt.preventDefault();
+            $scope.editMode = true;
+            $scope.setFocus = false;
+
 	        $scope.newItem = item;
 	    };
 
 	    $scope.cancel = function (evt) {
-	        evt.preventDefault();
+            evt.preventDefault();
+            $scope.editMode = false;
+            $scope.setFocus = true;
+
 	        $scope.newItem = null;
 	    };
 
-	    $scope.add = function (evt) {
-	        evt.preventDefault();
+        $scope.change = function () {
+            // Listen to the change event and set focus 2 false
+            if($scope.setFocus){
+                $scope.setFocus = false;
+                return;
+            }
+        }
 
-	        if ($scope.newItem && $scope.newItem.alias && 
+	    $scope.add = function (evt) {
+            evt.preventDefault();
+
+            $scope.editMode = false;
+
+            $scope.setFocus = true;
+
+	        if ($scope.newItem && $scope.newItem.alias &&
                 angular.isNumber($scope.newItem.width) && angular.isNumber($scope.newItem.height) &&
                 $scope.newItem.width > 0 && $scope.newItem.height > 0) {
 
-	            var exists = _.find($scope.model.value, function (item) { return $scope.newItem.alias === item.alias; });
+                var exists = _.find($scope.model.value, function (item) { return $scope.newItem.alias === item.alias; });
+
 	            if (!exists) {
 	                $scope.model.value.push($scope.newItem);
 	                $scope.newItem = {};
-	                $scope.hasError = false;
+                    $scope.hasError = false;
+                    $scope.cropAdded = false;
 	                return;
-	            }
+                }
+                else{
+                    $scope.newItem = null;
+                    $scope.hasError = false;
+                    return;
+                }
 	        }
 
 	        //there was an error, do the highlight (will be set back by the directive)
 	        $scope.hasError = true;
-	    };
+        };
 	});

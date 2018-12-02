@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class ImageCropperConfiguration
     {
-        [ConfigurationField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
+        [ConfigurationField("crops", "Define crops", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
         public Crop[] Crops { get; set; }
 
         public class Crop

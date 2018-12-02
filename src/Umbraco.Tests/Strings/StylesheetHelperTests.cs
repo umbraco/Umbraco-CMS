@@ -131,5 +131,84 @@ world */p{font-size: 1em;}")]
             // Assert
             Assert.IsTrue(results.Any() == false);
         }
+
+        [Test]
+        public void AppendRules_IsFormatted()
+        {
+            // base CSS
+            var css = Tabbed(
+@"body {
+#font-family:Arial;
+}");
+            // add a couple of rules
+            var result = StylesheetHelper.AppendRule(css, new StylesheetRule
+            {
+                Name = "Test",
+                Selector = ".test",
+                Styles = "font-color: red;margin: 1rem;"
+            });
+            result = StylesheetHelper.AppendRule(result, new StylesheetRule
+            {
+                Name = "Test2",
+                Selector = ".test2",
+                Styles = "font-color: green;"
+            });
+
+            // verify the CSS formatting including the indents
+            Assert.AreEqual(Tabbed(
+@"body {
+#font-family:Arial;
+}
+
+/**umb_name:Test*/
+.test {
+#font-color: red;
+#margin: 1rem;
+}
+
+/**umb_name:Test2*/
+.test2 {
+#font-color: green;
+}"), result
+            );
+        }
+
+        [Test]
+        public void ParseFormattedRules_CanParse()
+        {
+            // base CSS
+            var css = Tabbed(
+@"body {
+#font-family:Arial;
+}
+
+/**umb_name:Test*/
+.test {
+#font-color: red;
+#margin: 1rem;
+}
+
+/**umb_name:Test2*/
+.test2 {
+#font-color: green;
+}");
+            var rules = StylesheetHelper.ParseRules(css);
+            Assert.AreEqual(2, rules.Count());
+
+            Assert.AreEqual("Test", rules.First().Name);
+            Assert.AreEqual(".test", rules.First().Selector);
+            Assert.AreEqual(
+@"font-color: red;
+margin: 1rem;", rules.First().Styles);
+
+            Assert.AreEqual("Test2", rules.Last().Name);
+            Assert.AreEqual(".test2", rules.Last().Selector);
+            Assert.AreEqual("font-color: green;", rules.Last().Styles);
+        }
+
+        // can't put tabs in verbatim strings, so this will replace # with \t to test the CSS indents
+        // - and it's tabs because the editor uses tabs, not spaces...
+        private static string Tabbed(string input) => input.Replace("#", "\t");
+
     }
 }

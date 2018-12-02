@@ -376,7 +376,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             var foundIndex = 0;
 
             if ($scope.model.selection.length > 0) {
-                for (i = 0; $scope.model.selection.length > i; i++) {
+                for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
                     if (selectedItem.id === item.id) {
                         found = true;

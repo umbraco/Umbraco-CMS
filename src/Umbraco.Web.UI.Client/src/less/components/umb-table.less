@@ -150,35 +150,12 @@ input.umb-table__input {
 }
 
 // Show checkmark when checked, hide file icon
-.-selected {
+.umb-table-row--selected {
     .umb-table-body__fileicon {
         display: none;
     }
-
     .umb-table-body__checkicon {
         display: inline-block;
-    }
-}
-
-
-// Styling for when item is published or not
-.-published {
-
-}
-
-.-content :not(.with-unpublished-version).-unpublished {
-    .umb-table__name > * {
-        opacity: .4;
-    }
-
-    .umb-table-body__icon {
-        opacity: .4;
-    }
-}
-
-.-selected.-unpublished {
-    .umb-table-body__icon {
-        opacity: 1;
     }
 }
 

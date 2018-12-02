@@ -43,7 +43,7 @@ namespace Umbraco.Web.Migrations
 
                 var count = scope.Database.Execute(sql);
 
-                _logger.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
+                _logger.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared {Total} items from the media xml cache that were trashed and not meant to be there", count);
             }
         }
     }

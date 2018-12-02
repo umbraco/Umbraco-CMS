@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Configuration
+﻿using System;
+
+namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
@@ -24,6 +26,8 @@
         /// <remarks>
         /// Defaults to ~/App_Data/umbraco.config
         /// </remarks>
+        //fixme - remove
+        [Obsolete("This should not be used, need to remove the content xml cache")]
         string ContentXmlFile { get; }
 
         /// <summary>

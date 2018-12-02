@@ -28,7 +28,21 @@ namespace Umbraco.Web.Models.Mapping
         {
             public IEnumerable<Language> Convert(IEnumerable<ILanguage> source, IEnumerable<Language> destination, ResolutionContext context)
             {
-                return source.Select(x => context.Mapper.Map<ILanguage, Language>(x, null, context)).OrderBy(x => x.Name);
+                var langs = source.Select(x => context.Mapper.Map<ILanguage, Language>(x, null, context)).ToList();
+
+                //Put the default language first in the list & then sort rest by a-z
+                var defaultLang = langs.SingleOrDefault(x => x.IsDefault);
+
+                //Remove the default lang from the list for now
+                langs.Remove(defaultLang);
+
+                //Sort the remaining languages a-z
+                langs = langs.OrderBy(x => x.Name).ToList();
+
+                //Insert the default lang as the first item
+                langs.Insert(0, defaultLang);
+
+                return langs;
             }
         }
     }

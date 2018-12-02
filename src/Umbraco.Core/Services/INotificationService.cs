@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -14,20 +13,6 @@ namespace Umbraco.Core.Services
     public interface INotificationService : IService
     {
         /// <summary>
-        /// Sends the notifications for the specified user regarding the specified node and action.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="operatingUser"></param>
-        /// <param name="action"></param>
-        /// <param name="actionName"></param>
-        /// <param name="http"></param>
-        /// <param name="createSubject"></param>
-        /// <param name="createBody"></param>
-        void SendNotifications(IUser operatingUser, IUmbracoEntity entity, string action, string actionName, HttpContextBase http,
-                               Func<IUser, string[], string> createSubject,
-                               Func<IUser, string[], string> createBody);
-
-        /// <summary>
         /// Sends the notifications for the specified user regarding the specified nodes and action.
         /// </summary>
         /// <param name="entities"></param>
@@ -37,9 +22,9 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        void SendNotifications(IUser operatingUser, IEnumerable<IUmbracoEntity> entities, string action, string actionName, HttpContextBase http,
-                               Func<IUser, string[], string> createSubject,
-                               Func<IUser, string[], string> createBody);
+        void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+                               Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
+                               Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody);
 
         /// <summary>
         /// Gets the notifications for the user

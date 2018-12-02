@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -106,8 +107,10 @@ namespace Umbraco.Tests.TestHelpers
             CacheHelper cache,
             ILogger logger,
             IGlobalSettings globalSettings,
+            IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            TypeLoader typeLoader,
             IServiceFactory container = null)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
@@ -158,10 +161,11 @@ namespace Umbraco.Tests.TestHelpers
             var runtimeState = Mock.Of<IRuntimeState>();
             var idkMap = new IdkMap(scopeProvider);
 
+            var localizationService = GetLazyService<ILocalizationService>(container, c => new LocalizationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDictionaryRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<ILanguageRepository>(c)));
             var userService = GetLazyService<IUserService>(container, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c),globalSettings));
             var dataTypeService = GetLazyService<IDataTypeService>(container, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c)));
             var contentService = GetLazyService<IContentService>(container, c => new ContentService(scopeProvider, logger, eventMessagesFactory, mediaFileSystem, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c), GetRepo<ILanguageRepository>(c)));
-            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, logger, GetRepo<INotificationsRepository>(c),globalSettings));
+            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c)));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(container, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
@@ -169,7 +173,6 @@ namespace Umbraco.Tests.TestHelpers
             var contentTypeService = GetLazyService<IContentTypeService>(container, c => new ContentTypeService(scopeProvider, logger, eventMessagesFactory, contentService.Value, GetRepo<IContentTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IDocumentTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
             var mediaTypeService = GetLazyService<IMediaTypeService>(container, c => new MediaTypeService(scopeProvider, logger, eventMessagesFactory, mediaService.Value, GetRepo<IMediaTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
             var fileService = GetLazyService<IFileService>(container, c => new FileService(scopeProvider, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c)));
-            var localizationService = GetLazyService<ILocalizationService>(container, c => new LocalizationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDictionaryRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<ILanguageRepository>(c)));
 
             var memberTypeService = GetLazyService<IMemberTypeService>(container, c => new MemberTypeService(scopeProvider, logger, eventMessagesFactory, memberService.Value, GetRepo<IMemberTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c)));
             var entityService = GetLazyService<IEntityService>(container, c => new EntityService(
@@ -181,7 +184,7 @@ namespace Umbraco.Tests.TestHelpers
             var macroService = GetLazyService<IMacroService>(container, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(container, c => new PackagingService(logger, contentService.Value, contentTypeService.Value, mediaService.Value, macroService.Value, dataTypeService.Value, fileService.Value, localizationService.Value, entityService.Value, userService.Value, scopeProvider, urlSegmentProviders, GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()))));
             var relationService = GetLazyService<IRelationService>(container, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
-            var treeService = GetLazyService<IApplicationTreeService>(container, c => new ApplicationTreeService(logger, cache));
+            var treeService = GetLazyService<IApplicationTreeService>(container, c => new ApplicationTreeService(logger, cache, typeLoader));
             var tagService = GetLazyService<ITagService>(container, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var sectionService = GetLazyService<ISectionService>(container, c => new SectionService(userService.Value, treeService.Value, scopeProvider, cache));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(container, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));

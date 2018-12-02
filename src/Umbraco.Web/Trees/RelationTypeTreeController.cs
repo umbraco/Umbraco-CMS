@@ -3,7 +3,7 @@ using System.Net.Http.Formatting;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
@@ -22,18 +22,18 @@ namespace Umbraco.Web.Trees
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                
+
                 //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 return menu;
             }
 
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
             if (relationType == null) return new MenuItemCollection();
-            
+
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
-            
+
             return menu;
         }
 

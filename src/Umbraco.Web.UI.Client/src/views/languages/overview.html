@@ -41,7 +41,7 @@
                     <tr ng-repeat="language in vm.languages" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
                             <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
-                            <span class="bold">{{ language.name }}</span>
+                            <span ng-class="{'bold': language.isDefault}">{{ language.name }}</span>
                         </td>
                         <td>
                             <span>{{ language.culture }}</span>

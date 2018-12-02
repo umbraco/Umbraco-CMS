@@ -26,6 +26,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Web.Search
 {
@@ -102,12 +103,9 @@ namespace Umbraco.Web.Search
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
             ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated; ;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-
-            // fixme - content type?
-            // events handling removed in ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
-            // because, could not make sense of it?
 
             EnsureUnlocked(profilingLogger.Logger, examineManager);
 
@@ -307,16 +305,191 @@ namespace Umbraco.Web.Search
                     // branch
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
-                        var descendants = mediaService.GetDescendants(media);
-                        foreach (var descendant in descendants)
+                        const int pageSize = 500;
+                        var page = 0;
+                        var total = long.MaxValue;
+                        while (page * pageSize < total)
                         {
-                            ReIndexForMedia(descendant, descendant.Trashed == false);
+                            var descendants = mediaService.GetPagedDescendants(media.Id, page++, pageSize, out total);
+                            foreach (var descendant in descendants)
+                            {
+                                ReIndexForMedia(descendant, descendant.Trashed == false);
+                            }
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Updates indexes based on content type changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
+        {
+            if (Suspendable.ExamineEvents.CanIndex == false)
+                return;
+
+            if (args.MessageType != MessageType.RefreshByPayload)
+                throw new NotSupportedException();
+                        
+            var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
+           
+            foreach (var payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
+            {
+                if (!changedIds.TryGetValue(payload.ItemType, out var idLists))
+                {
+                    idLists = (removedIds: new List<int>(), refreshedIds: new List<int>(), otherIds: new List<int>());
+                    changedIds.Add(payload.ItemType, idLists);
+                }
+
+                if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+                    idLists.removedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                    idLists.refreshedIds.Add(payload.Id);
+                else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
+                    idLists.otherIds.Add(payload.Id);
+            }
+
+            const int pageSize = 500;
+
+            foreach(var ci in changedIds)
+            {
+                if (ci.Value.refreshedIds.Count > 0 || ci.Value.otherIds.Count > 0)
+                {
+                    switch(ci.Key)
+                    {
+                        case var itemType when itemType == typeof(IContentType).Name:
+                            RefreshContentOfContentTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
+                            break;
+                        case var itemType when itemType == typeof(IMediaType).Name:
+                            RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
+                            break;
+                        case var itemType when itemType == typeof(IMemberType).Name:
+                            RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
+                            break;
+                    }
+                }
+
+                //Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
+                foreach (var id in ci.Value.removedIds)
+                {
+                    foreach (var index in _examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>())
+                    {
+                        var searcher = index.GetSearcher();
+
+                        var page = 0;
+                        var total = long.MaxValue;
+                        while (page * pageSize < total)
+                        {
+                            //paging with examine, see https://shazwazza.com/post/paging-with-examine/
+                            var results = searcher.Search(
+                                    searcher.CreateCriteria().Field("nodeType", id).Compile(),
+                                    maxResults: pageSize * (page + 1));
+                            total = results.TotalItemCount;
+                            var paged = results.Skip(page * pageSize);
+
+                            foreach (var item in paged)
+                                if (int.TryParse(item.Id, out var contentId))
+                                    DeleteIndexForEntity(contentId, false);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RefreshMemberOfMemberTypes(int[] memberTypeIds)
+        {
+            const int pageSize = 500;
+
+            var memberTypes = _services.MemberTypeService.GetAll(memberTypeIds);
+            foreach(var memberType in memberTypes)
+            {
+                var page = 0;
+                var total = long.MaxValue;
+                while (page * pageSize < total)
+                {
+                    var memberToRefresh = _services.MemberService.GetAll(
+                        page++, pageSize, out total, "LoginName", Direction.Ascending,
+                        memberType.Alias);
+
+                    foreach (var c in memberToRefresh)
+                    {
+                        ReIndexForMember(c);
+                    }
+                }
+            }
+        }
+
+        private void RefreshMediaOfMediaTypes(int[] mediaTypeIds)
+        {
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                var mediaToRefresh = _services.MediaService.GetPagedOfTypes(
+                    //Re-index all content of these types
+                    mediaTypeIds,
+                    page++, pageSize, out total, null,
+                    Ordering.By("Path", Direction.Ascending));
+
+                foreach (var c in mediaToRefresh)
+                {
+                    ReIndexForMedia(c, c.Trashed == false);
+                }
+            }
+        }
+
+        private void RefreshContentOfContentTypes(int[] contentTypeIds)
+        {
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
+            {
+                var contentToRefresh = _services.ContentService.GetPagedOfTypes(
+                    //Re-index all content of these types
+                    contentTypeIds,
+                    page++, pageSize, out total, null,
+                    //order by shallowest to deepest, this allows us to check it's published state without checking every item
+                    Ordering.By("Path", Direction.Ascending));
+
+                //track which Ids have their paths are published
+                var publishChecked = new Dictionary<int, bool>();
+
+                foreach (var c in contentToRefresh)
+                {
+                    IContent published = null;
+                    if (c.Published)
+                    {
+                        if (publishChecked.TryGetValue(c.ParentId, out var isPublished))
+                        {
+                            //if the parent's published path has already been verified then this is published
+                            if (isPublished)
+                                published = c;
+                        }
+                        else
+                        {
+                            //nothing by parent id, so query the service and cache the result for the next child to check against
+                            isPublished = _services.ContentService.IsPathPublished(c);
+                            publishChecked[c.Id] = isPublished;
+                            if (isPublished)
+                                published = c;
+                        }
+                    }
+
+                    ReIndexForContent(c, published);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates indexes based on content changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -340,6 +513,8 @@ namespace Umbraco.Web.Search
                     // ExamineEvents does not support RefreshAll
                     // just ignore that payload
                     // so what?!
+
+                    //fixme: Rebuild the index at this point?
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
@@ -355,7 +530,7 @@ namespace Umbraco.Web.Search
                     }
 
                     IContent published = null;
-                    if (content.Published && ((ContentService)contentService).IsPathPublished(content))
+                    if (content.Published && contentService.IsPathPublished(content))
                         published = content;
 
                     // just that content
@@ -365,19 +540,28 @@ namespace Umbraco.Web.Search
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                     {
                         var masked = published == null ? null : new List<int>();
-                        var descendants = contentService.GetDescendants(content);
-                        foreach (var descendant in descendants)
+                        const int pageSize = 500;
+                        var page = 0;
+                        var total = long.MaxValue;
+                        while(page * pageSize < total)
                         {
-                            published = null;
-                            if (masked != null) // else everything is masked
-                            {
-                                if (masked.Contains(descendant.ParentId) || !descendant.Published)
-                                    masked.Add(descendant.Id);
-                                else
-                                    published = descendant;
-                            }
+                            var descendants = contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, 
+                                //order by shallowest to deepest, this allows us to check it's published state without checking every item
+                                ordering: Ordering.By("Path", Direction.Ascending));
 
-                            ReIndexForContent(descendant, published);
+                            foreach (var descendant in descendants)
+                            {
+                                published = null;
+                                if (masked != null) // else everything is masked
+                                {
+                                    if (masked.Contains(descendant.ParentId) || !descendant.Published)
+                                        masked.Add(descendant.Id);
+                                    else
+                                        published = descendant;
+                                }
+
+                                ReIndexForContent(descendant, published);
+                            }
                         }
                     }
                 }

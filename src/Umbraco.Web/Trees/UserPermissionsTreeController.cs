@@ -3,10 +3,11 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
 

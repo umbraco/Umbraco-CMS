@@ -53,7 +53,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.ContentType, opt => opt.ResolveUsing(mediaTypeBasicResolver))
                 .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger))))
-                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver));
+                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver))
+                .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
+
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic>>()
@@ -66,7 +68,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.VariesByCulture, opt => opt.MapFrom(src => src.ContentType.VariesByCulture()));
+
 
             //FROM IMedia TO ContentItemDto<IMedia>
             CreateMap<IMedia, ContentPropertyCollectionDto>();

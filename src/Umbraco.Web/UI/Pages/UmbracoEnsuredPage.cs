@@ -11,9 +11,10 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
-using Umbraco.Web._Legacy.Actions;
+
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -53,7 +54,9 @@ namespace Umbraco.Web.UI.Pages
             var entity = entityId == Constants.System.Root
                 ? EntitySlim.Root
                 : Services.EntityService.Get(entityId, objectType);
-            var hasAccess = Security.CurrentUser.HasPathAccess(entity, Services.EntityService, objectType == UmbracoObjectTypes.Document ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia);
+            var hasAccess = objectType == UmbracoObjectTypes.Document
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
             if (hasAccess == false)
                 throw new AuthorizationException($"The current user doesn't have access to the path '{entity.Path}'");
 

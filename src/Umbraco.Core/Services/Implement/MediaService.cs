@@ -364,18 +364,39 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by the Id of the <see cref="IMediaType"/>
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IMediaType"/></param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetMediaOfMediaType(int id)
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
         {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.ContentTypeId == id);
-                return _mediaRepository.Get(query);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _mediaRepository.GetPage(
+                    Query<IMedia>().Where(x => x.ContentTypeId == contentTypeId),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _mediaRepository.GetPage(
+                    Query<IMedia>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                    pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -460,148 +481,35 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetChildren(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.ParentId == id);
-                return _mediaRepository.Get(query).OrderBy(x => x.SortOrder);
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <param name="pageIndex">Page index (zero based)</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalChildren">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, string filter = "")
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IMedia>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <param name="pageIndex">Page index (zero based)</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalChildren">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter)
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IMedia> filter = null, Ordering ordering = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
 
                 var query = Query<IMedia>().Where(x => x.ParentId == id);
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Children from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalChildren">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search text filter</param>
-        /// <param name="contentTypeFilter">A list of content type Ids to filter the list by</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, string filter, int[] contentTypeFilter)
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IMedia> filter = null, Ordering ordering = null)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null)
+                ordering = Ordering.By("Path");
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
-
-                var query = Query<IMedia>();
-                // always check for a parent - else it will also get decendants (and then you should use the GetPagedDescendants method)
-
-                query.Where(x => x.ParentId == id);
-
-                if (contentTypeFilter != null && contentTypeFilter.Length > 0)
-                {
-                    query.Where(x => contentTypeFilter.Contains(x.ContentTypeId));
-                }
-
-                var filterQuery = filter.IsNullOrWhiteSpace()
-                    ? null
-                    : Query<IMedia>().Where(x => x.Name.Contains(filter));
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filterQuery, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalChildren">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="filter">Search text filter</param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
-        {
-            var filterQuery = filter.IsNullOrWhiteSpace()
-                ? null
-                : Query<IMedia>().Where(x => x.Name.Contains(filter));
-
-            return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
-        }
-
-        /// <summary>
-        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalChildren">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMedia> filter)
-        {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-
-                var query = Query<IMedia>();
 
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
@@ -612,47 +520,24 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IMedia>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith(mediaPath[0].Path + ",", TextColumnType.NVarchar));
+                    return GetPagedDescendantsLocked(mediaPath[0].Path, pageIndex, pageSize, out totalChildren, filter, ordering);
                 }
-
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
+                return GetPagedDescendantsLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
 
-        /// <summary>
-        /// Gets descendants of a <see cref="IMedia"/> object by its Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve descendants from</param>
-        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetDescendants(int id)
+        private IEnumerable<IMedia> GetPagedDescendantsLocked(string mediaPath, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IMedia> filter, Ordering ordering)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var media = GetById(id);
-                if (media == null)
-                    return Enumerable.Empty<IMedia>();
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-                var pathMatch = media.Path + ",";
-                var query = Query<IMedia>().Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
-                return _mediaRepository.Get(query);
-            }
-        }
+            var query = Query<IMedia>();
+            if (!mediaPath.IsNullOrWhiteSpace())
+                query.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
 
-        /// <summary>
-        /// Gets descendants of a <see cref="IMedia"/> object by its Id
-        /// </summary>
-        /// <param name="media">The Parent <see cref="IMedia"/> object to retrieve descendants from</param>
-        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetDescendants(IMedia media)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                var pathMatch = media.Path + ",";
-                var query = Query<IMedia>().Where(x => x.Id != media.Id && x.Path.StartsWith(pathMatch));
-                return _mediaRepository.Get(query);
-            }
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
         /// <summary>
@@ -694,17 +579,18 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a collection of an <see cref="IMedia"/> objects, which resides in the Recycle Bin
-        /// </summary>
-        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetMediaInRecycleBin()
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMedia> filter = null, Ordering ordering = null)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
+                if (ordering == null)
+                    ordering = Ordering.By("Path");
+
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
-                return _mediaRepository.Get(query);
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
             }
         }
 
@@ -865,25 +751,8 @@ namespace Umbraco.Core.Services.Implement
 
         private void DeleteLocked(IScope scope, IMedia media)
         {
-            // then recursively delete descendants, bottom-up
-            // just repository.Delete + an event
-            var stack = new Stack<IMedia>();
-            stack.Push(media);
-            var level = 1;
-            while (stack.Count > 0)
+            void DoDelete(IMedia c)
             {
-                var c = stack.Peek();
-                IMedia[] cc;
-                if (c.Level == level)
-                    while ((cc = c.Children(this).ToArray()).Length > 0)
-                    {
-                        foreach (var ci in cc)
-                            stack.Push(ci);
-                        c = cc[cc.Length - 1];
-                    }
-                c = stack.Pop();
-                level = c.Level;
-
                 _mediaRepository.Delete(c);
                 var args = new DeleteEventArgs<IMedia>(c, false); // raise event & get flagged files
                 scope.Events.Dispatch(Deleted, this, args);
@@ -891,6 +760,18 @@ namespace Umbraco.Core.Services.Implement
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
                     (file, e) => Logger.Error<MediaService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
+
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while(page * pageSize < total)
+            {
+                //get descendants - ordered from deepest to shallowest
+                var descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                foreach (var c in descendants)
+                    DoDelete(c);
+            }
+            DoDelete(media);
         }
 
         //TODO:
@@ -1007,7 +888,9 @@ namespace Umbraco.Core.Services.Implement
 
                 var originalPath = media.Path;
 
-                if (scope.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), nameof(Trashing)))
+                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
+                var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
+                if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs, nameof(Trashing)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -1018,8 +901,9 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 var moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
-
-                scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo), nameof(Trashed));
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
 
                 scope.Complete();
@@ -1034,13 +918,15 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public void Move(IMedia media, int parentId, int userId = 0)
+        public Attempt<OperationResult> Move(IMedia media, int parentId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinMedia)
             {
                 MoveToRecycleBin(media, userId);
-                return;
+                return OperationResult.Attempt.Succeed(evtMsgs);
             }
 
             var moves = new List<Tuple<IMedia, string>>();
@@ -1054,11 +940,11 @@ namespace Umbraco.Core.Services.Implement
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback // causes rollback
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
-                var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
+                var moveEventArgs = new MoveEventArgs<IMedia>(true, evtMsgs, moveEventInfo);
                 if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 // if media was trashed, and since we're not moving to the recycle bin,
@@ -1083,6 +969,7 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Move, userId, media.Id);
                 scope.Complete();
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         // MUST be called from within WriteLock
@@ -1100,8 +987,8 @@ namespace Umbraco.Core.Services.Implement
 
             moves.Add(Tuple.Create(media, media.Path)); // capture original path
 
-            // get before moving, in case uow is immediate
-            var descendants = GetDescendants(media);
+            //need to store the original path to lookup descendants based on it below
+            var originalPath = media.Path;
 
             // these will be updated by the repo because we changed parentId
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
@@ -1114,14 +1001,21 @@ namespace Umbraco.Core.Services.Implement
             //paths[media.Id] = media.Path;
             paths[media.Id] = (parent == null ? (parentId == Constants.System.RecycleBinMedia ? "-1,-21" : "-1") : parent.Path) + "," + media.Id;
 
-            foreach (var descendant in descendants)
+            const int pageSize = 500;
+            var page = 0;
+            var total = long.MaxValue;
+            while (page * pageSize < total)
             {
-                moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
+                var descendants = GetPagedDescendantsLocked(originalPath, page++, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                foreach (var descendant in descendants)
+                {
+                    moves.Add(Tuple.Create(descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveMediaLocked(descendant, userId, trash);
+                    // update path and level since we do not update parentId
+                    descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                    descendant.Level += levelDelta;
+                    PerformMoveMediaLocked(descendant, userId, trash);
+                }
             }
         }
 

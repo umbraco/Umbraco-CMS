@@ -159,7 +159,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         [DataMember]
         public virtual IReadOnlyDictionary<string, ContentCultureInfos> CultureInfos => _cultureInfos ?? NoInfos;
-        
+
         /// <inheritdoc />
         public string GetCultureName(string culture)
         {
@@ -222,6 +222,12 @@ namespace Umbraco.Core.Models
                 _cultureInfos = null;
         }
 
+        protected void TouchCultureInfo(string culture)
+        {
+            if (_cultureInfos == null || !_cultureInfos.TryGetValue(culture, out var infos)) return;
+            _cultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
+        }
+
         // internal for repository
         internal void SetCultureInfo(string culture, string name, DateTime date)
         {
@@ -235,7 +241,7 @@ namespace Umbraco.Core.Models
             {
                 _cultureInfos = new ContentCultureInfosCollection();
                 _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
-            }   
+            }
 
             _cultureInfos.AddOrUpdate(culture, name, date);
         }
@@ -368,7 +374,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region Validation
-        
+
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = "*")
         {
@@ -475,33 +481,27 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// Overriden to deal with specific object instances
         /// </remarks>
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (ContentBase) base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedContent = (ContentBase)clone;
 
             //if culture infos exist then deal with event bindings
-            if (clone._cultureInfos != null)
+            if (clonedContent._cultureInfos != null)
             {
-                clone._cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;          //clear this event handler if any
-                clone._cultureInfos = (ContentCultureInfosCollection) _cultureInfos.DeepClone(); //manually deep clone
-                clone._cultureInfos.CollectionChanged += clone.CultureInfosCollectionChanged;    //re-assign correct event handler
+                clonedContent._cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;          //clear this event handler if any
+                clonedContent._cultureInfos = (ContentCultureInfosCollection) _cultureInfos.DeepClone(); //manually deep clone
+                clonedContent._cultureInfos.CollectionChanged += clonedContent.CultureInfosCollectionChanged;    //re-assign correct event handler
             }
 
             //if properties exist then deal with event bindings
-            if (clone._properties != null)
+            if (clonedContent._properties != null)
             {
-                clone._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
-                clone._properties = (PropertyCollection) _properties.DeepClone(); //manually deep clone
-                clone._properties.CollectionChanged += clone.PropertiesChanged;   //re-assign correct event handler
+                clonedContent._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
+                clonedContent._properties = (PropertyCollection) _properties.DeepClone(); //manually deep clone
+                clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }
-
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
         }
     }
 }

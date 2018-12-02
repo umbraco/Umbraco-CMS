@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
+function DataTypeEditController($scope, $routeParams, appState, navigationService, dataTypeResource, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
 
     //setup scope vars
     $scope.page = {};

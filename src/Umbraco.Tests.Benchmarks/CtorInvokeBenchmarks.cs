@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Benchmarks
                     .WithLaunchCount(1) // benchmark process will be launched only once
                     .WithIterationTime(TimeInterval.FromMilliseconds(400)) 
                     .WithWarmupCount(3)
-                    .WithTargetCount(6));
+                    .WithIterationCount(6));
             }
         }
 

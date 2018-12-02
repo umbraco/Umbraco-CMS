@@ -13,7 +13,8 @@
                 label-key="contentTypeEditor_compositions"
                 icon="icon-merge"
                 action="openCompositionsDialog()"
-                size="xs">
+                size="xs"
+                add-ellipsis="true">
             </umb-button>
 
             <umb-button
@@ -157,7 +158,7 @@
                                                 <div class="umb-validation-label" ng-message="valServerField">{{propertyTypeForm.groupName.errorMsg}}</div>
                                                 <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
                                             </div>
-                                            
+
                                         </div>
 
                                         <div class="umb-group-builder__property-meta-description">
@@ -229,11 +230,11 @@
                                 </div>
 
                                 <ng-form name="propertyEditorPreviewForm" umb-disable-form-validation>
-                                    <umb-property-editor
-                                        ng-if="property.view !== undefined"
-                                        model="property"
-                                        preview="true">
-                                    </umb-property-editor>
+                                        <umb-property-editor
+                                            ng-if="property.view !== undefined"
+                                            model="property"
+                                            preview="true">
+                                        </umb-property-editor>
                                 </ng-form>
 
                             </div>

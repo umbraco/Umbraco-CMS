@@ -418,7 +418,7 @@ namespace Umbraco.Examine
             //icon
             if (e.IndexItem.ValueSet.Values.TryGetValue("icon", out var icon) && e.IndexItem.ValueSet.Values.ContainsKey(IconFieldName) == false)
             {
-                e.IndexItem.ValueSet.Values[IconFieldName] = new List<object> { icon };
+                e.IndexItem.ValueSet.Values[IconFieldName] = icon;
             }
         }
 

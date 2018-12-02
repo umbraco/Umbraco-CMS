@@ -3,7 +3,7 @@
     * @name umbraco.resources.mediaTypeResource
     * @description Loads in data for media types
     **/
-function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
+function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
 
@@ -208,13 +208,15 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("media_moveFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                'Failed to move content');
+                promise);
         },
 
         copy: function (args) {
@@ -228,16 +230,20 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("media_copyFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostCopy"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                'Failed to copy content');
+                promise);
         },
 
         createContainer: function(parentId, name) {
+
+            var promise = localizationService.localize("media_createFolderFailed", [parentId]);
 
             return umbRequestHelper.resourcePromise(
                  $http.post(
@@ -245,16 +251,18 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
                         { parentId: parentId, name: encodeURIComponent(name) })),
-                'Failed to create a folder under parent id ' + parentId);
+                promise);
         },
 
         renameContainer: function (id, name) {
+
+            var promise = localizationService.localize("media_renameFolderFailed", [id]);
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl",
                     "PostRenameContainer",
                     { id: id, name: name })),
-                "Failed to rename the folder with id " + id
+                promise
             );
 
         }

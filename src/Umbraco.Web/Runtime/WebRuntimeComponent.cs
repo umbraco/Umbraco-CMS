@@ -31,6 +31,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web.ContentApps;
@@ -53,7 +54,7 @@ using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
-using Umbraco.Web._Legacy.Actions;
+
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
@@ -121,9 +122,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
             composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
 
-            composition.Container.RegisterMvcControllers(typeLoader, GetType().Assembly);
+            composition.Container.RegisterUmbracoControllers(typeLoader, GetType().Assembly);
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
-            composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Runtime
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!
 
             composition.Container.RegisterCollectionBuilder<ActionCollectionBuilder>()
-                .SetProducer(() => typeLoader.GetActions());
+                .Add(() => typeLoader.GetTypes<IAction>());
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(typeLoader.GetSurfaceControllers());
             composition.Container.RegisterInstance(surfaceControllerTypes);
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-            
+
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course

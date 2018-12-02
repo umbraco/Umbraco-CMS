@@ -343,7 +343,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);
+            var parent = treeNode.parent();
+            parent.children.splice(parent.children.indexOf(treeNode), 1);
+
+            parent.hasChildren = parent.children.length !== 0;
         },
 
         /**
@@ -402,20 +405,38 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "Cannot get a descendant node from a section container node without a treeAlias specified";
             }
 
-            //if it is a section container, we need to find the tree to be searched
-            if (treeNode.isContainer) {
-                var foundRoot = null;
-                for (var c = 0; c < treeNode.children.length; c++) {
-                    if (this.getTreeAlias(treeNode.children[c]) === treeAlias) {
-                        foundRoot = treeNode.children[c];
-                        break;
+            //the treeNode passed in could be a section container, or it could be a section group
+            //in either case we need to go through the children until we can find the actual tree root with the treeAlias
+            var self = this;
+            function getTreeRoot(tn) {
+                //if it is a section container, we need to find the tree to be searched
+                if (tn.isContainer) {
+                    for (var c = 0; c < tn.children.length; c++) {
+                        if (tn.children[c].isContainer) {
+                            //recurse
+                            var root = getTreeRoot(tn.children[c]);
+
+                            //only return if we found the root in this child, otherwise continue.
+                            if(root){
+                                return root;
+                            }
+                        }
+                        else if (self.getTreeAlias(tn.children[c]) === treeAlias) {
+                            return tn.children[c];
+                        }
                     }
+                    return null;
                 }
-                if (!foundRoot) {
-                    throw "Could not find a tree in the current section with alias " + treeAlias;
+                else {
+                    return tn;
                 }
-                treeNode = foundRoot;
             }
+
+            var foundRoot = getTreeRoot(treeNode);
+            if (!foundRoot) {
+                throw "Could not find a tree in the current section with alias " + treeAlias;
+            }
+            treeNode = foundRoot;
 
             //check this node
             if (treeNode.id === id) {
@@ -723,7 +744,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
             return reversePath.reverse();
         },
-        
+
         syncTree: function(args) {
 
             if (!args) {

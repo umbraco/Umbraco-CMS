@@ -159,10 +159,13 @@ gulp.task('dependencies', function () {
                 "./node_modules/ace-builds/src-min-noconflict/ext-settings_menu.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
+                "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
             ],
             "base": "./node_modules/ace-builds"
         },
@@ -251,24 +254,6 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/clipboard/dist"
         },
         {
-            "name": "codemirror",
-            "src":  [
-                "./node_modules/codemirror/lib/codemirror.js",
-                "./node_modules/codemirror/lib/codemirror.css",
-
-                "./node_modules/codemirror/mode/css/css.js",
-                "./node_modules/codemirror/mode/javascript/javascript.js",
-                "./node_modules/codemirror/mode/xml/xml.js",
-                "./node_modules/codemirror/mode/htmlmixed/htmlmixed.js",
-
-                "./node_modules/codemirror/addon/search/*",
-                "./node_modules/codemirror/addon/edit/*",
-                "./node_modules/codemirror/addon/selection/*",
-                "./node_modules/codemirror/addon/dialog/*"
-            ],
-            "base": "./node_modules/codemirror"
-        },
-        {
             "name": "jsdiff",
             "src":  ["./node_modules/diff/dist/diff.min.js"],
             "base": "./node_modules/diff/dist"
@@ -347,6 +332,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/ng-file-upload/dist"
         },
         {
+            "name": "nouislider",
+            "src":  [
+                "./node_modules/nouislider/distribute/nouislider.min.js",
+                "./node_modules/nouislider/distribute/nouislider.min.css"
+            ],
+            "base": "./node_modules/nouislider/distribute"
+        },
+        {
             "name": "signalr",
             "src":  ["./node_modules/signalr/jquery.signalR.js"],
             "base": "./node_modules/signalr"
@@ -356,6 +349,7 @@ gulp.task('dependencies', function () {
             "src":  [
                 "./node_modules/tinymce/tinymce.min.js",
                 "./node_modules/tinymce/plugins/**",
+                "./node_modules/tinymce/skins/**",
                 "./node_modules/tinymce/themes/**"
             ],
             "base": "./node_modules/tinymce"

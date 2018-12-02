@@ -5,9 +5,12 @@ using System.Web.Http.Filters;
 using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
-using Umbraco.Web._Legacy.Actions;
+
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Actions;
+using Umbraco.Core.Security;
+using System.Net;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -39,7 +42,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
@@ -107,25 +110,27 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            if (ContentController.CheckPermissions(
-                actionContext.Request.Properties,
-                //fixme: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
                 Current.UmbracoContext.Security.CurrentUser,
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.EntityService,
-                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
-            {
-                base.OnActionExecuting(actionContext);
-            }
-            else
-            {
+                out var contentItem,
+                _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
+
+            if (contentItem != null)
+            {
+                //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
             }
 
+            base.OnActionExecuting(actionContext);
         }
-
-
-
     }
 }

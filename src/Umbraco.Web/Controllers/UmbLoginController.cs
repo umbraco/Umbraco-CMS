@@ -37,7 +37,6 @@ namespace Umbraco.Web.Controllers
             //redirect to current page by default
 
             return RedirectToCurrentUmbracoPage();
-            //return RedirectToCurrentUmbracoUrl();
         }
     }
 }

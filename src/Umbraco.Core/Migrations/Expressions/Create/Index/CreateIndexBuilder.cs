@@ -56,41 +56,29 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Index
 
         /// <inheritdoc />
         ICreateIndexOnColumnBuilder ICreateIndexColumnOptionsBuilder.Unique()
-        {
-            Expression.Index.IsUnique = true;
-            //if it is Unique then it must be unique nonclustered and set the other flags
-            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
-            Expression.Index.IsClustered = false;
+        {                       
+            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;            
             return this;
         }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder NonClustered()
         {
-            Expression.Index.IndexType = IndexTypes.NonClustered;
-            Expression.Index.IsClustered = false;
-            Expression.Index.IndexType = IndexTypes.NonClustered;
-            Expression.Index.IsUnique = false;
+            Expression.Index.IndexType = IndexTypes.NonClustered;            
             return this;
         }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder Clustered()
-        {
-            Expression.Index.IndexType = IndexTypes.Clustered;
-            Expression.Index.IsClustered = true;
-            //if it is clustered then we have to change the index type set the other flags
-            Expression.Index.IndexType = IndexTypes.Clustered;
-            Expression.Index.IsClustered = true;
-            Expression.Index.IsUnique = false;
-            return this;
+        {           
+           Expression.Index.IndexType = IndexTypes.Clustered;           
+           return this;
         }
 
         /// <inheritdoc />
         ICreateIndexOnColumnBuilder ICreateIndexOptionsBuilder.Unique()
         {
-            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
-            Expression.Index.IsUnique = true;
+            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;           
             return this;
         }
     }

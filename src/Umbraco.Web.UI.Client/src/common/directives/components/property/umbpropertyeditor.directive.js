@@ -12,7 +12,7 @@ function umbPropEditor(umbPropEditorHelper) {
             scope: {
                 model: "=",
                 isPreValue: "@",
-                preview: "@"
+                preview: "<"
             },
             
             require: "^^form",

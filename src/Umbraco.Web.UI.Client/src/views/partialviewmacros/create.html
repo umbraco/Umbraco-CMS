@@ -25,13 +25,13 @@
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFromSnippet()">
                             <i class="large icon icon-article"></i>
-                            <span class="menu-label"><localize key="create_newPartialViewMacroFromSnippet">>New partial view macro from snippet</localize></span>
+                            <span class="menu-label"><localize key="create_newPartialViewMacroFromSnippet">>New partial view macro from snippet</localize>...</span>
                         </a>
                     </li>
                     <li class="umb-action">
                         <a href="" class="umb-action-link" ng-click="vm.showCreateFolder()">
                             <i class="large icon icon-folder"></i>
-                            <span class="menu-label"><localize key="general_folder"></localize></span>
+                            <span class="menu-label"><localize key="general_folder"></localize>...</span>
                         </a>
                     </li>
                 </ul>
@@ -79,7 +79,7 @@
 
     <!-- Dialog footer -->
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <button class="btn btn-info" ng-click="nav.hideDialog(true)">
+        <button class="btn btn-info" ng-click="vm.close()">
             <localize key="buttons_somethingElse">Do something else</localize>
         </button>
     </div>

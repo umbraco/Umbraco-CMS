@@ -83,10 +83,7 @@
                     if (rejection.data && rejection.data.ExceptionMessage) {
                         errMsg += "<br/> with error: <br/><i>" + rejection.data.ExceptionMessage + "</i>";
                     }
-                    if (rejection.config.data) {
-                        errMsg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
-                    }
-
+                    
                     notificationsService.error(
                         "Request error",
                         errMsg);
@@ -102,11 +99,8 @@
 
                     //It was decided to just put these messages into the normal status messages.
 
-                    var msg = "Unauthorized access to URL: <br/><i>" + rejection.config.url.split('?')[0] + "</i>";
-                    if (rejection.config.data) {
-                        msg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
-                    }
-
+                    var msg = "Unauthorized access to URL: <br/><i>" + rejection.config.url.split('?')[0] + "</i><br/>Contact your administrator for information.";
+                    
                     notificationsService.error("Authorization error", msg);
                 }
 

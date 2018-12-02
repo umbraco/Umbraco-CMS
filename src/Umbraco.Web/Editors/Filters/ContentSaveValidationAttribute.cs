@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
-using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -94,24 +96,32 @@ namespace Umbraco.Web.Editors.Filters
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.Publish:
-                    permissionToCheck.Add(ActionPublish.Instance.Letter);
+                case ContentSaveAction.PublishWithDescendants:
+                case ContentSaveAction.PublishWithDescendantsForce:
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SendPublish:
-                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
+                    contentToCheck = contentItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
+                    break;
+                case ContentSaveAction.Schedule:
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.SaveNew:
                     //Save new requires ActionNew
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {
@@ -126,8 +136,8 @@ namespace Umbraco.Web.Editors.Filters
                 case ContentSaveAction.SendPublishNew:
                     //Send new requires both ActionToPublish AND ActionNew
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionToPublish.ActionLetter);
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
@@ -139,11 +149,29 @@ namespace Umbraco.Web.Editors.Filters
                     }
                     break;
                 case ContentSaveAction.PublishNew:
+                case ContentSaveAction.PublishWithDescendantsNew:
+                case ContentSaveAction.PublishWithDescendantsForceNew:
                     //Publish new requires both ActionNew AND ActionPublish
                     //TODO: Shoudn't publish also require ActionUpdate since it will definitely perform an update to publish but maybe that's just implied
 
-                    permissionToCheck.Add(ActionNew.Instance.Letter);
-                    permissionToCheck.Add(ActionPublish.Instance.Letter);
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
+
+                    if (contentItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = _contentService.GetById(contentItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = contentItem.ParentId;
+                    }
+                    break;
+                case ContentSaveAction.ScheduleNew:
+                    
+                    permissionToCheck.Add(ActionNew.ActionLetter);
+                    permissionToCheck.Add(ActionUpdate.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {
@@ -159,17 +187,34 @@ namespace Umbraco.Web.Editors.Filters
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (ContentController.CheckPermissions(
-                actionContext.Request.Properties,
-                _security.CurrentUser,
-                _userService, _contentService, _entityService,
-                contentIdToCheck, permissionToCheck.ToArray(), contentToCheck) == false)
+            ContentPermissionsHelper.ContentAccess accessResult;
+            if (contentToCheck != null)
             {
-                actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();
-                return false;
+                //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
+
+                accessResult = ContentPermissionsHelper.CheckPermissions(
+                    contentToCheck, _security.CurrentUser,
+                    _userService, _entityService, permissionToCheck.ToArray());
+            }
+            else
+            {
+                accessResult = ContentPermissionsHelper.CheckPermissions(
+                       contentIdToCheck, _security.CurrentUser,
+                       _userService, _contentService, _entityService,
+                       out contentToCheck,
+                       permissionToCheck.ToArray());
+                if (contentToCheck != null)
+                {
+                    //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                    actionContext.Request.Properties[typeof(IContent).ToString()] = contentToCheck;
+                }
             }
 
-            return true;
+            if (accessResult == ContentPermissionsHelper.ContentAccess.NotFound)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return accessResult == ContentPermissionsHelper.ContentAccess.Granted;
         }
     }
 }

@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Actions;
+
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 
@@ -13,7 +15,7 @@ namespace Umbraco.Web.Trees
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree(TreeGroup = Constants.Trees.Groups.Settings)]
-    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, null)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -51,10 +53,12 @@ namespace Umbraco.Web.Trees
 
             var nodes = new TreeNodeCollection();
 
+            Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.AddRange(
-                    Services.LocalizationService.GetRootDictionaryItems().Select(
+                    Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
                         x => CreateTreeNode(
                             x.Id.ToInvariantString(),
                             id,
@@ -70,7 +74,7 @@ namespace Umbraco.Web.Trees
                 if (parentDictionary == null)
                     return nodes;
 
-                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderByDescending(item => item.Key).Select(
+                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
@@ -95,14 +99,12 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
             if (id != Constants.System.Root.ToInvariantString())
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(
-                    $"actions/{ActionDelete.Instance.Alias}"), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
-                $"actions/{ActionRefresh.Instance.Alias}"), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }

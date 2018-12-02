@@ -17,10 +17,9 @@ namespace Umbraco.Core.Models
     {
         private IContentType _contentType;
         private ITemplate _template;
+        private ContentScheduleCollection _schedule;
         private bool _published;
         private PublishedState _publishedState;
-        private DateTime? _releaseDate;
-        private DateTime? _expireDate;
         private ContentCultureInfosCollection _publishInfos;
         private ContentCultureInfosCollection _publishInfosOrig;
         private HashSet<string> _editedCultures;
@@ -86,9 +85,41 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
-            public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
+            public readonly PropertyInfo ContentScheduleSelector = ExpressionHelper.GetPropertyInfo<Content, ContentScheduleCollection>(x => x.ContentSchedule);
             public readonly PropertyInfo PublishCultureInfosSelector = ExpressionHelper.GetPropertyInfo<Content, IReadOnlyDictionary<string, ContentCultureInfos>>(x => x.PublishCultureInfos);
+        }
+
+        /// <inheritdoc />
+        [DoNotClone]
+        public ContentScheduleCollection ContentSchedule
+        {
+            get
+            {
+                if (_schedule == null)
+                {
+                    _schedule = new ContentScheduleCollection();
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+                }
+                return _schedule;
+            }
+            set
+            {
+                if(_schedule != null)
+                    _schedule.CollectionChanged -= ScheduleCollectionChanged;
+                SetPropertyValueAndDetectChanges(value, ref _schedule, Ps.Value.ContentScheduleSelector);
+                if (_schedule != null)
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Collection changed event handler to ensure the schedule field is set to dirty when the schedule changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(Ps.Value.ContentScheduleSelector);
         }
 
         /// <summary>
@@ -100,35 +131,12 @@ namespace Umbraco.Core.Models
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
-        public virtual ITemplate Template
+        public ITemplate Template
         {
             get => _template ?? _contentType.DefaultTemplate;
             set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
         }
 
-        /// <summary>
-        /// Gets the current status of the Content
-        /// </summary>
-        [IgnoreDataMember]
-        public ContentStatus Status
-        {
-            get
-            {
-                if(Trashed)
-                    return ContentStatus.Trashed;
-
-                if(ExpireDate.HasValue && ExpireDate.Value > DateTime.MinValue && DateTime.Now > ExpireDate.Value)
-                    return ContentStatus.Expired;
-
-                if(ReleaseDate.HasValue && ReleaseDate.Value > DateTime.MinValue && ReleaseDate.Value > DateTime.Now)
-                    return ContentStatus.AwaitingRelease;
-
-                if(Published)
-                    return ContentStatus.Published;
-
-                return ContentStatus.Unpublished;
-            }
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this content item is published or not.
@@ -170,26 +178,6 @@ namespace Umbraco.Core.Models
         public bool Edited { get; internal set; }
 
         /// <summary>
-        /// The date this Content should be released and thus be published
-        /// </summary>
-        [DataMember]
-        public DateTime? ReleaseDate
-        {
-            get => _releaseDate;
-            set => SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector);
-        }
-
-        /// <summary>
-        /// The date this Content should expire and thus be unpublished
-        /// </summary>
-        [DataMember]
-        public DateTime? ExpireDate
-        {
-            get => _expireDate;
-            set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
-        }
-
-        /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
@@ -229,7 +217,7 @@ namespace Umbraco.Core.Models
         public bool WasCulturePublished(string culture)
             // just check _publishInfosOrig - a copy of _publishInfos
             // a non-available culture could not become published anyways
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
 
         // adjust dates to sync between version, cultures etc
         // used by the repo when persisting
@@ -310,6 +298,9 @@ namespace Umbraco.Core.Models
             if (_publishInfos == null) return;
             _publishInfos.Remove(culture);
             if (_publishInfos.Count == 0) _publishInfos = null;
+
+            // set the culture to be dirty - it's been modified
+            TouchCultureInfo(culture);
         }
 
         // sets a publish edited
@@ -351,7 +342,7 @@ namespace Umbraco.Core.Models
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        public virtual bool PublishCulture(string culture = "*")
+        public bool PublishCulture(string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
@@ -404,7 +395,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void UnpublishCulture(string culture = "*")
+        public void UnpublishCulture(string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
@@ -467,6 +458,11 @@ namespace Umbraco.Core.Models
         {
             base.ResetDirtyProperties(rememberDirty);
 
+            if (Template != null)
+                Template.ResetDirtyProperties(rememberDirty);
+            if (ContentType != null)
+                ContentType.ResetDirtyProperties(rememberDirty);
+
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
 
@@ -499,28 +495,30 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Content) base.DeepClone();
+            base.PerformDeepClone(clone);
 
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedContent = (Content)clone;
 
             //need to manually clone this since it's not settable
-            clone._contentType = (IContentType) ContentType.DeepClone();
+            clonedContent._contentType = (IContentType) ContentType.DeepClone();
 
             //if culture infos exist then deal with event bindings
-            if (clone._publishInfos != null)
+            if (clonedContent._publishInfos != null)
             {
-                clone._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
-                clone._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
-                clone._publishInfos.CollectionChanged += clone.PublishNamesCollectionChanged;    //re-assign correct event handler
+                clonedContent._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
+                clonedContent._publishInfos = (ContentCultureInfosCollection) _publishInfos.DeepClone(); //manually deep clone
+                clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
             }
 
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            //if properties exist then deal with event bindings
+            if (clonedContent._schedule != null)
+            {
+                clonedContent._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
+                clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
+                clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
+            }
         }
     }
 }

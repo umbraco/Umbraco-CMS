@@ -203,7 +203,14 @@ namespace Umbraco.Tests.Persistence
             Assert.IsNotNull(e1);
             Assert.IsInstanceOf<SqlCeLockTimeoutException>(e1);
 
-            Assert.IsNull(e2);
+            // the assertion below depends on timing conditions - on a fast enough environment,
+            // thread1 dies (deadlock) and frees thread2, which succeeds - however on a slow
+            // environment (CI) both threads can end up dying due to deadlock - so, cannot test
+            // that e2 is null - but if it's not, can test that it's a timeout
+            //
+            //Assert.IsNull(e2);
+            if (e2 != null)
+                Assert.IsInstanceOf<SqlCeLockTimeoutException>(e2);
         }
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)

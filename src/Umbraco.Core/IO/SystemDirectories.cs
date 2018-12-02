@@ -8,24 +8,20 @@ namespace Umbraco.Core.IO
     {
         public static string Bin => "~/bin";
 
-        public static string Config => IOHelper.ReturnPath("umbracoConfigDirectory", "~/config");
+        public static string Config => "~/config";
 
-        public static string Css => IOHelper.ReturnPath("umbracoCssDirectory", "~/css");
+        public static string Data => "~/App_Data";
 
-        public static string Data => IOHelper.ReturnPath("umbracoStorageDirectory", "~/App_Data");
+        public static string Install => "~/install";
 
-        public static string Install => IOHelper.ReturnPath("umbracoInstallPath", "~/install");
+        //fixme: remove this
+        [Obsolete("Master pages are obsolete and code should be removed")]
+        public static string Masterpages => "~/masterpages";
 
-        //TODO: Consider removing this
-        public static string Masterpages => IOHelper.ReturnPath("umbracoMasterPagesPath", "~/masterpages");
-
-        //NOTE: this is not configurable and shouldn't need to be
         public static string AppCode => "~/App_Code";
 
-        //NOTE: this is not configurable and shouldn't need to be
         public static string AppPlugins => "~/App_Plugins";
 
-        //NOTE: this is not configurable and shouldn't need to be
         public static string MvcViews => "~/Views";
 
         public static string PartialViews => MvcViews + "/Partials/";
@@ -36,19 +32,20 @@ namespace Umbraco.Core.IO
 
         public static string Scripts => IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
 
+        public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
+
         public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
-        //TODO: Consider removing this
-        public static string UserControls => IOHelper.ReturnPath("umbracoUsercontrolsPath", "~/usercontrols");
+        //fixme: remove this
+        [Obsolete("Usercontrols are obsolete and code should be removed")]
+        public static string UserControls => "~/usercontrols";
 
+        [Obsolete("Only used by legacy load balancing which is obsolete and should be removed")]
         public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
 
-        //by default the packages folder should exist in the data folder
-        public static string Packages => IOHelper.ReturnPath("umbracoPackagesPath", Data + IOHelper.DirSepChar + "packages");
+        public static string Packages => Data + IOHelper.DirSepChar + "packages";
 
-        public static string Preview => IOHelper.ReturnPath("umbracoPreviewPath", Data + IOHelper.DirSepChar + "preview");
-
-        public static string JavaScriptLibrary => IOHelper.ReturnPath("umbracoJavaScriptLibraryPath", Umbraco + IOHelper.DirSepChar + "lib");
+        public static string Preview => Data + IOHelper.DirSepChar + "preview";
 
         private static string _root;
 

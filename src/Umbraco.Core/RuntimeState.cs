@@ -55,7 +55,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the version comment of the executing code.
         /// </summary>
-        public string VersionComment => UmbracoVersion.CurrentComment;
+        public string VersionComment => UmbracoVersion.Comment;
 
         /// <summary>
         /// Gets the semantic version of the executing code.

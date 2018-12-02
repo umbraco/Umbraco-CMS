@@ -4,13 +4,13 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
+
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Users)]
-    [Tree(Constants.Applications.Users, Constants.Trees.Users, null, sortOrder: 0)]
+    [Tree(Constants.Applications.Users, Constants.Trees.Users, null, sortOrder: 0, isSingleNodeTree: true)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class UserTreeController : TreeController

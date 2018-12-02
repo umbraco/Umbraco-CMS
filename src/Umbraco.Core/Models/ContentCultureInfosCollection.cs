@@ -24,8 +24,12 @@ namespace Umbraco.Core.Models
         public ContentCultureInfosCollection(IEnumerable<ContentCultureInfos> items)
             : base(x => x.Culture, StringComparer.InvariantCultureIgnoreCase)
         {
+            // make sure to add *copies* and not the original items,
+            // as items can be modified by AddOrUpdate, and therefore
+            // the new collection would be impacted by changes made
+            // to the old collection
             foreach (var item in items)
-                Add(item);
+                Add(new ContentCultureInfos(item));
         }
         
         /// <summary>

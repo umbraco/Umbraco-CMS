@@ -8,6 +8,29 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
         /// <summary>
+        /// Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
+        /// </summary>
+        void ClearSchedule(DateTime date);
+
+        /// <summary>
+        /// Gets <see cref="IContent"/> objects having an expiration date before (lower than, or equal to) a specified date.
+        /// </summary>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForExpiration(DateTime date);
+
+        /// <summary>
+        /// Gets <see cref="IContent"/> objects having a release date before (lower than, or equal to) a specified date.
+        /// </summary>
+        /// <remarks>
+        /// The content returned from this method may be culture variant, in which case the resulting <see cref="IContent.ContentSchedule"/> should be queried
+        /// for which culture(s) have been scheduled.
+        /// </remarks>
+        IEnumerable<IContent> GetContentForRelease(DateTime date);
+
+        /// <summary>
         /// Get the count of published items
         /// </summary>
         /// <returns></returns>

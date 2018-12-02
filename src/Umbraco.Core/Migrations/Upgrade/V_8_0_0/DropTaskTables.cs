@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
+
     public class DropTaskTables : MigrationBase
     {
         public DropTaskTables(IMigrationContext context)
@@ -8,8 +9,10 @@
 
         public override void Migrate()
         {
-            Delete.Table("cmsTaskType");
-            Delete.Table("cmsTask");
+            if (TableExists("cmsTaskType"))
+                Delete.Table("cmsTaskType");
+            if (TableExists("cmsTask"))
+                Delete.Table("cmsTask");
         }
     }
 }

@@ -11,58 +11,19 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Custom value editor to handle posted json data and to return json data for the multiple selected items as well as ensuring
-    /// that the multiple selected int IDs are published to cache as a delimited string (values)
+    /// Custom value editor to handle posted json data and to return json data for the multiple selected items
     /// </summary>
     /// <remarks>
     /// This is re-used by editors such as the multiple drop down list or check box list
     /// </remarks>
-    internal class PublishValuesMultipleValueEditor : PublishValueValueEditor
+    internal class PublishValuesMultipleValueEditor : DataValueEditor
     {
-        private readonly bool _publishIds;
+        private readonly ILogger _logger;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, ILogger logger, DataEditorAttribute attribute)
-            : base(attribute, logger)
+        internal PublishValuesMultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
+            : base(attribute)
         {
-            _publishIds = publishIds;
-        }
-
-        public PublishValuesMultipleValueEditor(bool publishIds, DataEditorAttribute attribute)
-            : this(publishIds, Current.Logger, attribute)
-        { }
-
-        /// <summary>
-        /// If publishing ids, we don't need to do anything, otherwise we need to look up the pre-values and get the string values
-        /// </summary>
-        /// <param name="propertyType"></param>
-        /// <param name="propertyValue"></param>
-        /// <param name="dataTypeService"></param>
-        /// <returns></returns>
-        public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
-        {
-            if (propertyValue == null)
-                return null;
-
-            //publishing ids, so just need to return the value as-is
-            if (_publishIds)
-            {
-                return propertyValue.ToString();
-            }
-
-            // get the multiple ids
-            // if none, fallback to base
-            var selectedIds = propertyValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            if (selectedIds.Any() == false)
-                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
-
-            // get the configuration items
-            // if none, fallback to base
-            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
-            if (configuration == null)
-                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
-
-            var items = configuration.Items.Where(x => selectedIds.Contains(x.Id.ToInvariantString())).Select(x => x.Value);
-            return string.Join(",", items);
+            _logger = logger;
         }
 
         /// <summary>
@@ -81,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
 
         /// <summary>
         /// When multiple values are selected a json array will be posted back so we need to format for storage in
-        /// the database which is a comma separated ID value
+        /// the database which is a comma separated string value
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>

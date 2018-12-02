@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AssignDomainController($scope, localizationService, languageResource, contentResource) {
+    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService) {
         var vm = this;
         
         vm.closeDialog = closeDialog;
@@ -73,7 +73,7 @@
         }
 
         function closeDialog() {
-            $scope.nav.hideDialog();
+            navigationService.hideDialog();
         }
 
         function addDomain() {
