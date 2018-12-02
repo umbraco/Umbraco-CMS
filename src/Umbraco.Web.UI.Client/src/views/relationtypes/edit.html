@@ -20,45 +20,45 @@
                         </umb-control-group>
 
                         <!-- Direction -->
-                        <umb-control-group label="Direction">
+                        <umb-control-group label="@relationType_direction">
                             <ul class="unstyled">
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false"> Parent to child
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false"> <localize key="relationType_parentToChild">Parent to child</localize>
                                     </label>
                                 </li>
                                 <li>
                                     <label class="radio">
-                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true"> Bidirectional
+                                        <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true"> <localize key="relationType_bidirectional">Bidirectional</localize>
                                     </label>
                                 </li>
                             </ul>
                         </umb-control-group>
 
                         <!-- Parent-->
-                        <umb-control-group label="Parent">
+                        <umb-control-group label="@relationType_parent">
                             <div>{{vm.relationType.parentObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Child -->
-                        <umb-control-group label="Child">
+                        <umb-control-group label="@relationType_child">
                             <div>{{vm.relationType.childObjectTypeName}}</div>
                         </umb-control-group>
 
                         <!-- Relation count -->
-                        <umb-control-group label="Count" ng-if="vm.relationType.relations.length > 0">
+                        <umb-control-group label="@relationType_count" ng-if="vm.relationType.relations.length > 0">
                             <div>{{vm.relationType.relations.length}}</div>
                         </umb-control-group>
 
                         <!-- Relations -->
-                        <umb-control-group label="Relations" ng-if="vm.relationType.relations.length > 0">
+                        <umb-control-group label="@relationType_relations" ng-if="vm.relationType.relations.length > 0">
                             <div>
                                 <table class="table">
                                     <thead>
-                                        <th>Parent</th>
-                                        <th>Child</th>
-                                        <th>Created</th>
-                                        <th>Comment</th>
+                                        <th><localize key="relationType_parent">Parent</localize></th>
+                                        <th><localize key="relationType_child">Child</localize></th>
+                                        <th><localize key="relationType_created">Created</localize></th>
+                                        <th><localize key="relationType_comment">Comment</localize></th>
                                     </thead>
                                     <tr ng-repeat="relation in vm.relationType.relations">
                                         <td>{{relation.parentName}}</td>
