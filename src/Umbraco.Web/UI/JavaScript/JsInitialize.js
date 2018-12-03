@@ -23,7 +23,6 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
-    'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',
