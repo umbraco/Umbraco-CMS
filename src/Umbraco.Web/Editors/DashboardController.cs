@@ -38,10 +38,6 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
-            var context = UmbracoContext.Current;
-            if (context == null)
-                throw new HttpResponseException(HttpStatusCode.InternalServerError);
-
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
