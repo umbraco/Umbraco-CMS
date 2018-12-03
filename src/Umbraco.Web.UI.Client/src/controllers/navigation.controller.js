@@ -241,6 +241,15 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         init();
     }));
 
+    // event for infinite editors
+    evts.push(eventsService.on("appState.editors.open", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
+    }));
+
+    evts.push(eventsService.on("appState.editors.close", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
+    }));
+
     /**
      * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down
      */
