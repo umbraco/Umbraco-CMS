@@ -208,6 +208,8 @@ namespace Umbraco.Web.Runtime
                 .Append<ListViewContentAppDefinition>()
                 .Append<ContentEditorContentAppDefinition>()
                 .Append<ContentInfoContentAppDefinition>();
+
+            composition.Container.RegisterSingleton<DashboardHelper>();
         }
 
         internal void Initialize(

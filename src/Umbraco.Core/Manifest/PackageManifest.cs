@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.PropertyEditors;
 
@@ -32,6 +33,9 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// The dictionary of dashboards
         /// </summary>
-        public IDictionary<string, JObject> Dashboards { get; set; }
+        [JsonProperty("dashboards")]
+        public IReadOnlyDictionary<string, ManifestDashboardSection> Dashboards { get; set; } = new Dictionary<string, ManifestDashboardSection>();
+
+       
     }
 }
