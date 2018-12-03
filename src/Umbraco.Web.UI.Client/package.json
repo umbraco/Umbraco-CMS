@@ -11,7 +11,7 @@
     "cssnano": "^3.7.6",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-connect": "5.0.0",
+    "gulp-connect": "5.6.1",
     "gulp-eslint": "^5.0.0",
     "gulp-imagemin": "^4.1.0",
     "gulp-less": "^3.5.0",
