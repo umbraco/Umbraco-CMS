@@ -283,24 +283,14 @@ gulp.task('dependencies', function () {
             "base": "./node_modules/jquery/dist"
         },
         {
-            "name": "jquery-migrate",
-            "src":  ["./node_modules/jquery-migrate/dist/jquery-migrate.min.js"],
-            "base": "./node_modules/jquery-migrate/dist"
-        },
-        {
             "name": "jquery-ui",
             "src":  ["./node_modules/jquery-ui-dist/jquery-ui.min.js"],
             "base": "./node_modules/jquery-ui-dist"
         },
         {
-            "name": "jquery-validate",
-            "src":  ["./node_modules/jquery-validation/dist/jquery.validate.min.js"],
-            "base": "./node_modules/jquery-validation/dist"
-        },
-        {
-            "name": "jquery-validation-unobtrusive",
-            "src":  ["./node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"],
-            "base": "./node_modules/jquery-validation-unobtrusive/dist"
+            "name": "jquery-ui-touch-punch",
+            "src":  ["./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"],
+            "base": "./node_modules/jquery-ui-touch-punch"
         },
         {
             "name": "lazyload-js",
