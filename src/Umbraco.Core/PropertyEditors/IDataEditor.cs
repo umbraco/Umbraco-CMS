@@ -67,6 +67,6 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         IConfigurationEditor GetConfigurationEditor();
 
-        IValueIndexer ValueIndexer { get; }
+        IPropertyIndexValues PropertyIndexValues { get; }
     }
 }

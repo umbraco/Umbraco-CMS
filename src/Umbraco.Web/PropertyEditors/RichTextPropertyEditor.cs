@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
-        public override IValueIndexer ValueIndexer => new RichTextValueIndexer();
+        public override IPropertyIndexValues PropertyIndexValues => new RichTextPropertyIndexValues();
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal class RichTextValueIndexer : IValueIndexer
+        internal class RichTextPropertyIndexValues : IPropertyIndexValues
         {
             public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
             {
@@ -102,9 +102,9 @@ namespace Umbraco.Web.PropertyEditors
                 if (!(val is string strVal)) yield break;
 
                 //index the stripped html values
-                yield return new KeyValuePair<string, object[]>(property.Alias, new[] { strVal.StripHtml() });
+                yield return new KeyValuePair<string, object[]>(property.Alias, new object[] { strVal.StripHtml() });
                 //store the raw value
-                yield return new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new[] { strVal });
+                yield return new KeyValuePair<string, object[]>($"{UmbracoExamineIndexer.RawFieldPrefix}{property.Alias}", new object[] { strVal });
             }
         }
     }

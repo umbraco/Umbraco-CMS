@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Returns a single field to index containing the property value
     /// </summary>
-    public class DefaultValueIndexer : IValueIndexer
+    public class DefaultPropertyIndexValues : IPropertyIndexValues
     {
         public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
         {

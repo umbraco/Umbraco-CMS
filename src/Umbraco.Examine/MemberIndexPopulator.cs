@@ -26,8 +26,6 @@ namespace Umbraco.Examine
 
             IMember[] members;
 
-            //TODO: Add validators for member indexers for ConfigIndexCriteria.IncludeItemTypes
-
             //no node types specified, do all members
             do
             {

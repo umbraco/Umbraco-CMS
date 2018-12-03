@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Parses the grid value into indexable values
     /// </summary>
-    public class GridValueIndexer : IValueIndexer
+    public class GridPropertyIndexValues : IPropertyIndexValues
     {
         public IEnumerable<KeyValuePair<string, object[]>> GetIndexValues(Property property, string culture, string segment)
         {

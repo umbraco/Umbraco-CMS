@@ -69,9 +69,7 @@
     <Compile Include="IIndexPopulator.cs" />
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
-    <Compile Include="IUmbracoContentIndexer.cs" />
     <Compile Include="IUmbracoIndexer.cs" />
-    <Compile Include="IUmbracoMediaIndexer.cs" />
     <Compile Include="IValueSetBuilder.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
