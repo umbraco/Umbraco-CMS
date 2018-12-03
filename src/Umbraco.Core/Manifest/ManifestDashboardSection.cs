@@ -3,18 +3,31 @@ using Newtonsoft.Json;
 
 namespace Umbraco.Core.Manifest
 {
-    public class ManifestDashboardSection
+    public class ManifestDashboard
     {
-        public ManifestDashboardSection()
+        public ManifestDashboard()
         {
-            Areas = new List<string>();
-            Tabs = new Dictionary<string, ManifestDashboardTab>();
+            Name = string.Empty;
+            Alias = string.Empty;
+            Weight = int.MaxValue; //default so we can check if this value has been explicitly set
+            View = string.Empty;
+            Sections = new List<string>();
         }
 
-        [JsonProperty("areas")]
-        public List<string> Areas { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
-        [JsonProperty("tabs")]
-        public IDictionary<string, ManifestDashboardTab> Tabs { get; set; }
+        [JsonProperty("aias")]
+        public string Alias { get; set; }
+
+        [JsonProperty("weight")]
+        public int Weight { get; set; }
+
+        [JsonProperty("view")]
+        public string View { get; set; }
+
+        [JsonProperty("sections")]
+        public List<string> Sections { get; set; }
+        
     }
 }

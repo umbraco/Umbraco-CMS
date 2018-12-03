@@ -145,35 +145,30 @@ namespace Umbraco.Web.Editors
             var tabs = new List<Tab<DashboardControl>>();
             var i = startTabId;
 
-            foreach (var sectionDashboard in _manifestParser.Manifest.Dashboards.Where(x => x.Value.Areas.InvariantContains(section)))
+            foreach (var dashboard in _manifestParser.Manifest.Dashboards.Where(x => x.Sections.InvariantContains(section)))
             {
-                foreach (var tab in sectionDashboard.Value.Tabs)
+                var dashboardControls = new List<DashboardControl>();
+                var view = dashboard.View.Trim();
+                var dashboardControl = new DashboardControl
                 {
-                    var dashboardControls = new List<DashboardControl>();
+                    Path = IOHelper.FindFile(view)
+                };
 
-                    foreach (var control in tab.Value.Controls)
-                    {
-                        var dashboardControl = new DashboardControl();
-                        var controlPath = control.Path.Trim();
-                        dashboardControl.Caption = control.Caption;
-                        dashboardControl.Path = IOHelper.FindFile(controlPath);
-                        if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
-                            throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported");
+                if (view.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
+                    throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported");
 
-                        dashboardControls.Add(dashboardControl);
-                    }
+                dashboardControls.Add(dashboardControl);
 
-                    tabs.Add(new Tab<DashboardControl>
-                    {
-                        //assign the Id to the value of the index if one was defined, then we'll use the Id to sort later
-                        Id = tab.Value.Index == int.MaxValue ? i : tab.Value.Index,
-                        Alias = tab.Key.ToSafeAlias(),
-                        Label = tab.Key,
-                        Properties = dashboardControls
-                    });
+                tabs.Add(new Tab<DashboardControl>
+                {
+                    //assign the Id to the value of the index if one was defined, then we'll use the Id to sort later
+                    Id = dashboard.Weight == int.MaxValue ? i : dashboard.Weight,
+                    Alias = dashboard.Alias.ToSafeAlias(),
+                    Label = dashboard.Name,
+                    Properties = dashboardControls
+                });
 
-                    i++;
-                }
+                i++;
             }
             return tabs;
         }

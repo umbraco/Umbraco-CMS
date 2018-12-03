@@ -100,7 +100,7 @@ namespace Umbraco.Core.Manifest
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
             var contentApps = new List<IContentAppDefinition>();
-            var dashboards = new Dictionary<string, ManifestDashboardSection>();
+            var dashboards = new List<ManifestDashboard>();
 
             foreach (var manifest in manifests)
             {
@@ -110,35 +110,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
-                if (manifest.Dashboards != null)
-                {
-                    foreach (var item in manifest.Dashboards)
-                    {
-                        if (dashboards.TryGetValue(item.Key, out var existing))
-                        {
-                            foreach (var area in item.Value.Areas)
-                                if (existing.Areas.Contains(area, StringComparer.InvariantCultureIgnoreCase) == false)
-                                    existing.Areas.Add(area);
-
-                            //merge
-                            foreach (var tab in item.Value.Tabs)
-                            {
-                                if (existing.Tabs.TryGetValue(tab.Key, out var existingTab))
-                                {
-                                    //merge
-                                    foreach (var control in tab.Value.Controls)
-                                    {
-                                        existingTab.Controls.Add(control);
-                                    }
-                                }
-                                else
-                                    existing.Tabs[tab.Key] = tab.Value;
-                            }
-                        }
-                        else
-                            dashboards[item.Key] = item.Value;
-                    }
-                }
+                if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);               
             }
 
             return new PackageManifest
@@ -149,7 +121,7 @@ namespace Umbraco.Core.Manifest
                 ParameterEditors = parameterEditors.ToArray(),
                 GridEditors = gridEditors.ToArray(),
                 ContentApps = contentApps.ToArray(),
-                Dashboards = dashboards
+                Dashboards = dashboards.ToArray()
             };
         }
 

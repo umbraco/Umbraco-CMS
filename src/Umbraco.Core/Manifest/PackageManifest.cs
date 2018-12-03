@@ -34,7 +34,7 @@ namespace Umbraco.Core.Manifest
         /// The dictionary of dashboards
         /// </summary>
         [JsonProperty("dashboards")]
-        public IReadOnlyDictionary<string, ManifestDashboardSection> Dashboards { get; set; } = new Dictionary<string, ManifestDashboardSection>();
+        public ManifestDashboard[] Dashboards { get; set; } = Array.Empty<ManifestDashboard>();
 
        
     }
