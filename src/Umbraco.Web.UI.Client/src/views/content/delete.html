@@ -1,7 +1,7 @@
-<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.Content.DeleteController">
-    <div class="umb-dialog-body" auto-scale="90">
+<div class="umb-dialog" ng-controller="Umbraco.Editors.Content.DeleteController">
+    <div class="umb-dialog-body umb-pane">
 
-        <p class="umb-abstract">
+        <p class="abstract">
             <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong> ?
         </p>
 
@@ -9,7 +9,23 @@
             <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
         </div>
 
-        <umb-confirm on-confirm="performDelete" on-cancel="cancel"></umb-confirm>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+        <umb-button
+            type="button"
+            button-style="link"
+            label-key="general_cancel"
+            action="cancel()">
+        </umb-button>
+
+        <umb-button
+            type="button"
+            button-style="success"
+            label-key="actions_delete"
+            action="performDelete()">
+        </umb-button>
 
     </div>
 </div>

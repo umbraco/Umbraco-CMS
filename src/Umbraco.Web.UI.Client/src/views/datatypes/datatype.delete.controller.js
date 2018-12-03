@@ -7,6 +7,9 @@
  * The controller for deleting content
  */
 function DataTypeDeleteController($scope, dataTypeResource, treeService, navigationService) {
+    $scope.vm = {
+        confirmed: false
+    };
 
     $scope.performDelete = function() {
 
