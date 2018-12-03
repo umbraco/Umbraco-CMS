@@ -151,13 +151,6 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
-      <DependentUpon>UserControlProxy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.designer.cs">
-      <DependentUpon>UserControlProxy.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -236,7 +229,6 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
-    <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <None Include="Config\404handlers.Release.config">

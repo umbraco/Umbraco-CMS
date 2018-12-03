@@ -3,7 +3,7 @@
   <section alias="StartupSettingsDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Welcome"  xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing">
-      <control showOnce="true" addPanel="true" panelCaption="" xdt:Transform="InsertIfMissing">
+      <control panelCaption="" xdt:Transform="InsertIfMissing">
         views/dashboard/settings/settingsdashboardintro.html
       </control>
     </tab>
@@ -14,7 +14,7 @@
       <area>forms</area>
     </areas>
     <tab caption="Install Umbraco Forms">
-      <control showOnce="true" addPanel="true" panelCaption="">
+      <control panelCaption="">
         views/dashboard/forms/formsdashboardintro.html
       </control>
     </tab>
@@ -28,7 +28,7 @@
   
   <section alias="StartupDeveloperDashboardSection">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Replace">
-      <control showOnce="true" addPanel="true" panelCaption="">
+      <control panelCaption="">
         views/dashboard/developer/developerdashboardvideos.html
       </control>
     </tab>
@@ -47,7 +47,7 @@
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Content"  xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing" />
     <tab caption="Content"  xdt:Locator="Match(caption)" xdt:Transform="Replace">
-      <control showOnce="false" addPanel="false" panelCaption="">
+      <control panelCaption="">
         views/dashboard/media/mediafolderbrowser.html
       </control>
     </tab>
@@ -56,7 +56,7 @@
   <section alias="StartupMemberDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Get Started" xdt:Transform="Insert">
-      <control showOnce="true" addPanel="true" panelCaption="">
+      <control panelCaption="">
         views/dashboard/members/membersdashboardvideos.html
       </control>
     </tab>

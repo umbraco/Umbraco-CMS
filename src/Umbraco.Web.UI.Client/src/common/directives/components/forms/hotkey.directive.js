@@ -43,15 +43,15 @@ angular.module("umbraco.directives")
 
                                 // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
                                 if (keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
-                                    document.activeElement.click();
+                                    document.activeElement.trigger( "click" );
                                 } else {
-                                    element.click();
+                                    element.trigger("click");
                                 }
 
                             }
 
                         } else {
-                            element.focus();
+                            element.trigger("focus");
                         }
 
                     }, options);

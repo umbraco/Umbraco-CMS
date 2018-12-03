@@ -13,7 +13,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
-    $scope.editors = [];
+    $scope.infiniteMode = false;
     $scope.overlay = {};
     $scope.drawer = {};
     $scope.search = {};
@@ -160,12 +160,12 @@ function MainController($scope, $location, appState, treeService, notificationsS
     }));
 
     // event for infinite editors
-    evts.push(eventsService.on("appState.editors.add", function (name, args) {
-        $scope.editors = args.editors;
+    evts.push(eventsService.on("appState.editors.open", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
     }));
 
-    evts.push(eventsService.on("appState.editors.remove", function (name, args) {
-        $scope.editors = args.editors;
+    evts.push(eventsService.on("appState.editors.close", function (name, args) {
+        $scope.infiniteMode = args && args.editors.length > 0 ? true : false;
     }));
 
     //ensure to unregister from all events!
