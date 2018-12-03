@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService, $timeout) {
+function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
 
     $scope.performDelete = function() {
 
